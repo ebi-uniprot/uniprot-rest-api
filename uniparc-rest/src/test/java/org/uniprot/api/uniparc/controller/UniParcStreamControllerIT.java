@@ -14,7 +14,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -52,7 +51,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFService;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -126,10 +125,10 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
 
         // then
         mockMvc.perform(asyncDispatch(response))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFService.UNIPARC_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RDFPrologs.UNIPARC_RDF_PROLOG)))
                 .andExpect(
                         content()
                                 .string(
@@ -296,12 +295,11 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                                 containsInAnyOrder("UPI0000283A06", "UPI0000283A05")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniParcCrossReferences.*.properties[?(@.key=='gene_name')].value",
-                                containsInAnyOrder(
-                                        "geneName05", "geneName06", "geneName05", "geneName06")))
+                                "$.results.*.uniParcCrossReferences.*.geneName",
+                                containsInAnyOrder("geneName05", "geneName06")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.taxonomies.*.taxonId",
+                                "$.results.*.uniParcCrossReferences.*.taxonomy.taxonId",
                                 containsInAnyOrder(9606, 7787, 9606, 7787)))
                 .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
                 .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());

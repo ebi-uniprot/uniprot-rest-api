@@ -69,7 +69,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
 
     @Override
     protected String getStreamPath() {
-        return "/proteome/stream";
+        return "/proteomes/stream";
     }
 
     @Override
@@ -264,7 +264,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
                 .andExpect(xpath("//ErrorInfo").exists())
-                .andExpect(xpath("//ErrorInfo/url").string("http://localhost/proteome/stream"))
+                .andExpect(xpath("//ErrorInfo/url").string("http://localhost/proteomes/stream"))
                 .andExpect(
                         xpath("//ErrorInfo/messages[1]/messages")
                                 .string("'query' is a required parameter"));

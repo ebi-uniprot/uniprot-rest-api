@@ -20,13 +20,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.support.data.DataStoreTestConfig;
-import org.uniprot.api.support.data.SupportDataApplication;
+import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.service.CrossRefService;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataApplication.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @WebMvcTest(CrossRefController.class)
 class CrossRefControllerTest {
     @Autowired private MockMvc mockMvc;
@@ -40,11 +40,11 @@ class CrossRefControllerTest {
 
         ResultActions response =
                 this.mockMvc.perform(
-                        MockMvcRequestBuilders.get("/xref/" + accession)
+                        MockMvcRequestBuilders.get("/database/" + accession)
                                 .param("accessionId", accession)
                                 .header(HttpHeaders.ACCEPT, APPLICATION_JSON_VALUE));
 
-        response.andDo(MockMvcResultHandlers.print())
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(jsonPath("$.id", equalTo(crossRef.getId())))
                 .andExpect(jsonPath("$.abbrev", equalTo(crossRef.getAbbrev())))
                 .andExpect(jsonPath("$.name", equalTo(crossRef.getName())))

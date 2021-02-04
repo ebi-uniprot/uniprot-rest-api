@@ -28,13 +28,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/keyword/{{keyword_id}}",
+							"raw": "{{base_url}}/{{path_context}}/keywords/{{keyword_id}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
-								"keyword",
+								"keywords",
 								"{{keyword_id}}"
 							]
 						}
@@ -67,13 +67,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/keyword/search?query={{keyword_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/keywords/search?query={{keyword_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
-								"keyword",
+								"keywords",
 								"search"
 							],
 							"query": [
@@ -90,7 +90,7 @@
 			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "download",
+			"name": "stream",
 			"item": [
 				{
 					"name": "Download keyword",
@@ -112,14 +112,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/{{path_context}}/keyword/download?query={{keyword_search_string}}",
+							"raw": "{{base_url}}/{{path_context}}/keywords/stream?query={{keyword_search_string}}",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"{{path_context}}",
-								"keyword",
-								"download"
+								"keywords",
+								"stream"
 							],
 							"query": [
 								{

@@ -3,8 +3,8 @@ package org.uniprot.api.support.data.configure.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
-import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
+import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.store.config.UniProtDataType;
 
 /**

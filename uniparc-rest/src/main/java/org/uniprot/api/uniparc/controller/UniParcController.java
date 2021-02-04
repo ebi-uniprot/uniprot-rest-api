@@ -1,8 +1,8 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.springframework.http.MediaType.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
@@ -11,6 +11,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,14 +23,25 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniparc.request.*;
+import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
+import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.request.UniParcSearchRequest;
+import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
+import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -57,7 +69,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
 
     private final UniParcQueryService queryService;
     private static final int PREVIEW_SIZE = 10;
-    private final MessageConverterContextFactory<UniParcEntry> converterContextFactory;
 
     @Autowired
     public UniParcController(
@@ -67,7 +78,6 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC);
         this.queryService = queryService;
-        this.converterContextFactory = converterContextFactory;
     }
 
     @GetMapping(
@@ -198,20 +208,13 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        MessageConverterContext<UniParcEntry> context =
-                converterContextFactory.get(UNIPARC, contentType);
-        context.setFileType(FileType.bestFileTypeMatch(encoding));
-        context.setFields(streamRequest.getFields());
-        context.setDownloadContentDispositionHeader(streamRequest.isDownload());
-        if (contentType.equals(LIST_MEDIA_TYPE)) {
-            context.setEntityIds(queryService.streamIds(streamRequest));
-        } else if (contentType.equals(RDF_MEDIA_TYPE)) {
-            context.setEntityIds(queryService.streamRDF(streamRequest));
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            Stream<String> result = queryService.streamRDF(streamRequest);
+            return super.streamRDF(result, streamRequest, contentType, request);
         } else {
-            context.setEntities(queryService.stream(streamRequest));
+            Stream<UniParcEntry> result = queryService.stream(streamRequest);
+            return super.stream(result, streamRequest, contentType, request);
         }
-
-        return super.getDeferredResultResponseEntity(request, context);
     }
 
     @GetMapping(

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
-import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
+import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.uniparc.UniParcConfigUtil;

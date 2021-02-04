@@ -3,7 +3,7 @@ package org.uniprot.api.support.data.configure.service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.support.data.configure.domain.SolrJsonQuery;
+import org.uniprot.api.support.data.configure.response.SolrJsonQuery;
 
 /** @author lgonzales */
 class UtilServiceTest {

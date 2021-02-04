@@ -56,7 +56,7 @@ public class GetByAccessionsRequest implements SearchRequest {
     private String cursor;
 
     @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
-    @Positive(message = "{search.positive}")
+    @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 

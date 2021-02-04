@@ -51,7 +51,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFService;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
@@ -123,7 +123,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFService.UNIREF_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RDFPrologs.UNIREF_RDF_PROLOG)))
                 .andExpect(
                         content()
                                 .string(

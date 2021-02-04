@@ -2,9 +2,7 @@ package org.uniprot.api.support.data.disease;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,54 +14,13 @@ import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
-import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Slf4j
 public class DiseaseSolrDocumentHelper {
-    public static void createDiseaseDocuments(DataStoreManager storeManager, int documentCount) {
-        Set<String> accessionBag = new HashSet<>();
-        int batchSize = 100;
-        if (documentCount <= batchSize) {
-            batchSize = documentCount;
-        }
-        // create solr docs in batches
-        for (int i = 0, j = 1; i < documentCount; i += batchSize, j++) {
-            List<DiseaseDocument> diseaseDocuments = new ArrayList<>();
-            IntStream.rangeClosed(1, batchSize)
-                    .forEach(
-                            index -> {
-                                String accession = getNextUniqueAccession(accessionBag);
-                                DiseaseDocument diseaseDocument =
-                                        createDiseaseDocument(accession, index);
-                                diseaseDocuments.add(diseaseDocument);
-                            });
-            log.info("Creating docs of batch {} with size {}", j, diseaseDocuments.size());
-            storeManager.saveDocs(DataStoreManager.StoreType.DISEASE, diseaseDocuments);
-            log.info("Total Docs Created: {}", accessionBag.size());
-        }
-    }
-
-    public static void createDiseaseDocuments(
-            DataStoreManager storeManager, String accession, long suffix) {
-        DiseaseDocument diseaseDoc = createDiseaseDocument(accession, suffix);
-        storeManager.saveDocs(DataStoreManager.StoreType.DISEASE, diseaseDoc);
-    }
-
-    private static String getNextUniqueAccession(Set<String> accessionBag) {
-        String accPrefix = "DI-";
-        long num = ThreadLocalRandom.current().nextLong(10000, 99999);
-        String accession = accPrefix + num;
-        if (accessionBag.contains(accession)) {
-            return getNextUniqueAccession(accessionBag);
-        }
-        accessionBag.add(accession);
-        return accession;
-    }
-
-    private static DiseaseDocument createDiseaseDocument(String accession, long suffix) {
+    public static DiseaseDocument constructSolrDocument(String accession, long suffix) {
         DiseaseEntryBuilder diseaseBuilder = new DiseaseEntryBuilder();
         KeywordId keyword =
                 new KeywordIdBuilder()
@@ -78,16 +35,19 @@ public class DiseaseSolrDocumentHelper {
                         .build();
         DiseaseCrossReference xref2 =
                 new DiseaseCrossReferenceBuilder()
-                        .databaseType("MedGen")
+                        .databaseType("MedGen" + suffix)
                         .id("CN238690" + suffix)
                         .build();
         DiseaseCrossReference xref3 =
                 new DiseaseCrossReferenceBuilder()
-                        .databaseType("MeSH")
+                        .databaseType("MeSH" + suffix)
                         .id("D000015" + suffix)
                         .build();
         DiseaseCrossReference xref4 =
-                new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D008607").build();
+                new DiseaseCrossReferenceBuilder()
+                        .databaseType("MeSH" + suffix)
+                        .id("D008607" + suffix)
+                        .build();
         DiseaseEntry diseaseEntry =
                 diseaseBuilder
                         .name("ZTTK syndrome" + suffix)
@@ -125,14 +85,10 @@ public class DiseaseSolrDocumentHelper {
                                         kwIds.stream()),
                                 diseaseEntry.getAlternativeNames().stream())
                         .collect(Collectors.toList());
-        // content is name + accession
-        List<String> content = new ArrayList<>(name);
-        content.add(diseaseEntry.getId());
         DiseaseDocument document =
                 DiseaseDocument.builder()
                         .id(accession)
                         .name(name)
-                        .content(content)
                         .diseaseObj(getDiseaseBinary(diseaseEntry))
                         .build();
 

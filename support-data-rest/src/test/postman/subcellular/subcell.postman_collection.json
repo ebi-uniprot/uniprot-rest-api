@@ -1,0 +1,173 @@
+{
+	"info": {
+		"_postman_id": "e80924bd-ee64-417f-8455-7667b9cbb61f",
+		"name": "subcellularlocation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "id",
+			"item": [
+				{
+					"name": "Get by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "6117b8e1-c833-4b0e-9b91-7532c6e31590",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/locations/{{subcellularlocation_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"locations",
+								"{{subcellularlocation_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "search",
+			"item": [
+				{
+					"name": "Search",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cdf88bdc-74db-4cae-9e11-e8cfdd9b3f1d",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/locations/search?query={{subcellularlocation_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"locations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{subcellularlocation_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "stream",
+			"item": [
+				{
+					"name": "Download",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "cd6e9628-e257-42a1-a01a-27b5969459a8",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/{{path_context}}/locations/stream?query={{subcellularlocation_search_string}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"{{path_context}}",
+								"locations",
+								"stream"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "{{subcellularlocation_search_string}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "181cecbc-1f65-40f6-8dcd-a33e2a662461",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "66381f8c-4693-42e7-8dae-8a9552d9499d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "f29040f5-0c99-456d-a4d6-125642d8f945",
+			"key": "subcellularlocation_id",
+			"value": "SL-0476"
+		},
+		{
+			"id": "5f862cca-65f8-4033-a8d3-4da6b7364045",
+			"key": "subcellularlocation_search_string",
+			"value": "topology"
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -1,13 +1,10 @@
 package org.uniprot.api.uniparc.service.filter;
 
-import static org.uniprot.core.uniparc.UniParcCrossReference.*;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import org.uniprot.core.Property;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
@@ -27,19 +24,15 @@ public class UniParcCrossReferenceTaxonomyFilter
         if (Utils.notNullNotEmpty(xrefs) && Utils.notNullNotEmpty(taxonomyIds)) {
             List<UniParcCrossReference> filteredRefs =
                     xrefs.stream()
-                            .filter(xref -> Objects.nonNull(xref.getProperties()))
-                            .filter(xref -> taxonomyIds.contains(getTaxIdFromXRef(xref)))
+                            .filter(xref -> Objects.nonNull(xref.getTaxonomy()))
+                            .filter(
+                                    xref ->
+                                            taxonomyIds.contains(
+                                                    String.valueOf(
+                                                            xref.getTaxonomy().getTaxonId())))
                             .collect(Collectors.toList());
             builder.uniParcCrossReferencesSet(filteredRefs);
         }
         return builder.build();
-    }
-
-    private String getTaxIdFromXRef(UniParcCrossReference xref) {
-        return xref.getProperties().stream()
-                .filter(property -> property.getKey().equalsIgnoreCase(PROPERTY_NCBI_TAXONOMY_ID))
-                .map(Property::getValue)
-                .findFirst()
-                .orElse("");
     }
 }

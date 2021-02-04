@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
-import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
+import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.uniprotkb.evidence.EvidenceDatabaseDetail;

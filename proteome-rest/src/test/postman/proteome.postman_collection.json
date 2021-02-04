@@ -211,13 +211,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/proteome/search?query={{proteome_search_value}}",
+									"raw": "{{base_url}}/{{path_context}}/proteomes/search?query={{proteome_search_value}}",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"{{path_context}}",
-										"proteome",
+										"proteomes",
 										"search"
 									],
 									"query": [
@@ -257,13 +257,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/proteome/search?query={{proteome_search_value}}",
+									"raw": "{{base_url}}/{{path_context}}/proteomes/search?query={{proteome_search_value}}",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"{{path_context}}",
-										"proteome",
+										"proteomes",
 										"search"
 									],
 									"query": [
@@ -303,13 +303,13 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/proteome/{{upid}}",
+									"raw": "{{base_url}}/{{path_context}}/proteomes/{{upid}}",
 									"host": [
 										"{{base_url}}"
 									],
 									"path": [
 										"{{path_context}}",
-										"proteome",
+										"proteomes",
 										"{{upid}}"
 									]
 								}

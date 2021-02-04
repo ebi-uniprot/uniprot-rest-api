@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
-import org.uniprot.api.support.data.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -47,7 +46,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
 
     @Parameter(
             description =
-                    "Criteria to filter by facet value. It can any supported valid solr query.")
+                    "Criteria to filter by facet value. It can any supported valid Lucene query.")
     @ValidSolrQuerySyntax(message = "{search.taxonomy.ids.invalid.facet.filter}")
     @ValidSolrQueryFacetFields(facetConfig = TaxonomyFacetConfig.class)
     private String facetFilter;
@@ -61,7 +60,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
             message = "{search.taxonomy.invalid.download}")
     private String download;
 
-    @Positive(message = "{search.positive}")
+    @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     @Parameter(description = "Size of the result. Defaults to number of ids passed.")
     private Integer size;

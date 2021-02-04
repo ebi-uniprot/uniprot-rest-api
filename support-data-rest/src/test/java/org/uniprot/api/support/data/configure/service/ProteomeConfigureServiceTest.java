@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.support.data.configure.domain.AdvancedSearchTerm;
-import org.uniprot.api.support.data.configure.domain.UniProtReturnField;
+import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 
 /**
  * @author lgonzales

@@ -1,9 +1,12 @@
 package org.uniprot.api.support.data.crossref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,15 +15,25 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.support.data.crossref.request.CrossRefSearchRequest;
+import org.uniprot.api.support.data.crossref.request.CrossRefStreamRequest;
 import org.uniprot.api.support.data.crossref.service.CrossRefService;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -34,7 +47,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("/xref")
+@RequestMapping("/database")
 @Validated
 @Tag(
         name = "CrossReference",
@@ -51,8 +64,13 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
 
     public CrossRefController(
             ApplicationEventPublisher eventPublisher,
-            MessageConverterContextFactory<CrossRefEntry> crossrefMessageConverterContextFactory) {
-        super(eventPublisher, crossrefMessageConverterContextFactory, null, CROSSREF);
+            MessageConverterContextFactory<CrossRefEntry> crossrefMessageConverterContextFactory,
+            ThreadPoolTaskExecutor downloadTaskExecutor) {
+        super(
+                eventPublisher,
+                crossrefMessageConverterContextFactory,
+                downloadTaskExecutor,
+                CROSSREF);
     }
 
     @Operation(
@@ -87,7 +105,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     }
 
     @Operation(
-            summary = "Search cross-references by given SOLR search query.",
+            summary = "Search cross-references by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -111,6 +129,40 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
         QueryResult<CrossRefEntry> results = this.crossRefService.search(searchRequest);
 
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
+    }
+
+    @Operation(
+            summary = "Download cross-references by given Lucene search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            CrossRefEntry.class))),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
+                        })
+            })
+    @GetMapping(
+            value = "/stream",
+            produces = {APPLICATION_JSON_VALUE, RDF_MEDIA_TYPE_VALUE})
+    public DeferredResult<ResponseEntity<MessageConverterContext<CrossRefEntry>>> stream(
+            @Valid @ModelAttribute CrossRefStreamRequest streamRequest,
+            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                    MediaType contentType,
+            HttpServletRequest request) {
+
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            Stream<String> result = crossRefService.streamRDF(streamRequest);
+            return super.streamRDF(result, streamRequest, contentType, request);
+        } else {
+            Stream<CrossRefEntry> result = crossRefService.stream(streamRequest);
+            return super.stream(result, streamRequest, contentType, request);
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package org.uniprot.api.uniparc.service.filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -41,7 +42,7 @@ class UniParcDatabaseFilterTest {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
         Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
-        List<String> dbFilter = Arrays.asList("UniProtKB/TrEMBL".toLowerCase());
+        List<String> dbFilter = Collections.singletonList("UniProtKB/TrEMBL".toLowerCase());
         // filter by db
         UniParcEntry filteredEntry = uniParcDatabaseFilter.apply(this.uniParcEntry, dbFilter);
         // everything should be same except xrefs
@@ -87,7 +88,7 @@ class UniParcDatabaseFilterTest {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
         Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
-        List<String> dbFilter = Arrays.asList("RandomDB");
+        List<String> dbFilter = Collections.singletonList("RandomDB");
         // filter by db
         UniParcEntry filteredEntry = uniParcDatabaseFilter.apply(this.uniParcEntry, dbFilter);
         // everything should be same but no xrefs
@@ -102,7 +103,8 @@ class UniParcDatabaseFilterTest {
         UniParcEntryBuilder entryBuilder = UniParcEntryBuilder.from(uniParcEntry);
         entryBuilder.uniParcCrossReferencesSet(null);
         UniParcEntry entryWithoutXref = entryBuilder.build();
-        List<String> dbFilter = Arrays.asList(UniParcDatabase.SWISSPROT.getDisplayName());
+        List<String> dbFilter =
+                Collections.singletonList(UniParcDatabase.SWISSPROT.getDisplayName());
         // filter by db
         UniParcEntry filteredEntry = uniParcDatabaseFilter.apply(entryWithoutXref, dbFilter);
         Assertions.assertEquals(entryWithoutXref, filteredEntry);
@@ -122,6 +124,5 @@ class UniParcDatabaseFilterTest {
         Assertions.assertEquals(uniParcEntry.getSequence(), filteredEntry.getSequence());
         Assertions.assertEquals(
                 uniParcEntry.getSequenceFeatures(), filteredEntry.getSequenceFeatures());
-        Assertions.assertEquals(uniParcEntry.getTaxonomies(), filteredEntry.getTaxonomies());
     }
 }

@@ -20,7 +20,7 @@ import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
-import org.uniprot.api.common.repository.store.BatchStoreIterable;
+import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.uniref.request.UniRefMemberRequest;
 import org.uniprot.core.uniref.*;
 import org.uniprot.core.uniref.impl.AbstractUniRefMemberBuilder;
