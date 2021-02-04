@@ -73,7 +73,7 @@ public class LiteratureITUtils {
                         .journal(literature.getJournal().getName())
                         .published(literature.getPublicationDate().getValue())
                         .isUniprotkbMapped(facet)
-                        .isComputationalMapped(facet)
+                        .isComputationallyMapped(facet)
                         .isCommunityMapped(facet)
                         .literatureObj(getLiteratureBinary(entry))
                         .build();
