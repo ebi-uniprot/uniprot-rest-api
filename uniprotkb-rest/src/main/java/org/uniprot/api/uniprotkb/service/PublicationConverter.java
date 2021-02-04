@@ -61,7 +61,7 @@ public class PublicationConverter
 
                     addOrIgnoreNull(mappedPubs.getUniProtKBMappedReference(), mappedRefs);
 
-                    addIfPresent(mappedPubs.getComputationalMappedReferences(), mappedRefs);
+                    addIfPresent(mappedPubs.getComputationallyMappedReferences(), mappedRefs);
                     addIfPresent(mappedPubs.getCommunityMappedReferences(), mappedRefs);
 
                     pubEntryBuilder.references(mappedRefs);
