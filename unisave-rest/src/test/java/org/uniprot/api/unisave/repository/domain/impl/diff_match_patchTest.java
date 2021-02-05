@@ -17,11 +17,12 @@
  */
 package org.uniprot.api.unisave.repository.domain.impl;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class diff_match_patchTest {
 
@@ -33,6 +34,8 @@ class diff_match_patchTest {
     @Test
     void testDiffCommonPrefix() {
         // Detect any common prefix.
+        assertNotNull(dmp);
+
         thing(dmp.diff_commonPrefix("abc", "xyz"), 0, "diff_commonPrefix: Null case.");
 
         thing(
@@ -48,6 +51,8 @@ class diff_match_patchTest {
     @Test
     void testDiffCommonSuffix() {
         // Detect any common suffix.
+        assertNotNull(dmp);
+
         thing(0, dmp.diff_commonSuffix("abc", "xyz"), "diff_commonSuffix: Null case.");
 
         thing(
@@ -61,6 +66,8 @@ class diff_match_patchTest {
     @Test
     void testDiffCommonOverlap() {
         // Detect any suffix/prefix overlap.
+        assertNotNull(dmp);
+
         thing(0, dmp.diff_commonOverlap("", "abcd"), "diff_commonOverlap: Null case.");
 
         thing(3, dmp.diff_commonOverlap("abc", "abcd"), "diff_commonOverlap: Whole case.");
