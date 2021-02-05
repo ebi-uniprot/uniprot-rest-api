@@ -24,12 +24,12 @@ public class UniParcCrossReferenceTaxonomyFilter
         if (Utils.notNullNotEmpty(xrefs) && Utils.notNullNotEmpty(taxonomyIds)) {
             List<UniParcCrossReference> filteredRefs =
                     xrefs.stream()
-                            .filter(xref -> Objects.nonNull(xref.getTaxonomy()))
+                            .filter(xref -> Objects.nonNull(xref.getOrganism()))
                             .filter(
                                     xref ->
                                             taxonomyIds.contains(
                                                     String.valueOf(
-                                                            xref.getTaxonomy().getTaxonId())))
+                                                            xref.getOrganism().getTaxonId())))
                             .collect(Collectors.toList());
             builder.uniParcCrossReferencesSet(filteredRefs);
         }

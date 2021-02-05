@@ -299,7 +299,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                                 containsInAnyOrder("geneName05", "geneName06")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.uniParcCrossReferences.*.taxonomy.taxonId",
+                                "$.results.*.uniParcCrossReferences.*.organism.taxonId",
                                 containsInAnyOrder(9606, 7787, 9606, 7787)))
                 .andExpect(jsonPath("$.results.*.sequence").doesNotExist())
                 .andExpect(jsonPath("$.results.*.sequenceFeatures").doesNotExist());

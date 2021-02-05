@@ -273,7 +273,7 @@ class BestGuessAnalyserTest {
                 .active(active)
                 .created(LocalDate.of(2015, 4, 1))
                 .lastUpdated(LocalDate.of(2019, 5, 8))
-                .taxonomy(taxonomy)
+                .organism(taxonomy)
                 .proteinName("Gelsolin, isoform J")
                 .geneName("Gel")
                 .proteomeId("UPI")

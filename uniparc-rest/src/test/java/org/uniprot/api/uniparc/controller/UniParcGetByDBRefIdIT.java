@@ -248,10 +248,10 @@ class UniParcGetByDBRefIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results[0].sequence", notNullValue()))
                 .andExpect(jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13)))
                 .andExpect(
-                        jsonPath("$.results[0].uniParcCrossReferences[*].taxonomy", notNullValue()))
+                        jsonPath("$.results[0].uniParcCrossReferences[*].organism", notNullValue()))
                 .andExpect(
                         jsonPath(
-                                "$.results[0].uniParcCrossReferences[0].taxonomy.taxonId",
+                                "$.results[0].uniParcCrossReferences[0].organism.taxonId",
                                 is(9606)));
     }
 

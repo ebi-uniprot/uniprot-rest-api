@@ -40,7 +40,7 @@ public class UniParcControllerITUtils {
                 .build();
     }
 
-    static Organism getTaxonomy(long taxId) {
+    static Organism getOrganism(long taxId) {
         return new OrganismBuilder().taxonId(taxId).scientificName("Name " + taxId).build();
     }
 
@@ -82,7 +82,7 @@ public class UniParcControllerITUtils {
                         .proteinName(getName("proteinName", i))
                         .geneName(getName("geneName", i))
                         .proteomeId(getName("UP1234567", i))
-                        .taxonomy(getTaxonomy(7787L))
+                        .organism(getOrganism(7787L))
                         .component(getName("component", i))
                         .chain("chain")
                         .build();
@@ -97,7 +97,7 @@ public class UniParcControllerITUtils {
                         .created(LocalDate.of(2017, 2, 12))
                         .lastUpdated(LocalDate.of(2017, 4, 23))
                         .proteinName(getName("anotherProteinName", i))
-                        .taxonomy(getTaxonomy(9606L))
+                        .organism(getOrganism(9606L))
                         .proteomeId("UP000005640")
                         .component("com")
                         .build();
@@ -125,7 +125,7 @@ public class UniParcControllerITUtils {
                 .active(active)
                 .created(LocalDate.of(2017, 2, 12))
                 .lastUpdated(LocalDate.of(2017, 4, 23))
-                .taxonomy(getTaxonomy(taxId))
+                .organism(getOrganism(taxId))
                 .proteinName("protein Name")
                 .geneName("Gel")
                 .proteomeId("UPI")
