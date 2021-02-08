@@ -110,7 +110,7 @@ public class UniRefEntryStoreRepository {
         List<String> members = entryLight.getMembers();
 
         // Handle Facets
-        members = applyFacetFilters(members, memberRequest.getFilter());
+        members = applyFacetFilters(members, memberRequest.getFacetFilter());
         List<Facet> facets = getFacets(members, memberRequest.getFacets());
 
         // Build cursor page

@@ -232,7 +232,7 @@ class UniRefMembersControllerIT {
     }
 
     @Test
-    void filterMemberTypes() throws Exception {
+    void facetFilterMemberTypes() throws Exception {
         // given
         UniRefEntry builder = getUniRefEntryForFilter();
         saveEntry(builder);
@@ -242,7 +242,7 @@ class UniRefMembersControllerIT {
                 mockMvc.perform(
                         get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFIX_PATH)
                                 .param("size", "10")
-                                .param("filter", "member_id_type:uniparc")
+                                .param("facetFilter", "member_id_type:uniparc")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -258,7 +258,7 @@ class UniRefMembersControllerIT {
     }
 
     @Test
-    void filterUniProtMemberTypes() throws Exception {
+    void facetFilterUniProtMemberTypes() throws Exception {
         // given
         UniRefEntry builder = getUniRefEntryForFilter();
         saveEntry(builder);
@@ -269,7 +269,7 @@ class UniRefMembersControllerIT {
                         get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFIX_PATH)
                                 .param("size", "10")
                                 .param(
-                                        "filter",
+                                        "facetFilter",
                                         "uniprot_member_id_type:uniprotkb_unreviewed_trembl")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -288,7 +288,7 @@ class UniRefMembersControllerIT {
     }
 
     @Test
-    void filterInvalidQueryField() throws Exception {
+    void facetFilterInvalidQueryField() throws Exception {
         // given
         UniRefEntry builder = getUniRefEntryForFilter();
         saveEntry(builder);
@@ -298,7 +298,7 @@ class UniRefMembersControllerIT {
                 mockMvc.perform(
                         get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFIX_PATH)
                                 .param("size", "10")
-                                .param("filter", "invalid:invalid")
+                                .param("facetFilter", "invalid:invalid")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -316,13 +316,13 @@ class UniRefMembersControllerIT {
     }
 
     @Test
-    void filterInvalidQuerySyntax() throws Exception {
+    void facetFilterInvalidQuerySyntax() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
                         get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFIX_PATH)
                                 .param("size", "10")
-                                .param("filter", "invalid:}invalid{")
+                                .param("facetFilter", "invalid:}invalid{")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

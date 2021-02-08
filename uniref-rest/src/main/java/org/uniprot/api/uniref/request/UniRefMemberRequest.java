@@ -39,7 +39,7 @@ public class UniRefMemberRequest {
     @Parameter(description = "Facet filter query for UniRef Cluster Members")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFacetFields(facetConfig = UniRefEntryFacetConfig.class)
-    private String filter;
+    private String facetFilter;
 
     @Parameter(hidden = true)
     private String cursor;
