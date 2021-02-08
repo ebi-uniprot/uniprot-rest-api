@@ -34,7 +34,7 @@ public class PublicationRequest {
     @Parameter(description = "Facet filter query for Publications")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFacetFields(facetConfig = PublicationFacetConfig.class)
-    private String query;
+    private String facetFilter;
 
     @Parameter(description = "Name of the facet search")
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})

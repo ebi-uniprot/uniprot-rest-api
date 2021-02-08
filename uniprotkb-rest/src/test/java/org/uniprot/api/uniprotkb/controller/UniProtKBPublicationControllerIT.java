@@ -222,7 +222,7 @@ class UniProtKBPublicationControllerIT {
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
                                 .param("facets", "types,categories,is_large_scale")
-                                .param("query", "categories:Interaction")
+                                .param("facetFilter", "categories:Interaction")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -250,7 +250,7 @@ class UniProtKBPublicationControllerIT {
                 mockMvc.perform(
                         get(MAPPED_PROTEIN_PATH + "P12345/publications")
                                 .param("facets", "invalid")
-                                .param("query", "invalidQuery:invalidValue")
+                                .param("facetFilter", "invalidQuery:invalidValue")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
