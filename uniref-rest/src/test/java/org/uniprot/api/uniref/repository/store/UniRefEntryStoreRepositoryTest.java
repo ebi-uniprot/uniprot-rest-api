@@ -133,7 +133,7 @@ class UniRefEntryStoreRepositoryTest {
 
         request.setId(UNIREF_ID_OK);
         request.setFacets(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName());
-        request.setFilter(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName() + ":uniparc");
+        request.setFacetFilter(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName() + ":uniparc");
         QueryResult<UniRefMember> result = repository.getEntryMembers(request);
         assertNotNull(result);
 
