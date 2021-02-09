@@ -67,6 +67,7 @@ class UniParcConfigureServiceTest {
         UniParcDatabaseDetail database = result.get(0);
         assertEquals("EG_BACTERIA", database.getName());
         assertEquals("EnsemblBacteria", database.getDisplayName());
+        assertTrue(database.isAlive());
         assertEquals("https://www.ensemblgenomes.org/id/%id", database.getUriLink());
     }
 }

@@ -17,6 +17,7 @@ public class UniParcDatabaseDetail {
 
     private final String displayName;
 
-    private final String uriLink;
+    private final boolean alive;
 
+    private final String uriLink;
 }

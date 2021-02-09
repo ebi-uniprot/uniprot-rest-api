@@ -80,18 +80,18 @@ public class UniParcConfigureController {
     @Operation(
             summary = "List of database details available for UniParc entry page.",
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            array =
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
                                             @ArraySchema(
                                                     schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    UniParcDatabaseDetail
-                                                                            .class)))
-                            })
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcDatabaseDetail
+                                                                                    .class)))
+                        })
             })
     @GetMapping("/allDatabases")
     public List<UniParcDatabaseDetail> getUniParcDatabaseDetails() {

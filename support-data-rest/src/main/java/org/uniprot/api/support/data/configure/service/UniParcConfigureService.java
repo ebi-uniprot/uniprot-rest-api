@@ -58,6 +58,7 @@ public class UniParcConfigureService {
         return UniParcDatabaseDetail.builder()
                 .name(database.name())
                 .displayName(database.getDisplayName())
+                .alive(database.isAlive())
                 .uriLink(database.getUrl())
                 .build();
     }
