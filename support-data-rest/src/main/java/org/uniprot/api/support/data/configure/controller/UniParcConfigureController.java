@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniParcDatabaseDetail;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.api.support.data.configure.service.UniParcConfigureService;
 
@@ -74,5 +75,26 @@ public class UniParcConfigureController {
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getSearchFields() {
         return service.getSearchItems();
+    }
+
+    @Operation(
+            summary = "List of database details available for UniParc entry page.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcDatabaseDetail
+                                                                                    .class)))
+                        })
+            })
+    @GetMapping("/allDatabases")
+    public List<UniParcDatabaseDetail> getUniParcDatabaseDetails() {
+        return service.getAllUniParcDatabaseDetails();
     }
 }

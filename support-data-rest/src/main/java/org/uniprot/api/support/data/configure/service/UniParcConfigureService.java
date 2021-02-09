@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniParcDatabaseDetail;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.store.config.UniProtDataType;
@@ -47,6 +48,21 @@ public class UniParcConfigureService {
         return result;
     }
 
+    public List<UniParcDatabaseDetail> getAllUniParcDatabaseDetails() {
+        return Arrays.stream(UniParcDatabase.values())
+                .map(this::getUniParcDatabaseDetail)
+                .collect(Collectors.toList());
+    }
+
+    private UniParcDatabaseDetail getUniParcDatabaseDetail(UniParcDatabase database) {
+        return UniParcDatabaseDetail.builder()
+                .name(database.name())
+                .displayName(database.getDisplayName())
+                .alive(database.isAlive())
+                .uriLink(database.getUrl())
+                .build();
+    }
+
     private List<AdvancedSearchTerm.Value> getUniParcAllDatabaseValues() {
         return Arrays.stream(UniParcDatabase.values())
                 .map(UniParcConfigUtil::getDBNameValue)
@@ -57,7 +73,7 @@ public class UniParcConfigureService {
 
     private List<AdvancedSearchTerm.Value> getUniParcAliveDatabaseValues() {
         return Arrays.stream(UniParcDatabase.values())
-                .filter(db -> db.isAlive())
+                .filter(UniParcDatabase::isAlive)
                 .map(UniParcConfigUtil::getDBNameValue)
                 .distinct()
                 .map(db -> new AdvancedSearchTerm.Value(db.getKey(), db.getValue()))
