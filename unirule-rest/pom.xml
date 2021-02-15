@@ -34,11 +34,6 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>uk.ac.ebi.uniprot</groupId>
 			<artifactId>openapi-maven-plugin</artifactId>
 			<exclusions>

@@ -5,6 +5,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.text.DecimalFormat;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Edd
  */
+@Slf4j
 class UniProtPointRangeQueryNodeProcessorTest {
 
     private UniProtPointRangeQueryNodeProcessor processor;
@@ -51,7 +54,7 @@ class UniProtPointRangeQueryNodeProcessorTest {
         String processedQuery =
                 processedQueryNode.toQueryString(new EscapeQuerySyntaxImpl()).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(processedQuery, is(field + ":[" + from + " TO " + to + "]"));
     }
 
@@ -73,7 +76,7 @@ class UniProtPointRangeQueryNodeProcessorTest {
         String processedQuery =
                 processedQueryNode.toQueryString(new EscapeQuerySyntaxImpl()).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(processedQuery, is(field + ":[" + from + " TO " + to + "}"));
     }
 
@@ -95,7 +98,7 @@ class UniProtPointRangeQueryNodeProcessorTest {
         String processedQuery =
                 processedQueryNode.toQueryString(new EscapeQuerySyntaxImpl()).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(processedQuery, is(field + ":{" + from + " TO " + to + "}"));
     }
 
@@ -117,7 +120,7 @@ class UniProtPointRangeQueryNodeProcessorTest {
         String processedQuery =
                 processedQueryNode.toQueryString(new EscapeQuerySyntaxImpl()).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(processedQuery, is(field + ":{" + from + " TO " + to + "]"));
     }
 }

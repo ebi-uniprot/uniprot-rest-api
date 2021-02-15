@@ -23,9 +23,19 @@ import org.uniprot.cv.xdb.UniProtCrossReferenceDisplayOrder;
  */
 public class RequestQueryParser {
 
+    private RequestQueryParser(){
+
+    }
+
     private static final Map<String, String> commentMappingType = new HashMap<>();
 
     private static final Map<String, String> featureMappingType = new HashMap<>();
+    public static final String LOCATION = "location";
+    public static final String CC_COFACTOR_CHEBI = "cc_cofactor_chebi";
+    public static final String CC_SCL_TERM_LOCATION = "cc_scl_term_location";
+    public static final String EXISTENCE = "existence";
+    public static final String CHEBI = "chebi";
+    public static final String EVIDENCE = "evidence";
 
     static {
         initFeatureMappingType();
@@ -39,7 +49,7 @@ public class RequestQueryParser {
             Query parsedQuery =
                     parse(
                             inputQuery,
-                            queryString.contains("location"),
+                            queryString.contains(LOCATION),
                             queryString.contains("cofactor"));
             return parsedQuery.toString();
         } catch (Exception e) {
@@ -84,10 +94,10 @@ public class RequestQueryParser {
             Term parsedTerm = new Term(citationFieldName, termQuery.getTerm().bytes());
             parsedQuery = new TermQuery(parsedTerm);
         } else if (isCofactorTermQuery(fieldName)) {
-            Term parsedTerm = new Term("cc_cofactor_chebi", termQuery.getTerm().bytes());
+            Term parsedTerm = new Term(CC_COFACTOR_CHEBI, termQuery.getTerm().bytes());
             parsedQuery = new TermQuery(parsedTerm);
         } else if (isLocationTermQuery(fieldName)) {
-            Term parsedTerm = new Term("cc_scl_term_location", termQuery.getTerm().bytes());
+            Term parsedTerm = new Term(CC_SCL_TERM_LOCATION, termQuery.getTerm().bytes());
             parsedQuery = new TermQuery(parsedTerm);
         } else if (isNoteTermQuery(fieldName)) {
             String noteFieldName = getNoteFieldName(hasLocationFilter, hasCofactorFilter);
@@ -98,10 +108,10 @@ public class RequestQueryParser {
         } else if (isDatabaseCrossReference(termQuery)) {
             Term parsedTerm = new Term("database", termQuery.getTerm().text());
             parsedQuery = new TermQuery(parsedTerm);
-        } else if (termQuery.getTerm().field().equalsIgnoreCase("existence")) {
+        } else if (termQuery.getTerm().field().equalsIgnoreCase(EXISTENCE)) {
             Term parsedTerm =
                     new Term(
-                            "existence",
+                            EXISTENCE,
                             ProteinExistence.typeOf(termQuery.getTerm().text())
                                     .name()
                                     .toLowerCase());
@@ -132,7 +142,7 @@ public class RequestQueryParser {
             String[] values =
                     Arrays.stream(phraseQuery.getTerms()).map(Term::text).toArray(String[]::new);
             parsedQuery = parseTaxonomyRelatedQuery(true, fieldName, values);
-        } else if (fieldName.equalsIgnoreCase("existence")) {
+        } else if (fieldName.equalsIgnoreCase(EXISTENCE)) {
             Optional<ProteinExistence> proteinExistence =
                     Arrays.stream(ProteinExistence.values())
                             .filter(
@@ -151,16 +161,16 @@ public class RequestQueryParser {
             if (proteinExistence.isPresent()) {
                 existence = proteinExistence.get().name().toLowerCase();
             }
-            Term parsedTerm = new Term("existence", existence);
+            Term parsedTerm = new Term(EXISTENCE, existence);
             parsedQuery = new TermQuery(parsedTerm);
         } else {
             String parsedFieldName = fieldName;
             if (isCitation(fieldName)) {
                 parsedFieldName = getCitationFieldName(fieldName);
             } else if (isCofactorTermQuery(fieldName)) {
-                parsedFieldName = "cc_cofactor_chebi";
+                parsedFieldName = CC_COFACTOR_CHEBI;
             } else if (isLocationTermQuery(fieldName)) {
-                parsedFieldName = "cc_scl_term_location";
+                parsedFieldName = CC_SCL_TERM_LOCATION;
             } else if (isNoteTermQuery(fieldName)) {
                 parsedFieldName = getNoteFieldName(hasLocationFilter, hasCofactorFilter);
             }
@@ -221,7 +231,7 @@ public class RequestQueryParser {
                 if (query.getTerm().field().equalsIgnoreCase("annotation")) {
                     annotation = query.getTerm().text();
                 }
-                if (query.getTerm().field().equalsIgnoreCase("evidence")) {
+                if (query.getTerm().field().equalsIgnoreCase(EVIDENCE)) {
                     evidence = query.getTerm().text();
                 }
             } else if (clause.getQuery() instanceof TermRangeQuery) {
@@ -335,24 +345,24 @@ public class RequestQueryParser {
         for (BooleanClause clause : booleanQuery.clauses()) {
             if (clause.getQuery() instanceof TermQuery) {
                 TermQuery query = (TermQuery) clause.getQuery();
-                if (query.getTerm().field().equalsIgnoreCase("evidence")) {
+                if (query.getTerm().field().equalsIgnoreCase(EVIDENCE)) {
                     String evidence = query.getTerm().text();
                     TermQuery evidenceQuery =
                             new TermQuery(new Term("ccev_scl_term_location", evidence));
                     builder.add(evidenceQuery, BooleanClause.Occur.MUST);
-                } else if (query.getTerm().field().equalsIgnoreCase("location")) {
+                } else if (query.getTerm().field().equalsIgnoreCase(LOCATION)) {
                     String location = query.getTerm().text();
-                    TermQuery typeQuery = new TermQuery(new Term("cc_scl_term_location", location));
+                    TermQuery typeQuery = new TermQuery(new Term(CC_SCL_TERM_LOCATION, location));
                     builder.add(typeQuery, BooleanClause.Occur.MUST);
                 }
             } else if (clause.getQuery() instanceof PhraseQuery) {
                 PhraseQuery query = (PhraseQuery) clause.getQuery();
                 String fieldName = query.getTerms()[0].field();
-                if (fieldName.equalsIgnoreCase("location")) {
+                if (fieldName.equalsIgnoreCase(LOCATION)) {
                     String[] values =
                             Arrays.stream(query.getTerms()).map(Term::text).toArray(String[]::new);
                     builder.add(
-                            new PhraseQuery("cc_scl_term_location", values),
+                            new PhraseQuery(CC_SCL_TERM_LOCATION, values),
                             BooleanClause.Occur.MUST);
                 }
             }
@@ -366,23 +376,24 @@ public class RequestQueryParser {
         for (BooleanClause clause : booleanQuery.clauses()) {
             if (clause.getQuery() instanceof TermQuery) {
                 TermQuery query = (TermQuery) clause.getQuery();
-                if (query.getTerm().field().equalsIgnoreCase("evidence")) {
+                if (query.getTerm().field().equalsIgnoreCase(EVIDENCE)) {
                     String evidence = query.getTerm().text();
                     TermQuery evidenceQuery =
                             new TermQuery(new Term("ccev_cofactor_chebi", evidence));
                     builder.add(evidenceQuery, BooleanClause.Occur.MUST);
-                } else if (query.getTerm().field().equalsIgnoreCase("chebi")) {
+                } else if (query.getTerm().field().equalsIgnoreCase(CHEBI)) {
                     String cofactor = query.getTerm().text();
-                    TermQuery typeQuery = new TermQuery(new Term("cc_cofactor_chebi", cofactor));
+                    TermQuery typeQuery = new TermQuery(new Term(CC_COFACTOR_CHEBI, cofactor));
+                    builder.add(typeQuery, BooleanClause.Occur.MUST);
                 }
             } else if (clause.getQuery() instanceof PhraseQuery) {
                 PhraseQuery query = (PhraseQuery) clause.getQuery();
                 String fieldName = query.getTerms()[0].field();
-                if (fieldName.equalsIgnoreCase("chebi")) {
+                if (fieldName.equalsIgnoreCase(CHEBI)) {
                     String[] values =
                             Arrays.stream(query.getTerms()).map(Term::text).toArray(String[]::new);
                     builder.add(
-                            new PhraseQuery("cc_cofactor_chebi", values), BooleanClause.Occur.MUST);
+                            new PhraseQuery(CC_COFACTOR_CHEBI, values), BooleanClause.Occur.MUST);
                 }
             }
         }
@@ -395,7 +406,7 @@ public class RequestQueryParser {
         for (BooleanClause clause : booleanQuery.clauses()) {
             if (clause.getQuery() instanceof TermQuery) {
                 TermQuery query = (TermQuery) clause.getQuery();
-                if (query.getTerm().field().equalsIgnoreCase("evidence")) {
+                if (query.getTerm().field().equalsIgnoreCase(EVIDENCE)) {
                     String evidence = query.getTerm().text();
                     Term evidenceTerm =
                             parseNoteEvidenceTerm(evidence, hasLocationFilter, hasCofactorFilter);
@@ -497,7 +508,7 @@ public class RequestQueryParser {
     }
 
     private static boolean isLocationTermQuery(String fieldName) {
-        return fieldName.equalsIgnoreCase("location");
+        return fieldName.equalsIgnoreCase(LOCATION);
     }
 
     private static boolean isCofactor(BooleanQuery booleanQuery) {
@@ -519,7 +530,7 @@ public class RequestQueryParser {
     }
 
     private static boolean isCofactorTermQuery(String fieldName) {
-        return fieldName.equalsIgnoreCase("chebi");
+        return fieldName.equalsIgnoreCase(CHEBI);
     }
 
     private static boolean isNote(BooleanQuery booleanQuery) {
@@ -641,7 +652,7 @@ public class RequestQueryParser {
         commentMappingType.put("erroneous translation", "sc_etran");
         commentMappingType.put("miscellaneous discrepancy", "sc_misc");
 
-        // System.out.println(commentMappingType);
+        // log.debug(commentMappingType);
     }
 
     private static void initFeatureMappingType() {
@@ -663,6 +674,6 @@ public class RequestQueryParser {
         featureMappingType.put("natural_variations", "variants");
         featureMappingType.put("sites", "sites");
 
-        // System.out.println(featureMappingType);
+        // log.debug(featureMappingType);
     }
 }

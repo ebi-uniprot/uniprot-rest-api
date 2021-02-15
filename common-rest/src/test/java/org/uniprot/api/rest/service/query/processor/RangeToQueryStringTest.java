@@ -5,6 +5,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Locale;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.standard.nodes.TermRangeQueryNode;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author Edd
  */
+@Slf4j
 class RangeToQueryStringTest {
 
     private EscapeQuerySyntaxImpl escaper;
@@ -44,7 +47,7 @@ class RangeToQueryStringTest {
 
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(
                 processedQuery,
                 is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "]"));
@@ -68,7 +71,7 @@ class RangeToQueryStringTest {
 
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(
                 processedQuery,
                 is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "}"));
@@ -92,7 +95,7 @@ class RangeToQueryStringTest {
 
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(
                 processedQuery,
                 is(field + ":{" + escape(textLower) + " TO " + escape(textUpper) + "}"));
@@ -116,7 +119,7 @@ class RangeToQueryStringTest {
 
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(
                 processedQuery,
                 is(field + ":{" + escape(textLower) + " TO " + escape(textUpper) + "]"));
@@ -140,7 +143,7 @@ class RangeToQueryStringTest {
 
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(processedQuery, is(field + ":[* TO *]"));
     }
 
@@ -162,7 +165,7 @@ class RangeToQueryStringTest {
 
         String processedQuery = RangeToQueryString.toQueryString(queryNode, escaper).toString();
 
-        System.out.println(processedQuery);
+        log.debug(processedQuery);
         assertThat(
                 processedQuery,
                 is(field + ":[" + escape(textLower) + " TO " + escape(textUpper) + "]"));

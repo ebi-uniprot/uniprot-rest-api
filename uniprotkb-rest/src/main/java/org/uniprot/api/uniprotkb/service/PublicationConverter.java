@@ -80,14 +80,17 @@ public class PublicationConverter
     }
 
     static Optional<MappedPublications> extractObject(PublicationDocument document) {
+        Optional<MappedPublications> result = Optional.empty();
         try {
-            return Optional.of(
-                    OBJECT_MAPPER.readValue(
-                            document.getPublicationMappedReferences(), MappedPublications.class));
+            result =
+                    Optional.of(
+                            OBJECT_MAPPER.readValue(
+                                    document.getPublicationMappedReferences(),
+                                    MappedPublications.class));
         } catch (Exception e) {
             log.error("Could not deserialise PublicationDocument's object", e);
         }
-        return Optional.empty();
+        return result;
     }
 
     private <T extends MappedReference> void addIfPresent(

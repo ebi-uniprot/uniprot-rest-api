@@ -1,7 +1,5 @@
 package org.uniprot.api.rest.output.converter;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
@@ -14,7 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -38,9 +37,9 @@ import org.uniprot.core.util.Utils;
  *
  * @author Edd
  */
+@Slf4j
 public abstract class AbstractUUWHttpMessageConverter<C, T>
         extends AbstractGenericHttpMessageConverter<MessageConverterContext<C>> {
-    private static final Logger LOGGER = getLogger(AbstractUUWHttpMessageConverter.class);
     private static final int FLUSH_INTERVAL = 5000;
     private static final int LOG_INTERVAL = 10000;
     private static final ThreadLocal<String> ENTITY_SEPARATOR = new ThreadLocal<>();
@@ -182,7 +181,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     }
 
     private void logWhenNecessary(Instant start, int currentCount) {
-        if (currentCount % LOG_INTERVAL == 0) {
+        if (currentCount > 0 && currentCount % LOG_INTERVAL == 0) {
             logStats(currentCount, start);
         }
     }
@@ -199,7 +198,10 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         long millisDuration = Duration.between(start, now).toMillis();
         int secDuration = (int) millisDuration / 1000;
         String rate = String.format("%.2f", ((double) counter) / secDuration);
-        LOGGER.info("Entities written: {}", counter);
-        LOGGER.info("Entities duration: {} ({} entries/sec)", secDuration, rate);
+        log.info(
+                "Entities written: {} with duration: {} ({} entries/sec)",
+                counter,
+                secDuration,
+                rate);
     }
 }

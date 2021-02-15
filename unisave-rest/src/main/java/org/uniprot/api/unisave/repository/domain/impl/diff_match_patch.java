@@ -769,7 +769,7 @@ public class diff_match_patch {
                                 <= Math.max(length_insertions1, length_deletions1))
                         && (lastequality.length()
                                 <= Math.max(length_insertions2, length_deletions2))) {
-                    // System.out.println("Splitting: '" + lastequality + "'");
+                    // log.debug("Splitting: '" + lastequality + "'");
                     // Walk back to offending equality.
                     while (thisDiff != equalities.lastElement()) {
                         thisDiff = pointer.previous();
@@ -1077,7 +1077,7 @@ public class diff_match_patch {
                                                         + (post_ins ? 1 : 0)
                                                         + (post_del ? 1 : 0))
                                                 == 3))) {
-                    // System.out.println("Splitting: '" + lastequality + "'");
+                    // log.debug("Splitting: '" + lastequality + "'");
                     // Walk back to offending equality.
                     while (thisDiff != equalities.lastElement()) {
                         thisDiff = pointer.previous();

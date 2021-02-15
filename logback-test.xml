@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <logger name="org.apache.solr" level="WARN" />
+    <logger name="org.springframework" level="WARN" />
+    <logger name="org.apache.zookeeper" level="WARN" />
+    <appender name="SystemErr"
+              class="ch.qos.logback.core.ConsoleAppender" target="System.err">
+        <target>System.err</target>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+            <level>ERROR</level>
+        </filter>
+
+    </appender>
+
+    <appender name="SystemOut"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="SystemErr" />
+        <appender-ref ref="SystemOut" />
+    </root>
+</configuration>

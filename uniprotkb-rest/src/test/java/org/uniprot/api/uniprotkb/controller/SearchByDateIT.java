@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -51,6 +53,7 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
+@Slf4j
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "offline")
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -179,7 +182,7 @@ class SearchByDateIT {
                 .append(" TO ")
                 .append(end)
                 .append("]");
-        System.out.println(sb.toString());
+        log.debug(sb.toString());
         return sb.toString();
     }
 

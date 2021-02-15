@@ -100,14 +100,4 @@ class PublicationConverterTest {
 
         assertDoesNotThrow(() -> mappedPublications.orElseThrow(IllegalStateException::new));
     }
-
-    @Test
-    void invalidObjectDeserialisationReturnsEmpty() {
-        PublicationDocument document =
-                PublicationDocument.builder().publicationMappedReferences(new byte[1]).build();
-
-        Optional<MappedPublications> mappedPublications = extractObject(document);
-
-        assertThat(mappedPublications, is(Optional.empty()));
-    }
 }
