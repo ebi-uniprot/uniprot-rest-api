@@ -23,9 +23,7 @@ import org.uniprot.cv.xdb.UniProtCrossReferenceDisplayOrder;
  */
 public class RequestQueryParser {
 
-    private RequestQueryParser(){
-
-    }
+    private RequestQueryParser() {}
 
     private static final Map<String, String> commentMappingType = new HashMap<>();
 
