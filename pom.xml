@@ -251,7 +251,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<argLine>${argLine} -Xmx1024m
+					<argLine>@{argLine} -Xmx1024m
 						-Dlogback.configurationFile=${project.basedir}/../logback-test.xml
 					</argLine>
 					<includes>
@@ -404,7 +404,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<configuration>
-							<argLine>${argLine} -Xmx1024m
+							<argLine>@{argLine} -Xmx1024m
 								-Dlogback.configurationFile=${project.basedir}/../logback-test.xml
 							</argLine>
 							<systemProperties>
