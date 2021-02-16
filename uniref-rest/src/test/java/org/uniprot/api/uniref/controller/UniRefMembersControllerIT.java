@@ -1,48 +1,10 @@
 package org.uniprot.api.uniref.controller;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.api.uniref.UniRefRestApplication;
-import org.uniprot.api.uniref.repository.DataStoreTestConfig;
-import org.uniprot.api.uniref.repository.UniRefQueryRepository;
-import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
-import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
-import org.uniprot.core.uniref.RepresentativeMember;
-import org.uniprot.core.uniref.UniRefEntry;
-import org.uniprot.core.uniref.UniRefEntryLight;
-import org.uniprot.core.uniref.UniRefMemberIdType;
-import org.uniprot.core.uniref.UniRefType;
-import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
-import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
-import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
-import org.uniprot.core.xml.jaxb.uniref.Entry;
-import org.uniprot.core.xml.uniref.UniRefEntryConverter;
-import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
-import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -62,6 +24,51 @@ import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createEn
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createEntryMembers;
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createMember;
 import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createReprestativeMember;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import javax.validation.constraints.NotNull;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
+import org.uniprot.api.uniref.UniRefRestApplication;
+import org.uniprot.api.uniref.repository.DataStoreTestConfig;
+import org.uniprot.api.uniref.repository.UniRefQueryRepository;
+import org.uniprot.api.uniref.repository.store.UniRefEntryFacetConfig;
+import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
+import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
+import org.uniprot.core.uniref.RepresentativeMember;
+import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
+import org.uniprot.core.uniref.UniRefMemberIdType;
+import org.uniprot.core.uniref.UniRefType;
+import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
+import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
+import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
+import org.uniprot.core.xml.jaxb.uniref.Entry;
+import org.uniprot.core.xml.uniref.UniRefEntryConverter;
+import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
+import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 
 /**
  * @author lgonzales
@@ -94,6 +101,7 @@ class UniRefMembersControllerIT {
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
     @Autowired private MockMvc mockMvc;
+    @Autowired private UniRefEntryFacetConfig uniRefEntryFacetConfig;
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
@@ -415,21 +423,26 @@ class UniRefMembersControllerIT {
                                         "Invalid facet name 'invalid'. Expected value can be [member_id_type, uniprot_member_id_type].")));
     }
 
-
-    @Test
-    void getMembersSuccessSizeZero() throws Exception {
+    @ParameterizedTest(name = "[{index}] search with facetName {0}")
+    @MethodSource("getAllFacetFieldsArguments")
+    void getMembersSuccessSizeZero(String facetField) throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
                         get(MEMBER_PREFIX_PATH + ID_100 + MEMBER_SUFIX_PATH)
                                 .param("size", "0")
+                                .param("facets", facetField)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)));
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets.*.name", contains(facetField)))
+                .andExpect(jsonPath("$.facets[0].values.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
     }
 
     @Test
@@ -499,5 +512,9 @@ class UniRefMembersControllerIT {
                         .build());
         builder.memberCount(6);
         return builder.build();
+    }
+
+    private Stream<Arguments> getAllFacetFieldsArguments() {
+        return this.uniRefEntryFacetConfig.getFacetNames().stream().map(Arguments::of);
     }
 }
