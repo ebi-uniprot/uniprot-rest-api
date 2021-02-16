@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Builder
+//@Builder
 @Getter
 @AllArgsConstructor
-public class IDMappingPair<T> {
+abstract class IDMappingPair<T> {
     private final String fromValue;
     private final T toValue;
 }

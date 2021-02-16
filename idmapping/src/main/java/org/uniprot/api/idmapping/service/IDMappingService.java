@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IDMappingRequest;
-import org.uniprot.api.idmapping.model.IDMappingPair;
+import org.uniprot.api.idmapping.model.IDMappingStringPair;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class IDMappingService {
         this.restTemplate = restTemplate;
     }
 
-    public QueryResult<IDMappingPair<String>> fetchIDMappings(IDMappingRequest request) {
+    public QueryResult<IDMappingStringPair> fetchIDMappings(IDMappingRequest request) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(PIR_ID_MAPPING_URL);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_FORM_URLENCODED);
@@ -47,7 +47,7 @@ public class IDMappingService {
         ResponseEntity<String> response =
                 restTemplate.postForEntity(builder.toUriString(), requestBody, String.class);
         if (response.hasBody()) {
-            Stream<IDMappingPair<String>> idMappingPairStream =
+            Stream<IDMappingStringPair> idMappingPairStream =
                     response.getBody()
                             .lines()
                             .filter(x -> x.contains("\t"))
@@ -57,21 +57,14 @@ public class IDMappingService {
                                         String fromValue = linePart[0];
                                         return Arrays.stream(linePart[1].split(";"))
                                                 .map(
-                                                        toValue -> {
-                                                            IDMappingPair.IDMappingPairBuilder<
-                                                                            String>
-                                                                    pairBuilder =
-                                                                            IDMappingPair
-                                                                                    .<String>
-                                                                                            builder()
-                                                                                    .fromValue(
-                                                                                            fromValue)
-                                                                                    .toValue(
-                                                                                            toValue);
-                                                            return pairBuilder.build();
-                                                        })
+                                                        toValue ->
+                                                                IDMappingStringPair.builder()
+                                                                        .fromValue(fromValue)
+                                                                        .toValue(toValue)
+                                                                        .build())
                                                 .collect(Collectors.toList());
-                                    }).flatMap(Collection::stream);
+                                    })
+                            .flatMap(Collection::stream);
 
             return QueryResult.of(idMappingPairStream, null);
         }
