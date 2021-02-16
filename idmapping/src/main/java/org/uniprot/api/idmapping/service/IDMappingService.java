@@ -10,11 +10,12 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.idmapping.controller.request.IDMappingRequest;
 import org.uniprot.api.idmapping.model.IDMappingPair;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
@@ -35,7 +36,7 @@ public class IDMappingService {
         this.restTemplate = restTemplate;
     }
 
-    public QueryResult<IDMappingPair> fetchIDMappings(IDMappingRequest request) {
+    public QueryResult<IDMappingPair<String>> fetchIDMappings(IDMappingRequest request) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(PIR_ID_MAPPING_URL);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_FORM_URLENCODED);
@@ -46,24 +47,36 @@ public class IDMappingService {
         ResponseEntity<String> response =
                 restTemplate.postForEntity(builder.toUriString(), requestBody, String.class);
         if (response.hasBody()) {
-            Stream<IDMappingPair> idMappingPairStream =
+            Stream<IDMappingPair<String>> idMappingPairStream =
                     response.getBody()
                             .lines()
                             .filter(x -> x.contains("\t"))
                             .map(row -> row.split("\t"))
                             .map(
-                                    lineParts -> {
-                                        IDMappingPair.IDMappingPairBuilder pairBuilder =
-                                                IDMappingPair.builder().fromValue(lineParts[0]);
-                                        Arrays.stream(lineParts[1].split(";"))
-                                                .forEach(pairBuilder::toValue);
-                                        return pairBuilder.build();
-                                    });
+                                    linePart -> {
+                                        String fromValue = linePart[0];
+                                        return Arrays.stream(linePart[1].split(";"))
+                                                .map(
+                                                        toValue -> {
+                                                            IDMappingPair.IDMappingPairBuilder<
+                                                                            String>
+                                                                    pairBuilder =
+                                                                            IDMappingPair
+                                                                                    .<String>
+                                                                                            builder()
+                                                                                    .fromValue(
+                                                                                            fromValue)
+                                                                                    .toValue(
+                                                                                            toValue);
+                                                            return pairBuilder.build();
+                                                        })
+                                                .collect(Collectors.toList());
+                                    }).flatMap(Collection::stream);
 
-            return QueryResult.of(idMappingPairStream, CursorPage.of(null, Integer.MAX_VALUE));
+            return QueryResult.of(idMappingPairStream, null);
         }
 
-        return QueryResult.of(Stream.empty(), CursorPage.of(null, 0));
+        return QueryResult.of(Stream.empty(), null);
     }
 
     private MultiValueMap<String, String> createPostBody(IDMappingRequest request) {

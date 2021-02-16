@@ -1,14 +1,13 @@
 package org.uniprot.api.idmapping.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Singular;
-
-import java.util.List;
 
 @Builder
 @Getter
-public class IDMappingPair {
+@AllArgsConstructor
+public class IDMappingPair<T> {
     private final String fromValue;
-    @Singular private final List<String> toValues;
+    private final T toValue;
 }

@@ -49,8 +49,8 @@ public class MessageConverterConfig {
     }
 
     @Bean("idMappingMessageConverterContextFactory")
-    public MessageConverterContextFactory<IDMappingPair> messageConverterContextFactory() {
-        MessageConverterContextFactory<IDMappingPair> contextFactory =
+    public MessageConverterContextFactory<IDMappingPair<String>> messageConverterContextFactory() {
+        MessageConverterContextFactory<IDMappingPair<String>> contextFactory =
                 new MessageConverterContextFactory<>();
 
         asList(
@@ -63,8 +63,8 @@ public class MessageConverterConfig {
         return contextFactory;
     }
 
-    private MessageConverterContext<IDMappingPair> context(MediaType contentType) {
-        return MessageConverterContext.<IDMappingPair>builder()
+    private MessageConverterContext<IDMappingPair<String>> context(MediaType contentType) {
+        return MessageConverterContext.<IDMappingPair<String>>builder()
                 .resource(MessageConverterContextFactory.Resource.IDMAPPING_PIR)
                 .contentType(contentType)
                 .build();

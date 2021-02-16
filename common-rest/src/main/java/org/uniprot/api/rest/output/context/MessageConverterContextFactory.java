@@ -49,6 +49,7 @@ public class MessageConverterContextFactory<T> {
         PROTEOME,
         TAXONOMY,
         GENECENTRIC,
+        IDMAPPING_PIR,
         KEYWORD,
         LITERATURE,
         DISEASE,

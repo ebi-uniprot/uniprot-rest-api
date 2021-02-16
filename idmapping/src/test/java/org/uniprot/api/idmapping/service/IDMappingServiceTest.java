@@ -13,9 +13,9 @@ class IDMappingServiceTest {
 
         IDMappingRequest request =
                 IDMappingRequest.builder().id("Q5KPU2").id("Q9PW07").from("ACC").to("EMBL").build();
-        QueryResult<IDMappingPair> idMappingPairStream = service.fetchIDMappings(request);
+        QueryResult<IDMappingPair<String>> idMappingPairStream = service.fetchIDMappings(request);
         idMappingPairStream
                 .getContent()
-                .forEach(x -> System.out.println(x.getFromValue() + " -> " + x.getToValues()));
+                .forEach(x -> System.out.println(x.getFromValue() + " -> " + x.getToValue()));
     }
 }

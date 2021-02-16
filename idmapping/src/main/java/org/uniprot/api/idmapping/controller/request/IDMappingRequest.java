@@ -1,18 +1,19 @@
 package org.uniprot.api.idmapping.controller.request;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
-
 import java.util.List;
+
+import lombok.*;
 
 /**
  * Created 08/02/2021
  *
  * @author Edd
  */
-@Builder
 @Data
+@Builder
+@AllArgsConstructor
+// @RequiredArgsConstructor
+// @NoArgsConstructor
 public class IDMappingRequest {
     private String taxId;
     private String taxOff;

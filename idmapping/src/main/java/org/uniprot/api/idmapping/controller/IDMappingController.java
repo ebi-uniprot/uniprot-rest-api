@@ -1,5 +1,16 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.springframework.http.MediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +28,6 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
-
 /**
  * Created 15/02/2021
  *
@@ -35,7 +36,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 @RestController
 @Validated
 @RequestMapping(value = IDMappingController.IDMAPPING_RESOURCE)
-public class IDMappingController extends BasicSearchController<IDMappingPair> {
+public class IDMappingController extends BasicSearchController<IDMappingPair<String>> {
     static final String IDMAPPING_RESOURCE = "/idmapping";
     private final IDMappingService idMappingService;
 
@@ -43,31 +44,52 @@ public class IDMappingController extends BasicSearchController<IDMappingPair> {
     public IDMappingController(
             ApplicationEventPublisher eventPublisher,
             IDMappingService idMappingService,
-            MessageConverterContextFactory<IDMappingPair> converterContextFactory,
+            MessageConverterContextFactory<IDMappingPair<String>> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, IDMAPPING_PIR);
         this.idMappingService = idMappingService;
     }
 
     @PostMapping(
-            value = "/search",
-            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE})
-    public ResponseEntity<MessageConverterContext<IDMappingPair>> search(
+            value = "/pir",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<MessageConverterContext<IDMappingPair<String>>> pirSearch(
             @Valid @ModelAttribute IDMappingRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<IDMappingPair> mappings = idMappingService.fetchIDMappings(searchRequest);
+        QueryResult<IDMappingPair<String>> mappings = idMappingService.fetchIDMappings(searchRequest);
         return super.getSearchResponse(mappings, null, false, request, response);
     }
 
     @PostMapping(
-            value = "/stream",
-            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE, APPLICATION_XML_VALUE})
-    public ResponseEntity<MessageConverterContext<IDMappingPair>> stream(
+            value = "/search",
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
+            })
+    public ResponseEntity<MessageConverterContext<IDMappingPair<String>>> search(
             @Valid @ModelAttribute IDMappingRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<IDMappingPair> mappings = idMappingService.fetchIDMappings(searchRequest);
+        QueryResult<IDMappingPair<String>> mappings = idMappingService.fetchIDMappings(searchRequest);
+        return super.getSearchResponse(mappings, null, true, request, response);
+    }
+
+    @PostMapping(
+            value = "/stream",
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE
+            })
+    public ResponseEntity<MessageConverterContext<IDMappingPair<String>>> stream(
+            @Valid @ModelAttribute IDMappingRequest searchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<IDMappingPair<String>> mappings = idMappingService.fetchIDMappings(searchRequest);
         return super.getSearchResponse(mappings, null, true, request, response);
     }
 
