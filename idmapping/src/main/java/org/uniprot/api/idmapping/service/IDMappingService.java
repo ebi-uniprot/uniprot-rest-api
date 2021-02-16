@@ -1,5 +1,12 @@
 package org.uniprot.api.idmapping.service;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,13 +19,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IDMappingRequest;
 import org.uniprot.api.idmapping.model.IDMappingStringPair;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
 /**
  * Created 08/02/2021

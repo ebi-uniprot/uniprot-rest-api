@@ -1,9 +1,9 @@
 package org.uniprot.api.idmapping.controller.request;
 
-import org.uniprot.api.rest.request.SearchRequest;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import org.uniprot.api.rest.request.SearchRequest;
 
 /**
  * @author sahmad
