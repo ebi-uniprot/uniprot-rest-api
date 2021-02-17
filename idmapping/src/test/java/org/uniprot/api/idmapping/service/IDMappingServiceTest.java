@@ -1,15 +1,15 @@
 package org.uniprot.api.idmapping.service;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IDMappingRequest;
 import org.uniprot.api.idmapping.model.IDMappingStringPair;
+import org.uniprot.api.idmapping.service.impl.IDMappingServiceImpl;
 
 class IDMappingServiceTest {
     @Test
     void checkCanReachPIR() {
-        IDMappingService service = new IDMappingService(new RestTemplate());
+        IDMappingServiceImpl service = new IDMappingServiceImpl(null);
 
         IDMappingRequest request =
                 IDMappingRequest.builder().id("Q5KPU2").id("Q9PW07").from("ACC").to("EMBL").build();
