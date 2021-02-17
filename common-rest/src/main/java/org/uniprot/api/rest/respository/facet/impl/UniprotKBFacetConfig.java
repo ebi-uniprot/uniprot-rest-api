@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.repository.search.impl;
+package org.uniprot.api.rest.respository.facet.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 @Component
 @Getter
 @Setter
-@PropertySource("classpath:facet.properties")
+@PropertySource("classpath:uniprotkb.facet.properties")
 @ConfigurationProperties(prefix = "facet")
 public class UniprotKBFacetConfig extends FacetConfig {
 

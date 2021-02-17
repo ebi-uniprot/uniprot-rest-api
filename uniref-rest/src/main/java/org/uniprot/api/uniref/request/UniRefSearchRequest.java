@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.validation.*;
-import org.uniprot.api.uniref.repository.UniRefFacetConfig;
 
 import io.swagger.v3.oas.annotations.Parameter;
 

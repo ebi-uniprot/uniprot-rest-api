@@ -1,17 +1,24 @@
 package org.uniprot.api.idmapping.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import lombok.*;
 
+import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
+import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.core.util.Pair;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author sahmad
@@ -21,7 +28,7 @@ public abstract class BasicIdService<T> {
     private final IDMappingPIRService idMappingService;
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
-    private final FacetConfig facetConfig;
+    private final FacetTupleStreamConverter facetTupleStreamConverter;
     protected final PIRResponseConverter pirResponseConverter;
 
     protected BasicIdService(
@@ -32,8 +39,8 @@ public abstract class BasicIdService<T> {
         this.idMappingService = idMappingService;
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
-        this.facetConfig = facetConfig;
         this.pirResponseConverter = new PIRResponseConverter();
+        this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);
     }
 
     public abstract QueryResult<Pair<String, T>> getMappedEntries(
@@ -46,4 +53,38 @@ public abstract class BasicIdService<T> {
     public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {
         return null; // TODO fill code
     }
+
+    protected List<Facet> loadFacets(List<String> ids, IdMappingSearchRequest searchRequest) {
+        List<Facet> result = new ArrayList<>();
+        SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
+        TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
+        SolrStreamFacetResponse solrStreamResponse = this.facetTupleStreamConverter.convert(facetTupleStream);
+        if(solrStreamResponse != null){
+            result = solrStreamResponse.getFacets();
+        }
+        return result;
+    }
+
+    private SolrStreamFacetRequest createSolrStreamRequest(
+            List<String> ids, IdMappingSearchRequest searchRequest) {
+        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
+                SolrStreamFacetRequest.builder();
+
+        // construct the query for tuple stream
+        StringBuilder qb = new StringBuilder();
+        qb.append("({!terms f=")
+                .append(getFacetIdField())
+                .append("}):(")
+                .append(String.join(",", ids))
+                .append(")");
+        // append the facet filter query in the accession query
+        if (Utils.notNullNotEmpty(searchRequest.getFacetFilter())) {
+            qb.append(" AND (").append(searchRequest.getFacetFilter()).append(")");
+            solrRequestBuilder.searchAccession(Boolean.TRUE);
+        }
+
+        return solrRequestBuilder.query(qb.toString()).facets(searchRequest.getFacetList()).build();
+    }
+
+    public abstract String getFacetIdField();
 }

@@ -13,6 +13,8 @@ import org.uniprot.api.rest.request.SearchRequest;
 public class IdMappingSearchRequest extends IdMappingBasicRequest implements SearchRequest {
     private String facets;
 
+    private String facetFilter;
+
     private String cursor;
 
     private Integer size;

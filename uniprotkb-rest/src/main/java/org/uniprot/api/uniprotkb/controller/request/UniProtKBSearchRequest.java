@@ -13,9 +13,9 @@ import lombok.EqualsAndHashCode;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 
 import io.swagger.v3.oas.annotations.Parameter;
 

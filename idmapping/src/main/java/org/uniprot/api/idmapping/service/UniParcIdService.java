@@ -1,10 +1,10 @@
 package org.uniprot.api.idmapping.service;
 
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
+import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.Pair;
 
@@ -17,8 +17,7 @@ public class UniParcIdService extends BasicIdService<UniParcEntry> {
             IDMappingPIRService idMappingService,
             StoreStreamer<UniParcEntry> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
-            FacetConfig facetConfig) { // TODO specific FacetConfig e.g. UniParcFacetConfig,
-        // we may need to move UniParcFacetConfig to common
+            UniParcFacetConfig facetConfig) {
         super(idMappingService, storeStreamer, tupleStream, facetConfig);
     }
 
@@ -26,5 +25,10 @@ public class UniParcIdService extends BasicIdService<UniParcEntry> {
     public QueryResult<Pair<String, UniParcEntry>> getMappedEntries(
             IdMappingSearchRequest searchRequest) {
         return null;
+    }
+
+    @Override
+    public String getFacetIdField() {
+        return "upi";
     }
 }

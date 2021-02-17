@@ -11,8 +11,8 @@ import lombok.Data;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.api.rest.validation.*;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotKBFacetConfig;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;

@@ -112,6 +112,18 @@
 			<version>${logback.version}</version>
 		</dependency>
 
+
+		<!-- Solr Data -->
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+		</dependency>
+
 		<!-- CACHING -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

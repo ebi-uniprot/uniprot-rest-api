@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.repository;
+package org.uniprot.api.rest.respository.facet.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,23 +15,23 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 
 /**
  * @author jluo
- * @date: 20 Aug 2019
+ * @date: 20 Jun 2019
  */
 @Component
 @Getter
 @Setter
-@PropertySource("classpath:facet.properties")
+@PropertySource("classpath:uniparc.facet.properties")
 @ConfigurationProperties(prefix = "facet")
-public class UniRefFacetConfig extends FacetConfig {
-    private Map<String, FacetProperty> uniref = new HashMap<>();
+public class UniParcFacetConfig extends FacetConfig {
 
-    @Override
-    public Collection<String> getFacetNames() {
-        return uniref.keySet();
-    }
+    private Map<String, FacetProperty> uniparc = new HashMap<>();
 
     @Override
     public Map<String, FacetProperty> getFacetPropertyMap() {
-        return uniref;
+        return uniparc;
+    }
+
+    public Collection<String> getFacetNames() {
+        return uniparc.keySet();
     }
 }

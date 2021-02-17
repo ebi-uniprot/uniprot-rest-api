@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Pair;
 import org.uniprot.core.util.PairImpl;
@@ -31,7 +31,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry> {
             IDMappingPIRService idMappingService,
             StoreStreamer<UniProtKBEntry> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
-            FacetConfig facetConfig) { // TODO Use UniprotKBFacetConfig
+            UniprotKBFacetConfig facetConfig) {
         super(idMappingService, storeStreamer, tupleStream, facetConfig);
         this.idMappingService = idMappingService;
     }
@@ -67,6 +67,11 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry> {
         Stream<Pair<String, UniProtKBEntry>> result =
                 mappedIds.stream().map(mId -> convertToPair(mId, idEntryMap));
         return QueryResult.of(result, cursorPage, null, null);
+    }
+
+    @Override
+    public String getFacetIdField() {
+        return "accession_id";
     }
 
     private Pair<String, UniProtKBEntry> convertToPair(
