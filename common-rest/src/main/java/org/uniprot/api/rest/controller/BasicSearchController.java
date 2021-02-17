@@ -102,6 +102,7 @@ public abstract class BasicSearchController<T> {
             context.setEntityIds(accList);
         } else {
             context.setEntities(result.getContent());
+            context.setFailedIds(result.getFailedIds());
         }
 
         HttpHeaders headers = createHttpSearchHeader(contentType);

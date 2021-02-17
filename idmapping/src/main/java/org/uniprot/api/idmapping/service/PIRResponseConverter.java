@@ -1,13 +1,11 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import org.springframework.http.ResponseEntity;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.core.util.Utils;
+
+import java.util.Arrays;
 
 /**
  * Created 17/02/2021

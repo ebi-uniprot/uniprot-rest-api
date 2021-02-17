@@ -29,6 +29,7 @@ public class MessageConverterContext<T> {
     private Collection<TermInfo> matchedFields;
     private boolean entityOnly;
     private boolean downloadContentDispositionHeader;
+    private Collection<String> failedIds;
 
     MessageConverterContext<T> asCopy() {
         return MessageConverterContext.<T>builder()
@@ -42,6 +43,7 @@ public class MessageConverterContext<T> {
                 .matchedFields(this.matchedFields)
                 .entityOnly(this.entityOnly)
                 .downloadContentDispositionHeader(downloadContentDispositionHeader)
+                .failedIds(this.failedIds)
                 .build();
     }
 }

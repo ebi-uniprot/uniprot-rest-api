@@ -1,10 +1,8 @@
 package org.uniprot.api.idmapping.output;
 
+
 import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 
 import java.util.List;
 
@@ -19,14 +17,13 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 
 /**
  * Created 21/08/18
@@ -66,32 +63,30 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
+                JsonMessageConverter<StringUniProtKBEntryPair> idMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
-                                new ObjectMapper(), IdMappingStringPair.class, null);
+                                UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
+                                StringUniProtKBEntryPair.class,
+                                null);
                 converters.add(0, idMappingPairJsonMessageConverter);
             }
         };
     }
 
     @Bean("idMappingMessageConverterContextFactory")
-    public MessageConverterContextFactory<IdMappingStringPair> messageConverterContextFactory() {
-        MessageConverterContextFactory<IdMappingStringPair> contextFactory =
+    public MessageConverterContextFactory<StringUniProtKBEntryPair>
+            messageConverterContextFactory() {
+        MessageConverterContextFactory<StringUniProtKBEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(
-                        context(APPLICATION_XML),
-                        context(APPLICATION_JSON),
-                        context(TSV_MEDIA_TYPE),
-                        context(XLS_MEDIA_TYPE))
-                .forEach(contextFactory::addMessageConverterContext);
+        asList(context(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
 
-    private MessageConverterContext<IdMappingStringPair> context(MediaType contentType) {
-        return MessageConverterContext.<IdMappingStringPair>builder()
-                .resource(MessageConverterContextFactory.Resource.IDMAPPING_PIR)
+    private MessageConverterContext<StringUniProtKBEntryPair> context(MediaType contentType) {
+        return MessageConverterContext.<StringUniProtKBEntryPair>builder()
+                .resource(MessageConverterContextFactory.Resource.UNIPROTKB)
                 .contentType(contentType)
                 .build();
     }
