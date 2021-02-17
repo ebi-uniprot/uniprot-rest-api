@@ -34,13 +34,13 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
  */
 @RestController
 @Validated
-@RequestMapping(value = IDMappingController.IDMAPPING_RESOURCE)
-public class IDMappingController extends BasicSearchController<IdMappingStringPair> {
+@RequestMapping(value = IdMappingController.IDMAPPING_RESOURCE)
+public class IdMappingController extends BasicSearchController<IdMappingStringPair> {
     static final String IDMAPPING_RESOURCE = "/idmapping";
     private final IDMappingPIRService idMappingService;
 
     @Autowired
-    public IDMappingController(
+    public IdMappingController(
             ApplicationEventPublisher eventPublisher,
             IDMappingPIRService idMappingService,
             MessageConverterContextFactory<IdMappingStringPair> converterContextFactory,
