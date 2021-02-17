@@ -1,6 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -8,7 +8,6 @@ import lombok.*;
 
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
 import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
@@ -49,18 +48,13 @@ public abstract class BasicIdService<T> {
     }
 
     public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {
-        return null; // TODO fill code
+        return Collections.emptyList(); // TODO fill code
     }
 
-    protected List<Facet> loadFacets(List<String> ids, IdMappingSearchRequest searchRequest) {
-        List<Facet> result = new ArrayList<>();
+    protected SolrStreamFacetResponse searchBySolrStream(List<String> ids, IdMappingSearchRequest searchRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
-        SolrStreamFacetResponse solrStreamResponse = this.facetTupleStreamConverter.convert(facetTupleStream);
-        if(solrStreamResponse != null){
-            result = solrStreamResponse.getFacets();
-        }
-        return result;
+        return this.facetTupleStreamConverter.convert(facetTupleStream);
     }
 
     private SolrStreamFacetRequest createSolrStreamRequest(
