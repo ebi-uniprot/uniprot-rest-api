@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.service;
 
-import org.springframework.http.ResponseEntity;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 
 /**
  * Created 17/02/2021
@@ -9,5 +9,5 @@ import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
  * @author Edd
  */
 public interface IDMappingPIRService {
-    ResponseEntity<String> doPIRRequest(IdMappingBasicRequest request);
+    IdMappingResult doPIRRequest(IdMappingBasicRequest request);
 }

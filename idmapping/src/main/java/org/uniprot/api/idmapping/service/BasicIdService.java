@@ -29,7 +29,6 @@ public abstract class BasicIdService<T> {
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
-    protected final PIRResponseConverter pirResponseConverter;
 
     protected BasicIdService(
             IDMappingPIRService idMappingService,
@@ -39,7 +38,6 @@ public abstract class BasicIdService<T> {
         this.idMappingService = idMappingService;
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
-        this.pirResponseConverter = new PIRResponseConverter();
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);
     }
 

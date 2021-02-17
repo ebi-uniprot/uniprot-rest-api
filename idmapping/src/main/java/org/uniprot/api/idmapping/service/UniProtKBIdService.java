@@ -15,6 +15,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Pair;
@@ -39,22 +40,20 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry> {
     public QueryResult<Pair<String, UniProtKBEntry>> getMappedEntries(
             IdMappingSearchRequest searchRequest) {
         // get the mapped ids from PIR
-        List<IdMappingStringPair> mappedIds =
-                pirResponseConverter.convertToIDMappings(
-                        idMappingService.doPIRRequest(searchRequest));
+        IdMappingResult mappingResult = idMappingService.doPIRRequest(searchRequest);
         // TODO add facet related code
         // TODO add some checks like empty response from PIR
         int pageSize =
                 Objects.isNull(searchRequest.getSize())
-                        ? mappedIds.size()
+                        ? mappingResult.getMappedIds().size()
                         : searchRequest.getSize();
 
         // compute the cursor and get subset of accessions as per cursor
         CursorPage cursorPage =
-                CursorPage.of(searchRequest.getCursor(), pageSize, mappedIds.size());
+                CursorPage.of(searchRequest.getCursor(), pageSize, mappingResult.getMappedIds().size());
 
         List<IdMappingStringPair> mappedIdsInPage =
-                mappedIds.subList(
+                mappingResult.getMappedIds().subList(
                         cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
 
         // extract id to get from store
@@ -65,7 +64,9 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry> {
         Map<String, UniProtKBEntry> idEntryMap = constructIdEntryMap(entries);
         // from -> uniprot entry
         Stream<Pair<String, UniProtKBEntry>> result =
-                mappedIds.stream().map(mId -> convertToPair(mId, idEntryMap));
+                mappingResult.getMappedIds().stream()
+                        .filter(mId -> idEntryMap.containsKey(mId.getValue()))
+                        .map(mId -> convertToPair(mId, idEntryMap));
         return QueryResult.of(result, cursorPage, null, null);
     }
 

@@ -1,14 +1,13 @@
 package org.uniprot.api.idmapping.service;
 
-import static java.util.Collections.emptyList;
-
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.core.util.Utils;
 
 /**
  * Created 17/02/2021
@@ -16,28 +15,33 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
  * @author Edd
  */
 public class PIRResponseConverter {
-    public List<IdMappingStringPair> convertToIDMappings(ResponseEntity<String> response) {
+    public IdMappingResult convertToIDMappings(ResponseEntity<String> response) {
+        IdMappingResult.IdMappingResultBuilder builder = IdMappingResult.builder();
         if (response.hasBody()) {
-            return response.getBody()
+            response.getBody()
                     .lines()
-                    .filter(x -> x.contains("\t"))
-                    .map(row -> row.split("\t"))
-                    .map(
-                            linePart -> {
-                                String fromValue = linePart[0];
-                                return Arrays.stream(linePart[1].split(";"))
-                                        .map(
-                                                toValue ->
-                                                        IdMappingStringPair.builder()
-                                                                .fromValue(fromValue)
-                                                                .toValue(toValue)
-                                                                .build())
-                                        .collect(Collectors.toList());
-                            })
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
+                    .filter(line -> !line.startsWith("Taxonomy ID:"))
+                    .filter(Utils::notNullNotEmpty)
+                    .filter(line -> !line.startsWith("MSG:"))
+                    .forEach(
+                            line -> {
+                                String[] rowParts = line.split("\t");
+                                if (rowParts.length == 1) {
+                                    builder.unmappedId(rowParts[0]);
+                                } else {
+                                    String fromValue = rowParts[0];
+                                    Arrays.stream(rowParts[1].split(";"))
+                                            .map(
+                                                    toValue ->
+                                                            IdMappingStringPair.builder()
+                                                                    .fromValue(fromValue)
+                                                                    .toValue(toValue)
+                                                                    .build())
+                                            .forEach(builder::mappedId);
+                                }
+                            });
         }
 
-        return emptyList();
+        return builder.build();
     }
 }
