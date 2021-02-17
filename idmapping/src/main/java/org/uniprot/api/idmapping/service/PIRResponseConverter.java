@@ -1,14 +1,12 @@
 package org.uniprot.api.idmapping.service;
 
-import static java.util.Collections.emptyList;
-
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 
 /**
  * Created 17/02/2021
@@ -16,9 +14,10 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
  * @author Edd
  */
 public class PIRResponseConverter {
-    public List<IdMappingStringPair> convertToIDMappings(ResponseEntity<String> response) {
+    public IdMappingResult convertToIDMappings(ResponseEntity<String> response) {
+        IdMappingResult.IdMappingResultBuilder builder = IdMappingResult.builder();
         if (response.hasBody()) {
-            return response.getBody()
+            builder.mappedIds(response.getBody()
                     .lines()
                     .filter(x -> x.contains("\t"))
                     .map(row -> row.split("\t"))
@@ -35,9 +34,9 @@ public class PIRResponseConverter {
                                         .collect(Collectors.toList());
                             })
                     .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()));
         }
 
-        return emptyList();
+        return builder.build();
     }
 }
