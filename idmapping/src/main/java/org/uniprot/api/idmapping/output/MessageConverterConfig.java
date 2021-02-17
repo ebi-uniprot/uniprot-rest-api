@@ -19,7 +19,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
-import org.uniprot.api.idmapping.model.IDMappingStringPair;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
@@ -66,17 +66,17 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                JsonMessageConverter<IDMappingStringPair> idMappingPairJsonMessageConverter =
+                JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
-                                new ObjectMapper(), IDMappingStringPair.class, null);
+                                new ObjectMapper(), IdMappingStringPair.class, null);
                 converters.add(0, idMappingPairJsonMessageConverter);
             }
         };
     }
 
     @Bean("idMappingMessageConverterContextFactory")
-    public MessageConverterContextFactory<IDMappingStringPair> messageConverterContextFactory() {
-        MessageConverterContextFactory<IDMappingStringPair> contextFactory =
+    public MessageConverterContextFactory<IdMappingStringPair> messageConverterContextFactory() {
+        MessageConverterContextFactory<IdMappingStringPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
         asList(
@@ -89,8 +89,8 @@ public class MessageConverterConfig {
         return contextFactory;
     }
 
-    private MessageConverterContext<IDMappingStringPair> context(MediaType contentType) {
-        return MessageConverterContext.<IDMappingStringPair>builder()
+    private MessageConverterContext<IdMappingStringPair> context(MediaType contentType) {
+        return MessageConverterContext.<IdMappingStringPair>builder()
                 .resource(MessageConverterContextFactory.Resource.IDMAPPING_PIR)
                 .contentType(contentType)
                 .build();

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.*;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
@@ -15,13 +16,14 @@ import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
  * @created 16/02/2021
  */
 public abstract class BasicIdService<T> {
-    private final IDMappingService idMappingService;
+    private final IDMappingPIRService idMappingService;
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetConfig facetConfig;
+    private final PIRResponseConverter pirResponseConverter;
 
     protected BasicIdService(
-            IDMappingService idMappingService,
+            IDMappingPIRService idMappingService,
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig) {
@@ -29,6 +31,7 @@ public abstract class BasicIdService<T> {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
         this.facetConfig = facetConfig;
+        this.pirResponseConverter = new PIRResponseConverter();
     }
 
     // TODO define type of Object, may Pair<FromId, Entry>

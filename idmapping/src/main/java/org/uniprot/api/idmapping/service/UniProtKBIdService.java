@@ -12,7 +12,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 public class UniProtKBIdService extends BasicIdService<UniProtKBEntry> {
 
     public UniProtKBIdService(
-            IDMappingService idMappingService,
+            IDMappingPIRService idMappingService,
             StoreStreamer<UniProtKBEntry> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig) { // TODO Use UniprotKBFacetConfig

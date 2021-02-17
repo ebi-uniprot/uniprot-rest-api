@@ -8,8 +8,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.uniprot.api.idmapping.controller.request.IDMappingRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.service.IDMappingPIRService;
+
+import java.util.Objects;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
@@ -29,7 +31,7 @@ public class CacheablePIRServiceImpl implements IDMappingPIRService {
 
     @Override
     @Cacheable(value = "pirIDMappingCache")
-    public ResponseEntity<String> doPIRRequest(IDMappingRequest request) {
+    public ResponseEntity<String> doPIRRequest(IdMappingBasicRequest request) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(PIR_ID_MAPPING_URL);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(APPLICATION_FORM_URLENCODED);
@@ -40,14 +42,15 @@ public class CacheablePIRServiceImpl implements IDMappingPIRService {
         return restTemplate.postForEntity(builder.toUriString(), requestBody, String.class);
     }
 
-    private MultiValueMap<String, String> createPostBody(IDMappingRequest request) {
+    private MultiValueMap<String, String> createPostBody(IdMappingBasicRequest request) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        String taxOff = Objects.isNull(request.getTaxId()) ? "NO" : "YES";
         map.add("ids", String.join(",", request.getIds()));
         map.add("from", request.getFrom());
         map.add("to", request.getTo());
-        map.add("tax_off", request.getTaxOff());
+        map.add("tax_off", taxOff);
         map.add("taxid", request.getTaxId());
-        map.add("async", request.getAsync());
+        map.add("async", "NO");
 
         return map;
     }

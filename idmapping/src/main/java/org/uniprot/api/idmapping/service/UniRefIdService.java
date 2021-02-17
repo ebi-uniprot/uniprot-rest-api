@@ -11,7 +11,7 @@ import org.uniprot.core.uniref.UniRefEntry;
  */
 public class UniRefIdService extends BasicIdService<UniRefEntry> {
     public UniRefIdService(
-            IDMappingService idMappingService,
+            IDMappingPIRService idMappingService,
             StoreStreamer<UniRefEntry> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig) { // TODO use UniRefFacetConfig

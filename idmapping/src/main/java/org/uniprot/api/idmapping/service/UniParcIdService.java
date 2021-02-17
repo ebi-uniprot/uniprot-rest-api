@@ -11,7 +11,7 @@ import org.uniprot.core.uniparc.UniParcEntry;
  */
 public class UniParcIdService extends BasicIdService<UniParcEntry> {
     public UniParcIdService(
-            IDMappingService idMappingService,
+            IDMappingPIRService idMappingService,
             StoreStreamer<UniParcEntry> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig) { // TODO specific FacetConfig e.g. UniParcFacetConfig,
