@@ -65,7 +65,9 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry> {
         Map<String, UniProtKBEntry> idEntryMap = constructIdEntryMap(entries);
         // from -> uniprot entry
         Stream<Pair<String, UniProtKBEntry>> result =
-                mappedIds.stream().map(mId -> convertToPair(mId, idEntryMap));
+                mappedIds.stream()
+                        .filter(mId -> idEntryMap.containsKey(mId.getValue()))
+                        .map(mId -> convertToPair(mId, idEntryMap));
         return QueryResult.of(result, cursorPage, null, null);
     }
 
