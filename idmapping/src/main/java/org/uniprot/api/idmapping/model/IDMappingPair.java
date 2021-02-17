@@ -1,10 +1,9 @@
 package org.uniprot.api.idmapping.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
-//@Builder
+// @Builder
 @Getter
 @AllArgsConstructor
 abstract class IDMappingPair<T> {

@@ -73,8 +73,8 @@
 		<module>benchmark-rest</module>
 		<module>unirule-rest</module>
 		<module>jacoco-aggregate-report</module>
-        <module>idmapping</module>
-    </modules>
+		<module>idmapping</module>
+	</modules>
 
 	<dependencyManagement>
 		<dependencies>
