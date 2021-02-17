@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.controller.request;
 
 import lombok.*;
+
 import org.uniprot.api.rest.request.SearchRequest;
 
 /**

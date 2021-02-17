@@ -1,15 +1,17 @@
 package org.uniprot.api.idmapping.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.*;
+
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
+import org.uniprot.core.util.Pair;
 
 /**
  * @author sahmad
@@ -20,7 +22,7 @@ public abstract class BasicIdService<T> {
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetConfig facetConfig;
-    private final PIRResponseConverter pirResponseConverter;
+    protected final PIRResponseConverter pirResponseConverter;
 
     protected BasicIdService(
             IDMappingPIRService idMappingService,
@@ -34,12 +36,11 @@ public abstract class BasicIdService<T> {
         this.pirResponseConverter = new PIRResponseConverter();
     }
 
-    // TODO define type of Object, may Pair<FromId, Entry>
-    public List<Object> getEntries(IdMappingSearchRequest searchRequest) {
-        // Fill code
-        List<String> ids = List.of(searchRequest.getIds().split(","));
-        Stream<T> entries = this.storeStreamer.streamEntries(ids);
-        return entries.collect(Collectors.toList());
+    public abstract QueryResult<Pair<String, T>> getMappedEntries(
+            IdMappingSearchRequest searchRequest);
+
+    protected Stream<T> getEntries(List<String> toIds) {
+        return this.storeStreamer.streamEntries(toIds);
     }
 
     public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {

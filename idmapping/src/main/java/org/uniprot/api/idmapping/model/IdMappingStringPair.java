@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.model;
 
 import lombok.Builder;
+
 import org.uniprot.core.util.PairImpl;
 
 /**
