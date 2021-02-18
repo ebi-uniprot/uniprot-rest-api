@@ -77,7 +77,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 generator.writeFieldName("facets");
                 generator.writeStartArray();
                 for (Object facet : context.getFacets()) {
-                    writeFacet(generator, facet);
+                    writeElement(generator, facet);
                 }
                 generator.writeEndArray();
             }
@@ -86,7 +86,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 generator.writeFieldName("matchedFields");
                 generator.writeStartArray();
                 for (Object matchedField : context.getMatchedFields()) {
-                    writeFacet(generator, matchedField);
+                    writeElement(generator, matchedField);
                 }
                 generator.writeEndArray();
             }
@@ -140,6 +140,15 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         if (!context.isEntityOnly()) {
             generator.writeEndArray();
             generator.writeEndObject();
+
+            if (notNullNotEmpty(context.getFailedIds())) {
+                generator.writeFieldName("failedIds");
+                generator.writeStartArray();
+                for (Object matchedField : context.getFailedIds()) {
+                    writeElement(generator, matchedField);
+                }
+                generator.writeEndArray();
+            }
         }
         generator.flush();
     }
@@ -170,11 +179,11 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         }
     }
 
-    private void writeFacet(JsonGenerator generator, Object facet) {
+    private void writeElement(JsonGenerator generator, Object facet) {
         try {
             generator.writeObject(facet);
         } catch (IOException e) {
-            throw new StopStreamException("Failed to write Facet JSON object", e);
+            throw new StopStreamException("Failed to write JSON object", e);
         }
     }
 
