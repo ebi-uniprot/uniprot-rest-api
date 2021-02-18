@@ -32,7 +32,8 @@ public class ResponseExceptionHelper {
                 && request.getParameter("debugError").equalsIgnoreCase("true")) {
 
             error.add(exception.getMessage());
-            Arrays.stream(exception.getStackTrace()).sequential()
+            Arrays.stream(exception.getStackTrace())
+                    .sequential()
                     .forEach(element -> error.add(element.toString()));
         }
     }

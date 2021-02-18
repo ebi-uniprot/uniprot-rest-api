@@ -60,7 +60,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
 
         int pageSize =
                 Objects.isNull(searchRequest.getSize())
-                        ? mappedIdPairs.size()
+                        ? getDefaultPageSize()
                         : searchRequest.getSize();
 
         // compute the cursor and get subset of accessions as per cursor

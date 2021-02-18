@@ -8,9 +8,6 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import org.uniprot.api.rest.validation.ValidAccessionList;
-
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -30,7 +27,7 @@ public class IdMappingBasicRequest {
 
     @NotNull(message = "{search.required}")
     @Parameter(description = "Comma separated list of ids")
-    private String ids;//TODO add validation like length, regex
+    private String ids; // TODO add validation like length, regex
 
     @Parameter(description = "Value of the taxon Id")
     private String taxId;

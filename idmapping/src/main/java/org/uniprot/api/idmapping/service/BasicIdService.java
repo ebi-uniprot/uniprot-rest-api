@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
@@ -25,6 +26,9 @@ public abstract class BasicIdService<T, U> {
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
+
+    @Value("${search.default.page.size:#{null}}")
+    private Integer defaultPageSize;
 
     protected BasicIdService(
             IDMappingPIRService idMappingService,
@@ -76,4 +80,8 @@ public abstract class BasicIdService<T, U> {
     }
 
     public abstract String getFacetIdField();
+
+    protected Integer getDefaultPageSize() {
+        return this.defaultPageSize;
+    }
 }
