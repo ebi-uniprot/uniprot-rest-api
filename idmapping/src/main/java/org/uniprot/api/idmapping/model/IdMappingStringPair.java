@@ -1,7 +1,10 @@
 package org.uniprot.api.idmapping.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+import lombok.Getter;
+import lombok.ToString;
 import org.uniprot.core.util.PairImpl;
 
 /**
@@ -9,9 +12,11 @@ import org.uniprot.core.util.PairImpl;
  *
  * @author Edd
  */
-public class IdMappingStringPair extends PairImpl<String, String> {
-    @Builder
-    public IdMappingStringPair(String fromValue, String toValue) {
-        super(fromValue, toValue);
-    }
+@Builder
+@Getter
+@AllArgsConstructor
+@ToString
+public class IdMappingStringPair {
+    private String from;
+    private String to;
 }

@@ -20,7 +20,7 @@ class CacheablePIRServiceImplTest {
                 .forEach(
                         pair ->
                                 System.out.println(
-                                        "from=" + pair.getKey() + ", to=" + pair.getValue()));
+                                        "from=" + pair.getFrom() + ", to=" + pair.getTo()));
         System.out.println(result.getUnmappedIds());
     }
 }

@@ -32,8 +32,8 @@ public class PIRResponseConverter {
                                             .map(
                                                     toValue ->
                                                             IdMappingStringPair.builder()
-                                                                    .fromValue(fromValue)
-                                                                    .toValue(toValue)
+                                                                    .from(fromValue)
+                                                                    .to(toValue)
                                                                     .build())
                                             .forEach(builder::mappedId);
                                 }
