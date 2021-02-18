@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -50,17 +51,18 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
                 mappedIdPairs.stream()
                         .map(IdMappingStringPair::getValue)
                         .collect(Collectors.toList());
-
+        List<Facet> facets = null;
         if (Utils.notNullNotEmpty(searchRequest.getFacets())) {
             SolrStreamFacetResponse solrStreamResponse =
                     searchBySolrStream(mappedIds, searchRequest);
 
+            facets = solrStreamResponse.getFacets();
             if (Utils.notNullNotEmpty(searchRequest.getFacetFilter())) {
                 // Apply Filter in PIR result
                 List<String> solrFilteredIds = solrStreamResponse.getAccessions();
                 mappedIdPairs =
                         mappedIdPairs.stream()
-                                .filter(idPair -> !solrFilteredIds.contains(idPair.getValue()))
+                                .filter(idPair -> solrFilteredIds.contains(idPair.getValue()))
                                 .collect(Collectors.toList());
             }
         }
@@ -91,7 +93,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
                         .filter(mId -> idEntryMap.containsKey(mId.getValue()))
                         .map(mId -> convertToPair(mId, idEntryMap));
 
-        return QueryResult.of(result, cursorPage, null, null, mappingResult.getUnmappedIds());
+        return QueryResult.of(result, cursorPage, facets, null, mappingResult.getUnmappedIds());
     }
 
     @Override

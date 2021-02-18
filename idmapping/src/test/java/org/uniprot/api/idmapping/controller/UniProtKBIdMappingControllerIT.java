@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasItems;
+import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.hamcrest.Matchers;
@@ -39,9 +40,18 @@ import org.uniprot.core.uniprotkb.ProteinExistence;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.cv.chebi.ChebiRepo;
+import org.uniprot.cv.ec.ECRepo;
+import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
+import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.DocumentConverter;
+import org.uniprot.store.search.document.uniparc.UniParcDocument;
+import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /**
  * @author sahmad
@@ -60,6 +70,14 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Autowired private IDMappingPIRService pirService;
 
     @Autowired private MockMvc mockMvc;
+    private final UniProtEntryConverter documentConverter =
+            new UniProtEntryConverter(
+                    TaxonomyRepoMocker.getTaxonomyRepo(),
+                    Mockito.mock(GORepo.class),
+                    PathwayRepoMocker.getPathwayRepo(),
+                    mock(ChebiRepo.class),
+                    mock(ECRepo.class),
+                    new HashMap<>());
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
@@ -83,15 +101,23 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
             storeClient.saveEntry(uniProtKBEntry);
-        }
 
+            UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
+            cloudSolrClient.addBean(SolrCollection.uniprot.name(), doc);
+            cloudSolrClient.commit(SolrCollection.uniprot.name());
+        }
     }
 
     @Test
     void testUniProtKBToUniProtKBMapping() throws Exception {
         // when
-        IdMappingResult pirResponse = IdMappingResult.builder().mappedIds(List.of(new IdMappingStringPair("Q00001", "Q00001"),
-                new IdMappingStringPair("Q00002", "Q00002"))).build();
+        IdMappingResult pirResponse =
+                IdMappingResult.builder()
+                        .mappedIds(
+                                List.of(
+                                        new IdMappingStringPair("Q00001", "Q00001"),
+                                        new IdMappingStringPair("Q00002", "Q00002")))
+                        .build();
         Mockito.when(pirService.doPIRRequest(ArgumentMatchers.any())).thenReturn(pirResponse);
         ResultActions response =
                 mockMvc.perform(
@@ -106,6 +132,72 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
                 .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
-                .andExpect(jsonPath("$.results.*.entry.primaryAccession", contains("Q00001", "Q00002")));
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.entry.primaryAccession",
+                                contains("Q00001", "Q00002")));
+    }
+
+    @Test
+    void testUniProtKBToUniProtKBMappingWithFacet() throws Exception {
+        // when
+        IdMappingResult pirResponse =
+                IdMappingResult.builder()
+                        .mappedIds(
+                                List.of(
+                                        new IdMappingStringPair("Q00001", "Q00001"),
+                                        new IdMappingStringPair("Q00002", "Q00002")))
+                        .build();
+        Mockito.when(pirService.doPIRRequest(ArgumentMatchers.any())).thenReturn(pirResponse);
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "ACC")
+                                .param("to", "ACC")
+                                .param("facets","proteins_with,reviewed")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.entry.primaryAccession",
+                                contains("Q00001", "Q00002")));
+    }
+
+    @Test
+    void testUniProtKBToUniProtKBMappingWithFacetFilter() throws Exception {
+        // when
+        IdMappingResult pirResponse =
+                IdMappingResult.builder()
+                        .mappedIds(
+                                List.of(
+                                        new IdMappingStringPair("Q00001", "Q00001"),
+                                        new IdMappingStringPair("Q00002", "Q00002")))
+                        .build();
+        Mockito.when(pirService.doPIRRequest(ArgumentMatchers.any())).thenReturn(pirResponse);
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "ACC")
+                                .param("to", "ACC")
+                                .param("facets","proteins_with,reviewed")
+                                .param("facetFilter", "proteins_with:np_bind AND protein_name:\"LEoLeoLeo\"")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.entry.primaryAccession",
+                                contains("Q00001", "Q00002")));
     }
 }

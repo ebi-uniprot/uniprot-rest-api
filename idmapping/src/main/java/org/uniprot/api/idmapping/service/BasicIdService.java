@@ -63,7 +63,7 @@ public abstract class BasicIdService<T, U> {
         StringBuilder qb = new StringBuilder();
         qb.append("({!terms f=")
                 .append(getFacetIdField())
-                .append("}):(")
+                .append("}")
                 .append(String.join(",", ids))
                 .append(")");
         // append the facet filter query in the accession query

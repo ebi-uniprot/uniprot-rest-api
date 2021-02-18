@@ -19,5 +19,4 @@ public class IdMappingBasicRequest {
     private String cursor;
 
     private Integer size;
-
 }
