@@ -1,15 +1,15 @@
 package org.uniprot.api.idmapping.service;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import lombok.Data;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Created 21/08/18
  *
  * @author Edd
  */
-//FIXME move it common used by uniprot kb rest as well
+// FIXME move it common used by uniprot kb rest as well
 @ConfigurationProperties(prefix = "voldemort.uniprot")
 @Data
 public class UniProtStoreConfigProperties {

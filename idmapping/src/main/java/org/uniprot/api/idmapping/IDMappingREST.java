@@ -3,10 +3,8 @@ package org.uniprot.api.idmapping;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
-import org.uniprot.api.rest.respository.RepositoryConfig;
 
 /**
  * Starts the ID Mapping service.
@@ -17,9 +15,8 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
  */
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class})
-@ComponentScan(
-        basePackages = {"org.uniprot.api.idmapping", "org.uniprot.api.rest"})
-//,
+@ComponentScan(basePackages = {"org.uniprot.api.idmapping", "org.uniprot.api.rest"})
+// ,
 //        excludeFilters = {
 //            @ComponentScan.Filter(
 //                    type = FilterType.ASSIGNABLE_TYPE,
