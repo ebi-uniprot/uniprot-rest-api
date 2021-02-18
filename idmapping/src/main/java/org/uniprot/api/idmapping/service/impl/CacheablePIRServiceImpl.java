@@ -1,9 +1,5 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-
-import java.util.Objects;
-
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +12,8 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IDMappingPIRService;
 import org.uniprot.api.idmapping.service.PIRResponseConverter;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
 /**
  * Created 17/02/2021
  *
@@ -24,8 +22,13 @@ import org.uniprot.api.idmapping.service.PIRResponseConverter;
 public class CacheablePIRServiceImpl implements IDMappingPIRService {
     public static final String PIR_ID_MAPPING_URL =
             "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async_test";
+    static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
     private final RestTemplate restTemplate;
     private final PIRResponseConverter pirResponseConverter;
+
+    static {
+        HTTP_HEADERS.setContentType(APPLICATION_FORM_URLENCODED);
+    }
 
     public CacheablePIRServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -36,11 +39,9 @@ public class CacheablePIRServiceImpl implements IDMappingPIRService {
     @Cacheable(value = "pirIDMappingCache")
     public IdMappingResult doPIRRequest(IdMappingBasicRequest request) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(PIR_ID_MAPPING_URL);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(APPLICATION_FORM_URLENCODED);
 
         HttpEntity<MultiValueMap<String, String>> requestBody =
-                new HttpEntity<>(createPostBody(request), headers);
+                new HttpEntity<>(createPostBody(request), HTTP_HEADERS);
 
         return pirResponseConverter.convertToIDMappings(
                 restTemplate.postForEntity(builder.toUriString(), requestBody, String.class));
@@ -48,11 +49,10 @@ public class CacheablePIRServiceImpl implements IDMappingPIRService {
 
     private MultiValueMap<String, String> createPostBody(IdMappingBasicRequest request) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        String taxOff = Objects.isNull(request.getTaxId()) ? "NO" : "YES";
         map.add("ids", String.join(",", request.getIds()));
         map.add("from", request.getFrom());
         map.add("to", request.getTo());
-        map.add("tax_off", taxOff);
+        map.add("tax_off", "NO"); // we do not need PIR's header line, "Taxonomy ID:"
         map.add("taxid", request.getTaxId());
         map.add("async", "NO");
 
