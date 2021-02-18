@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.validation.error;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,13 +31,9 @@ public class ResponseExceptionHelper {
         if (request.getParameter("debugError") != null
                 && request.getParameter("debugError").equalsIgnoreCase("true")) {
 
-            Throwable cause = exception.getCause();
-            while (cause != null) {
-                if (cause.getMessage() != null && !cause.getMessage().isEmpty()) {
-                    error.add("Caused by: " + cause.getMessage());
-                }
-                cause = cause.getCause();
-            }
+            error.add(exception.getMessage());
+            Arrays.stream(exception.getStackTrace()).sequential()
+                    .forEach(element -> error.add(element.toString()));
         }
     }
 

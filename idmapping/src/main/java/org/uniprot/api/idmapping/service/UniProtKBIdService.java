@@ -1,10 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,13 +12,12 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.util.Pair;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -43,11 +38,13 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
     }
 
     public QueryResult<StringUniProtKBEntryPair> getMappedEntries(
-            IdMappingSearchRequest searchRequest) {
+            UniProtKBIdMappingSearchRequest searchRequest) {
         // get the mapped ids from PIR
         IdMappingResult mappingResult = idMappingService.doPIRRequest(searchRequest);
         List<IdMappingStringPair> mappedIdPairs = mappingResult.getMappedIds();
         List<String> mappedIds =
+                mappedIdPairs.stream().map(IdMappingStringPair::getTo).collect(Collectors.toList());
+
                 mappedIdPairs.stream()
                         .map(IdMappingStringPair::getValue)
                         .collect(Collectors.toList());
@@ -67,7 +64,6 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
             }
         }
 
-        // TODO add some checks like empty response from PIR
         int pageSize =
                 Objects.isNull(searchRequest.getSize())
                         ? mappedIdPairs.size()
@@ -83,14 +79,16 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
 
         // extract ids to get entries from store
         Set<String> toIds =
-                mappedIdsInPage.stream().map(Pair::getValue).collect(Collectors.toSet());
+                mappedIdsInPage.stream()
+                        .map(IdMappingStringPair::getTo)
+                        .collect(Collectors.toSet());
         Stream<UniProtKBEntry> entries = getEntries(new ArrayList<>(toIds));
         // accession -> entry map
         Map<String, UniProtKBEntry> idEntryMap = constructIdEntryMap(entries);
         // from -> uniprot entry
         Stream<StringUniProtKBEntryPair> result =
                 mappedIdsInPage.stream()
-                        .filter(mId -> idEntryMap.containsKey(mId.getValue()))
+                        .filter(mId -> idEntryMap.containsKey(mId.getTo()))
                         .map(mId -> convertToPair(mId, idEntryMap));
 
         return QueryResult.of(result, cursorPage, facets, null, mappingResult.getUnmappedIds());
@@ -104,8 +102,8 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
     private StringUniProtKBEntryPair convertToPair(
             IdMappingStringPair mId, Map<String, UniProtKBEntry> idEntryMap) {
         return StringUniProtKBEntryPair.builder()
-                .from(mId.getKey())
-                .entry(idEntryMap.get(mId.getValue()))
+                .from(mId.getFrom())
+                .entry(idEntryMap.get(mId.getTo()))
                 .build();
     }
 

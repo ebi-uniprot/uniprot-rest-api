@@ -64,7 +64,7 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
             @Valid @ModelAttribute IdMappingBasicRequest mappingRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        IdMappingResult idMappingResult = idMappingService.doPIRRequest(mappingRequest);
+        IdMappingResult idMappingResult = pirIdMapping(mappingRequest);
         QueryResult<IdMappingStringPair> queryResult =
                 idMappingService.queryResultPage(mappingRequest, idMappingResult);
         return super.getSearchResponse(queryResult, null, request, response);
@@ -82,7 +82,7 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
             @Valid @ModelAttribute IdMappingBasicRequest mappingRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        IdMappingResult idMappingResult = idMappingService.doPIRRequest(mappingRequest);
+        IdMappingResult idMappingResult = pirIdMapping(mappingRequest);
         QueryResult<IdMappingStringPair> queryResult =
                 idMappingService.queryResultAll(idMappingResult);
         return super.getSearchResponse(queryResult, null, request, response);
@@ -96,5 +96,15 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
     @Override
     protected Optional<String> getEntityRedirectId(IdMappingStringPair entity) {
         return Optional.empty();
+    }
+
+    private IdMappingResult pirIdMapping(IdMappingBasicRequest request) {
+        IdMappingBasicRequest pirRequest = new IdMappingBasicRequest();
+        pirRequest.setFrom(request.getFrom());
+        pirRequest.setTo(request.getTo());
+        pirRequest.setIds(request.getIds());
+        pirRequest.setTaxId(request.getTaxId());
+
+        return idMappingService.doPIRRequest(pirRequest);
     }
 }
