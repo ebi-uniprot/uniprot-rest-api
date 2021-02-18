@@ -453,17 +453,17 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                 .param("from", "ACC")
                                 .param("to", "ACC")
                                 .param("facets","proteins_with,reviewed")
-                                .param("facetFilter", "proteins_with:np_bind AND protein_name:\"LEoLeoLeo\"")
+                                .param("query", "reviewed:true")
                                 .param("ids", "Q00001,Q00002"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(1)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00002")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.entry.primaryAccession",
-                                contains("Q00001", "Q00002")));
+                                contains("Q00002")));
     }
 }

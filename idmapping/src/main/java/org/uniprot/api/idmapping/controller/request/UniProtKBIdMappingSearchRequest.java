@@ -25,11 +25,4 @@ public class UniProtKBIdMappingSearchRequest extends UniProtKBIdMappingBasicRequ
     @Parameter(description = "Name of the facet search")
     @ValidFacets(facetConfig = UniprotKBFacetConfig.class)
     private String facets;
-
-    @Parameter(
-            description =
-                    "Criteria to filter by facet value. It can any supported valid solr query.")
-    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFacetFields(facetConfig = UniprotKBFacetConfig.class)
-    private String facetFilter;
 }

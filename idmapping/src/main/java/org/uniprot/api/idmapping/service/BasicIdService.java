@@ -71,8 +71,8 @@ public abstract class BasicIdService<T, U> {
                 .append(String.join(",", ids))
                 .append(")");
         // append the facet filter query in the accession query
-        if (Utils.notNullNotEmpty(searchRequest.getFacetFilter())) {
-            qb.append(" AND (").append(searchRequest.getFacetFilter()).append(")");
+        if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
+            qb.append(" AND (").append(searchRequest.getQuery()).append(")");
             solrRequestBuilder.searchAccession(Boolean.TRUE);
         }
 

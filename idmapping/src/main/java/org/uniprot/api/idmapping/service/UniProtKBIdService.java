@@ -44,22 +44,19 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
         List<IdMappingStringPair> mappedIdPairs = mappingResult.getMappedIds();
         List<String> mappedIds =
                 mappedIdPairs.stream().map(IdMappingStringPair::getTo).collect(Collectors.toList());
-
-                mappedIdPairs.stream()
-                        .map(IdMappingStringPair::getValue)
-                        .collect(Collectors.toList());
         List<Facet> facets = null;
         if (Utils.notNullNotEmpty(searchRequest.getFacets())) {
             SolrStreamFacetResponse solrStreamResponse =
                     searchBySolrStream(mappedIds, searchRequest);
 
             facets = solrStreamResponse.getFacets();
-            if (Utils.notNullNotEmpty(searchRequest.getFacetFilter())) {
+            //TODO: WILL FAIL IF ONLY QUERY, NEED TO THINK
+            if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
                 // Apply Filter in PIR result
                 List<String> solrFilteredIds = solrStreamResponse.getAccessions();
                 mappedIdPairs =
                         mappedIdPairs.stream()
-                                .filter(idPair -> solrFilteredIds.contains(idPair.getValue()))
+                                .filter(idPair -> solrFilteredIds.contains(idPair.getTo()))
                                 .collect(Collectors.toList());
             }
         }
