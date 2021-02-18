@@ -22,7 +22,7 @@ import org.uniprot.api.idmapping.service.PIRResponseConverter;
  * @author Edd
  */
 public class CacheablePIRServiceImpl implements IDMappingPIRService {
-    private static final String PIR_ID_MAPPING_URL =
+    public static final String PIR_ID_MAPPING_URL =
             "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async_test";
     private final RestTemplate restTemplate;
     private final PIRResponseConverter pirResponseConverter;

@@ -1,10 +1,7 @@
 package org.uniprot.api.idmapping.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.*;
 
-import lombok.Getter;
-import lombok.ToString;
 import org.uniprot.core.util.PairImpl;
 
 /**
@@ -16,6 +13,7 @@ import org.uniprot.core.util.PairImpl;
 @Getter
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class IdMappingStringPair {
     private String from;
     private String to;
