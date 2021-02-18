@@ -52,7 +52,8 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
                         .collect(Collectors.toList());
 
         if (Utils.notNullNotEmpty(searchRequest.getFacets())) {
-            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(mappedIds, searchRequest);
+            SolrStreamFacetResponse solrStreamResponse =
+                    searchBySolrStream(mappedIds, searchRequest);
 
             if (Utils.notNullNotEmpty(searchRequest.getFacetFilter())) {
                 // Apply Filter in PIR result

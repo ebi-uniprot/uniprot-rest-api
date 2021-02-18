@@ -1,6 +1,5 @@
 package org.uniprot.api.idmapping.output;
 
-
 import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 

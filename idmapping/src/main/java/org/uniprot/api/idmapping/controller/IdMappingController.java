@@ -25,7 +25,6 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IDMappingPIRService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
 /**
  * Created 15/02/2021
@@ -43,9 +42,8 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
     public IdMappingController(
             ApplicationEventPublisher eventPublisher,
             IDMappingPIRService idMappingService,
-            MessageConverterContextFactory<IdMappingStringPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, IDMAPPING_PIR);
+        super(eventPublisher, null, downloadTaskExecutor, IDMAPPING_PIR);
         this.idMappingService = idMappingService;
     }
 
