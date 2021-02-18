@@ -466,4 +466,37 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                 "$.results.*.entry.primaryAccession",
                                 contains("Q00002")));
     }
+
+    @Test
+    void testUniProtKBToUniProtKBMappingWithUnmappedIds() throws Exception {
+        // when
+        List<String> unmappedIds = List.of("S12345", "T12345");
+        IdMappingResult pirResponse =
+                IdMappingResult.builder()
+                        .mappedIds(
+                                List.of(
+                                        new IdMappingStringPair("Q00001", "Q00001"),
+                                        new IdMappingStringPair("Q00002", "Q00002")))
+                        .unmappedIds(unmappedIds)
+                        .build();
+        Mockito.when(pirService.doPIRRequest(ArgumentMatchers.any())).thenReturn(pirResponse);
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "ACC")
+                                .param("to", "ACC")
+                                .param("ids", "Q00001,S12345,Q00002,T12345"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.entry.primaryAccession",
+                                contains("Q00001", "Q00002")))
+                .andExpect(jsonPath("$.failedIds", contains("S12345","T12345")));
+    }
 }

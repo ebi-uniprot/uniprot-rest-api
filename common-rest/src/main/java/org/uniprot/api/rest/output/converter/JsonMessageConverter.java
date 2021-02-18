@@ -139,7 +139,6 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
         if (!context.isEntityOnly()) {
             generator.writeEndArray();
-            generator.writeEndObject();
 
             if (notNullNotEmpty(context.getFailedIds())) {
                 generator.writeFieldName("failedIds");
@@ -149,6 +148,8 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 }
                 generator.writeEndArray();
             }
+
+            generator.writeEndObject();
         }
         generator.flush();
     }
