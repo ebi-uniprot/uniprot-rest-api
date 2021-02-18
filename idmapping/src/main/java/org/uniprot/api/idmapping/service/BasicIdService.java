@@ -12,8 +12,8 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
-import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
+import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingStreamRequest;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -37,25 +37,25 @@ public abstract class BasicIdService<T, U> {
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);
     }
 
-    public abstract QueryResult<U> getMappedEntries(IdMappingSearchRequest searchRequest);
+    public abstract QueryResult<U> getMappedEntries(UniProtKBIdMappingSearchRequest searchRequest);
 
     protected Stream<T> getEntries(List<String> toIds) {
         return this.storeStreamer.streamEntries(toIds);
     }
 
-    public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {
+    public List<Object> streamEntries(UniProtKBIdMappingStreamRequest streamRequest) {
         return Collections.emptyList(); // TODO fill code
     }
 
     protected SolrStreamFacetResponse searchBySolrStream(
-            List<String> ids, IdMappingSearchRequest searchRequest) {
+            List<String> ids, UniProtKBIdMappingSearchRequest searchRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
         return this.facetTupleStreamConverter.convert(facetTupleStream);
     }
 
     private SolrStreamFacetRequest createSolrStreamRequest(
-            List<String> ids, IdMappingSearchRequest searchRequest) {
+            List<String> ids, UniProtKBIdMappingSearchRequest searchRequest) {
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
                 SolrStreamFacetRequest.builder();
 

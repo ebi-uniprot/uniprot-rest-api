@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
 import org.uniprot.api.idmapping.service.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -48,7 +48,7 @@ public class UniProtKBIdMappingController extends BasicSearchController<StringUn
             value = "search",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<StringUniProtKBEntryPair>> getMappedEntries(
-            @Valid IdMappingSearchRequest searchRequest,
+            @Valid UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 

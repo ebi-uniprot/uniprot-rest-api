@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 class IdMappingStringPairTest {
     @Test
     void canCreatePair() {
-        IdMappingStringPair pair =
-                IdMappingStringPair.builder().from("from").to("to").build();
+        IdMappingStringPair pair = IdMappingStringPair.builder().from("from").to("to").build();
         assertThat(pair.getFrom(), is("from"));
         assertThat(pair.getTo(), is("to"));
     }

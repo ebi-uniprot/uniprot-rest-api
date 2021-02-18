@@ -1,23 +1,23 @@
 package org.uniprot.api.idmapping.service;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -37,7 +37,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
     }
 
     public QueryResult<StringUniProtKBEntryPair> getMappedEntries(
-            IdMappingSearchRequest searchRequest) {
+            UniProtKBIdMappingSearchRequest searchRequest) {
         // get the mapped ids from PIR
         IdMappingResult mappingResult = idMappingService.doPIRRequest(searchRequest);
         List<IdMappingStringPair> mappedIdPairs = mappingResult.getMappedIds();
@@ -58,7 +58,6 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
             }
         }
 
-        // TODO add some checks like empty response from PIR
         int pageSize =
                 Objects.isNull(searchRequest.getSize())
                         ? mappedIdPairs.size()
