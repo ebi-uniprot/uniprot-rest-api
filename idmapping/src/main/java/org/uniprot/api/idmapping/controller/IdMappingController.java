@@ -1,17 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -21,10 +9,26 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
 import org.uniprot.api.idmapping.service.IDMappingPIRService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
 
 /**
  * Created 15/02/2021
@@ -42,8 +46,9 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
     public IdMappingController(
             ApplicationEventPublisher eventPublisher,
             IDMappingPIRService idMappingService,
+            MessageConverterContextFactory<IdMappingStringPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, null, downloadTaskExecutor, IDMAPPING_PIR);
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, IDMAPPING_PIR);
         this.idMappingService = idMappingService;
     }
 
@@ -56,10 +61,13 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
                 APPLICATION_XML_VALUE
             })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> search(
-            @Valid @ModelAttribute IDMappingPIRService searchRequest,
+            @Valid @ModelAttribute IdMappingBasicRequest mappingRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        return null;
+        IdMappingResult idMappingResult = idMappingService.doPIRRequest(mappingRequest);
+        QueryResult<IdMappingStringPair> queryResult =
+                idMappingService.queryResultPage(mappingRequest, idMappingResult);
+        return super.getSearchResponse(queryResult, null, request, response);
     }
 
     @PostMapping(
@@ -71,10 +79,13 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
                 APPLICATION_XML_VALUE
             })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> stream(
-            @Valid @ModelAttribute IDMappingPIRService searchRequest,
+            @Valid @ModelAttribute IdMappingBasicRequest mappingRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        return null;
+        IdMappingResult idMappingResult = idMappingService.doPIRRequest(mappingRequest);
+        QueryResult<IdMappingStringPair> queryResult =
+                idMappingService.queryResultAll(idMappingResult);
+        return super.getSearchResponse(queryResult, null, request, response);
     }
 
     @Override

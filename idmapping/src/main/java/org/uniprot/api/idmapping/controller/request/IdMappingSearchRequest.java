@@ -15,10 +15,6 @@ public class IdMappingSearchRequest extends IdMappingBasicRequest implements Sea
 
     private String facetFilter;
 
-    private String cursor;
-
-    private Integer size;
-
     @Override
     public String getQuery() {
         return "";

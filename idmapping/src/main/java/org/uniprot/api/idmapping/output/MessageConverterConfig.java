@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -62,28 +64,53 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                JsonMessageConverter<StringUniProtKBEntryPair> idMappingPairJsonMessageConverter =
+                JsonMessageConverter<StringUniProtKBEntryPair> kbMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                                 StringUniProtKBEntryPair.class,
                                 null);
-                converters.add(0, idMappingPairJsonMessageConverter);
+                converters.add(0, kbMappingPairJsonMessageConverter);
+
+                JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
+                        new JsonMessageConverter<>(
+                                new ObjectMapper(),
+                                IdMappingStringPair.class,
+                                null);
+                converters.add(1, idMappingPairJsonMessageConverter);
             }
         };
     }
 
-    @Bean("idMappingMessageConverterContextFactory")
-    public MessageConverterContextFactory<StringUniProtKBEntryPair>
-            messageConverterContextFactory() {
-        MessageConverterContextFactory<StringUniProtKBEntryPair> contextFactory =
+    @Bean("stringPairMessageConverterContextFactory")
+    public MessageConverterContextFactory<IdMappingStringPair>
+    stringPairMessageConverterContextFactory() {
+        MessageConverterContextFactory<IdMappingStringPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(context(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
+        asList(idMappingContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
 
-    private MessageConverterContext<StringUniProtKBEntryPair> context(MediaType contentType) {
+    @Bean("stringUniProtKBEntryPairMessageConverterContextFactory")
+    public MessageConverterContextFactory<StringUniProtKBEntryPair>
+            stringUniProtKBEntryPairMessageConverterContextFactory() {
+        MessageConverterContextFactory<StringUniProtKBEntryPair> contextFactory =
+                new MessageConverterContextFactory<>();
+
+        asList(kbContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    private MessageConverterContext<IdMappingStringPair> idMappingContext(MediaType contentType) {
+        return MessageConverterContext.<IdMappingStringPair>builder()
+                .resource(MessageConverterContextFactory.Resource.IDMAPPING_PIR)
+                .contentType(contentType)
+                .build();
+    }
+
+    private MessageConverterContext<StringUniProtKBEntryPair> kbContext(MediaType contentType) {
         return MessageConverterContext.<StringUniProtKBEntryPair>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIPROTKB)
                 .contentType(contentType)

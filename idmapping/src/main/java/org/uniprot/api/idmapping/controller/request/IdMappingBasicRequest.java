@@ -15,4 +15,9 @@ public class IdMappingBasicRequest {
     private String taxId;
     private String fields;
     private String sort;
+
+    private String cursor;
+
+    private Integer size;
+
 }
