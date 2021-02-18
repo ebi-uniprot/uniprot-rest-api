@@ -5,7 +5,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,6 +24,8 @@ import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created 21/08/18
@@ -73,9 +74,7 @@ public class MessageConverterConfig {
 
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
-                                new ObjectMapper(),
-                                IdMappingStringPair.class,
-                                null);
+                                new ObjectMapper(), IdMappingStringPair.class, null);
                 converters.add(1, idMappingPairJsonMessageConverter);
             }
         };
@@ -83,11 +82,12 @@ public class MessageConverterConfig {
 
     @Bean("stringPairMessageConverterContextFactory")
     public MessageConverterContextFactory<IdMappingStringPair>
-    stringPairMessageConverterContextFactory() {
+            stringPairMessageConverterContextFactory() {
         MessageConverterContextFactory<IdMappingStringPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(idMappingContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
+        asList(idMappingContext(APPLICATION_JSON))
+                .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }

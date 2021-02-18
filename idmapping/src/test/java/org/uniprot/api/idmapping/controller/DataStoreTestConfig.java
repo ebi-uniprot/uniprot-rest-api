@@ -1,5 +1,9 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.mockito.Mockito.mock;
+
+import java.net.URISyntaxException;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -12,10 +16,6 @@ import org.uniprot.api.idmapping.service.IDMappingPIRService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
-
-import java.net.URISyntaxException;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * @author sahmad
