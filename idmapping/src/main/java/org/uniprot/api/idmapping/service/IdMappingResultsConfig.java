@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
@@ -22,6 +23,8 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.datastore.voldemort.VoldemortClient;
+import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
 import org.uniprot.store.search.SolrCollection;
 
 /**
@@ -92,5 +95,22 @@ public class IdMappingResultsConfig {
                 .zookeeperHost(configProperties.getZkHost())
                 .httpClient(httpClient)
                 .build();
+    }
+
+    @Bean
+    @Profile("live")
+    public UniProtStoreClient<UniProtKBEntry> uniProtStoreClient(
+            UniProtStoreConfigProperties uniProtStoreConfigProperties) {
+        VoldemortClient<UniProtKBEntry> client =
+                new VoldemortRemoteUniProtKBEntryStore(
+                        uniProtStoreConfigProperties.getNumberOfConnections(),
+                        uniProtStoreConfigProperties.getStoreName(),
+                        uniProtStoreConfigProperties.getHost());
+        return new UniProtStoreClient<>(client);
+    }
+
+    @Bean
+    public UniProtStoreConfigProperties storeConfigProperties() {
+        return new UniProtStoreConfigProperties();
     }
 }

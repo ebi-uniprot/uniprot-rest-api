@@ -18,15 +18,16 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class})
 @ComponentScan(
-        basePackages = {"org.uniprot.api.idmapping", "org.uniprot.api.rest"},
-        excludeFilters = {
-            @ComponentScan.Filter(
-                    type = FilterType.ASSIGNABLE_TYPE,
-                    classes = RepositoryConfig.class),
-            @ComponentScan.Filter(
-                    type = FilterType.REGEX,
-                    pattern = "org\\.uniprot\\.api\\.rest\\.service\\..*")
-        })
+        basePackages = {"org.uniprot.api.idmapping", "org.uniprot.api.rest"})
+//,
+//        excludeFilters = {
+//            @ComponentScan.Filter(
+//                    type = FilterType.ASSIGNABLE_TYPE,
+//                    classes = RepositoryConfig.class),
+//            @ComponentScan.Filter(
+//                    type = FilterType.REGEX,
+//                    pattern = "org\\.uniprot\\.api\\.rest\\.service\\..*")
+//        })
 public class IDMappingREST {
     public static void main(String[] args) {
         SpringApplication.run(IDMappingREST.class, args);
