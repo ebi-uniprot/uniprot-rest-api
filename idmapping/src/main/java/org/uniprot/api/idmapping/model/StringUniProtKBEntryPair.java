@@ -13,5 +13,5 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @Builder
 public class StringUniProtKBEntryPair {
     private String from;
-    private UniProtKBEntry entry;
+    private UniProtKBEntry to;
 }

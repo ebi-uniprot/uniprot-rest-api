@@ -60,7 +60,7 @@ public class UniProtKBIdMappingController extends BasicSearchController<StringUn
 
     @Override
     protected String getEntityId(StringUniProtKBEntryPair entity) {
-        return entity.getEntry().getPrimaryAccession().getValue();
+        return entity.getTo().getPrimaryAccession().getValue();
     }
 
     @Override

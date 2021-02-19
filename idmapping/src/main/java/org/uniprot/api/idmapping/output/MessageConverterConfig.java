@@ -4,10 +4,12 @@ import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +26,10 @@ import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -65,11 +71,13 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
 
+                ReturnFieldConfig returnFieldConfig = getUniProtKBIdMappingReturnFieldConfig();
+
                 JsonMessageConverter<StringUniProtKBEntryPair> kbMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                                 StringUniProtKBEntryPair.class,
-                                null);
+                                returnFieldConfig);
                 converters.add(0, kbMappingPairJsonMessageConverter);
 
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
@@ -115,5 +123,42 @@ public class MessageConverterConfig {
                 .resource(MessageConverterContextFactory.Resource.UNIPROTKB)
                 .contentType(contentType)
                 .build();
+    }
+
+    private ReturnFieldConfig getUniProtKBIdMappingReturnFieldConfig() {
+        ReturnFieldConfig uniProtKBReturnField =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
+        // clone it to avoid messing with the global constant
+        ReturnFieldConfig idMappingReturnConfig =
+                (ReturnFieldConfig) SerializationUtils.clone(uniProtKBReturnField);
+        List<ReturnField> returnFields =
+                idMappingReturnConfig.getReturnFields().stream()
+                        .map(this::updatePath)
+                        .collect(Collectors.toList());
+        idMappingReturnConfig.getReturnFields().clear();
+        ReturnField fromField = getFromReturnField();
+        idMappingReturnConfig.getReturnFields().add(fromField);// add required from field on the fly
+        idMappingReturnConfig.getReturnFields().addAll(returnFields);
+        return idMappingReturnConfig;
+    }
+    // prefix to. in the return field path
+    private ReturnField updatePath(ReturnField returnField) {
+        ReturnField updatedReturnField = returnField;
+        List<String> oldPaths =
+                returnField.getPaths().stream()
+                        .map(path -> "to." + path)
+                        .collect(Collectors.toList());
+        updatedReturnField.setPaths(oldPaths);
+        return updatedReturnField;
+    }
+
+    // add a required field from to be returned in the response all the time
+    private ReturnField getFromReturnField() {
+        ReturnField fromReturnField = new ReturnField();
+        fromReturnField.setName("from");
+        fromReturnField.setId("from");
+        fromReturnField.addPath("from");
+        fromReturnField.setIsRequiredForJson(true);
+        return fromReturnField;
     }
 }
