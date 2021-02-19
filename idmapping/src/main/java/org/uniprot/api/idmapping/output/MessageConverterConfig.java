@@ -71,13 +71,13 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                ReturnFieldConfig returnFieldConfig = getUniProtKBIdMappingReturnFieldConfig();
+                ReturnFieldConfig uniProtKBReturnFieldCfg = getIdMappingReturnFieldConfig(UniProtDataType.UNIPROTKB);
 
                 JsonMessageConverter<StringUniProtKBEntryPair> kbMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                                 StringUniProtKBEntryPair.class,
-                                returnFieldConfig);
+                                uniProtKBReturnFieldCfg);
                 converters.add(0, kbMappingPairJsonMessageConverter);
 
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
@@ -125,19 +125,21 @@ public class MessageConverterConfig {
                 .build();
     }
 
-    private ReturnFieldConfig getUniProtKBIdMappingReturnFieldConfig() {
-        ReturnFieldConfig uniProtKBReturnField =
-                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
+    private ReturnFieldConfig getIdMappingReturnFieldConfig(UniProtDataType dataType) {
+        ReturnFieldConfig returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(dataType);
         // clone it to avoid messing with the global constant
         ReturnFieldConfig idMappingReturnConfig =
-                (ReturnFieldConfig) SerializationUtils.clone(uniProtKBReturnField);
+                (ReturnFieldConfig) SerializationUtils.clone(returnFieldConfig);
         List<ReturnField> returnFields =
                 idMappingReturnConfig.getReturnFields().stream()
                         .map(this::updatePath)
                         .collect(Collectors.toList());
         idMappingReturnConfig.getReturnFields().clear();
         ReturnField fromField = getFromReturnField();
-        idMappingReturnConfig.getReturnFields().add(fromField);// add required from field on the fly
+        idMappingReturnConfig
+                .getReturnFields()
+                .add(fromField); // add required from field on the fly
         idMappingReturnConfig.getReturnFields().addAll(returnFields);
         return idMappingReturnConfig;
     }
