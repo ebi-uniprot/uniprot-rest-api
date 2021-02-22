@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.controller.request;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode
+@Builder
 public class IdMappingRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the from type")
