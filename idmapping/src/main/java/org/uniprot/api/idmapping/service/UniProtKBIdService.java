@@ -50,7 +50,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
                     searchBySolrStream(mappedIds, searchRequest);
 
             facets = solrStreamResponse.getFacets();
-            //TODO: WILL FAIL IF ONLY QUERY, NEED TO THINK
+            // TODO: WILL FAIL IF ONLY QUERY, NEED TO THINK
             if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
                 // Apply Filter in PIR result
                 List<String> solrFilteredIds = solrStreamResponse.getAccessions();
@@ -100,7 +100,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
             IdMappingStringPair mId, Map<String, UniProtKBEntry> idEntryMap) {
         return StringUniProtKBEntryPair.builder()
                 .from(mId.getFrom())
-                .entry(idEntryMap.get(mId.getTo()))
+                .to(idEntryMap.get(mId.getTo()))
                 .build();
     }
 

@@ -6,8 +6,6 @@ import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
-import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;

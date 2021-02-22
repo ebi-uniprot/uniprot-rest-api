@@ -1,29 +1,13 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.mockito.Mockito.mock;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,21 +26,72 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IDMappingPIRService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.core.json.parser.taxonomy.TaxonomyLineageTest;
+import org.uniprot.core.json.parser.uniprot.FeatureTest;
+import org.uniprot.core.json.parser.uniprot.GeneLocationTest;
+import org.uniprot.core.json.parser.uniprot.GeneTest;
+import org.uniprot.core.json.parser.uniprot.OrganimHostTest;
+import org.uniprot.core.json.parser.uniprot.UniProtKBCrossReferenceTest;
+import org.uniprot.core.json.parser.uniprot.comment.AlternativeProductsCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.BPCPCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.CatalyticActivityCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.CofactorCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.DiseaseCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.FreeTextCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.InteractionCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.MassSpectrometryCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.RnaEditingCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.SequenceCautionCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.SubcellularLocationCommentTest;
+import org.uniprot.core.json.parser.uniprot.comment.WebResourceCommentTest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.comment.Comment;
+import org.uniprot.core.uniprotkb.comment.CommentType;
+import org.uniprot.core.uniprotkb.comment.FreeTextComment;
+import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentBuilder;
+import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentImpl;
+import org.uniprot.core.uniprotkb.evidence.impl.EvidencedValueBuilder;
+import org.uniprot.core.uniprotkb.feature.UniProtKBFeature;
+import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.xdb.UniProtKBCrossReference;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.go.GORepo;
+import org.uniprot.cv.xdb.UniProtDatabaseTypes;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.DocumentConverter;
-import org.uniprot.store.search.document.uniparc.UniParcDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -71,10 +106,13 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     private static final String UNIPROTKB_ID_MAPPING_SEARCH = "/uniprotkb/idmapping/search";
 
-    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
-    @Autowired private IDMappingPIRService pirService;
+    @Autowired
+    private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired
+    private IDMappingPIRService pirService;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
@@ -104,7 +142,18 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 entryBuilder.entryType(UniProtKBEntryType.TREMBL);
             }
 
+            List<Comment> comments = createAllComments();
+            entryBuilder.extraAttributesAdd(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
+            entryBuilder.lineagesAdd(TaxonomyLineageTest.getCompleteTaxonomyLineage());
+            entryBuilder.geneLocationsAdd(GeneLocationTest.getGeneLocation());
+            entryBuilder.genesAdd(GeneTest.createCompleteGene());
+            entryBuilder.organismHostsAdd(OrganimHostTest.getOrganismHost());
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
+            uniProtKBEntry.getComments().addAll(comments);
+
+            uniProtKBEntry.getUniProtKBCrossReferences().addAll(createDatabases());
+            uniProtKBEntry.getFeatures().addAll(getFeatures());
+
             storeClient.saveEntry(uniProtKBEntry);
 
             UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
@@ -138,9 +187,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
                 .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
                 .andExpect(
-                        jsonPath(
-                                "$.results.*.entry.primaryAccession",
-                                contains("Q00001", "Q00002")));
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")));
     }
 
     @Test
@@ -181,7 +228,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                 contains("Q00001", "Q00002", "Q00003", "Q00004", "Q00005")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.entry.primaryAccession",
+                                "$.results.*.to.primaryAccession",
                                 contains("Q00001", "Q00002", "Q00003", "Q00004", "Q00005")));
     }
 
@@ -226,7 +273,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                         "Q00007", "Q00008", "Q00009", "Q00010")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.entry.primaryAccession",
+                                "$.results.*.to.primaryAccession",
                                 contains(
                                         "Q00001", "Q00002", "Q00003", "Q00004", "Q00005", "Q00006",
                                         "Q00007", "Q00008", "Q00009", "Q00010")));
@@ -274,7 +321,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                         "Q00007", "Q00008", "Q00009", "Q00010")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.entry.primaryAccession",
+                                "$.results.*.to.primaryAccession",
                                 contains(
                                         "Q00001", "Q00002", "Q00003", "Q00004", "Q00005", "Q00006",
                                         "Q00007", "Q00008", "Q00009", "Q00010")));
@@ -314,7 +361,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                         "Q00017", "Q00018", "Q00019", "Q00020")))
                 .andExpect(
                         jsonPath(
-                                "$.results.*.entry.primaryAccession",
+                                "$.results.*.to.primaryAccession",
                                 contains(
                                         "Q00011", "Q00012", "Q00013", "Q00014", "Q00015", "Q00016",
                                         "Q00017", "Q00018", "Q00019", "Q00020")));
@@ -421,7 +468,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("from", "ACC")
                                 .param("to", "ACC")
-                                .param("facets","proteins_with,reviewed")
+                                .param("facets", "proteins_with,reviewed")
                                 .param("ids", "Q00001,Q00002"));
         // then
         response.andDo(print())
@@ -430,9 +477,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
                 .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
                 .andExpect(
-                        jsonPath(
-                                "$.results.*.entry.primaryAccession",
-                                contains("Q00001", "Q00002")));
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")));
     }
 
     @Test
@@ -452,7 +497,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("from", "ACC")
                                 .param("to", "ACC")
-                                .param("facets","proteins_with,reviewed")
+                                .param("facets", "proteins_with,reviewed")
                                 .param("query", "reviewed:true")
                                 .param("ids", "Q00001,Q00002"));
         // then
@@ -461,10 +506,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(1)))
                 .andExpect(jsonPath("$.results.*.from", contains("Q00002")))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.entry.primaryAccession",
-                                contains("Q00002")));
+                .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00002")));
     }
 
     @Test
@@ -494,9 +536,107 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
                 .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
                 .andExpect(
-                        jsonPath(
-                                "$.results.*.entry.primaryAccession",
-                                contains("Q00001", "Q00002")))
-                .andExpect(jsonPath("$.failedIds", contains("S12345","T12345")));
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")))
+                .andExpect(jsonPath("$.failedIds", contains("S12345", "T12345")));
+    }
+
+    // FIXME add more data to the sample object to have all the paths populated to return
+    @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
+    @MethodSource("getAllReturnedFields")
+    void searchCanSearchWithAllAvailableReturnedFields(String name, List<String> paths)
+            throws Exception {
+
+        assertThat(name, notNullValue());
+        assertThat(paths, notNullValue());
+        // when
+        IdMappingResult pirResponse =
+                IdMappingResult.builder()
+                        .mappedIds(List.of(new IdMappingStringPair("Q00001", "Q00001")))
+                        .build();
+        Mockito.when(pirService.doPIRRequest(ArgumentMatchers.any())).thenReturn(pirResponse);
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "ACC")
+                                .param("to", "ACC")
+                                .param("ids", "Q00001")
+                                .param("fields", name));
+
+        // then
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                        .andExpect(jsonPath("$.results.size()", Matchers.is(1)))
+                        .andExpect(jsonPath("$.results.*.from", contains("Q00001")))
+                        .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00001")));
+        for (String path : paths) {
+            String returnFieldValidatePath = "$.results[*].to." + path;
+            resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
+        }
+    }
+
+    protected Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB)
+                .getReturnFields().stream()
+                .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
+    }
+
+    private List<Comment> createAllComments() {
+        List<Comment> comments = new ArrayList<>();
+        comments.add(AlternativeProductsCommentTest.getAlternativeProductsComment());
+        comments.add(BPCPCommentTest.getBpcpComment());
+        comments.add(CatalyticActivityCommentTest.getCatalyticActivityComment());
+        comments.add(CofactorCommentTest.getCofactorComment());
+        comments.add(DiseaseCommentTest.getDiseaseComment());
+        comments.add(FreeTextCommentTest.getFreeTextComment());
+        comments.add(FreeTextCommentTest.getFreeTextComment2());
+        comments.add(InteractionCommentTest.getInteractionComment());
+        comments.add(MassSpectrometryCommentTest.getMassSpectrometryComment());
+        comments.add(RnaEditingCommentTest.getRnaEditingComment());
+        comments.add(SequenceCautionCommentTest.getSequenceCautionComment());
+        comments.add(SubcellularLocationCommentTest.getSubcellularLocationComment());
+        comments.add(WebResourceCommentTest.getWebResourceComment());
+        List<Comment> freeTextComments =
+                Arrays.stream(CommentType.values())
+                        .filter(FreeTextCommentImpl::isFreeTextCommentType)
+                        .map(FreeTextCommentTest::getFreeTextComment)
+                        .collect(Collectors.toList());
+
+        FreeTextComment similarityFamily =
+                new FreeTextCommentBuilder()
+                        .commentType(CommentType.SIMILARITY)
+                        .textsAdd(
+                                new EvidencedValueBuilder()
+                                        .value("Belongs to the NSMF family")
+                                        .build())
+                        .build();
+        freeTextComments.add(similarityFamily);
+
+        comments.addAll(freeTextComments);
+        return comments;
+    }
+
+    private List<UniProtKBCrossReference> createDatabases() {
+        List<UniProtKBCrossReference> xrefs =
+                UniProtDatabaseTypes.INSTANCE.getAllDbTypes().stream()
+                        .map(UniProtDatabaseDetail::getName)
+                        .map(UniProtKBCrossReferenceTest::getUniProtDBCrossReference)
+                        .collect(Collectors.toList());
+
+        xrefs.add(UniProtKBCrossReferenceTest.getUniProtDBGOCrossReferences("C", "IDA"));
+        xrefs.add(UniProtKBCrossReferenceTest.getUniProtDBGOCrossReferences("F", "IDA"));
+        xrefs.add(UniProtKBCrossReferenceTest.getUniProtDBGOCrossReferences("P", "IDA"));
+        return xrefs;
+    }
+
+    private List<UniProtKBFeature> getFeatures() {
+        List<UniProtKBFeature> features =
+                Arrays.stream(UniprotKBFeatureType.values())
+                        .map(FeatureTest::getFeature)
+                        .collect(Collectors.toList());
+        return features;
     }
 }
