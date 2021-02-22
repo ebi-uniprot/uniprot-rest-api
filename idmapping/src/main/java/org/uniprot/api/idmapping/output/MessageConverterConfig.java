@@ -71,7 +71,8 @@ public class MessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                ReturnFieldConfig uniProtKBReturnFieldCfg = getIdMappingReturnFieldConfig(UniProtDataType.UNIPROTKB);
+                ReturnFieldConfig uniProtKBReturnFieldCfg =
+                        getIdMappingReturnFieldConfig(UniProtDataType.UNIPROTKB);
 
                 JsonMessageConverter<StringUniProtKBEntryPair> kbMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
