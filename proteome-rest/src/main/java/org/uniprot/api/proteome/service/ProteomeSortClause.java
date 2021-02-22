@@ -1,5 +1,7 @@
 package org.uniprot.api.proteome.service;
 
+import static org.uniprot.api.rest.search.SortUtils.*;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -2,8 +2,11 @@ package org.uniprot.api.idmapping.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -15,7 +18,9 @@ import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingStreamRequest;
+import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author sahmad
@@ -66,7 +71,7 @@ public abstract class BasicIdService<T, U> {
         // construct the query for tuple stream
         StringBuilder qb = new StringBuilder();
         qb.append("({!terms f=")
-                .append(getFacetIdField())
+                .append(getSolrIdField())
                 .append("}")
                 .append(String.join(",", ids))
                 .append(")");
@@ -76,10 +81,33 @@ public abstract class BasicIdService<T, U> {
             solrRequestBuilder.searchAccession(Boolean.TRUE);
         }
 
+        if (Utils.notNullNotEmpty(searchRequest.getSort())) {
+            List<SolrQuery.SortClause> sort = SortUtils.parseSortClause(getUniProtDataType(), searchRequest.getSort());
+            solrRequestBuilder.searchSort(getSearchSort(sort));
+            solrRequestBuilder.searchFieldList(getFieldList(sort));
+            solrRequestBuilder.searchAccession(Boolean.TRUE);
+        }
+
         return solrRequestBuilder.query(qb.toString()).facets(searchRequest.getFacetList()).build();
     }
 
-    public abstract String getFacetIdField();
+    private String getSearchSort(List<SolrQuery.SortClause> sort) {
+        return sort.stream()
+                .map(clause -> clause.getItem()+" "+clause.getOrder().name())
+                .collect(Collectors.joining(","));
+    }
+
+    private String getFieldList(List<SolrQuery.SortClause> sort){
+        Set<String> fieldList = sort.stream()
+                .map(SolrQuery.SortClause::getItem)
+                .collect(Collectors.toSet());
+        fieldList.add(getSolrIdField());
+        return String.join(",", fieldList);
+    }
+
+    public abstract String getSolrIdField();
+
+    public abstract UniProtDataType getUniProtDataType();
 
     protected Integer getDefaultPageSize() {
         return this.defaultPageSize;

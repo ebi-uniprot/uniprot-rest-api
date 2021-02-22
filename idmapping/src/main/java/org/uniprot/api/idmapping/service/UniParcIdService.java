@@ -7,6 +7,7 @@ import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequ
 import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author sahmad
@@ -28,7 +29,12 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, StringUniProt
     }
 
     @Override
-    public String getFacetIdField() {
+    public String getSolrIdField() {
         return "upi";
+    }
+
+    @Override
+    public UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPARC;
     }
 }

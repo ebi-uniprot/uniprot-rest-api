@@ -21,11 +21,6 @@ public class FakeSolrSortClause extends AbstractSolrSortClause {
     }
 
     @Override
-    public String getSolrSortFieldName(String name) {
-        return name + "_field";
-    }
-
-    @Override
     protected UniProtDataType getUniProtDataType() {
         return null;
     }

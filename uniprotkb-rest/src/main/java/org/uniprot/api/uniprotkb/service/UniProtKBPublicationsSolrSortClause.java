@@ -42,9 +42,4 @@ public class UniProtKBPublicationsSolrSortClause extends AbstractSolrSortClause 
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
     }
-
-    @Override
-    public String getSolrSortFieldName(String name) {
-        return super.getSolrSortFieldName(name);
-    }
 }

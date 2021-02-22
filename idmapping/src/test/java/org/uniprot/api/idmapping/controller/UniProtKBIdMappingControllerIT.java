@@ -1,5 +1,27 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -63,6 +85,9 @@ import org.uniprot.cv.go.GORepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
@@ -70,28 +95,6 @@ import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.mock;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -106,13 +109,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     private static final String UNIPROTKB_ID_MAPPING_SEARCH = "/uniprotkb/idmapping/search";
 
-    @Autowired
-    private UniProtStoreClient<UniProtKBEntry> storeClient;
-    @Autowired
-    private IDMappingPIRService pirService;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private IDMappingPIRService pirService;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
@@ -143,7 +143,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
             }
 
             List<Comment> comments = createAllComments();
-            entryBuilder.extraAttributesAdd(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
+            entryBuilder.extraAttributesAdd(
+                    UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
             entryBuilder.lineagesAdd(TaxonomyLineageTest.getCompleteTaxonomyLineage());
             entryBuilder.geneLocationsAdd(GeneLocationTest.getGeneLocation());
             entryBuilder.genesAdd(GeneTest.createCompleteGene());
@@ -509,6 +510,36 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00002")));
     }
 
+    @ParameterizedTest(name = "[{index}] sortFieldName {0}")
+    @MethodSource("getAllSortFields")
+    void testUniProtKBToUniProtKBMappingWithSort(String sortField) throws Exception {
+        // when
+        IdMappingResult pirResponse =
+                IdMappingResult.builder()
+                        .mappedIds(
+                                List.of(
+                                        new IdMappingStringPair("Q00001", "Q00001"),
+                                        new IdMappingStringPair("Q00002", "Q00002")))
+                        .build();
+        Mockito.when(pirService.doPIRRequest(ArgumentMatchers.any())).thenReturn(pirResponse);
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "ACC")
+                                .param("to", "ACC")
+                                .param("facets", "proteins_with,reviewed")
+                                .param("sort", sortField + " asc")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00001","Q00002")))
+                .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00001","Q00002")));
+    }
+
     @Test
     void testUniProtKBToUniProtKBMappingWithUnmappedIds() throws Exception {
         // when
@@ -638,5 +669,13 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                         .map(FeatureTest::getFeature)
                         .collect(Collectors.toList());
         return features;
+    }
+
+    private Stream<Arguments> getAllSortFields() {
+        SearchFieldConfig fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+        return fieldConfig.getSearchFieldItems().stream()
+                .map(SearchFieldItem::getFieldName)
+                .filter(fieldConfig::correspondingSortFieldExists)
+                .map(Arguments::of);
     }
 }

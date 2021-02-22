@@ -5,6 +5,8 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
+import org.uniprot.core.util.Utils;
+
 /**
  * Represents a request object containing the details to create a Solr streaming expressions for a
  * facets function call and/or search function
@@ -28,10 +30,21 @@ public class SolrStreamFacetRequest {
     private String requestHandler = "/export";
 
     @Builder
-    SolrStreamFacetRequest(String query, List<String> facets, boolean searchAccession) {
+    SolrStreamFacetRequest(
+            String query,
+            List<String> facets,
+            boolean searchAccession,
+            String searchSort,
+            String searchFieldList) {
         this.query = query;
         this.facets = facets;
         this.searchAccession = searchAccession;
+        if (Utils.notNullNotEmpty(searchSort)) {
+            this.searchSort = searchSort;
+        }
+        if (Utils.notNullNotEmpty(searchFieldList)) {
+            this.searchFieldList = searchFieldList;
+        }
         this.bucketSizeLimit = BUCKET_SIZE;
         this.bucketSorts = BUCKET_SORTS;
         this.metrics = METRICS;

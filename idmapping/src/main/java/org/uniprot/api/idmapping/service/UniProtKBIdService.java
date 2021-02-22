@@ -19,6 +19,7 @@ import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author sahmad
@@ -42,21 +43,46 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
         // get the mapped ids from PIR
         IdMappingResult mappingResult = idMappingService.doPIRRequest(searchRequest);
         List<IdMappingStringPair> mappedIdPairs = mappingResult.getMappedIds();
-        List<String> mappedIds =
-                mappedIdPairs.stream().map(IdMappingStringPair::getTo).collect(Collectors.toList());
         List<Facet> facets = null;
-        if (Utils.notNullNotEmpty(searchRequest.getFacets())) {
-            SolrStreamFacetResponse solrStreamResponse =
-                    searchBySolrStream(mappedIds, searchRequest);
+        if (needSearchInSolr(searchRequest)) {
+
+            List<String> toIds =
+                    mappedIdPairs.stream()
+                            .map(IdMappingStringPair::getTo)
+                            .collect(Collectors.toList());
+
+            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
 
             facets = solrStreamResponse.getFacets();
-            // TODO: WILL FAIL IF ONLY QUERY, NEED TO THINK
+
+            List<String> solrToIds = solrStreamResponse.getAccessions();
             if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
                 // Apply Filter in PIR result
-                List<String> solrFilteredIds = solrStreamResponse.getAccessions();
                 mappedIdPairs =
                         mappedIdPairs.stream()
-                                .filter(idPair -> solrFilteredIds.contains(idPair.getTo()))
+                                .filter(idPair -> solrToIds.contains(idPair.getTo()))
+                                .collect(Collectors.toList());
+            }
+
+            if (Utils.notNullNotEmpty(searchRequest.getSort())) {
+                // create a Map<To,List<From>>
+                Map<String, List<String>> toMap =
+                        mappedIdPairs.stream()
+                                .collect(
+                                        Collectors.groupingBy(
+                                                IdMappingStringPair::getTo,
+                                                Collectors.mapping(
+                                                        IdMappingStringPair::getFrom,
+                                                        Collectors.toList())));
+                mappedIdPairs =
+                        solrToIds.stream()
+                                .flatMap(
+                                        to ->
+                                                toMap.get(to).stream()
+                                                        .map(
+                                                                from ->
+                                                                        new IdMappingStringPair(
+                                                                                from, to)))
                                 .collect(Collectors.toList());
             }
         }
@@ -92,8 +118,13 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
     }
 
     @Override
-    public String getFacetIdField() {
+    public String getSolrIdField() {
         return "accession_id";
+    }
+
+    @Override
+    public UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPROTKB;
     }
 
     private StringUniProtKBEntryPair convertToPair(
@@ -108,5 +139,11 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, StringUni
         return entries.collect(
                 Collectors.toMap(
                         entry -> entry.getPrimaryAccession().getValue(), Function.identity()));
+    }
+
+    private boolean needSearchInSolr(UniProtKBIdMappingSearchRequest searchRequest) {
+        return Utils.notNullNotEmpty(searchRequest.getQuery())
+                || Utils.notNullNotEmpty(searchRequest.getFacets())
+                || Utils.notNullNotEmpty(searchRequest.getSort());
     }
 }

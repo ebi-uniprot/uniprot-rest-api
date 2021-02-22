@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
+import org.uniprot.api.rest.search.SortUtils;
 
 /**
  * Unit Test class to validate UniProtSortUtil class behaviour
@@ -30,11 +31,7 @@ class UniProtSolrSortClauseTest {
     void testCreateSingleAccessionSortAsc() {
         List<SolrQuery.SortClause> sorts = uniProtSolrSortClause.getSort("accession asc");
 
-        assertThat(
-                sorts,
-                contains(
-                        SolrQuery.SortClause.asc(
-                                uniProtSolrSortClause.getSolrSortFieldName("accession"))));
+        assertThat(sorts, contains(SolrQuery.SortClause.asc(getSolrSortFieldName("accession"))));
     }
 
     @Test
@@ -44,9 +41,8 @@ class UniProtSolrSortClauseTest {
         assertThat(
                 sorts,
                 contains(
-                        SolrQuery.SortClause.desc(uniProtSolrSortClause.getSolrSortFieldName("id")),
-                        SolrQuery.SortClause.asc(
-                                uniProtSolrSortClause.getSolrSortFieldName("accession"))));
+                        SolrQuery.SortClause.desc(getSolrSortFieldName("id")),
+                        SolrQuery.SortClause.asc(getSolrSortFieldName("accession"))));
     }
 
     @Test
@@ -56,10 +52,8 @@ class UniProtSolrSortClauseTest {
         assertThat(
                 sorts,
                 contains(
-                        SolrQuery.SortClause.desc(
-                                uniProtSolrSortClause.getSolrSortFieldName("accession")),
-                        SolrQuery.SortClause.asc(
-                                uniProtSolrSortClause.getSolrSortFieldName("gene"))));
+                        SolrQuery.SortClause.desc(getSolrSortFieldName("accession")),
+                        SolrQuery.SortClause.asc(getSolrSortFieldName("gene"))));
     }
 
     @Test
@@ -70,12 +64,9 @@ class UniProtSolrSortClauseTest {
         assertThat(
                 sorts,
                 contains(
-                        SolrQuery.SortClause.asc(
-                                uniProtSolrSortClause.getSolrSortFieldName("organism_name")),
-                        SolrQuery.SortClause.desc(
-                                uniProtSolrSortClause.getSolrSortFieldName("mass")),
-                        SolrQuery.SortClause.asc(
-                                uniProtSolrSortClause.getSolrSortFieldName("accession"))));
+                        SolrQuery.SortClause.asc(getSolrSortFieldName("organism_name")),
+                        SolrQuery.SortClause.desc(getSolrSortFieldName("mass")),
+                        SolrQuery.SortClause.asc(getSolrSortFieldName("accession"))));
     }
 
     @Test
@@ -86,19 +77,22 @@ class UniProtSolrSortClauseTest {
                 sorts,
                 contains(
                         SolrQuery.SortClause.desc(AbstractSolrSortClause.SCORE),
-                        SolrQuery.SortClause.desc(
-                                uniProtSolrSortClause.getSolrSortFieldName("annotation_score")),
-                        SolrQuery.SortClause.asc(
-                                uniProtSolrSortClause.getSolrSortFieldName("accession"))));
+                        SolrQuery.SortClause.desc(getSolrSortFieldName("annotation_score")),
+                        SolrQuery.SortClause.asc(getSolrSortFieldName("accession"))));
     }
 
     @Test
     void canGetSortFieldWhenExists() {
-        assertThat(uniProtSolrSortClause.getSolrSortFieldName("accession"), is("accession_id"));
+        assertThat(getSolrSortFieldName("accession"), is("accession_id"));
     }
 
     @Test
     void gettingSortFieldWhenDoesntExistCausesException() {
-        assertThrows(Exception.class, () -> uniProtSolrSortClause.getSolrSortFieldName("XXXX"));
+        assertThrows(Exception.class, () -> getSolrSortFieldName("XXXX"));
+    }
+
+    private String getSolrSortFieldName(String fieldName) {
+        return SortUtils.getSolrSortFieldName(
+                uniProtSolrSortClause.getUniProtDataType(), fieldName);
     }
 }
