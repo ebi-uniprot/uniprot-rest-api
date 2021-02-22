@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.output;
 
 import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.commons.lang.SerializationUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,13 +26,14 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
+import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created 21/08/18
@@ -68,8 +70,11 @@ public class MessageConverterConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(new ErrorMessageConverter());
-                converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
+                int index = 0;
+                converters.add(index++, new ErrorMessageConverter());
+                converters.add(index++, new ErrorMessageXMLConverter()); // to handle xml error messages
+
+                // ------------------------- StringUniProtKBEntryPair -------------------------
 
                 ReturnFieldConfig uniProtKBReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIPROTKB);
@@ -79,12 +84,19 @@ public class MessageConverterConfig {
                                 UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                                 StringUniProtKBEntryPair.class,
                                 uniProtKBReturnFieldCfg);
-                converters.add(0, kbMappingPairJsonMessageConverter);
+                converters.add(index++, kbMappingPairJsonMessageConverter);
 
+                // ------------------------- IdMappingStringPair -------------------------
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 new ObjectMapper(), IdMappingStringPair.class, null);
-                converters.add(1, idMappingPairJsonMessageConverter);
+                converters.add(index++, idMappingPairJsonMessageConverter);
+                converters.add(
+                        index++,
+                        new TsvMessageConverter<>(
+                                IdMappingStringPair.class,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING),
+                                new IdMappingStringPairTSVMapper()));
             }
         };
     }

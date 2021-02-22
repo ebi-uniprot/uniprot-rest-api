@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
+import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
+
+import java.util.UUID;
 
 /**
  * @author sahmad
@@ -16,12 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(IDMAPPING_PATH)
 public class IdMappingJobController {
     static final String IDMAPPING_PATH = "/idmapping";
-    // TODO add request and response classes
+
     @PostMapping(
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
-    public Object submitJob(Object request) {
-        return null;
+    public JobSubmitResponse submitJob(IdMappingRequest request) {
+        String jobId = UUID.randomUUID().toString();//TODO call the service layer
+        JobSubmitResponse response = new JobSubmitResponse(jobId);
+        return response;
     }
 
     // TODO add response class
