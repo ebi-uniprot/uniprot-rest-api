@@ -1,5 +1,27 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -71,28 +93,6 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.mock;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * @author sahmad
  * @created 18/02/2021
@@ -106,13 +106,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     private static final String UNIPROTKB_ID_MAPPING_SEARCH = "/uniprotkb/idmapping/search";
 
-    @Autowired
-    private UniProtStoreClient<UniProtKBEntry> storeClient;
-    @Autowired
-    private IDMappingPIRService pirService;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private IDMappingPIRService pirService;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
@@ -143,7 +140,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
             }
 
             List<Comment> comments = createAllComments();
-            entryBuilder.extraAttributesAdd(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
+            entryBuilder.extraAttributesAdd(
+                    UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
             entryBuilder.lineagesAdd(TaxonomyLineageTest.getCompleteTaxonomyLineage());
             entryBuilder.geneLocationsAdd(GeneLocationTest.getGeneLocation());
             entryBuilder.genesAdd(GeneTest.createCompleteGene());
