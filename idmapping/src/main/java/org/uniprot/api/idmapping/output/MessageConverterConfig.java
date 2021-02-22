@@ -1,13 +1,8 @@
 package org.uniprot.api.idmapping.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,14 +13,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
+import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
 
 /**
  * Created 21/08/18
@@ -62,20 +64,30 @@ public class MessageConverterConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(new ErrorMessageConverter());
-                converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
+                int index = 0;
+                converters.add(index++, new ErrorMessageConverter());
+                converters.add(
+                        index++, new ErrorMessageXMLConverter()); // to handle xml error messages
 
+                // ------------------------- StringUniProtKBEntryPair -------------------------
                 JsonMessageConverter<StringUniProtKBEntryPair> kbMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                                 StringUniProtKBEntryPair.class,
                                 null);
-                converters.add(0, kbMappingPairJsonMessageConverter);
+                converters.add(index++, kbMappingPairJsonMessageConverter);
 
+                // ------------------------- IdMappingStringPair -------------------------
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 new ObjectMapper(), IdMappingStringPair.class, null);
-                converters.add(1, idMappingPairJsonMessageConverter);
+                converters.add(index++, idMappingPairJsonMessageConverter);
+                converters.add(
+                        index++,
+                        new TsvMessageConverter<>(
+                                IdMappingStringPair.class,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING),
+                                new IdMappingStringPairTSVMapper()));
             }
         };
     }
@@ -86,7 +98,9 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<IdMappingStringPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(idMappingContext(APPLICATION_JSON))
+        asList(
+                        idMappingContext(APPLICATION_JSON),
+                        idMappingContext(UniProtMediaType.TSV_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
