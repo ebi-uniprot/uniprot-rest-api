@@ -5,10 +5,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +30,10 @@ import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 
 /**
  * Created 21/08/18
