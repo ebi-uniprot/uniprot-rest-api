@@ -143,8 +143,7 @@ public class MessageConverterConfig {
         ReturnFieldConfig returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(dataType);
         // clone it to avoid messing with the global constant
-        ReturnFieldConfig idMappingReturnConfig =
-                SerializationUtils.clone(returnFieldConfig);
+        ReturnFieldConfig idMappingReturnConfig = SerializationUtils.clone(returnFieldConfig);
         List<ReturnField> returnFields =
                 idMappingReturnConfig.getReturnFields().stream()
                         .map(this::updatePath)
