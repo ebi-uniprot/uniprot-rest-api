@@ -155,18 +155,19 @@ public class MessageConverterConfig {
 
     @Bean("uniParcEntryPairMessageConverterContextFactory")
     public MessageConverterContextFactory<UniParcEntryPair>
-    uniParcEntryPairMessageConverterContextFactory() {
+            uniParcEntryPairMessageConverterContextFactory() {
         MessageConverterContextFactory<UniParcEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(uniParcContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
+        asList(uniParcContext(APPLICATION_JSON))
+                .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
 
     @Bean("uniRefEntryPairMessageConverterContextFactory")
     public MessageConverterContextFactory<UniRefEntryPair>
-    uniRefEntryPairMessageConverterContextFactory() {
+            uniRefEntryPairMessageConverterContextFactory() {
         MessageConverterContextFactory<UniRefEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 

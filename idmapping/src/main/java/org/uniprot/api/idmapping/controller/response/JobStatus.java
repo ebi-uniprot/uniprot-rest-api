@@ -6,6 +6,7 @@ package org.uniprot.api.idmapping.controller.response;
  * @author Edd
  */
 public enum JobStatus {
+    NEW,
     RUNNING,
     FINISHED,
     ERROR,

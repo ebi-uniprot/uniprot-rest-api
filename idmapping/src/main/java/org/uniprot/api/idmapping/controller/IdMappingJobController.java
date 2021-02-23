@@ -3,8 +3,10 @@ package org.uniprot.api.idmapping.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
 
-import java.util.UUID;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobStatusResponse;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
+import org.uniprot.api.idmapping.service.IdMappingJobService;
 
 /**
  * @author sahmad
@@ -25,13 +28,19 @@ import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 @RequestMapping(IDMAPPING_PATH)
 public class IdMappingJobController {
     static final String IDMAPPING_PATH = "/idmapping";
+    private final IdMappingJobService idMappingJobService;
+
+    @Autowired
+    public IdMappingJobController(IdMappingJobService idMappingJobService) {
+        this.idMappingJobService = idMappingJobService;
+    }
 
     @PostMapping(
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<JobSubmitResponse> submitJob(IdMappingRequest request) {
-        String jobId = UUID.randomUUID().toString(); // TODO call the service layer
-        JobSubmitResponse response = new JobSubmitResponse(jobId);
+    public ResponseEntity<JobSubmitResponse> submitJob(IdMappingRequest request)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
+        JobSubmitResponse response = this.idMappingJobService.submitJob(request);
         return ResponseEntity.ok(response);
     }
 

@@ -6,7 +6,7 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
  * @author sahmad
  * @created 23/02/2021
  */
-public interface IdMappingJobService {
+public interface IdMappingJobCacheService {
     void put(String key, IdMappingJob value);
 
     IdMappingJob get(String key);

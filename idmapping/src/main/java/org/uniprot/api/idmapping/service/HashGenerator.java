@@ -19,13 +19,17 @@ import org.uniprot.core.util.Utils;
  * @created 22/02/2021
  */
 public class HashGenerator {
+    private final String ALGORITHM_NAME = "PBKDF2WithHmacSHA1";
+    private final int ITERATION_COUNT = 16;
+    private final int KEY_LENGTH = 160;
+    private final String SALT_STR = "UNIPROT_SALT";
+    private final byte[] SALT = SALT_STR.getBytes(StandardCharsets.UTF_8);
 
     public String generateHash(IdMappingRequest request)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         char[] requestArray = convertRequestToArray(request);
-        byte[] salt = "UNIPROT".getBytes(StandardCharsets.UTF_8);
-        PBEKeySpec keySpec = new PBEKeySpec(requestArray, salt, 16, 80 * 2);
-        SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+        PBEKeySpec keySpec = new PBEKeySpec(requestArray, SALT, ITERATION_COUNT, KEY_LENGTH);
+        SecretKeyFactory skf = SecretKeyFactory.getInstance(ALGORITHM_NAME);
         byte[] hash = skf.generateSecret(keySpec).getEncoded();
         return Hex.encodeHexString(hash);
     }
@@ -36,7 +40,7 @@ public class HashGenerator {
         builder.append(request.getTo().strip().toLowerCase());
         // sort list of ids and append them into builder
         List<String> sortedIds = Arrays.asList(request.getIds().strip().split(","));
-        Collections.sort(sortedIds);
+        Collections.sort(sortedIds); // remove it
         sortedIds.stream().map(String::toLowerCase).map(String::strip).forEach(builder::append);
 
         if (Utils.notNullNotEmpty(request.getTaxId())) {

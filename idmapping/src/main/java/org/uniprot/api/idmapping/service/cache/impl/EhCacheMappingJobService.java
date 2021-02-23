@@ -2,17 +2,15 @@ package org.uniprot.api.idmapping.service.cache.impl;
 
 import org.springframework.cache.Cache;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.service.cache.IdMappingJobService;
+import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.core.util.Utils;
-
-import java.util.Objects;
 
 /**
  * Created 23/02/2021
  *
  * @author Edd
  */
-public class EhCacheMappingJobService implements IdMappingJobService {
+public class EhCacheMappingJobService implements IdMappingJobCacheService {
     private final Cache cache;
 
     public EhCacheMappingJobService(Cache cache) {

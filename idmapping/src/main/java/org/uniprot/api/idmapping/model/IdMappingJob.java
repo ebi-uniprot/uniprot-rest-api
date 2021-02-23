@@ -16,10 +16,12 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 @Data
 @Builder
 public class IdMappingJob {
+    private String jobId;
     private JobStatus jobStatus;
     private IdMappingRequest idMappingRequest;
     private IdMappingResult idMappingResult;
     private List<String> errorMessages;
-    private Date created;
-    private Date updated;
+    private long expiryInMillis = 5 * 60 * 1000; // 5 minutes
+    private Date created = new Date();
+    private Date updated = new Date();
 }
