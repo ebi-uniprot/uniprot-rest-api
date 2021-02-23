@@ -17,8 +17,6 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobStatusResponse;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 
-import java.util.UUID;
-
 /**
  * @author sahmad
  * @created 22/02/2021

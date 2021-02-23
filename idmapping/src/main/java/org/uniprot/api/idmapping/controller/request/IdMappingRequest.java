@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.controller.request;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,8 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @created 22/02/2021
  */
 @Data
+@Builder
+@AllArgsConstructor
 public class IdMappingRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the from type")
@@ -26,12 +29,4 @@ public class IdMappingRequest {
 
     @Parameter(description = "Value of the taxon Id")
     private String taxId;
-
-    @Builder
-    public IdMappingRequest(String from, String to, String ids, String taxId) {
-        this.from = from;
-        this.to = to;
-        this.ids = ids;
-        this.taxId = taxId;
-    }
 }
