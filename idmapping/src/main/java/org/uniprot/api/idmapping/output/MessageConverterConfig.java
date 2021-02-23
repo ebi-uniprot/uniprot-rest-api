@@ -20,14 +20,18 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
+import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
+import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
+import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -75,17 +79,41 @@ public class MessageConverterConfig {
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                // ------------------------- StringUniProtKBEntryPair -------------------------
+                // ------------------------- UniProtKbEntryPair -------------------------
 
                 ReturnFieldConfig uniProtKBReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIPROTKB);
 
-                JsonMessageConverter<UniProtKbEntryPair> kbMappingPairJsonMessageConverter =
+                JsonMessageConverter<UniProtKbEntryPair> uniprotPairJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniProtKbEntryPair.class,
                                 uniProtKBReturnFieldCfg);
-                converters.add(index++, kbMappingPairJsonMessageConverter);
+                converters.add(index++, uniprotPairJsonMessageConverter);
+
+                // ------------------------- UniParcEntryPair -------------------------
+
+                ReturnFieldConfig uniParcReturnFieldCfg =
+                        getIdMappingReturnFieldConfig(UniProtDataType.UNIPARC);
+
+                JsonMessageConverter<UniParcEntryPair> uniparcPairJsonMessageConverter =
+                        new JsonMessageConverter<>(
+                                UniParcJsonConfig.getInstance().getSimpleObjectMapper(),
+                                UniParcEntryPair.class,
+                                uniParcReturnFieldCfg);
+                converters.add(index++, uniparcPairJsonMessageConverter);
+
+                // ------------------------- UniRefEntryPair -------------------------
+
+                ReturnFieldConfig uniRefReturnFieldCfg =
+                        getIdMappingReturnFieldConfig(UniProtDataType.UNIREF);
+
+                JsonMessageConverter<UniRefEntryPair> uniRefPairJsonMessageConverter =
+                        new JsonMessageConverter<>(
+                                UniRefEntryLightJsonConfig.getInstance().getSimpleObjectMapper(),
+                                UniRefEntryPair.class,
+                                uniRefReturnFieldCfg);
+                converters.add(index++, uniRefPairJsonMessageConverter);
 
                 // ------------------------- IdMappingStringPair -------------------------
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
@@ -93,7 +121,7 @@ public class MessageConverterConfig {
                                 new ObjectMapper(), IdMappingStringPair.class, null);
                 converters.add(index++, idMappingPairJsonMessageConverter);
                 converters.add(
-                        index++,
+                        index,
                         new TsvMessageConverter<>(
                                 IdMappingStringPair.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING),
@@ -123,6 +151,42 @@ public class MessageConverterConfig {
         asList(kbContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
+    }
+
+    @Bean("uniParcEntryPairMessageConverterContextFactory")
+    public MessageConverterContextFactory<UniParcEntryPair>
+    uniParcEntryPairMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniParcEntryPair> contextFactory =
+                new MessageConverterContextFactory<>();
+
+        asList(uniParcContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    @Bean("uniRefEntryPairMessageConverterContextFactory")
+    public MessageConverterContextFactory<UniRefEntryPair>
+    uniRefEntryPairMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniRefEntryPair> contextFactory =
+                new MessageConverterContextFactory<>();
+
+        asList(uniRefContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    private MessageConverterContext<UniParcEntryPair> uniParcContext(MediaType contentType) {
+        return MessageConverterContext.<UniParcEntryPair>builder()
+                .resource(MessageConverterContextFactory.Resource.UNIPARC)
+                .contentType(contentType)
+                .build();
+    }
+
+    private MessageConverterContext<UniRefEntryPair> uniRefContext(MediaType contentType) {
+        return MessageConverterContext.<UniRefEntryPair>builder()
+                .resource(MessageConverterContextFactory.Resource.UNIREF)
+                .contentType(contentType)
+                .build();
     }
 
     private MessageConverterContext<IdMappingStringPair> idMappingContext(MediaType contentType) {
