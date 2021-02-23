@@ -9,8 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
+import org.uniprot.api.idmapping.service.HashGenerator;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
+
+import javax.validation.Valid;
 
 /**
  * @author sahmad
@@ -21,12 +26,14 @@ import java.util.UUID;
 public class IdMappingJobController {
     static final String IDMAPPING_PATH = "/idmapping";
 
+
+
     @PostMapping(
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
-    public JobSubmitResponse submitJob(IdMappingRequest request) {
+    public JobSubmitResponse submitJob(@Valid IdMappingRequest request) throws InvalidKeySpecException, NoSuchAlgorithmException {
         String jobId = UUID.randomUUID().toString();//TODO call the service layer
-        JobSubmitResponse response = new JobSubmitResponse(jobId);
+        JobSubmitResponse response = new JobSubmitResponse(new HashGenerator().generateHash(request));
         return response;
     }
 
