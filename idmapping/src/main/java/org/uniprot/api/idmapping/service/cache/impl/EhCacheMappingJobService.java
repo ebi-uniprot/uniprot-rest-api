@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.service.cache.impl;
 import org.springframework.cache.Cache;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobService;
+import org.uniprot.core.util.Utils;
 
 import java.util.Objects;
 
@@ -30,7 +31,7 @@ public class EhCacheMappingJobService implements IdMappingJobService {
 
     @Override
     public boolean exists(String key) {
-        return Objects.isNull(this.cache.get(key, IdMappingJob.class));
+        return Utils.notNull(this.cache.get(key, IdMappingJob.class));
     }
 
     @Override

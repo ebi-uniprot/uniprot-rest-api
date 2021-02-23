@@ -37,16 +37,66 @@ class EhCacheMappingJobServiceTest {
 
     @Test
     void canPut() {
-        assertThat(fakeCache.get("key", IdMappingJob.class), is(nullValue()));
+        String id = "id";
+        assertThat(fakeCache.get(id, IdMappingJob.class), is(nullValue()));
 
         IdMappingResult result =
                 IdMappingResult.builder().mappedId(new IdMappingStringPair("from1", "to1")).build();
         IdMappingJob job = IdMappingJob.builder().jobStatus(JobStatus.FINISHED).idMappingResult(result).build();
 
-        String id = "id";
         jobService.put(id, job);
 
         assertThat(fakeCache.get(id, IdMappingJob.class), is(job));
         assertThat(jobService.get(id), is(job));
+    }
+
+    @Test
+    void canOverwriteValue() {
+        String id = "id";
+        assertThat(fakeCache.get(id, IdMappingJob.class), is(nullValue()));
+
+        IdMappingResult value1 =
+                IdMappingResult.builder().build();
+        IdMappingJob job1 = IdMappingJob.builder().jobStatus(JobStatus.RUNNING).idMappingResult(value1).build();
+
+        IdMappingResult value2 =
+                IdMappingResult.builder().mappedId(new IdMappingStringPair("from1", "to1")).build();
+        IdMappingJob job2 = IdMappingJob.builder().jobStatus(JobStatus.FINISHED).idMappingResult(value2).build();
+
+
+        // put
+        jobService.put(id, job1);
+        assertThat(jobService.get(id), is(job1));
+
+        // overwrite with second put
+        jobService.put(id, job2);
+        assertThat(jobService.get(id), is(job2));
+    }
+
+    @Test
+    void checkExists() {
+        String id = "id";
+        IdMappingResult result =
+                IdMappingResult.builder().mappedId(new IdMappingStringPair("from1", "to1")).build();
+        IdMappingJob job = IdMappingJob.builder().jobStatus(JobStatus.FINISHED).idMappingResult(result).build();
+
+        assertThat(jobService.exists(id), is(false));
+
+        jobService.put(id, job);
+        assertThat(jobService.exists(id), is(true));
+    }
+    
+    @Test
+    void canDelete() {
+        String id = "id";
+        IdMappingResult result =
+                IdMappingResult.builder().mappedId(new IdMappingStringPair("from1", "to1")).build();
+        IdMappingJob job = IdMappingJob.builder().jobStatus(JobStatus.FINISHED).idMappingResult(result).build();
+
+        jobService.put(id, job);
+        assertThat(jobService.exists(id), is(true));
+
+        jobService.delete(id);
+        assertThat(jobService.exists(id), is(false));
     }
 }
