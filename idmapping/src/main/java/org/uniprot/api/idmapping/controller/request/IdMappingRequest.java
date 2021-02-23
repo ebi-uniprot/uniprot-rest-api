@@ -4,9 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import io.swagger.v3.oas.annotations.Parameter;
-import lombok.NoArgsConstructor;
 
 /**
  * @author sahmad

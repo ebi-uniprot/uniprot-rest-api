@@ -536,8 +536,9 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00001","Q00002")))
-                .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00001","Q00002")));
+                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
+                .andExpect(
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")));
     }
 
     @Test
@@ -672,7 +673,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     }
 
     private Stream<Arguments> getAllSortFields() {
-        SearchFieldConfig fieldConfig = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+        SearchFieldConfig fieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
         return fieldConfig.getSearchFieldItems().stream()
                 .map(SearchFieldItem::getFieldName)
                 .filter(fieldConfig::correspondingSortFieldExists)

@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.controller.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -7,6 +8,7 @@ import lombok.Data;
  * @created 22/02/2021
  */
 @Data
+@AllArgsConstructor
 public class JobStatusResponse {
-    private String jobStatus;
+    private JobStatus jobStatus;
 }

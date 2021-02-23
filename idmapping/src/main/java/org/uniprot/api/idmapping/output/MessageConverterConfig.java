@@ -28,12 +28,12 @@ import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created 21/08/18
@@ -72,7 +72,8 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 int index = 0;
                 converters.add(index++, new ErrorMessageConverter());
-                converters.add(index++, new ErrorMessageXMLConverter()); // to handle xml error messages
+                converters.add(
+                        index++, new ErrorMessageXMLConverter()); // to handle xml error messages
 
                 // ------------------------- StringUniProtKBEntryPair -------------------------
 

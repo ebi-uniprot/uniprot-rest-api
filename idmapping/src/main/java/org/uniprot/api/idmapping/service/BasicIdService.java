@@ -82,7 +82,8 @@ public abstract class BasicIdService<T, U> {
         }
 
         if (Utils.notNullNotEmpty(searchRequest.getSort())) {
-            List<SolrQuery.SortClause> sort = SortUtils.parseSortClause(getUniProtDataType(), searchRequest.getSort());
+            List<SolrQuery.SortClause> sort =
+                    SortUtils.parseSortClause(getUniProtDataType(), searchRequest.getSort());
             solrRequestBuilder.searchSort(getSearchSort(sort));
             solrRequestBuilder.searchFieldList(getFieldList(sort));
             solrRequestBuilder.searchAccession(Boolean.TRUE);
@@ -93,14 +94,13 @@ public abstract class BasicIdService<T, U> {
 
     private String getSearchSort(List<SolrQuery.SortClause> sort) {
         return sort.stream()
-                .map(clause -> clause.getItem()+" "+clause.getOrder().name())
+                .map(clause -> clause.getItem() + " " + clause.getOrder().name())
                 .collect(Collectors.joining(","));
     }
 
-    private String getFieldList(List<SolrQuery.SortClause> sort){
-        Set<String> fieldList = sort.stream()
-                .map(SolrQuery.SortClause::getItem)
-                .collect(Collectors.toSet());
+    private String getFieldList(List<SolrQuery.SortClause> sort) {
+        Set<String> fieldList =
+                sort.stream().map(SolrQuery.SortClause::getItem).collect(Collectors.toSet());
         fieldList.add(getSolrIdField());
         return String.join(",", fieldList);
     }
