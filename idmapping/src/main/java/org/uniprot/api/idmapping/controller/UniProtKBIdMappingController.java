@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
-import org.uniprot.api.idmapping.model.StringUniProtKBEntryPair;
-import org.uniprot.api.idmapping.service.UniProtKBIdService;
+import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
+import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -30,7 +30,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
  */
 @RestController
 @RequestMapping(value = "/uniprotkb/idmapping/")
-public class UniProtKBIdMappingController extends BasicSearchController<StringUniProtKBEntryPair> {
+public class UniProtKBIdMappingController extends BasicSearchController<UniProtKbEntryPair> {
 
     private final UniProtKBIdService idService;
 
@@ -38,7 +38,7 @@ public class UniProtKBIdMappingController extends BasicSearchController<StringUn
     public UniProtKBIdMappingController(
             ApplicationEventPublisher eventPublisher,
             UniProtKBIdService idService,
-            MessageConverterContextFactory<StringUniProtKBEntryPair> converterContextFactory,
+            MessageConverterContextFactory<UniProtKbEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
         this.idService = idService;
@@ -47,24 +47,23 @@ public class UniProtKBIdMappingController extends BasicSearchController<StringUn
     @GetMapping(
             value = "search",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<MessageConverterContext<StringUniProtKBEntryPair>> getMappedEntries(
+    public ResponseEntity<MessageConverterContext<UniProtKbEntryPair>> getMappedEntries(
             @Valid UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        QueryResult<StringUniProtKBEntryPair> result =
-                this.idService.getMappedEntries(searchRequest);
+        QueryResult<UniProtKbEntryPair> result = this.idService.getMappedEntries(searchRequest);
 
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
 
     @Override
-    protected String getEntityId(StringUniProtKBEntryPair entity) {
+    protected String getEntityId(UniProtKbEntryPair entity) {
         return entity.getTo().getPrimaryAccession().getValue();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(StringUniProtKBEntryPair entity) {
+    protected Optional<String> getEntityRedirectId(UniProtKbEntryPair entity) {
         return Optional.empty();
     }
 }

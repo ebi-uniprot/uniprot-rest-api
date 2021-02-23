@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.service;
 
+import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
+import org.uniprot.api.idmapping.service.impl.UniRefIdService;
+
 /**
  * @author sahmad
  * @created 16/02/2021

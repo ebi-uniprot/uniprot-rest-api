@@ -1,9 +1,5 @@
 package org.uniprot.api.idmapping.service;
 
-import org.apache.commons.codec.binary.Hex;
-import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
-import org.uniprot.core.util.Utils;
-
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -14,16 +10,21 @@ import java.util.List;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+import org.apache.commons.codec.binary.Hex;
+import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
+import org.uniprot.core.util.Utils;
+
 /**
  * @author sahmad
  * @created 22/02/2021
  */
 public class HashGenerator {
 
-    public String generateHash(IdMappingRequest request) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public String generateHash(IdMappingRequest request)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         char[] requestArray = convertRequestToArray(request);
         byte[] salt = "UNIPROT".getBytes(StandardCharsets.UTF_8);
-        PBEKeySpec keySpec = new PBEKeySpec(requestArray, salt, 16, 80*2);
+        PBEKeySpec keySpec = new PBEKeySpec(requestArray, salt, 16, 80 * 2);
         SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
         byte[] hash = skf.generateSecret(keySpec).getEncoded();
         return Hex.encodeHexString(hash);
@@ -42,8 +43,6 @@ public class HashGenerator {
             builder.append(request.getTaxId().strip().toLowerCase());
         }
 
-        char[] requestArray = builder.toString().toCharArray();
-        return requestArray;
+        return builder.toString().toCharArray();
     }
-
 }

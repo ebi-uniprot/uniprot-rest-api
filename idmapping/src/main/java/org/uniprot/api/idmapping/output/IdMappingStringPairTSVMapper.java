@@ -1,12 +1,12 @@
 package org.uniprot.api.idmapping.output;
 
+import java.util.List;
+import java.util.Map;
+
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.core.parser.tsv.EntityValueMapper;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-
-import java.util.List;
-import java.util.Map;
 
 public class IdMappingStringPairTSVMapper implements EntityValueMapper<IdMappingStringPair> {
     private static final String FROM_FIELD =
