@@ -1,18 +1,16 @@
 package org.uniprot.api.idmapping.service;
 
+import org.apache.commons.codec.binary.Hex;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.core.util.Utils;
+
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-
-import org.apache.commons.codec.binary.Hex;
-import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
-import org.uniprot.core.util.Utils;
 
 /**
  * @author sahmad
@@ -25,7 +23,7 @@ public class HashGenerator {
     private final String SALT_STR = "UNIPROT_SALT";
     private final byte[] SALT = SALT_STR.getBytes(StandardCharsets.UTF_8);
 
-    public String generateHash(IdMappingRequest request)
+    public String generateHash(IdMappingBasicRequest request)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         char[] requestArray = convertRequestToArray(request);
         PBEKeySpec keySpec = new PBEKeySpec(requestArray, SALT, ITERATION_COUNT, KEY_LENGTH);
@@ -34,14 +32,15 @@ public class HashGenerator {
         return Hex.encodeHexString(hash);
     }
 
-    private char[] convertRequestToArray(IdMappingRequest request) {
+    private char[] convertRequestToArray(IdMappingBasicRequest request) {
         StringBuilder builder = new StringBuilder();
         builder.append(request.getFrom().strip().toLowerCase());
         builder.append(request.getTo().strip().toLowerCase());
-        // sort list of ids and append them into builder
-        List<String> sortedIds = Arrays.asList(request.getIds().strip().split(","));
-        Collections.sort(sortedIds); // remove it
-        sortedIds.stream().map(String::toLowerCase).map(String::strip).forEach(builder::append);
+        List.of(request.getIds().strip().split(","))
+                .stream()
+                .map(String::toLowerCase)
+                .map(String::strip)
+                .forEach(builder::append);
 
         if (Utils.notNullNotEmpty(request.getTaxId())) {
             builder.append(request.getTaxId().strip().toLowerCase());

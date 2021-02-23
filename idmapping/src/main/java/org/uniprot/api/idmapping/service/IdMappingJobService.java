@@ -2,8 +2,10 @@ package org.uniprot.api.idmapping.service;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.concurrent.BlockingQueue;
 
 import org.springframework.stereotype.Service;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
@@ -19,27 +21,29 @@ public class IdMappingJobService {
 
     private final IdMappingJobCacheService cacheService;
     private final HashGenerator hashGenerator;
+    private final BlockingQueue<IdMappingJob> queue;
 
-    public IdMappingJobService(IdMappingJobCacheService cacheService) {
+    public IdMappingJobService(IdMappingJobCacheService cacheService, BlockingQueue<IdMappingJob> queue) {
         this.cacheService = cacheService;
+        this.queue = queue;
         this.hashGenerator = new HashGenerator();
     }
 
-    public JobSubmitResponse submitJob(IdMappingRequest request)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public JobSubmitResponse submitJob(IdMappingBasicRequest request)
+            throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
+
         String jobId = this.hashGenerator.generateHash(request);
         IdMappingJob idMappingJob = createJob(jobId, request);
 
         if (!this.cacheService.exists(jobId)) {
             this.cacheService.put(jobId, idMappingJob);
+            this.queue.put(idMappingJob);
         }
-
-        // TODO logic to put idMappingJob in queue
 
         return new JobSubmitResponse(jobId);
     }
 
-    private IdMappingJob createJob(String jobId, IdMappingRequest request) {
+    private IdMappingJob createJob(String jobId, IdMappingBasicRequest request) {
         IdMappingJob.IdMappingJobBuilder builder = IdMappingJob.builder();
         builder.jobId(jobId).jobStatus(JobStatus.NEW);
         builder.idMappingRequest(request);

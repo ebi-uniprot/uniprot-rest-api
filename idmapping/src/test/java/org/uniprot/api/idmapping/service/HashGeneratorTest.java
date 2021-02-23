@@ -9,7 +9,8 @@ import java.security.spec.InvalidKeySpecException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 
 /**
  * @author sahmad
@@ -20,15 +21,19 @@ class HashGeneratorTest {
     @Test
     void testTwoHashesOfTwoRequests() throws InvalidKeySpecException, NoSuchAlgorithmException {
         HashGenerator generator = new HashGenerator();
-        IdMappingRequest.IdMappingRequestBuilder reqBuilder1 = IdMappingRequest.builder();
-        IdMappingRequest req1 =
-                reqBuilder1.from("from1").to("to1").ids("1,2,3,4").taxId("taxonId1").build();
+        IdMappingBasicRequest req1 = new IdMappingBasicRequest();
+        req1.setFrom("from1");
+        req1.setTo("to1");
+        req1.setIds("1,2,3,4");
+        req1.setTaxId("taxonId1");
         String req1Hash = generator.generateHash(req1);
         Assertions.assertNotNull(req1Hash);
         // create another request object with same fields values
-        IdMappingRequest.IdMappingRequestBuilder reqBuilder2 = IdMappingRequest.builder();
-        IdMappingRequest req2 =
-                reqBuilder2.from("from1").to("to1").ids("1,2,3,4").taxId("taxonId1").build();
+        IdMappingBasicRequest req2 = new IdMappingBasicRequest();
+        req2.setFrom("from1");
+        req2.setTo("to1");
+        req2.setIds("1,2,3,4");
+        req2.setTaxId("taxonId1");
         String req2Hash = generator.generateHash(req2);
         Assertions.assertNotNull(req2Hash);
         Assertions.assertEquals(req1Hash, req2Hash);
@@ -38,33 +43,21 @@ class HashGeneratorTest {
     void testTwoHashesOfTwoRequestsWithIdsInDifferentOrder()
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         HashGenerator generator = new HashGenerator();
-        IdMappingRequest.IdMappingRequestBuilder reqBuilder1 = IdMappingRequest.builder();
-        IdMappingRequest req1 =
-                reqBuilder1.from("from1").to("to1").ids("2,4,3,1").taxId("taxonId1").build();
+        IdMappingBasicRequest req1 = new IdMappingBasicRequest();
+        req1.setFrom("from1");
+        req1.setTo("to1");
+        req1.setIds("4,2,1,3");
+        req1.setTaxId("taxonId1");
         String req1Hash = generator.generateHash(req1);
         Assertions.assertNotNull(req1Hash);
         // create another request object with same fields values
-        IdMappingRequest.IdMappingRequestBuilder reqBuilder2 = IdMappingRequest.builder();
-        IdMappingRequest req2 =
-                reqBuilder2.from("from1").to("to1").ids("1,2,3,4").taxId("taxonId1").build();
+        IdMappingBasicRequest req2 = new IdMappingBasicRequest();
+        req2.setFrom("from1");
+        req2.setTo("to1");
+        req2.setIds("1,2,3,4");
+        req2.setTaxId("taxonId1");
         String req2Hash = generator.generateHash(req2);
         Assertions.assertNotNull(req2Hash);
-        Assertions.assertEquals(req1Hash, req2Hash);
-    }
-
-    @Test
-    void testHashGenerationTiming()
-            throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
-        IdMappingRequest.IdMappingRequestBuilder reqBuilder1 = IdMappingRequest.builder();
-        reqBuilder1.from("from1").to("to1");
-        Path filePath = Paths.get("/Users/sahmad/Downloads/ids.txt");
-        String ids = Files.readString(filePath);
-        reqBuilder1.ids(ids);
-        long start = System.currentTimeMillis();
-        HashGenerator generator = new HashGenerator();
-        String hash = generator.generateHash(reqBuilder1.build());
-        long end = System.currentTimeMillis();
-        System.out.println("Total time taken in ms : " + (end - start));
-        System.out.println("hash : " + hash);
+        Assertions.assertNotEquals(req1Hash, req2Hash);
     }
 }
