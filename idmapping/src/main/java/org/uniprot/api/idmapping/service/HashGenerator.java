@@ -1,9 +1,5 @@
 package org.uniprot.api.idmapping.service;
 
-import org.apache.commons.codec.binary.Hex;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
-import org.uniprot.core.util.Utils;
-
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -11,6 +7,10 @@ import java.util.List;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+
+import org.apache.commons.codec.binary.Hex;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author sahmad
@@ -36,8 +36,7 @@ public class HashGenerator {
         StringBuilder builder = new StringBuilder();
         builder.append(request.getFrom().strip().toLowerCase());
         builder.append(request.getTo().strip().toLowerCase());
-        List.of(request.getIds().strip().split(","))
-                .stream()
+        List.of(request.getIds().strip().split(",")).stream()
                 .map(String::toLowerCase)
                 .map(String::strip)
                 .forEach(builder::append);

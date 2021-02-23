@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.controller.request;
 
+import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -9,13 +11,11 @@ import lombok.Builder;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.Parameter;
 
-import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
-
 /**
  * @author sahmad
  * @created 22/02/2021
  */
-//FIXME - probably we can delete this class
+// FIXME - probably we can delete this class
 @Data
 @Builder
 @AllArgsConstructor

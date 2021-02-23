@@ -6,11 +6,11 @@ import java.util.concurrent.BlockingQueue;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
-import org.uniprot.api.idmapping.controller.request.IdMappingRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.service.job.AsyncJobProducer;
 
 /**
  * @author sahmad
@@ -22,11 +22,14 @@ public class IdMappingJobService {
     private final IdMappingJobCacheService cacheService;
     private final HashGenerator hashGenerator;
     private final BlockingQueue<IdMappingJob> queue;
+    private final AsyncJobProducer jobProducer;
 
-    public IdMappingJobService(IdMappingJobCacheService cacheService, BlockingQueue<IdMappingJob> queue) {
+    public IdMappingJobService(
+            IdMappingJobCacheService cacheService, BlockingQueue<IdMappingJob> queue) {
         this.cacheService = cacheService;
         this.queue = queue;
         this.hashGenerator = new HashGenerator();
+        this.jobProducer = new AsyncJobProducer(this.queue);
     }
 
     public JobSubmitResponse submitJob(IdMappingBasicRequest request)
@@ -37,7 +40,7 @@ public class IdMappingJobService {
 
         if (!this.cacheService.exists(jobId)) {
             this.cacheService.put(jobId, idMappingJob);
-            this.queue.put(idMappingJob);
+            this.jobProducer.enqueueJob(idMappingJob); // Async call
         }
 
         return new JobSubmitResponse(jobId);
