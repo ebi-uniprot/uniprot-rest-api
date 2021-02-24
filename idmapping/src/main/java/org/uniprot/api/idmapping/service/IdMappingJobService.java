@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.service;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -11,9 +12,12 @@ import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.job.AsyncJobProducer;
+import org.uniprot.api.idmapping.service.job.JobTask;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
 import static org.uniprot.api.rest.controller.BasicSearchController.getLocationURLForId;
@@ -26,14 +30,22 @@ import static org.uniprot.api.rest.controller.BasicSearchController.getLocationU
 public class IdMappingJobService {
 
     private final IdMappingJobCacheService cacheService;
+    private final BlockingQueue<IdMappingJob> jobQueue;
+    private final IDMappingPIRService pirService;
+    private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
-    private final BlockingQueue<IdMappingJob> queue;
     private final AsyncJobProducer jobProducer;
 
     public IdMappingJobService(
-            IdMappingJobCacheService cacheService, AsyncJobProducer asyncJobProducer) {
+            IdMappingJobCacheService cacheService,
+            AsyncJobProducer asyncJobProducer,
+            BlockingQueue<IdMappingJob> jobQueue,
+            IDMappingPIRService pirService,
+            ThreadPoolTaskExecutor jobTaskExecutor) {
         this.cacheService = cacheService;
-        this.queue = queue;
+        this.jobQueue = jobQueue;
+        this.pirService = pirService;
+        this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = new HashGenerator();
         this.jobProducer = asyncJobProducer;
     }
@@ -49,7 +61,7 @@ public class IdMappingJobService {
             this.jobProducer.enqueueJob(idMappingJob); // Async call
 
             // create task and submit
-            JobTask jobTask = new JobTask(queue, cacheService, pirService);
+            JobTask jobTask = new JobTask(jobQueue, cacheService, pirService);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);

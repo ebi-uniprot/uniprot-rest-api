@@ -1,11 +1,15 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author sahmad
@@ -28,8 +32,10 @@ public class JobConfig {
         configurableJobTaskExecutor.setCorePoolSize(taskExecutorProperties.getCorePoolSize());
         configurableJobTaskExecutor.setMaxPoolSize(taskExecutorProperties.getMaxPoolSize());
         configurableJobTaskExecutor.setQueueCapacity(taskExecutorProperties.getQueueCapacity());
-        configurableJobTaskExecutor.setKeepAliveSeconds(taskExecutorProperties.getKeepAliveSeconds());
-        configurableJobTaskExecutor.setAllowCoreThreadTimeOut(taskExecutorProperties.isAllowCoreThreadTimeout());
+        configurableJobTaskExecutor.setKeepAliveSeconds(
+                taskExecutorProperties.getKeepAliveSeconds());
+        configurableJobTaskExecutor.setAllowCoreThreadTimeOut(
+                taskExecutorProperties.isAllowCoreThreadTimeout());
         configurableJobTaskExecutor.setWaitForTasksToCompleteOnShutdown(
                 taskExecutorProperties.isWaitForTasksToCompleteOnShutdown());
         return configurableJobTaskExecutor;
@@ -39,5 +45,4 @@ public class JobConfig {
     public ThreadPoolTaskExecutor configurableJobTaskExecutor() {
         return new ThreadPoolTaskExecutor();
     }
-
 }
