@@ -11,14 +11,16 @@ import org.uniprot.api.idmapping.service.cache.impl.EhCacheMappingJobService;
 @Configuration
 @EnableCaching
 public class CacheConfig {
+    private static final String PIR_ID_MAPPING_CACHE = "pirIDMappingCache";
+
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("pirIDMappingCache");
+        return new ConcurrentMapCacheManager(PIR_ID_MAPPING_CACHE);
     }
 
     @Bean
     public EhCacheMappingJobService ehCacheMappingJobService(CacheManager cacheManager) {
-        Cache mappingCache = cacheManager.getCache("pirIDMappingCache");
+        Cache mappingCache = cacheManager.getCache(PIR_ID_MAPPING_CACHE);
         return new EhCacheMappingJobService(mappingCache);
     }
 }

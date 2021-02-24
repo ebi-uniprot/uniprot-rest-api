@@ -199,7 +199,7 @@ public abstract class BasicSearchController<T> {
         return getDeferredResultResponseEntity(request, context);
     }
 
-    private String getLocationURLForId(String redirectId) {
+    public static String getLocationURLForId(String redirectId) {
         String path = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
         if (path != null) {
             path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
