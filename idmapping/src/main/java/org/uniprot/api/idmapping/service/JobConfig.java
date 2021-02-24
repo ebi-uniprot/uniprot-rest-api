@@ -5,6 +5,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 
 /**
@@ -14,6 +15,7 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 @Configuration
 public class JobConfig {
     @Bean
+    @Profile("live")
     BlockingQueue<IdMappingJob> jobQueue() {
         return new LinkedBlockingQueue<>();
     }

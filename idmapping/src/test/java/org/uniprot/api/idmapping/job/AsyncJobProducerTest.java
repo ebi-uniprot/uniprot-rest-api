@@ -17,8 +17,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author sahmad
  * @created 24/02/2021
  */
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {AsyncJobProducer.class, JobConfig.class})
 class AsyncJobProducerTest {
     @Test
     void testEnqueueJob() throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
