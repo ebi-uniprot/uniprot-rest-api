@@ -22,7 +22,7 @@ import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPP
 @RestController
 @RequestMapping(IDMAPPING_PATH)
 public class IdMappingJobController {
-    static final String IDMAPPING_PATH = "/idmapping";
+    public static final String IDMAPPING_PATH = "/idmapping";
     private final IdMappingJobService idMappingJobService;
 
     @Autowired

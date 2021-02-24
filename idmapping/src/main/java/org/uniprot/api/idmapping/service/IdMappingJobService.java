@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.service;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -11,12 +12,14 @@ import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.job.AsyncJobProducer;
+import org.uniprot.api.idmapping.service.job.JobTask;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
-
-import static org.uniprot.api.rest.controller.BasicSearchController.getLocationURLForId;
 
 /**
  * @author sahmad
@@ -28,13 +31,20 @@ public class IdMappingJobService {
     private final IdMappingJobCacheService cacheService;
     private final HashGenerator hashGenerator;
     private final BlockingQueue<IdMappingJob> queue;
+    private final ThreadPoolTaskExecutor jobTaskExecutor;
+    private final IDMappingPIRService pirService;
     private final AsyncJobProducer jobProducer;
 
     public IdMappingJobService(
-            IdMappingJobCacheService cacheService, BlockingQueue<IdMappingJob> queue,
-            AsyncJobProducer asyncJobProducer) {
+            IdMappingJobCacheService cacheService,
+            BlockingQueue<IdMappingJob> queue,
+            AsyncJobProducer asyncJobProducer,
+            ThreadPoolTaskExecutor jobTaskExecutor,
+            IDMappingPIRService pirService) {
         this.cacheService = cacheService;
         this.queue = queue;
+        this.jobTaskExecutor = jobTaskExecutor;
+        this.pirService = pirService;
         this.hashGenerator = new HashGenerator();
         this.jobProducer = asyncJobProducer;
     }
@@ -46,9 +56,18 @@ public class IdMappingJobService {
         IdMappingJob idMappingJob = createJob(jobId, request);
 
         if (!this.cacheService.exists(jobId)) {
-            this.cacheService.put(jobId, idMappingJob);
             this.jobProducer.enqueueJob(idMappingJob); // Async call
+
+            // create task and submit
+            JobTask jobTask = new JobTask(queue, cacheService, pirService);
+            jobTaskExecutor.execute(jobTask);
+        } else {
+            IdMappingJob job = this.cacheService.get(jobId);
+
+            // update expiry time
+            job.setUpdated(new Date());
         }
+
 
         return new JobSubmitResponse(jobId);
     }
@@ -63,7 +82,8 @@ public class IdMappingJobService {
                     response = ResponseEntity.ok(new JobStatusResponse(job.getJobStatus()));
                     break;
                 case FINISHED:
-                    String redirectUrl = getLocationURLForId(jobId);
+                    String redirectUrl = getRedirectPathToResults(job);
+
                     response =
                             ResponseEntity.status(HttpStatus.SEE_OTHER)
                                     .header(HttpHeaders.LOCATION, redirectUrl)
@@ -81,6 +101,20 @@ public class IdMappingJobService {
         }
 
         return response;
+    }
+
+    private String getRedirectPathToResults(IdMappingJob job) {
+        String toDB = job.getIdMappingRequest().getTo();
+        String dbType = "";
+        if (Set.of("NF50", "NF90", "NF100").contains(toDB)) {
+            dbType = "uniref/";
+        } else if ("UPARC".equals(toDB)) {
+            dbType = "uniparc/";
+        } else if (Set.of("ACC", "ID", "SWISSPROT").contains(toDB)) {
+            dbType = "uniprotkb/";
+        }
+
+        return "/uniprot/api/idmapping/" + dbType + "results/" + job.getJobId();
     }
 
     private IdMappingJob createJob(String jobId, IdMappingBasicRequest request) {
