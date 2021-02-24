@@ -67,10 +67,19 @@ class ResponseExceptionHandlerTest {
         assertEquals(REQUEST_URL, errorMessage.getUrl());
 
         assertNotNull(errorMessage.getMessages());
-        assertEquals(2, errorMessage.getMessages().size());
+        assertEquals(72, errorMessage.getMessages().size());
 
         assertEquals("Internal server error", errorMessage.getMessages().get(0));
-        assertEquals("Caused by: Null Pointer", errorMessage.getMessages().get(1));
+        assertTrue(errorMessage.getMessages().contains("Message: Throwable error message"));
+        boolean hasStackTrace =
+                errorMessage.getMessages().stream().anyMatch(msg -> msg.startsWith("StackTrace: "));
+        assertTrue(hasStackTrace);
+
+        assertTrue(errorMessage.getMessages().contains("Caused by: Null Pointer"));
+        boolean hasCauseStackTrace =
+                errorMessage.getMessages().stream()
+                        .anyMatch(msg -> msg.startsWith("Caused by StackTrace: "));
+        assertTrue(hasCauseStackTrace);
     }
 
     @Test
