@@ -14,7 +14,6 @@ import org.uniprot.api.idmapping.service.job.AsyncJobProducer;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.concurrent.BlockingQueue;
 
 import static org.uniprot.api.rest.controller.BasicSearchController.getLocationURLForId;
 
@@ -27,14 +26,11 @@ public class IdMappingJobService {
 
     private final IdMappingJobCacheService cacheService;
     private final HashGenerator hashGenerator;
-    private final BlockingQueue<IdMappingJob> queue;
     private final AsyncJobProducer jobProducer;
 
     public IdMappingJobService(
-            IdMappingJobCacheService cacheService, BlockingQueue<IdMappingJob> queue,
-            AsyncJobProducer asyncJobProducer) {
+            IdMappingJobCacheService cacheService, AsyncJobProducer asyncJobProducer) {
         this.cacheService = cacheService;
-        this.queue = queue;
         this.hashGenerator = new HashGenerator();
         this.jobProducer = asyncJobProducer;
     }
