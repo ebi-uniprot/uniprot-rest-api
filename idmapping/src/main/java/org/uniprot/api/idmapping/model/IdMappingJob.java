@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,8 +21,8 @@ public class IdMappingJob {
     private JobStatus jobStatus;
     private IdMappingBasicRequest idMappingRequest;
     private IdMappingResult idMappingResult;
-    private List<String> errorMessages;
-//    @Builder.Default private long expiryInMillis = 5 * 60 * 1000; // 5 minutes
+    @Builder.Default private List<String> errorMessages = new ArrayList<>();
+    //    @Builder.Default private long expiryInMillis = 5 * 60 * 1000; // 5 minutes
     @Builder.Default private Date created = new Date();
     @Builder.Default private Date updated = new Date();
 }

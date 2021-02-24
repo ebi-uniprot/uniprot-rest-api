@@ -19,9 +19,8 @@ import org.uniprot.core.util.Utils;
  */
 public class ResponseExceptionHelper {
 
-    private ResponseExceptionHelper(){
+    private ResponseExceptionHelper() {}
 
-    }
     /**
      * If there is debugError in the request, this method also print exception causes to help in the
      * debug error

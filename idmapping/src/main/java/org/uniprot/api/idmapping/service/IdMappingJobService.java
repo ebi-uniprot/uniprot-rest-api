@@ -1,5 +1,11 @@
 package org.uniprot.api.idmapping.service;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,14 +19,6 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.job.AsyncJobProducer;
 import org.uniprot.api.idmapping.service.job.JobTask;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-
-import static org.uniprot.api.rest.controller.BasicSearchController.getLocationURLForId;
 
 /**
  * @author sahmad
