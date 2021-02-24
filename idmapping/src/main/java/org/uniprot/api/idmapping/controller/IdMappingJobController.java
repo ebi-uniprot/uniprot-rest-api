@@ -20,6 +20,8 @@ import org.uniprot.api.idmapping.controller.response.JobStatusResponse;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 
+import javax.validation.Valid;
+
 /**
  * @author sahmad
  * @created 22/02/2021
@@ -38,7 +40,7 @@ public class IdMappingJobController {
     @PostMapping(
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<JobSubmitResponse> submitJob(IdMappingBasicRequest request)
+    public ResponseEntity<JobSubmitResponse> submitJob(@Valid IdMappingBasicRequest request)
             throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
         JobSubmitResponse response = this.idMappingJobService.submitJob(request);
         return ResponseEntity.ok(response);

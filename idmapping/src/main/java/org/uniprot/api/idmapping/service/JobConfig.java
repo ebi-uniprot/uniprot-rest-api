@@ -13,7 +13,6 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
  */
 @Configuration
 public class JobConfig {
-
     @Bean
     BlockingQueue<IdMappingJob> jobQueue() {
         return new LinkedBlockingQueue<>();

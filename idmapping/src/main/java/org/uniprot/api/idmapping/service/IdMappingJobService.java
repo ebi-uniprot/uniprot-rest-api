@@ -25,11 +25,12 @@ public class IdMappingJobService {
     private final AsyncJobProducer jobProducer;
 
     public IdMappingJobService(
-            IdMappingJobCacheService cacheService, BlockingQueue<IdMappingJob> queue) {
+            IdMappingJobCacheService cacheService, BlockingQueue<IdMappingJob> queue,
+            AsyncJobProducer asyncJobProducer) {
         this.cacheService = cacheService;
         this.queue = queue;
         this.hashGenerator = new HashGenerator();
-        this.jobProducer = new AsyncJobProducer(this.queue);
+        this.jobProducer = asyncJobProducer;
     }
 
     public JobSubmitResponse submitJob(IdMappingBasicRequest request)
