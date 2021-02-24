@@ -8,7 +8,7 @@ import org.uniprot.store.config.UniProtDataType;
  * @since 01/10/2020
  */
 public class FakeSolrSortClause extends AbstractSolrSortClause {
-    public static final String ID = "id_field";
+    public static final String ID = "id_sort";
 
     public FakeSolrSortClause() {
         addDefaultFieldOrderPair("default", SolrQuery.ORDER.asc);
@@ -22,6 +22,6 @@ public class FakeSolrSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return null;
+        return UniProtDataType.UNIPROTKB;
     }
 }

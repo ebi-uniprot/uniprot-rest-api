@@ -15,7 +15,7 @@ import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 public class AsyncJobSubmitExceptionHandler implements AsyncUncaughtExceptionHandler {
     private final IdMappingJobCacheService cacheService;
 
-    public AsyncJobSubmitExceptionHandler(IdMappingJobCacheService cacheService){
+    public AsyncJobSubmitExceptionHandler(IdMappingJobCacheService cacheService) {
         this.cacheService = cacheService;
     }
 
@@ -24,7 +24,7 @@ public class AsyncJobSubmitExceptionHandler implements AsyncUncaughtExceptionHan
         // FIXME add code to update error in job object
         log.error("Exception message - " + throwable.getMessage());
         log.error("Method name - " + method.getName());
-        for (Object param : objects) {// object is of type IdMappingJob
+        for (Object param : objects) { // object is of type IdMappingJob
             log.error("Parameter value - " + param);
         }
     }

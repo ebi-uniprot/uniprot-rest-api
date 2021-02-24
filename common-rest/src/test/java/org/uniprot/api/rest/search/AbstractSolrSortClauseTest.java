@@ -36,13 +36,13 @@ class AbstractSolrSortClauseTest {
 
     @Test
     void singleSortClauseProducesSingleSort() {
-        String name = "name";
-        List<SolrQuery.SortClause> sorts = fakeSolrSortClause.getSort(name + " asc");
+        String gene = "gene";
+        List<SolrQuery.SortClause> sorts = fakeSolrSortClause.getSort(gene + " asc");
 
         assertThat(
                 sorts,
                 contains(
-                        SolrQuery.SortClause.asc(field(name)),
+                        SolrQuery.SortClause.asc(field(gene)),
                         SolrQuery.SortClause.asc(FakeSolrSortClause.ID)));
     }
 
@@ -55,36 +55,36 @@ class AbstractSolrSortClauseTest {
 
     @Test
     void multipleSortClausesWithIDProduceMultipleSorts() {
-        String name = "name";
-        String age = "age";
+        String proteinName = "protein_name";
+        String gene = "gene";
         List<SolrQuery.SortClause> sorts =
-                fakeSolrSortClause.getSort(name + " asc, " + age + " desc, id desc");
+                fakeSolrSortClause.getSort(proteinName + " asc, " + gene + " desc, id desc");
 
         assertThat(
                 sorts,
                 contains(
-                        SolrQuery.SortClause.asc(field(name)),
-                        SolrQuery.SortClause.desc(field(age)),
+                        SolrQuery.SortClause.asc(field(proteinName)),
+                        SolrQuery.SortClause.desc(field(gene)),
                         SolrQuery.SortClause.desc(FakeSolrSortClause.ID)));
     }
 
     @Test
     void multipleSortClausesProduceMultipleSorts() {
-        String name = "name";
-        String age = "age";
+        String gene = "gene";
+        String proteinName = "protein_name";
         List<SolrQuery.SortClause> sorts =
-                fakeSolrSortClause.getSort(name + " asc, " + age + " desc");
+                fakeSolrSortClause.getSort(gene + " asc, " + proteinName + " desc");
 
         assertThat(
                 sorts,
                 contains(
-                        SolrQuery.SortClause.asc(field(name)),
-                        SolrQuery.SortClause.desc(field(age)),
+                        SolrQuery.SortClause.asc(field(gene)),
+                        SolrQuery.SortClause.desc(field(proteinName)),
                         SolrQuery.SortClause.asc(FakeSolrSortClause.ID)));
     }
 
     static String field(String name) {
-        return name + "_field";
+        return name + "_sort";
     }
 
     static SolrQuery.SortClause defaultSort() {

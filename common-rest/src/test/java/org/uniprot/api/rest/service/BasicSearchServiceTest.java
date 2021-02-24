@@ -361,7 +361,7 @@ class BasicSearchServiceTest {
         // when
         FakeSearchRequest request = new FakeSearchRequest();
         request.setQuery("queryValue");
-        request.setSort("field1 asc");
+        request.setSort("accession asc");
 
         SolrRequest solrRequest = service.createSearchSolrRequest(request);
         assertNotNull(solrRequest);

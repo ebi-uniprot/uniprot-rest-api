@@ -18,6 +18,10 @@ import org.uniprot.core.util.Utils;
  * @author Edd
  */
 public class ResponseExceptionHelper {
+
+    private ResponseExceptionHelper(){
+
+    }
     /**
      * If there is debugError in the request, this method also print exception causes to help in the
      * debug error
@@ -31,10 +35,26 @@ public class ResponseExceptionHelper {
         if (request.getParameter("debugError") != null
                 && request.getParameter("debugError").equalsIgnoreCase("true")) {
 
-            error.add(exception.getMessage());
+            error.add("Message: " + exception.getMessage());
             Arrays.stream(exception.getStackTrace())
                     .sequential()
-                    .forEach(element -> error.add(element.toString()));
+                    .forEach(element -> error.add("StackTrace: " + element.toString()));
+            Throwable cause = exception.getCause();
+            while (cause != null) {
+                if (cause.getMessage() != null && !cause.getMessage().isEmpty()) {
+                    error.add("Caused by: " + cause.getMessage());
+                }
+                if (cause.getStackTrace() != null && cause.getStackTrace().length > 0) {
+                    Arrays.stream(cause.getStackTrace())
+                            .sequential()
+                            .limit(5)
+                            .forEach(
+                                    element ->
+                                            error.add(
+                                                    "Caused by StackTrace: " + element.toString()));
+                }
+                cause = cause.getCause();
+            }
         }
     }
 

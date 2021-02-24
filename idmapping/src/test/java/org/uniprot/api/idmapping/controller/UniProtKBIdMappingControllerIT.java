@@ -49,10 +49,10 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IDMappingPIRService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.core.gene.Gene;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyLineageTest;
 import org.uniprot.core.json.parser.uniprot.FeatureTest;
 import org.uniprot.core.json.parser.uniprot.GeneLocationTest;
-import org.uniprot.core.json.parser.uniprot.GeneTest;
 import org.uniprot.core.json.parser.uniprot.OrganimHostTest;
 import org.uniprot.core.json.parser.uniprot.UniProtKBCrossReferenceTest;
 import org.uniprot.core.json.parser.uniprot.comment.AlternativeProductsCommentTest;
@@ -77,7 +77,7 @@ import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentImpl;
 import org.uniprot.core.uniprotkb.evidence.impl.EvidencedValueBuilder;
 import org.uniprot.core.uniprotkb.feature.UniProtKBFeature;
 import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
-import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.impl.*;
 import org.uniprot.core.uniprotkb.xdb.UniProtKBCrossReference;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
@@ -147,7 +147,14 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                     UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
             entryBuilder.lineagesAdd(TaxonomyLineageTest.getCompleteTaxonomyLineage());
             entryBuilder.geneLocationsAdd(GeneLocationTest.getGeneLocation());
-            entryBuilder.genesAdd(GeneTest.createCompleteGene());
+            Gene gene =
+                    new GeneBuilder()
+                            .geneName(new GeneNameBuilder().value("gene " + i).build())
+                            .orderedLocusNamesAdd(
+                                    new OrderedLocusNameBuilder().value("gene " + i).build())
+                            .orfNamesAdd(new ORFNameBuilder().value("gene " + i).build())
+                            .build();
+            entryBuilder.genesAdd(gene);
             entryBuilder.organismHostsAdd(OrganimHostTest.getOrganismHost());
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
             uniProtKBEntry.getComments().addAll(comments);
@@ -510,7 +517,37 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00002")));
     }
 
-    @ParameterizedTest(name = "[{index}] sortFieldName {0}")
+    @Test
+    void testCanSortMultipleFieldsWithSuccess() throws Exception {
+        // when
+        IdMappingResult pirResponse =
+                IdMappingResult.builder()
+                        .mappedIds(
+                                List.of(
+                                        new IdMappingStringPair("Q00001", "Q00001"),
+                                        new IdMappingStringPair("Q00002", "Q00002")))
+                        .build();
+        Mockito.when(pirService.doPIRRequest(ArgumentMatchers.any())).thenReturn(pirResponse);
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "ACC")
+                                .param("to", "ACC")
+                                .param("facets", "proteins_with,reviewed")
+                                .param("sort", "gene desc , accession asc")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00002", "Q00001")))
+                .andExpect(
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00002", "Q00001")));
+    }
+
+    @ParameterizedTest(name = "[{index}] sortFieldName {0} desc")
     @MethodSource("getAllSortFields")
     void testUniProtKBToUniProtKBMappingWithSort(String sortField) throws Exception {
         // when
@@ -529,16 +566,16 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                                 .param("from", "ACC")
                                 .param("to", "ACC")
                                 .param("facets", "proteins_with,reviewed")
-                                .param("sort", sortField + " asc")
+                                .param("sort", sortField + " desc")
                                 .param("ids", "Q00001,Q00002"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00002", "Q00001")))
                 .andExpect(
-                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")));
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00002", "Q00001")));
     }
 
     @Test
