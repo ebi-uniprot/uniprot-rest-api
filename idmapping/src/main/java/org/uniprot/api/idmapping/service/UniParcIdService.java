@@ -6,6 +6,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -16,11 +17,11 @@ import org.uniprot.store.config.UniProtDataType;
  */
 public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryPair> {
     public UniParcIdService(
-            IDMappingPIRService idMappingService,
+            IdMappingJobCacheService idMappingJobCacheService,
             StoreStreamer<UniParcEntry> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             UniParcFacetConfig facetConfig) {
-        super(idMappingService, storeStreamer, tupleStream, facetConfig);
+        super(idMappingJobCacheService, storeStreamer, tupleStream, facetConfig);
     }
 
     @Override

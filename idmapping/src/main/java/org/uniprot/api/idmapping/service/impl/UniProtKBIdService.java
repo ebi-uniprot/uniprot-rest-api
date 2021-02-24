@@ -8,7 +8,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
 import org.uniprot.api.idmapping.service.BasicIdService;
-import org.uniprot.api.idmapping.service.IDMappingPIRService;
+import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -21,11 +21,11 @@ import org.uniprot.store.config.UniProtDataType;
 public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKbEntryPair> {
 
     public UniProtKBIdService(
-            IDMappingPIRService idMappingService,
+            IdMappingJobCacheService idMappingJobCacheService,
             StoreStreamer<UniProtKBEntry> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             UniprotKBFacetConfig facetConfig) {
-        super(idMappingService, storeStreamer, tupleStream, facetConfig);
+        super(idMappingJobCacheService, storeStreamer, tupleStream, facetConfig);
     }
 
     @Override

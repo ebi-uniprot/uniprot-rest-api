@@ -3,7 +3,7 @@ package org.uniprot.api.idmapping.model;
 import lombok.Builder;
 import lombok.Getter;
 
-import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 
 /**
  * @author lgonzales
@@ -11,7 +11,7 @@ import org.uniprot.core.uniref.UniRefEntry;
  */
 @Getter
 @Builder
-public class UniRefEntryPair implements EntryPair<UniRefEntry> {
+public class UniRefEntryPair implements EntryPair<UniRefEntryLight> {
     private final String from;
-    private final UniRefEntry to;
+    private final UniRefEntryLight to;
 }

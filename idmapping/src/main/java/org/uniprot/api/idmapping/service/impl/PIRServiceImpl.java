@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.service.impl;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
@@ -10,8 +12,6 @@ import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IDMappingPIRService;
 import org.uniprot.api.idmapping.service.PIRResponseConverter;
-
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
 /**
  * Created 17/02/2021

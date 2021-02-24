@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UniProtKBIdMappingBasicRequest extends IdMappingBasicRequest {
+public class UniProtKBIdMappingBasicRequest extends IdMappingBasicSearchRequest {
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")

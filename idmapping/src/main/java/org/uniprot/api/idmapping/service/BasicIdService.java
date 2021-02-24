@@ -19,8 +19,10 @@ import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingStreamRequest;
+import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
@@ -30,7 +32,7 @@ import org.uniprot.store.config.UniProtDataType;
  * @created 16/02/2021
  */
 public abstract class BasicIdService<T, U> {
-    private final IDMappingPIRService idMappingService;
+    private final IdMappingJobCacheService idMappingJobCacheService;
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
@@ -39,11 +41,11 @@ public abstract class BasicIdService<T, U> {
     private Integer defaultPageSize;
 
     protected BasicIdService(
-            IDMappingPIRService idMappingService,
+            IdMappingJobCacheService idMappingJobCacheService,
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig) {
-        this.idMappingService = idMappingService;
+        this.idMappingJobCacheService = idMappingJobCacheService;
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);
@@ -51,7 +53,9 @@ public abstract class BasicIdService<T, U> {
 
     public QueryResult<U> getMappedEntries(UniProtKBIdMappingSearchRequest searchRequest) {
         // get the mapped ids from PIR
-        IdMappingResult mappingResult = idMappingService.mapIds(searchRequest);
+        IdMappingJob jobResult = idMappingJobCacheService.get(searchRequest.getJobId());
+        // TODO: check for status and throws 404
+        IdMappingResult mappingResult = jobResult.getIdMappingResult();
         List<IdMappingStringPair> mappedIdPairs = mappingResult.getMappedIds();
         List<Facet> facets = null;
         if (needSearchInSolr(searchRequest)) {
