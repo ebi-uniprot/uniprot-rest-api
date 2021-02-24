@@ -53,7 +53,6 @@ import org.uniprot.core.gene.Gene;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyLineageTest;
 import org.uniprot.core.json.parser.uniprot.FeatureTest;
 import org.uniprot.core.json.parser.uniprot.GeneLocationTest;
-import org.uniprot.core.json.parser.uniprot.GeneTest;
 import org.uniprot.core.json.parser.uniprot.OrganimHostTest;
 import org.uniprot.core.json.parser.uniprot.UniProtKBCrossReferenceTest;
 import org.uniprot.core.json.parser.uniprot.comment.AlternativeProductsCommentTest;
@@ -148,11 +147,13 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                     UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
             entryBuilder.lineagesAdd(TaxonomyLineageTest.getCompleteTaxonomyLineage());
             entryBuilder.geneLocationsAdd(GeneLocationTest.getGeneLocation());
-            Gene gene = new GeneBuilder()
-                    .geneName(new GeneNameBuilder().value("gene "+i).build())
-                    .orderedLocusNamesAdd(new OrderedLocusNameBuilder().value("gene "+i).build())
-                    .orfNamesAdd(new ORFNameBuilder().value("gene "+i).build())
-                    .build();
+            Gene gene =
+                    new GeneBuilder()
+                            .geneName(new GeneNameBuilder().value("gene " + i).build())
+                            .orderedLocusNamesAdd(
+                                    new OrderedLocusNameBuilder().value("gene " + i).build())
+                            .orfNamesAdd(new ORFNameBuilder().value("gene " + i).build())
+                            .build();
             entryBuilder.genesAdd(gene);
             entryBuilder.organismHostsAdd(OrganimHostTest.getOrganismHost());
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();

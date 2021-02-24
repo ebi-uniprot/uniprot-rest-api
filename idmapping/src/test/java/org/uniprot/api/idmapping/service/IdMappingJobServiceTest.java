@@ -1,5 +1,9 @@
 package org.uniprot.api.idmapping.service;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -10,12 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * @author sahmad
@@ -26,11 +24,11 @@ import java.util.concurrent.BlockingQueue;
 @ContextConfiguration(classes = {IdMappingJobService.class, TestConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobServiceTest {
-    @Autowired
-    private IdMappingJobService jobService;
+    @Autowired private IdMappingJobService jobService;
 
     @Test
-    void testSubmitJob() throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
+    void testSubmitJob()
+            throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
         IdMappingBasicRequest request = createIdMappingRequest();
         JobSubmitResponse response = this.jobService.submitJob(request);
         Assertions.assertNotNull(response);
@@ -45,5 +43,4 @@ class IdMappingJobServiceTest {
         request.setIds("ids" + random);
         return request;
     }
-
 }

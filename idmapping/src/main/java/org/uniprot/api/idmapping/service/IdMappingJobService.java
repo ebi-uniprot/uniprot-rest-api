@@ -1,5 +1,10 @@
 package org.uniprot.api.idmapping.service;
 
+import static org.uniprot.api.rest.controller.BasicSearchController.getLocationURLForId;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +16,6 @@ import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.job.AsyncJobProducer;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-
-import static org.uniprot.api.rest.controller.BasicSearchController.getLocationURLForId;
 
 /**
  * @author sahmad
