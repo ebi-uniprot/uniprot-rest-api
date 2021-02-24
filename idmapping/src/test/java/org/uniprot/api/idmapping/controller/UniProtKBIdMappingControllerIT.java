@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,8 +45,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.idmapping.IDMappingREST;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.response.JobStatus;
+import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.service.HashGenerator;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
@@ -76,7 +82,11 @@ import org.uniprot.core.uniprotkb.comment.impl.FreeTextCommentImpl;
 import org.uniprot.core.uniprotkb.evidence.impl.EvidencedValueBuilder;
 import org.uniprot.core.uniprotkb.feature.UniProtKBFeature;
 import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
-import org.uniprot.core.uniprotkb.impl.*;
+import org.uniprot.core.uniprotkb.impl.GeneBuilder;
+import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
+import org.uniprot.core.uniprotkb.impl.ORFNameBuilder;
+import org.uniprot.core.uniprotkb.impl.OrderedLocusNameBuilder;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.core.uniprotkb.xdb.UniProtKBCrossReference;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
@@ -110,6 +120,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private IdMappingJobCacheService idMappingJobCacheService;
+    private HashGenerator hashGenerator = new HashGenerator();
 
     @Autowired private MockMvc mockMvc;
     private final UniProtEntryConverter documentConverter =
@@ -172,21 +183,12 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Test
     void testUniProtKBToUniProtKBMapping() throws Exception {
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("jobId", job.getJobId()));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -200,30 +202,18 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Test
     void testUniProtKBToUniProtKBMappingOnePage() throws Exception {
         // when
-        Integer defaultPageSize = 5;
-        List<IdMappingStringPair> idPairs =
+        String ids =
                 IntStream.rangeClosed(1, 20)
-                        .mapToObj(
-                                i -> {
-                                    String acc = String.format("Q%05d", i);
-                                    return new IdMappingStringPair(acc, acc);
-                                })
-                        .collect(Collectors.toList());
+                        .mapToObj(i -> String.format("Q%05d", i))
+                        .collect(Collectors.joining(","));
+        Integer defaultPageSize = 5;
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", ids);
 
-        IdMappingResult pirResponse = IdMappingResult.builder().mappedIds(idPairs).build();
-
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param(
-                                        "ids",
-                                        "Q00001,Q00002,Q00003,Q00004,Q00005,Q00006,"
-                                                + "Q00007,Q00008,Q00009,Q00010,"
-                                                + "Q00011,Q00012,Q00013,Q00014,Q00015,Q00016,Q00017,Q00018,Q00019,Q0020"));
+                                .param("jobId", job.getJobId()));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -243,24 +233,18 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     void testUniProtKBToUniProtKBMappingWithSize() throws Exception {
         // when
         Integer size = 10;
-        List<IdMappingStringPair> idPairs =
+        String ids =
                 IntStream.rangeClosed(1, 20)
-                        .mapToObj(
-                                i -> {
-                                    String acc = String.format("Q%05d", i);
-                                    return new IdMappingStringPair(acc, acc);
-                                })
-                        .collect(Collectors.toList());
+                        .mapToObj(i -> String.format("Q%05d", i))
+                        .collect(Collectors.joining(","));
 
-        IdMappingResult pirResponse = IdMappingResult.builder().mappedIds(idPairs).build();
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", ids);
 
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
+                                .param("jobId", job.getJobId())
                                 .param("size", String.valueOf(size))
                                 .param(
                                         "ids",
@@ -290,24 +274,18 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     void testUniProtKBToUniProtKBMappingWithSizeAndPagination() throws Exception {
         // when
         Integer size = 10;
-        List<IdMappingStringPair> idPairs =
+        String ids =
                 IntStream.rangeClosed(1, 20)
-                        .mapToObj(
-                                i -> {
-                                    String acc = String.format("Q%05d", i);
-                                    return new IdMappingStringPair(acc, acc);
-                                })
-                        .collect(Collectors.toList());
+                        .mapToObj(i -> String.format("Q%05d", i))
+                        .collect(Collectors.joining(","));
 
-        IdMappingResult pirResponse = IdMappingResult.builder().mappedIds(idPairs).build();
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", ids);
 
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
+                                .param("jobId", job.getJobId())
                                 .param("size", String.valueOf(size))
                                 .param(
                                         "ids",
@@ -335,23 +313,21 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
-        String cursor = linkHeader.split("\\?")[1].split("&")[3].split("=")[1];
+        String cursor = linkHeader.split("\\?")[1].split("&")[2].split("=")[1];
 
         // when 2nd page
         response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
+                                .param("jobId", job.getJobId())
                                 .param("size", String.valueOf(size))
                                 .param(
                                         "ids",
                                         "Q00001,Q00002,Q00003,Q00004,Q00005,Q00006,"
                                                 + "Q00007,Q00008,Q00009,Q00010,"
                                                 + "Q00011,Q00012,Q00013,Q00014,Q00015,Q00016,Q00017,Q00018,Q00019,Q0020")
-                                .param("cursor", cursor)
-                                .param("size", String.valueOf(size)));
+                                .param("cursor", cursor));
 
         // then
         response.andDo(log())
@@ -377,22 +353,13 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Test
     void testUniProtKBToUniProtKBMappingWithZeroSize() throws Exception {
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param("size", "0")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("jobId", job.getJobId())
+                                .param("size", "0"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -403,22 +370,13 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Test
     void testUniProtKBToUniProtKBMappingWithNegativeSize() throws Exception {
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param("size", "-1")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("jobId", job.getJobId())
+                                .param("size", "-1"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -432,22 +390,13 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Test
     void testUniProtKBToUniProtKBMappingWithMoreThan500Size() throws Exception {
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param("size", "600")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("jobId", job.getJobId())
+                                .param("size", "600"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -462,22 +411,13 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Test
     void testUniProtKBToUniProtKBMappingWithFacet() throws Exception {
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param("facets", "proteins_with,reviewed")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("jobId", job.getJobId())
+                                .param("facets", "proteins_with,reviewed"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -492,23 +432,14 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Test
     void testUniProtKBToUniProtKBMappingWithFacetFilter() throws Exception {
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
+                                .param("jobId", job.getJobId())
                                 .param("facets", "proteins_with,reviewed")
-                                .param("query", "reviewed:true")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("query", "reviewed:true"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -521,23 +452,14 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Test
     void testCanSortMultipleFieldsWithSuccess() throws Exception {
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
+                                .param("jobId", job.getJobId())
                                 .param("facets", "proteins_with,reviewed")
-                                .param("sort", "gene desc , accession asc")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("sort", "gene desc , accession asc"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -555,23 +477,14 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @MethodSource("getAllSortFields")
     void testUniProtKBToUniProtKBMappingWithSort(String sortField) throws Exception {
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
+                                .param("jobId", job.getJobId())
                                 .param("facets", "proteins_with,reviewed")
-                                .param("sort", sortField + " desc")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("sort", sortField + " desc"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -586,30 +499,22 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     void testUniProtKBToUniProtKBMappingWithUnmappedIds() throws Exception {
         // when
         List<String> unmappedIds = List.of("S12345", "T12345");
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(
-                                List.of(
-                                        new IdMappingStringPair("Q00001", "Q00001"),
-                                        new IdMappingStringPair("Q00002", "Q00002")))
-                        .unmappedIds(unmappedIds)
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00005,Q00006");
+        job.getIdMappingResult().setUnmappedIds(unmappedIds);
+
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param("ids", "Q00001,S12345,Q00002,T12345"));
+                                .param("jobId", job.getJobId()));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00005", "Q00006")))
                 .andExpect(
-                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")))
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00005", "Q00006")))
                 .andExpect(jsonPath("$.failedIds", contains("S12345", "T12345")));
     }
 
@@ -621,18 +526,12 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         assertThat(name, notNullValue());
         assertThat(paths, notNullValue());
         // when
-        IdMappingResult pirResponse =
-                IdMappingResult.builder()
-                        .mappedIds(List.of(new IdMappingStringPair("Q00001", "Q00001")))
-                        .build();
-        // Mockito.when(pirService.mapIds(ArgumentMatchers.any())).thenReturn(pirResponse);
+        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_SEARCH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param("ids", "Q00001")
+                                .param("jobId", job.getJobId())
                                 .param("fields", name));
 
         // then
@@ -719,5 +618,50 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
                 .map(SearchFieldItem::getFieldName)
                 .filter(fieldConfig::correspondingSortFieldExists)
                 .map(Arguments::of);
+    }
+
+    private IdMappingJob createAndPutJobInCache(String from, String to, String ids)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
+        IdMappingBasicRequest idMappingRequest = createRequest(from, to, ids);
+        String jobId = generateHash(idMappingRequest);
+        IdMappingResult idMappingResult = createIdMappingResult(idMappingRequest);
+        IdMappingJob job = createJob(jobId, idMappingRequest, idMappingResult, JobStatus.FINISHED);
+        if (!this.idMappingJobCacheService.exists(jobId)) {
+            this.idMappingJobCacheService.put(jobId, job); // put the finished job in cache
+        }
+        return job;
+    }
+
+    private IdMappingBasicRequest createRequest(String from, String to, String ids) {
+        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        request.setIds(ids);
+        return request;
+    }
+
+    private String generateHash(IdMappingBasicRequest request)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
+        return this.hashGenerator.generateHash(request);
+    }
+
+    private IdMappingResult createIdMappingResult(IdMappingBasicRequest request) {
+        List<IdMappingStringPair> mappedIds =
+                Arrays.stream(request.getIds().split(","))
+                        .map(String::strip)
+                        .map(id -> new IdMappingStringPair(id, id))
+                        .collect(Collectors.toList());
+        return IdMappingResult.builder().mappedIds(mappedIds).build();
+    }
+
+    private IdMappingJob createJob(
+            String jobId,
+            IdMappingBasicRequest request,
+            IdMappingResult result,
+            JobStatus jobStatus) {
+        IdMappingJob.IdMappingJobBuilder builder = IdMappingJob.builder();
+        builder.jobId(jobId).jobStatus(jobStatus);
+        builder.idMappingRequest(request).idMappingResult(result);
+        return builder.build();
     }
 }
