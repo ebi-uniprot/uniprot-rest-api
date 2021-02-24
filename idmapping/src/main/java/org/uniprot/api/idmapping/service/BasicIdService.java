@@ -51,7 +51,7 @@ public abstract class BasicIdService<T, U> {
 
     public QueryResult<U> getMappedEntries(UniProtKBIdMappingSearchRequest searchRequest) {
         // get the mapped ids from PIR
-        IdMappingResult mappingResult = idMappingService.doPIRRequest(searchRequest);
+        IdMappingResult mappingResult = idMappingService.mapIds(searchRequest);
         List<IdMappingStringPair> mappedIdPairs = mappingResult.getMappedIds();
         List<Facet> facets = null;
         if (needSearchInSolr(searchRequest)) {

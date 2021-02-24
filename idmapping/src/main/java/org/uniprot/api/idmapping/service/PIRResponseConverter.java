@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpServerErrorException;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.impl.CacheablePIRServiceImpl;
+import org.uniprot.api.idmapping.service.impl.PIRServiceImpl;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -47,7 +47,7 @@ public class PIRResponseConverter {
         } else {
             throw new HttpServerErrorException(
                     statusCode,
-                    "PIR id-mapping service error: " + CacheablePIRServiceImpl.PIR_ID_MAPPING_URL);
+                    "PIR id-mapping service error: " + PIRServiceImpl.PIR_ID_MAPPING_URL);
         }
 
         return builder.build();

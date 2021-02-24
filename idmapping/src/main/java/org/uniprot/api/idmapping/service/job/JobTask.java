@@ -32,7 +32,7 @@ public class JobTask implements Runnable {
             IdMappingJob job = this.queue.take();
             job.setJobStatus(JobStatus.RUNNING);
             this.cacheService.put(job.getJobId(), job);
-            IdMappingResult pirResponse = pirService.doPIRRequest(job.getIdMappingRequest());
+            IdMappingResult pirResponse = pirService.mapIds(job.getIdMappingRequest());
             job.setJobStatus(JobStatus.FINISHED);
             job.setIdMappingResult(pirResponse);
             this.cacheService.put(job.getJobId(), job);

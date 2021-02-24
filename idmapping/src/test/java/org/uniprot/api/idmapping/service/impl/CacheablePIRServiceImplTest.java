@@ -4,8 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.idmapping.service.impl.CacheablePIRServiceImpl.HTTP_HEADERS;
-import static org.uniprot.api.idmapping.service.impl.CacheablePIRServiceImpl.PIR_ID_MAPPING_URL;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.HTTP_HEADERS;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.PIR_ID_MAPPING_URL;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +21,12 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 class CacheablePIRServiceImplTest {
 
     private RestTemplate restTemplate;
-    private CacheablePIRServiceImpl pirService;
+    private PIRServiceImpl pirService;
 
     @BeforeEach
     void setUp() {
         restTemplate = mock(RestTemplate.class);
-        pirService = new CacheablePIRServiceImpl(restTemplate);
+        pirService = new PIRServiceImpl(restTemplate);
     }
 
     @Test
@@ -49,7 +49,7 @@ class CacheablePIRServiceImplTest {
                         PIR_ID_MAPPING_URL, new HttpEntity<>(map, HTTP_HEADERS), String.class))
                 .thenReturn(ResponseEntity.ok().body("From1\tTo1\n"));
 
-        IdMappingResult idMappingResult = pirService.doPIRRequest(request);
+        IdMappingResult idMappingResult = pirService.mapIds(request);
 
         assertThat(
                 idMappingResult.getMappedIds(), contains(new IdMappingStringPair("From1", "To1")));

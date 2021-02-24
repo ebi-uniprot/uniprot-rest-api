@@ -14,7 +14,7 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
  * @author Edd
  */
 public interface IDMappingPIRService {
-    IdMappingResult doPIRRequest(IdMappingBasicRequest request);
+    IdMappingResult mapIds(IdMappingBasicRequest request);
 
     default QueryResult<IdMappingStringPair> queryResultPage(
             IdMappingBasicRequest request, IdMappingResult result) {

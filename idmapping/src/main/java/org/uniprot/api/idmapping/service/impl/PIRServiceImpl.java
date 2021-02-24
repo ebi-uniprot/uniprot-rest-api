@@ -1,8 +1,5 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
@@ -14,12 +11,14 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IDMappingPIRService;
 import org.uniprot.api.idmapping.service.PIRResponseConverter;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
 /**
  * Created 17/02/2021
  *
  * @author Edd
  */
-public class CacheablePIRServiceImpl implements IDMappingPIRService {
+public class PIRServiceImpl implements IDMappingPIRService {
     public static final String PIR_ID_MAPPING_URL =
             "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async_test";
     static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
@@ -30,14 +29,13 @@ public class CacheablePIRServiceImpl implements IDMappingPIRService {
         HTTP_HEADERS.setContentType(APPLICATION_FORM_URLENCODED);
     }
 
-    public CacheablePIRServiceImpl(RestTemplate restTemplate) {
+    public PIRServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
         this.pirResponseConverter = new PIRResponseConverter();
     }
 
     @Override
-    @Cacheable(value = "pirIDMappingCache")
-    public IdMappingResult doPIRRequest(IdMappingBasicRequest request) {
+    public IdMappingResult mapIds(IdMappingBasicRequest request) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(PIR_ID_MAPPING_URL);
 
         HttpEntity<MultiValueMap<String, String>> requestBody =
