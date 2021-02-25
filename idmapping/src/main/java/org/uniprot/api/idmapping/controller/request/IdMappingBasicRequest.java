@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @created 16/02/2021
  */
 @Data
-@EqualsAndHashCode
 public class IdMappingBasicRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the from type")
@@ -31,12 +30,4 @@ public class IdMappingBasicRequest {
 
     @Parameter(description = "Value of the taxon Id")
     private String taxId;
-
-    @Parameter(hidden = true)
-    private String cursor;
-
-    @Parameter(description = "Size of the result. Defaults to 25")
-    @PositiveOrZero(message = "{search.positive.or.zero}")
-    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
-    private Integer size;
 }

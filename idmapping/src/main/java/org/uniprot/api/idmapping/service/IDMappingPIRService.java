@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 
@@ -17,7 +18,7 @@ public interface IDMappingPIRService {
     IdMappingResult mapIds(IdMappingBasicRequest request);
 
     default QueryResult<IdMappingStringPair> queryResultPage(
-            IdMappingBasicRequest request, IdMappingResult result) {
+            IdMappingPageRequest request, IdMappingResult result) {
         int pageSize =
                 Objects.isNull(request.getSize())
                         ? result.getMappedIds().size()
