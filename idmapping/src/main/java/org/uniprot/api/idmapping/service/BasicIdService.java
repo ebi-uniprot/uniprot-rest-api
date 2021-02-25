@@ -19,8 +19,8 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
-import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingStreamRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
@@ -54,7 +54,7 @@ public abstract class BasicIdService<T, U> {
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);
     }
 
-    public QueryResult<U> getMappedEntries(UniProtKBIdMappingSearchRequest searchRequest) {
+    public QueryResult<U> getMappedEntries(IdMappingSearchRequest searchRequest) {
         // get the mapped ids cached by JobId
         IdMappingJob jobResult = idMappingJobCacheService.get(searchRequest.getJobId());
         //TODO: Fix it.... not throw Exception
@@ -71,7 +71,7 @@ public abstract class BasicIdService<T, U> {
         }
     }
 
-    public List<Object> streamEntries(UniProtKBIdMappingStreamRequest streamRequest) {
+    public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {
         return Collections.emptyList(); // TODO fill code
     }
 
@@ -88,7 +88,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     private QueryResult<U> getMappedEntries(
-            UniProtKBIdMappingSearchRequest searchRequest, IdMappingResult mappingResult) {
+            IdMappingSearchRequest searchRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
         if (needSearchInSolr(searchRequest)) {
@@ -118,13 +118,13 @@ public abstract class BasicIdService<T, U> {
     }
 
     private SolrStreamFacetResponse searchBySolrStream(
-            List<String> ids, UniProtKBIdMappingSearchRequest searchRequest) {
+            List<String> ids, IdMappingSearchRequest searchRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
         return this.facetTupleStreamConverter.convert(facetTupleStream);
     }
 
-    private Integer getPageSize(UniProtKBIdMappingSearchRequest searchRequest) {
+    private Integer getPageSize(IdMappingSearchRequest searchRequest) {
         Integer pageSize = this.defaultPageSize;
         if (Utils.notNull(searchRequest.getSize())) {
             pageSize = searchRequest.getSize();
@@ -185,7 +185,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     private SolrStreamFacetRequest createSolrStreamRequest(
-            List<String> ids, UniProtKBIdMappingSearchRequest searchRequest) {
+            List<String> ids, IdMappingSearchRequest searchRequest) {
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
                 SolrStreamFacetRequest.builder();
 
@@ -230,7 +230,7 @@ public abstract class BasicIdService<T, U> {
         return entries.collect(Collectors.toMap(this::getEntryId, Function.identity()));
     }
 
-    private boolean needSearchInSolr(UniProtKBIdMappingSearchRequest searchRequest) {
+    private boolean needSearchInSolr(IdMappingSearchRequest searchRequest) {
         return Utils.notNullNotEmpty(searchRequest.getQuery())
                 || Utils.notNullNotEmpty(searchRequest.getFacets())
                 || Utils.notNullNotEmpty(searchRequest.getSort());

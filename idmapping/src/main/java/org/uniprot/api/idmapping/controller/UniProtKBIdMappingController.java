@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.idmapping.controller.request.UniProtKBIdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
 import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;

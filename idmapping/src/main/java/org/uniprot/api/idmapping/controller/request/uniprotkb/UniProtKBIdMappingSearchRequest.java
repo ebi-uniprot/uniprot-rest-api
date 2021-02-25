@@ -1,9 +1,9 @@
-package org.uniprot.api.idmapping.controller.request;
+package org.uniprot.api.idmapping.controller.request.uniprotkb;
 
 import lombok.*;
 
+import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidFacets;
 
@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UniProtKBIdMappingSearchRequest extends UniProtKBIdMappingBasicRequest
-        implements SearchRequest {
+        implements IdMappingSearchRequest {
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
     @Parameter(description = "Name of the facet search")

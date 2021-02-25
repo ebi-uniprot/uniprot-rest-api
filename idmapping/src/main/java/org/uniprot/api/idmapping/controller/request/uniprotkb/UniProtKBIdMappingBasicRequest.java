@@ -1,8 +1,9 @@
-package org.uniprot.api.idmapping.controller.request;
+package org.uniprot.api.idmapping.controller.request.uniprotkb;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicSearchRequest;
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
