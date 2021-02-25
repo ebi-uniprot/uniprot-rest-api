@@ -11,6 +11,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.cache.impl.EhCacheMappingJobService;
@@ -56,5 +57,11 @@ public class TestConfig {
     @Profile("offline")
     public AsyncJobProducer testJobProducer(BlockingQueue<IdMappingJob> queue) {
         return new AsyncJobProducer(queue);
+    }
+
+    @Bean
+    @Profile("offline")
+    public ThreadPoolTaskExecutor jobTaskExecutor(){
+        return new ThreadPoolTaskExecutor();
     }
 }
