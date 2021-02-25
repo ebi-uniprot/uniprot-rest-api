@@ -1,5 +1,10 @@
 package org.uniprot.api.idmapping.service;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.Set;
+
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -8,14 +13,7 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
-import org.uniprot.api.idmapping.service.job.AsyncJobProducer;
 import org.uniprot.api.idmapping.service.job.JobTask;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * @author sahmad
@@ -25,38 +23,30 @@ import java.util.concurrent.BlockingQueue;
 public class IdMappingJobService {
 
     private final IdMappingJobCacheService cacheService;
-    private final BlockingQueue<IdMappingJob> jobQueue;
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
-    private final AsyncJobProducer jobProducer;
 
     public IdMappingJobService(
             IdMappingJobCacheService cacheService,
-            AsyncJobProducer asyncJobProducer,
-            BlockingQueue<IdMappingJob> jobQueue,
             IdMappingPIRService pirService,
             ThreadPoolTaskExecutor jobTaskExecutor) {
         this.cacheService = cacheService;
-        this.jobQueue = jobQueue;
         this.pirService = pirService;
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = new HashGenerator();
-        this.jobProducer = asyncJobProducer;
     }
 
     public JobSubmitResponse submitJob(IdMappingBasicRequest request)
-            throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         String jobId = this.hashGenerator.generateHash(request);
         IdMappingJob idMappingJob = createJob(jobId, request);
 
         if (!this.cacheService.exists(jobId)) {
             this.cacheService.put(jobId, idMappingJob);
-            this.jobProducer.enqueueJob(idMappingJob); // Async call
-
             // create task and submit
-            JobTask jobTask = new JobTask(jobQueue, cacheService, pirService);
+            JobTask jobTask = new JobTask(idMappingJob, cacheService, pirService);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);

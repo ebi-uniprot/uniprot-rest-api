@@ -1,13 +1,15 @@
 package org.uniprot.api.idmapping.controller.request.uniref;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.validation.ValidFacets;
+
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author lgonzales

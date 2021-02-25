@@ -57,7 +57,7 @@ public abstract class BasicIdService<T, U> {
     public QueryResult<U> getMappedEntries(IdMappingSearchRequest searchRequest) {
         // get the mapped ids cached by JobId
         IdMappingJob jobResult = idMappingJobCacheService.get(searchRequest.getJobId());
-        //TODO: Fix it.... not throw Exception
+        // TODO: Fix it.... not throw Exception
         if (jobResult == null) {
             throw new ResourceNotFoundException("{search.not.found}");
         } else if (jobResult.getJobStatus() == JobStatus.ERROR) {
