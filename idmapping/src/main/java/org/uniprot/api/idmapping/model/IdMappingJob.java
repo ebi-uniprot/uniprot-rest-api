@@ -20,7 +20,6 @@ public class IdMappingJob {
     private IdMappingBasicRequest idMappingRequest;
     private IdMappingResult idMappingResult;
     private String errorMessage;
-    //    @Builder.Default private long expiryInMillis = 5 * 60 * 1000; // 5 minutes
     @Builder.Default private Date created = new Date();
     @Builder.Default private Date updated = new Date();
 }
