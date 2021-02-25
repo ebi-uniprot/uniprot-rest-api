@@ -120,7 +120,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private IdMappingJobCacheService idMappingJobCacheService;
-    private HashGenerator hashGenerator = new HashGenerator();
+    private final HashGenerator hashGenerator = new HashGenerator();
 
     @Autowired private MockMvc mockMvc;
     private final UniProtEntryConverter documentConverter =
