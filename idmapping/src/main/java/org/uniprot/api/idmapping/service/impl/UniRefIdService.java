@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.service.impl;
 
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -16,6 +17,7 @@ import org.uniprot.store.config.UniProtDataType;
  * @author sahmad
  * @created 16/02/2021
  */
+@Service
 public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntryPair> {
     public UniRefIdService(
             IdMappingJobCacheService idMappingJobCacheService,

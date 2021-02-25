@@ -1,14 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -17,29 +8,37 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.uniparc.UniParcIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
-import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
+import org.uniprot.api.idmapping.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.service.impl.UniParcIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
+
 /**
- * @author sahmad
- * @created 17/02/2021
+ * @author lgonzales
+ * @since 25/02/2021
  */
 @RestController
-@RequestMapping(value = "/uniprotkb/idmapping/")
-public class UniProtKBIdMappingController extends BasicSearchController<UniProtKbEntryPair> {
+@RequestMapping(value = "/uniparc/idmapping/")
+public class UniParcIdMappingController extends BasicSearchController<UniParcEntryPair> {
 
-    private final UniProtKBIdService idService;
+    private final UniParcIdService idService;
 
     @Autowired
-    public UniProtKBIdMappingController(
+    public UniParcIdMappingController(
             ApplicationEventPublisher eventPublisher,
-            UniProtKBIdService idService,
-            MessageConverterContextFactory<UniProtKbEntryPair> converterContextFactory,
+            UniParcIdService idService,
+            MessageConverterContextFactory<UniParcEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
         this.idService = idService;
@@ -48,25 +47,24 @@ public class UniProtKBIdMappingController extends BasicSearchController<UniProtK
     @GetMapping(
             value = "/results/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<MessageConverterContext<UniProtKbEntryPair>> getMappedEntries(
-            @Valid UniProtKBIdMappingSearchRequest searchRequest,
+    public ResponseEntity<MessageConverterContext<UniParcEntryPair>> getMappedEntries(
+            @Valid UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-
         IdMappingJob cachedJobResult = idService.getCachedIdMappingJob(searchRequest.getJobId());
 
-        QueryResult<UniProtKbEntryPair> result = this.idService.getMappedEntries(searchRequest, cachedJobResult.getIdMappingResult());
+        QueryResult<UniParcEntryPair> result = this.idService.getMappedEntries(searchRequest, cachedJobResult.getIdMappingResult());
 
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
 
     @Override
-    protected String getEntityId(UniProtKbEntryPair entity) {
-        return entity.getTo().getPrimaryAccession().getValue();
+    protected String getEntityId(UniParcEntryPair entity) {
+        return entity.getTo().getUniParcId().getValue();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniProtKbEntryPair entity) {
+    protected Optional<String> getEntityRedirectId(UniParcEntryPair entity) {
         return Optional.empty();
     }
 }

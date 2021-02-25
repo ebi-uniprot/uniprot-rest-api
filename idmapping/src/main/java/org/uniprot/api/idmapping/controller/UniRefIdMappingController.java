@@ -1,14 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -19,54 +10,62 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
-import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
+import org.uniprot.api.idmapping.model.UniRefEntryPair;
+import org.uniprot.api.idmapping.service.impl.UniRefIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
+
 /**
- * @author sahmad
- * @created 17/02/2021
+ * @author lgonzales
+ * @since 25/02/2021
  */
 @RestController
-@RequestMapping(value = "/uniprotkb/idmapping/")
-public class UniProtKBIdMappingController extends BasicSearchController<UniProtKbEntryPair> {
+@RequestMapping(value = "/uniref/idmapping/")
+public class UniRefIdMappingController extends BasicSearchController<UniRefEntryPair> {
 
-    private final UniProtKBIdService idService;
+    private final UniRefIdService idService;
 
     @Autowired
-    public UniProtKBIdMappingController(
+    public UniRefIdMappingController(
             ApplicationEventPublisher eventPublisher,
-            UniProtKBIdService idService,
-            MessageConverterContextFactory<UniProtKbEntryPair> converterContextFactory,
+            UniRefIdService idService,
+            MessageConverterContextFactory<UniRefEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF);
         this.idService = idService;
     }
 
     @GetMapping(
             value = "/results/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<MessageConverterContext<UniProtKbEntryPair>> getMappedEntries(
+    public ResponseEntity<MessageConverterContext<UniRefEntryPair>> getMappedEntries(
             @Valid UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
         IdMappingJob cachedJobResult = idService.getCachedIdMappingJob(searchRequest.getJobId());
 
-        QueryResult<UniProtKbEntryPair> result = this.idService.getMappedEntries(searchRequest, cachedJobResult.getIdMappingResult());
+        QueryResult<UniRefEntryPair> result = this.idService.getMappedEntries(searchRequest, cachedJobResult.getIdMappingResult());
 
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
 
     @Override
-    protected String getEntityId(UniProtKbEntryPair entity) {
-        return entity.getTo().getPrimaryAccession().getValue();
+    protected String getEntityId(UniRefEntryPair entity) {
+        return entity.getTo().getId().getValue();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniProtKbEntryPair entity) {
+    protected Optional<String> getEntityRedirectId(UniRefEntryPair entity) {
         return Optional.empty();
     }
 }
