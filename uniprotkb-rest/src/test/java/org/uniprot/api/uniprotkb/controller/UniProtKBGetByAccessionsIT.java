@@ -37,6 +37,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -82,6 +84,9 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                     new HashMap<>());
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
     @Autowired private MockMvc mockMvc;
 
@@ -669,6 +674,16 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return Collections.singletonList(SolrCollection.uniprot);
+    }
+
+    @Override
+    protected TupleStreamTemplate getTupleStreamTemplate() {
+        return tupleStreamTemplate;
+    }
+
+    @Override
+    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
+        return facetTupleStreamTemplate;
     }
 
     private Stream<Arguments> getContentTypes() {

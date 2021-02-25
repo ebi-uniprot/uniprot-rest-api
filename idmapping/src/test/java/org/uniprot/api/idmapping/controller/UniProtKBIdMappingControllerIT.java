@@ -32,8 +32,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +44,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IDMappingREST;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -116,17 +118,26 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
-    private static final String UNIPROTKB_ID_MAPPING_SEARCH = "/uniprotkb/idmapping/search";
+    private static final String UNIPROTKB_ID_MAPPING_SEARCH =
+            "/uniprotkb/idmapping/results/{jobId}";
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private IdMappingJobCacheService idMappingJobCacheService;
     private final HashGenerator hashGenerator = new HashGenerator();
 
+    @Qualifier("uniproKBfacetTupleStreamTemplate")
+    @Autowired
+    private FacetTupleStreamTemplate facetTupleStreamTemplate;
+
+    @Qualifier("uniProtKBTupleStreamTemplate")
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
+
     @Autowired private MockMvc mockMvc;
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
-                    Mockito.mock(GORepo.class),
+                    mock(GORepo.class),
                     PathwayRepoMocker.getPathwayRepo(),
                     mock(ChebiRepo.class),
                     mock(ECRepo.class),
@@ -135,6 +146,16 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return List.of(SolrCollection.uniprot);
+    }
+
+    @Override
+    protected TupleStreamTemplate getTupleStreamTemplate() {
+        return tupleStreamTemplate;
+    }
+
+    @Override
+    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
+        return facetTupleStreamTemplate;
     }
 
     private static final UniProtKBEntry TEMPLATE_ENTRY =
@@ -186,9 +207,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId()));
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -211,9 +231,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId()));
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -242,9 +261,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("size", String.valueOf(size))
                                 .param(
                                         "ids",
@@ -283,15 +301,9 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
-                                .param("size", String.valueOf(size))
-                                .param(
-                                        "ids",
-                                        "Q00001,Q00002,Q00003,Q00004,Q00005,Q00006,"
-                                                + "Q00007,Q00008,Q00009,Q00010,"
-                                                + "Q00011,Q00012,Q00013,Q00014,Q00015,Q00016,Q00017,Q00018,Q00019,Q0020"));
+                                .param("size", String.valueOf(size)));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -313,20 +325,14 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
-        String cursor = linkHeader.split("\\?")[1].split("&")[2].split("=")[1];
+        String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
 
         // when 2nd page
         response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("size", String.valueOf(size))
-                                .param(
-                                        "ids",
-                                        "Q00001,Q00002,Q00003,Q00004,Q00005,Q00006,"
-                                                + "Q00007,Q00008,Q00009,Q00010,"
-                                                + "Q00011,Q00012,Q00013,Q00014,Q00015,Q00016,Q00017,Q00018,Q00019,Q0020")
                                 .param("cursor", cursor));
 
         // then
@@ -356,9 +362,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("size", "0"));
         // then
         response.andDo(log())
@@ -373,9 +378,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("size", "-1"));
         // then
         response.andDo(print())
@@ -393,9 +397,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("size", "600"));
         // then
         response.andDo(print())
@@ -414,9 +417,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("facets", "proteins_with,reviewed"));
         // then
         response.andDo(print())
@@ -435,9 +437,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("facets", "proteins_with,reviewed")
                                 .param("query", "reviewed:true"));
         // then
@@ -455,9 +456,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("facets", "proteins_with,reviewed")
                                 .param("sort", "gene desc , accession asc"));
         // then
@@ -480,9 +480,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("facets", "proteins_with,reviewed")
                                 .param("sort", sortField + " desc"));
         // then
@@ -504,9 +503,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId()));
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -529,9 +527,8 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001");
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_SEARCH)
+                        get(UNIPROTKB_ID_MAPPING_SEARCH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", job.getJobId())
                                 .param("fields", name));
 
         // then

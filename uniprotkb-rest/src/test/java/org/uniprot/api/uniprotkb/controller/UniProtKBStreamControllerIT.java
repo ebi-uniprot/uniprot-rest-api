@@ -43,6 +43,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -95,6 +97,8 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -332,6 +336,16 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return Collections.singletonList(SolrCollection.uniprot);
+    }
+
+    @Override
+    protected TupleStreamTemplate getTupleStreamTemplate() {
+        return tupleStreamTemplate;
+    }
+
+    @Override
+    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
+        return facetTupleStreamTemplate;
     }
 
     private void saveEntries() throws Exception {

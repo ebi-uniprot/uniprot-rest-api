@@ -41,6 +41,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
@@ -73,6 +75,8 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
     @Autowired UniProtStoreClient<UniParcEntry> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
     @BeforeAll
     void initUniParcBestGuessDataStore() throws IOException, SolrServerException {
@@ -282,5 +286,15 @@ class UniParcBestGuessControllerIT extends AbstractStreamControllerIT {
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return Collections.singletonList(SolrCollection.uniparc);
+    }
+
+    @Override
+    protected TupleStreamTemplate getTupleStreamTemplate() {
+        return tupleStreamTemplate;
+    }
+
+    @Override
+    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
+        return facetTupleStreamTemplate;
     }
 }

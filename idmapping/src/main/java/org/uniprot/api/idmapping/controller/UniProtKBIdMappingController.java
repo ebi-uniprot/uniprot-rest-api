@@ -56,7 +56,8 @@ public class UniProtKBIdMappingController extends BasicSearchController<UniProtK
             @Valid UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(searchRequest.getJobId());
+        IdMappingJob cachedJobResult =
+                cacheService.getCompletedJobAsResource(searchRequest.getJobId());
 
         QueryResult<UniProtKbEntryPair> result =
                 this.idService.getMappedEntries(

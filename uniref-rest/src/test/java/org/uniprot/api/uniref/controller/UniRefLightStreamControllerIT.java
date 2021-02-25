@@ -49,6 +49,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RDFPrologs;
@@ -89,6 +91,8 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
     @Autowired private RestTemplate restTemplate;
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -318,6 +322,16 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return Collections.singletonList(SolrCollection.uniref);
+    }
+
+    @Override
+    protected TupleStreamTemplate getTupleStreamTemplate() {
+        return tupleStreamTemplate;
+    }
+
+    @Override
+    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
+        return facetTupleStreamTemplate;
     }
 
     private void saveEntries() throws Exception {

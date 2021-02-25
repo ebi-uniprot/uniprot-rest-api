@@ -49,11 +49,7 @@ public abstract class AbstractStreamControllerIT {
                     + "    <someMore>text3</someMore>\n"
                     + "</rdf:RDF>";
 
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
-
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
-
-    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
     private MiniSolrCloudCluster cluster;
 
@@ -72,11 +68,15 @@ public abstract class AbstractStreamControllerIT {
         JettyConfig jettyConfig = JettyConfig.builder().setPort(0).stopAtShutdown(true).build();
         try {
             cluster = new MiniSolrCloudCluster(1, tempClusterDir, jettyConfig);
-            tupleStreamTemplate.getStreamConfig().setZkHost(cluster.getZkServer().getZkAddress());
+            getTupleStreamTemplate()
+                    .getStreamConfig()
+                    .setZkHost(cluster.getZkServer().getZkAddress());
             ReflectionTestUtils.setField(
-                    tupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
-            ReflectionTestUtils.setField(tupleStreamTemplate, "streamFactory", null);
-            ReflectionTestUtils.setField(tupleStreamTemplate, "streamContext", null);
+                    getTupleStreamTemplate(),
+                    "httpClient",
+                    cluster.getSolrClient().getHttpClient());
+            ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamFactory", null);
+            ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamContext", null);
             cloudSolrClient = cluster.getSolrClient();
 
             updateFacetTupleStreamTemplate();
@@ -95,6 +95,10 @@ public abstract class AbstractStreamControllerIT {
     }
 
     protected abstract List<SolrCollection> getSolrCollections();
+
+    protected abstract TupleStreamTemplate getTupleStreamTemplate();
+
+    protected abstract FacetTupleStreamTemplate getFacetTupleStreamTemplate();
 
     protected Stream<Arguments> getContentTypes(String requestPath) {
         return ControllerITUtils.getContentTypes(requestPath, requestMappingHandlerMapping).stream()
@@ -129,10 +133,14 @@ public abstract class AbstractStreamControllerIT {
     private void updateFacetTupleStreamTemplate() {
         // update facet tuple for fields value for testing
         ReflectionTestUtils.setField(
-                facetTupleStreamTemplate, "zookeeperHost", cluster.getZkServer().getZkAddress());
+                getFacetTupleStreamTemplate(),
+                "zookeeperHost",
+                cluster.getZkServer().getZkAddress());
         ReflectionTestUtils.setField(
-                facetTupleStreamTemplate, "httpClient", cluster.getSolrClient().getHttpClient());
-        ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamFactory", null);
-        ReflectionTestUtils.setField(facetTupleStreamTemplate, "streamContext", null);
+                getFacetTupleStreamTemplate(),
+                "httpClient",
+                cluster.getSolrClient().getHttpClient());
+        ReflectionTestUtils.setField(getFacetTupleStreamTemplate(), "streamFactory", null);
+        ReflectionTestUtils.setField(getFacetTupleStreamTemplate(), "streamContext", null);
     }
 }
