@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.service;
+package org.uniprot.api.idmapping.service.impl;
 
 import java.util.Map;
 
@@ -6,6 +6,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.service.BasicIdService;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
