@@ -9,7 +9,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
 import org.uniprot.api.idmapping.service.BasicIdService;
-import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;

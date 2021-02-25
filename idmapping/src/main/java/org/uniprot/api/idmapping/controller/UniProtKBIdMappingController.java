@@ -20,6 +20,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -34,15 +35,18 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 public class UniProtKBIdMappingController extends BasicSearchController<UniProtKbEntryPair> {
 
     private final UniProtKBIdService idService;
+    private final IdMappingJobCacheService cacheService;
 
     @Autowired
     public UniProtKBIdMappingController(
             ApplicationEventPublisher eventPublisher,
             UniProtKBIdService idService,
+            IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<UniProtKbEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
         this.idService = idService;
+        this.cacheService = cacheService;
     }
 
     @GetMapping(
@@ -52,8 +56,7 @@ public class UniProtKBIdMappingController extends BasicSearchController<UniProtK
             @Valid UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-
-        IdMappingJob cachedJobResult = idService.getCachedIdMappingJob(searchRequest.getJobId());
+        IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(searchRequest.getJobId());
 
         QueryResult<UniProtKbEntryPair> result =
                 this.idService.getMappedEntries(

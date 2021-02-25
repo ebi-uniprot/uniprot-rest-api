@@ -7,8 +7,8 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
-import org.uniprot.api.idmapping.service.cache.impl.EhCacheMappingJobService;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.service.impl.EhCacheMappingJobService;
 
 @Configuration
 @EnableCaching

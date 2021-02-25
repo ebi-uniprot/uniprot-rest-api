@@ -26,7 +26,7 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
-import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -67,7 +67,7 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
             @Valid IdMappingPageRequest pageRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        IdMappingJob completedJob = jobService.getCompletedJobAsResource(jobId);
+        IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
         QueryResult<IdMappingStringPair> queryResult =
                 idMappingService.queryResultPage(pageRequest, completedJob.getIdMappingResult());
         return super.getSearchResponse(queryResult, null, request, response);
@@ -78,7 +78,7 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> streamResults(
             @PathVariable String jobId, HttpServletRequest request, HttpServletResponse response) {
-        IdMappingJob completedJob = jobService.getCompletedJobAsResource(jobId);
+        IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
         QueryResult<IdMappingStringPair> queryResult =
                 idMappingService.queryResultAll(completedJob.getIdMappingResult());
         return super.getSearchResponse(queryResult, null, request, response);

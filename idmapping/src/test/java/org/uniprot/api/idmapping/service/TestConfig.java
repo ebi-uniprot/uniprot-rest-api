@@ -10,8 +10,7 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
-import org.uniprot.api.idmapping.service.cache.impl.EhCacheMappingJobService;
+import org.uniprot.api.idmapping.service.impl.EhCacheMappingJobService;
 
 /**
  * @author sahmad

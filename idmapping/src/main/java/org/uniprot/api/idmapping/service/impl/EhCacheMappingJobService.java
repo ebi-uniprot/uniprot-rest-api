@@ -1,8 +1,8 @@
-package org.uniprot.api.idmapping.service.cache.impl;
+package org.uniprot.api.idmapping.service.impl;
 
 import org.springframework.cache.Cache;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.core.util.Utils;
 
 /**

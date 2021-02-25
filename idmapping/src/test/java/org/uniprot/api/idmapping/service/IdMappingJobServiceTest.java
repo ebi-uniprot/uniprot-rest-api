@@ -37,6 +37,7 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 class IdMappingJobServiceTest {
     @Autowired private IdMappingJobService jobService;
     @Autowired private IdMappingPIRService pirService;
+    @Autowired private IdMappingJobCacheService cacheService;
 
     @Test
     void testSubmitJob()
@@ -64,7 +65,7 @@ class IdMappingJobServiceTest {
         // then
         Thread.sleep(1000); // delay to make sure that job is running
         String jobId = submitResponse.getJobId();
-        IdMappingJob submittedJob = this.jobService.getJobAsResource(jobId);
+        IdMappingJob submittedJob = this.cacheService.getJobAsResource(jobId);
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
         Assertions.assertEquals(JobStatus.FINISHED, submittedJob.getJobStatus());
@@ -97,7 +98,7 @@ class IdMappingJobServiceTest {
         // then
         Thread.sleep(500); // to make sure that task is picked to run
         String jobId = submitResponse.getJobId();
-        IdMappingJob submittedJob = this.jobService.getJobAsResource(jobId);
+        IdMappingJob submittedJob = this.cacheService.getJobAsResource(jobId);
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
         Assertions.assertEquals(JobStatus.RUNNING, submittedJob.getJobStatus());
@@ -122,7 +123,7 @@ class IdMappingJobServiceTest {
         // then
         Thread.sleep(1000); // delay to make sure that thread is picked to run
         String jobId = submitResponse.getJobId();
-        IdMappingJob submittedJob = this.jobService.getJobAsResource(jobId);
+        IdMappingJob submittedJob = this.cacheService.getJobAsResource(jobId);
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
         Assertions.assertEquals(JobStatus.ERROR, submittedJob.getJobStatus());
@@ -139,7 +140,7 @@ class IdMappingJobServiceTest {
     void testGetUnknownJob() {
         Assertions.assertThrows(
                 ResourceNotFoundException.class,
-                () -> this.jobService.getJobAsResource("some random id"));
+                () -> this.cacheService.getJobAsResource("some random id"));
     }
 
     private IdMappingBasicRequest createIdMappingRequest() {

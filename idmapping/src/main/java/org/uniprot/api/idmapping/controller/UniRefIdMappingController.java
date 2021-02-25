@@ -1,14 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
-
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +11,19 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.UniRefIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
 /**
  * @author lgonzales
@@ -34,15 +34,18 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 public class UniRefIdMappingController extends BasicSearchController<UniRefEntryPair> {
 
     private final UniRefIdService idService;
+    private final IdMappingJobCacheService cacheService;
 
     @Autowired
     public UniRefIdMappingController(
             ApplicationEventPublisher eventPublisher,
             UniRefIdService idService,
+            IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<UniRefEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF);
         this.idService = idService;
+        this.cacheService = cacheService;
     }
 
     @GetMapping(
@@ -53,7 +56,8 @@ public class UniRefIdMappingController extends BasicSearchController<UniRefEntry
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        IdMappingJob cachedJobResult = idService.getCachedIdMappingJob(searchRequest.getJobId());
+        IdMappingJob cachedJobResult =
+                cacheService.getCompletedJobAsResource(searchRequest.getJobId());
 
         QueryResult<UniRefEntryPair> result =
                 this.idService.getMappedEntries(

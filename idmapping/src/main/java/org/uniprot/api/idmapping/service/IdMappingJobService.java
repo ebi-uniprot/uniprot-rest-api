@@ -14,7 +14,6 @@ import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.job.JobTask;
 
 /**
@@ -57,23 +56,6 @@ public class IdMappingJobService {
         }
 
         return new JobSubmitResponse(jobId);
-    }
-
-    public IdMappingJob getJobAsResource(String jobId) {
-        if (this.cacheService.exists(jobId)) {
-            return this.cacheService.get(jobId);
-        } else {
-            throw new ResourceNotFoundException("Id mapping job identifier does not exist.");
-        }
-    }
-
-    public IdMappingJob getCompletedJobAsResource(String jobId) {
-        IdMappingJob job = getJobAsResource(jobId);
-        if (job.getJobStatus() == FINISHED) {
-            return job;
-        } else {
-            throw new ResourceNotFoundException("Id mapping job identifier does not exist.");
-        }
     }
 
     public String getRedirectPathToResults(IdMappingJob job) {

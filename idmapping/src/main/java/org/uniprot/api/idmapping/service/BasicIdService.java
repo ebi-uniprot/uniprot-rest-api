@@ -23,7 +23,6 @@ import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
@@ -50,14 +49,6 @@ public abstract class BasicIdService<T, U> {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);
-    }
-
-    public IdMappingJob getCachedIdMappingJob(String jobId) {
-        if (idMappingJobCacheService.exists(jobId)) {
-            return idMappingJobCacheService.get(jobId);
-        } else {
-            throw new ResourceNotFoundException("{search.not.found}");
-        }
     }
 
     public QueryResult<U> getMappedEntries(
