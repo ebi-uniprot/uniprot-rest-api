@@ -37,7 +37,7 @@ public class AsyncJobSubmitExceptionHandler implements AsyncUncaughtExceptionHan
         if (this.cacheService.exists(job.getJobId())) {
             IdMappingJob cachedJob = this.cacheService.get(job.getJobId());
             cachedJob.setJobStatus(JobStatus.ERROR);
-            cachedJob.getErrorMessages().add(throwable.getMessage());
+            cachedJob.setErrorMessage(throwable.getMessage());
         } else {
             log.warn("Failed job not found in cache {}", job.getJobId());
         }
