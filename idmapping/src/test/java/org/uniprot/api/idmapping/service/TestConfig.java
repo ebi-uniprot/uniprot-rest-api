@@ -1,8 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
 import java.util.Collections;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.Cache;
@@ -12,10 +10,8 @@ import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.cache.impl.EhCacheMappingJobService;
-import org.uniprot.api.idmapping.service.job.AsyncJobProducer;
 
 /**
  * @author sahmad
@@ -49,19 +45,7 @@ public class TestConfig {
 
     @Bean
     @Profile("offline")
-    public BlockingQueue<IdMappingJob> testQueue() {
-        return new LinkedBlockingQueue<>(5);
-    }
-
-    @Bean
-    @Profile("offline")
-    public AsyncJobProducer testJobProducer(BlockingQueue<IdMappingJob> queue) {
-        return new AsyncJobProducer(queue);
-    }
-
-    @Bean
-    @Profile("offline")
-    public ThreadPoolTaskExecutor jobTaskExecutor(){
+    public ThreadPoolTaskExecutor jobTaskExecutor() {
         return new ThreadPoolTaskExecutor();
     }
 }
