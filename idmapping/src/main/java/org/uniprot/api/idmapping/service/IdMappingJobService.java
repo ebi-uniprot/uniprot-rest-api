@@ -35,30 +35,24 @@ public class IdMappingJobService {
 
     public IdMappingJobService(
             IdMappingJobCacheService cacheService,
-            AsyncJobProducer asyncJobProducer,
-            BlockingQueue<IdMappingJob> jobQueue,
             IdMappingPIRService pirService,
             ThreadPoolTaskExecutor jobTaskExecutor) {
         this.cacheService = cacheService;
-        this.jobQueue = jobQueue;
         this.pirService = pirService;
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = new HashGenerator();
-        this.jobProducer = asyncJobProducer;
     }
 
     public JobSubmitResponse submitJob(IdMappingBasicRequest request)
-            throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         String jobId = this.hashGenerator.generateHash(request);
         IdMappingJob idMappingJob = createJob(jobId, request);
 
         if (!this.cacheService.exists(jobId)) {
             this.cacheService.put(jobId, idMappingJob);
-            this.jobProducer.enqueueJob(idMappingJob); // Async call
-
             // create task and submit
-            JobTask jobTask = new JobTask(jobQueue, cacheService, pirService);
+            JobTask jobTask = new JobTask(idMappingJob, cacheService, pirService);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);

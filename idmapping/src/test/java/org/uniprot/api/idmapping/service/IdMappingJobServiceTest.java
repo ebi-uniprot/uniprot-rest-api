@@ -22,7 +22,8 @@ import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
  */
 @ActiveProfiles(profiles = "offline")
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {IdMappingJobService.class, TestConfig.class, DataStoreTestConfig.class})
+@ContextConfiguration(
+        classes = {IdMappingJobService.class, TestConfig.class, DataStoreTestConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobServiceTest {
     @Autowired private IdMappingJobService jobService;

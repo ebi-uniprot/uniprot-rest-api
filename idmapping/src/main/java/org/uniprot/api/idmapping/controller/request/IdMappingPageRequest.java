@@ -1,13 +1,12 @@
 package org.uniprot.api.idmapping.controller.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
 
-import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
+import lombok.Data;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * Created 25/02/2021

@@ -1,15 +1,11 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
-import org.uniprot.api.idmapping.model.IdMappingJob;
 
 /**
  * @author sahmad
@@ -19,12 +15,6 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 @ConfigurationProperties(prefix = "id.mapping.job")
 public class JobConfig {
     private final TaskExecutorProperties taskExecutorProperties = new TaskExecutorProperties();
-
-    @Bean
-    @Profile("live")
-    BlockingQueue<IdMappingJob> jobQueue() {
-        return new LinkedBlockingQueue<>();
-    }
 
     @Bean
     @Profile("live")
