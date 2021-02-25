@@ -1,6 +1,5 @@
 package org.uniprot.api.idmapping.controller.request;
 
-
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;

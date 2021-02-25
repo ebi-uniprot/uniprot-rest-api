@@ -53,7 +53,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     public IdMappingJob getCachedIdMappingJob(String jobId) {
-        if(idMappingJobCacheService.exists(jobId)){
+        if (idMappingJobCacheService.exists(jobId)) {
             return idMappingJobCacheService.get(jobId);
         } else {
             throw new ResourceNotFoundException("{search.not.found}");
