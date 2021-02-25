@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.service;
+package org.uniprot.api.idmapping.service.config;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;

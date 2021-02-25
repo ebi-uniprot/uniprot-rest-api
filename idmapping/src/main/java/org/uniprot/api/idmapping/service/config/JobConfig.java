@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.service;
+package org.uniprot.api.idmapping.service.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;

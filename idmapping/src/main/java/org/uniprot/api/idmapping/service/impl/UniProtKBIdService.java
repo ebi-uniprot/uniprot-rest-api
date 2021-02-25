@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.service.impl;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
@@ -22,8 +23,8 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKb
 
     public UniProtKBIdService(
             IdMappingJobCacheService idMappingJobCacheService,
-            StoreStreamer<UniProtKBEntry> storeStreamer,
-            FacetTupleStreamTemplate tupleStream,
+            @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
+            @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             UniprotKBFacetConfig facetConfig) {
         super(idMappingJobCacheService, storeStreamer, tupleStream, facetConfig);
     }

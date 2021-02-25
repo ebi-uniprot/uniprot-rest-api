@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.service;
+package org.uniprot.api.idmapping.service.config;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -8,6 +8,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.store.StoreConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
@@ -34,17 +36,24 @@ import org.uniprot.store.search.SolrCollection;
 @Configuration
 @Import(RepositoryConfig.class)
 @Slf4j
-public class IdMappingResultsConfig {
+public class UniProtKBIdMappingResultsConfig {
 
-    @Bean
+    @Bean("uniProtKBStoreConfigProperties")
+    @ConfigurationProperties(prefix = "voldemort.uniprot")
+    public StoreConfigProperties uniProtKBStoreConfigProperties() {
+        return new StoreConfigProperties();
+    }
+
+    @Bean("uniProtKBStreamerConfigProperties")
     @ConfigurationProperties(prefix = "id.mapping.streamer.uniprot")
-    public StreamerConfigProperties streamerConfigProperties() {
+    public StreamerConfigProperties uniprotKbStreamerConfigProperties() {
         return new StreamerConfigProperties();
     }
 
-    @Bean
-    public TupleStreamTemplate tupleStreamTemplate(
-            StreamerConfigProperties configProperties,
+    @Bean("uniProtKBTupleStreamTemplate")
+    public TupleStreamTemplate uniProtKBTupleStreamTemplate(
+            @Qualifier("uniProtKBStreamerConfigProperties")
+                    StreamerConfigProperties configProperties,
             HttpClient httpClient,
             SolrClient solrClient,
             SolrRequestConverter requestConverter) {
@@ -56,12 +65,12 @@ public class IdMappingResultsConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("uniProtKBEntryStoreStreamer")
     public StoreStreamer<UniProtKBEntry> uniProtKBEntryStoreStreamer(
-            UniProtStoreClient<UniProtKBEntry> storeClient,
-            TupleStreamTemplate tupleStreamTemplate,
-            StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream) {
+            @Qualifier("uniProtStoreClient") UniProtStoreClient<UniProtKBEntry> storeClient,
+            @Qualifier("uniProtKBTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
+            @Qualifier("uniprotKBdocumentIdStream") TupleStreamDocumentIdStream documentIdStream) {
 
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
@@ -78,17 +87,20 @@ public class IdMappingResultsConfig {
                 .build();
     }
 
-    @Bean
-    public TupleStreamDocumentIdStream documentIdStream(
-            TupleStreamTemplate tupleStreamTemplate, StreamerConfigProperties streamConfig) {
+    @Bean("uniprotKBdocumentIdStream")
+    public TupleStreamDocumentIdStream uniprotKBdocumentIdStream(
+            @Qualifier("uniProtKBTupleStreamTemplate")
+                    TupleStreamTemplate uniProtKBTupleStreamTemplate,
+            @Qualifier("uniProtKBStreamerConfigProperties")
+                    StreamerConfigProperties uniProtKBStreamerConfigProperties) {
         return TupleStreamDocumentIdStream.builder()
-                .tupleStreamTemplate(tupleStreamTemplate)
-                .streamConfig(streamConfig)
+                .tupleStreamTemplate(uniProtKBTupleStreamTemplate)
+                .streamConfig(uniProtKBStreamerConfigProperties)
                 .build();
     }
 
-    @Bean
-    public FacetTupleStreamTemplate facetTupleStreamTemplate(
+    @Bean("uniproKBfacetTupleStreamTemplate")
+    public FacetTupleStreamTemplate uniproKBfacetTupleStreamTemplate(
             RepositoryConfigProperties configProperties, HttpClient httpClient) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())
@@ -97,20 +109,16 @@ public class IdMappingResultsConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("uniProtStoreClient")
     @Profile("live")
     public UniProtStoreClient<UniProtKBEntry> uniProtStoreClient(
-            UniProtStoreConfigProperties uniProtStoreConfigProperties) {
+            @Qualifier("uniProtKBStoreConfigProperties")
+                    StoreConfigProperties storeConfigProperties) {
         VoldemortClient<UniProtKBEntry> client =
                 new VoldemortRemoteUniProtKBEntryStore(
-                        uniProtStoreConfigProperties.getNumberOfConnections(),
-                        uniProtStoreConfigProperties.getStoreName(),
-                        uniProtStoreConfigProperties.getHost());
+                        storeConfigProperties.getNumberOfConnections(),
+                        storeConfigProperties.getStoreName(),
+                        storeConfigProperties.getHost());
         return new UniProtStoreClient<>(client);
-    }
-
-    @Bean
-    public UniProtStoreConfigProperties storeConfigProperties() {
-        return new UniProtStoreConfigProperties();
     }
 }

@@ -13,8 +13,12 @@ import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
+import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
+import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 
 /**
@@ -35,12 +39,24 @@ public class DataStoreTestConfig {
         return mock(SolrClient.class);
     }
 
-    @SuppressWarnings("rawtypes")
-    @Bean
+    @Bean("uniProtStoreClient")
     @Profile("offline")
-    public UniProtStoreClient<UniProtKBEntry> primaryUniProtStoreClient() {
+    public UniProtStoreClient<UniProtKBEntry> uniProtStoreClient() {
         return new UniProtStoreClient<>(
                 VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
+    }
+
+    @Bean("uniRefLightStoreClient")
+    @Profile("offline")
+    public UniProtStoreClient<UniRefEntryLight> uniRefLightStoreClient() {
+        return new UniProtStoreClient<>(
+                VoldemortInMemoryUniRefEntryLightStore.getInstance("avro-uniprot"));
+    }
+
+    @Bean("uniParcStoreClient")
+    @Profile("offline")
+    public UniProtStoreClient<UniParcEntry> uniParcStoreClient() {
+        return new UniProtStoreClient<>(VoldemortInMemoryUniParcEntryStore.getInstance("uniparc"));
     }
 
     @Bean
