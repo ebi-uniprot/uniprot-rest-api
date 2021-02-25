@@ -9,7 +9,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
@@ -21,7 +20,6 @@ import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -54,40 +52,15 @@ public abstract class BasicIdService<T, U> {
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);
     }
 
-    public QueryResult<U> getMappedEntries(IdMappingSearchRequest searchRequest) {
-        // get the mapped ids cached by JobId
-        IdMappingJob jobResult = idMappingJobCacheService.get(searchRequest.getJobId());
-        //TODO: Fix it.... not throw Exception
-        if (jobResult == null) {
-            throw new ResourceNotFoundException("{search.not.found}");
-        } else if (jobResult.getJobStatus() == JobStatus.ERROR) {
-            ServiceException cause = new ServiceException(jobResult.getErrorMessage());
-            throw new ServiceException("{pir.search.error}", cause);
-        } else if (jobResult.getJobStatus() != JobStatus.FINISHED) {
-            throw new ServiceException("{pir.search.not.finished}");
+    public IdMappingJob getCachedIdMappingJob(String jobId) {
+        if(idMappingJobCacheService.exists(jobId)){
+            return idMappingJobCacheService.get(jobId);
         } else {
-            IdMappingResult mappingResult = jobResult.getIdMappingResult();
-            return getMappedEntries(searchRequest, mappingResult);
+            throw new ResourceNotFoundException("{search.not.found}");
         }
     }
 
-    public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {
-        return Collections.emptyList(); // TODO fill code
-    }
-
-    protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);
-
-    protected abstract String getEntryId(T entry);
-
-    protected abstract String getSolrIdField();
-
-    protected abstract UniProtDataType getUniProtDataType();
-
-    protected Stream<T> getEntries(List<String> toIds) {
-        return this.storeStreamer.streamEntries(toIds);
-    }
-
-    private QueryResult<U> getMappedEntries(
+    public QueryResult<U> getMappedEntries(
             IdMappingSearchRequest searchRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
@@ -115,6 +88,22 @@ public abstract class BasicIdService<T, U> {
         Stream<U> result = getPagedEntries(mappedIds, cursor);
 
         return QueryResult.of(result, cursor, facets, null, mappingResult.getUnmappedIds());
+    }
+
+    public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {
+        return Collections.emptyList(); // TODO fill code
+    }
+
+    protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);
+
+    protected abstract String getEntryId(T entry);
+
+    protected abstract String getSolrIdField();
+
+    protected abstract UniProtDataType getUniProtDataType();
+
+    protected Stream<T> getEntries(List<String> toIds) {
+        return this.storeStreamer.streamEntries(toIds);
     }
 
     private SolrStreamFacetResponse searchBySolrStream(
