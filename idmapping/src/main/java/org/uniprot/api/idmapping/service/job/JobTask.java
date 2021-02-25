@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.service.job;
 
+import java.util.Date;
+
+import org.springframework.web.client.RestClientException;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
@@ -27,10 +30,17 @@ public class JobTask implements Runnable {
     @Override
     public void run() {
         this.job.setJobStatus(JobStatus.RUNNING);
-        this.cacheService.put(job.getJobId(), job);
-        IdMappingResult pirResponse = pirService.mapIds(job.getIdMappingRequest());
-        job.setJobStatus(JobStatus.FINISHED);
-        job.setIdMappingResult(pirResponse);
-        this.cacheService.put(job.getJobId(), job);
+        this.job.setUpdated(new Date());
+        this.cacheService.put(this.job.getJobId(), this.job);
+        try {
+            IdMappingResult pirResponse = pirService.mapIds(this.job.getIdMappingRequest());
+            this.job.setJobStatus(JobStatus.FINISHED);
+            this.job.setIdMappingResult(pirResponse);
+            this.job.setUpdated(new Date());
+        } catch (RestClientException restException) {
+            this.job.setErrorMessage(restException.getMessage());
+            this.job.setJobStatus(JobStatus.ERROR);
+            this.job.setUpdated(new Date());
+        }
     }
 }
