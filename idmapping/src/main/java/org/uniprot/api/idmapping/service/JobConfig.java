@@ -27,6 +27,7 @@ public class JobConfig {
     }
 
     @Bean
+    @Profile("live")
     public ThreadPoolTaskExecutor jobTaskExecutor(
             ThreadPoolTaskExecutor configurableJobTaskExecutor) {
         configurableJobTaskExecutor.setCorePoolSize(taskExecutorProperties.getCorePoolSize());

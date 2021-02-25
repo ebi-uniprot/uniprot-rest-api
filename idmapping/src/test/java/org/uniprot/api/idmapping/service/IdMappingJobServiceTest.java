@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.uniprot.api.idmapping.controller.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 
@@ -21,7 +22,7 @@ import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
  */
 @ActiveProfiles(profiles = "offline")
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {IdMappingJobService.class, TestConfig.class})
+@ContextConfiguration(classes = {IdMappingJobService.class, TestConfig.class, DataStoreTestConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobServiceTest {
     @Autowired private IdMappingJobService jobService;

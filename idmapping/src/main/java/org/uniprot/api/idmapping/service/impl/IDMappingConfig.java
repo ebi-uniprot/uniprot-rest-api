@@ -21,7 +21,7 @@ public class IDMappingConfig {
 
     @Bean
     @Profile("live")
-    public IDMappingPIRService cacheablePIRService(RestTemplate restTemplate) {
+    public IDMappingPIRService pirService(RestTemplate restTemplate) {
         return new PIRServiceImpl(restTemplate);
     }
 }
