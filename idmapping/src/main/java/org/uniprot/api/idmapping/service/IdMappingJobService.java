@@ -1,10 +1,5 @@
 package org.uniprot.api.idmapping.service;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-import java.util.Set;
-
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -15,13 +10,19 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.job.JobTask;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.Set;
+
+import static org.uniprot.api.idmapping.controller.response.JobStatus.FINISHED;
+
 /**
  * @author sahmad
  * @created 23/02/2021
  */
 @Service
 public class IdMappingJobService {
-
     private final IdMappingJobCacheService cacheService;
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
@@ -58,9 +59,18 @@ public class IdMappingJobService {
         return new JobSubmitResponse(jobId);
     }
 
-    public IdMappingJob getCompletedJob(String jobId) {
+    public IdMappingJob getJobAsResource(String jobId) {
         if (this.cacheService.exists(jobId)) {
             return this.cacheService.get(jobId);
+        } else {
+            throw new ResourceNotFoundException("Id mapping job identifier does not exist.");
+        }
+    }
+
+    public IdMappingJob getCompletedJobAsResource(String jobId) {
+        IdMappingJob job = getJobAsResource(jobId);
+        if (job.getJobStatus() == FINISHED) {
+            return job;
         } else {
             throw new ResourceNotFoundException("Id mapping job identifier does not exist.");
         }

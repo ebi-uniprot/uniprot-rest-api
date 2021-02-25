@@ -48,7 +48,7 @@ public class IdMappingJobController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<JobStatusResponse> getStatus(@PathVariable String jobId) {
-        return createStatus(idMappingJobService.getCompletedJob(jobId));
+        return createStatus(idMappingJobService.getJobAsResource(jobId));
     }
 
     public ResponseEntity<JobStatusResponse> createStatus(IdMappingJob job) {
