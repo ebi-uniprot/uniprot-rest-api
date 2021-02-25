@@ -24,6 +24,7 @@ import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
 
 /**
  * @author sahmad
@@ -32,10 +33,10 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 @ActiveProfiles(profiles = "offline")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-        classes = {IdMappingJobService.class, TestConfig.class, DataStoreTestConfig.class})
+        classes = {IdMappingJobServiceImpl.class, TestConfig.class, DataStoreTestConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobServiceTest {
-    @Autowired private IdMappingJobService jobService;
+    @Autowired private IdMappingJobServiceImpl jobService;
     @Autowired private IdMappingPIRService pirService;
     @Autowired private IdMappingJobCacheService cacheService;
 

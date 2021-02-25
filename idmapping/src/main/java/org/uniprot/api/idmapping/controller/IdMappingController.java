@@ -25,6 +25,7 @@ import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
+import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -41,20 +42,17 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 @RequestMapping(value = IdMappingController.IDMAPPING_RESOURCE)
 public class IdMappingController extends BasicSearchController<IdMappingStringPair> {
     static final String IDMAPPING_RESOURCE = "/idmapping";
-    private final IdMappingJobService jobService;
     private final IdMappingPIRService idMappingService;
     private final IdMappingJobCacheService cacheService;
 
     @Autowired
     public IdMappingController(
             ApplicationEventPublisher eventPublisher,
-            IdMappingJobService jobService,
             IdMappingPIRService idMappingService,
             IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<IdMappingStringPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, IDMAPPING_PIR);
-        this.jobService = jobService;
         this.idMappingService = idMappingService;
         this.cacheService = cacheService;
     }

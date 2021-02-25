@@ -12,6 +12,7 @@ import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
+import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
 
 import javax.validation.Valid;
 import java.security.NoSuchAlgorithmException;
