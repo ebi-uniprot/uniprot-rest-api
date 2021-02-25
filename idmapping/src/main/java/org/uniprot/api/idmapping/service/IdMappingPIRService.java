@@ -14,7 +14,7 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
  *
  * @author Edd
  */
-public interface IDMappingPIRService {
+public interface IdMappingPIRService {
     IdMappingResult mapIds(IdMappingBasicRequest request);
 
     default QueryResult<IdMappingStringPair> queryResultPage(

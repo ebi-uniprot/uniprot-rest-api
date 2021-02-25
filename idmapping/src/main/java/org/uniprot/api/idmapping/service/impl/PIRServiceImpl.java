@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.service.IDMappingPIRService;
+import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.PIRResponseConverter;
 
 /**
@@ -18,7 +18,7 @@ import org.uniprot.api.idmapping.service.PIRResponseConverter;
  *
  * @author Edd
  */
-public class PIRServiceImpl implements IDMappingPIRService {
+public class PIRServiceImpl implements IdMappingPIRService {
     public static final String PIR_ID_MAPPING_URL =
             "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async_test";
     static final HttpHeaders HTTP_HEADERS = new HttpHeaders();

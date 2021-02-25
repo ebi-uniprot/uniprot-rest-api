@@ -13,7 +13,7 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.IDMappingPIRService;
+import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -40,13 +40,13 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 @RequestMapping(value = IdMappingController.IDMAPPING_RESOURCE)
 public class IdMappingController extends BasicSearchController<IdMappingStringPair> {
     static final String IDMAPPING_RESOURCE = "/idmapping";
-    private final IDMappingPIRService idMappingService;
+    private final IdMappingPIRService idMappingService;
     private final IdMappingJobCacheService cacheService;
 
     @Autowired
     public IdMappingController(
             ApplicationEventPublisher eventPublisher,
-            IDMappingPIRService idMappingService,
+            IdMappingPIRService idMappingService,
             IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<IdMappingStringPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {

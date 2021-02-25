@@ -29,7 +29,7 @@ public class IdMappingJobService {
 
     private final IdMappingJobCacheService cacheService;
     private final BlockingQueue<IdMappingJob> jobQueue;
-    private final IDMappingPIRService pirService;
+    private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
     private final AsyncJobProducer jobProducer;
@@ -38,7 +38,7 @@ public class IdMappingJobService {
             IdMappingJobCacheService cacheService,
             AsyncJobProducer asyncJobProducer,
             BlockingQueue<IdMappingJob> jobQueue,
-            IDMappingPIRService pirService,
+            IdMappingPIRService pirService,
             ThreadPoolTaskExecutor jobTaskExecutor) {
         this.cacheService = cacheService;
         this.jobQueue = jobQueue;

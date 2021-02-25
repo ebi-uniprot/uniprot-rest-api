@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
-import org.uniprot.api.idmapping.service.IDMappingPIRService;
+import org.uniprot.api.idmapping.service.IdMappingPIRService;
 
 /**
  * Created 15/02/2021
@@ -21,7 +21,7 @@ public class IDMappingConfig {
 
     @Bean
     @Profile("live")
-    public IDMappingPIRService pirService(RestTemplate restTemplate) {
+    public IdMappingPIRService pirService(RestTemplate restTemplate) {
         return new PIRServiceImpl(restTemplate);
     }
 }

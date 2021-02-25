@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.api.idmapping.service.IDMappingPIRService;
+import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -62,7 +62,7 @@ public class DataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public IDMappingPIRService pirService() {
-        return mock(IDMappingPIRService.class);
+    public IdMappingPIRService pirService() {
+        return mock(IdMappingPIRService.class);
     }
 }

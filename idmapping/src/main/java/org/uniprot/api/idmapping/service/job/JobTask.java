@@ -5,7 +5,7 @@ import java.util.concurrent.BlockingQueue;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.service.IDMappingPIRService;
+import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 
 /**
@@ -15,12 +15,12 @@ import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 public class JobTask implements Runnable {
     private final IdMappingJobCacheService cacheService;
     private final BlockingQueue<IdMappingJob> queue;
-    private final IDMappingPIRService pirService;
+    private final IdMappingPIRService pirService;
 
     public JobTask(
             BlockingQueue<IdMappingJob> queue,
             IdMappingJobCacheService cacheService,
-            IDMappingPIRService pirService) {
+            IdMappingPIRService pirService) {
         this.queue = queue;
         this.cacheService = cacheService;
         this.pirService = pirService;
