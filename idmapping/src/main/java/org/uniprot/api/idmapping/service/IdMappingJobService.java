@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
+import static org.uniprot.api.idmapping.controller.response.JobStatus.FINISHED;
+
 /**
  * @author sahmad
  * @created 23/02/2021
@@ -68,9 +70,18 @@ public class IdMappingJobService {
         return new JobSubmitResponse(jobId);
     }
 
-    public IdMappingJob getCompletedJob(String jobId) {
+    public IdMappingJob getJobAsResource(String jobId) {
         if (this.cacheService.exists(jobId)) {
             return this.cacheService.get(jobId);
+        } else {
+            throw new ResourceNotFoundException("Id mapping job identifier does not exist.");
+        }
+    }
+
+    public IdMappingJob getCompletedJobAsResource(String jobId) {
+        IdMappingJob job = getJobAsResource(jobId);
+        if (job.getJobStatus() == FINISHED) {
+            return job;
         } else {
             throw new ResourceNotFoundException("Id mapping job identifier does not exist.");
         }

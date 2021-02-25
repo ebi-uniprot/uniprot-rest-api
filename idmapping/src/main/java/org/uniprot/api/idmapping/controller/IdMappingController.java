@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.cache.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -25,7 +25,6 @@ import javax.validation.Valid;
 import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.idmapping.controller.response.JobStatus.FINISHED;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
@@ -40,17 +39,20 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 @RequestMapping(value = IdMappingController.IDMAPPING_RESOURCE)
 public class IdMappingController extends BasicSearchController<IdMappingStringPair> {
     static final String IDMAPPING_RESOURCE = "/idmapping";
+    private final IdMappingJobService jobService;
     private final IdMappingPIRService idMappingService;
     private final IdMappingJobCacheService cacheService;
 
     @Autowired
     public IdMappingController(
             ApplicationEventPublisher eventPublisher,
+            IdMappingJobService jobService,
             IdMappingPIRService idMappingService,
             IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<IdMappingStringPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, IDMAPPING_PIR);
+        this.jobService = jobService;
         this.idMappingService = idMappingService;
         this.cacheService = cacheService;
     }
@@ -63,20 +65,13 @@ public class IdMappingController extends BasicSearchController<IdMappingStringPa
             @Valid IdMappingPageRequest pageRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        if (cacheService.exists(jobId)) {
-            IdMappingJob mappingJob = cacheService.get(jobId);
-            JobStatus jobStatus = mappingJob.getJobStatus();
-            if (jobStatus == FINISHED) {
-                QueryResult<IdMappingStringPair> queryResult =
-                        idMappingService.queryResultPage(
-                                pageRequest, mappingJob.getIdMappingResult());
-                return super.getSearchResponse(queryResult, null, request, response);
-            }
-        }
-
-        return ResponseEntity.notFound().build();
+        IdMappingJob completedJob = jobService.getCompletedJobAsResource(jobId);
+        QueryResult<IdMappingStringPair> queryResult =
+                idMappingService.queryResultPage(pageRequest, completedJob.getIdMappingResult());
+        return super.getSearchResponse(queryResult, null, request, response);
     }
 
+    // TODO: 25/02/2021 NOT IMPLEMENTED
     @PostMapping(
             value = "/stream",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
