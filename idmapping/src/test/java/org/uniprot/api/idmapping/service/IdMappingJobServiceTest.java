@@ -132,7 +132,6 @@ class IdMappingJobServiceTest {
         Assertions.assertNull(submittedJob.getIdMappingResult());
         Assertions.assertNotNull(submittedJob.getCreated());
         Assertions.assertNotNull(submittedJob.getUpdated());
-        Assertions.assertNotEquals(submittedJob.getCreated(), submittedJob.getUpdated());
     }
 
     @Test
