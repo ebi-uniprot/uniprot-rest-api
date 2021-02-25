@@ -55,7 +55,9 @@ public class UniProtKBIdMappingController extends BasicSearchController<UniProtK
 
         IdMappingJob cachedJobResult = idService.getCachedIdMappingJob(searchRequest.getJobId());
 
-        QueryResult<UniProtKbEntryPair> result = this.idService.getMappedEntries(searchRequest, cachedJobResult.getIdMappingResult());
+        QueryResult<UniProtKbEntryPair> result =
+                this.idService.getMappedEntries(
+                        searchRequest, cachedJobResult.getIdMappingResult());
 
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
