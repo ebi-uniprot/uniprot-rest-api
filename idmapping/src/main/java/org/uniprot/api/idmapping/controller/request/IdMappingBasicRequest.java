@@ -3,6 +3,9 @@ package org.uniprot.api.idmapping.controller.request;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+
+import org.uniprot.api.rest.validation.ValidIdType;
+
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -13,11 +16,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class IdMappingBasicRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the from type")
-    private String from; // TODO add a from validator to verify supported from
+    @ValidIdType(message = "{idmapping.invalid.from}")
+    private String from;
 
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the to type")
-    private String to; // TODO add a to validator based on from
+    @ValidIdType(message = "{idmapping.invalid.to}")
+    private String to;
 
     @NotNull(message = "{search.required}")
     @Parameter(description = "Comma separated list of ids")
