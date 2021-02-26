@@ -43,7 +43,7 @@ public class IdMappingJobController {
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<JobSubmitResponse> submitJob(@Valid IdMappingBasicRequest request)
-            throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
         JobSubmitResponse response = this.idMappingJobService.submitJob(request);
         return ResponseEntity.ok(response);
     }
@@ -55,7 +55,7 @@ public class IdMappingJobController {
         return createStatus(cacheService.getJobAsResource(jobId));
     }
 
-    public ResponseEntity<JobStatusResponse> createStatus(IdMappingJob job) {
+    private ResponseEntity<JobStatusResponse> createStatus(IdMappingJob job) {
         ResponseEntity<JobStatusResponse> response;
         switch (job.getJobStatus()) {
             case NEW:
