@@ -113,7 +113,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  */
 @ActiveProfiles(profiles = "offline")
 @ContextConfiguration(classes = {DataStoreTestConfig.class, IDMappingREST.class})
-@WebMvcTest(UniProtKBIdMappingController.class)
+@WebMvcTest(UniProtKBIdMappingResultsController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

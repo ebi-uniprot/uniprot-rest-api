@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 
 import java.util.Optional;
 
@@ -19,32 +19,32 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.UniRefEntryPair;
+import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
-import org.uniprot.api.idmapping.service.impl.UniRefIdService;
+import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
 /**
- * @author lgonzales
- * @since 25/02/2021
+ * @author sahmad
+ * @created 17/02/2021
  */
 @RestController
-@RequestMapping(value = "/uniref/idmapping/")
-public class UniRefIdMappingController extends BasicSearchController<UniRefEntryPair> {
+@RequestMapping(value = "/uniprotkb/idmapping/")
+public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKbEntryPair> {
 
-    private final UniRefIdService idService;
+    private final UniProtKBIdService idService;
     private final IdMappingJobCacheService cacheService;
 
     @Autowired
-    public UniRefIdMappingController(
+    public UniProtKBIdMappingResultsController(
             ApplicationEventPublisher eventPublisher,
-            UniRefIdService idService,
+            UniProtKBIdService idService,
             IdMappingJobCacheService cacheService,
-            MessageConverterContextFactory<UniRefEntryPair> converterContextFactory,
+            MessageConverterContextFactory<UniProtKbEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF);
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
         this.idService = idService;
         this.cacheService = cacheService;
     }
@@ -52,15 +52,14 @@ public class UniRefIdMappingController extends BasicSearchController<UniRefEntry
     @GetMapping(
             value = "/results/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<MessageConverterContext<UniRefEntryPair>> getMappedEntries(
+    public ResponseEntity<MessageConverterContext<UniProtKbEntryPair>> getMappedEntries(
             @Valid UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-
         IdMappingJob cachedJobResult =
                 cacheService.getCompletedJobAsResource(searchRequest.getJobId());
 
-        QueryResult<UniRefEntryPair> result =
+        QueryResult<UniProtKbEntryPair> result =
                 this.idService.getMappedEntries(
                         searchRequest, cachedJobResult.getIdMappingResult());
 
@@ -68,12 +67,12 @@ public class UniRefIdMappingController extends BasicSearchController<UniRefEntry
     }
 
     @Override
-    protected String getEntityId(UniRefEntryPair entity) {
-        return entity.getTo().getId().getValue();
+    protected String getEntityId(UniProtKbEntryPair entity) {
+        return entity.getTo().getPrimaryAccession().getValue();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRefEntryPair entity) {
+    protected Optional<String> getEntityRedirectId(UniProtKbEntryPair entity) {
         return Optional.empty();
     }
 }
