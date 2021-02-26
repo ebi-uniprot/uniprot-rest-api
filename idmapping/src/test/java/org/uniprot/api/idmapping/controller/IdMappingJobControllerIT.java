@@ -1,20 +1,17 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,12 +20,28 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.IDMappingREST;
+import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.response.JobStatus;
+import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 
-/**
- * @author sahmad
- * @created 22/02/2021
- */
+import java.io.UnsupportedEncodingException;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+/** @author sahmad */
 @ActiveProfiles(profiles = "offline")
 @ContextConfiguration(classes = {IDMappingREST.class})
 @WebMvcTest(IdMappingJobController.class)
@@ -38,23 +51,148 @@ import org.uniprot.api.idmapping.IDMappingREST;
 class IdMappingJobControllerIT {
     private static final String JOB_SUBMIT_ENDPOINT =
             IdMappingJobController.IDMAPPING_PATH + "/run";
+    private static final String JOB_STATUS_ENDPOINT =
+            IdMappingJobController.IDMAPPING_PATH + "/status";
 
     @Autowired private MockMvc mockMvc;
+    @MockBean private IdMappingJobCacheService cacheService;
 
     @Test
-    void testSubmitJob() throws Exception {
+    void jobSubmittedSuccessfully() throws Exception {
         // when
+        IdMappingBasicRequest basicRequest = new IdMappingBasicRequest();
+        basicRequest.setFrom("ACC");
+        basicRequest.setTo("EMBL");
+        basicRequest.setIds("Q1,Q2");
+
         ResultActions response =
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
-                                .param("to", "ACC")
-                                .param("ids", "Q00001,Q00002"));
+                                .param("from", basicRequest.getFrom())
+                                .param("to", basicRequest.getTo())
+                                .param("ids", basicRequest.getIds()));
+        // then
+        response.andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", Matchers.notNullValue()));
+
+        String jobId = extractJobId(response);
+
+        ArgumentCaptor<IdMappingJob> jobCaptor = ArgumentCaptor.forClass(IdMappingJob.class);
+        verify(cacheService).put(eq(jobId), jobCaptor.capture());
+        assertThat(jobCaptor.getValue().getIdMappingRequest(), equalTo(basicRequest));
+    }
+
+    @Test
+    void finishedJobShowsFinishedStatusWithCorrectRedirect() throws Exception {
+        String jobId = "ID";
+        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        request.setTo("EMBL");
+
+        IdMappingJob job = IdMappingJob.builder().idMappingRequest(request).jobStatus(JobStatus.FINISHED).jobId(jobId).build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(redirectedUrlPattern("/**/idmapping/results/"+jobId))
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.FINISHED.toString())));
+    }
+
+    @Test
+    void nonExistentJobStatusIsNotFound() throws Exception {
+        String jobId = "JOB_ID_THAT_DOES_NOT_EXIST";
+
+        when(cacheService.getJobAsResource(jobId)).thenThrow(ResourceNotFoundException.class);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_STATUS_ENDPOINT + "/"+jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+    }
+
+    @Test
+    void newJobHasRunningStatus() throws Exception {
+        String jobId = "ID";
+        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        request.setTo("EMBL");
+
+        IdMappingJob job = IdMappingJob.builder().idMappingRequest(request).jobStatus(JobStatus.NEW).jobId(jobId).build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", Matchers.notNullValue()));
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.NEW.toString())));
+
+    }
+
+    @Test
+    void runningJobHasRunningStatus() throws Exception {
+        String jobId = "ID";
+        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        request.setTo("EMBL");
+
+        IdMappingJob job = IdMappingJob.builder().idMappingRequest(request).jobStatus(JobStatus.RUNNING).jobId(jobId).build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.RUNNING.toString())));
+
+    }
+
+    @Test
+    void errorJobHasErrorStatus() throws Exception {
+        String jobId = "ID";
+        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        request.setTo("EMBL");
+
+        IdMappingJob job = IdMappingJob.builder().idMappingRequest(request).jobStatus(JobStatus.ERROR).jobId(jobId).build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.ERROR.toString())));
+
+    }
+
+    private String extractJobId(ResultActions response)
+            throws UnsupportedEncodingException, JsonProcessingException {
+        String contentAsString = response.andReturn().getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readTree(contentAsString).get("jobId").asText();
     }
 }
