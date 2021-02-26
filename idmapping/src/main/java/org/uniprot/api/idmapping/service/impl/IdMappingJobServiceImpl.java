@@ -48,7 +48,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         if (!this.cacheService.exists(jobId)) {
             this.cacheService.put(jobId, idMappingJob);
             // create task and submit
-            JobTask jobTask = new JobTask(idMappingJob, cacheService, pirService);
+            JobTask jobTask = new JobTask(idMappingJob, pirService);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);
