@@ -44,6 +44,8 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryP
 
     @Override
     protected String getSolrIdField() {
+        // TODO: 26/02/2021
+        // SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
         return "upi";
     }
 
