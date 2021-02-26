@@ -44,7 +44,7 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
 
     @Override
     protected String getSolrIdField() {
-        // SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
+        // todo SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
         return "id";
     }
 
