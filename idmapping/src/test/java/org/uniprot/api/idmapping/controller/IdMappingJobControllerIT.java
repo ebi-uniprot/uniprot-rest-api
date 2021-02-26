@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -21,7 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.IDMappingREST;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
@@ -31,9 +33,9 @@ import java.io.UnsupportedEncodingException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,7 +44,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -66,7 +71,7 @@ class IdMappingJobControllerIT {
     @Test
     void jobSubmittedSuccessfully() throws Exception {
         // when
-        IdMappingBasicRequest basicRequest = new IdMappingBasicRequest();
+        IdMappingJobRequest basicRequest = new IdMappingJobRequest();
         basicRequest.setFrom("ACC");
         basicRequest.setTo("EMBL");
         basicRequest.setIds("Q1,Q2");
@@ -93,7 +98,7 @@ class IdMappingJobControllerIT {
     @Test
     void finishedJobShowsFinishedStatusWithCorrectRedirect() throws Exception {
         String jobId = "ID";
-        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        IdMappingJobRequest request = new IdMappingJobRequest();
         request.setTo("EMBL");
 
         IdMappingJob job =
@@ -137,7 +142,7 @@ class IdMappingJobControllerIT {
     @Test
     void newJobHasRunningStatus() throws Exception {
         String jobId = "ID";
-        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        IdMappingJobRequest request = new IdMappingJobRequest();
         request.setTo("EMBL");
 
         IdMappingJob job =
@@ -163,7 +168,7 @@ class IdMappingJobControllerIT {
     @Test
     void runningJobHasRunningStatus() throws Exception {
         String jobId = "ID";
-        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        IdMappingJobRequest request = new IdMappingJobRequest();
         request.setTo("EMBL");
 
         IdMappingJob job =
@@ -189,7 +194,7 @@ class IdMappingJobControllerIT {
     @Test
     void jobThatErroredHasErrorStatus() throws Exception {
         String jobId = "ID";
-        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        IdMappingJobRequest request = new IdMappingJobRequest();
         request.setTo("EMBL");
 
         IdMappingJob job =
