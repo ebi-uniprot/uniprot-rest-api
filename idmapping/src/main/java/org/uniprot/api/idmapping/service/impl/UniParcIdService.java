@@ -25,7 +25,7 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryP
             @Qualifier("uniParcEntryStoreStreamer") StoreStreamer<UniParcEntry> storeStreamer,
             @Qualifier("uniParcFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             UniParcFacetConfig facetConfig) {
-        super(idMappingJobCacheService, storeStreamer, tupleStream, facetConfig);
+        super(storeStreamer, tupleStream, facetConfig);
     }
 
     @Override

@@ -30,7 +30,6 @@ import org.uniprot.store.config.UniProtDataType;
  * @created 16/02/2021
  */
 public abstract class BasicIdService<T, U> {
-    private final IdMappingJobCacheService idMappingJobCacheService;
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
@@ -39,11 +38,9 @@ public abstract class BasicIdService<T, U> {
     private Integer defaultPageSize;
 
     protected BasicIdService(
-            IdMappingJobCacheService idMappingJobCacheService,
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig) {
-        this.idMappingJobCacheService = idMappingJobCacheService;
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
         this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);

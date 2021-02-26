@@ -26,7 +26,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKb
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
             @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             UniprotKBFacetConfig facetConfig) {
-        super(idMappingJobCacheService, storeStreamer, tupleStream, facetConfig);
+        super(storeStreamer, tupleStream, facetConfig);
     }
 
     @Override

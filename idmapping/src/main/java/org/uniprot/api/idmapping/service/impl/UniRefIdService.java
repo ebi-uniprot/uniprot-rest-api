@@ -25,7 +25,7 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
             @Qualifier("uniRefEntryStoreStreamer") StoreStreamer<UniRefEntryLight> storeStreamer,
             @Qualifier("uniRefFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             UniRefFacetConfig facetConfig) {
-        super(idMappingJobCacheService, storeStreamer, tupleStream, facetConfig);
+        super(storeStreamer, tupleStream, facetConfig);
     }
 
     @Override
