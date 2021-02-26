@@ -1,17 +1,20 @@
 package org.uniprot.api.idmapping.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,28 +23,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.IDMappingREST;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 
-import java.io.UnsupportedEncodingException;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-/** @author sahmad */
+/**
+ * @author sahmad
+ * @created 22/02/2021
+ */
 @ActiveProfiles(profiles = "offline")
 @ContextConfiguration(classes = {IDMappingREST.class})
 @WebMvcTest(IdMappingJobController.class)
@@ -194,5 +181,49 @@ class IdMappingJobControllerIT {
         String contentAsString = response.andReturn().getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readTree(contentAsString).get("jobId").asText();
+    }
+
+    @Test
+    void testSubmitJobWithInvalidFrom() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "ACC123")
+                                .param("to", "ACC")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages[*]",
+                                contains("Invalid from value")));
+    }
+
+    @Test
+    void testSubmitJobWithInvalidTo() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "ACC")
+                                .param("to", "ACC123")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", iterableWithSize(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages[*]",
+                                contains("Invalid to value")));
     }
 }

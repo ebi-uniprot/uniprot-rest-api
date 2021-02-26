@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 
 public class FacetTupleStreamConverter
         extends FacetConverter<TupleStream, SolrStreamFacetResponse> {
@@ -22,11 +20,12 @@ public class FacetTupleStreamConverter
     private static final String RANGE_801_PLUS = "[801,*]";
     private static final Map<String, Integer> RANGE_INDEX = new HashMap<>();
     // TODO: 26/02/2021 fix it for uniref, uniparc, uniprotkb, and use
-    // e.g., SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
+    // e.g.,
+    // SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
     public static final String ACCESSION_ID = "accession_id";
 
     static {
-                RANGE_INDEX.put(RANGE_1_200, 5);
+        RANGE_INDEX.put(RANGE_1_200, 5);
         RANGE_INDEX.put(RANGE_201_400, 4);
         RANGE_INDEX.put(RANGE_401_600, 3);
         RANGE_INDEX.put(RANGE_601_800, 2);
