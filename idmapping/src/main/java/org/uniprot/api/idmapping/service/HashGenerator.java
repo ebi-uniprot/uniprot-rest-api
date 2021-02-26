@@ -17,11 +17,11 @@ import org.uniprot.core.util.Utils;
  * @created 22/02/2021
  */
 public class HashGenerator {
-    private final String ALGORITHM_NAME = "PBKDF2WithHmacSHA1";
-    private final int ITERATION_COUNT = 16;
-    private final int KEY_LENGTH = 160;
-    private final String SALT_STR = "UNIPROT_SALT";
-    private final byte[] SALT = SALT_STR.getBytes(StandardCharsets.UTF_8);
+    private final static String ALGORITHM_NAME = "PBKDF2WithHmacSHA1";
+    private final static int ITERATION_COUNT = 16;
+    private final static int KEY_LENGTH = 160;
+    private final static String SALT_STR = "UNIPROT_SALT";
+    private final static byte[] SALT = SALT_STR.getBytes(StandardCharsets.UTF_8);
 
     public String generateHash(IdMappingBasicRequest request)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
