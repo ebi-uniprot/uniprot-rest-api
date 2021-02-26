@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
@@ -39,7 +39,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     }
 
     @Override
-    public JobSubmitResponse submitJob(IdMappingBasicRequest request)
+    public JobSubmitResponse submitJob(IdMappingJobRequest request)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         String jobId = this.hashGenerator.generateHash(request);
@@ -75,7 +75,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         return "/uniprot/api/idmapping/" + dbType + "results/" + job.getJobId();
     }
 
-    private IdMappingJob createJob(String jobId, IdMappingBasicRequest request) {
+    private IdMappingJob createJob(String jobId, IdMappingJobRequest request) {
         IdMappingJob.IdMappingJobBuilder builder = IdMappingJob.builder();
         builder.jobId(jobId).jobStatus(JobStatus.NEW);
         builder.idMappingRequest(request);

@@ -1,7 +1,6 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -78,10 +77,7 @@ class IdMappingJobControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.messages[*]",
-                                contains("Invalid from value")));
+                .andExpect(jsonPath("$.messages[*]", contains("Invalid from value")));
     }
 
     @Test
@@ -100,9 +96,6 @@ class IdMappingJobControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", iterableWithSize(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.messages[*]",
-                                contains("Invalid to value")));
+                .andExpect(jsonPath("$.messages[*]", contains("Invalid to value")));
     }
 }

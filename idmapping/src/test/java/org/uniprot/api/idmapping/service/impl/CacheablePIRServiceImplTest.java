@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 
@@ -31,7 +31,7 @@ class CacheablePIRServiceImplTest {
 
     @Test
     void createsExpectedResult() {
-        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom("from");
         request.setTo("to");
         request.setIds("id");

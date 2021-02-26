@@ -9,7 +9,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import org.apache.commons.codec.binary.Hex;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -23,7 +23,7 @@ public class HashGenerator {
     private static final String SALT_STR = "UNIPROT_SALT";
     private static final byte[] SALT = SALT_STR.getBytes(StandardCharsets.UTF_8);
 
-    public String generateHash(IdMappingBasicRequest request)
+    public String generateHash(IdMappingJobRequest request)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         char[] requestArray = convertRequestToArray(request);
         PBEKeySpec keySpec = new PBEKeySpec(requestArray, SALT, ITERATION_COUNT, KEY_LENGTH);
@@ -32,7 +32,7 @@ public class HashGenerator {
         return Hex.encodeHexString(hash);
     }
 
-    private char[] convertRequestToArray(IdMappingBasicRequest request) {
+    private char[] convertRequestToArray(IdMappingJobRequest request) {
         StringBuilder builder = new StringBuilder();
         builder.append(request.getFrom().strip().toLowerCase());
         builder.append(request.getTo().strip().toLowerCase());

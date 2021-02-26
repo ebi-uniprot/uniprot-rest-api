@@ -47,7 +47,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IDMappingREST;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
@@ -619,7 +619,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
     private IdMappingJob createAndPutJobInCache(String from, String to, String ids)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
-        IdMappingBasicRequest idMappingRequest = createRequest(from, to, ids);
+        IdMappingJobRequest idMappingRequest = createRequest(from, to, ids);
         String jobId = generateHash(idMappingRequest);
         IdMappingResult idMappingResult = createIdMappingResult(idMappingRequest);
         IdMappingJob job = createJob(jobId, idMappingRequest, idMappingResult, JobStatus.FINISHED);
@@ -629,20 +629,20 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
         return job;
     }
 
-    private IdMappingBasicRequest createRequest(String from, String to, String ids) {
-        IdMappingBasicRequest request = new IdMappingBasicRequest();
+    private IdMappingJobRequest createRequest(String from, String to, String ids) {
+        IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom(from);
         request.setTo(to);
         request.setIds(ids);
         return request;
     }
 
-    private String generateHash(IdMappingBasicRequest request)
+    private String generateHash(IdMappingJobRequest request)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         return this.hashGenerator.generateHash(request);
     }
 
-    private IdMappingResult createIdMappingResult(IdMappingBasicRequest request) {
+    private IdMappingResult createIdMappingResult(IdMappingJobRequest request) {
         List<IdMappingStringPair> mappedIds =
                 Arrays.stream(request.getIds().split(","))
                         .map(String::strip)
@@ -653,7 +653,7 @@ class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
 
     private IdMappingJob createJob(
             String jobId,
-            IdMappingBasicRequest request,
+            IdMappingJobRequest request,
             IdMappingResult result,
             JobStatus jobStatus) {
         IdMappingJob.IdMappingJobBuilder builder = IdMappingJob.builder();

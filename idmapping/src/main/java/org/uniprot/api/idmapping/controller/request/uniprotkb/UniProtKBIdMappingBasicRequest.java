@@ -1,9 +1,6 @@
 package org.uniprot.api.idmapping.controller.request.uniprotkb;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicSearchRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
@@ -13,8 +10,10 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 
 /**
  * @author sahmad
@@ -22,7 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UniProtKBIdMappingBasicRequest extends IdMappingBasicSearchRequest {
+public class UniProtKBIdMappingBasicRequest extends IdMappingPageRequest {
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")

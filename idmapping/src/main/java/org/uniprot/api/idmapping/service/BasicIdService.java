@@ -1,10 +1,5 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,13 +12,22 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -47,7 +51,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     public QueryResult<U> getMappedEntries(
-            IdMappingSearchRequest searchRequest, IdMappingResult mappingResult) {
+            SearchRequest searchRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
         if (needSearchInSolr(searchRequest)) {
@@ -93,13 +97,13 @@ public abstract class BasicIdService<T, U> {
     }
 
     private SolrStreamFacetResponse searchBySolrStream(
-            List<String> ids, IdMappingSearchRequest searchRequest) {
+            List<String> ids, SearchRequest searchRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
         return this.facetTupleStreamConverter.convert(facetTupleStream);
     }
 
-    private Integer getPageSize(IdMappingSearchRequest searchRequest) {
+    private Integer getPageSize(SearchRequest searchRequest) {
         Integer pageSize = this.defaultPageSize;
         if (Utils.notNull(searchRequest.getSize())) {
             pageSize = searchRequest.getSize();
@@ -160,7 +164,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     private SolrStreamFacetRequest createSolrStreamRequest(
-            List<String> ids, IdMappingSearchRequest searchRequest) {
+            List<String> ids, SearchRequest searchRequest) {
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
                 SolrStreamFacetRequest.builder();
 
@@ -205,7 +209,7 @@ public abstract class BasicIdService<T, U> {
         return entries.collect(Collectors.toMap(this::getEntryId, Function.identity()));
     }
 
-    private boolean needSearchInSolr(IdMappingSearchRequest searchRequest) {
+    private boolean needSearchInSolr(SearchRequest searchRequest) {
         return Utils.notNullNotEmpty(searchRequest.getQuery())
                 || Utils.notNullNotEmpty(searchRequest.getFacets())
                 || Utils.notNullNotEmpty(searchRequest.getSort());

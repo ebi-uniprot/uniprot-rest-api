@@ -13,7 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobStatusResponse;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
@@ -42,7 +42,7 @@ public class IdMappingJobController {
     @PostMapping(
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<JobSubmitResponse> submitJob(@Valid IdMappingBasicRequest request)
+    public ResponseEntity<JobSubmitResponse> submitJob(@Valid IdMappingJobRequest request)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         JobSubmitResponse response = this.idMappingJobService.submitJob(request);
         return ResponseEntity.ok(response);
