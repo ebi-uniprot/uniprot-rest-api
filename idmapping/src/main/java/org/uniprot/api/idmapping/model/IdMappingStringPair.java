@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class IdMappingStringPair {
-    private String from;
-    private String to;
+public class IdMappingStringPair implements EntryPair<String> {
+    private final String from;
+    private final String to;
 }

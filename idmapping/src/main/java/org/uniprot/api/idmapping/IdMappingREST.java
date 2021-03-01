@@ -25,8 +25,8 @@ import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 //                    type = FilterType.REGEX,
 //                    pattern = "org\\.uniprot\\.api\\.rest\\.service\\..*")
 //        })
-public class IDMappingREST {
+public class IdMappingREST {
     public static void main(String[] args) {
-        SpringApplication.run(IDMappingREST.class, args);
+        SpringApplication.run(IdMappingREST.class, args);
     }
 }

@@ -6,8 +6,9 @@ import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 
 /**
+ * Created 23/02/2021
+ *
  * @author sahmad
- * @created 23/02/2021
  */
 public interface IdMappingJobCacheService {
     void put(String key, IdMappingJob value);

@@ -3,7 +3,7 @@ package org.uniprot.api.idmapping.controller.request.uniprotkb;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicSearchRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UniProtKBIdMappingBasicRequest extends IdMappingBasicSearchRequest {
+public class UniProtKBIdMappingBasicRequest extends IdMappingPageRequest {
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")

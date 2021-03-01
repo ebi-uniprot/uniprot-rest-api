@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.service.cache.impl;
+package org.uniprot.api.idmapping.service.impl;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -15,7 +15,6 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.impl.EhCacheMappingJobService;
 
 class EhCacheMappingJobServiceTest {
     private Cache fakeCache;
@@ -34,7 +33,7 @@ class EhCacheMappingJobServiceTest {
     }
 
     @Test
-    void canPut() {
+    void canPutThenGet() {
         String id = "id";
         assertThat(fakeCache.get(id, IdMappingJob.class), is(nullValue()));
 
@@ -50,6 +49,13 @@ class EhCacheMappingJobServiceTest {
 
         assertThat(fakeCache.get(id, IdMappingJob.class), is(job));
         assertThat(jobService.get(id), is(job));
+    }
+
+    @Test
+    void gettingNonExistentKeyReturnsNull() {
+        assertThat(
+                fakeCache.get("THIS IS A KEY THAT DOES NOT EXIST", IdMappingJob.class),
+                is(nullValue()));
     }
 
     @Test

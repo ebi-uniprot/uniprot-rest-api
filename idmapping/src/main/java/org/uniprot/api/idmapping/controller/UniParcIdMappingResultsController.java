@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -31,7 +32,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
  * @since 25/02/2021
  */
 @RestController
-@RequestMapping(value = "/uniparc/idmapping/")
+@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniparc/")
 public class UniParcIdMappingResultsController extends BasicSearchController<UniParcEntryPair> {
 
     private final UniParcIdService idService;
@@ -53,11 +54,11 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             value = "/results/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniParcEntryPair>> getMappedEntries(
+            @PathVariable String jobId,
             @Valid UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        IdMappingJob cachedJobResult =
-                cacheService.getCompletedJobAsResource(searchRequest.getJobId());
+        IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
 
         QueryResult<UniParcEntryPair> result =
                 this.idService.getMappedEntries(

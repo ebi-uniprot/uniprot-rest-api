@@ -4,6 +4,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
 
+import javax.servlet.ServletContext;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -12,13 +14,14 @@ import org.mockito.Mockito;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 import org.mockito.internal.stubbing.answers.Returns;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.controller.DataStoreTestConfig;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
@@ -39,11 +42,12 @@ class IdMappingJobServiceTest {
     @Autowired private IdMappingJobServiceImpl jobService;
     @Autowired private IdMappingPIRService pirService;
     @Autowired private IdMappingJobCacheService cacheService;
+    @MockBean private ServletContext servletContext;
 
     @Test
     void testSubmitJob()
             throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
-        IdMappingBasicRequest request = createIdMappingRequest();
+        IdMappingJobRequest request = createIdMappingRequest();
         JobSubmitResponse response = this.jobService.submitJob(request);
         Assertions.assertNotNull(response);
         Assertions.assertNotNull(response.getJobId());
@@ -53,7 +57,7 @@ class IdMappingJobServiceTest {
     void testFinishedJob()
             throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
         // when
-        IdMappingBasicRequest request = createIdMappingRequest();
+        IdMappingJobRequest request = createIdMappingRequest();
         Mockito.when(this.pirService.mapIds(request))
                 .thenReturn(
                         IdMappingResult.builder()
@@ -82,7 +86,7 @@ class IdMappingJobServiceTest {
     void testRunningJob()
             throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
         // when
-        IdMappingBasicRequest request = createIdMappingRequest();
+        IdMappingJobRequest request = createIdMappingRequest();
         Mockito.doAnswer(
                         new AnswersWithDelay(
                                 1500,
@@ -114,7 +118,7 @@ class IdMappingJobServiceTest {
     void testErroredJob()
             throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
         // when
-        IdMappingBasicRequest request = createIdMappingRequest();
+        IdMappingJobRequest request = createIdMappingRequest();
         String errorMsg = "Error during rest call";
         Mockito.when(this.pirService.mapIds(request)).thenThrow(new RestClientException(errorMsg));
 
@@ -143,9 +147,9 @@ class IdMappingJobServiceTest {
                 () -> this.cacheService.getJobAsResource("some random id"));
     }
 
-    private IdMappingBasicRequest createIdMappingRequest() {
+    private IdMappingJobRequest createIdMappingRequest() {
         String random = UUID.randomUUID().toString();
-        IdMappingBasicRequest request = new IdMappingBasicRequest();
+        IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom("from" + random);
         request.setTo("to" + random);
         request.setIds("ids" + random);

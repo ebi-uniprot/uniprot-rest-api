@@ -1,9 +1,15 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -17,10 +23,10 @@ import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.controller.request.IdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
@@ -29,6 +35,7 @@ import org.uniprot.store.config.UniProtDataType;
  * @author sahmad
  * @created 16/02/2021
  */
+@Slf4j
 public abstract class BasicIdService<T, U> {
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
@@ -48,12 +55,16 @@ public abstract class BasicIdService<T, U> {
     }
 
     public QueryResult<U> getMappedEntries(
-            IdMappingSearchRequest searchRequest, IdMappingResult mappingResult) {
+            SearchRequest searchRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
         if (needSearchInSolr(searchRequest)) {
             List<String> toIds = getMappedToIds(mappedIds);
+
+            long start = System.currentTimeMillis();
             SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
+            long end = System.currentTimeMillis();
+            log.info("Time taken to search solr in ms {}", (end - start));
 
             facets = solrStreamResponse.getFacets();
 
@@ -71,8 +82,10 @@ public abstract class BasicIdService<T, U> {
         // compute the cursor and get subset of accessions as per cursor
         int pageSize = getPageSize(searchRequest);
         CursorPage cursor = CursorPage.of(searchRequest.getCursor(), pageSize, mappedIds.size());
-
+        long start = System.currentTimeMillis();
         Stream<U> result = getPagedEntries(mappedIds, cursor);
+        long end = System.currentTimeMillis();
+        log.info("Total time taken to call voldemort in ms {}", (end - start));
 
         return QueryResult.of(result, cursor, facets, null, mappingResult.getUnmappedIds());
     }
@@ -94,13 +107,13 @@ public abstract class BasicIdService<T, U> {
     }
 
     private SolrStreamFacetResponse searchBySolrStream(
-            List<String> ids, IdMappingSearchRequest searchRequest) {
+            List<String> ids, SearchRequest searchRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
         return this.facetTupleStreamConverter.convert(facetTupleStream);
     }
 
-    private Integer getPageSize(IdMappingSearchRequest searchRequest) {
+    private Integer getPageSize(SearchRequest searchRequest) {
         Integer pageSize = this.defaultPageSize;
         if (Utils.notNull(searchRequest.getSize())) {
             pageSize = searchRequest.getSize();
@@ -161,7 +174,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     private SolrStreamFacetRequest createSolrStreamRequest(
-            List<String> ids, IdMappingSearchRequest searchRequest) {
+            List<String> ids, SearchRequest searchRequest) {
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
                 SolrStreamFacetRequest.builder();
 
@@ -206,7 +219,7 @@ public abstract class BasicIdService<T, U> {
         return entries.collect(Collectors.toMap(this::getEntryId, Function.identity()));
     }
 
-    private boolean needSearchInSolr(IdMappingSearchRequest searchRequest) {
+    private boolean needSearchInSolr(SearchRequest searchRequest) {
         return Utils.notNullNotEmpty(searchRequest.getQuery())
                 || Utils.notNullNotEmpty(searchRequest.getFacets())
                 || Utils.notNullNotEmpty(searchRequest.getSort());

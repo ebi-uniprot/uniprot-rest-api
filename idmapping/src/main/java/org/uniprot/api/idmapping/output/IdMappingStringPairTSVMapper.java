@@ -9,12 +9,12 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 public class IdMappingStringPairTSVMapper implements EntityValueMapper<IdMappingStringPair> {
-    private static final String FROM_FIELD =
+    static final String FROM_FIELD =
             ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.PIR_ID_MAPPING)
                     .getReturnFieldByName("from")
                     .getName();
 
-    private static final String TO_FIELD =
+    static final String TO_FIELD =
             ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.PIR_ID_MAPPING)
                     .getReturnFieldByName("to")
                     .getName();

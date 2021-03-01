@@ -3,11 +3,17 @@ package org.uniprot.api.idmapping.service.impl;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.servlet.ServletContext;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.idmapping.controller.request.IdMappingBasicRequest;
+import org.uniprot.api.idmapping.controller.IdMappingJobController;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
@@ -16,30 +22,78 @@ import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
+import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+
+import com.google.common.base.Preconditions;
 
 /**
+ * Created 23/02/2021
+ *
  * @author sahmad
- * @created 23/02/2021
  */
 @Service
 public class IdMappingJobServiceImpl implements IdMappingJobService {
+    private static final String RESULTS_SUBPATH = "results/";
     private final IdMappingJobCacheService cacheService;
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
+    private final String contextPath;
+    private static final Set<String> UNIREF_SET;
+    private static final String UNIPARC;
+    private static final Set<String> UNIPROTKB_SET;
+
+    static {
+        Map<String, String> collect =
+                IdMappingFieldConfig.getAllIdMappingTypes().stream()
+                        .collect(
+                                Collectors.toMap(
+                                        UniProtDatabaseDetail::getName,
+                                        UniProtDatabaseDetail::getIdMappingName));
+
+        UNIREF_SET =
+                Stream.of("UniRef50", "UniRef90", "UniRef100")
+                        .map(collect::get)
+                        .collect(Collectors.toSet());
+        UNIPARC = collect.get("UniParc");
+        UNIPROTKB_SET =
+                Stream.of(
+                                "UniProt ACC/ID",
+                                "UniProtKB Accession",
+                                "UniProt ID",
+                                "UniProtKB/SwissProt ACC")
+                        .map(collect::get)
+                        .collect(Collectors.toSet());
+
+        Preconditions.checkState(
+                UNIREF_SET.size() == 3,
+                "Expected to extract 3 UniRef database types from: "
+                        + IdMappingFieldConfig.class.getName());
+        Preconditions.checkNotNull(
+                UNIPARC,
+                "Expected to extract UniParc database type from: "
+                        + IdMappingFieldConfig.class.getName());
+        Preconditions.checkState(
+                UNIPROTKB_SET.size() == 3,
+                "Expected to extract 3 UniProtKB database types from: "
+                        + IdMappingFieldConfig.class.getName());
+    }
 
     public IdMappingJobServiceImpl(
             IdMappingJobCacheService cacheService,
             IdMappingPIRService pirService,
-            ThreadPoolTaskExecutor jobTaskExecutor) {
+            ThreadPoolTaskExecutor jobTaskExecutor,
+            ServletContext servletContext) {
         this.cacheService = cacheService;
         this.pirService = pirService;
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = new HashGenerator();
+        this.contextPath = servletContext.getContextPath();
     }
 
     @Override
-    public JobSubmitResponse submitJob(IdMappingBasicRequest request)
+    public JobSubmitResponse submitJob(IdMappingJobRequest request)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
 
         String jobId = this.hashGenerator.generateHash(request);
@@ -64,18 +118,27 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     public String getRedirectPathToResults(IdMappingJob job) {
         String toDB = job.getIdMappingRequest().getTo();
         String dbType = "";
-        if (Set.of("NF50", "NF90", "NF100").contains(toDB)) {
+        if (UNIREF_SET.contains(toDB)) {
             dbType = "uniref/";
-        } else if ("UPARC".equals(toDB)) {
-            dbType = "uniparc/";
-        } else if (Set.of("ACC", "ID", "SWISSPROT").contains(toDB)) {
-            dbType = "uniprotkb/";
+        } else {
+            if (UNIPARC.equals(toDB)) {
+                dbType = "uniparc/";
+            } else {
+                if (UNIPROTKB_SET.contains(toDB)) {
+                    dbType = "uniprotkb/";
+                }
+            }
         }
 
-        return "/uniprot/api/idmapping/" + dbType + "results/" + job.getJobId();
+        return contextPath
+                + IdMappingJobController.IDMAPPING_PATH
+                + "/"
+                + dbType
+                + RESULTS_SUBPATH
+                + job.getJobId();
     }
 
-    private IdMappingJob createJob(String jobId, IdMappingBasicRequest request) {
+    private IdMappingJob createJob(String jobId, IdMappingJobRequest request) {
         IdMappingJob.IdMappingJobBuilder builder = IdMappingJob.builder();
         builder.jobId(jobId).jobStatus(JobStatus.NEW);
         builder.idMappingRequest(request);

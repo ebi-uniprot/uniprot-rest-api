@@ -44,6 +44,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IDMappingREST;
+import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.gene.Gene;
@@ -102,14 +103,14 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  * @created 18/02/2021
  */
 @ActiveProfiles(profiles = "offline")
-@ContextConfiguration(classes = {DataStoreTestConfig.class, IDMappingREST.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniProtKBIdMappingResultsController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsControllerIT {
     private static final String UNIPROTKB_ID_MAPPING_RESULT_PATH =
-            "/uniprotkb/idmapping/results/{jobId}";
+            "/idmapping/uniprotkb/results/{jobId}";
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 
