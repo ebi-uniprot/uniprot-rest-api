@@ -37,9 +37,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
  */
 @RestController
 @Validated
-@RequestMapping(value = IdMappingResultsController.IDMAPPING_RESOURCE)
+@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH)
 public class IdMappingResultsController extends BasicSearchController<IdMappingStringPair> {
-    static final String IDMAPPING_RESOURCE = "/idmapping";
     private final IdMappingPIRService idMappingService;
     private final IdMappingJobCacheService cacheService;
 

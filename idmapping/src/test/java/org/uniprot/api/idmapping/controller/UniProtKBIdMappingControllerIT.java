@@ -119,7 +119,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniProtKBIdMappingControllerIT extends AbstractStreamControllerIT {
     private static final String UNIPROTKB_ID_MAPPING_SEARCH =
-            "/uniprotkb/idmapping/results/{jobId}";
+            "/idmapping/uniprotkb/results/{jobId}";
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private IdMappingJobCacheService idMappingJobCacheService;

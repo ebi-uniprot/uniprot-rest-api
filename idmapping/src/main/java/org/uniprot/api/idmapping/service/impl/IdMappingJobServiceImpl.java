@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.service.impl;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.idmapping.controller.IdMappingJobController;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
@@ -12,6 +13,7 @@ import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
 
+import javax.servlet.ServletContext;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
@@ -23,19 +25,23 @@ import java.util.Set;
  */
 @Service
 public class IdMappingJobServiceImpl implements IdMappingJobService {
+    private static final String RESULTS_SUBPATH = "results/";
     private final IdMappingJobCacheService cacheService;
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
+    private final String contextPath;
 
     public IdMappingJobServiceImpl(
             IdMappingJobCacheService cacheService,
             IdMappingPIRService pirService,
-            ThreadPoolTaskExecutor jobTaskExecutor) {
+            ThreadPoolTaskExecutor jobTaskExecutor,
+            ServletContext servletContext) {
         this.cacheService = cacheService;
         this.pirService = pirService;
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = new HashGenerator();
+        this.contextPath = servletContext.getContextPath();
     }
 
     @Override
@@ -72,7 +78,12 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
             dbType = "uniprotkb/";
         }
 
-        return "/uniprot/api/idmapping/" + dbType + "results/" + job.getJobId();
+        return contextPath
+                + IdMappingJobController.IDMAPPING_PATH
+                + "/"
+                + dbType
+                + RESULTS_SUBPATH
+                + job.getJobId();
     }
 
     private IdMappingJob createJob(String jobId, IdMappingJobRequest request) {

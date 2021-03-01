@@ -32,7 +32,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
  * @since 25/02/2021
  */
 @RestController
-@RequestMapping(value = "/uniref/idmapping/")
+@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniref/")
 public class UniRefIdMappingResultsController extends BasicSearchController<UniRefEntryPair> {
 
     private final UniRefIdService idService;

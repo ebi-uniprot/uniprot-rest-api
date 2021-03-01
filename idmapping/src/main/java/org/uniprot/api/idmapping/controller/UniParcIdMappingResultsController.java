@@ -32,7 +32,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
  * @since 25/02/2021
  */
 @RestController
-@RequestMapping(value = "/uniparc/idmapping/")
+@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniparc/")
 public class UniParcIdMappingResultsController extends BasicSearchController<UniParcEntryPair> {
 
     private final UniParcIdService idService;
