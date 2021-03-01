@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 class FacetTupleStreamConverterTest {
 
     private final TupleStream tupleStream = mock(TupleStream.class);
+    private final String idFieldName = "accession_id";
 
     @Test
     void convertFacetForNullResponse() throws IOException {
@@ -24,7 +25,7 @@ class FacetTupleStreamConverterTest {
         tuple.EOF = true;
         when(tupleStream.read()).thenReturn(tuple);
         FacetTupleStreamConverter facetConverter =
-                new FacetTupleStreamConverter(new FakeFacetConfig());
+                new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
         SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
         assertNotNull(response);
         assertNotNull(response.getFacets());
@@ -45,7 +46,7 @@ class FacetTupleStreamConverterTest {
         when(tupleStream.read()).thenReturn(tuple1, tuple2, tuple3, tuple4, eofTuple);
 
         FacetTupleStreamConverter facetConverter =
-                new FacetTupleStreamConverter(new FakeFacetConfig());
+                new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
         SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
         assertNotNull(response);
         List<Facet> facets = response.getFacets();
@@ -106,7 +107,7 @@ class FacetTupleStreamConverterTest {
         when(tupleStream.read()).thenReturn(tuple1, tuple2, tuple3, tuple4, tuple5, eofTuple);
 
         FacetTupleStreamConverter facetConverter =
-                new FacetTupleStreamConverter(new FakeFacetConfig());
+                new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
         SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
 
         List<Facet> facets = response.getFacets();
@@ -155,7 +156,7 @@ class FacetTupleStreamConverterTest {
                 .thenReturn(tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, eofTuple);
 
         FacetTupleStreamConverter facetConverter =
-                new FacetTupleStreamConverter(new FakeFacetConfig());
+                new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
         SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
         assertNotNull(response);
         List<Facet> facets = response.getFacets();

@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
 
@@ -44,7 +44,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<UniParcEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC);
         this.idService = idService;
         this.cacheService = cacheService;
     }
@@ -56,7 +56,8 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             @Valid UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(searchRequest.getJobId());
+        IdMappingJob cachedJobResult =
+                cacheService.getCompletedJobAsResource(searchRequest.getJobId());
 
         QueryResult<UniParcEntryPair> result =
                 this.idService.getMappedEntries(

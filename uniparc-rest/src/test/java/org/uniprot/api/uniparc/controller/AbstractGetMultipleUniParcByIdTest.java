@@ -51,6 +51,7 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 
@@ -201,9 +202,9 @@ abstract class AbstractGetMultipleUniParcByIdTest {
     }
 
     private void saveEntry(int i) {
-        UniParcEntry entry = UniParcControllerITUtils.createEntry(i, UPI_PREF);
+        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
         // append two more cross ref
-        UniParcEntry updatedEntry = UniParcControllerITUtils.appendMoreXRefs(entry, i);
+        UniParcEntry updatedEntry = UniParcEntryMocker.appendMoreXRefs(entry, i);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(updatedEntry);
         storeManager.saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);

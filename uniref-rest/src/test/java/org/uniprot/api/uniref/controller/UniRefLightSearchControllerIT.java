@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,6 +55,7 @@ import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRe
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
+import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 
 /**
@@ -99,7 +100,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @Test
     void searchInvalidCompleteValueReturnBadRequest() throws Exception {
         // given
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefEntryMocker.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -123,7 +124,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @Test
     void searchByDefaultReturnTopTenMembersAndOrganisms() throws Exception {
         // given
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefEntryMocker.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when
@@ -178,7 +179,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @Test
     void searchByDefaultReturnCompleteMembersAndOrganisms() throws Exception {
         // given
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(1, 12, UniRefType.UniRef50);
+        UniRefEntry entry = UniRefEntryMocker.createEntry(1, 12, UniRefType.UniRef50);
         saveEntry(entry);
 
         // when

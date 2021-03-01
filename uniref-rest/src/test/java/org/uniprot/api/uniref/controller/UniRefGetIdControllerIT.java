@@ -1,9 +1,8 @@
 package org.uniprot.api.uniref.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.*;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 
 import java.util.List;
 

@@ -63,6 +63,7 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
@@ -349,7 +350,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     private void saveEntry(int i) throws Exception {
-        UniParcEntry entry = UniParcControllerITUtils.createEntry(i, UPI_PREF);
+        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniParcDocument doc = documentConverter.convert(xmlEntry);

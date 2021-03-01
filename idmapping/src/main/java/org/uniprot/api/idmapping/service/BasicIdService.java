@@ -43,7 +43,8 @@ public abstract class BasicIdService<T, U> {
             FacetConfig facetConfig) {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
-        this.facetTupleStreamConverter = new FacetTupleStreamConverter(facetConfig);
+        this.facetTupleStreamConverter =
+                new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
     }
 
     public QueryResult<U> getMappedEntries(

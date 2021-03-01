@@ -3,7 +3,7 @@ package org.uniprot.api.uniparc.controller;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.uniparc.controller.UniParcControllerITUtils.*;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

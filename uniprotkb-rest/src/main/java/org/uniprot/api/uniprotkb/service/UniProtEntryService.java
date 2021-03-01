@@ -92,7 +92,8 @@ public class UniProtEntryService
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         this.queryProcessor = uniProtKBQueryProcessor;
-        this.facetTupleStreamConverter = new FacetTupleStreamConverter(uniprotKBFacetConfig);
+        this.facetTupleStreamConverter =
+                new FacetTupleStreamConverter(getIdField().getFieldName(), uniprotKBFacetConfig);
         this.facetTupleStreamTemplate = facetTupleStreamTemplate;
         this.uniProtRDFStreamer = uniProtRDFStreamer;
     }

@@ -14,8 +14,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.uniparc.controller.UniParcControllerITUtils.createEntry;
-import static org.uniprot.api.uniparc.controller.UniParcControllerITUtils.getXref;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntry;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getXref;
 
 import java.io.IOException;
 import java.util.ArrayList;

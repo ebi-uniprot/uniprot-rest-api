@@ -1,12 +1,12 @@
 package org.uniprot.api.idmapping.service.job;
 
+import java.util.Date;
+
 import org.springframework.web.client.RestClientException;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
-
-import java.util.Date;
 
 /**
  * @author sahmad

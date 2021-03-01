@@ -9,7 +9,6 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
 import org.uniprot.api.idmapping.service.BasicIdService;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -22,7 +21,6 @@ import org.uniprot.store.config.UniProtDataType;
 public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKbEntryPair> {
 
     public UniProtKBIdService(
-            IdMappingJobCacheService idMappingJobCacheService,
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
             @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             UniprotKBFacetConfig facetConfig) {
@@ -45,7 +43,8 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKb
 
     @Override
     public String getSolrIdField() {
-        // todo  SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
+        // todo
+        // SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
         return "accession_id";
     }
 

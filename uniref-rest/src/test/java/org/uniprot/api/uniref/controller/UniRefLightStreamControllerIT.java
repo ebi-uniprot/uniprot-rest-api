@@ -67,6 +67,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
+import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
@@ -344,7 +345,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     private void saveEntry(int i, UniRefType type) throws Exception {
-        UniRefEntry entry = UniRefControllerITUtils.createEntry(i, type);
+        UniRefEntry entry = UniRefEntryMocker.createEntry(i, type);
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();

@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.io.Tuple;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 
 public class FacetTupleStreamConverter
         extends FacetConverter<TupleStream, SolrStreamFacetResponse> {
@@ -21,12 +19,9 @@ public class FacetTupleStreamConverter
     private static final String RANGE_601_800 = "[601,800]";
     private static final String RANGE_801_PLUS = "[801,*]";
     private static final Map<String, Integer> RANGE_INDEX = new HashMap<>();
-    // TODO: 26/02/2021 fix it for uniref, uniparc, uniprotkb, and use
-    // e.g., SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
-    public static final String ACCESSION_ID = "accession_id";
 
     static {
-                RANGE_INDEX.put(RANGE_1_200, 5);
+        RANGE_INDEX.put(RANGE_1_200, 5);
         RANGE_INDEX.put(RANGE_201_400, 4);
         RANGE_INDEX.put(RANGE_401_600, 3);
         RANGE_INDEX.put(RANGE_601_800, 2);
@@ -34,8 +29,10 @@ public class FacetTupleStreamConverter
     }
 
     private final FacetConfig facetConfig;
+    private final String idFieldName;
 
-    public FacetTupleStreamConverter(FacetConfig facetConfig) {
+    public FacetTupleStreamConverter(String idFieldName, FacetConfig facetConfig) {
+        this.idFieldName = idFieldName;
         this.facetConfig = facetConfig;
     }
 
@@ -49,12 +46,12 @@ public class FacetTupleStreamConverter
         Map<String, List<Pair<String, Long>>> facetNameValuesMap =
                 computeFacetValuesMap(tupleStream);
         List<String> accessions =
-                facetNameValuesMap.getOrDefault(ACCESSION_ID, new ArrayList<>()).stream()
+                facetNameValuesMap.getOrDefault(idFieldName, new ArrayList<>()).stream()
                         .map(Pair::getLeft)
                         .collect(Collectors.toList());
         List<Facet> facets =
                 facetNameValuesMap.entrySet().stream()
-                        .filter(entry -> !ACCESSION_ID.equals(entry.getKey()))
+                        .filter(entry -> !idFieldName.equals(entry.getKey()))
                         .map(this::convertSolrStreamFacet)
                         .collect(Collectors.toList());
         return new SolrStreamFacetResponse(facets, accessions);
@@ -72,7 +69,7 @@ public class FacetTupleStreamConverter
                 Map<Object, Object> map = tuple.getMap();
                 for (Map.Entry<Object, Object> entry : map.entrySet()) {
                     String facetName = String.valueOf(entry.getKey());
-                    if (ACCESSION_ID.equals(facetName)
+                    if (idFieldName.equals(facetName)
                             || facetConfig.getFacetPropertyMap().containsKey(facetName)) {
                         String facetValue = String.valueOf(entry.getValue());
                         Long facetCount = (long) map.getOrDefault(COUNT_STAR_STR, 0L);

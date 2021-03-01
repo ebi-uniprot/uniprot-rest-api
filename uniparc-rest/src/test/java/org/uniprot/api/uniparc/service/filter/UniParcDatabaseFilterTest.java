@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.uniparc.controller.UniParcControllerITUtils;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.core.uniparc.*;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 
@@ -31,7 +31,7 @@ class UniParcDatabaseFilterTest {
 
     @BeforeEach
     void createTestData() {
-        this.uniParcEntry = UniParcControllerITUtils.createEntry(1, UNIPARC_ID_PREFIX);
+        this.uniParcEntry = UniParcEntryMocker.createEntry(1, UNIPARC_ID_PREFIX);
         Assertions.assertNotNull(this.uniParcEntry);
         Assertions.assertTrue(
                 this.uniParcEntry.getUniParcId().getValue().startsWith(UNIPARC_ID_PREFIX));

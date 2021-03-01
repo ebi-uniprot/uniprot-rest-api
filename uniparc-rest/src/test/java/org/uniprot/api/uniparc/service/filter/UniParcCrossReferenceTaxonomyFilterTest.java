@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.uniparc.controller.UniParcControllerITUtils;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
@@ -32,7 +32,7 @@ class UniParcCrossReferenceTaxonomyFilterTest {
 
     @BeforeEach
     void createTestData() {
-        this.uniParcEntry = UniParcControllerITUtils.createEntry(1, UNIPARC_ID_PREFIX);
+        this.uniParcEntry = UniParcEntryMocker.createEntry(1, UNIPARC_ID_PREFIX);
         assertNotNull(this.uniParcEntry);
         assertTrue(this.uniParcEntry.getUniParcId().getValue().startsWith(UNIPARC_ID_PREFIX));
     }

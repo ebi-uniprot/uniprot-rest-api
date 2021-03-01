@@ -33,6 +33,7 @@ import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 
@@ -68,9 +69,9 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
 
     @Override
     protected void saveEntry() {
-        UniParcEntry entry = UniParcControllerITUtils.createEntry(1, UPI_PREF);
+        UniParcEntry entry = UniParcEntryMocker.createEntry(1, UPI_PREF);
         // append two more cross ref
-        UniParcEntry updatedEntry = UniParcControllerITUtils.appendMoreXRefs(entry, 1);
+        UniParcEntry updatedEntry = UniParcEntryMocker.appendMoreXRefs(entry, 1);
         UniParcEntryConverter converter = new UniParcEntryConverter();
         Entry xmlEntry = converter.toXml(updatedEntry);
         getStoreManager().saveEntriesInSolr(DataStoreManager.StoreType.UNIPARC, xmlEntry);
