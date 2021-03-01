@@ -1,15 +1,15 @@
 package org.uniprot.api.idmapping.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class IdMappingJobCacheServiceTest {
     private static final String NEW_JOB_IN_CACHE = "new job";

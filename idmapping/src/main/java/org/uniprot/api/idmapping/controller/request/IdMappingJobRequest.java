@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @created 16/02/2021
  */
 @Data
+@ValidFromAndTo
 public class IdMappingJobRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the from type")

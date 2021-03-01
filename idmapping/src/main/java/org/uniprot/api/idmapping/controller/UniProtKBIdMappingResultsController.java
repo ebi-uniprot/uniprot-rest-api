@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
  * @author sahmad
  * @created 17/02/2021
  */
+@Slf4j
 @RestController
 @RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniprotkb/")
 public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKbEntryPair> {
@@ -58,13 +61,11 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             @Valid UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        IdMappingJob cachedJobResult =
-                cacheService.getCompletedJobAsResource(jobId);
+        IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
 
         QueryResult<UniProtKbEntryPair> result =
                 this.idService.getMappedEntries(
                         searchRequest, cachedJobResult.getIdMappingResult());
-
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
 

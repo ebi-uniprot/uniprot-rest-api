@@ -1,23 +1,19 @@
 package org.uniprot.api.idmapping.service;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.contains;
 
 class IdMappingPIRServiceTest {
     private static FakeIdMappingPIRService pirService;
@@ -37,10 +33,7 @@ class IdMappingPIRServiceTest {
         List<IdMappingStringPair> mappingPairs = createMappingPairs(10);
         List<String> unmappedIds = createUnmappedIds(5);
         IdMappingResult mappingResult =
-                IdMappingResult.builder()
-                        .mappedIds(mappingPairs)
-                        .unmappedIds(unmappedIds)
-                        .build();
+                IdMappingResult.builder().mappedIds(mappingPairs).unmappedIds(unmappedIds).build();
 
         // when
         QueryResult<IdMappingStringPair> queryResult =
@@ -54,23 +47,17 @@ class IdMappingPIRServiceTest {
     }
 
     @Test
-    void queryAllResultsSuccessfully() {        // given
+    void queryAllResultsSuccessfully() { // given
         List<IdMappingStringPair> mappingPairs = createMappingPairs(10);
         List<String> unmappedIds = createUnmappedIds(5);
         IdMappingResult mappingResult =
-                IdMappingResult.builder()
-                        .mappedIds(mappingPairs)
-                        .unmappedIds(unmappedIds)
-                        .build();
+                IdMappingResult.builder().mappedIds(mappingPairs).unmappedIds(unmappedIds).build();
 
         // when
-        QueryResult<IdMappingStringPair> queryResult =
-                pirService.queryResultAll(mappingResult);
+        QueryResult<IdMappingStringPair> queryResult = pirService.queryResultAll(mappingResult);
 
         // then
-        assertThat(
-                queryResult.getContent().collect(Collectors.toList()),
-                is(mappingPairs));
+        assertThat(queryResult.getContent().collect(Collectors.toList()), is(mappingPairs));
         assertThat(queryResult.getFailedIds(), is(unmappedIds));
     }
 

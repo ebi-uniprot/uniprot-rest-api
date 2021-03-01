@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.controller.request.uniref;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
@@ -10,10 +13,8 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author lgonzales

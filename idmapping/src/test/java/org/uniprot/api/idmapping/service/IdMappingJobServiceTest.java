@@ -4,6 +4,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
 
+import javax.servlet.ServletContext;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -26,9 +28,6 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 
 /**
  * @author sahmad

@@ -58,8 +58,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             @Valid UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        IdMappingJob cachedJobResult =
-                cacheService.getCompletedJobAsResource(jobId);
+        IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
 
         QueryResult<UniParcEntryPair> result =
                 this.idService.getMappedEntries(

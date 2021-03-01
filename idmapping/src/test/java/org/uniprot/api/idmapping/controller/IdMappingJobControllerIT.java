@@ -1,7 +1,26 @@
 package org.uniprot.api.idmapping.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.UnsupportedEncodingException;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -27,26 +46,8 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 
-import java.io.UnsupportedEncodingException;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author sahmad
@@ -71,7 +72,7 @@ class IdMappingJobControllerIT {
     void jobSubmittedSuccessfully() throws Exception {
         // when
         IdMappingJobRequest basicRequest = new IdMappingJobRequest();
-        basicRequest.setFrom("ACC");
+        basicRequest.setFrom("ACC,ID");
         basicRequest.setTo("EMBL");
         basicRequest.setIds("Q1,Q2");
 
@@ -249,7 +250,7 @@ class IdMappingJobControllerIT {
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC")
+                                .param("from", "ACC,ID")
                                 .param("to", "ACC123")
                                 .param("ids", "Q00001,Q00002"));
         // then
@@ -259,5 +260,69 @@ class IdMappingJobControllerIT {
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", iterableWithSize(1)))
                 .andExpect(jsonPath("$.messages[*]", contains("Invalid 'to' value")));
+    }
+
+    @Test
+    void submittingJobWithInvalidFromToPairCausesBadRequest() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "EMBL")
+                                .param("to", "UPARC")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", hasSize(1)))
+                .andExpect(jsonPath("$.messages[*]", contains("Invalid 'from' and 'to' pair")));
+    }
+
+    @Test
+    void submittingJobWithInvalidFromToWithTaxIdCausesBadRequest() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "EMBL")
+                                .param("to", "UPARC")
+                                .param("taxId", "taxId")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", hasSize(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages[*]",
+                                containsInAnyOrder(
+                                        "Invalid 'from' and 'to' pair",
+                                        "Invalid parameter 'taxId'")));
+    }
+
+    @Test
+    void submittingJobWithValidFromToWithInvalidTaxIdCausesBadRequest() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", "EMBL")
+                                .param("to", "ACC")
+                                .param("taxId", "taxId")
+                                .param("ids", "Q00001,Q00002"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", notNullValue()))
+                .andExpect(jsonPath("$.messages", hasSize(1)))
+                .andExpect(jsonPath("$.messages[*]", contains("Invalid parameter 'taxId'")));
     }
 }

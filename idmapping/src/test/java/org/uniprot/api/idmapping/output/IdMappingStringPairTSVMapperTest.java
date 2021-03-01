@@ -1,15 +1,15 @@
 package org.uniprot.api.idmapping.output;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-
-import java.util.Map;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.uniprot.api.idmapping.output.IdMappingStringPairTSVMapper.FROM_FIELD;
 import static org.uniprot.api.idmapping.output.IdMappingStringPairTSVMapper.TO_FIELD;
+
+import java.util.Map;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
 
 class IdMappingStringPairTSVMapperTest {
 

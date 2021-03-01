@@ -1,6 +1,15 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import com.google.common.base.Preconditions;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.servlet.ServletContext;
+
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.IdMappingJobController;
@@ -16,14 +25,7 @@ import org.uniprot.api.idmapping.service.job.JobTask;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
-import javax.servlet.ServletContext;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.google.common.base.Preconditions;
 
 /**
  * Created 23/02/2021

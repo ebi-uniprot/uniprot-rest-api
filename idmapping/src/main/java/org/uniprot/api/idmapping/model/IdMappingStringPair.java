@@ -1,7 +1,6 @@
 package org.uniprot.api.idmapping.model;
 
 import lombok.*;
-import org.uniprot.core.uniparc.UniParcEntry;
 
 /**
  * Created 16/02/2021

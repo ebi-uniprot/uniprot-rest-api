@@ -59,8 +59,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        IdMappingJob cachedJobResult =
-                cacheService.getCompletedJobAsResource(jobId);
+        IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
 
         QueryResult<UniRefEntryPair> result =
                 this.idService.getMappedEntries(

@@ -1,14 +1,15 @@
 package org.uniprot.api.idmapping.controller.request.uniprotkb;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidFacets;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad

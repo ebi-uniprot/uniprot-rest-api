@@ -1,5 +1,16 @@
 package org.uniprot.api.idmapping.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,19 +31,11 @@ import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * @author sahmad
  * @created 16/02/2021
  */
+@Slf4j
 public abstract class BasicIdService<T, U> {
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
@@ -56,7 +59,11 @@ public abstract class BasicIdService<T, U> {
         List<Facet> facets = null;
         if (needSearchInSolr(searchRequest)) {
             List<String> toIds = getMappedToIds(mappedIds);
+
+            long start = System.currentTimeMillis();
             SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
+            long end = System.currentTimeMillis();
+            log.info("Time taken to search solr in ms {}", (end - start));
 
             facets = solrStreamResponse.getFacets();
 
@@ -74,8 +81,10 @@ public abstract class BasicIdService<T, U> {
         // compute the cursor and get subset of accessions as per cursor
         int pageSize = getPageSize(searchRequest);
         CursorPage cursor = CursorPage.of(searchRequest.getCursor(), pageSize, mappedIds.size());
-
+        long start = System.currentTimeMillis();
         Stream<U> result = getPagedEntries(mappedIds, cursor);
+        long end = System.currentTimeMillis();
+        log.info("Total time taken to call voldemort in ms {}", (end - start));
 
         return QueryResult.of(result, cursor, facets, null, mappingResult.getUnmappedIds());
     }
