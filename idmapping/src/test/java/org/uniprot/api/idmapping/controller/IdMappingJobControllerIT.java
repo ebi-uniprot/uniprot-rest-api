@@ -21,9 +21,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.idmapping.IDMappingREST;
+import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
@@ -54,7 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @created 22/02/2021
  */
 @ActiveProfiles(profiles = "offline")
-@ContextConfiguration(classes = {IDMappingREST.class})
+@ContextConfiguration(classes = {IdMappingREST.class})
 @WebMvcTest(IdMappingJobController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})

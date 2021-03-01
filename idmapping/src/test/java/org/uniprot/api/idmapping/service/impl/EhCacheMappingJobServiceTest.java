@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.service.cache.impl;
+package org.uniprot.api.idmapping.service.impl;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

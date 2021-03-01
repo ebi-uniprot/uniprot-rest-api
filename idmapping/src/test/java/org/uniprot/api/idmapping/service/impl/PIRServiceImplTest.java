@@ -18,7 +18,7 @@ import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 
-class CacheablePIRServiceImplTest {
+class PIRServiceImplTest {
 
     private RestTemplate restTemplate;
     private PIRServiceImpl pirService;

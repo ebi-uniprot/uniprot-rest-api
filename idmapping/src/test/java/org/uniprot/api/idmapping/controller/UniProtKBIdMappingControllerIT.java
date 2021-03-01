@@ -46,7 +46,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.idmapping.IDMappingREST;
+import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
@@ -112,7 +112,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  * @created 18/02/2021
  */
 @ActiveProfiles(profiles = "offline")
-@ContextConfiguration(classes = {DataStoreTestConfig.class, IDMappingREST.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniProtKBIdMappingResultsController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
