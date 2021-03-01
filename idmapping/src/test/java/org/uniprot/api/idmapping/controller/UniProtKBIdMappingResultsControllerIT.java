@@ -3,7 +3,6 @@ package org.uniprot.api.idmapping.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -43,8 +42,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.idmapping.IDMappingREST;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
+import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.gene.Gene;
@@ -158,7 +156,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     }
 
     @Override
-    protected IdMappingJob createAndPutJobInCache() throws Exception{
+    protected IdMappingJob createAndPutJobInCache() throws Exception {
         String ids =
                 IntStream.rangeClosed(1, 20)
                         .mapToObj(i -> String.format("Q%05d", i))
@@ -369,7 +367,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
 
-    //TODO: remove duplicated code with UniprotIT
+    // TODO: remove duplicated code with UniprotIT
     private List<Comment> createAllComments() {
         List<Comment> comments = new ArrayList<>();
         comments.add(AlternativeProductsCommentTest.getAlternativeProductsComment());
@@ -434,5 +432,4 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .filter(fieldConfig::correspondingSortFieldExists)
                 .map(Arguments::of);
     }
-
 }

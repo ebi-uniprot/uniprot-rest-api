@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.core.uniparc.*;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
 /**
  * @@author sahmad

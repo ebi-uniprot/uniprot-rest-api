@@ -1,5 +1,10 @@
 package org.uniprot.api.idmapping.controller;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.idmapping.IDMappingREST;
+import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -23,33 +28,26 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author lgonzales
  * @since 26/02/2021
  */
 @ActiveProfiles(profiles = "offline")
-@ContextConfiguration(classes = {DataStoreTestConfig.class, IDMappingREST.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniParcIdMappingResultsController.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsControllerIT{
+public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsControllerIT {
 
     private static final String UPI_PREF = "UPI0000283A";
-    private static final String UNIPARC_ID_MAPPING_RESULT =
-            "/uniparc/idmapping/results/{jobId}";
+    private static final String UNIPARC_ID_MAPPING_RESULT = "/idmapping/uniparc/results/{jobId}";
 
     private final UniParcDocumentConverter documentConverter =
             new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
 
-    @Autowired
-    private UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
     @Qualifier("uniParcFacetTupleStreamTemplate")
     @Autowired
@@ -86,15 +84,14 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
 
     @Override
     protected IdMappingJob createAndPutJobInCache() throws Exception {
-        Map<String, String> ids = new HashMap<>();
-        for(int i=1; i <= 20; i++){
+        Map<String, String> ids = new LinkedHashMap<>();
+        for (int i = 1; i <= 20; i++) {
             String fromId = String.format("Q%05d", i);
-            String toId = String.format(UPI_PREF+"%02d", i);
+            String toId = String.format(UPI_PREF + "%02d", i);
             ids.put(fromId, toId);
         }
         return createAndPutJobInCache("ACC", "UPARC", ids);
     }
-
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
@@ -117,4 +114,3 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
         storeClient.saveEntry(entry);
     }
 }
-
