@@ -1,16 +1,15 @@
 package org.uniprot.api.idmapping.controller.request;
 
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.GENENAME_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF100_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF50_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF90_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UPARC_STR;
+import org.apache.commons.beanutils.BeanUtils;
+import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.Constraint;
@@ -20,9 +19,12 @@ import javax.validation.Payload;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.GENENAME_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF100_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF50_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF90_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UPARC_STR;
 
 /**
  * @author sahmad
@@ -49,6 +51,7 @@ public @interface ValidFromAndTo {
         private String fromFieldName;
         private String toFieldName;
         private String taxIdFieldName;
+        private List<UniProtDatabaseDetail> dbDetails;
 
         private static final Set<String> FROM_WITH_DIFFERENT_TO =
                 Set.of(
@@ -56,8 +59,7 @@ public @interface ValidFromAndTo {
                         UPARC_STR,
                         UNIREF50_STR,
                         UNIREF90_STR,
-                        UNIREF100_STR,
-                        GENENAME_STR);
+                        UNIREF100_STR);
         private static final Set<String> FROM_RULE_101 =
                 Set.of(UPARC_STR, UNIREF50_STR, UNIREF90_STR, UNIREF100_STR);
 
@@ -66,6 +68,7 @@ public @interface ValidFromAndTo {
             this.fromFieldName = constraintAnnotation.from();
             this.toFieldName = constraintAnnotation.to();
             this.taxIdFieldName = constraintAnnotation.taxId();
+            this.dbDetails = IdMappingFieldConfig.getAllIdMappingTypes();
         }
 
         @Override
@@ -76,7 +79,8 @@ public @interface ValidFromAndTo {
                 String fromValue = BeanUtils.getProperty(value, this.fromFieldName);
                 String toValue = BeanUtils.getProperty(value, this.toFieldName);
                 String taxIdValue = BeanUtils.getProperty(value, this.taxIdFieldName);
-                isValid = isValidPair(fromValue, toValue, taxIdValue, context);
+                boolean isValidFrom = this.dbDetails.stream().anyMatch(db -> db.getIdMappingName().equals(fromValue));
+                isValid = isValidFrom && isValidPair(fromValue, toValue, taxIdValue, context);
             } catch (Exception e) {
                 log.warn("Error during validation {}", e.getMessage());
                 isValid = false;
@@ -88,11 +92,16 @@ public @interface ValidFromAndTo {
                 String from, String to, String taxId, ConstraintValidatorContext context) {
             boolean isValid = true;
             boolean isTaxIdPassed = Utils.notNullNotEmpty(taxId);
+
             if (!FROM_WITH_DIFFERENT_TO.contains(from)) {
                 isValid = isUniProtKBOrSwissProt(to);
             }
             if (FROM_RULE_101.contains(from)) {
                 isValid = isUniProtKBOrSwissProt(to) || from.equals(to);
+            }
+
+            if(ACC_ID_STR.equals(from)){
+               isValid = this.dbDetails.stream().anyMatch(db -> db.getIdMappingName().equals(to));
             }
 
             if (!GENENAME_STR.equals(from)

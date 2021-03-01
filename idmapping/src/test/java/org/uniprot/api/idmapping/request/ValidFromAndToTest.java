@@ -17,6 +17,34 @@ import org.uniprot.api.idmapping.controller.request.ValidFromAndTo;
  */
 class ValidFromAndToTest {
     @Test
+    void testInvalidFromTo() {
+        String from = "ABCD";
+        String to = "SWISSPROT";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertFalse(isValid);
+    }
+
+    @Test
+    void testFromInvalidTo() {
+        String from = "ACC,ID";
+        String to = "ABCD";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertFalse(isValid);
+    }
+
+    @Test
     void testValidFromTo() {
         String from = "ACC,ID";
         String to = "SWISSPROT";
@@ -107,6 +135,34 @@ class ValidFromAndToTest {
         boolean isValid = validator.isValid(request, null);
         Assertions.assertTrue(isValid);
         Assertions.assertTrue(validator.errorMesssage.isEmpty());
+    }
+
+    @Test
+    void testValidFromGeneNameToSwissWithoutTaxId() {
+        String from = "GENENAME";
+        String to = "SWISSPROT";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
+    }
+
+    @Test
+    void testValidFromACCIDTo() {
+        String from = "ACC,ID";
+        String to = "DMDM_ID";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(from);
+        request.setTo(to);
+        FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
+        ValidFromAndTo validFromTo = getMockedValidFromAndTo();
+        validator.initialize(validFromTo);
+        boolean isValid = validator.isValid(request, null);
+        Assertions.assertTrue(isValid);
     }
 
     private ValidFromAndTo getMockedValidFromAndTo() {
