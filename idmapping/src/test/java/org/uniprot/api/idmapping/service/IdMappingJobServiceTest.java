@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 import org.mockito.internal.stubbing.answers.Returns;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,6 +27,9 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+
 /**
  * @author sahmad
  * @created 24/02/2021
@@ -39,6 +43,7 @@ class IdMappingJobServiceTest {
     @Autowired private IdMappingJobServiceImpl jobService;
     @Autowired private IdMappingPIRService pirService;
     @Autowired private IdMappingJobCacheService cacheService;
+    @MockBean private ServletContext servletContext;
 
     @Test
     void testSubmitJob()
