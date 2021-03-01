@@ -75,8 +75,8 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                 "Expected to extract UniParc database type from: "
                         + IdMappingFieldConfig.class.getName());
         Preconditions.checkState(
-                UNIPROTKB_SET.size() == 4,
-                "Expected to extract 4 UniProtKB database types from: "
+                UNIPROTKB_SET.size() == 3,
+                "Expected to extract 3 UniProtKB database types from: "
                         + IdMappingFieldConfig.class.getName());
     }
 
