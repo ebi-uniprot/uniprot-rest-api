@@ -82,13 +82,14 @@ class ValidFromAndToTest {
     }
 
     private static Stream<Arguments> provideInvalidFromTo(){
-        return Stream.of(Arguments.of("INVALID", "SWISSPROT"), Arguments.of("ACC,ID", "INVALID"), Arguments.of("EMBL", "NF100"));
+        return Stream.of(Arguments.of("INVALID", "SWISSPROT"), Arguments.of("ACC,ID", "INVALID"),
+                Arguments.of("EMBL", "NF100"), Arguments.of("SWISSPROT", "ACC"), Arguments.of("UPARC", "ACC,ID"));
     }
 
     private static Stream<Arguments> provideValidFromTo(){
         return Stream.of(Arguments.of("ACC,ID", "SWISSPROT"), Arguments.of("EMBL", "ACC"),
                 Arguments.of("UPARC", "UPARC"), Arguments.of("ACC,ID", "DMDM_ID"),
-                Arguments.of("GENENAME", "SWISSPROT"));
+                Arguments.of("GENENAME", "SWISSPROT"), Arguments.of("NF50", "ACC"));
     }
 
     private ValidFromAndTo getMockedValidFromAndTo() {

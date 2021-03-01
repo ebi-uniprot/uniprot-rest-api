@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.GENENAME_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.SWISSPROT_STR;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF100_STR;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF50_STR;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF90_STR;
@@ -79,7 +80,8 @@ public @interface ValidFromAndTo {
                 String fromValue = BeanUtils.getProperty(value, this.fromFieldName);
                 String toValue = BeanUtils.getProperty(value, this.toFieldName);
                 String taxIdValue = BeanUtils.getProperty(value, this.taxIdFieldName);
-                boolean isValidFrom = this.dbDetails.stream().anyMatch(db -> db.getIdMappingName().equals(fromValue));
+                boolean isValidFrom = this.dbDetails.stream()
+                        .anyMatch(db -> db.getIdMappingName().equals(fromValue) && !SWISSPROT_STR.equals(fromValue));
                 isValid = isValidFrom && isValidPair(fromValue, toValue, taxIdValue, context);
             } catch (Exception e) {
                 log.warn("Error during validation {}", e.getMessage());
@@ -101,7 +103,8 @@ public @interface ValidFromAndTo {
             }
 
             if(ACC_ID_STR.equals(from)){
-               isValid = this.dbDetails.stream().anyMatch(db -> db.getIdMappingName().equals(to));
+               isValid = this.dbDetails.stream().anyMatch(db -> db.getIdMappingName().equals(to)
+                       && !ACC_ID_STR.equals(to));
             }
 
             if (!GENENAME_STR.equals(from)
