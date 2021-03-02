@@ -1,6 +1,21 @@
 package org.uniprot.api.idmapping.output;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.idmapping.output.converter.uniparc.UniParcMessageConverterConfig.appendUniParcConverters;
+import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMessageConverterConfig.appendUniProtKBConverters;
+import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -26,21 +41,7 @@ import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.api.idmapping.output.converter.uniparc.UniParcMessageConverterConfig.appendUniParcConverters;
-import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMessageConverterConfig.appendUniProtKBConverters;
-import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
-import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created 21/08/18
@@ -136,8 +137,12 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniProtKBEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(kbContext(APPLICATION_JSON), kbContext(FASTA_MEDIA_TYPE),
-                kbContext(TSV_MEDIA_TYPE), kbContext(XLS_MEDIA_TYPE))
+        List.of(
+                        kbContext(APPLICATION_JSON),
+                        kbContext(FASTA_MEDIA_TYPE),
+                        kbContext(TSV_MEDIA_TYPE),
+                        kbContext(XLS_MEDIA_TYPE),
+                        kbContext(APPLICATION_XML))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -149,8 +154,12 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniParcEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(uniParcContext(APPLICATION_JSON), uniParcContext(FASTA_MEDIA_TYPE),
-                uniParcContext(TSV_MEDIA_TYPE), uniParcContext(XLS_MEDIA_TYPE))
+        List.of(
+                        uniParcContext(APPLICATION_JSON),
+                        uniParcContext(FASTA_MEDIA_TYPE),
+                        uniParcContext(TSV_MEDIA_TYPE),
+                        uniParcContext(XLS_MEDIA_TYPE),
+                        uniParcContext(APPLICATION_XML))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -162,8 +171,9 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniRefEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(uniRefContext(APPLICATION_JSON), uniRefContext(FASTA_MEDIA_TYPE),
-                uniRefContext(TSV_MEDIA_TYPE), uniRefContext(XLS_MEDIA_TYPE))
+        List.of(
+                        uniRefContext(APPLICATION_JSON), uniRefContext(FASTA_MEDIA_TYPE),
+                        uniRefContext(TSV_MEDIA_TYPE), uniRefContext(XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

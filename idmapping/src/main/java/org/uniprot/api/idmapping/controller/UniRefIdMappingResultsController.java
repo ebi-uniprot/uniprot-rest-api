@@ -55,7 +55,12 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
 
     @GetMapping(
             value = "/results/{jobId}",
-            produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, TSV_MEDIA_TYPE_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = {
+                APPLICATION_JSON_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
     public ResponseEntity<MessageConverterContext<UniRefEntryPair>> getMappedEntries(
             @PathVariable String jobId,
             @Valid UniRefIdMappingSearchRequest searchRequest,
