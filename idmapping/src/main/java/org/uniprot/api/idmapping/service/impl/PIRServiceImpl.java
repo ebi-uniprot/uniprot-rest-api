@@ -14,7 +14,6 @@ import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.PIRResponseConverter;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
@@ -59,8 +58,14 @@ public class PIRServiceImpl extends IdMappingPIRService {
     private MultiValueMap<String, String> createPostBody(IdMappingJobRequest request) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("ids", String.join(",", request.getIds()));
-        map.add("from", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getFrom()));
-        map.add("to", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getTo()));
+
+        // TODO: 02/03/2021 which way is the right way?
+        //        map.add("from", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getFrom()));
+        //        map.add("to", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getTo()));
+
+        map.add("from", request.getFrom());
+        map.add("to", request.getTo());
+
         map.add("tax_off", "NO"); // we do not need PIR's header line, "Taxonomy ID:"
         map.add("taxid", request.getTaxId());
         map.add("async", "NO");
