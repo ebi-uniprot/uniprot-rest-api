@@ -38,6 +38,7 @@ import static org.uniprot.api.idmapping.output.converter.uniparc.UniParcMessageC
 import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMessageConverterConfig.appendUniProtKBConverters;
 import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
 import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
 
 /**
@@ -134,7 +135,7 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniProtKBEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(kbContext(APPLICATION_JSON), kbContext(FASTA_MEDIA_TYPE))
+        List.of(kbContext(APPLICATION_JSON), kbContext(FASTA_MEDIA_TYPE), kbContext(TSV_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -146,7 +147,7 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniParcEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(uniParcContext(APPLICATION_JSON), uniParcContext(FASTA_MEDIA_TYPE))
+        List.of(uniParcContext(APPLICATION_JSON), uniParcContext(FASTA_MEDIA_TYPE), uniParcContext(TSV_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -158,7 +159,7 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniRefEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(uniRefContext(APPLICATION_JSON), uniRefContext(FASTA_MEDIA_TYPE))
+        List.of(uniRefContext(APPLICATION_JSON), uniRefContext(FASTA_MEDIA_TYPE), uniRefContext(TSV_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -227,6 +228,9 @@ public class MessageConverterConfig {
         fromReturnField.setId("from");
         fromReturnField.addPath("from");
         fromReturnField.setIsRequiredForJson(true);
+        fromReturnField.setIsDefaultForTsv(true);
+        fromReturnField.setDefaultForTsvOrder(-1);
+        fromReturnField.setLabel("From");
         return fromReturnField;
     }
 }

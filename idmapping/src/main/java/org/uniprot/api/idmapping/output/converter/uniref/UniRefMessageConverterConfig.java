@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.output.converter.uniref;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
+import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 
@@ -25,6 +26,12 @@ public class UniRefMessageConverterConfig {
                         returnFieldConfig);
         converters.add(currentIndex++, jsonMessageConverter);
         converters.add(currentIndex++, new UniRefEntryFastaMessageConverter());
+        converters.add(
+                currentIndex++,
+                new TsvMessageConverter<>(
+                        UniRefEntryPair.class,
+                        returnFieldConfig,
+                        new UniRefEntryPairValueMapper()));
         return currentIndex;
     }
 

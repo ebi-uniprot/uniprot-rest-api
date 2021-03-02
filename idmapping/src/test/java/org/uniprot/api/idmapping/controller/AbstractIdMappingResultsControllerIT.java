@@ -240,7 +240,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         ResultActions response = getMockMvc().perform(requestBuilder);
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(content().contentTypeCompatibleWith(mediaType));
