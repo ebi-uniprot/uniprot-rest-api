@@ -1,12 +1,5 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.HTTP_HEADERS;
-import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.PIR_ID_MAPPING_URL;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -18,6 +11,13 @@ import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.HTTP_HEADERS;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.PIR_ID_MAPPING_URL;
+
 class PIRServiceImplTest {
 
     private RestTemplate restTemplate;
@@ -26,7 +26,7 @@ class PIRServiceImplTest {
     @BeforeEach
     void setUp() {
         restTemplate = mock(RestTemplate.class);
-        pirService = new PIRServiceImpl(restTemplate);
+        pirService = new PIRServiceImpl(restTemplate, 5);
     }
 
     @Test

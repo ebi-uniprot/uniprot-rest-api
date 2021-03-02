@@ -2,8 +2,12 @@ package org.uniprot.api.idmapping.service.impl;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +22,9 @@ import org.uniprot.api.idmapping.service.PIRResponseConverter;
  *
  * @author Edd
  */
-public class PIRServiceImpl implements IdMappingPIRService {
+@Profile("live")
+@Service
+public class PIRServiceImpl extends IdMappingPIRService {
     public static final String PIR_ID_MAPPING_URL =
             "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async_test";
     static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
@@ -29,7 +35,11 @@ public class PIRServiceImpl implements IdMappingPIRService {
         HTTP_HEADERS.setContentType(APPLICATION_FORM_URLENCODED);
     }
 
-    public PIRServiceImpl(RestTemplate restTemplate) {
+    @Autowired
+    public PIRServiceImpl(
+            RestTemplate restTemplate,
+            @Value("${search.default.page.size:#{null}}") Integer defaultPageSize) {
+        super(defaultPageSize);
         this.restTemplate = restTemplate;
         this.pirResponseConverter = new PIRResponseConverter();
     }

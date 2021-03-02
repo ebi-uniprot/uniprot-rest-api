@@ -19,10 +19,4 @@ public class IdMappingConfig {
     public RestTemplate idMappingRestTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder.build();
     }
-
-    @Bean
-    @Profile("live")
-    public IdMappingPIRService pirService(RestTemplate restTemplate) {
-        return new PIRServiceImpl(restTemplate);
-    }
 }
