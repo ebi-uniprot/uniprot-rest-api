@@ -6,11 +6,14 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import com.google.common.base.Stopwatch;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
@@ -37,6 +41,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
  */
 @RestController
 @Validated
+@Slf4j
 @RequestMapping(value = IdMappingJobController.IDMAPPING_PATH)
 public class IdMappingResultsController extends BasicSearchController<IdMappingStringPair> {
     private final IdMappingPIRService idMappingService;
@@ -63,8 +68,17 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             HttpServletRequest request,
             HttpServletResponse response) {
         IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
+
+        Stopwatch stopwatch = Stopwatch.createStarted();
         QueryResult<IdMappingStringPair> queryResult =
                 idMappingService.queryResultPage(pageRequest, completedJob.getIdMappingResult());
+        stopwatch.stop();
+
+        log.debug(
+                "[idmapping/results/{}] response took {} seconds (id count={})",
+                jobId,
+                stopwatch.elapsed(TimeUnit.SECONDS),
+                completedJob.getIdMappingRequest().getIds().split(",").length);
         return super.getSearchResponse(queryResult, null, request, response);
     }
 

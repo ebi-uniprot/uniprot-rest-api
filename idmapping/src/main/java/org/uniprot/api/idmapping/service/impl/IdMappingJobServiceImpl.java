@@ -116,14 +116,10 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         String dbType = "";
         if (UNIREF_SET.contains(toDB)) {
             dbType = "uniref/";
-        } else {
-            if (UNIPARC.equals(toDB)) {
-                dbType = "uniparc/";
-            } else {
-                if (UNIPROTKB_SET.contains(toDB)) {
-                    dbType = "uniprotkb/";
-                }
-            }
+        } else if (UNIPARC.equals(toDB)) {
+            dbType = "uniparc/";
+        } else if (UNIPROTKB_SET.contains(toDB)) {
+            dbType = "uniprotkb/";
         }
 
         return contextPath
