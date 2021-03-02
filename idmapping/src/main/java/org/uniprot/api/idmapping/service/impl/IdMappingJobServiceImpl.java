@@ -1,15 +1,6 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.ServletContext;
-
+import com.google.common.base.Preconditions;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.IdMappingJobController;
@@ -25,7 +16,14 @@ import org.uniprot.api.idmapping.service.job.JobTask;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
-import com.google.common.base.Preconditions;
+import javax.servlet.ServletContext;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created 23/02/2021
@@ -58,11 +56,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                         .collect(Collectors.toSet());
         UNIPARC = collect.get("UniParc");
         UNIPROTKB_SET =
-                Stream.of(
-                                "UniProt ACC/ID",
-                                "UniProtKB Accession",
-                                "UniProt ID",
-                                "UniProtKB/SwissProt ACC")
+                Stream.of("UniProt ACC/ID", "UniProtKB Accession", "UniProtKB/SwissProt ACC")
                         .map(collect::get)
                         .collect(Collectors.toSet());
 
