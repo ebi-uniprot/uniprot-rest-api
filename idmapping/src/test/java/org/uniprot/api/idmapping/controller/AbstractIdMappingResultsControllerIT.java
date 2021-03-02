@@ -5,8 +5,10 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.security.NoSuchAlgorithmException;
@@ -17,17 +19,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -37,6 +45,11 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.HashGenerator;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * @author lgonzales
@@ -53,6 +66,8 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     protected abstract String getIdMappingResultPath();
 
     protected abstract IdMappingJob createAndPutJobInCache() throws Exception;
+
+    protected abstract UniProtDataType getUniProtDataType();
 
     @Test
     void testIdMappingResultOnePage() throws Exception {
@@ -221,6 +236,88 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                                 contains("'size' must be less than or equal to 500")));
     }
 
+    @ParameterizedTest(name = "[{index}] contentType {0}")
+    @MethodSource("getContentTypes")
+    void testGetResultsAllContentType(MediaType mediaType) throws Exception {
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                .andExpect(content().contentTypeCompatibleWith(mediaType));
+    }
+
+    @ParameterizedTest(name = "[{index}] sortFieldName {0} desc")
+    @MethodSource("getAllSortFields")
+    void testIdMappingWithAllAvailableSortFields(String sortField) throws Exception {
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("sort", sortField + " desc"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+    }
+
+    @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
+    @MethodSource("getAllReturnedFields")
+    void testIdMappingResultWithAllAvailableReturnedFields(String name, List<String> paths)
+            throws Exception {
+
+        assertThat(name, notNullValue());
+        assertThat(paths, notNullValue());
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("fields", name));
+
+        // then
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                        .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+        for (String path : paths) {
+            String returnFieldValidatePath = "$.results[*].to." + path;
+            resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
+        }
+    }
+
+
+    protected Stream<Arguments> getAllReturnedFields() {
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields().stream()
+                .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
+    }
+
+
+    protected Stream<Arguments> getAllSortFields() {
+        SearchFieldConfig fieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType());
+        return fieldConfig.getSearchFieldItems().stream()
+                .map(SearchFieldItem::getFieldName)
+                .filter(fieldConfig::correspondingSortFieldExists)
+                .map(Arguments::of);
+    }
+
     protected final HashGenerator hashGenerator = new HashGenerator();
 
     protected IdMappingJobRequest createRequest(String from, String to, String fromIds) {
@@ -247,11 +344,17 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     protected IdMappingJob createAndPutJobInCache(
             String from, String to, Map<String, String> mappedIds)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
+        return createAndPutJobInCache(from, to, mappedIds, JobStatus.FINISHED);
+    }
+
+    protected IdMappingJob createAndPutJobInCache(
+            String from, String to, Map<String, String> mappedIds, JobStatus jobStatus)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
         String fromIds = String.join(",", mappedIds.keySet());
         IdMappingJobRequest idMappingRequest = createRequest(from, to, fromIds);
         String jobId = generateHash(idMappingRequest);
         IdMappingResult idMappingResult = createIdMappingResult(idMappingRequest, mappedIds);
-        IdMappingJob job = createJob(jobId, idMappingRequest, idMappingResult, JobStatus.FINISHED);
+        IdMappingJob job = createJob(jobId, idMappingRequest, idMappingResult, jobStatus);
         if (!this.idMappingJobCacheService.exists(jobId)) {
             this.idMappingJobCacheService.put(jobId, job); // put the finished job in cache
         }
@@ -281,5 +384,9 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         builder.jobId(jobId).jobStatus(jobStatus);
         builder.idMappingRequest(request).idMappingResult(result);
         return builder.build();
+    }
+
+    protected Stream<Arguments> getContentTypes() {
+        return super.getContentTypes(getIdMappingResultPath());
     }
 }

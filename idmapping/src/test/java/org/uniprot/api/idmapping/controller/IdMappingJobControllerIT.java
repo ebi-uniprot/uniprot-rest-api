@@ -240,7 +240,11 @@ class IdMappingJobControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", hasSize(2)))
-                .andExpect(jsonPath("$.messages[*]", containsInAnyOrder("Invalid 'from' value","Invalid 'from' and 'to' pair")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[*]",
+                                containsInAnyOrder(
+                                        "Invalid 'from' value", "Invalid 'from' and 'to' pair")));
     }
 
     @Test
@@ -259,7 +263,10 @@ class IdMappingJobControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", iterableWithSize(2)))
-                .andExpect(jsonPath("$.messages[*]", contains("Invalid 'to' value","Invalid 'from' and 'to' pair")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[*]",
+                                contains("Invalid 'to' value", "Invalid 'from' and 'to' pair")));
     }
 
     @Test

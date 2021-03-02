@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
+import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.service.BasicIdService;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -18,7 +18,7 @@ import org.uniprot.store.config.UniProtDataType;
  * @created 16/02/2021
  */
 @Service
-public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKbEntryPair> {
+public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKBEntryPair> {
 
     public UniProtKBIdService(
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
@@ -28,9 +28,9 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKb
     }
 
     @Override
-    protected UniProtKbEntryPair convertToPair(
+    protected UniProtKBEntryPair convertToPair(
             IdMappingStringPair mId, Map<String, UniProtKBEntry> idEntryMap) {
-        return UniProtKbEntryPair.builder()
+        return UniProtKBEntryPair.builder()
                 .from(mId.getFrom())
                 .to(idEntryMap.get(mId.getTo()))
                 .build();

@@ -1,6 +1,9 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
 import java.util.Optional;
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
@@ -52,10 +55,10 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
 
     @GetMapping(
             value = "/results/{jobId}",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, TSV_MEDIA_TYPE_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniRefEntryPair>> getMappedEntries(
             @PathVariable String jobId,
-            @Valid UniProtKBIdMappingSearchRequest searchRequest,
+            @Valid UniRefIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 

@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -21,6 +23,11 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
@@ -91,6 +98,11 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
             ids.put(fromId, toId);
         }
         return createAndPutJobInCache("ACC", "UPARC", ids);
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPARC;
     }
 
     @BeforeAll

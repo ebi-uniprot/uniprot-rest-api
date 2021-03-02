@@ -1,6 +1,9 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 
 import java.util.Optional;
@@ -22,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
+import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -36,7 +39,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 @Slf4j
 @RestController
 @RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniprotkb/")
-public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKbEntryPair> {
+public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKBEntryPair> {
 
     private final UniProtKBIdService idService;
     private final IdMappingJobCacheService cacheService;
@@ -46,7 +49,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             ApplicationEventPublisher eventPublisher,
             UniProtKBIdService idService,
             IdMappingJobCacheService cacheService,
-            MessageConverterContextFactory<UniProtKbEntryPair> converterContextFactory,
+            MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor) {
         super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
         this.idService = idService;
@@ -55,27 +58,27 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
 
     @GetMapping(
             value = "/results/{jobId}",
-            produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<MessageConverterContext<UniProtKbEntryPair>> getMappedEntries(
+            produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, TSV_MEDIA_TYPE_VALUE, XLS_MEDIA_TYPE_VALUE})
+    public ResponseEntity<MessageConverterContext<UniProtKBEntryPair>> getMappedEntries(
             @PathVariable String jobId,
             @Valid UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
 
-        QueryResult<UniProtKbEntryPair> result =
+        QueryResult<UniProtKBEntryPair> result =
                 this.idService.getMappedEntries(
                         searchRequest, cachedJobResult.getIdMappingResult());
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
 
     @Override
-    protected String getEntityId(UniProtKbEntryPair entity) {
+    protected String getEntityId(UniProtKBEntryPair entity) {
         return entity.getTo().getPrimaryAccession().getValue();
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniProtKbEntryPair entity) {
+    protected Optional<String> getEntityRedirectId(UniProtKBEntryPair entity) {
         return Optional.empty();
     }
 }
