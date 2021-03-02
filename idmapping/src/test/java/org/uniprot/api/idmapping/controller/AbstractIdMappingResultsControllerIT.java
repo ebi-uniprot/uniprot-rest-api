@@ -55,7 +55,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     protected abstract IdMappingJob createAndPutJobInCache() throws Exception;
 
     @Test
-    void testUniProtKBToUniProtKBMappingOnePage() throws Exception {
+    void testIdMappingResultOnePage() throws Exception {
         // when
         Integer defaultPageSize = 5;
         IdMappingJob job = createAndPutJobInCache();
@@ -69,6 +69,8 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(defaultPageSize)))
                 .andExpect(
@@ -78,7 +80,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     }
 
     @Test
-    void testUniProtKBToUniProtKBMappingWithSize() throws Exception {
+    void testIdMappingResultWithSize() throws Exception {
         // when
         Integer size = 10;
         IdMappingJob job = createAndPutJobInCache();
@@ -93,6 +95,8 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -104,7 +108,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     }
 
     @Test
-    void testUniProtKBToUniProtKBMappingWithSizeAndPagination() throws Exception {
+    void testIdMappingResultWithSizeAndPagination() throws Exception {
         // when
         Integer size = 10;
         IdMappingJob job = createAndPutJobInCache();
@@ -121,6 +125,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
                         jsonPath(
@@ -158,7 +163,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     }
 
     @Test
-    void testUniProtKBToUniProtKBMappingWithZeroSize() throws Exception {
+    void testIdMappingResultMappingWithZeroSize() throws Exception {
         // when
         IdMappingJob job = createAndPutJobInCache();
         ResultActions response =
@@ -170,12 +175,14 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(0)));
     }
 
     @Test
-    void testUniProtKBToUniProtKBMappingWithNegativeSize() throws Exception {
+    void testIdMappingResultWithNegativeSize() throws Exception {
         // when
         IdMappingJob job = createAndPutJobInCache();
         ResultActions response =
@@ -195,7 +202,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     }
 
     @Test
-    void testUniProtKBToUniProtKBMappingWithMoreThan500Size() throws Exception {
+    void testIdMappingResultWithMoreThan500Size() throws Exception {
         // when
         IdMappingJob job = createAndPutJobInCache();
         ResultActions response =
