@@ -13,7 +13,8 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @created 16/02/2021
  */
 @Data
-//@ValidFromAndTo
+@ValidFromAndTo // TODO: 02/03/2021 need to convert from/to into PIR's named DBs in the request sent
+                // to PIR
 public class IdMappingJobRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the from type")
