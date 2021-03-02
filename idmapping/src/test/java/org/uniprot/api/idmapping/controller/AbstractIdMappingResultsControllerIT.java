@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -32,7 +33,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -233,6 +236,23 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                                 contains("'size' must be less than or equal to 500")));
     }
 
+    @ParameterizedTest(name = "[{index}] contentType {0}")
+    @MethodSource("getContentTypes")
+    void testGetResultsAllContentType(MediaType mediaType) throws Exception {
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                .andExpect(content().contentTypeCompatibleWith(mediaType));
+    }
+
     @ParameterizedTest(name = "[{index}] sortFieldName {0} desc")
     @MethodSource("getAllSortFields")
     void testIdMappingWithAllAvailableSortFields(String sortField) throws Exception {
@@ -364,5 +384,9 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         builder.jobId(jobId).jobStatus(jobStatus);
         builder.idMappingRequest(request).idMappingResult(result);
         return builder.build();
+    }
+
+    protected Stream<Arguments> getContentTypes() {
+        return super.getContentTypes(getIdMappingResultPath());
     }
 }
