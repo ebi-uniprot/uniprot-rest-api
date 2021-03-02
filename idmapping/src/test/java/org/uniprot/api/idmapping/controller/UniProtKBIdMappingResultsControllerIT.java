@@ -1,8 +1,6 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -25,9 +23,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -164,6 +160,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         return createAndPutJobInCache("ACC", "ACC", ids);
     }
 
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPROTKB;
+    }
+
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
@@ -285,30 +286,6 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         jsonPath("$.results.*.to.primaryAccession", contains("Q00002", "Q00001")));
     }
 
-    // TODO: test for all queries
-    // TODO: all Facets
-    // TODO: Test just with JobId (default)
-    @ParameterizedTest(name = "[{index}] sortFieldName {0} desc")
-    @MethodSource("getAllSortFields")
-    void testUniProtKBToUniProtKBMappingWithSort(String sortField) throws Exception {
-        // when
-        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
-        ResultActions response =
-                mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("facets", "proteins_with,reviewed")
-                                .param("sort", sortField + " desc"));
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00002", "Q00001")))
-                .andExpect(
-                        jsonPath("$.results.*.to.primaryAccession", contains("Q00002", "Q00001")));
-    }
-
     @Test
     void testUniProtKBToUniProtKBMappingWithUnmappedIds() throws Exception {
         // when
@@ -329,42 +306,6 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andExpect(
                         jsonPath("$.results.*.to.primaryAccession", contains("Q00005", "Q00006")))
                 .andExpect(jsonPath("$.failedIds", contains("S12345", "T12345")));
-    }
-
-    @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
-    @MethodSource("getAllReturnedFields")
-    void searchCanSearchWithAllAvailableReturnedFields(String name, List<String> paths)
-            throws Exception {
-
-        assertThat(name, notNullValue());
-        assertThat(paths, notNullValue());
-        // when
-        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001");
-        ResultActions response =
-                mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("fields", name));
-
-        // then
-        ResultActions resultActions =
-                response.andDo(print())
-                        .andExpect(status().is(HttpStatus.OK.value()))
-                        .andExpect(
-                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                        .andExpect(jsonPath("$.results.size()", Matchers.is(1)))
-                        .andExpect(jsonPath("$.results.*.from", contains("Q00001")))
-                        .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00001")));
-        for (String path : paths) {
-            String returnFieldValidatePath = "$.results[*].to." + path;
-            resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
-        }
-    }
-
-    protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB)
-                .getReturnFields().stream()
-                .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
 
     // TODO: remove duplicated code with UniprotIT
@@ -422,14 +363,5 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         .map(FeatureTest::getFeature)
                         .collect(Collectors.toList());
         return features;
-    }
-
-    private Stream<Arguments> getAllSortFields() {
-        SearchFieldConfig fieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
-        return fieldConfig.getSearchFieldItems().stream()
-                .map(SearchFieldItem::getFieldName)
-                .filter(fieldConfig::correspondingSortFieldExists)
-                .map(Arguments::of);
     }
 }

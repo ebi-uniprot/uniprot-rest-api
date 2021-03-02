@@ -1,5 +1,11 @@
 package org.uniprot.api.idmapping.request;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import javax.validation.ConstraintValidatorContext;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,12 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.request.ValidFromAndTo;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import javax.validation.ConstraintValidatorContext;
 
 /**
  * @author sahmad
@@ -81,15 +81,23 @@ class ValidFromAndToTest {
         Assertions.assertTrue(isValid);
     }
 
-    private static Stream<Arguments> provideInvalidFromTo(){
-        return Stream.of(Arguments.of("INVALID", "SWISSPROT"), Arguments.of("ACC,ID", "INVALID"),
-                Arguments.of("EMBL", "NF100"), Arguments.of("SWISSPROT", "ACC"), Arguments.of("UPARC", "ACC,ID"));
+    private static Stream<Arguments> provideInvalidFromTo() {
+        return Stream.of(
+                Arguments.of("INVALID", "SWISSPROT"),
+                Arguments.of("ACC,ID", "INVALID"),
+                Arguments.of("EMBL", "NF100"),
+                Arguments.of("SWISSPROT", "ACC"),
+                Arguments.of("UPARC", "ACC,ID"));
     }
 
-    private static Stream<Arguments> provideValidFromTo(){
-        return Stream.of(Arguments.of("ACC,ID", "SWISSPROT"), Arguments.of("EMBL", "ACC"),
-                Arguments.of("UPARC", "UPARC"), Arguments.of("ACC,ID", "DMDM_ID"),
-                Arguments.of("GENENAME", "SWISSPROT"), Arguments.of("NF50", "ACC"));
+    private static Stream<Arguments> provideValidFromTo() {
+        return Stream.of(
+                Arguments.of("ACC,ID", "SWISSPROT"),
+                Arguments.of("EMBL", "ACC"),
+                Arguments.of("UPARC", "UPARC"),
+                Arguments.of("ACC,ID", "DMDM_ID"),
+                Arguments.of("GENENAME", "SWISSPROT"),
+                Arguments.of("NF50", "ACC"));
     }
 
     private ValidFromAndTo getMockedValidFromAndTo() {

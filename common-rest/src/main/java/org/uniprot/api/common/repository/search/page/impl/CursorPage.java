@@ -3,10 +3,9 @@ package org.uniprot.api.common.repository.search.page.impl;
 import java.math.BigInteger;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.repository.search.page.Page;
+import org.uniprot.core.util.Utils;
 
 /**
  * This class implements a cursor page with string nextCursor, pageSize and totalElements
@@ -15,17 +14,16 @@ import org.uniprot.api.common.repository.search.page.Page;
  * @author lgonzales
  */
 public class CursorPage implements Page {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CursorPage.class);
 
     private static final String CURSOR_PARAM_NAME = "cursor";
     private static final String SIZE_PARAM_NAME = "size";
     private static final String DELIMITER = ",";
 
-    private String cursor;
+    private final String cursor;
     private String nextCursor;
-    private Integer pageSize;
+    private final Integer pageSize;
     private Long totalElements;
-    private Long offset;
+    private final Long offset;
 
     private CursorPage(String cursor, Long offset, Integer pageSize) {
         this.cursor = cursor;
@@ -41,7 +39,7 @@ public class CursorPage implements Page {
      * @return CursorPage object
      */
     public static CursorPage of(String cursor, Integer pageSize) {
-        if (cursor == null) { // if is first page...
+        if (Utils.nullOrEmpty(cursor)) { // if is first page...
             return new CursorPage(null, 0L, pageSize);
         } else {
             byte[] bytes = new BigInteger(cursor, 36).toByteArray();

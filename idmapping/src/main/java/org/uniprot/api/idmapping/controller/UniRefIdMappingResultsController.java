@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingSearchRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
@@ -55,7 +55,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniRefEntryPair>> getMappedEntries(
             @PathVariable String jobId,
-            @Valid UniProtKBIdMappingSearchRequest searchRequest,
+            @Valid UniRefIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
