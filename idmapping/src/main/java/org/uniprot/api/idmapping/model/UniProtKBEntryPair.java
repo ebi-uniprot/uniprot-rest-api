@@ -11,7 +11,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
  */
 @Getter
 @Builder
-public class UniProtKbEntryPair implements EntryPair<UniProtKBEntry> {
+public class UniProtKBEntryPair implements EntryPair<UniProtKBEntry> {
     private final String from;
     private final UniProtKBEntry to;
 }

@@ -1,14 +1,6 @@
 package org.uniprot.api.idmapping.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
-import org.uniprot.api.idmapping.model.UniProtKbEntryPair;
+import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -29,15 +21,24 @@ import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
-import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
-import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
-import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.api.idmapping.output.converter.uniparc.UniParcMessageConverterConfig.appendUniParcConverters;
+import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMessageConverterConfig.appendUniProtKBConverters;
+import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
 
 /**
  * Created 21/08/18
@@ -79,41 +80,26 @@ public class MessageConverterConfig {
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                // ------------------------- UniProtKbEntryPair -------------------------
+                // ------------------------- UniProtKb converters -------------------------
 
                 ReturnFieldConfig uniProtKBReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIPROTKB);
 
-                JsonMessageConverter<UniProtKbEntryPair> uniprotPairJsonMessageConverter =
-                        new JsonMessageConverter<>(
-                                UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
-                                UniProtKbEntryPair.class,
-                                uniProtKBReturnFieldCfg);
-                converters.add(index++, uniprotPairJsonMessageConverter);
+                index = appendUniProtKBConverters(index, converters, uniProtKBReturnFieldCfg);
 
                 // ------------------------- UniParcEntryPair -------------------------
 
                 ReturnFieldConfig uniParcReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIPARC);
 
-                JsonMessageConverter<UniParcEntryPair> uniparcPairJsonMessageConverter =
-                        new JsonMessageConverter<>(
-                                UniParcJsonConfig.getInstance().getSimpleObjectMapper(),
-                                UniParcEntryPair.class,
-                                uniParcReturnFieldCfg);
-                converters.add(index++, uniparcPairJsonMessageConverter);
+                index = appendUniParcConverters(index, converters, uniParcReturnFieldCfg);
 
                 // ------------------------- UniRefEntryPair -------------------------
 
                 ReturnFieldConfig uniRefReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIREF);
 
-                JsonMessageConverter<UniRefEntryPair> uniRefPairJsonMessageConverter =
-                        new JsonMessageConverter<>(
-                                UniRefEntryLightJsonConfig.getInstance().getSimpleObjectMapper(),
-                                UniRefEntryPair.class,
-                                uniRefReturnFieldCfg);
-                converters.add(index++, uniRefPairJsonMessageConverter);
+                index = appendUniRefConverters(index, converters, uniRefReturnFieldCfg);
 
                 // ------------------------- IdMappingStringPair -------------------------
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
@@ -143,12 +129,13 @@ public class MessageConverterConfig {
     }
 
     @Bean("stringUniProtKBEntryPairMessageConverterContextFactory")
-    public MessageConverterContextFactory<UniProtKbEntryPair>
+    public MessageConverterContextFactory<UniProtKBEntryPair>
             stringUniProtKBEntryPairMessageConverterContextFactory() {
-        MessageConverterContextFactory<UniProtKbEntryPair> contextFactory =
+        MessageConverterContextFactory<UniProtKBEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(kbContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
+        List.of(kbContext(APPLICATION_JSON), kbContext(FASTA_MEDIA_TYPE))
+                .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
@@ -159,7 +146,7 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniParcEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(uniParcContext(APPLICATION_JSON))
+        List.of(uniParcContext(APPLICATION_JSON), uniParcContext(FASTA_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -171,7 +158,8 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniRefEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(uniRefContext(APPLICATION_JSON)).forEach(contextFactory::addMessageConverterContext);
+        List.of(uniRefContext(APPLICATION_JSON), uniRefContext(FASTA_MEDIA_TYPE))
+                .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
@@ -197,8 +185,8 @@ public class MessageConverterConfig {
                 .build();
     }
 
-    private MessageConverterContext<UniProtKbEntryPair> kbContext(MediaType contentType) {
-        return MessageConverterContext.<UniProtKbEntryPair>builder()
+    private MessageConverterContext<UniProtKBEntryPair> kbContext(MediaType contentType) {
+        return MessageConverterContext.<UniProtKBEntryPair>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIPROTKB)
                 .contentType(contentType)
                 .build();

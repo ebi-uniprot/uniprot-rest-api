@@ -5,8 +5,10 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.security.NoSuchAlgorithmException;
@@ -17,17 +19,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -221,6 +229,23 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                                 contains("'size' must be less than or equal to 500")));
     }
 
+    @ParameterizedTest(name = "[{index}] contentType {0}")
+    @MethodSource("getContentTypes")
+    void testGetResultsAllContentType(MediaType mediaType) throws Exception {
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                .andExpect(content().contentTypeCompatibleWith(mediaType));
+    }
+
     protected final HashGenerator hashGenerator = new HashGenerator();
 
     protected IdMappingJobRequest createRequest(String from, String to, String fromIds) {
@@ -281,5 +306,9 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         builder.jobId(jobId).jobStatus(jobStatus);
         builder.idMappingRequest(request).idMappingResult(result);
         return builder.build();
+    }
+
+    protected Stream<Arguments> getContentTypes() {
+        return super.getContentTypes(getIdMappingResultPath());
     }
 }
