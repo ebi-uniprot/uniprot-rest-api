@@ -39,6 +39,7 @@ import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMess
 import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
 
 /**
@@ -135,7 +136,8 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniProtKBEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(kbContext(APPLICATION_JSON), kbContext(FASTA_MEDIA_TYPE), kbContext(TSV_MEDIA_TYPE))
+        List.of(kbContext(APPLICATION_JSON), kbContext(FASTA_MEDIA_TYPE),
+                kbContext(TSV_MEDIA_TYPE), kbContext(XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -147,7 +149,8 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniParcEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(uniParcContext(APPLICATION_JSON), uniParcContext(FASTA_MEDIA_TYPE), uniParcContext(TSV_MEDIA_TYPE))
+        List.of(uniParcContext(APPLICATION_JSON), uniParcContext(FASTA_MEDIA_TYPE),
+                uniParcContext(TSV_MEDIA_TYPE), uniParcContext(XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -159,7 +162,8 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<UniRefEntryPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        List.of(uniRefContext(APPLICATION_JSON), uniRefContext(FASTA_MEDIA_TYPE), uniRefContext(TSV_MEDIA_TYPE))
+        List.of(uniRefContext(APPLICATION_JSON), uniRefContext(FASTA_MEDIA_TYPE),
+                uniRefContext(TSV_MEDIA_TYPE), uniRefContext(XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

@@ -4,9 +4,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
+import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
-import org.uniprot.core.parser.tsv.uniprot.UniProtKBEntryValueMapper;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 
 import java.util.List;
@@ -30,6 +29,12 @@ public class UniProtKBMessageConverterConfig {
         converters.add(
                 currentIdx++,
                 new TsvMessageConverter<>(
+                        UniProtKBEntryPair.class,
+                        returnFieldConfig,
+                        new UniProtKBEntryPairValueMapper()));
+        converters.add(
+                currentIdx++,
+                new XlsMessageConverter<>(
                         UniProtKBEntryPair.class,
                         returnFieldConfig,
                         new UniProtKBEntryPairValueMapper()));
