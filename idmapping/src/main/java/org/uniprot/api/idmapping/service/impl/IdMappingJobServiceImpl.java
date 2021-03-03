@@ -45,21 +45,21 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final Set<String> UNIPROTKB_SET;
 
     static {
-        Map<String, String> collect =
+        Map<String, String> dbDetails =
                 IdMappingFieldConfig.getAllIdMappingTypes().stream()
                         .collect(
                                 Collectors.toMap(
-                                        UniProtDatabaseDetail::getName,
+                                        UniProtDatabaseDetail::getDisplayName,
                                         UniProtDatabaseDetail::getIdMappingName));
 
         UNIREF_SET =
                 Stream.of("UniRef50", "UniRef90", "UniRef100")
-                        .map(collect::get)
+                        .map(dbDetails::get)
                         .collect(Collectors.toSet());
-        UNIPARC = collect.get("UniParc");
+        UNIPARC = dbDetails.get("UniParc");
         UNIPROTKB_SET =
-                Stream.of("UniProt_ACC-ID", "UniProtKB", "UniProtKB-Swiss-Prot")
-                        .map(collect::get)
+                Stream.of("UniProtKB AC/ID", "UniProtKB", "UniProtKB Swiss-Prot")
+                        .map(dbDetails::get)
                         .collect(Collectors.toSet());
 
         Preconditions.checkState(

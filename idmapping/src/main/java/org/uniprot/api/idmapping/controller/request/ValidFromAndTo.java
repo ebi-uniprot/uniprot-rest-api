@@ -89,13 +89,17 @@ public @interface ValidFromAndTo {
             boolean isValid = true;
             boolean isTaxIdPassed = Utils.notNullNotEmpty(taxId);
 
+            // TODO: 03/03/2021 describe
             if (!FROM_WITH_DIFFERENT_TO.contains(from)) {
                 isValid = isUniProtKBOrSwissProt(to);
             }
+
+            // TODO: 03/03/2021 describe
             if (FROM_RULE_101.contains(from)) {
                 isValid = isUniProtKBOrSwissProt(to) || from.equals(to);
             }
 
+            // TODO: 03/03/2021 describe
             if (ACC_ID_STR.equals(from)) {
                 isValid =
                         this.dbDetails.stream()

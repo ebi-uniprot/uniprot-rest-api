@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.List;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -13,7 +12,6 @@ import javax.validation.Payload;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
@@ -32,18 +30,10 @@ public @interface ValidIdType {
 
     @Slf4j
     class ValidIdTypeValidator implements ConstraintValidator<ValidIdType, String> {
-        private List<UniProtDatabaseDetail> idMappingDBNames;
-
-        @Override
-        public void initialize(ValidIdType constraintAnnotation) {
-            this.idMappingDBNames = IdMappingFieldConfig.getAllIdMappingTypes();
-        }
-
         @Override
         public boolean isValid(
                 String idType, ConstraintValidatorContext constraintValidatorContext) {
-            return this.idMappingDBNames.stream()
-                    .anyMatch(type -> type.getIdMappingName().equals(idType));
+            return IdMappingFieldConfig.isValidDbName(idType);
         }
     }
 }

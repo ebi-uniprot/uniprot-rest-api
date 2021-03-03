@@ -14,10 +14,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -45,6 +47,8 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
 
     private final UniParcDocumentConverter documentConverter =
             new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
+
+    @Autowired private UniParcFacetConfig facetConfig;
 
     @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
 
@@ -97,6 +101,11 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPARC;
+    }
+
+    @Override
+    protected FacetConfig getFacetConfig() {
+        return facetConfig;
     }
 
     @BeforeAll

@@ -16,10 +16,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
@@ -50,6 +52,8 @@ public class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResults
 
     private final UniRefDocumentConverter documentConverter =
             new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+
+    @Autowired private UniRefFacetConfig facetConfig;
 
     @Autowired private UniProtStoreClient<UniRefEntryLight> storeClient;
 
@@ -102,6 +106,11 @@ public class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResults
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIREF;
+    }
+
+    @Override
+    protected FacetConfig getFacetConfig() {
+        return facetConfig;
     }
 
     @Override
