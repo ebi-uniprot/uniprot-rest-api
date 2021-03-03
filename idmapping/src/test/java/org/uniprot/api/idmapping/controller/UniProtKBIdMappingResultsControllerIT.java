@@ -34,10 +34,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyLineageTest;
@@ -100,6 +102,8 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     private static final String UNIPROTKB_ID_MAPPING_RESULT_PATH =
             "/idmapping/uniprotkb/results/{jobId}";
 
+    @Autowired private UniprotKBFacetConfig facetConfig;
+
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 
     @Qualifier("uniproKBfacetTupleStreamTemplate")
@@ -159,6 +163,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         return UniProtDataType.UNIPROTKB;
     }
 
+    @Override
+    protected FacetConfig getFacetConfig() {
+        return facetConfig;
+    }
+
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
@@ -197,6 +206,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
             storeClient.saveEntry(uniProtKBEntry);
 
             UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
+            doc.otherOrganism="otherValue";
             cloudSolrClient.addBean(SolrCollection.uniprot.name(), doc);
             cloudSolrClient.commit(SolrCollection.uniprot.name());
         }
@@ -210,26 +220,6 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
-                .andExpect(
-                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")));
-    }
-
-    // TODO: Leo improve
-    @Test
-    void testUniProtKBToUniProtKBMappingWithFacet() throws Exception {
-        // when
-        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
-        ResultActions response =
-                mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("facets", "proteins_with,reviewed"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))

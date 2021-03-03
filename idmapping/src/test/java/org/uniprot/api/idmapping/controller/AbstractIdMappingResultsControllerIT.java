@@ -34,6 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -66,6 +67,8 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     protected abstract IdMappingJob createAndPutJobInCache() throws Exception;
 
     protected abstract UniProtDataType getUniProtDataType();
+
+    protected abstract FacetConfig getFacetConfig();
 
     @Test
     void testIdMappingResultOnePage() throws Exception {
@@ -299,6 +302,55 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         }
     }
 
+    @Test
+    void searchFacetsWithIncorrectValuesReturnBadRequest() throws Exception {
+
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .param("facets", "invalid, invalid2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        startsWith(
+                                                "Invalid facet name 'invalid'. Expected value can be "),
+                                        startsWith(
+                                                "Invalid facet name 'invalid2'. Expected value can be "))));
+    }
+
+    @ParameterizedTest(name = "[{index}] facet field name {0}")
+    @MethodSource("getAllFacets")
+    void testUniProtKBToUniProtKBMappingWithFacet(String facetName) throws Exception {
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("facets", facetName)
+                                        .param("size", "0"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets.*.name", contains(facetName)))
+                .andExpect(jsonPath("$.facets[0].values.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
+    }
+
     protected Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
                 .stream()
@@ -384,5 +436,9 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
 
     protected Stream<Arguments> getContentTypes() {
         return super.getContentTypes(getIdMappingResultPath());
+    }
+
+    private Stream<Arguments> getAllFacets() {
+        return getFacetConfig().getFacetNames().stream().map(Arguments::of);
     }
 }
