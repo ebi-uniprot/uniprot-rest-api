@@ -7,6 +7,9 @@ import static org.uniprot.api.idmapping.output.converter.uniparc.UniParcMessageC
 import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMessageConverterConfig.appendUniProtKBConverters;
 import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.GFF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
@@ -35,6 +38,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
 import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
+import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -109,6 +113,7 @@ public class MessageConverterConfig {
                         new JsonMessageConverter<>(
                                 new ObjectMapper(), IdMappingStringPair.class, null);
                 converters.add(index++, idMappingPairJsonMessageConverter);
+                converters.add(index++, new ListMessageConverter());
                 converters.add(
                         index,
                         new TsvMessageConverter<>(
@@ -125,7 +130,7 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<IdMappingStringPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(idMappingContext(APPLICATION_JSON))
+        asList(idMappingContext(APPLICATION_JSON), idMappingContext(LIST_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -142,7 +147,10 @@ public class MessageConverterConfig {
                         kbContext(FASTA_MEDIA_TYPE),
                         kbContext(TSV_MEDIA_TYPE),
                         kbContext(XLS_MEDIA_TYPE),
-                        kbContext(APPLICATION_XML))
+                        kbContext(APPLICATION_XML),
+                        kbContext(FF_MEDIA_TYPE),
+                        kbContext(GFF_MEDIA_TYPE),
+                        kbContext(LIST_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -159,7 +167,8 @@ public class MessageConverterConfig {
                         uniParcContext(FASTA_MEDIA_TYPE),
                         uniParcContext(TSV_MEDIA_TYPE),
                         uniParcContext(XLS_MEDIA_TYPE),
-                        uniParcContext(APPLICATION_XML))
+                        uniParcContext(APPLICATION_XML),
+                        uniParcContext(LIST_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -172,8 +181,11 @@ public class MessageConverterConfig {
                 new MessageConverterContextFactory<>();
 
         List.of(
-                        uniRefContext(APPLICATION_JSON), uniRefContext(FASTA_MEDIA_TYPE),
-                        uniRefContext(TSV_MEDIA_TYPE), uniRefContext(XLS_MEDIA_TYPE))
+                        uniRefContext(APPLICATION_JSON),
+                        uniRefContext(FASTA_MEDIA_TYPE),
+                        uniRefContext(TSV_MEDIA_TYPE),
+                        uniRefContext(XLS_MEDIA_TYPE),
+                        uniRefContext(LIST_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

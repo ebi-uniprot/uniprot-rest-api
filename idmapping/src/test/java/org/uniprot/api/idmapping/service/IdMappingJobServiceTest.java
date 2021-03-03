@@ -142,7 +142,7 @@ class IdMappingJobServiceTest {
 
     // TODO: 02/03/2021 test all paths of redirect logic
 
-   @Test
+    @Test
     void testGetUnknownJob() {
         Assertions.assertThrows(
                 ResourceNotFoundException.class,

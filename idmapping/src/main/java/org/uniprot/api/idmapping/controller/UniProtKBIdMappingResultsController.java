@@ -3,6 +3,9 @@ package org.uniprot.api.idmapping.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.GFF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
@@ -64,7 +67,10 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 FASTA_MEDIA_TYPE_VALUE,
                 TSV_MEDIA_TYPE_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE
+                APPLICATION_XML_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntryPair>> getMappedEntries(
             @PathVariable String jobId,

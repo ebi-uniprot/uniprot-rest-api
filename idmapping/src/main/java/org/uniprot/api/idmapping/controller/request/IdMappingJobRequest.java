@@ -1,10 +1,12 @@
 package org.uniprot.api.idmapping.controller.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.NotNull;
+
 import lombok.Data;
+
 import org.uniprot.api.rest.validation.ValidIdType;
 
-import javax.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * Created 16/02/2021

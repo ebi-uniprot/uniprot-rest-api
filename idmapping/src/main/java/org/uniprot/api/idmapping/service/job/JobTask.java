@@ -1,15 +1,17 @@
 package org.uniprot.api.idmapping.service.job;
 
-import com.google.common.base.Stopwatch;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.client.RestClientException;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import com.google.common.base.Stopwatch;
 
 /**
  * @author sahmad

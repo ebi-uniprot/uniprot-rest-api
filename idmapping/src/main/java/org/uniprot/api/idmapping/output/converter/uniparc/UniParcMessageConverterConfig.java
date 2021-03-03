@@ -11,6 +11,7 @@ import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
 import org.uniprot.api.idmapping.output.converter.EntryPairXmlMessageConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
+import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
@@ -37,6 +38,7 @@ public class UniParcMessageConverterConfig {
                         returnFieldConfig);
         converters.add(currentIndex++, jsonMessageConverter);
         converters.add(currentIndex++, new UniParcEntryPairFastaMessageConverter());
+        converters.add(currentIndex++, new ListMessageConverter());
         converters.add(
                 currentIndex++,
                 new TsvMessageConverter<>(
