@@ -1,18 +1,18 @@
 package org.uniprot.api.rest.validation;
 
-import lombok.extern.slf4j.Slf4j;
-import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
  * @author sahmad

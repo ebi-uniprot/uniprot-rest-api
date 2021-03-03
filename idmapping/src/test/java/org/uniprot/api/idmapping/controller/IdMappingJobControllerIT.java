@@ -1,26 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.io.UnsupportedEncodingException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -46,8 +27,27 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.UnsupportedEncodingException;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author sahmad
@@ -72,8 +72,8 @@ class IdMappingJobControllerIT {
     void jobSubmittedSuccessfully() throws Exception {
         // when
         IdMappingJobRequest basicRequest = new IdMappingJobRequest();
-        basicRequest.setFrom("ACC,ID");
-        basicRequest.setTo("EMBL");
+        basicRequest.setFrom("UniProtKB_AC-ID");
+        basicRequest.setTo("EMBL-GenBank-DDBJ");
         basicRequest.setIds("Q1,Q2");
 
         ResultActions response =
@@ -99,7 +99,7 @@ class IdMappingJobControllerIT {
     void finishedJobShowsFinishedStatusWithCorrectRedirect() throws Exception {
         String jobId = "ID";
         IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setTo("EMBL");
+        request.setTo("EMBL-GenBank-DDBJ");
 
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -143,7 +143,7 @@ class IdMappingJobControllerIT {
     void newJobHasRunningStatus() throws Exception {
         String jobId = "ID";
         IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setTo("EMBL");
+        request.setTo("EMBL-GenBank-DDBJ");
 
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -169,7 +169,7 @@ class IdMappingJobControllerIT {
     void runningJobHasRunningStatus() throws Exception {
         String jobId = "ID";
         IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setTo("EMBL");
+        request.setTo("EMBL-GenBank-DDBJ");
 
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -195,7 +195,7 @@ class IdMappingJobControllerIT {
     void jobThatErroredHasErrorStatus() throws Exception {
         String jobId = "ID";
         IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setTo("EMBL");
+        request.setTo("EMBL-GenBank-DDBJ");
 
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -232,7 +232,7 @@ class IdMappingJobControllerIT {
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("from", "ACC123")
-                                .param("to", "ACC")
+                                .param("to", "UniProtKB")
                                 .param("ids", "Q00001,Q00002"));
         // then
         response.andDo(print())
@@ -254,7 +254,7 @@ class IdMappingJobControllerIT {
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "ACC,ID")
+                                .param("from", "UniProtKB_AC-ID")
                                 .param("to", "ACC123")
                                 .param("ids", "Q00001,Q00002"));
         // then
@@ -276,8 +276,8 @@ class IdMappingJobControllerIT {
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "EMBL")
-                                .param("to", "UPARC")
+                                .param("from", "EMBL-GenBank-DDBJ")
+                                .param("to", "UniParc")
                                 .param("ids", "Q00001,Q00002"));
         // then
         response.andDo(print())
@@ -295,8 +295,8 @@ class IdMappingJobControllerIT {
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "EMBL")
-                                .param("to", "UPARC")
+                                .param("from", "EMBL-GenBank-DDBJ")
+                                .param("to", "UniParc")
                                 .param("taxId", "taxId")
                                 .param("ids", "Q00001,Q00002"));
         // then
@@ -320,8 +320,8 @@ class IdMappingJobControllerIT {
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("from", "EMBL")
-                                .param("to", "ACC")
+                                .param("from", "EMBL-GenBank-DDBJ")
+                                .param("to", "UniProtKB")
                                 .param("taxId", "taxId")
                                 .param("ids", "Q00001,Q00002"));
         // then

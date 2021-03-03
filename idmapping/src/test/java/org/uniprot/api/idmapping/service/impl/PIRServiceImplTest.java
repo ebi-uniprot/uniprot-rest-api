@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 class PIRServiceImplTest {
 
@@ -32,15 +33,15 @@ class PIRServiceImplTest {
     @Test
     void createsExpectedResult() {
         IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setFrom("from");
-        request.setTo("to");
+        request.setFrom("UniProtKB_AC-ID");
+        request.setTo("UniProtKB");
         request.setIds("id");
         request.setTaxId("taxId");
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("ids", String.join(",", request.getIds()));
-        map.add("from", request.getFrom());
-        map.add("to", request.getTo());
+        map.add("from", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getFrom()));
+        map.add("to", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getTo()));
         map.add("tax_off", "NO"); // we do not need PIR's header line, "Taxonomy ID:"
         map.add("taxid", request.getTaxId());
         map.add("async", "NO");

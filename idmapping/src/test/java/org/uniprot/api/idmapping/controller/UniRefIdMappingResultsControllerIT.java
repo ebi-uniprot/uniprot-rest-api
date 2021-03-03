@@ -1,9 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -20,7 +18,6 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
@@ -70,6 +67,8 @@ public class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResults
     @Autowired
     private TupleStreamTemplate tupleStreamTemplate;
 
+    @Autowired private JobOperation uniRefIdMappingJobOp;
+
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return List.of(SolrCollection.uniref);
@@ -96,17 +95,6 @@ public class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResults
     }
 
     @Override
-    protected IdMappingJob createAndPutJobInCache() throws Exception {
-        Map<String, String> ids = new LinkedHashMap<>();
-        for (int i = 1; i <= 20; i++) {
-            String fromId = String.format("Q%05d", i);
-            String toId = String.format(UniRefEntryMocker.ID_PREF_50 + "%02d", i);
-            ids.put(fromId, toId);
-        }
-        return createAndPutJobInCache("ACC", "NF50", ids);
-    }
-
-    @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIREF;
     }
@@ -114,6 +102,11 @@ public class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResults
     @Override
     protected FacetConfig getFacetConfig() {
         return facetConfig;
+    }
+
+    @Override
+    protected JobOperation getJobOperation() {
+        return uniRefIdMappingJobOp;
     }
 
     @Override
