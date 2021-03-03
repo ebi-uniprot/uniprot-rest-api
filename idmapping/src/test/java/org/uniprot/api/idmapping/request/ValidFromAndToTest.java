@@ -49,8 +49,8 @@ class ValidFromAndToTest {
 
     @Test
     void testInvalidFromToWithTaxId() {
-        String from = "ACC,ID";
-        String to = "SWISSPROT";
+        String from = "UniProtKB_AC-ID";
+        String to = "UniProtKB-Swiss-Prot";
         String taxId = "taxId";
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom(from);
@@ -67,8 +67,8 @@ class ValidFromAndToTest {
 
     @Test
     void testValidFromGeneNameToSwiss() {
-        String from = "GENENAME";
-        String to = "SWISSPROT";
+        String from = "Gene_Name";
+        String to = "UniProtKB-Swiss-Prot";
         String taxId = "taxId";
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom(from);
@@ -83,21 +83,21 @@ class ValidFromAndToTest {
 
     private static Stream<Arguments> provideInvalidFromTo() {
         return Stream.of(
-                Arguments.of("INVALID", "SWISSPROT"),
-                Arguments.of("ACC,ID", "INVALID"),
-                Arguments.of("EMBL", "NF100"),
-                Arguments.of("SWISSPROT", "ACC"),
-                Arguments.of("UPARC", "ACC,ID"));
+                Arguments.of("INVALID", "UniProtKB-Swiss-Prot"),
+                Arguments.of("UniProtKB_AC-ID", "INVALID"),
+                Arguments.of("EMBL-GenBank-DDBJ_CDS", "UniRef100"),
+                Arguments.of("UniProtKB-Swiss-Prot", "UniProtKB"),
+                Arguments.of("UniParc", "UniProtKB_AC-ID"));
     }
 
     private static Stream<Arguments> provideValidFromTo() {
         return Stream.of(
-                Arguments.of("ACC,ID", "SWISSPROT"),
-                Arguments.of("EMBL", "ACC"),
-                Arguments.of("UPARC", "UPARC"),
-                Arguments.of("ACC,ID", "DMDM_ID"),
-                Arguments.of("GENENAME", "SWISSPROT"),
-                Arguments.of("NF50", "ACC"));
+                Arguments.of("UniProtKB_AC-ID", "UniProtKB-Swiss-Prot"),
+                Arguments.of("EMBL-GenBank-DDBJ_CDS", "UniProtKB"),
+                Arguments.of("UniParc", "UniParc"),
+                Arguments.of("UniProtKB_AC-ID", "DMDM"),
+                Arguments.of("Gene_Name", "UniProtKB"),
+                Arguments.of("UniRef50", "UniProtKB-Swiss-Prot"));
     }
 
     private ValidFromAndTo getMockedValidFromAndTo() {

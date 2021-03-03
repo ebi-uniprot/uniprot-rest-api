@@ -1,13 +1,15 @@
 package org.uniprot.api.idmapping.controller.request;
 
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.GENENAME_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.SWISSPROT_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF100_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF50_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIREF90_STR;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UPARC_STR;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.BeanUtils;
+import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,21 +17,12 @@ import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.beanutils.BeanUtils;
-import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
-import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 
 /**
+ * Created 01/03/2021
+ *
  * @author sahmad
- * @created 01/03/2021
  */
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -79,7 +72,7 @@ public @interface ValidFromAndTo {
                         this.dbDetails.stream()
                                 .anyMatch(
                                         db ->
-                                                db.getIdMappingName().equals(fromValue)
+                                                db.getName().equals(fromValue)
                                                         && !SWISSPROT_STR.equals(fromValue));
                 isValid = isValidFrom && isValidPair(fromValue, toValue, taxIdValue, context);
             } catch (Exception e) {
@@ -104,10 +97,7 @@ public @interface ValidFromAndTo {
             if (ACC_ID_STR.equals(from)) {
                 isValid =
                         this.dbDetails.stream()
-                                .anyMatch(
-                                        db ->
-                                                db.getIdMappingName().equals(to)
-                                                        && !ACC_ID_STR.equals(to));
+                                .anyMatch(db -> db.getName().equals(to) && !ACC_ID_STR.equals(to));
             }
 
             if (!GENENAME_STR.equals(from)
