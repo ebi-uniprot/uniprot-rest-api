@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
@@ -12,8 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import com.google.common.base.Stopwatch;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+
+import com.google.common.base.Stopwatch;
 
 /**
  * Created 15/02/2021
@@ -61,7 +63,12 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
 
     @GetMapping(
             value = "/results/{jobId}",
-            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> results(
             @PathVariable String jobId,
             @Valid IdMappingPageRequest pageRequest,
@@ -95,7 +102,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
 
     @Override
     protected String getEntityId(IdMappingStringPair entity) {
-        return null;
+        return entity.getTo();
     }
 
     @Override

@@ -1,9 +1,14 @@
 package org.uniprot.api.uniparc.output.converter;
 
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CONTEXT;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_FOOTER;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_HEADER;
+
 import javax.xml.bind.Marshaller;
 
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 
@@ -13,22 +18,17 @@ import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
  */
 public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniParcEntry, Entry> {
     private final UniParcEntryConverter converter;
-    private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.uniparc";
-    private static final String HEADER_PREFIX =
-            "<uniparc xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/uniparc.xsd\"";
-
-    private static final String FOOTER = "\n</uniparc>";
 
     private String header;
 
     public UniParcXmlMessageConverter(String version) {
-        super(UniParcEntry.class, XML_CONTEXT);
+        super(UniParcEntry.class, UNIPARC_XML_CONTEXT);
         converter = new UniParcEntryConverter();
-        header = HEADER_PREFIX;
-        if ((version != null) && (!version.isEmpty())) {
-            header += " version=\"" + version + "\"";
+        header = UNIPARC_XML_HEADER;
+        if (Utils.notNullNotEmpty(version)) {
+            String versionAttrib = " version=\"" + version + "\"" + ">\n";
+            header = header.replace(">\n", versionAttrib);
         }
-        header += ">\n";
     }
 
     @Override
@@ -49,6 +49,6 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
 
     @Override
     protected String getFooter() {
-        return FOOTER;
+        return UNIPARC_XML_FOOTER;
     }
 }

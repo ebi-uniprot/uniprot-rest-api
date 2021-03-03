@@ -1,13 +1,13 @@
 package org.uniprot.api.idmapping.service;
 
+import java.util.Objects;
+
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-
-import java.util.Objects;
 
 /**
  * Created 17/02/2021
@@ -32,8 +32,7 @@ public abstract class IdMappingPIRService {
                 CursorPage.of(request.getCursor(), pageSize, result.getMappedIds().size());
 
         return QueryResult.of(
-                result
-                        .getMappedIds()
+                result.getMappedIds()
                         .subList(
                                 cursorPage.getOffset().intValue(),
                                 CursorPage.getNextOffset(cursorPage))

@@ -28,9 +28,6 @@ import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
@@ -109,8 +106,8 @@ public class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResults
 
     @Override
     protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF).getReturnFields()
-                .stream()
+        return ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF)
+                .getReturnFields().stream()
                 .map(
                         returnField -> {
                             String lightPath =

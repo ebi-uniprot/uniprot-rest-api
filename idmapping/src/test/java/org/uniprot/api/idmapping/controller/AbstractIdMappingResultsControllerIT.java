@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -33,7 +32,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
@@ -301,13 +299,11 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         }
     }
 
-
     protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
-                .getReturnFields().stream()
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
+                .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
-
 
     protected Stream<Arguments> getAllSortFields() {
         SearchFieldConfig fieldConfig =
