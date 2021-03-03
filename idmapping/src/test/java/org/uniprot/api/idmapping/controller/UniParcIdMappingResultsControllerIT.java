@@ -1,9 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
@@ -18,7 +16,6 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -42,7 +39,7 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsControllerIT {
 
-    private static final String UPI_PREF = "UPI0000283A";
+    static final String UPI_PREF = "UPI0000283A";
     private static final String UNIPARC_ID_MAPPING_RESULT = "/idmapping/uniparc/results/{jobId}";
 
     private final UniParcDocumentConverter documentConverter =
@@ -61,6 +58,8 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
     @Qualifier("uniParcTupleStreamTemplate")
     @Autowired
     private TupleStreamTemplate tupleStreamTemplate;
+
+    @Autowired private JobOperation uniParcIdMappingJobOp;
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
@@ -88,17 +87,6 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
     }
 
     @Override
-    protected IdMappingJob createAndPutJobInCache() throws Exception {
-        Map<String, String> ids = new LinkedHashMap<>();
-        for (int i = 1; i <= 20; i++) {
-            String fromId = String.format("Q%05d", i);
-            String toId = String.format(UPI_PREF + "%02d", i);
-            ids.put(fromId, toId);
-        }
-        return createAndPutJobInCache("ACC", "UPARC", ids);
-    }
-
-    @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPARC;
     }
@@ -106,6 +94,11 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
     @Override
     protected FacetConfig getFacetConfig() {
         return facetConfig;
+    }
+
+    @Override
+    protected JobOperation getJobOperation() {
+        return uniParcIdMappingJobOp;
     }
 
     @BeforeAll

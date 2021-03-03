@@ -2,8 +2,11 @@ package org.uniprot.api.idmapping.controller;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
@@ -25,6 +28,19 @@ public abstract class AbstractJobOperation implements JobOperation {
     public AbstractJobOperation(IdMappingJobCacheService cacheService) {
         this.cacheService = cacheService;
         this.hashGenerator = new HashGenerator();
+    }
+
+    public IdMappingJob createAndPutJobInCache(String from, String to, String fromIds)
+            throws InvalidKeySpecException, NoSuchAlgorithmException {
+        Map<String, String> mappedIds =
+                Arrays.stream(fromIds.split(","))
+                        .collect(
+                                Collectors.toMap(
+                                        Function.identity(),
+                                        Function.identity(),
+                                        (a, b) -> a,
+                                        LinkedHashMap::new));
+        return createAndPutJobInCache(from, to, mappedIds);
     }
 
     protected IdMappingJob createAndPutJobInCache(

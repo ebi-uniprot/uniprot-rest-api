@@ -95,4 +95,22 @@ public class DataStoreTestConfig {
     public JobOperation idMappingResultJobOp(IdMappingJobCacheService cacheService) {
         return new IdMappingResultsJobOperation(cacheService);
     }
+
+    @Bean
+    @Profile("offline")
+    public JobOperation uniProtKBIdMappingJobOp(IdMappingJobCacheService cacheService) {
+        return new UniProtKBIdMappingResultsJobOperation(cacheService);
+    }
+
+    @Bean
+    @Profile("offline")
+    public JobOperation uniRefIdMappingJobOp(IdMappingJobCacheService cacheService) {
+        return new UniRefIdMappingResultsJobOperation(cacheService);
+    }
+
+    @Bean
+    @Profile("offline")
+    public JobOperation uniParcIdMappingJobOp(IdMappingJobCacheService cacheService) {
+        return new UniParcIdMappingResultsJobOperation(cacheService);
+    }
 }

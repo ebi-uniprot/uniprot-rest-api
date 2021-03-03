@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
@@ -114,6 +113,8 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Autowired
     private TupleStreamTemplate tupleStreamTemplate;
 
+    @Autowired protected JobOperation uniProtKBIdMappingJobOp;
+
     @Autowired private MockMvc mockMvc;
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
@@ -150,15 +151,6 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     }
 
     @Override
-    protected IdMappingJob createAndPutJobInCache() throws Exception {
-        String ids =
-                IntStream.rangeClosed(1, 20)
-                        .mapToObj(i -> String.format("Q%05d", i))
-                        .collect(Collectors.joining(","));
-        return createAndPutJobInCache("ACC", "ACC", ids);
-    }
-
-    @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
     }
@@ -166,6 +158,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Override
     protected FacetConfig getFacetConfig() {
         return facetConfig;
+    }
+
+    @Override
+    protected JobOperation getJobOperation() {
+        return uniProtKBIdMappingJobOp;
     }
 
     private static final UniProtKBEntry TEMPLATE_ENTRY =
@@ -215,7 +212,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Test
     void testUniProtKBToUniProtKBMapping() throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
+        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
@@ -234,7 +231,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Test
     void testUniProtKBToUniProtKBMappingWithFacetFilter() throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
+        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
@@ -253,7 +250,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Test
     void testCanSortMultipleFieldsWithSuccess() throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
+        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
@@ -274,7 +271,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     void testUniProtKBToUniProtKBMappingWithUnmappedIds() throws Exception {
         // when
         List<String> unmappedIds = List.of("S12345", "T12345");
-        IdMappingJob job = createAndPutJobInCache("ACC", "ACC", "Q00005,Q00006");
+        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00005,Q00006");
         job.getIdMappingResult().setUnmappedIds(unmappedIds);
 
         ResultActions response =

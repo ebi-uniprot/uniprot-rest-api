@@ -1,23 +1,25 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
@@ -36,12 +38,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.HashGenerator;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.store.config.UniProtDataType;
@@ -64,17 +61,17 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
 
     protected abstract String getIdMappingResultPath();
 
-    protected abstract IdMappingJob createAndPutJobInCache() throws Exception;
-
     protected abstract UniProtDataType getUniProtDataType();
 
     protected abstract FacetConfig getFacetConfig();
+
+    protected abstract JobOperation getJobOperation();
 
     @Test
     void testIdMappingResultOnePage() throws Exception {
         // when
         Integer defaultPageSize = 5;
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         String[] ids = job.getIdMappingRequest().getIds().split(",");
 
         ResultActions response =
@@ -99,7 +96,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     void testIdMappingResultWithSize() throws Exception {
         // when
         Integer size = 10;
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         String[] ids = job.getIdMappingRequest().getIds().split(",");
 
         ResultActions response =
@@ -127,7 +124,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     void testIdMappingResultWithSizeAndPagination() throws Exception {
         // when
         Integer size = 10;
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         String[] ids = job.getIdMappingRequest().getIds().split(",");
 
         ResultActions response =
@@ -181,7 +178,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     @Test
     void testIdMappingResultMappingWithZeroSize() throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -200,7 +197,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     @Test
     void testIdMappingResultWithNegativeSize() throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -220,7 +217,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     @Test
     void testIdMappingResultWithMoreThan500Size() throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -241,7 +238,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     @MethodSource("getContentTypes")
     void testGetResultsAllContentType(MediaType mediaType) throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         MockHttpServletRequestBuilder requestBuilder =
                 get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
 
@@ -258,7 +255,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     @MethodSource("getAllSortFields")
     void testIdMappingWithAllAvailableSortFields(String sortField) throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
 
         ResultActions response =
                 getMockMvc()
@@ -281,7 +278,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         assertThat(name, notNullValue());
         assertThat(paths, notNullValue());
         // when
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -306,7 +303,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     void searchFacetsWithIncorrectValuesReturnBadRequest() throws Exception {
 
         // when
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -331,7 +328,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     @MethodSource("getAllFacets")
     void testUniProtKBToUniProtKBMappingWithFacet(String facetName) throws Exception {
         // when
-        IdMappingJob job = createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -364,74 +361,6 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 .map(SearchFieldItem::getFieldName)
                 .filter(fieldConfig::correspondingSortFieldExists)
                 .map(Arguments::of);
-    }
-
-    protected final HashGenerator hashGenerator = new HashGenerator();
-
-    protected IdMappingJobRequest createRequest(String from, String to, String fromIds) {
-        IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setFrom(from);
-        request.setTo(to);
-        request.setIds(fromIds);
-        return request;
-    }
-
-    protected IdMappingJob createAndPutJobInCache(String from, String to, String fromIds)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
-        Map<String, String> mappedIds =
-                Arrays.stream(fromIds.split(","))
-                        .collect(
-                                Collectors.toMap(
-                                        Function.identity(),
-                                        Function.identity(),
-                                        (a, b) -> a,
-                                        LinkedHashMap::new));
-        return createAndPutJobInCache(from, to, mappedIds);
-    }
-
-    protected IdMappingJob createAndPutJobInCache(
-            String from, String to, Map<String, String> mappedIds)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
-        return createAndPutJobInCache(from, to, mappedIds, JobStatus.FINISHED);
-    }
-
-    protected IdMappingJob createAndPutJobInCache(
-            String from, String to, Map<String, String> mappedIds, JobStatus jobStatus)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
-        String fromIds = String.join(",", mappedIds.keySet());
-        IdMappingJobRequest idMappingRequest = createRequest(from, to, fromIds);
-        String jobId = generateHash(idMappingRequest);
-        IdMappingResult idMappingResult = createIdMappingResult(idMappingRequest, mappedIds);
-        IdMappingJob job = createJob(jobId, idMappingRequest, idMappingResult, jobStatus);
-        if (!this.idMappingJobCacheService.exists(jobId)) {
-            this.idMappingJobCacheService.put(jobId, job); // put the finished job in cache
-        }
-        return job;
-    }
-
-    private String generateHash(IdMappingJobRequest request)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
-        return this.hashGenerator.generateHash(request);
-    }
-
-    private IdMappingResult createIdMappingResult(
-            IdMappingJobRequest request, Map<String, String> mappedIds) {
-        List<IdMappingStringPair> ids =
-                mappedIds.entrySet().stream()
-                        .map(entry -> new IdMappingStringPair(entry.getKey(), entry.getValue()))
-                        .collect(Collectors.toList());
-        return IdMappingResult.builder().mappedIds(ids).build();
-    }
-
-    private IdMappingJob createJob(
-            String jobId,
-            IdMappingJobRequest request,
-            IdMappingResult result,
-            JobStatus jobStatus) {
-        IdMappingJob.IdMappingJobBuilder builder = IdMappingJob.builder();
-        builder.jobId(jobId).jobStatus(jobStatus);
-        builder.idMappingRequest(request).idMappingResult(result);
-        return builder.build();
     }
 
     protected Stream<Arguments> getContentTypes() {
