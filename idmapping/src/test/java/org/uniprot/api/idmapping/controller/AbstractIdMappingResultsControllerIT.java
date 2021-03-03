@@ -494,14 +494,6 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 .map(Arguments::of);
     }
 
-    protected Stream<Arguments> getContentTypes() {
-        return super.getContentTypes(getIdMappingResultPath());
-    }
-
-    private Stream<Arguments> getAllFacets() {
-        return getFacetConfig().getFacetNames().stream().map(Arguments::of);
-    }
-
     private String getFieldValueForField(String searchField) {
         String value = getFieldValueForValidatedField(searchField);
         if (value.isEmpty()) {
