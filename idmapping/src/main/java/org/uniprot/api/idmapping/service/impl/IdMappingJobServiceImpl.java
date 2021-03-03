@@ -58,7 +58,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                         .collect(Collectors.toSet());
         UNIPARC = collect.get("UniParc");
         UNIPROTKB_SET =
-                Stream.of("UniProt ACC/ID", "UniProtKB Accession", "UniProtKB/SwissProt ACC")
+                Stream.of("UniProt_ACC-ID", "UniProtKB", "UniProtKB-Swiss-Prot")
                         .map(collect::get)
                         .collect(Collectors.toSet());
 

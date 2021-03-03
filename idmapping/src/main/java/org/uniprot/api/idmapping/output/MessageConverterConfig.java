@@ -40,6 +40,7 @@ import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
+import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -115,8 +116,14 @@ public class MessageConverterConfig {
                 converters.add(index++, idMappingPairJsonMessageConverter);
                 converters.add(index++, new ListMessageConverter());
                 converters.add(
-                        index,
+                        index++,
                         new TsvMessageConverter<>(
+                                IdMappingStringPair.class,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING),
+                                new IdMappingStringPairTSVMapper()));
+                converters.add(
+                        index,
+                        new XlsMessageConverter<>(
                                 IdMappingStringPair.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING),
                                 new IdMappingStringPairTSVMapper()));
@@ -130,7 +137,11 @@ public class MessageConverterConfig {
         MessageConverterContextFactory<IdMappingStringPair> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(idMappingContext(APPLICATION_JSON), idMappingContext(LIST_MEDIA_TYPE))
+        asList(
+                        idMappingContext(APPLICATION_JSON),
+                        idMappingContext(LIST_MEDIA_TYPE),
+                        idMappingContext(TSV_MEDIA_TYPE),
+                        idMappingContext(XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

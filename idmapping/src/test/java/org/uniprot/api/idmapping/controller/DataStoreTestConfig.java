@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -79,6 +82,17 @@ public class DataStoreTestConfig {
     @Bean
     @Profile("offline")
     public IdMappingPIRService pirService() {
-        return mock(IdMappingPIRService.class);
+        return new IdMappingPIRService(25) {
+            @Override
+            public IdMappingResult mapIds(IdMappingJobRequest request) {
+                return null;
+            }
+        };
+    }
+
+    @Bean
+    @Profile("offline")
+    public JobOperation idMappingResultJobOp(IdMappingJobCacheService cacheService) {
+        return new IdMappingResultsJobOperation(cacheService);
     }
 }

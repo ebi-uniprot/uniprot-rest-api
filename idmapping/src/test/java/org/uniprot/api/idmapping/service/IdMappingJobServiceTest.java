@@ -40,7 +40,7 @@ import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobServiceTest {
     @Autowired private IdMappingJobServiceImpl jobService;
-    @Autowired private IdMappingPIRService pirService;
+    @MockBean private IdMappingPIRService pirService;
     @Autowired private IdMappingJobCacheService cacheService;
     @MockBean private ServletContext servletContext;
 

@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 
 /** @author lgonzales */
-class ControllerITUtils {
+public class ControllerITUtils {
 
     static void verifyContentTypes(
             String requestPath,
@@ -68,7 +68,7 @@ class ControllerITUtils {
         assertThat(mappingInfo.getProducesCondition().getProducibleMediaTypes(), is(mediaTypes));
     }
 
-    static Set<MediaType> getContentTypes(
+    public static Set<MediaType> getContentTypes(
             String requestPath, RequestMappingHandlerMapping requestMappingHandlerMapping) {
 
         RequestMappingInfo mappingInfo =

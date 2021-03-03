@@ -1,15 +1,7 @@
 package org.uniprot.api.idmapping.controller.request;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
-import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
-import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,7 +9,17 @@ import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Set;
 
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.beanutils.BeanUtils;
+import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
  * Created 01/03/2021
