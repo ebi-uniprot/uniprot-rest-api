@@ -43,7 +43,7 @@ public @interface ValidIdType {
         public boolean isValid(
                 String idType, ConstraintValidatorContext constraintValidatorContext) {
             return this.idMappingDBNames.stream()
-                    .anyMatch(type -> type.getIdMappingName().equals(idType));
+                    .anyMatch(type -> type.getName().equals(idType));
         }
     }
 }

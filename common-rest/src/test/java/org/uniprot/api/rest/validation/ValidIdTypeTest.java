@@ -3,10 +3,12 @@ package org.uniprot.api.rest.validation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
+ * Created 26/02/2021
+ *
  * @author sahmad
- * @created 26/02/2021
  */
 class ValidIdTypeTest {
     private static ValidIdType.ValidIdTypeValidator validator;
@@ -19,7 +21,7 @@ class ValidIdTypeTest {
 
     @Test
     void testValidValue() {
-        String value = "ACC";
+        String value = IdMappingFieldConfig.convertDisplayNameToName("UniProtKB");
         Assertions.assertTrue(validator.isValid(value, null));
     }
 
