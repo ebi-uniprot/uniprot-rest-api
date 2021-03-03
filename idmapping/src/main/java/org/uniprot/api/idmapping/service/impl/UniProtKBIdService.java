@@ -12,6 +12,7 @@ import org.uniprot.api.idmapping.service.BasicIdService;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 
 /**
  * @author sahmad
@@ -43,9 +44,10 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     @Override
     public String getSolrIdField() {
-        // todo
-        // SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB).getFieldTypeBySearchFieldName("accession_id").name();
-        return "accession_id";
+        return SearchFieldConfigFactory
+                .getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+                .getSearchFieldItemByName("accession_id")
+                .getFieldName();
     }
 
     @Override

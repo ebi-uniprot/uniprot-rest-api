@@ -44,6 +44,7 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.HashGenerator;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -69,6 +70,12 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     protected abstract UniProtDataType getUniProtDataType();
 
     protected abstract FacetConfig getFacetConfig();
+
+    protected abstract String getFieldValueForValidatedField(String searchField);
+
+    // ---------------------------------------------------------------------------------
+    // -------------------------------- PAGINATION TEST --------------------------------
+    // ---------------------------------------------------------------------------------
 
     @Test
     void testIdMappingResultOnePage() throws Exception {
@@ -237,13 +244,18 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                                 contains("'size' must be less than or equal to 500")));
     }
 
+    // ---------------------------------------------------------------------------------
+    // -------------------------------- CONTENT TYPES ----------------------------------
+    // ---------------------------------------------------------------------------------
+
     @ParameterizedTest(name = "[{index}] contentType {0}")
     @MethodSource("getContentTypes")
     void testGetResultsAllContentType(MediaType mediaType) throws Exception {
         // when
         IdMappingJob job = createAndPutJobInCache();
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
+                get(getIdMappingResultPath(), job.getJobId())
+                        .header(ACCEPT, mediaType);
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -271,6 +283,105 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+    }
+
+    // ---------------------------------------------------------------------------------
+    // -------------------------------- SEARCH FIELDS ----------------------------------
+    // ---------------------------------------------------------------------------------
+
+
+    @Test
+    void testIdMappingWithInvalidQueryFormatReturnBadRequest() throws Exception {
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                .param("query", "invalidfield(:invalidValue AND :invalid:10)")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*", contains("query parameter has an invalid syntax")));
+    }
+
+    @Test
+    void testIdMappingWithInvalidFieldNameReturnBadRequest() throws Exception {
+        // when
+        IdMappingJob job = createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                .param(
+                                        "query",
+                                        "invalidfield:invalidValue OR invalidfield2:invalidValue2")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "'invalidfield' is not a valid search field",
+                                        "'invalidfield2' is not a valid search field")));
+    }
+
+    @ParameterizedTest(name = "[{index}] search fieldName {0}")
+    @MethodSource("getAllSearchFields")
+    void searchCanSearchWithAllSearchFields(String searchField) throws Exception {
+        assertThat(searchField, notNullValue());
+
+        // when
+        String fieldValue = getFieldValueForField(searchField);
+        IdMappingJob job = createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                .param("query", searchField + ":" + fieldValue)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+    }
+
+    // ---------------------------------------------------------------------------------
+    // -------------------------------- RETURN FIELDS ----------------------------------
+    // ---------------------------------------------------------------------------------
+
+    @Test
+    void testIdMappingResultWithInvalidReturnedFields() throws Exception {
+        IdMappingJob job = createAndPutJobInCache();
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                .param("query", "*:*")
+                                .param("fields", "invalidField, otherInvalid")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid fields parameter value 'invalidField'",
+                                        "Invalid fields parameter value 'otherInvalid'")));
     }
 
     @ParameterizedTest(name = "[{index}] return for fieldName {0} and paths: {1}")
@@ -302,8 +413,11 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         }
     }
 
+    // ---------------------------------------------------------------------------------
+    // ----------------------------------------- TEST FACETS ---------------------------
+    // ---------------------------------------------------------------------------------
     @Test
-    void searchFacetsWithIncorrectValuesReturnBadRequest() throws Exception {
+    void testUniProtKBToUniProtKBMappingWithIncorrectFacetField() throws Exception {
 
         // when
         IdMappingJob job = createAndPutJobInCache();
@@ -351,19 +465,54 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
     }
 
+
+
     protected Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
 
-    protected Stream<Arguments> getAllSortFields() {
+    private Stream<Arguments> getContentTypes() {
+        return super.getContentTypes(getIdMappingResultPath());
+    }
+
+    private Stream<Arguments> getAllFacets() {
+        return getFacetConfig().getFacetNames().stream().map(Arguments::of);
+    }
+
+    private Stream<Arguments> getAllSearchFields() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType())
+                .getSearchFieldItems().stream()
+                .map(SearchFieldItem::getFieldName)
+                .map(Arguments::of);
+    }
+
+    private Stream<Arguments> getAllSortFields() {
         SearchFieldConfig fieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType());
         return fieldConfig.getSearchFieldItems().stream()
                 .map(SearchFieldItem::getFieldName)
                 .filter(fieldConfig::correspondingSortFieldExists)
                 .map(Arguments::of);
+    }
+
+    private String getFieldValueForField(String searchField) {
+        String value = getFieldValueForValidatedField(searchField);
+        if (value.isEmpty()) {
+            if (fieldValueIsValid(searchField, "*")) {
+                value = "*";
+            } else if (fieldValueIsValid(searchField, "true")) {
+                value = "true";
+            }
+        }
+        return value;
+    }
+
+    private boolean fieldValueIsValid(String field, String value) {
+        SearchFieldConfig fieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType());
+        return fieldConfig.isSearchFieldValueValid(field, value);
     }
 
     protected final HashGenerator hashGenerator = new HashGenerator();
@@ -432,13 +581,5 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         builder.jobId(jobId).jobStatus(jobStatus);
         builder.idMappingRequest(request).idMappingResult(result);
         return builder.build();
-    }
-
-    protected Stream<Arguments> getContentTypes() {
-        return super.getContentTypes(getIdMappingResultPath());
-    }
-
-    private Stream<Arguments> getAllFacets() {
-        return getFacetConfig().getFacetNames().stream().map(Arguments::of);
     }
 }

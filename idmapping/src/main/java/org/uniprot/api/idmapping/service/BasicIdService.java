@@ -189,6 +189,8 @@ public abstract class BasicIdService<T, U> {
         if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
             qb.append(" AND (").append(searchRequest.getQuery()).append(")");
             solrRequestBuilder.searchAccession(Boolean.TRUE);
+            solrRequestBuilder.searchSort(getSolrIdField()+" asc");
+            solrRequestBuilder.searchFieldList(getSolrIdField());
         }
 
         if (Utils.notNullNotEmpty(searchRequest.getSort())) {

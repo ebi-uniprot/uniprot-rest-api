@@ -10,12 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
@@ -87,6 +86,9 @@ import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+import org.uniprot.store.search.domain.EvidenceGroup;
+import org.uniprot.store.search.domain.EvidenceItem;
+import org.uniprot.store.search.domain.impl.GoEvidences;
 
 /**
  * @author sahmad
@@ -168,6 +170,44 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         return facetConfig;
     }
 
+    @Override
+    protected String getFieldValueForValidatedField(String searchField) {
+        String value = "";
+        if (searchField.startsWith("ftlen_") || searchField.startsWith("xref_count_")) {
+            value = "[* TO *]";
+        } else {
+            switch (searchField) {
+                case "accession_id":
+                case "accession":
+                    value = "Q00011";
+                    break;
+                case "mass":
+                case "length":
+                    value = "[* TO *]";
+                    break;
+                case "organism_id":
+                case "virus_host_id":
+                case "taxonomy_id":
+                    value = "9606";
+                    break;
+                case "date_modified":
+                case "date_sequence_modified":
+                case "date_created":
+                case "lit_pubdate":
+                    String now = Instant.now().toString();
+                    value = "[* TO " + now + "]";
+                    break;
+                case "proteome":
+                    value = "UP000000000";
+                    break;
+                case "annotation_score":
+                    value = "5";
+                    break;
+            }
+        }
+        return value;
+    }
+
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
@@ -207,6 +247,50 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
             UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
             doc.otherOrganism="otherValue";
+            doc.unirefCluster50 = "UniRef50_P0001";
+            doc.unirefCluster90 = "UniRef90_P0001";
+            doc.unirefCluster100 = "UniRef100_P0001";
+            doc.uniparc = "UPI000000000";
+            doc.computationalPubmedIds.add("890123456");
+            doc.communityPubmedIds.add("1234567");
+            doc.isIsoform = i % 10 == 0;
+            doc.proteomes.add("UP000000000");
+            doc.apApu.add("Search All");
+            doc.apApuEv.add("Search All");
+            doc.apAsEv.add("Search All");
+            doc.apRf.add("Search All");
+            doc.apRfEv.add("Search All");
+            doc.seqCautionFrameshift.add("Search All");
+            doc.seqCautionErTerm.add("Search All");
+            doc.seqCautionErTran.add("Search All");
+            doc.seqCautionMisc.add("Search All");
+            doc.seqCautionMiscEv.add("Search All");
+            doc.rcPlasmid.add("Search All");
+            doc.rcTransposon.add("Search All");
+            doc.rcStrain.add("Search All");
+            List<String> goAssertionCodes =
+                    GoEvidences.INSTANCE.getEvidences().stream()
+                            .filter(this::getManualEvidenceGroup)
+                            .flatMap(this::getEvidenceCodes)
+                            .map(String::toLowerCase)
+                            .collect(Collectors.toList());
+
+            goAssertionCodes.addAll(
+                    Arrays.asList(
+                            "rca", "nd", "ibd", "ikr", "ird", "unknown")); // TODO: is it correct?
+
+            goAssertionCodes.forEach(
+                    code ->
+                            doc.goWithEvidenceMaps.put(
+                                    "go_" + code, Collections.singleton("Search All")));
+            Arrays.stream(CommentType.values())
+                    .forEach(
+                            type -> {
+                                String typeName = type.name().toLowerCase();
+                                doc.commentEvMap.put(
+                                        "ccev_" + typeName, Collections.singleton("Search All"));
+                            });
+            doc.commentMap.put("cc_unknown", Collections.singleton("Search All"));
             cloudSolrClient.addBean(SolrCollection.uniprot.name(), doc);
             cloudSolrClient.commit(SolrCollection.uniprot.name());
         }
@@ -326,6 +410,14 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
         comments.addAll(freeTextComments);
         return comments;
+    }
+
+    private boolean getManualEvidenceGroup(EvidenceGroup evidenceGroup) {
+        return evidenceGroup.getGroupName().equalsIgnoreCase("Manual assertions");
+    }
+
+    private Stream<String> getEvidenceCodes(EvidenceGroup evidenceGroup) {
+        return evidenceGroup.getItems().stream().map(EvidenceItem::getCode);
     }
 
     private List<UniProtKBCrossReference> createDatabases() {

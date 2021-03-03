@@ -28,6 +28,7 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
+import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
@@ -106,6 +107,30 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
     @Override
     protected FacetConfig getFacetConfig() {
         return facetConfig;
+    }
+
+    @Override
+    protected String getFieldValueForValidatedField(String fieldName) {
+        String value = "";
+        switch (fieldName) {
+            case "upid":
+                value = "UP000005640";
+                break;
+            case "upi":
+                value = UPI_PREF + 11;
+                break;
+            case "length":
+                value = "[* TO *]";
+                break;
+            case "taxonomy_id":
+                value = "9606";
+                break;
+            case "uniprotkb":
+            case "isoform":
+                value = "P10011";
+                break;
+        }
+        return value;
     }
 
     @BeforeAll

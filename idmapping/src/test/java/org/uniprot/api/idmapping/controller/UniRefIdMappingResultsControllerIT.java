@@ -37,6 +37,9 @@ import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
+
 /**
  * @author lgonzales
  * @since 26/02/2021
@@ -111,6 +114,35 @@ public class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResults
     @Override
     protected FacetConfig getFacetConfig() {
         return facetConfig;
+    }
+
+    @Override
+    protected String getFieldValueForValidatedField(String searchField) {
+        String value = "*";
+        switch (searchField) {
+            case "id":
+                value = ID_PREF_50 + 11;
+                break;
+            case "upi":
+                value = "UPI0000083A11";
+                break;
+            case "taxonomy_id":
+                value = "9600";
+                break;
+            case "uniprot_id":
+                value = ACC_PREF + 11;
+                break;
+            case "count":
+                value = "[2 TO 2]";
+                break;
+            case "length":
+                value = "[10 TO 500]";
+                break;
+            case "created":
+                value = "[* TO *]";
+                break;
+        }
+        return value;
     }
 
     @Override
