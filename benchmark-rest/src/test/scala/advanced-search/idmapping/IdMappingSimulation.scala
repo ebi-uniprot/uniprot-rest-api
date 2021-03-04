@@ -32,12 +32,13 @@ class IdMappingSimulation extends Simulation {
   }
 
   // --------- IDMAPPING SCENARIO ----------
-  def getIdMappingFlowRequest(count: Integer): ChainBuilder = {
-    val httpReqInfo: String = "POST UniProtKB Acc->EMBL ("+count+" ids)"
+  def getIdMappingFlowRequest(ids: String): ChainBuilder = {
+    val count = "${randomIds}".count(_ == ',')
+    val httpReqInfo: String = "POST /run [UniProtKB Acc->EMBL, "+count+"]"
     val queryRequestStr: String = host + "/uniprot/api/idmapping/run"
 
 
-    val ids = getRandomisedIds(count)
+//    val ids = getRandomisedIds(count)
     println(">>> "+queryRequestStr + " with ids="+ids)
 
     val request =
@@ -55,7 +56,7 @@ class IdMappingSimulation extends Simulation {
           .doIf("${jobId.exists()}") {
             tryMax(100) {
               exec(
-                http("GET /status/${jobId}")
+                http("GET /status/JOB_ID [UniProtKB Acc->EMBL, "+count+"]")
                   .get(host + "/uniprot/api/idmapping/status/${jobId}")
                   .disableFollowRedirect
                   .check(
@@ -64,40 +65,30 @@ class IdMappingSimulation extends Simulation {
                   )
               )
                 .doIfEquals("${jobStatus}", "FINISHED") {
-//                .doIf(session => session("jobStatus").as[String] == "FINISHED") {
-//                  exec( session => {
-//                    http("GET /results/${jobId}")
-//                      .get(host + "/uniprot/api/idmapping/results/${jobId}")
-//                      .check(status.is(200))
-//                    println("i just ran /results")
-//                    session
-//                  })
-                    exec( http("GET /results/${jobId}")
+                    exec( http("GET /results/JOB_ID [UniProtKB Acc->EMBL, "+count+"]")
                       .get(host + "/uniprot/api/idmapping/results/${jobId}")
                       .check(status.is(200)))
                 }
-                // otherwise, wait a bit, then try again
-//                {
-//                  pause(2)
-//                  pause(2).exec( session => {
-//                    println("in else branch")
-//                  })
-//                  println("in else branch")
-//                }
             }
           }
 
     return request
   }
 
-  val idMappingRequestFlowSeq = Seq(
-    getIdMappingFlowRequest(5)
-  )
+//  val idMappingRequestFlowSeq = Seq(
+//    getIdMappingFlowRequest(5)
+//  )
 
-  val idMapping50Instance = scenario("IdMapping UniProtKB Acc->EMBL (#ids=50) Scenario")
-    .forever {
-      exec(idMappingRequestFlowSeq)
-    }
+  val idMapping50Instance =
+    scenario("IdMapping UniProtKB Acc->EMBL (#ids=50) Scenario")
+      .forever {
+        exec {
+          session => session.set("randomIds", getRandomisedIds(5))
+        }
+          // TODO: randomIds not being interpolated
+          .exec(getIdMappingFlowRequest("${randomIds}"))
+//        .exec(idMappingRequestFlowSeq)
+      }
 
   setUp(
     idMapping50Instance.inject(atOnceUsers(conf.getInt("a.s.multi.filters.download.users")))
