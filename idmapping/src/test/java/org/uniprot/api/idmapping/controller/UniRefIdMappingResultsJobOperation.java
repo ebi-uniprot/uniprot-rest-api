@@ -8,6 +8,8 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_AC_ID_STR;
+
 /**
  * @author sahmad
  * @created 03/03/2021
@@ -30,6 +32,6 @@ public class UniRefIdMappingResultsJobOperation extends AbstractJobOperation {
             String toId = String.format(UniRefEntryMocker.ID_PREF_50 + "%02d", i);
             ids.put(fromId, toId);
         }
-        return createAndPutJobInCache("ACC", "NF50", ids, jobStatus);
+        return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, "UniRef50", ids, jobStatus);
     }
 }

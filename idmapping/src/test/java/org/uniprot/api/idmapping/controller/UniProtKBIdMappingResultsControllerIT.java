@@ -118,6 +118,9 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     private static final String UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniprotkb/results/stream/{jobId}";
 
+    static final String UNIPROTKB_AC_ID_STR = "UniProtKB_AC-ID";
+    static final String UNIPROTKB_STR = "UniProtKB";
+
     @Autowired private UniprotKBFacetConfig facetConfig;
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
@@ -319,7 +322,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Test
     void testUniProtKBToUniProtKBMapping() throws Exception {
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
@@ -378,7 +381,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Test
     void testCanSortMultipleFieldsWithSuccess() throws Exception {
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
@@ -399,7 +402,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     void streamRDFCanReturnSuccess() throws Exception {
         // when
         IdMappingJob job =
-                getJobOperation().createAndPutJobInCache("UniProtKB_AC-ID", "UniProtKB", "Q00001");
+                getJobOperation().createAndPutJobInCache(UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001");
         MockHttpServletRequestBuilder requestBuilder =
                 get(UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH, job.getJobId())
                         .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
