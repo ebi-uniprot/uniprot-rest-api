@@ -59,25 +59,37 @@ class IdMappingSimulation extends Simulation {
                   .get(host + "/uniprot/api/idmapping/status/${jobId}")
                   .disableFollowRedirect
                   .check(
-                    jsonPath("$.jobStatus").saveAs("jobStatus")
+                     status.not(400), status.not(500),
+                     jsonPath("$.jobStatus").saveAs("jobStatus")
                   )
               )
-                .exec(session => {
-                  println(session("jobStatus").as[String])
-                  session
-                })
+//                .exec(session => {
+//                  println(session("jobStatus").as[String])
+//                  session
+//                })
                 // polling here
                 //              asLongAs(session => session("jobStatus").as[String] != "FINISHED") {
-                .doIfEqualsOrElse("${jobStatus}", "FINISHED") {
-                  exec(
-                    http("GET /results/${jobId}")
+//                .doIfEqualsOrElse("${jobStatus}", "FINISHED") {
+                .doIf(session => session("jobStatus").as[String] == "FINISHED") {
+//                  exec( session => {
+//                    http("GET /results/${jobId}")
+//                      .get(host + "/uniprot/api/idmapping/results/${jobId}")
+//                      .check(status.is(200))
+//                    println("i just ran /results")
+//                    session
+//                  })
+                    exec( http("GET /results/${jobId}")
                       .get(host + "/uniprot/api/idmapping/results/${jobId}")
-                  )
+                      .check(status.is(200)))
                 }
                 // otherwise, wait a bit, then try again
-                {
-                  pause(2)
-                }
+//                {
+//                  pause(2)
+//                  pause(2).exec( session => {
+//                    println("in else branch")
+//                  })
+//                  println("in else branch")
+//                }
             }
           }
 
