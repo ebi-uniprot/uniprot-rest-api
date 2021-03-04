@@ -32,6 +32,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
@@ -118,6 +119,9 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Autowired protected JobOperation uniProtKBIdMappingJobOp;
 
     @Autowired private MockMvc mockMvc;
+
+    @Autowired private RestTemplate uniProtKBRestTemplate;
+
     private final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),

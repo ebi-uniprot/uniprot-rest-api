@@ -76,8 +76,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 APPLICATION_XML_VALUE,
                 FF_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                LIST_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntryPair>> getMappedEntries(
             @PathVariable String jobId,
