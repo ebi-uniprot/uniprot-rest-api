@@ -24,8 +24,9 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
     public UniRefIdService(
             @Qualifier("uniRefEntryStoreStreamer") StoreStreamer<UniRefEntryLight> storeStreamer,
             @Qualifier("uniRefFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
-            UniRefFacetConfig facetConfig) {
-        super(storeStreamer, tupleStream, facetConfig);
+            UniRefFacetConfig facetConfig,
+            RDFStreamer uniRefRDFStreamer) {
+        super(storeStreamer, tupleStream, facetConfig, uniRefRDFStreamer);
     }
 
     @Override
@@ -52,10 +53,5 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIREF;
-    }
-
-    @Override
-    protected RDFStreamer getRDFStreamer() {
-        return null;
     }
 }

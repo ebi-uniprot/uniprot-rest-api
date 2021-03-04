@@ -21,15 +21,12 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
  */
 @Service
 public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKBEntryPair> {
-    private final RDFStreamer uniProtKBRDFStreamer;
-
     public UniProtKBIdService(
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
             @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             UniprotKBFacetConfig facetConfig,
             RDFStreamer uniProtKBRDFStreamer) {
-        super(storeStreamer, tupleStream, facetConfig);
-        this.uniProtKBRDFStreamer = uniProtKBRDFStreamer;
+        super(storeStreamer, tupleStream, facetConfig, uniProtKBRDFStreamer);
     }
 
     @Override
@@ -56,10 +53,5 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     @Override
     public UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
-    }
-
-    @Override
-    protected RDFStreamer getRDFStreamer() {
-        return this.uniProtKBRDFStreamer;
     }
 }

@@ -1,5 +1,21 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,13 +31,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
@@ -35,14 +57,6 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 /**
  * @author lgonzales
  * @since 26/02/2021
@@ -52,10 +66,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UniParcIdMappingResultsController.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsControllerIT {
+class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsControllerIT {
 
     static final String UPI_PREF = "UPI0000283A";
     private static final String UNIPARC_ID_MAPPING_RESULT = "/idmapping/uniparc/results/{jobId}";
+    private static final String UNIPARC_ID_MAPPING__STREAM_RESULT =
+            "/idmapping/uniparc/results/stream/{jobId}";
 
     private final UniParcDocumentConverter documentConverter =
             new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
@@ -75,6 +91,8 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
     private TupleStreamTemplate tupleStreamTemplate;
 
     @Autowired private JobOperation uniParcIdMappingJobOp;
+
+    @Autowired private RestTemplate uniParcRestTemplate;
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
@@ -165,18 +183,69 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets.size()", is(2)))
-                .andExpect(jsonPath("$.facets.*.name", contains("organism_name","database")))
+                .andExpect(jsonPath("$.facets.*.name", contains("organism_name", "database")))
                 .andExpect(jsonPath("$.facets[0].values.size()", is(2)))
-                .andExpect(jsonPath("$.facets[0].values.*.value", contains("Homo sapiens", "Torpedo californica")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[0].values.*.value",
+                                contains("Homo sapiens", "Torpedo californica")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(6, 6)))
                 .andExpect(jsonPath("$.results.size()", is(6)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00018","Q00015","Q00012","Q00009","Q00006","Q00003")))
-                .andExpect(jsonPath("$.results.*.to.uniParcId", contains("UPI0000283A18","UPI0000283A15","UPI0000283A12","UPI0000283A09","UPI0000283A06","UPI0000283A03")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.from",
+                                contains(
+                                        "Q00018", "Q00015", "Q00012", "Q00009", "Q00006",
+                                        "Q00003")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.uniParcId",
+                                contains(
+                                        "UPI0000283A18",
+                                        "UPI0000283A15",
+                                        "UPI0000283A12",
+                                        "UPI0000283A09",
+                                        "UPI0000283A06",
+                                        "UPI0000283A03")))
                 .andExpect(jsonPath("$.results.*.to.uniParcCrossReferences.*.database").exists())
-                .andExpect(jsonPath("$.results.*.to.uniParcCrossReferences.*.organism").doesNotExist());
+                .andExpect(
+                        jsonPath("$.results.*.to.uniParcCrossReferences.*.organism")
+                                .doesNotExist());
+    }
+
+    @Test
+    void streamRDFCanReturnSuccess() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ;
+        MockHttpServletRequestBuilder requestBuilder =
+                get(UNIPARC_ID_MAPPING__STREAM_RESULT, job.getJobId())
+                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(content().string(startsWith(RDFPrologs.UNIPARC_RDF_PROLOG)))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "    <sample>text</sample>\n"
+                                                        + "    <anotherSample>text2</anotherSample>\n"
+                                                        + "    <someMore>text3</someMore>\n\n"
+                                                        + "</rdf:RDF>")));
     }
 
     private void saveEntries() throws Exception {
+
+        when(uniParcRestTemplate.getUriTemplateHandler())
+                .thenReturn(new DefaultUriBuilderFactory());
+        when(uniParcRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+
         for (int i = 1; i <= 20; i++) {
             saveEntry(i);
         }
@@ -184,9 +253,11 @@ public class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResult
     }
 
     private void saveEntry(int i) throws Exception {
-        UniParcEntryBuilder builder = UniParcEntryBuilder.from(UniParcEntryMocker.createEntry(i, UPI_PREF));
-        if(i % 3 == 0){
-            builder.uniParcCrossReferencesAdd(UniParcEntryMocker.getXref(UniParcDatabase.EG_METAZOA));
+        UniParcEntryBuilder builder =
+                UniParcEntryBuilder.from(UniParcEntryMocker.createEntry(i, UPI_PREF));
+        if (i % 3 == 0) {
+            builder.uniParcCrossReferencesAdd(
+                    UniParcEntryMocker.getXref(UniParcDatabase.EG_METAZOA));
         }
         UniParcEntry entry = builder.build();
         UniParcEntryConverter converter = new UniParcEntryConverter();

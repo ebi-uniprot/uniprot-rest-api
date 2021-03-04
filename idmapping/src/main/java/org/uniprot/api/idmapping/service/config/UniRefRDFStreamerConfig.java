@@ -31,19 +31,19 @@ import org.uniprot.api.rest.service.RDFService;
 @Configuration
 @Import(RepositoryConfig.class)
 @Slf4j
-public class UniProtKBRDFStreamerConfig {
+public class UniRefRDFStreamerConfig {
 
     @Bean
-    public RDFStreamer uniProtKBRDFStreamer(
-            RestTemplate uniProtKBRestTemplate,
-            RDFStreamerConfigProperties uniProtKBRDFConfigProperties) {
-        int rdfRetryDelay = uniProtKBRDFConfigProperties.getRetryDelayMillis();
+    public RDFStreamer uniRefRDFStreamer(
+            RestTemplate uniRefRestTemplate,
+            RDFStreamerConfigProperties uniRefRDFConfigProperties) {
+        int rdfRetryDelay = uniRefRDFConfigProperties.getRetryDelayMillis();
         int maxRdfRetryDelay = rdfRetryDelay * 8;
         RetryPolicy<Object> rdfRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
                         .withBackoff(rdfRetryDelay, maxRdfRetryDelay, ChronoUnit.MILLIS)
-                        .withMaxRetries(uniProtKBRDFConfigProperties.getMaxRetries())
+                        .withMaxRetries(uniRefRDFConfigProperties.getMaxRetries())
                         .onRetry(
                                 e ->
                                         log.warn(
@@ -51,29 +51,29 @@ public class UniProtKBRDFStreamerConfig {
                                                 e.getAttemptCount()));
 
         return RDFStreamer.builder()
-                .rdfBatchSize(uniProtKBRDFConfigProperties.getBatchSize())
+                .rdfBatchSize(uniRefRDFConfigProperties.getBatchSize())
                 .rdfFetchRetryPolicy(rdfRetryPolicy)
-                .rdfService(new RDFService<>(uniProtKBRestTemplate, String.class))
-                .rdfProlog(RDFPrologs.UNIPROT_RDF_PROLOG)
+                .rdfService(new RDFService<>(uniRefRestTemplate, String.class))
+                .rdfProlog(RDFPrologs.UNIREF_RDF_PROLOG)
                 .build();
     }
 
     @Bean
     @Profile("live")
-    RestTemplate uniProtKBRestTemplate(RDFStreamerConfigProperties uniProtKBRDFConfigProperties) {
+    RestTemplate uniRefRestTemplate(RDFStreamerConfigProperties uniRefRDFConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.setInterceptors(
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
-                new DefaultUriBuilderFactory(uniProtKBRDFConfigProperties.getRequestUrl()));
+                new DefaultUriBuilderFactory(uniRefRDFConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "id.mapping.streamer.uniprot.rdf")
-    public RDFStreamerConfigProperties uniProtKBRDFConfigProperties() {
+    @ConfigurationProperties(prefix = "id.mapping.streamer.uniref.rdf")
+    public RDFStreamerConfigProperties uniRefRDFConfigProperties() {
         return new RDFStreamerConfigProperties();
     }
 }

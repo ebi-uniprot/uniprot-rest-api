@@ -21,11 +21,13 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
  */
 @Service
 public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryPair> {
+
     public UniParcIdService(
             @Qualifier("uniParcEntryStoreStreamer") StoreStreamer<UniParcEntry> storeStreamer,
             @Qualifier("uniParcFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
-            UniParcFacetConfig facetConfig) {
-        super(storeStreamer, tupleStream, facetConfig);
+            UniParcFacetConfig facetConfig,
+            RDFStreamer uniParcRDFStreamer) {
+        super(storeStreamer, tupleStream, facetConfig, uniParcRDFStreamer);
     }
 
     @Override
@@ -52,10 +54,5 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryP
     @Override
     public UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPARC;
-    }
-
-    @Override // TODO
-    protected RDFStreamer getRDFStreamer() {
-        return null;
     }
 }

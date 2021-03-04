@@ -7,6 +7,7 @@ import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.rest.output.converter.RDFMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
@@ -32,6 +33,7 @@ public class UniRefMessageConverterConfig {
         converters.add(currentIndex++, jsonMessageConverter);
         converters.add(currentIndex++, new UniRefEntryFastaMessageConverter());
         converters.add(currentIndex++, new ListMessageConverter());
+        converters.add(currentIndex++, new RDFMessageConverter());
         converters.add(
                 currentIndex++,
                 new TsvMessageConverter<>(

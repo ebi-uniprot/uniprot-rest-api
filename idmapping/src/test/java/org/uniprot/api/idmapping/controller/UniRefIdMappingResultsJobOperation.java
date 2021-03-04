@@ -20,7 +20,6 @@ public class UniRefIdMappingResultsJobOperation extends AbstractJobOperation {
     @Override
     public IdMappingJob createAndPutJobInCache() throws Exception {
         return createAndPutJobInCache(JobStatus.FINISHED);
-
     }
 
     @Override
