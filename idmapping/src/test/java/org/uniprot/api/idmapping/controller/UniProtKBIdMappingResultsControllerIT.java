@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -13,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
@@ -312,24 +312,34 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")));
     }
 
-    // TODO: Leo improve (facet and query)
     @Test
-    void testUniProtKBToUniProtKBMappingWithFacetFilter() throws Exception {
+    void testIdMappingWithSuccess() throws Exception {
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
+                        get(getIdMappingResultPath(), job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("facets", "proteins_with,reviewed")
-                                .param("query", "reviewed:true"));
+                                .param("facets", "reviewed,proteins_with")
+                                .param("query", "reviewed:true")
+                                .param("fields", "accession,sequence")
+                                .param("sort", "accession desc")
+                                .param("size", "6"));
         // then
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(1)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00002")))
-                .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00002")));
+                .andExpect(jsonPath("$.facets.size()", is(2)))
+                .andExpect(jsonPath("$.facets.*.name", contains("reviewed","proteins_with")))
+                .andExpect(jsonPath("$.facets[0].values.size()", is(1)))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("true")))
+                .andExpect(jsonPath("$.facets[0].values.*.label", contains("Reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(10)))
+                .andExpect(jsonPath("$.results.size()", is(6)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00020","Q00018","Q00016","Q00014","Q00012","Q00010")))
+                .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00020","Q00018","Q00016","Q00014","Q00012","Q00010")))
+                .andExpect(jsonPath("$.results.*.to.sequence").exists())
+                .andExpect(jsonPath("$.results.*.to.organism").doesNotExist());
     }
 
     @Test
@@ -352,27 +362,6 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         jsonPath("$.results.*.to.primaryAccession", contains("Q00002", "Q00001")));
     }
 
-    @Test
-    void testUniProtKBToUniProtKBMappingWithUnmappedIds() throws Exception {
-        // when
-        List<String> unmappedIds = List.of("S12345", "T12345");
-        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00005,Q00006");
-        job.getIdMappingResult().setUnmappedIds(unmappedIds);
-
-        ResultActions response =
-                mockMvc.perform(
-                        get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00005", "Q00006")))
-                .andExpect(
-                        jsonPath("$.results.*.to.primaryAccession", contains("Q00005", "Q00006")))
-                .andExpect(jsonPath("$.failedIds", contains("S12345", "T12345")));
-    }
 
     // TODO: remove duplicated code with UniprotIT
     private List<Comment> createAllComments() {

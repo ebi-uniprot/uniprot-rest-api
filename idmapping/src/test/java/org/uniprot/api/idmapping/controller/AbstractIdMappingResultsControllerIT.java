@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
@@ -242,6 +243,25 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     }
 
     // ---------------------------------------------------------------------------------
+    // -------------------------------- JOB TESTS --------------------------------------
+    // ---------------------------------------------------------------------------------
+
+    @Test
+    void testIdMappingWithWrongJobId() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), "WRONG_JOB_ID")
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
+    }
+    // ---------------------------------------------------------------------------------
     // -------------------------------- CONTENT TYPES ----------------------------------
     // ---------------------------------------------------------------------------------
 
@@ -261,6 +281,36 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(content().contentTypeCompatibleWith(mediaType));
+    }
+
+    // ---------------------------------------------------------------------------------
+    // -------------------------------- SORT -------------------------------------------
+    // ---------------------------------------------------------------------------------
+
+    @Test
+    void searchSortWithIncorrectValuesReturnBadRequest() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                .param("query", "*:*")
+                                .param("sort", "invalidField desc,invalidField1 invalidSort1")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid sort field order 'invalidsort1'. Expected asc or desc",
+                                        "Invalid sort field 'invalidfield1'",
+                                        "Invalid sort field 'invalidfield'")));
     }
 
     @ParameterizedTest(name = "[{index}] sortFieldName {0} desc")
@@ -285,7 +335,6 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     // ---------------------------------------------------------------------------------
     // -------------------------------- SEARCH FIELDS ----------------------------------
     // ---------------------------------------------------------------------------------
-
 
     @Test
     void testIdMappingWithInvalidQueryFormatReturnBadRequest() throws Exception {

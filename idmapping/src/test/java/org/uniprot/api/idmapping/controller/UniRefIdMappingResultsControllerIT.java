@@ -5,35 +5,51 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
+import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
+import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
 
@@ -154,6 +170,37 @@ public class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResults
     @BeforeAll
     void saveEntriesStore() throws Exception {
         saveEntries();
+    }
+
+    @Test
+    void testIdMappingWithSuccess() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .param("query", "identity:0.5")
+                                        .param("facets", "identity")
+                                        .param("fields", "id,name,common_taxon,sequence")
+                                        .param("sort", "id desc")
+                                        .param("size", "6")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.facets.size()", is(1)))
+                .andExpect(jsonPath("$.facets.*.name", contains("identity")))
+                .andExpect(jsonPath("$.facets[0].values.size()", is(1)))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("0.5")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(20)))
+                .andExpect(jsonPath("$.results.size()", is(6)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00020","Q00019","Q00018","Q00017","Q00016","Q00015")))
+                .andExpect(jsonPath("$.results.*.to.id", contains("UniRef50_P03920","UniRef50_P03919","UniRef50_P03918","UniRef50_P03917","UniRef50_P03916","UniRef50_P03915")))
+                .andExpect(jsonPath("$.results.*.to.commonTaxon").exists())
+                .andExpect(jsonPath("$.results.*.to.members").doesNotExist());
     }
 
     private void saveEntries() throws Exception {
