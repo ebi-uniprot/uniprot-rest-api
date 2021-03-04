@@ -1,12 +1,18 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,14 +38,19 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyLineageTest;
@@ -104,6 +115,11 @@ import org.uniprot.store.search.domain.impl.GoEvidences;
 class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsControllerIT {
     private static final String UNIPROTKB_ID_MAPPING_RESULT_PATH =
             "/idmapping/uniprotkb/results/{jobId}";
+    private static final String UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH =
+            "/idmapping/uniprotkb/results/stream/{jobId}";
+
+    static final String UNIPROTKB_AC_ID_STR = "UniProtKB_AC-ID";
+    static final String UNIPROTKB_STR = "UniProtKB";
 
     @Autowired private UniprotKBFacetConfig facetConfig;
 
@@ -215,6 +231,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
+
+        when(uniProtKBRestTemplate.getUriTemplateHandler())
+                .thenReturn(new DefaultUriBuilderFactory());
+        when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+
         for (int i = 1; i <= 20; i++) {
             UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
             String acc = String.format("Q%05d", i);
@@ -301,7 +322,10 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Test
     void testUniProtKBToUniProtKBMapping() throws Exception {
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
@@ -334,14 +358,25 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets.size()", is(2)))
-                .andExpect(jsonPath("$.facets.*.name", contains("reviewed","proteins_with")))
+                .andExpect(jsonPath("$.facets.*.name", contains("reviewed", "proteins_with")))
                 .andExpect(jsonPath("$.facets[0].values.size()", is(1)))
                 .andExpect(jsonPath("$.facets[0].values.*.value", contains("true")))
-                .andExpect(jsonPath("$.facets[0].values.*.label", contains("Reviewed (Swiss-Prot)")))
+                .andExpect(
+                        jsonPath("$.facets[0].values.*.label", contains("Reviewed (Swiss-Prot)")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(10)))
                 .andExpect(jsonPath("$.results.size()", is(6)))
-                .andExpect(jsonPath("$.results.*.from", contains("Q00020","Q00018","Q00016","Q00014","Q00012","Q00010")))
-                .andExpect(jsonPath("$.results.*.to.primaryAccession", contains("Q00020","Q00018","Q00016","Q00014","Q00012","Q00010")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.from",
+                                contains(
+                                        "Q00020", "Q00018", "Q00016", "Q00014", "Q00012",
+                                        "Q00010")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains(
+                                        "Q00020", "Q00018", "Q00016", "Q00014", "Q00012",
+                                        "Q00010")))
                 .andExpect(jsonPath("$.results.*.to.sequence").exists())
                 .andExpect(jsonPath("$.results.*.to.organism").doesNotExist());
     }
@@ -349,7 +384,10 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Test
     void testCanSortMultipleFieldsWithSuccess() throws Exception {
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache("ACC", "ACC", "Q00001,Q00002");
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001,Q00002");
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
@@ -366,6 +404,33 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         jsonPath("$.results.*.to.primaryAccession", contains("Q00002", "Q00001")));
     }
 
+    @Test
+    void streamRDFCanReturnSuccess() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001");
+        MockHttpServletRequestBuilder requestBuilder =
+                get(UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH, job.getJobId())
+                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(content().string(startsWith(RDFPrologs.UNIPROT_RDF_PROLOG)))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "    <sample>text</sample>\n"
+                                                        + "    <anotherSample>text2</anotherSample>\n"
+                                                        + "    <someMore>text3</someMore>\n\n"
+                                                        + "</rdf:RDF>")));
+    }
 
     // TODO: remove duplicated code with UniprotIT
     private List<Comment> createAllComments() {

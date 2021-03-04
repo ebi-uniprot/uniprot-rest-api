@@ -181,7 +181,8 @@ public class MessageConverterConfig {
                         uniParcContext(TSV_MEDIA_TYPE),
                         uniParcContext(XLS_MEDIA_TYPE),
                         uniParcContext(APPLICATION_XML),
-                        uniParcContext(LIST_MEDIA_TYPE))
+                        uniParcContext(LIST_MEDIA_TYPE),
+                        uniParcContext(RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -198,7 +199,8 @@ public class MessageConverterConfig {
                         uniRefContext(FASTA_MEDIA_TYPE),
                         uniRefContext(TSV_MEDIA_TYPE),
                         uniRefContext(XLS_MEDIA_TYPE),
-                        uniRefContext(LIST_MEDIA_TYPE))
+                        uniRefContext(LIST_MEDIA_TYPE),
+                        uniRefContext(RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

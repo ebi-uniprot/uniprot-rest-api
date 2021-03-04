@@ -38,7 +38,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
@@ -332,9 +331,11 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 getMockMvc()
                         .perform(
                                 get(getIdMappingResultPath(), job.getJobId())
-                                .param("query", "*:*")
-                                .param("sort", "invalidField desc,invalidField1 invalidSort1")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .param("query", "*:*")
+                                        .param(
+                                                "sort",
+                                                "invalidField desc,invalidField1 invalidSort1")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())

@@ -24,7 +24,6 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -42,6 +41,7 @@ public abstract class BasicIdService<T, U> {
     private final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
+    private final RDFStreamer rdfStreamer;
 
     @Value("${search.default.page.size:#{null}}")
     private Integer defaultPageSize;
@@ -49,11 +49,13 @@ public abstract class BasicIdService<T, U> {
     protected BasicIdService(
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
-            FacetConfig facetConfig) {
+            FacetConfig facetConfig,
+            RDFStreamer rdfStreamer) {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
         this.facetTupleStreamConverter =
                 new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
+        this.rdfStreamer = rdfStreamer;
     }
 
     public QueryResult<U> getMappedEntries(
@@ -92,7 +94,7 @@ public abstract class BasicIdService<T, U> {
         return QueryResult.of(result, cursor, facets, null, mappingResult.getUnmappedIds());
     }
 
-    public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {
+    public List<Object> streamEntries(StreamRequest streamRequest) {
         return Collections.emptyList(); // TODO fill code
     }
 
@@ -104,7 +106,7 @@ public abstract class BasicIdService<T, U> {
                 .filter(ft -> !entryIds.contains(ft.getTo()))
                 .forEach(ft -> entryIds.add(ft.getTo()));
 
-        return getRDFStreamer().streamRDFXML(entryIds.stream());
+        return this.rdfStreamer.streamRDFXML(entryIds.stream());
     }
 
     protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);
@@ -114,8 +116,6 @@ public abstract class BasicIdService<T, U> {
     protected abstract String getSolrIdField();
 
     protected abstract UniProtDataType getUniProtDataType();
-
-    protected abstract RDFStreamer getRDFStreamer();
 
     protected Stream<T> getEntries(List<String> toIds) {
         return this.storeStreamer.streamEntries(toIds);

@@ -3,11 +3,14 @@ package org.uniprot.api.idmapping.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,14 +18,17 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
@@ -76,6 +82,27 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                         searchRequest, cachedJobResult.getIdMappingResult());
 
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
+    }
+
+    @GetMapping(
+            value = "/results/stream/{jobId}",
+            produces = {RDF_MEDIA_TYPE_VALUE})
+    public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryPair>>>
+            streamMappedEntries(
+                    @PathVariable String jobId,
+                    @Valid UniRefIdMappingStreamRequest streamRequest,
+                    HttpServletRequest request,
+                    HttpServletResponse response) {
+
+        IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
+        MediaType contentType = getAcceptHeader(request);
+
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            Stream<String> result =
+                    this.idService.streamRDF(streamRequest, cachedJobResult.getIdMappingResult());
+            return super.streamRDF(result, streamRequest, contentType, request);
+        }
+        return null; // FIXME
     }
 
     @Override

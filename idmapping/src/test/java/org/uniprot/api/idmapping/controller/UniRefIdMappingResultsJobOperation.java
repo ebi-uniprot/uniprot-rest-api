@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_AC_ID_STR;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,7 +22,6 @@ public class UniRefIdMappingResultsJobOperation extends AbstractJobOperation {
     @Override
     public IdMappingJob createAndPutJobInCache() throws Exception {
         return createAndPutJobInCache(JobStatus.FINISHED);
-
     }
 
     @Override
@@ -31,6 +32,6 @@ public class UniRefIdMappingResultsJobOperation extends AbstractJobOperation {
             String toId = String.format(UniRefEntryMocker.ID_PREF_50 + "%02d", i);
             ids.put(fromId, toId);
         }
-        return createAndPutJobInCache("ACC", "NF50", ids, jobStatus);
+        return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, "UniRef50", ids, jobStatus);
     }
 }

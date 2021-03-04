@@ -1,9 +1,10 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_AC_ID_STR;
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_STR;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
@@ -18,7 +19,6 @@ public class UniProtKBIdMappingResultsJobOperation extends AbstractJobOperation 
         super(cacheService);
     }
 
-
     @Override
     public IdMappingJob createAndPutJobInCache() throws Exception {
         return createAndPutJobInCache(JobStatus.FINISHED);
@@ -31,6 +31,6 @@ public class UniProtKBIdMappingResultsJobOperation extends AbstractJobOperation 
             String id = String.format("Q%05d", i);
             ids.put(id, id);
         }
-        return createAndPutJobInCache("ACC", "ACC", ids, jobStatus);
+        return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, ids, jobStatus);
     }
 }

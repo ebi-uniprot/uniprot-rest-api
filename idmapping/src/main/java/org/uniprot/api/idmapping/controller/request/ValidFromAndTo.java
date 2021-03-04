@@ -49,9 +49,9 @@ public @interface ValidFromAndTo {
         private String taxIdFieldName;
         private List<UniProtDatabaseDetail> dbDetails;
 
-        private static final Set<String> FROM_WITH_DIFFERENT_TO =
+        private static final Set<String> UNIPROT_GROUP_TYPES =
                 Set.of(ACC_ID_STR, UPARC_STR, UNIREF50_STR, UNIREF90_STR, UNIREF100_STR);
-        private static final Set<String> FROM_RULE_101 =
+        private static final Set<String> UNIPROT_GROUP_TYPES_MINUS_UNIPROTKB =
                 Set.of(UPARC_STR, UNIREF50_STR, UNIREF90_STR, UNIREF100_STR);
 
         @Override
@@ -70,12 +70,15 @@ public @interface ValidFromAndTo {
                 String fromValue = BeanUtils.getProperty(value, this.fromFieldName);
                 String toValue = BeanUtils.getProperty(value, this.toFieldName);
                 String taxIdValue = BeanUtils.getProperty(value, this.taxIdFieldName);
+
+                // SwissProt type cannot be in from type
                 boolean isValidFrom =
                         this.dbDetails.stream()
                                 .anyMatch(
                                         db ->
                                                 db.getName().equals(fromValue)
                                                         && !SWISSPROT_STR.equals(fromValue));
+
                 isValid = isValidFrom && isValidPair(fromValue, toValue, taxIdValue, context);
             } catch (Exception e) {
                 log.warn("Error during validation {}", e.getMessage());
@@ -89,17 +92,19 @@ public @interface ValidFromAndTo {
             boolean isValid = true;
             boolean isTaxIdPassed = Utils.notNullNotEmpty(taxId);
 
-            // TODO: 03/03/2021 describe
-            if (!FROM_WITH_DIFFERENT_TO.contains(from)) {
+            // Non-UniProt from types (e.g. PIR, PDB etc) can only be mapped to either Trembl or
+            // Swissprot type
+            if (!UNIPROT_GROUP_TYPES.contains(from)) {
                 isValid = isUniProtKBOrSwissProt(to);
             }
 
-            // TODO: 03/03/2021 describe
-            if (FROM_RULE_101.contains(from)) {
+            // From types (except UniProtKB AC/ID) of UniProt group can be mapped to Trembl,
+            // SwissProt or self type
+            if (UNIPROT_GROUP_TYPES_MINUS_UNIPROTKB.contains(from)) {
                 isValid = isUniProtKBOrSwissProt(to) || from.equals(to);
             }
 
-            // TODO: 03/03/2021 describe
+            // From type 'UniProtKB AC/ID' can mapped to all possible to type except self
             if (ACC_ID_STR.equals(from)) {
                 isValid =
                         this.dbDetails.stream()

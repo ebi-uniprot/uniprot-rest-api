@@ -1,5 +1,9 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.mockito.Mockito.mock;
+
+import java.net.URISyntaxException;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -21,10 +25,6 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
-
-import java.net.URISyntaxException;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * @author sahmad
@@ -119,6 +119,18 @@ public class DataStoreTestConfig {
     @Bean
     @Profile("offline")
     public RestTemplate uniProtKBRestTemplate() {
+        return mock(RestTemplate.class);
+    }
+
+    @Bean
+    @Profile("offline")
+    public RestTemplate uniParcRestTemplate() {
+        return mock(RestTemplate.class);
+    }
+
+    @Bean
+    @Profile("offline")
+    public RestTemplate uniRefRestTemplate() {
         return mock(RestTemplate.class);
     }
 }
