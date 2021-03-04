@@ -56,7 +56,6 @@ class IdMappingResultsControllerIT {
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
-
     // ---------------------------------------------------------------------------------
     // -------------------------------- PAGINATION TEST --------------------------------
     // ---------------------------------------------------------------------------------
