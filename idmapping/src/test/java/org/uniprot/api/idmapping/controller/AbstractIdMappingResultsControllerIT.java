@@ -260,6 +260,44 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 .andExpect(jsonPath("$.messages.size()", is(1)))
                 .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
     }
+
+    @Test
+    void testIdMappingWithUnmappedIds() throws Exception {
+        // when
+        List<String> unmappedIds = List.of("UnMappedId1", "UnMappedId2");
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        job.getIdMappingResult().setUnmappedIds(unmappedIds);
+
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(5)))
+                .andExpect(jsonPath("$.failedIds", contains("UnMappedId1", "UnMappedId2")));
+    }
+
+    @Test
+    void testIdMappingWithJobIdWithErrorStatus() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(JobStatus.ERROR);
+
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(1)))
+                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
+    }
     // ---------------------------------------------------------------------------------
     // -------------------------------- CONTENT TYPES ----------------------------------
     // ---------------------------------------------------------------------------------

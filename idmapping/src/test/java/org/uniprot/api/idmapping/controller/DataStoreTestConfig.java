@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.controller;
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
@@ -82,8 +83,8 @@ public class DataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public IdMappingPIRService pirService() {
-        return new IdMappingPIRService(25) {
+    public IdMappingPIRService pirService(@Value("${search.default.page.size:#{null}}") Integer defaultPageSize) {
+        return new IdMappingPIRService(defaultPageSize) {
             @Override
             public IdMappingResult mapIds(IdMappingJobRequest request) {
                 return null;
