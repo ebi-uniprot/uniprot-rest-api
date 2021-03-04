@@ -63,14 +63,8 @@ class IdMappingSimulation extends Simulation {
                      jsonPath("$.jobStatus").saveAs("jobStatus")
                   )
               )
-//                .exec(session => {
-//                  println(session("jobStatus").as[String])
-//                  session
-//                })
-                // polling here
-                //              asLongAs(session => session("jobStatus").as[String] != "FINISHED") {
-//                .doIfEqualsOrElse("${jobStatus}", "FINISHED") {
-                .doIf(session => session("jobStatus").as[String] == "FINISHED") {
+                .doIfEquals("${jobStatus}", "FINISHED") {
+//                .doIf(session => session("jobStatus").as[String] == "FINISHED") {
 //                  exec( session => {
 //                    http("GET /results/${jobId}")
 //                      .get(host + "/uniprot/api/idmapping/results/${jobId}")
