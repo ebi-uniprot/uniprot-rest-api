@@ -24,7 +24,6 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -95,7 +94,7 @@ public abstract class BasicIdService<T, U> {
         return QueryResult.of(result, cursor, facets, null, mappingResult.getUnmappedIds());
     }
 
-    public List<Object> streamEntries(IdMappingStreamRequest streamRequest) {
+    public List<Object> streamEntries(StreamRequest streamRequest) {
         return Collections.emptyList(); // TODO fill code
     }
 

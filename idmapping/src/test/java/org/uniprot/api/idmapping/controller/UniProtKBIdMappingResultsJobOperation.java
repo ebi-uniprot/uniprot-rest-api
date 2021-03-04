@@ -1,14 +1,14 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_AC_ID_STR;
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_STR;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
-
-import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_AC_ID_STR;
-import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_STR;
 
 /**
  * @author sahmad

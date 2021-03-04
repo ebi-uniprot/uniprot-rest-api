@@ -63,12 +63,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
 
     @GetMapping(
             value = "/results/{jobId}",
-            produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE
-            })
+            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> results(
             @PathVariable String jobId,
             @Valid IdMappingPageRequest pageRequest,
@@ -91,7 +86,12 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
 
     @GetMapping(
             value = "/stream/{jobId}",
-            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
+            })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> streamResults(
             @PathVariable String jobId, HttpServletRequest request, HttpServletResponse response) {
         IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
