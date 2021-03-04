@@ -50,7 +50,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                         .collect(
                                 Collectors.toMap(
                                         UniProtDatabaseDetail::getDisplayName,
-                                        UniProtDatabaseDetail::getIdMappingName));
+                                        UniProtDatabaseDetail::getName));
 
         UNIREF_SET =
                 Stream.of("UniRef50", "UniRef90", "UniRef100")

@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
@@ -20,12 +21,15 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
  */
 @Service
 public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKBEntryPair> {
+    private final RDFStreamer uniProtKBRDFStreamer;
 
     public UniProtKBIdService(
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
             @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
-            UniprotKBFacetConfig facetConfig) {
+            UniprotKBFacetConfig facetConfig,
+            RDFStreamer uniProtKBRDFStreamer) {
         super(storeStreamer, tupleStream, facetConfig);
+        this.uniProtKBRDFStreamer = uniProtKBRDFStreamer;
     }
 
     @Override
@@ -44,8 +48,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     @Override
     public String getSolrIdField() {
-        return SearchFieldConfigFactory
-                .getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
                 .getSearchFieldItemByName("accession_id")
                 .getFieldName();
     }
@@ -53,5 +56,10 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     @Override
     public UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
+    }
+
+    @Override
+    protected RDFStreamer getRDFStreamer() {
+        return this.uniProtKBRDFStreamer;
     }
 }

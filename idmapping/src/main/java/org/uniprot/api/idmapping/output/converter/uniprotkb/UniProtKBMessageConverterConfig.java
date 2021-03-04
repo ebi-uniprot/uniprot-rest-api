@@ -12,6 +12,7 @@ import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
 import org.uniprot.api.idmapping.output.converter.EntryPairXmlMessageConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
+import org.uniprot.api.rest.output.converter.RDFMessageConverter;
 import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
@@ -40,6 +41,7 @@ public class UniProtKBMessageConverterConfig {
         converters.add(currentIdx++, new UniProtKBEntryPairFlatFileMessageConverter());
         converters.add(currentIdx++, new UniProtKBEntryPairFastaMessageConverter());
         converters.add(currentIdx++, new ListMessageConverter());
+        converters.add(currentIdx++, new RDFMessageConverter());
         converters.add(currentIdx++, new UniProtKBEntryPairGFFMessageConverter());
         converters.add(
                 currentIdx++,
