@@ -25,7 +25,6 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 

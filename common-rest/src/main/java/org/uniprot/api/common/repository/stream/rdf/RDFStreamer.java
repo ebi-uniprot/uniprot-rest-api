@@ -34,10 +34,13 @@ public class RDFStreamer {
 
     public Stream<String> idsToRDFStoreStream(SolrRequest solrRequest) {
         Stream<String> idsStream = fetchIds(solrRequest);
+        return streamRDFXML(idsStream);
+    }
 
+    public Stream<String> streamRDFXML(Stream<String> entryIds) {
         RDFStreamer.BatchRDFStoreIterable batchRDFStoreIterable =
                 new RDFStreamer.BatchRDFStoreIterable(
-                        idsStream::iterator, rdfService, rdfFetchRetryPolicy, rdfBatchSize);
+                        entryIds::iterator, rdfService, rdfFetchRetryPolicy, rdfBatchSize);
 
         Stream<String> rdfStringStream =
                 StreamSupport.stream(batchRDFStoreIterable.spliterator(), false)

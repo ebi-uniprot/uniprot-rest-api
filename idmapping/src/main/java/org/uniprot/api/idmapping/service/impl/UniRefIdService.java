@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
@@ -43,8 +44,7 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
 
     @Override
     protected String getSolrIdField() {
-        return SearchFieldConfigFactory
-                .getSearchFieldConfig(UniProtDataType.UNIREF)
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF)
                 .getSearchFieldItemByName("id")
                 .getFieldName();
     }
@@ -52,5 +52,10 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIREF;
+    }
+
+    @Override
+    protected RDFStreamer getRDFStreamer() {
+        return null;
     }
 }

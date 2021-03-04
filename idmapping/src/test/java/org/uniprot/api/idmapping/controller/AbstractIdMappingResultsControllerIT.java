@@ -41,7 +41,6 @@ import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
-import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -251,8 +250,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, mediaType);
+                get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -286,7 +284,6 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
     // -------------------------------- SEARCH FIELDS ----------------------------------
     // ---------------------------------------------------------------------------------
 
-
     @Test
     void testIdMappingWithInvalidQueryFormatReturnBadRequest() throws Exception {
         // when
@@ -295,8 +292,10 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 getMockMvc()
                         .perform(
                                 get(getIdMappingResultPath(), job.getJobId())
-                                .param("query", "invalidfield(:invalidValue AND :invalid:10)")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .param(
+                                                "query",
+                                                "invalidfield(:invalidValue AND :invalid:10)")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
@@ -315,10 +314,10 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 getMockMvc()
                         .perform(
                                 get(getIdMappingResultPath(), job.getJobId())
-                                .param(
-                                        "query",
-                                        "invalidfield:invalidValue OR invalidfield2:invalidValue2")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .param(
+                                                "query",
+                                                "invalidfield:invalidValue OR invalidfield2:invalidValue2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
@@ -344,8 +343,8 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 getMockMvc()
                         .perform(
                                 get(getIdMappingResultPath(), job.getJobId())
-                                .param("query", searchField + ":" + fieldValue)
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .param("query", searchField + ":" + fieldValue)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
@@ -366,9 +365,9 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 getMockMvc()
                         .perform(
                                 get(getIdMappingResultPath(), job.getJobId())
-                                .param("query", "*:*")
-                                .param("fields", "invalidField, otherInvalid")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .param("query", "*:*")
+                                        .param("fields", "invalidField, otherInvalid")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -461,8 +460,6 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractStreamContro
                 .andExpect(jsonPath("$.facets[0].values.size()", greaterThan(0)))
                 .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
     }
-
-
 
     protected Stream<Arguments> getAllReturnedFields() {
         return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()

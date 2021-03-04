@@ -38,10 +38,10 @@ public class PIRServiceImpl extends IdMappingPIRService {
 
     @Autowired
     public PIRServiceImpl(
-            RestTemplate restTemplate,
+            RestTemplate idMappingRestTemplate,
             @Value("${search.default.page.size:#{null}}") Integer defaultPageSize) {
         super(defaultPageSize);
-        this.restTemplate = restTemplate;
+        this.restTemplate = idMappingRestTemplate;
         this.pirResponseConverter = new PIRResponseConverter();
     }
 

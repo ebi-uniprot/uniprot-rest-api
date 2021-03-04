@@ -22,11 +22,13 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
@@ -94,6 +96,17 @@ public abstract class BasicIdService<T, U> {
         return Collections.emptyList(); // TODO fill code
     }
 
+    public Stream<String> streamRDF(StreamRequest streamRequest, IdMappingResult mappingResult) {
+        List<IdMappingStringPair> fromToPairs = mappingResult.getMappedIds();
+        // get unique entry ids
+        List<String> entryIds = new ArrayList<>();
+        fromToPairs.stream()
+                .filter(ft -> !entryIds.contains(ft.getTo()))
+                .forEach(ft -> entryIds.add(ft.getTo()));
+
+        return getRDFStreamer().streamRDFXML(entryIds.stream());
+    }
+
     protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);
 
     protected abstract String getEntryId(T entry);
@@ -101,6 +114,8 @@ public abstract class BasicIdService<T, U> {
     protected abstract String getSolrIdField();
 
     protected abstract UniProtDataType getUniProtDataType();
+
+    protected abstract RDFStreamer getRDFStreamer();
 
     protected Stream<T> getEntries(List<String> toIds) {
         return this.storeStreamer.streamEntries(toIds);
@@ -189,7 +204,7 @@ public abstract class BasicIdService<T, U> {
         if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
             qb.append(" AND (").append(searchRequest.getQuery()).append(")");
             solrRequestBuilder.searchAccession(Boolean.TRUE);
-            solrRequestBuilder.searchSort(getSolrIdField()+" asc");
+            solrRequestBuilder.searchSort(getSolrIdField() + " asc");
             solrRequestBuilder.searchFieldList(getSolrIdField());
         }
 

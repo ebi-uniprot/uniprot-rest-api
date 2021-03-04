@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -33,9 +36,6 @@ import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
-
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
 
 /**
  * @author lgonzales

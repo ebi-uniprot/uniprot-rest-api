@@ -10,6 +10,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.GFF_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
@@ -161,7 +162,8 @@ public class MessageConverterConfig {
                         kbContext(APPLICATION_XML),
                         kbContext(FF_MEDIA_TYPE),
                         kbContext(GFF_MEDIA_TYPE),
-                        kbContext(LIST_MEDIA_TYPE))
+                        kbContext(LIST_MEDIA_TYPE),
+                        kbContext(RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
