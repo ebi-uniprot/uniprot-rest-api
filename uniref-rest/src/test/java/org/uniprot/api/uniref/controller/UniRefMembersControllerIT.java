@@ -16,7 +16,6 @@ import static org.springframework.http.HttpHeaders.LINK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,6 +31,7 @@ import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -139,9 +139,10 @@ class UniRefMembersControllerIT {
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
         Entry entry = converter.toXml(unirefEntry);
         UniRefEntryLight entryLight = unirefLightConverter.fromXml(entry);
-        log.info("Saving Entry: {} " +
-                "with Entry members count {} and " +
-                "EntryLight members count {}.",
+        log.info(
+                "Saving Entry: {} "
+                        + "with Entry members count {} and "
+                        + "EntryLight members count {}.",
                 unirefEntry.getId().getValue(),
                 unirefEntry.getMembers().size(),
                 entryLight.getMembers().size());
@@ -463,7 +464,7 @@ class UniRefMembersControllerIT {
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
