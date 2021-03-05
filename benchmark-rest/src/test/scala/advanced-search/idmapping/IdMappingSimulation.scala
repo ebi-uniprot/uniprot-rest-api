@@ -19,31 +19,22 @@ class IdMappingSimulation extends Simulation {
     .doNotTrackHeader("1")
 
   val host = conf.getString("a.s.host")
-  println("host = "+host)
   val rawAccessions = Source.fromFile(conf.getString("a.s.idmapping.accessions.csv")).getLines.mkString
-  println("rawAccessions = "+rawAccessions)
   val accessions = rawAccessions.split(",").map(_.trim()).toSeq
-  println("accessions = "+accessions)
 
   def getRandomisedIds(count: Integer): String = {
     val randomList = scala.util.Random.shuffle(accessions).slice(0, count).mkString(",")
-    println("randomList = " + randomList)
     return randomList
   }
 
   // --------- IDMAPPING SCENARIO ----------
   def getIdMappingFlowRequest(ids: String): ChainBuilder = {
-    val count = "${randomIds}".count(_ == ',')
-    val httpReqInfo: String = "POST /run [UniProtKB Acc->EMBL, "+count+"]"
+    val count = s"${ids}".count(_ == ',') + 1
+    val httpReqInfo: String = "POST /run [KB->EMBL, "+count+"]"
     val queryRequestStr: String = host + "/uniprot/api/idmapping/run"
 
-
-//    val ids = getRandomisedIds(count)
-    println(">>> "+queryRequestStr + " with ids="+ids)
-
     val request =
-//        pause(15 seconds, 120 seconds)
-        pause(1 seconds, 5 seconds)
+        pause(5 seconds, 60 seconds)
         .exec(http(httpReqInfo)
           .post(queryRequestStr)
           .formParam("ids", ids)
@@ -56,7 +47,7 @@ class IdMappingSimulation extends Simulation {
           .doIf("${jobId.exists()}") {
             tryMax(100) {
               exec(
-                http("GET /status/JOB_ID [UniProtKB Acc->EMBL, "+count+"]")
+                http("GET /status/JOB_ID [KB->EMBL, "+count+"]")
                   .get(host + "/uniprot/api/idmapping/status/${jobId}")
                   .disableFollowRedirect
                   .check(
@@ -65,7 +56,7 @@ class IdMappingSimulation extends Simulation {
                   )
               )
                 .doIfEquals("${jobStatus}", "FINISHED") {
-                    exec( http("GET /results/JOB_ID [UniProtKB Acc->EMBL, "+count+"]")
+                    exec( http("GET /results/JOB_ID [KB->EMBL, "+count+"]")
                       .get(host + "/uniprot/api/idmapping/results/${jobId}")
                       .check(status.is(200)))
                 }
@@ -75,23 +66,50 @@ class IdMappingSimulation extends Simulation {
     return request
   }
 
-//  val idMappingRequestFlowSeq = Seq(
-//    getIdMappingFlowRequest(5)
-//  )
-
-  val idMapping50Instance =
-    scenario("IdMapping UniProtKB Acc->EMBL (#ids=50) Scenario")
+  val idMapping10Instance =
+    scenario("IdMapping KB->EMBL (#ids=10) Scenario")
       .forever {
-        exec {
-          session => session.set("randomIds", getRandomisedIds(5))
-        }
-          // TODO: randomIds not being interpolated
-          .exec(getIdMappingFlowRequest("${randomIds}"))
-//        .exec(idMappingRequestFlowSeq)
+        exec(getIdMappingFlowRequest(getRandomisedIds(10)))
+      }
+
+  val idMapping100Instance =
+    scenario("IdMapping KB->EMBL (#ids=100) Scenario")
+      .forever {
+        exec(getIdMappingFlowRequest(getRandomisedIds(100)))
+      }
+
+  val idMapping1KInstance =
+    scenario("IdMapping KB->EMBL (#ids=1K) Scenario")
+      .forever {
+        exec(getIdMappingFlowRequest(getRandomisedIds(1000)))
+      }
+
+  val idMapping5KInstance =
+    scenario("IdMapping KB->EMBL (#ids=5K) Scenario")
+      .forever {
+        exec(getIdMappingFlowRequest(getRandomisedIds(5000)))
+      }
+
+  val idMapping10KInstance =
+    scenario("IdMapping KB->EMBL (#ids=10K) Scenario")
+      .forever {
+        exec(getIdMappingFlowRequest(getRandomisedIds(10000)))
+      }
+
+  val idMapping20KInstance =
+    scenario("IdMapping KB->EMBL (#ids=20K) Scenario")
+      .forever {
+        exec(getIdMappingFlowRequest(getRandomisedIds(20000)))
+      }
+
+  val idMapping50KInstance =
+    scenario("IdMapping KB->EMBL (#ids=50K) Scenario")
+      .forever {
+        exec(getIdMappingFlowRequest(getRandomisedIds(50000)))
       }
 
   setUp(
-    idMapping50Instance.inject(atOnceUsers(conf.getInt("a.s.multi.filters.download.users")))
+    idMapping50Instance.inject(atOnceUsers(conf.getInt("a.s.idmapping.users")))
   )
     .protocols(httpConf)
     .assertions(global.responseTime.percentile3.lt(conf.getInt("a.s.multi.filters.percentile3.responseTime")), //percentile3 == 95th Percentile
