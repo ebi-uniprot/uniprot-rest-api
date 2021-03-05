@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -74,6 +75,7 @@ import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
  * @author lgonzales
  * @since 08/01/2021
  */
+@Slf4j
 @ContextConfiguration(
         classes = {
             DataStoreTestConfig.class,
@@ -137,6 +139,12 @@ class UniRefMembersControllerIT {
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
         Entry entry = converter.toXml(unirefEntry);
         UniRefEntryLight entryLight = unirefLightConverter.fromXml(entry);
+        log.info("Saving Entry: {} " +
+                "with Entry members count {} and " +
+                "EntryLight members count {}.",
+                unirefEntry.getId().getValue(),
+                unirefEntry.getMembers().size(),
+                entryLight.getMembers().size());
         storeManager.saveToStore(DataStoreManager.StoreType.UNIREF_LIGHT, entryLight);
         List<RepresentativeMember> members = createEntryMembers(unirefEntry);
         members.forEach(
