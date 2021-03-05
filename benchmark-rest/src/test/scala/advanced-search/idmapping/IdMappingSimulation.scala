@@ -22,6 +22,14 @@ class IdMappingSimulation extends Simulation {
   val rawAccessions = Source.fromFile(conf.getString("a.s.idmapping.accessions.csv")).getLines.mkString
   val accessions = rawAccessions.split(",").map(_.trim()).toSeq
 
+  val scenario1Users =   conf.getInt("a.s.idmapping.scenario1.users")
+  val scenario1IdCount = conf.getInt("a.s.idmapping.scenario1.idCount")
+  val scenario2IdCount = conf.getInt("a.s.idmapping.scenario2.users")
+  val scenario2Users =   conf.getInt("a.s.idmapping.scenario2.idCount")
+  val scenario3Users =   conf.getInt("a.s.idmapping.scenario3.users")
+  val scenario3IdCount = conf.getInt("a.s.idmapping.scenario3.idCount")
+
+
   def getRandomisedIds(count: Integer): String = {
     val randomList = scala.util.Random.shuffle(accessions).slice(0, count).mkString(",")
     return randomList
@@ -65,54 +73,31 @@ class IdMappingSimulation extends Simulation {
 
     return request
   }
-
-  val idMapping10Instance =
-    scenario("IdMapping KB->EMBL (#ids=10) Scenario")
+  
+  val idMappingScenario1 =
+    scenario("IdMapping KB->EMBL Scenario 1 (#users="+scenario1Users+", #ids="+scenario1IdCount+")")
       .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(10)))
+        exec(getIdMappingFlowRequest(getRandomisedIds(scenario1IdCount)))
       }
 
-  val idMapping100Instance =
-    scenario("IdMapping KB->EMBL (#ids=100) Scenario")
+  val idMappingScenario2 =
+    scenario("IdMapping KB->EMBL Scenario 2 (#users="+scenario2Users+", #ids="+scenario2IdCount+")")
       .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(100)))
+        exec(getIdMappingFlowRequest(getRandomisedIds(scenario2IdCount)))
       }
 
-  val idMapping1KInstance =
-    scenario("IdMapping KB->EMBL (#ids=1K) Scenario")
+  val idMappingScenario3 =
+    scenario("IdMapping KB->EMBL Scenario 3 (#users="+scenario3Users+", #ids="+scenario3IdCount+")")
       .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(1000)))
+        exec(getIdMappingFlowRequest(getRandomisedIds(scenario3IdCount)))
       }
-
-  val idMapping5KInstance =
-    scenario("IdMapping KB->EMBL (#ids=5K) Scenario")
-      .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(5000)))
-      }
-
-  val idMapping10KInstance =
-    scenario("IdMapping KB->EMBL (#ids=10K) Scenario")
-      .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(10000)))
-      }
-
-  val idMapping20KInstance =
-    scenario("IdMapping KB->EMBL (#ids=20K) Scenario")
-      .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(20000)))
-      }
-
-  val idMapping50KInstance =
-    scenario("IdMapping KB->EMBL (#ids=50K) Scenario")
-      .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(50000)))
-      }
-
-  setUp(
-    idMapping50Instance.inject(atOnceUsers(conf.getInt("a.s.idmapping.users")))
+ setUp(
+   idMappingScenario1.inject(atOnceUsers(scenario1Users)),
+   idMappingScenario2.inject(atOnceUsers(scenario2Users)),
+   idMappingScenario3.inject(atOnceUsers(scenario3Users))
   )
     .protocols(httpConf)
-    .assertions(global.responseTime.percentile3.lt(conf.getInt("a.s.multi.filters.percentile3.responseTime")), //percentile3 == 95th Percentile
-      global.successfulRequests.percent.gt(conf.getInt("a.s.multi.filters.successPercentGreaterThan")))
-    .maxDuration(conf.getInt("a.s.multi.filters.maxDuration") minutes)
+    .assertions(global.responseTime.percentile3.lt(conf.getInt("a.s.idmapping.percentile3.responseTime")), //percentile3 == 95th Percentile
+      global.successfulRequests.percent.gt(conf.getInt("a.s.idmapping.successPercentGreaterThan")))
+    .maxDuration(conf.getInt("a.s.idmapping.maxDuration") minutes)
 }
