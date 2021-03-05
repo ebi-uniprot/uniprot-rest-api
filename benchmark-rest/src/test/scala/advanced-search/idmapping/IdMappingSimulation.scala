@@ -19,6 +19,12 @@ class IdMappingSimulation extends Simulation {
     .doNotTrackHeader("1")
 
   val host = conf.getString("a.s.host")
+  val from = conf.getString("a.s.idmapping.from")
+  val to = conf.getString("a.s.idmapping.to")
+  val runUrl = host + conf.getString("a.s.idmapping.run.url")
+  val statusUrl = host + conf.getString("a.s.idmapping.status.url")
+  val resultsUrl = host + conf.getString("a.s.idmapping.results.url")
+  val resultsParams = conf.getString("a.s.idmapping.results.params")
   val rawAccessions = Source.fromFile(conf.getString("a.s.idmapping.accessions.csv")).getLines.mkString
   val accessions = rawAccessions.split(",").map(_.trim()).toSeq
 
@@ -38,16 +44,16 @@ class IdMappingSimulation extends Simulation {
   // --------- IDMAPPING SCENARIO ----------
   def getIdMappingFlowRequest(ids: String): ChainBuilder = {
     val count = s"${ids}".count(_ == ',') + 1
-    val httpReqInfo: String = "POST /run [KB->EMBL, "+count+"]"
-    val queryRequestStr: String = host + "/uniprot/api/idmapping/run"
+    val requestId = s"[$from->$to, $count]"
+    val httpReqInfo: String = s"POST /run $requestId"
 
     val request =
         pause(5 seconds, 60 seconds)
         .exec(http(httpReqInfo)
-          .post(queryRequestStr)
+          .post(runUrl)
           .formParam("ids", ids)
-          .formParam("from", "UniProtKB_AC-ID")
-          .formParam("to", "EMBL-GenBank-DDBJ_CDS")
+          .formParam("from", from)
+          .formParam("to", to)
           .check(
             jsonPath("$.jobId").saveAs("jobId")
           )
@@ -55,8 +61,8 @@ class IdMappingSimulation extends Simulation {
           .doIf("${jobId.exists()}") {
             tryMax(100) {
               exec(
-                http("GET /status/JOB_ID [KB->EMBL, "+count+"]")
-                  .get(host + "/uniprot/api/idmapping/status/${jobId}")
+                http(s"GET /status/JOB_ID $requestId")
+                  .get(statusUrl + "/${jobId}")
                   .disableFollowRedirect
                   .check(
                      status.not(400), status.not(500),
@@ -64,8 +70,8 @@ class IdMappingSimulation extends Simulation {
                   )
               )
                 .doIfEquals("${jobStatus}", "FINISHED") {
-                    exec( http("GET /results/JOB_ID [KB->EMBL, "+count+"]")
-                      .get(host + "/uniprot/api/idmapping/results/${jobId}")
+                    exec( http(s"GET /results/JOB_ID $requestId")
+                      .get(resultsUrl + "/${jobId}?"+resultsParams)
                       .check(status.is(200)))
                 }
             }
@@ -75,19 +81,19 @@ class IdMappingSimulation extends Simulation {
   }
   
   val idMappingScenario1 =
-    scenario("IdMapping KB->EMBL Scenario 1 (#users="+scenario1Users+", #ids="+scenario1IdCount+")")
+    scenario("IdMapping Scenario 1 ("+from+"->"+to+", #users="+scenario1Users+", #ids="+scenario1IdCount+")")
       .forever {
         exec(getIdMappingFlowRequest(getRandomisedIds(scenario1IdCount)))
       }
 
   val idMappingScenario2 =
-    scenario("IdMapping KB->EMBL Scenario 2 (#users="+scenario2Users+", #ids="+scenario2IdCount+")")
+    scenario("IdMapping Scenario 2 ("+from+"->"+to+", #users="+scenario2Users+", #ids="+scenario2IdCount+")")
       .forever {
         exec(getIdMappingFlowRequest(getRandomisedIds(scenario2IdCount)))
       }
 
   val idMappingScenario3 =
-    scenario("IdMapping KB->EMBL Scenario 3 (#users="+scenario3Users+", #ids="+scenario3IdCount+")")
+    scenario("IdMapping Scenario 3 ("+from+"->"+to+", #users="+scenario3Users+", #ids="+scenario3IdCount+")")
       .forever {
         exec(getIdMappingFlowRequest(getRandomisedIds(scenario3IdCount)))
       }
