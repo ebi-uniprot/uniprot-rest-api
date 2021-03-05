@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.service;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.servlet.ServletContext;
@@ -147,6 +148,27 @@ class IdMappingJobServiceTest {
         Assertions.assertThrows(
                 ResourceNotFoundException.class,
                 () -> this.cacheService.getJobAsResource("some random id"));
+    }
+
+    @Test
+    void testSubmitSameJobTwice()
+            throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
+        IdMappingJobRequest request = createIdMappingRequest();
+        JobSubmitResponse response = this.jobService.submitJob(request);
+        Assertions.assertNotNull(response);
+        Assertions.assertNotNull(response.getJobId());
+        IdMappingJob job = this.cacheService.get(response.getJobId());
+        Date created = job.getCreated();
+        Assertions.assertNotNull(created);
+        Date updated = job.getUpdated();
+        Assertions.assertNotNull(updated);
+        // submit the same job
+        JobSubmitResponse response2 = this.jobService.submitJob(request);
+        Assertions.assertNotNull(response2);
+        Assertions.assertEquals(response.getJobId(), response2.getJobId());
+        Assertions.assertEquals(job.getCreated(), created);
+        Assertions.assertNotEquals(updated, job.getUpdated());
+        Assertions.assertTrue((job.getUpdated().getTime() - updated.getTime()) > 0);
     }
 
     private IdMappingJobRequest createIdMappingRequest() {
