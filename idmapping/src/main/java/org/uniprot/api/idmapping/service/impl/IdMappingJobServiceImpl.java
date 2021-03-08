@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.IdMappingJobController;
@@ -33,6 +34,7 @@ import com.google.common.base.Preconditions;
  * @author sahmad
  */
 @Service
+@Slf4j
 public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final String RESULTS_SUBPATH = "results/";
     private final IdMappingJobCacheService cacheService;
@@ -97,6 +99,10 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
 
         if (!this.cacheService.exists(jobId)) {
             this.cacheService.put(jobId, idMappingJob);
+            log.debug(
+                    "Put into cache, {} ids: {}...",
+                    idMappingJob.getIdMappingRequest().getIds().split(",").length,
+                    idMappingJob.getIdMappingRequest().getIds().substring(0, 40));
             // create task and submit
             JobTask jobTask = new JobTask(idMappingJob, pirService);
             jobTaskExecutor.execute(jobTask);

@@ -37,7 +37,7 @@ public class JobTask implements Runnable {
             stopwatch.stop();
 
             log.debug(
-                    "[idmapping/results/{}] response took {} seconds (id count={})",
+                    "[idmapping/run/{}] response took {} seconds (id count={})",
                     job.getJobId(),
                     stopwatch.elapsed(TimeUnit.SECONDS),
                     job.getIdMappingRequest().getIds().split(",").length);
