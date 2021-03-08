@@ -35,6 +35,13 @@ class IdMappingSimulation extends Simulation {
   val scenario3Users =   conf.getInt("a.s.idmapping.scenario3.users")
   val scenario3IdCount = conf.getInt("a.s.idmapping.scenario3.idCount")
 
+  val scenario1RandomIdFeeder =
+      Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario1Users)))
+  val scenario2RandomIdFeeder =
+    Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario2Users)))
+  val scenario3RandomIdFeeder =
+    Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario3Users)))
+
 
   def getRandomisedIds(count: Integer): String = {
     val randomList = scala.util.Random.shuffle(accessions).slice(0, count).mkString(",")
@@ -42,16 +49,17 @@ class IdMappingSimulation extends Simulation {
   }
 
   // --------- IDMAPPING SCENARIO ----------
-  def getIdMappingFlowRequest(ids: String): ChainBuilder = {
-    val count = s"${ids}".count(_ == ',') + 1
+  def getIdMappingFlowRequest(count: Integer): ChainBuilder = {
+//    val count = s"${ids}".count(_ == ',') + 1
     val requestId = s"[$from->$to, $count]"
     val httpReqInfo: String = s"POST /run $requestId"
 
     val request =
         pause(5 seconds, 60 seconds)
+        .feed(scenario1RandomIdFeeder)
         .exec(http(httpReqInfo)
           .post(runUrl)
-          .formParam("ids", ids)
+          .formParam("ids", "${randomIds}")
           .formParam("from", from)
           .formParam("to", to)
           .check(
@@ -60,15 +68,20 @@ class IdMappingSimulation extends Simulation {
         )
           .doIf("${jobId.exists()}") {
             tryMax(100) {
-              exec(
+              pause(2 seconds,)
+              .exec(
                 http(s"GET /status/JOB_ID $requestId")
                   .get(statusUrl + "/${jobId}")
                   .disableFollowRedirect
                   .check(
                      status.not(400), status.not(500),
-                     jsonPath("$.jobStatus").saveAs("jobStatus")
+                     jsonPath("$.jobStatus").saveAs("jobStatus") // TODO: attach jobId to variable 
                   )
               )
+//                .exec{
+//                  session => println(session)
+//                    session
+//                }
                 .doIfEquals("${jobStatus}", "FINISHED") {
                     exec( http(s"GET /results/JOB_ID $requestId")
                       .get(resultsUrl + "/${jobId}?"+resultsParams)
@@ -83,24 +96,27 @@ class IdMappingSimulation extends Simulation {
   val idMappingScenario1 =
     scenario("IdMapping Scenario 1 ("+from+"->"+to+", #users="+scenario1Users+", #ids="+scenario1IdCount+")")
       .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(scenario1IdCount)))
+  exec (
+    getIdMappingFlowRequest(scenario1IdCount)
+  )
       }
-
-  val idMappingScenario2 =
-    scenario("IdMapping Scenario 2 ("+from+"->"+to+", #users="+scenario2Users+", #ids="+scenario2IdCount+")")
-      .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(scenario2IdCount)))
-      }
-
-  val idMappingScenario3 =
-    scenario("IdMapping Scenario 3 ("+from+"->"+to+", #users="+scenario3Users+", #ids="+scenario3IdCount+")")
-      .forever {
-        exec(getIdMappingFlowRequest(getRandomisedIds(scenario3IdCount)))
-      }
+//
+//  val idMappingScenario2 =
+//    scenario("IdMapping Scenario 2 ("+from+"->"+to+", #users="+scenario2Users+", #ids="+scenario2IdCount+")")
+//      .forever {
+//        exec(getIdMappingFlowRequest(scenario2IdCount))
+//      }
+//
+//  val idMappingScenario3 =
+//    scenario("IdMapping Scenario 3 ("+from+"->"+to+", #users="+scenario3Users+", #ids="+scenario3IdCount+")")
+//      .forever {
+//        exec(getIdMappingFlowRequest(scenario3IdCount))
+//      }
  setUp(
-   idMappingScenario1.inject(atOnceUsers(scenario1Users)),
-   idMappingScenario2.inject(atOnceUsers(scenario2Users)),
-   idMappingScenario3.inject(atOnceUsers(scenario3Users))
+   idMappingScenario1.inject(atOnceUsers(scenario1Users))
+//   ,
+//   idMappingScenario2.inject(atOnceUsers(scenario2Users)),
+//   idMappingScenario3.inject(atOnceUsers(scenario3Users))
   )
     .protocols(httpConf)
     .assertions(global.responseTime.percentile3.lt(conf.getInt("a.s.idmapping.percentile3.responseTime")), //percentile3 == 95th Percentile
