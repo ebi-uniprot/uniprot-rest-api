@@ -18,6 +18,7 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.config.UniRefSolrQueryConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.request.UniRefStreamRequest;

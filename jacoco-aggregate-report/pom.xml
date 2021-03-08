@@ -60,6 +60,12 @@
 			<version>${uniprot-core.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>idmapping-rest</artifactId>
+			<version>${uniprot-core.version}</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

@@ -72,7 +72,7 @@
 		<module>unisave-rest</module>
 		<module>benchmark-rest</module>
 		<module>unirule-rest</module>
-		<module>idmapping</module>
+		<module>idmapping-rest</module>
 		<module>jacoco-aggregate-report</module>
 	</modules>
 
