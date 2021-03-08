@@ -55,7 +55,7 @@ class IdMappingSimulation extends Simulation {
     val httpReqInfo: String = s"POST /run $requestId"
 
     val request =
-        pause(5 seconds, 60 seconds)
+      pause(5 seconds, 60 seconds)
         .feed(scenario1RandomIdFeeder)
         .exec(http(httpReqInfo)
           .post(runUrl)
@@ -66,28 +66,46 @@ class IdMappingSimulation extends Simulation {
             jsonPath("$.jobId").saveAs("jobId")
           )
         )
-          .doIf("${jobId.exists()}") {
-            tryMax(100) {
-              pause(2 seconds,)
+        .doIf("${jobId.exists()}") {
+          doWhile(session => session("jobStatus").as[String].equals("NEW") || session("jobStatus").as[String].equals("RUNNING")) {
+            pause(2 seconds)
               .exec(
                 http(s"GET /status/JOB_ID $requestId")
                   .get(statusUrl + "/${jobId}")
                   .disableFollowRedirect
                   .check(
-                     status.not(400), status.not(500),
-                     jsonPath("$.jobStatus").saveAs("jobStatus") // TODO: attach jobId to variable 
+                    status.not(400), status.not(500),
+                    jsonPath("$.jobStatus").saveAs("jobStatus")
                   )
               )
+          } .
+            doIfEquals("${jobStatus}", "FINISHED") {
+              exec(http(s"GET /results/JOB_ID $requestId")
+                .get(resultsUrl + "/${jobId}?" + resultsParams)
+                .check(status.is(200)))
+            }
+
+//            tryMax(100) {
+//              pause(2 seconds,)
+//              .exec(
+//                http(s"GET /status/JOB_ID $requestId")
+//                  .get(statusUrl + "/${jobId}")
+//                  .disableFollowRedirect
+//                  .check(
+//                     status.not(400), status.not(500),
+//                     jsonPath("$.jobStatus").saveAs("jobStatus") // TODO: attach jobId to variable
+//                  )
+//              )
 //                .exec{
 //                  session => println(session)
 //                    session
 //                }
-                .doIfEquals("${jobStatus}", "FINISHED") {
-                    exec( http(s"GET /results/JOB_ID $requestId")
-                      .get(resultsUrl + "/${jobId}?"+resultsParams)
-                      .check(status.is(200)))
-                }
-            }
+//                .doIfEquals("${jobStatus}", "FINISHED") {
+//                    exec( http(s"GET /results/JOB_ID $requestId")
+//                      .get(resultsUrl + "/${jobId}?"+resultsParams)
+//                      .check(status.is(200)))
+//                }
+//            }
           }
 
     return request
