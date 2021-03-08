@@ -5,6 +5,8 @@
 	<logger name="org" level="info" />
 	<logger name="com" level="info" />
 
+	<logger name="org.uniprot" level="debug" />
+
 	<appender name="STDOUT"
 		class="ch.qos.logback.core.ConsoleAppender">
 		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
@@ -13,7 +15,7 @@
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
-	<root level="debug">
+	<root level="info">
 		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>
