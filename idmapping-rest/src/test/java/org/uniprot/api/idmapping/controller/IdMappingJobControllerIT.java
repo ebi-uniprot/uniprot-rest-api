@@ -14,7 +14,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
@@ -115,7 +115,7 @@ class IdMappingJobControllerIT {
                         get(JOB_STATUS_ENDPOINT + "/" + jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(redirectedUrlPattern("/**/idmapping/results/" + jobId))
@@ -134,7 +134,7 @@ class IdMappingJobControllerIT {
                         get(JOB_STATUS_ENDPOINT + "/" + jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
     }
@@ -159,7 +159,7 @@ class IdMappingJobControllerIT {
                         get(JOB_STATUS_ENDPOINT + "/" + jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.NEW.toString())));
@@ -185,7 +185,7 @@ class IdMappingJobControllerIT {
                         get(JOB_STATUS_ENDPOINT + "/" + jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.RUNNING.toString())));
@@ -211,7 +211,7 @@ class IdMappingJobControllerIT {
                         get(JOB_STATUS_ENDPOINT + "/" + jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.ERROR.toString())));
@@ -235,7 +235,7 @@ class IdMappingJobControllerIT {
                                 .param("to", "UniProtKB")
                                 .param("ids", "Q00001,Q00002"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
@@ -258,7 +258,7 @@ class IdMappingJobControllerIT {
                                 .param("to", "ACC123")
                                 .param("ids", "Q00001,Q00002"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
@@ -280,7 +280,7 @@ class IdMappingJobControllerIT {
                                 .param("to", "UniParc")
                                 .param("ids", "Q00001,Q00002"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
@@ -300,7 +300,7 @@ class IdMappingJobControllerIT {
                                 .param("taxId", "taxId")
                                 .param("ids", "Q00001,Q00002"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
@@ -325,7 +325,7 @@ class IdMappingJobControllerIT {
                                 .param("taxId", "taxId")
                                 .param("ids", "Q00001,Q00002"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))

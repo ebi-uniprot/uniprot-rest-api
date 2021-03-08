@@ -98,30 +98,14 @@ public abstract class BasicIdService<T, U> {
     }
 
     public Stream<U> streamEntries(StreamRequest streamRequest, IdMappingResult mappingResult) {
-        List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
-        if (Utils.notNull(streamRequest.getQuery()) || Utils.notNull(streamRequest.getSort())) {
-            List<String> toIds = getMappedToIds(mappedIds);
-
-            long start = System.currentTimeMillis();
-            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, null);
-            long end = System.currentTimeMillis();
-            log.info("Time taken to search solr in ms {}", (end - start));
-
-            List<String> solrToIds = solrStreamResponse.getAccessions();
-            if (Utils.notNullNotEmpty(streamRequest.getQuery())) {
-                // Apply Filter in PIR result
-                mappedIds = applyQueryFilter(mappedIds, solrToIds);
-            }
-
-            if (Utils.notNullNotEmpty(streamRequest.getSort())) {
-                mappedIds = applySort(mappedIds, solrToIds);
-            }
-        }
+        List<IdMappingStringPair> mappedIds =
+                streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds());
         return streamEntries(mappedIds);
     }
 
     public Stream<String> streamRDF(StreamRequest streamRequest, IdMappingResult mappingResult) {
-        List<IdMappingStringPair> fromToPairs = mappingResult.getMappedIds();
+        List<IdMappingStringPair> fromToPairs =
+                streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds());
         // get unique entry ids
         List<String> entryIds = new ArrayList<>();
         fromToPairs.stream()
@@ -143,6 +127,29 @@ public abstract class BasicIdService<T, U> {
 
     protected Stream<T> getEntries(List<String> toIds) {
         return this.storeStreamer.streamEntries(toIds);
+    }
+
+    private List<IdMappingStringPair> streamFilterAndSortEntries(
+            StreamRequest streamRequest, List<IdMappingStringPair> mappedIds) {
+        if (Utils.notNull(streamRequest.getQuery()) || Utils.notNull(streamRequest.getSort())) {
+            List<String> toIds = getMappedToIds(mappedIds);
+
+            long start = System.currentTimeMillis();
+            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, null);
+            long end = System.currentTimeMillis();
+            log.info("Time taken to search solr in ms {}", (end - start));
+
+            List<String> solrToIds = solrStreamResponse.getAccessions();
+            if (Utils.notNullNotEmpty(streamRequest.getQuery())) {
+                // Apply Filter in PIR result
+                mappedIds = applyQueryFilter(mappedIds, solrToIds);
+            }
+
+            if (Utils.notNullNotEmpty(streamRequest.getSort())) {
+                mappedIds = applySort(mappedIds, solrToIds);
+            }
+        }
+        return mappedIds;
     }
 
     private SolrStreamFacetResponse searchBySolrStream(
