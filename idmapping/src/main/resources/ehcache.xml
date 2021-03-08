@@ -10,11 +10,11 @@
 		</expiry>
 
 		<resources>
-			<heap unit="MB">500</heap>
+			<heap unit="MB">4000</heap>
 		</resources>
 
 		<heap-store-settings>
-			<max-object-graph-size>50000</max-object-graph-size>
+			<max-object-graph-size>100000</max-object-graph-size>
 		</heap-store-settings>
 	</cache>
 </config>
