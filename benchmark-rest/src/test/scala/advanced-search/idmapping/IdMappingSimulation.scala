@@ -49,14 +49,23 @@ class IdMappingSimulation extends Simulation {
   }
 
   // --------- IDMAPPING SCENARIO ----------
-  def getIdMappingFlowRequest(count: Integer): ChainBuilder = {
-//    val count = s"${ids}".count(_ == ',') + 1
+  val scenario1FlowRequest: ChainBuilder =
+    pause(5 seconds, 60 seconds)
+      .feed(scenario1RandomIdFeeder)
+  val scenario2FlowRequest: ChainBuilder =
+    pause(5 seconds, 60 seconds)
+      .feed(scenario2RandomIdFeeder)
+  val scenario3FlowRequest: ChainBuilder =
+    pause(5 seconds, 60 seconds)
+      .feed(scenario3RandomIdFeeder)
+
+
+  def getIdMappingFlowRequest(feederBuilder: ChainBuilder, count: Integer): ChainBuilder = {
     val requestId = s"[$from->$to, $count]"
     val httpReqInfo: String = s"POST /run $requestId"
 
     val request =
-      pause(5 seconds, 60 seconds)
-        .feed(scenario1RandomIdFeeder)
+        feederBuilder
         .exec(http(httpReqInfo)
           .post(runUrl)
           .formParam("ids", "${randomIds}")
@@ -78,35 +87,12 @@ class IdMappingSimulation extends Simulation {
                     jsonPath("$.jobStatus").saveAs("jobStatus")
                   )
               )
-          } .
-            doIfEquals("${jobStatus}", "FINISHED") {
+          }.doIfEquals("${jobStatus}", "FINISHED") {
               exec(http(s"GET /results/JOB_ID $requestId")
                 .get(resultsUrl + "/${jobId}?" + resultsParams)
                 .check(status.is(200)))
             }
-
-//            tryMax(100) {
-//              pause(2 seconds,)
-//              .exec(
-//                http(s"GET /status/JOB_ID $requestId")
-//                  .get(statusUrl + "/${jobId}")
-//                  .disableFollowRedirect
-//                  .check(
-//                     status.not(400), status.not(500),
-//                     jsonPath("$.jobStatus").saveAs("jobStatus") // TODO: attach jobId to variable
-//                  )
-//              )
-//                .exec{
-//                  session => println(session)
-//                    session
-//                }
-//                .doIfEquals("${jobStatus}", "FINISHED") {
-//                    exec( http(s"GET /results/JOB_ID $requestId")
-//                      .get(resultsUrl + "/${jobId}?"+resultsParams)
-//                      .check(status.is(200)))
-//                }
-//            }
-          }
+         }
 
     return request
   }
@@ -115,26 +101,26 @@ class IdMappingSimulation extends Simulation {
     scenario("IdMapping Scenario 1 ("+from+"->"+to+", #users="+scenario1Users+", #ids="+scenario1IdCount+")")
       .forever {
   exec (
-    getIdMappingFlowRequest(scenario1IdCount)
+    getIdMappingFlowRequest(scenario1FlowRequest, scenario1IdCount)
   )
       }
 //
-//  val idMappingScenario2 =
-//    scenario("IdMapping Scenario 2 ("+from+"->"+to+", #users="+scenario2Users+", #ids="+scenario2IdCount+")")
-//      .forever {
-//        exec(getIdMappingFlowRequest(scenario2IdCount))
-//      }
+  val idMappingScenario2 =
+    scenario("IdMapping Scenario 2 ("+from+"->"+to+", #users="+scenario2Users+", #ids="+scenario2IdCount+")")
+      .forever {
+        getIdMappingFlowRequest(scenario2FlowRequest, scenario2IdCount)
+      }
 //
-//  val idMappingScenario3 =
-//    scenario("IdMapping Scenario 3 ("+from+"->"+to+", #users="+scenario3Users+", #ids="+scenario3IdCount+")")
-//      .forever {
-//        exec(getIdMappingFlowRequest(scenario3IdCount))
-//      }
+  val idMappingScenario3 =
+    scenario("IdMapping Scenario 3 ("+from+"->"+to+", #users="+scenario3Users+", #ids="+scenario3IdCount+")")
+      .forever {
+        getIdMappingFlowRequest(scenario3FlowRequest, scenario3IdCount)
+      }
  setUp(
    idMappingScenario1.inject(atOnceUsers(scenario1Users))
-//   ,
-//   idMappingScenario2.inject(atOnceUsers(scenario2Users)),
-//   idMappingScenario3.inject(atOnceUsers(scenario3Users))
+   ,
+   idMappingScenario2.inject(atOnceUsers(scenario2Users)),
+   idMappingScenario3.inject(atOnceUsers(scenario3Users))
   )
     .protocols(httpConf)
     .assertions(global.responseTime.percentile3.lt(conf.getInt("a.s.idmapping.percentile3.responseTime")), //percentile3 == 95th Percentile
