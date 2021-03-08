@@ -163,6 +163,7 @@ class IdMappingJobServiceTest {
         Date updated = job.getUpdated();
         Assertions.assertNotNull(updated);
         // submit the same job
+        Thread.sleep(1);
         JobSubmitResponse response2 = this.jobService.submitJob(request);
         Assertions.assertNotNull(response2);
         Assertions.assertEquals(response.getJobId(), response2.getJobId());

@@ -14,6 +14,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetTupleStreamConverter;
@@ -41,6 +42,7 @@ public abstract class BasicIdService<T, U> {
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final RDFStreamer rdfStreamer;
+    private final SolrQueryConfig queryConfig;
 
     @Value("${search.default.page.size:#{null}}")
     private Integer defaultPageSize;
@@ -49,12 +51,14 @@ public abstract class BasicIdService<T, U> {
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
-            RDFStreamer rdfStreamer) {
+            RDFStreamer rdfStreamer,
+            SolrQueryConfig queryConfig) {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
         this.facetTupleStreamConverter =
                 new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
         this.rdfStreamer = rdfStreamer;
+        this.queryConfig = queryConfig;
     }
 
     public QueryResult<U> getMappedEntries(
@@ -220,12 +224,17 @@ public abstract class BasicIdService<T, U> {
                 .append("}")
                 .append(String.join(",", ids))
                 .append(")");
+        String termQuery = qb.toString();
+
         // append the facet filter query in the accession query
         if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
-            qb.append(" AND (").append(searchRequest.getQuery()).append(")");
+            solrRequestBuilder.query(searchRequest.getQuery());
+            solrRequestBuilder.filteredQuery(termQuery);
             solrRequestBuilder.searchAccession(Boolean.TRUE);
             solrRequestBuilder.searchSort(getSolrIdField() + " asc");
             solrRequestBuilder.searchFieldList(getSolrIdField());
+        } else {
+            solrRequestBuilder.query(termQuery);
         }
 
         if (Utils.notNullNotEmpty(searchRequest.getSort())) {
@@ -236,7 +245,10 @@ public abstract class BasicIdService<T, U> {
             solrRequestBuilder.searchAccession(Boolean.TRUE);
         }
 
-        return solrRequestBuilder.query(qb.toString()).facets(searchRequest.getFacetList()).build();
+        return solrRequestBuilder
+                .queryConfig(this.queryConfig)
+                .facets(searchRequest.getFacetList())
+                .build();
     }
 
     private String getSearchSort(List<SolrQuery.SortClause> sort) {

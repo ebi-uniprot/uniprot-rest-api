@@ -103,7 +103,9 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                     this.idService.streamRDF(streamRequest, cachedJobResult.getIdMappingResult());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
-            Stream<UniParcEntryPair> result = this.idService.streamEntries(streamRequest, cachedJobResult.getIdMappingResult());
+            Stream<UniParcEntryPair> result =
+                    this.idService.streamEntries(
+                            streamRequest, cachedJobResult.getIdMappingResult());
             return super.stream(result, streamRequest, contentType, request);
         }
     }

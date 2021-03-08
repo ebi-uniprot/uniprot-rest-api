@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -28,6 +29,8 @@ public class SolrStreamFacetRequest {
     private String searchFieldList = "accession_id";
     private String searchSort = "accession_id asc";
     private String requestHandler = "/export";
+    private String filteredQuery;
+    private SolrQueryConfig queryConfig;
 
     @Builder
     SolrStreamFacetRequest(
@@ -35,10 +38,14 @@ public class SolrStreamFacetRequest {
             List<String> facets,
             boolean searchAccession,
             String searchSort,
-            String searchFieldList) {
+            String searchFieldList,
+            String filteredQuery,
+            SolrQueryConfig queryConfig) {
         this.query = query;
         this.facets = facets;
         this.searchAccession = searchAccession;
+        this.filteredQuery = filteredQuery;
+        this.queryConfig = queryConfig;
         if (Utils.notNullNotEmpty(searchSort)) {
             this.searchSort = searchSort;
         }

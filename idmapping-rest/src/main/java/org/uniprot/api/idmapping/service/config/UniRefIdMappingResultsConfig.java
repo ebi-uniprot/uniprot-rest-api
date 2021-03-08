@@ -100,11 +100,12 @@ public class UniRefIdMappingResultsConfig {
     }
 
     @Bean("uniRefStoreRetryPolicy")
-    public RetryPolicy<Object> uniRefStoreRetryPolicy(@Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig){
+    public RetryPolicy<Object> uniRefStoreRetryPolicy(
+            @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig) {
         return new RetryPolicy<>()
-                        .handle(IOException.class)
-                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
+                .handle(IOException.class)
+                .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
+                .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
     }
 
     @Bean("uniRefLightStoreClient")

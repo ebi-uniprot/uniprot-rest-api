@@ -1,29 +1,32 @@
 package org.uniprot.api.idmapping.service.store;
 
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-import org.uniprot.api.idmapping.model.EntryPair;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.store.datastore.UniProtStoreClient;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+
+import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.store.datastore.UniProtStoreClient;
 
 /**
  * @author lgonzales
  * @since 05/03/2021
  */
-public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S> implements Iterable<Collection<T>> {
+public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
+        implements Iterable<Collection<T>> {
     private final Iterator<IdMappingStringPair> sourceIterator;
     private final int batchSize;
     private final UniProtStoreClient<S> storeClient;
     private final RetryPolicy<Object> retryPolicy;
 
-    public BatchStoreEntryPairIterable(Iterable<IdMappingStringPair> sourceIterable,
-                                       int batchSize,
-                                       UniProtStoreClient<S> storeClient,
-                                       RetryPolicy<Object> retryPolicy) {
+    public BatchStoreEntryPairIterable(
+            Iterable<IdMappingStringPair> sourceIterable,
+            int batchSize,
+            UniProtStoreClient<S> storeClient,
+            RetryPolicy<Object> retryPolicy) {
         this.batchSize = batchSize;
         this.sourceIterator = sourceIterable.iterator();
         this.storeClient = storeClient;
@@ -54,17 +57,14 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S> imp
         };
     }
 
-    protected List<T> convertBatch(List<IdMappingStringPair> batch){
+    protected List<T> convertBatch(List<IdMappingStringPair> batch) {
         Set<String> toIds =
-                batch.stream()
-                        .map(IdMappingStringPair::getTo)
-                        .collect(Collectors.toSet());
-        List<S> entries = Failsafe.with(retryPolicy)
-                .get(() -> storeClient.getEntries(toIds));
+                batch.stream().map(IdMappingStringPair::getTo).collect(Collectors.toSet());
+        List<S> entries = Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(toIds));
 
         // accession -> entry map
-        Map<String, S> idEntryMap = entries.stream()
-                .collect(Collectors.toMap(this::getEntryId, Function.identity()));
+        Map<String, S> idEntryMap =
+                entries.stream().collect(Collectors.toMap(this::getEntryId, Function.identity()));
 
         // from -> uniprot entry
         return batch.stream()

@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.service;
+package org.uniprot.api.rest.service.query.config;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
@@ -18,40 +19,47 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
+/**
+ * Created 05/09/19
+ *
+ * @author Edd
+ */
+@ComponentScan(basePackages = "org.uniprot.api.rest.validation.config")
 @Configuration
-public class UniParcSolrQueryConfig {
-    private static final String RESOURCE_LOCATION = "/uniparc-query.config";
+public class UniProtSolrQueryConfig {
+    private static final String RESOURCE_LOCATION = "/uniprotkb-query.config";
 
     @Bean
-    public SolrQueryConfig uniParcSolrQueryConf() {
+    public SolrQueryConfig uniProtKBSolrQueryConf() {
         return new SolrQueryConfigFileReader(RESOURCE_LOCATION).getConfig();
     }
 
     @Bean
-    public SearchFieldConfig uniParcSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC);
+    public SearchFieldConfig uniProtKBSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
     }
 
     @Bean
-    public QueryProcessor uniParcQueryProcessor(
-            WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig uniParcSearchFieldConfig) {
-        Map<String, String> uniParcWhiteListFields =
+    public QueryProcessor uniProtKBQueryProcessor(
+            WhitelistFieldConfig whiteListFieldConfig,
+            SearchFieldConfig uniProtKBSearchFieldConfig) {
+        Map<String, String> uniprotWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
-                                UniProtDataType.UNIPARC.toString().toLowerCase(), new HashMap<>());
+                                UniProtDataType.UNIPROTKB.toString().toLowerCase(),
+                                new HashMap<>());
         return UniProtQueryProcessor.newInstance(
                 UniProtQueryProcessorConfig.builder()
                         .optimisableFields(
-                                getDefaultSearchOptimisedFieldItems(uniParcSearchFieldConfig))
-                        .whiteListFields(uniParcWhiteListFields)
+                                getDefaultSearchOptimisedFieldItems(uniProtKBSearchFieldConfig))
+                        .whiteListFields(uniprotWhiteListFields)
                         .build());
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
-            SearchFieldConfig uniParcSearchFieldConfig) {
+            SearchFieldConfig uniProtKBSearchFieldConfig) {
         return Collections.singletonList(
-                uniParcSearchFieldConfig.getSearchFieldItemByName(
-                        UniParcQueryService.UNIPARC_ID_FIELD));
+                uniProtKBSearchFieldConfig.getSearchFieldItemByName("accession_id"));
     }
 }

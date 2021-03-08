@@ -36,7 +36,7 @@ public class JobTask implements Runnable {
             IdMappingResult pirResponse = pirService.mapIds(this.job.getIdMappingRequest());
             stopwatch.stop();
 
-            log.debug(
+            log.info(
                     "[idmapping/results/{}] response took {} seconds (id count={})",
                     job.getJobId(),
                     stopwatch.elapsed(TimeUnit.SECONDS),

@@ -107,7 +107,9 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                     this.idService.streamRDF(streamRequest, cachedJobResult.getIdMappingResult());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
-            Stream<UniProtKBEntryPair> result = this.idService.streamEntries(streamRequest, cachedJobResult.getIdMappingResult());
+            Stream<UniProtKBEntryPair> result =
+                    this.idService.streamEntries(
+                            streamRequest, cachedJobResult.getIdMappingResult());
             return super.stream(result, streamRequest, contentType, request);
         }
     }

@@ -7,8 +7,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import net.jodah.failsafe.RetryPolicy;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
@@ -43,8 +45,14 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
             UniprotKBFacetConfig facetConfig,
             RDFStreamer uniProtKBRDFStreamer,
-            UniProtStoreClient<UniProtKBEntry> storeClient) {
-        super(storeStreamer, tupleStream, facetConfig, uniProtKBRDFStreamer);
+            UniProtStoreClient<UniProtKBEntry> storeClient,
+            SolrQueryConfig uniProtKBSolrQueryConf) {
+        super(
+                storeStreamer,
+                tupleStream,
+                facetConfig,
+                uniProtKBRDFStreamer,
+                uniProtKBSolrQueryConf);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;
@@ -78,8 +86,12 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     @Override
     protected Stream<UniProtKBEntryPair> streamEntries(List<IdMappingStringPair> mappedIds) {
-        UniProtKBBatchStoreEntryPairIterable batchIterable = new UniProtKBBatchStoreEntryPairIterable(mappedIds, streamConfig.getStoreBatchSize(), storeClient, storeFetchRetryPolicy);
-        return StreamSupport.stream(batchIterable.spliterator(), false)
-                .flatMap(Collection::stream);
+        UniProtKBBatchStoreEntryPairIterable batchIterable =
+                new UniProtKBBatchStoreEntryPairIterable(
+                        mappedIds,
+                        streamConfig.getStoreBatchSize(),
+                        storeClient,
+                        storeFetchRetryPolicy);
+        return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
     }
 }

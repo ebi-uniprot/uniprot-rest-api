@@ -83,7 +83,8 @@ public class UniProtKBIdMappingResultsConfig {
     }
 
     @Bean("uniProtKBStoreRetryPolicy")
-    public RetryPolicy<Object> uniProtKBStoreRetryPolicy(@Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig){
+    public RetryPolicy<Object> uniProtKBStoreRetryPolicy(
+            @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig) {
         return new RetryPolicy<>()
                 .handle(IOException.class)
                 .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))

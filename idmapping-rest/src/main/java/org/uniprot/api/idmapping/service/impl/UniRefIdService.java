@@ -7,8 +7,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import net.jodah.failsafe.RetryPolicy;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
@@ -43,8 +45,9 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
             @Qualifier("uniRefStoreRetryPolicy") RetryPolicy<Object> storeFetchRetryPolicy,
             UniRefFacetConfig facetConfig,
             RDFStreamer uniRefRDFStreamer,
-            UniProtStoreClient<UniRefEntryLight> storeClient) {
-        super(storeStreamer, tupleStream, facetConfig, uniRefRDFStreamer);
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            SolrQueryConfig uniRefSolrQueryConf) {
+        super(storeStreamer, tupleStream, facetConfig, uniRefRDFStreamer, uniRefSolrQueryConf);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;
@@ -78,8 +81,12 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
 
     @Override
     protected Stream<UniRefEntryPair> streamEntries(List<IdMappingStringPair> mappedIds) {
-        UniRefBatchStoreEntryPairIterable batchIterable = new UniRefBatchStoreEntryPairIterable(mappedIds, streamConfig.getStoreBatchSize(), storeClient, storeFetchRetryPolicy);
-        return StreamSupport.stream(batchIterable.spliterator(), false)
-                .flatMap(Collection::stream);
+        UniRefBatchStoreEntryPairIterable batchIterable =
+                new UniRefBatchStoreEntryPairIterable(
+                        mappedIds,
+                        streamConfig.getStoreBatchSize(),
+                        storeClient,
+                        storeFetchRetryPolicy);
+        return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
     }
 }

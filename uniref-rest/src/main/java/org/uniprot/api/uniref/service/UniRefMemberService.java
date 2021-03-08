@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.rest.service.query.config.UniRefSolrQueryConfig;
 import org.uniprot.api.uniref.repository.store.UniRefEntryStoreRepository;
 import org.uniprot.api.uniref.request.UniRefMemberRequest;
 import org.uniprot.core.uniref.UniRefMember;

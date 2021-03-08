@@ -99,7 +99,8 @@ public class UniParcIdMappingResultsConfig {
     }
 
     @Bean("uniParcStoreRetryPolicy")
-    public RetryPolicy<Object> uniParcStoreRetryPolicy(@Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig){
+    public RetryPolicy<Object> uniParcStoreRetryPolicy(
+            @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig) {
         return new RetryPolicy<>()
                 .handle(IOException.class)
                 .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
