@@ -1,19 +1,27 @@
 package org.uniprot.api.idmapping.service.impl;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import net.jodah.failsafe.RetryPolicy;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.service.BasicIdService;
+import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.datastore.UniProtStoreClient;
 
 /**
  * @author sahmad
@@ -21,12 +29,25 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
  */
 @Service
 public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKBEntryPair> {
+
+    private final UniProtStoreClient<UniProtKBEntry> storeClient;
+
+    private final RetryPolicy<Object> storeFetchRetryPolicy;
+
+    private final StreamerConfigProperties streamConfig;
+
     public UniProtKBIdService(
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
             @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
+            @Qualifier("uniProtKBStoreRetryPolicy") RetryPolicy<Object> storeFetchRetryPolicy,
+            @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
             UniprotKBFacetConfig facetConfig,
-            RDFStreamer uniProtKBRDFStreamer) {
+            RDFStreamer uniProtKBRDFStreamer,
+            UniProtStoreClient<UniProtKBEntry> storeClient) {
         super(storeStreamer, tupleStream, facetConfig, uniProtKBRDFStreamer);
+        this.streamConfig = streamConfig;
+        this.storeClient = storeClient;
+        this.storeFetchRetryPolicy = storeFetchRetryPolicy;
     }
 
     @Override
@@ -53,5 +74,12 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     @Override
     public UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
+    }
+
+    @Override
+    protected Stream<UniProtKBEntryPair> streamEntries(List<IdMappingStringPair> mappedIds) {
+        UniProtKBBatchStoreEntryPairIterable batchIterable = new UniProtKBBatchStoreEntryPairIterable(mappedIds, streamConfig.getStoreBatchSize(), storeClient, storeFetchRetryPolicy);
+        return StreamSupport.stream(batchIterable.spliterator(), false)
+                .flatMap(Collection::stream);
     }
 }

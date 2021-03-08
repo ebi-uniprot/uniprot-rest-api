@@ -87,21 +87,24 @@ public class UniRefIdMappingResultsConfig {
             @Qualifier("uniRefLightStoreClient") UniProtStoreClient<UniRefEntryLight> storeClient,
             @Qualifier("uniRefTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig,
-            @Qualifier("uniRefDocumentIdStream") TupleStreamDocumentIdStream documentIdStream) {
-
-        RetryPolicy<Object> storeRetryPolicy =
-                new RetryPolicy<>()
-                        .handle(IOException.class)
-                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
+            @Qualifier("uniRefDocumentIdStream") TupleStreamDocumentIdStream documentIdStream,
+            @Qualifier("uniRefStoreRetryPolicy") RetryPolicy<Object> uniRefStoreRetryPolicy) {
 
         return StoreStreamer.<UniRefEntryLight>builder()
                 .streamConfig(streamConfig)
                 .storeClient(storeClient)
                 .tupleStreamTemplate(tupleStreamTemplate)
-                .storeFetchRetryPolicy(storeRetryPolicy)
+                .storeFetchRetryPolicy(uniRefStoreRetryPolicy)
                 .documentIdStream(documentIdStream)
                 .build();
+    }
+
+    @Bean("uniRefStoreRetryPolicy")
+    public RetryPolicy<Object> uniRefStoreRetryPolicy(@Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig){
+        return new RetryPolicy<>()
+                        .handle(IOException.class)
+                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
+                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
     }
 
     @Bean("uniRefLightStoreClient")

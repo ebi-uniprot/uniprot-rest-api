@@ -87,21 +87,23 @@ public class UniParcIdMappingResultsConfig {
             @Qualifier("uniParcStoreClient") UniProtStoreClient<UniParcEntry> storeClient,
             @Qualifier("uniParcTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig,
-            @Qualifier("uniParcDocumentIdStream") TupleStreamDocumentIdStream documentIdStream) {
-
-        RetryPolicy<Object> storeRetryPolicy =
-                new RetryPolicy<>()
-                        .handle(IOException.class)
-                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
-
+            @Qualifier("uniParcDocumentIdStream") TupleStreamDocumentIdStream documentIdStream,
+            @Qualifier("uniParcStoreRetryPolicy") RetryPolicy<Object> uniParcStoreRetryPolicy) {
         return StoreStreamer.<UniParcEntry>builder()
                 .streamConfig(streamConfig)
                 .storeClient(storeClient)
                 .tupleStreamTemplate(tupleStreamTemplate)
-                .storeFetchRetryPolicy(storeRetryPolicy)
+                .storeFetchRetryPolicy(uniParcStoreRetryPolicy)
                 .documentIdStream(documentIdStream)
                 .build();
+    }
+
+    @Bean("uniParcStoreRetryPolicy")
+    public RetryPolicy<Object> uniParcStoreRetryPolicy(@Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig){
+        return new RetryPolicy<>()
+                .handle(IOException.class)
+                .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
+                .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
     }
 
     @Bean("uniParcStoreClient")

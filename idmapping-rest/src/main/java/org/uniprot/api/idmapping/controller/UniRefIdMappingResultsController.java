@@ -101,8 +101,10 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
             Stream<String> result =
                     this.idService.streamRDF(streamRequest, cachedJobResult.getIdMappingResult());
             return super.streamRDF(result, streamRequest, contentType, request);
+        } else {
+            Stream<UniRefEntryPair> result = this.idService.streamEntries(streamRequest, cachedJobResult.getIdMappingResult());
+            return super.stream(result, streamRequest, contentType, request);
         }
-        return null; // FIXME
     }
 
     @Override

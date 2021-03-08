@@ -1,19 +1,27 @@
 package org.uniprot.api.idmapping.service.impl;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import net.jodah.failsafe.RetryPolicy;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.service.BasicIdService;
+import org.uniprot.api.idmapping.service.store.impl.UniRefBatchStoreEntryPairIterable;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.datastore.UniProtStoreClient;
 
 /**
  * @author sahmad
@@ -21,12 +29,25 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
  */
 @Service
 public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntryPair> {
+
+    private final UniProtStoreClient<UniRefEntryLight> storeClient;
+
+    private final RetryPolicy<Object> storeFetchRetryPolicy;
+
+    private final StreamerConfigProperties streamConfig;
+
     public UniRefIdService(
             @Qualifier("uniRefEntryStoreStreamer") StoreStreamer<UniRefEntryLight> storeStreamer,
             @Qualifier("uniRefFacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
+            @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig,
+            @Qualifier("uniRefStoreRetryPolicy") RetryPolicy<Object> storeFetchRetryPolicy,
             UniRefFacetConfig facetConfig,
-            RDFStreamer uniRefRDFStreamer) {
+            RDFStreamer uniRefRDFStreamer,
+            UniProtStoreClient<UniRefEntryLight> storeClient) {
         super(storeStreamer, tupleStream, facetConfig, uniRefRDFStreamer);
+        this.streamConfig = streamConfig;
+        this.storeClient = storeClient;
+        this.storeFetchRetryPolicy = storeFetchRetryPolicy;
     }
 
     @Override
@@ -53,5 +74,12 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIREF;
+    }
+
+    @Override
+    protected Stream<UniRefEntryPair> streamEntries(List<IdMappingStringPair> mappedIds) {
+        UniRefBatchStoreEntryPairIterable batchIterable = new UniRefBatchStoreEntryPairIterable(mappedIds, streamConfig.getStoreBatchSize(), storeClient, storeFetchRetryPolicy);
+        return StreamSupport.stream(batchIterable.spliterator(), false)
+                .flatMap(Collection::stream);
     }
 }

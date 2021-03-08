@@ -1,7 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,8 +93,27 @@ public abstract class BasicIdService<T, U> {
         return QueryResult.of(result, cursor, facets, null, mappingResult.getUnmappedIds());
     }
 
-    public List<Object> streamEntries(StreamRequest streamRequest) {
-        return Collections.emptyList(); // TODO fill code
+    public Stream<U> streamEntries(StreamRequest streamRequest, IdMappingResult mappingResult) {
+        List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
+        if (Utils.notNull(streamRequest.getQuery()) || Utils.notNull(streamRequest.getSort())) {
+            List<String> toIds = getMappedToIds(mappedIds);
+
+            long start = System.currentTimeMillis();
+            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, null);
+            long end = System.currentTimeMillis();
+            log.info("Time taken to search solr in ms {}", (end - start));
+
+            List<String> solrToIds = solrStreamResponse.getAccessions();
+            if (Utils.notNullNotEmpty(streamRequest.getQuery())) {
+                // Apply Filter in PIR result
+                mappedIds = applyQueryFilter(mappedIds, solrToIds);
+            }
+
+            if (Utils.notNullNotEmpty(streamRequest.getSort())) {
+                mappedIds = applySort(mappedIds, solrToIds);
+            }
+        }
+        return streamEntries(mappedIds);
     }
 
     public Stream<String> streamRDF(StreamRequest streamRequest, IdMappingResult mappingResult) {
@@ -116,6 +134,8 @@ public abstract class BasicIdService<T, U> {
     protected abstract String getSolrIdField();
 
     protected abstract UniProtDataType getUniProtDataType();
+
+    protected abstract Stream<U> streamEntries(List<IdMappingStringPair> mappedIds);
 
     protected Stream<T> getEntries(List<String> toIds) {
         return this.storeStreamer.streamEntries(toIds);
