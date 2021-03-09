@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,12 +38,20 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * @author lgonzales
  * @since 25/02/2021
  */
+@Tag(name = "results", description = "APIs to get result of the submitted job.")
 @RestController
-@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniref/")
+@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniref")
 public class UniRefIdMappingResultsController extends BasicSearchController<UniRefEntryPair> {
 
     private final UniRefIdService idService;
@@ -63,15 +72,35 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
     @GetMapping(
             value = "/results/{jobId}",
             produces = {
+                TSV_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                TSV_MEDIA_TYPE_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary = "Search result of UniRef cluster (or clusters) by a submitted job id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniRefEntryPair
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<UniRefEntryPair>> getMappedEntries(
             @PathVariable String jobId,
-            @Valid UniRefIdMappingSearchRequest searchRequest,
+            @Valid @ModelAttribute UniRefIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
@@ -86,11 +115,39 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
 
     @GetMapping(
             value = "/results/stream/{jobId}",
-            produces = {RDF_MEDIA_TYPE_VALUE})
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Stream an UniRef cluster (or clusters) retrieved by a submitted job id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniRefEntryPair
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
+                        })
+            })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryPair>>>
             streamMappedEntries(
                     @PathVariable String jobId,
-                    @Valid UniRefIdMappingStreamRequest streamRequest,
+                    @Valid @ModelAttribute UniRefIdMappingStreamRequest streamRequest,
                     HttpServletRequest request,
                     HttpServletResponse response) {
 

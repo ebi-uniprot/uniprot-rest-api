@@ -30,6 +30,7 @@ import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebCl
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -257,6 +258,42 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                                                         + "    <anotherSample>text2</anotherSample>\n"
                                                         + "    <someMore>text3</someMore>\n\n"
                                                         + "</rdf:RDF>")));
+    }
+
+    @Test
+    void testGetResultsInTSV() throws Exception {
+        // when
+        MediaType mediaType = UniProtMediaType.TSV_MEDIA_TYPE;
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                .andExpect(content().contentTypeCompatibleWith(mediaType))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "From\tCluster ID\tCluster Name\tCommon taxon\tSize\tDate of creation")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Q00001\tUniRef50_P03901\tCluster: MoeK5 01\tHomo sapiens\t2\t2019-08-27\n"
+                                                        + "Q00002\tUniRef50_P03902\tCluster: MoeK5 02\tHomo sapiens\t2\t2019-08-27\n"
+                                                        + "Q00003\tUniRef50_P03903\tCluster: MoeK5 03\tHomo sapiens\t2\t2019-08-27\n"
+                                                        + "Q00004\tUniRef50_P03904\tCluster: MoeK5 04\tHomo sapiens\t2\t2019-08-27\n"
+                                                        + "Q00005\tUniRef50_P03905\tCluster: MoeK5 05\tHomo sapiens\t2\t2019-08-27")));
+    }
+
+    @Override
+    protected String getDefaultSearchQuery() {
+        return "Homo sapiens";
     }
 
     private void saveEntries() throws Exception {

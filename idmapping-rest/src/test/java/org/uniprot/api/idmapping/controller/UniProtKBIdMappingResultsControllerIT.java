@@ -18,7 +18,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -430,6 +434,42 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                                         + "    <anotherSample>text2</anotherSample>\n"
                                                         + "    <someMore>text3</someMore>\n\n"
                                                         + "</rdf:RDF>")));
+    }
+
+    @Test
+    void testGetResultsInTSV() throws Exception {
+        // when
+        MediaType mediaType = UniProtMediaType.TSV_MEDIA_TYPE;
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                .andExpect(content().contentTypeCompatibleWith(mediaType))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "From\tEntry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Q00001\tQ00001\tFGFR2_HUMAN\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00002\tQ00002\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 2 gene 2 gene 2\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00003\tQ00003\tFGFR2_HUMAN\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00004\tQ00004\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 4 gene 4 gene 4\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00005\tQ00005\tFGFR2_HUMAN\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
+    }
+
+    @Override
+    protected String getDefaultSearchQuery() {
+        return "FGF1"; // geneName
     }
 
     // TODO: remove duplicated code with UniprotIT

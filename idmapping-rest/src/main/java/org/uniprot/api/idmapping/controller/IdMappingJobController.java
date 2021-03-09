@@ -12,7 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobStatusResponse;
@@ -21,10 +26,18 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * @author sahmad
  * @created 22/02/2021
  */
+@Tag(name = "job", description = "APIs related to job")
 @RestController
 @RequestMapping(IDMAPPING_PATH)
 public class IdMappingJobController {
@@ -42,7 +55,24 @@ public class IdMappingJobController {
     @PostMapping(
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<JobSubmitResponse> submitJob(@Valid IdMappingJobRequest request)
+    @Operation(
+            summary = "Submit a job.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            JobSubmitResponse
+                                                                                    .class)))
+                        })
+            })
+    public ResponseEntity<JobSubmitResponse> submitJob(
+            @Valid @ModelAttribute IdMappingJobRequest request)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         JobSubmitResponse response = this.idMappingJobService.submitJob(request);
         return ResponseEntity.ok(response);
@@ -51,6 +81,22 @@ public class IdMappingJobController {
     @GetMapping(
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = "Get the status of a job.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            JobStatusResponse
+                                                                                    .class)))
+                        })
+            })
     public ResponseEntity<JobStatusResponse> getStatus(@PathVariable String jobId) {
         return createStatus(cacheService.getJobAsResource(jobId));
     }

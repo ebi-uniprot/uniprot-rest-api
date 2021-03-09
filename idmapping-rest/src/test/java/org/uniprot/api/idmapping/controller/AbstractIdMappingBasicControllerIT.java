@@ -6,10 +6,12 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
@@ -426,6 +428,44 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                 .andExpect(jsonPath("$.results.size()", greaterThan(0)));
     }
 
+    @Test
+    void testSearchWithoutFieldName() throws Exception {
+        // when
+        String searchQuery = getDefaultSearchQuery();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .param("query", searchQuery)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+    }
+
+    @Test
+    void testSearchWithoutFieldNameWithEmptyResult() throws Exception {
+        // when
+        String searchQuery = UUID.randomUUID().toString();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .param("query", searchQuery)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
     // ---------------------------------------------------------------------------------
     // -------------------------------- RETURN FIELDS ----------------------------------
     // ---------------------------------------------------------------------------------
@@ -480,6 +520,10 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
             String returnFieldValidatePath = "$.results[*].to." + path;
             resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }
+    }
+
+    protected String getDefaultSearchQuery() {
+        return "*";
     }
 
     private Stream<Arguments> getAllSearchFields() {
