@@ -466,7 +466,6 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                 .andExpect(jsonPath("$.results.size()", is(0)));
     }
 
-
     // ---------------------------------------------------------------------------------
     // -------------------------------- RETURN FIELDS ----------------------------------
     // ---------------------------------------------------------------------------------
@@ -523,8 +522,7 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         }
     }
 
-
-    protected String getDefaultSearchQuery(){
+    protected String getDefaultSearchQuery() {
         return "*";
     }
 

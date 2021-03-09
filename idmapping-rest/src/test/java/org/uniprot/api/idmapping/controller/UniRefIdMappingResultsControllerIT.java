@@ -260,7 +260,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
     }
 
     @Override
-    protected String getDefaultSearchQuery(){
+    protected String getDefaultSearchQuery() {
         return "Homo sapiens";
     }
 

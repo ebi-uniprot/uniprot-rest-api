@@ -241,7 +241,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
     }
 
     @Override
-    protected String getDefaultSearchQuery(){
+    protected String getDefaultSearchQuery() {
         return "9606";
     }
 

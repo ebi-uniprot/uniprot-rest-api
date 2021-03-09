@@ -434,7 +434,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @Override
     protected String getDefaultSearchQuery() {
-        return "FGF1"; //geneName
+        return "FGF1"; // geneName
     }
 
     // TODO: remove duplicated code with UniprotIT

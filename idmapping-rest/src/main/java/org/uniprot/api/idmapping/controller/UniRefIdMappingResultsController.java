@@ -63,9 +63,9 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
     @GetMapping(
             value = "/results/{jobId}",
             produces = {
+                TSV_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                TSV_MEDIA_TYPE_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE
             })
@@ -86,7 +86,14 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
 
     @GetMapping(
             value = "/results/stream/{jobId}",
-            produces = {RDF_MEDIA_TYPE_VALUE})
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
+            })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryPair>>>
             streamMappedEntries(
                     @PathVariable String jobId,

@@ -87,7 +87,15 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
 
     @GetMapping(
             value = "/results/stream/{jobId}",
-            produces = {RDF_MEDIA_TYPE_VALUE})
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
+            })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntryPair>>>
             streamMappedEntries(
                     @PathVariable String jobId,
