@@ -240,12 +240,11 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         // when
         String searchQuery = getDefaultSearchQuery();
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .param("query", searchQuery)
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        MockHttpServletRequestBuilder requestBuilder = get(getIdMappingResultPath(), job.getJobId())
+                .param("query", searchQuery)
+                .header(ACCEPT, APPLICATION_JSON_VALUE);
+        ResultActions response = performRequest(requestBuilder);
 
         // then
         response.andDo(print())
@@ -259,12 +258,11 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         // when
         String searchQuery = UUID.randomUUID().toString();
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .param("query", searchQuery)
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        MockHttpServletRequestBuilder requestBuilder = get(getIdMappingResultPath(), job.getJobId())
+                .param("query", searchQuery)
+                .header(ACCEPT, APPLICATION_JSON_VALUE);
+        ResultActions response = performRequest(requestBuilder);
 
         // then
         response.andDo(print())
