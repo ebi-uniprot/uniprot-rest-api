@@ -31,7 +31,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
  * @author Edd
  */
 @Slf4j
-public class CheckResponseRetrievalTimes {
+public class IdMappingCheckResponseTimes {
     private static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
     private final RestTemplate restTemplate =
             new RestTemplate(
@@ -58,7 +58,7 @@ public class CheckResponseRetrievalTimes {
     private final String resultsParams;
     private final String idFilePath;
 
-    public CheckResponseRetrievalTimes(Parameters parameters) {
+    public IdMappingCheckResponseTimes(Parameters parameters) {
         from = parameters.from;
         to = parameters.to;
         host = parameters.host;
@@ -67,7 +67,6 @@ public class CheckResponseRetrievalTimes {
         if (Utils.notNullNotEmpty(parameters.ids)) {
             ids = parameters.ids;
         } else {
-            log.info("Fetching IDs from standard input ...");
             ids = initIds();
         }
         stopWatch = new StopWatch();
@@ -81,7 +80,6 @@ public class CheckResponseRetrievalTimes {
             // try to read file of IDs. If there is a problem with it, read from stdin
             InputStream in = System.in;
             if (Utils.notNullNotEmpty(idFilePath)) {
-
                 in = new FileInputStream(idFilePath);
             }
             try (InputStreamReader streamReader = new InputStreamReader(in);
@@ -226,7 +224,7 @@ public class CheckResponseRetrievalTimes {
         Parameters parameters = new Parameters();
         JCommander.newBuilder().addObject(parameters).build().parse(args);
 
-        CheckResponseRetrievalTimes checker = new CheckResponseRetrievalTimes(parameters);
+        IdMappingCheckResponseTimes checker = new IdMappingCheckResponseTimes(parameters);
         checker.processAll();
     }
 
