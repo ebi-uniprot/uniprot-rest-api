@@ -234,10 +234,10 @@
 						<version>${openapi-maven-plugin.version}</version>
 						<configuration>
 							<packageLocations>
-								<packageLocation>org.uniprot.api.uniprotkb.controller</packageLocation>
+								<packageLocation>org.uniprot.api.idmapping.controller</packageLocation>
 							</packageLocations>
 							<openApiDirectory>target/generated-sources/swagger</openApiDirectory>
-							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
+							<openApiFileName>idmapping-openapi3.yaml</openApiFileName>
 							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
 						</configuration>
 						<dependencies>

@@ -27,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,14 +42,23 @@ import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.core.xml.jaxb.uniprot.Entry;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author sahmad
  * @created 17/02/2021
  */
+@Tag(name = "results", description = "APIs to get result of the submitted job.")
 @Slf4j
 @RestController
-@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniprotkb/")
+@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniprotkb")
 public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKBEntryPair> {
 
     private final UniProtKBIdService idService;
@@ -78,9 +88,40 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 GFF_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE
             })
+    @Operation(
+            summary =
+                    "Search result for a UniProtKB protein entry (or entries) mapped by a submitted job id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniProtKBEntryPair
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<UniProtKBEntryPair>> getMappedEntries(
             @PathVariable String jobId,
-            @Valid UniProtKBIdMappingSearchRequest searchRequest,
+            @Valid @ModelAttribute UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
@@ -93,11 +134,52 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
 
     @GetMapping(
             value = "/results/stream/{jobId}",
-            produces = {RDF_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniProtKBEntryPair
+                                                                                    .class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation = Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
+                        })
+            })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntryPair>>>
             streamMappedEntries(
                     @PathVariable String jobId,
-                    @Valid UniProtKBIdMappingStreamRequest streamRequest,
+                    @Valid @ModelAttribute UniProtKBIdMappingStreamRequest streamRequest,
                     HttpServletRequest request,
                     HttpServletResponse response) {
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);

@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,11 +37,19 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
 import com.google.common.base.Stopwatch;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * Created 15/02/2021
  *
  * @author Edd
  */
+@Tag(name = "results", description = "APIs to get result of the submitted job.")
 @RestController
 @Validated
 @Slf4j
@@ -64,9 +73,28 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
     @GetMapping(
             value = "/results/{jobId}",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
+    @Operation(
+            summary = "Search result by a submitted job id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            IdMappingStringPair
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> results(
             @PathVariable String jobId,
-            @Valid IdMappingPageRequest pageRequest,
+            @Valid @ModelAttribute IdMappingPageRequest pageRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
@@ -91,6 +119,25 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Stream result by a submitted job id.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            IdMappingStringPair
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                        })
             })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> streamResults(
             @PathVariable String jobId, HttpServletRequest request, HttpServletResponse response) {
