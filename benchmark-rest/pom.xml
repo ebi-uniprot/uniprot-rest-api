@@ -1,76 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.uniprot</groupId>
-		<artifactId>uniprot-rest-api</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
-		<relativePath>../</relativePath>
-	</parent>
-	<artifactId>benchmark-rest</artifactId>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.uniprot</groupId>
+        <artifactId>uniprot-rest-api</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    <artifactId>benchmark-rest</artifactId>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gatling.highcharts.version>3.3.0</gatling.highcharts.version>
-		<gatling-plugin.version>3.0.5</gatling-plugin.version>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <gatling.highcharts.version>3.3.0</gatling.highcharts.version>
+        <gatling-plugin.version>3.0.5</gatling-plugin.version>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>io.gatling.highcharts</groupId>
-			<artifactId>gatling-charts-highcharts</artifactId>
-			<version>${gatling.highcharts.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.uniprot</groupId>
+            <artifactId>core-common</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>io.gatling</groupId>
-				<artifactId>gatling-maven-plugin</artifactId>
-				<version>${gatling-plugin.version}</version>
-			</plugin>
-		</plugins>
-		<!-- allow us to specify an external properties files used to configure 
-			the tests -->
-		<testResources>
-			<testResource>
-				<directory>${properties.dir}</directory>
-				<includes>
-					<include>application.properties</include>
-				</includes>
-			</testResource>
-		</testResources>
-	</build>
+        <!-- Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-	<profiles>
-		<profile>
-			<id>benchmark</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>io.gatling</groupId>
-						<artifactId>gatling-maven-plugin</artifactId>
-						<version>${gatling-plugin.version}</version>
-						<executions>
-							<execution>
-								<phase>test</phase>
-								<goals>
-									<goal>test</goal>
-								</goals>
-								<configuration>
-									<resultsFolder>target/gatling/results/advanced-search</resultsFolder>
-									<simulationsFolder>src/test/scala/advanced-search/</simulationsFolder>
-									<runMultipleSimulations>true</runMultipleSimulations>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+        <!-- Convenience -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Command line -->
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.81</version>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- Gatling -->
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <version>${gatling.highcharts.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.gatling</groupId>
+                <artifactId>gatling-maven-plugin</artifactId>
+                <version>${gatling-plugin.version}</version>
+            </plugin>
+        </plugins>
+        <!-- allow us to specify an external properties files used to configure
+            the tests -->
+        <testResources>
+            <testResource>
+                <directory>${properties.dir}</directory>
+                <includes>
+                    <include>application.properties</include>
+                </includes>
+            </testResource>
+        </testResources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>benchmark</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.gatling</groupId>
+                        <artifactId>gatling-maven-plugin</artifactId>
+                        <version>${gatling-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                                <configuration>
+                                    <resultsFolder>target/gatling/results/advanced-search</resultsFolder>
+                                    <simulationsFolder>src/test/scala/advanced-search/</simulationsFolder>
+                                    <runMultipleSimulations>true</runMultipleSimulations>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
