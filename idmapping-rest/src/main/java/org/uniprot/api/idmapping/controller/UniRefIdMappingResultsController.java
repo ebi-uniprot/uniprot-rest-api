@@ -86,7 +86,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
 
     @GetMapping(
             value = "/results/stream/{jobId}",
-            produces = {RDF_MEDIA_TYPE_VALUE})
+            produces = {RDF_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryPair>>>
             streamMappedEntries(
                     @PathVariable String jobId,

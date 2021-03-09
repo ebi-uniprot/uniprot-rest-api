@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.controller;
+package org.uniprot.api.idmapping.controller.utils;
 
 import static org.mockito.Mockito.mock;
 
@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+import org.uniprot.api.idmapping.controller.utils.*;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;

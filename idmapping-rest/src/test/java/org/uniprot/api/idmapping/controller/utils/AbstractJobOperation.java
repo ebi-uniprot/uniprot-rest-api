@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.controller;
+package org.uniprot.api.idmapping.controller.utils;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;

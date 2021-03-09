@@ -27,6 +27,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
+import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
+import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.store.config.UniProtDataType;
@@ -54,177 +56,6 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
     protected abstract String getFieldValueForValidatedField(String searchField);
 
     // ---------------------------------------------------------------------------------
-    // -------------------------------- PAGINATION TEST --------------------------------
-    // ---------------------------------------------------------------------------------
-
-    @Test
-    void testIdMappingResultOnePage() throws Exception {
-        // when
-        Integer defaultPageSize = 5;
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        String[] ids = job.getIdMappingRequest().getIds().split(",");
-
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(defaultPageSize)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.from",
-                                contains(ids[0], ids[1], ids[2], ids[3], ids[4])));
-    }
-
-    @Test
-    void testIdMappingResultWithSize() throws Exception {
-        // when
-        Integer size = 10;
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        String[] ids = job.getIdMappingRequest().getIds().split(",");
-
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("size", String.valueOf(size)));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.from",
-                                contains(
-                                        ids[0], ids[1], ids[2], ids[3], ids[4], ids[5], ids[6],
-                                        ids[7], ids[8], ids[9])));
-    }
-
-    @Test
-    void testIdMappingResultWithSizeAndPagination() throws Exception {
-        // when
-        Integer size = 10;
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        String[] ids = job.getIdMappingRequest().getIds().split(",");
-
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("size", String.valueOf(size)));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "20"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.from",
-                                contains(
-                                        ids[0], ids[1], ids[2], ids[3], ids[4], ids[5], ids[6],
-                                        ids[7], ids[8], ids[9])));
-
-        String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
-        assertThat(linkHeader, notNullValue());
-        String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
-
-        // when 2nd page
-        response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("size", String.valueOf(size))
-                                        .param("cursor", cursor));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "20"))
-                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.from",
-                                contains(
-                                        ids[10], ids[11], ids[12], ids[13], ids[14], ids[15],
-                                        ids[16], ids[17], ids[18], ids[19])));
-    }
-
-    @Test
-    void testIdMappingResultMappingWithZeroSize() throws Exception {
-        // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("size", "0"));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(0)));
-    }
-
-    @Test
-    void testIdMappingResultWithNegativeSize() throws Exception {
-        // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("size", "-1"));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                contains("'size' must be greater than or equal to 0")));
-    }
-
-    @Test
-    void testIdMappingResultWithMoreThan500Size() throws Exception {
-        // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("size", "600"));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                contains("'size' must be less than or equal to 500")));
-    }
-
-    // ---------------------------------------------------------------------------------
     // -------------------------------- JOB TESTS --------------------------------------
     // ---------------------------------------------------------------------------------
 
@@ -242,26 +73,6 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.size()", is(1)))
                 .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
-    }
-
-    @Test
-    void testIdMappingWithUnmappedIds() throws Exception {
-        // when
-        List<String> unmappedIds = List.of("UnMappedId1", "UnMappedId2");
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        job.getIdMappingResult().setUnmappedIds(unmappedIds);
-
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", Matchers.is(5)))
-                .andExpect(jsonPath("$.failedIds", contains("UnMappedId1", "UnMappedId2")));
     }
 
     @Test
@@ -293,7 +104,7 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         MockHttpServletRequestBuilder requestBuilder =
                 get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType);
 
-        ResultActions response = getMockMvc().perform(requestBuilder);
+        ResultActions response = performRequest(requestBuilder);
 
         // then
         response.andDo(log())
@@ -341,11 +152,9 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
 
         ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("sort", sortField + " desc"));
+                performRequest(get(getIdMappingResultPath(), job.getJobId())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("sort", sortField + " desc"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -413,11 +222,9 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         String fieldValue = getFieldValueForField(searchField);
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .param("query", searchField + ":" + fieldValue)
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                performRequest(get(getIdMappingResultPath(), job.getJobId())
+                        .param("query", searchField + ":" + fieldValue)
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
@@ -463,11 +270,9 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param("fields", name));
+                performRequest(get(getIdMappingResultPath(), job.getJobId())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("fields", name));
 
         // then
         ResultActions resultActions =
@@ -480,6 +285,10 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
             String returnFieldValidatePath = "$.results[*].to." + path;
             resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }
+    }
+
+    protected ResultActions performRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+        return getMockMvc().perform(requestBuilder);
     }
 
     private Stream<Arguments> getAllSearchFields() {

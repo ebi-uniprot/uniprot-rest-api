@@ -1,6 +1,7 @@
-package org.uniprot.api.idmapping.controller;
+package org.uniprot.api.idmapping.controller.utils;
 
-import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_AC_ID_STR;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class UniParcIdMappingResultsJobOperation extends AbstractJobOperation {
         Map<String, String> ids = new LinkedHashMap<>();
         for (int i = 1; i <= 20; i++) {
             String fromId = String.format("Q%05d", i);
-            String toId = String.format(UniParcIdMappingResultsControllerIT.UPI_PREF + "%02d", i);
+            String toId = String.format(UPI_PREF + "%02d", i);
             ids.put(fromId, toId);
         }
         return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, "UniParc", ids, jobStatus);

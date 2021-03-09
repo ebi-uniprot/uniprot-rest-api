@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,22 +41,16 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
+import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.RDFPrologs;
-import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
-import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
 /**
  * @author lgonzales
@@ -68,13 +63,9 @@ import org.uniprot.store.search.document.uniparc.UniParcDocument;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsControllerIT {
 
-    static final String UPI_PREF = "UPI0000283A";
     private static final String UNIPARC_ID_MAPPING_RESULT = "/idmapping/uniparc/results/{jobId}";
     private static final String UNIPARC_ID_MAPPING__STREAM_RESULT =
             "/idmapping/uniparc/results/stream/{jobId}";
-
-    private final UniParcDocumentConverter documentConverter =
-            new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
 
     @Autowired private UniParcFacetConfig facetConfig;
 
@@ -136,31 +127,16 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
 
     @Override
     protected String getFieldValueForValidatedField(String fieldName) {
-        String value = "";
-        switch (fieldName) {
-            case "upid":
-                value = "UP000005640";
-                break;
-            case "upi":
-                value = UPI_PREF + 11;
-                break;
-            case "length":
-                value = "[* TO *]";
-                break;
-            case "taxonomy_id":
-                value = "9606";
-                break;
-            case "uniprotkb":
-            case "isoform":
-                value = "P10011";
-                break;
-        }
-        return value;
+        return getUniParcFieldValueForValidatedField(fieldName);
     }
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
-        saveEntries();
+        when(uniParcRestTemplate.getUriTemplateHandler())
+                .thenReturn(new DefaultUriBuilderFactory());
+        when(uniParcRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+
+        saveEntries(cloudSolrClient, storeClient);
     }
 
     @Test
@@ -240,30 +216,4 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                                         + "</rdf:RDF>")));
     }
 
-    private void saveEntries() throws Exception {
-
-        when(uniParcRestTemplate.getUriTemplateHandler())
-                .thenReturn(new DefaultUriBuilderFactory());
-        when(uniParcRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-
-        for (int i = 1; i <= 20; i++) {
-            saveEntry(i);
-        }
-        cloudSolrClient.commit(SolrCollection.uniparc.name());
-    }
-
-    private void saveEntry(int i) throws Exception {
-        UniParcEntryBuilder builder =
-                UniParcEntryBuilder.from(UniParcEntryMocker.createEntry(i, UPI_PREF));
-        if (i % 3 == 0) {
-            builder.uniParcCrossReferencesAdd(
-                    UniParcEntryMocker.getXref(UniParcDatabase.EG_METAZOA));
-        }
-        UniParcEntry entry = builder.build();
-        UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
-        UniParcDocument doc = documentConverter.convert(xmlEntry);
-        cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
-        storeClient.saveEntry(entry);
-    }
 }

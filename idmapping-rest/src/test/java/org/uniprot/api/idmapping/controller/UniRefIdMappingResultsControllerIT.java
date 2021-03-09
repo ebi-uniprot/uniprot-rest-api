@@ -13,8 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,24 +41,19 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
+import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.RDFPrologs;
-import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
-import org.uniprot.core.uniref.UniRefType;
-import org.uniprot.core.xml.jaxb.uniref.Entry;
-import org.uniprot.core.xml.uniref.UniRefEntryConverter;
-import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
-import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.uniref.UniRefDocument;
 
 /**
  * @author lgonzales
@@ -139,31 +133,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
 
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
-        String value = "*";
-        switch (searchField) {
-            case "id":
-                value = ID_PREF_50 + 11;
-                break;
-            case "upi":
-                value = "UPI0000083A11";
-                break;
-            case "taxonomy_id":
-                value = "9600";
-                break;
-            case "uniprot_id":
-                value = ACC_PREF + 11;
-                break;
-            case "count":
-                value = "[2 TO 2]";
-                break;
-            case "length":
-                value = "[10 TO 500]";
-                break;
-            case "created":
-                value = "[* TO *]";
-                break;
-        }
-        return value;
+        return getUniRefFieldValueForValidatedField(searchField);
     }
 
     @Override
@@ -184,7 +154,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
         when(uniRefRestTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(uniRefRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
 
-        saveEntries();
+        saveEntries(cloudSolrClient, storeClient);
     }
 
     @Test
@@ -259,23 +229,4 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                                                         + "</rdf:RDF>")));
     }
 
-    private void saveEntries() throws Exception {
-        for (int i = 1; i <= 20; i++) {
-            saveEntry(i, UniRefType.UniRef50);
-            saveEntry(i, UniRefType.UniRef90);
-            saveEntry(i, UniRefType.UniRef100);
-        }
-        cloudSolrClient.commit(SolrCollection.uniref.name());
-    }
-
-    private void saveEntry(int i, UniRefType type) throws Exception {
-        UniRefEntry entry = UniRefEntryMocker.createEntry(i, type);
-        UniRefEntryConverter converter = new UniRefEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
-        UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
-        UniRefEntryLight entryLight = unirefLightConverter.fromXml(xmlEntry);
-        UniRefDocument doc = documentConverter.convert(xmlEntry);
-        cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
-        storeClient.saveEntry(entryLight);
-    }
 }

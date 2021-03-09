@@ -93,7 +93,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
 
     @GetMapping(
             value = "/results/stream/{jobId}",
-            produces = {RDF_MEDIA_TYPE_VALUE})
+            produces = {RDF_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntryPair>>>
             streamMappedEntries(
                     @PathVariable String jobId,

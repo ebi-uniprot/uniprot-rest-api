@@ -1,6 +1,4 @@
-package org.uniprot.api.idmapping.controller;
-
-import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsControllerIT.UNIPROTKB_AC_ID_STR;
+package org.uniprot.api.idmapping.controller.utils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -8,14 +6,16 @@ import java.util.Map;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
-import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
+
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_AC_ID_STR;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
 
 /**
  * @author sahmad
  * @created 03/03/2021
  */
-public class UniRefIdMappingResultsJobOperation extends AbstractJobOperation {
-    public UniRefIdMappingResultsJobOperation(IdMappingJobCacheService cacheService) {
+public class UniProtKBIdMappingResultsJobOperation extends AbstractJobOperation {
+    public UniProtKBIdMappingResultsJobOperation(IdMappingJobCacheService cacheService) {
         super(cacheService);
     }
 
@@ -28,10 +28,9 @@ public class UniRefIdMappingResultsJobOperation extends AbstractJobOperation {
     public IdMappingJob createAndPutJobInCache(JobStatus jobStatus) throws Exception {
         Map<String, String> ids = new LinkedHashMap<>();
         for (int i = 1; i <= 20; i++) {
-            String fromId = String.format("Q%05d", i);
-            String toId = String.format(UniRefEntryMocker.ID_PREF_50 + "%02d", i);
-            ids.put(fromId, toId);
+            String id = String.format("Q%05d", i);
+            ids.put(id, id);
         }
-        return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, "UniRef50", ids, jobStatus);
+        return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, ids, jobStatus);
     }
 }
