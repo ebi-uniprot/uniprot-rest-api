@@ -259,6 +259,11 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                                                         + "</rdf:RDF>")));
     }
 
+    @Override
+    protected String getDefaultSearchQuery(){
+        return "Homo sapiens";
+    }
+
     private void saveEntries() throws Exception {
         for (int i = 1; i <= 20; i++) {
             saveEntry(i, UniRefType.UniRef50);

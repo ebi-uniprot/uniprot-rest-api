@@ -240,6 +240,11 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                                         + "</rdf:RDF>")));
     }
 
+    @Override
+    protected String getDefaultSearchQuery(){
+        return "9606";
+    }
+
     private void saveEntries() throws Exception {
 
         when(uniParcRestTemplate.getUriTemplateHandler())

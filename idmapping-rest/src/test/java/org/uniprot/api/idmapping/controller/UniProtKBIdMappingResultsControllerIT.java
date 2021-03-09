@@ -432,6 +432,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                                         + "</rdf:RDF>")));
     }
 
+    @Override
+    protected String getDefaultSearchQuery() {
+        return "FGF1"; //geneName
+    }
+
     // TODO: remove duplicated code with UniprotIT
     private List<Comment> createAllComments() {
         List<Comment> comments = new ArrayList<>();
