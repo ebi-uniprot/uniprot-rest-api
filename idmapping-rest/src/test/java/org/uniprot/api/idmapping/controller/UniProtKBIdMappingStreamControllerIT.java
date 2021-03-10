@@ -1,5 +1,12 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,13 +33,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
-
 /**
  * @author lgonzales
  * @since 08/03/2021
@@ -43,13 +43,12 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUti
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingBasicControllerIT{
+public class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingBasicControllerIT {
 
     private static final String UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniprotkb/results/stream/{jobId}";
 
-    @Autowired
-    private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 
     @Qualifier("uniproKBfacetTupleStreamTemplate")
     @Autowired
@@ -106,7 +105,8 @@ public class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingBasic
     }
 
     @Override
-    protected ResultActions performRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+    protected ResultActions performRequest(MockHttpServletRequestBuilder requestBuilder)
+            throws Exception {
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
         return mockMvc.perform(asyncDispatch(response));
     }

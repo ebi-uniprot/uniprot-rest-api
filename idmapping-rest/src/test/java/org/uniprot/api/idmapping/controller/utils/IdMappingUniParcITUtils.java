@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.controller.utils;
 
+import java.util.HashMap;
+
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;
@@ -12,11 +14,6 @@ import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-
-import java.util.HashMap;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 /**
  * @author lgonzales
@@ -52,15 +49,18 @@ public class IdMappingUniParcITUtils {
         return value;
     }
 
-
-    public static void saveEntries(CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient) throws Exception {
+    public static void saveEntries(
+            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient)
+            throws Exception {
         for (int i = 1; i <= 20; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
         cloudSolrClient.commit(SolrCollection.uniparc.name());
     }
 
-    private static void saveEntry(int i, CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient) throws Exception {
+    private static void saveEntry(
+            int i, CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient)
+            throws Exception {
         UniParcEntryBuilder builder =
                 UniParcEntryBuilder.from(UniParcEntryMocker.createEntry(i, UPI_PREF));
         if (i % 3 == 0) {

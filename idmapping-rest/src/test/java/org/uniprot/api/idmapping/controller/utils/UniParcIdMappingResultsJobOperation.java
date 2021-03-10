@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller.utils;
 
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

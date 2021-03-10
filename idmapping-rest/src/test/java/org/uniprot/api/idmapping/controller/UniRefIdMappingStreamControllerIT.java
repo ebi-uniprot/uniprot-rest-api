@@ -1,5 +1,15 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.saveEntries;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.provider.Arguments;
@@ -26,16 +36,6 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.saveEntries;
-
 /**
  * @author lgonzales
  * @since 08/03/2021
@@ -45,13 +45,12 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.
 @WebMvcTest(UniRefIdMappingResultsController.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UniRefIdMappingStreamControllerIT extends AbstractIdMappingBasicControllerIT{
+public class UniRefIdMappingStreamControllerIT extends AbstractIdMappingBasicControllerIT {
 
     private static final String UNIREF_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniref/results/stream/{jobId}";
 
-    @Autowired
-    private UniProtStoreClient<UniRefEntryLight> storeClient;
+    @Autowired private UniProtStoreClient<UniRefEntryLight> storeClient;
 
     @Qualifier("uniRefFacetTupleStreamTemplate")
     @Autowired
@@ -108,7 +107,8 @@ public class UniRefIdMappingStreamControllerIT extends AbstractIdMappingBasicCon
     }
 
     @Override
-    protected ResultActions performRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+    protected ResultActions performRequest(MockHttpServletRequestBuilder requestBuilder)
+            throws Exception {
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
         return mockMvc.perform(asyncDispatch(response));
     }
@@ -133,5 +133,4 @@ public class UniRefIdMappingStreamControllerIT extends AbstractIdMappingBasicCon
 
         saveEntries(cloudSolrClient, storeClient);
     }
-
 }
