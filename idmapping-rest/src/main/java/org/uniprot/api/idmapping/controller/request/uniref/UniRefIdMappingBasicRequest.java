@@ -23,9 +23,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UniRefIdMappingBasicRequest extends IdMappingPageRequest {
-
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniref-search-fields.json")
-    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
+    @Parameter(description = "Criteria to search the proteins. It can take any valid lucene query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(uniProtDataType = UniProtDataType.UNIREF, messagePrefix = "search.uniref")
     private String query;
