@@ -32,6 +32,9 @@ import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * @author lgonzales
@@ -226,6 +229,29 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
     }
 
     // ---------------------------------------------------------------------------------
+    // -------------------------------- SEARCH FIELDS ----------------------------------
+    // ---------------------------------------------------------------------------------
+    @ParameterizedTest(name = "[{index}] search fieldName {0}")
+    @MethodSource("getAllSearchFields")
+    void searchCanSearchWithAllSearchFields(String searchField) throws Exception {
+        assertThat(searchField, notNullValue());
+
+        // when
+        String fieldValue = getFieldValueForField(searchField);
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                performRequest(get(getIdMappingResultPath(), job.getJobId())
+                        .param("query", searchField + ":" + fieldValue)
+                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", greaterThan(0)));
+    }
+
+    // ---------------------------------------------------------------------------------
     // ----------------------------------------- TEST FACETS ---------------------------
     // ---------------------------------------------------------------------------------
     @Test
@@ -277,7 +303,32 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
                 .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
     }
 
+    private Stream<Arguments> getAllSearchFields() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType())
+                .getSearchFieldItems().stream()
+                .map(SearchFieldItem::getFieldName)
+                .map(Arguments::of);
+    }
+
     private Stream<Arguments> getAllFacets() {
         return getFacetConfig().getFacetNames().stream().map(Arguments::of);
+    }
+
+    private String getFieldValueForField(String searchField) {
+        String value = getFieldValueForValidatedField(searchField);
+        if (value.isEmpty()) {
+            if (fieldValueIsValid(searchField, "*")) {
+                value = "*";
+            } else if (fieldValueIsValid(searchField, "true")) {
+                value = "true";
+            }
+        }
+        return value;
+    }
+
+    private boolean fieldValueIsValid(String field, String value) {
+        SearchFieldConfig fieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType());
+        return fieldConfig.isSearchFieldValueValid(field, value);
     }
 }

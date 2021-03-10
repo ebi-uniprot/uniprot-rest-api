@@ -20,6 +20,6 @@ public class UniProtKBIdMappingStreamRequest extends UniProtKBIdMappingBasicRequ
     @Parameter(
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
-    @Pattern(regexp = "^true|false$", message = "{search.uniprotkb.invalid.download}")
+    @Pattern(regexp = "^true|false$", message = "{search.uniprot.invalid.download}")
     private String download;
 }

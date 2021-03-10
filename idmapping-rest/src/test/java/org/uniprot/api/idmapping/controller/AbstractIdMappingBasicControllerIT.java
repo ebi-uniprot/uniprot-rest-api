@@ -215,26 +215,6 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                                         "'invalidfield2' is not a valid search field")));
     }
 
-    @ParameterizedTest(name = "[{index}] search fieldName {0}")
-    @MethodSource("getAllSearchFields")
-    void searchCanSearchWithAllSearchFields(String searchField) throws Exception {
-        assertThat(searchField, notNullValue());
-
-        // when
-        String fieldValue = getFieldValueForField(searchField);
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .param("query", searchField + ":" + fieldValue)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", greaterThan(0)));
-    }
-
     @Test
     void testSearchWithoutFieldName() throws Exception {
         // when
@@ -333,13 +313,6 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         return "*";
     }
 
-    private Stream<Arguments> getAllSearchFields() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType())
-                .getSearchFieldItems().stream()
-                .map(SearchFieldItem::getFieldName)
-                .map(Arguments::of);
-    }
-
     private Stream<Arguments> getAllSortFields() {
         SearchFieldConfig fieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType());
@@ -357,23 +330,5 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
-    }
-
-    private String getFieldValueForField(String searchField) {
-        String value = getFieldValueForValidatedField(searchField);
-        if (value.isEmpty()) {
-            if (fieldValueIsValid(searchField, "*")) {
-                value = "*";
-            } else if (fieldValueIsValid(searchField, "true")) {
-                value = "true";
-            }
-        }
-        return value;
-    }
-
-    private boolean fieldValueIsValid(String field, String value) {
-        SearchFieldConfig fieldConfig =
-                SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType());
-        return fieldConfig.isSearchFieldValueValid(field, value);
     }
 }
