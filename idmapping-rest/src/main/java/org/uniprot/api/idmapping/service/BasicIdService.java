@@ -8,6 +8,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrQuery;
@@ -31,8 +33,6 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * @author sahmad
@@ -137,7 +137,9 @@ public abstract class BasicIdService<T, U> {
             List<String> toIds = getMappedToIds(mappedIds);
 
             long start = System.currentTimeMillis();
-            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, streamRequest);
+
+            SearchRequest searchRequest= SearchStreamRequest.from(streamRequest);
+            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
             long end = System.currentTimeMillis();
             log.info("Time taken to search solr in ms {}", (end - start));
 
@@ -152,13 +154,6 @@ public abstract class BasicIdService<T, U> {
             }
         }
         return mappedIds;
-    }
-
-    private SolrStreamFacetResponse searchBySolrStream(
-            List<String> ids, StreamRequest streamRequest) {
-        SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, streamRequest);
-        TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
-        return this.facetTupleStreamConverter.convert(facetTupleStream);
     }
 
     private SolrStreamFacetResponse searchBySolrStream(
@@ -229,57 +224,22 @@ public abstract class BasicIdService<T, U> {
     }
 
     private SolrStreamFacetRequest createSolrStreamRequest(
-            List<String> ids, StreamRequest streamRequest) {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
-                SolrStreamFacetRequest.builder();
-
-        // append the facet filter query in the accession query
-        String termQuery = createIdTermQuery(ids);
-        createQuery(solrRequestBuilder, termQuery, streamRequest.getQuery());
-
-        createSort(solrRequestBuilder, streamRequest.getSort());
-
-        return solrRequestBuilder
-                .queryConfig(this.queryConfig)
-                .facets(Collections.emptyList())
-                .build();
-    }
-
-    private SolrStreamFacetRequest createSolrStreamRequest(
             List<String> ids, SearchRequest searchRequest) {
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
                 SolrStreamFacetRequest.builder();
 
+        // construct the query for tuple stream
+        StringBuilder qb = new StringBuilder();
+        qb.append("({!terms f=")
+                .append(getSolrIdField())
+                .append("}")
+                .append(String.join(",", ids))
+                .append(")");
+        String termQuery = qb.toString();
+
         // append the facet filter query in the accession query
-        String termQuery = createIdTermQuery(ids);
-        createQuery(solrRequestBuilder, termQuery, searchRequest.getQuery());
-
-        createSort(solrRequestBuilder, searchRequest.getSort());
-
-        return solrRequestBuilder
-                .queryConfig(this.queryConfig)
-                .facets(searchRequest.getFacetList())
-                .build();
-    }
-
-    private void createSort(
-            SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder,
-            String sortRequest) {
-        if (Utils.notNullNotEmpty(sortRequest)) {
-            List<SolrQuery.SortClause> sort =
-                    SortUtils.parseSortClause(getUniProtDataType(), sortRequest);
-            solrRequestBuilder.searchSort(getSearchSort(sort));
-            solrRequestBuilder.searchFieldList(getFieldList(sort));
-            solrRequestBuilder.searchAccession(Boolean.TRUE);
-        }
-    }
-
-    private void createQuery(
-            SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder,
-            String termQuery,
-            String requestQuery) {
-        if (Utils.notNullNotEmpty(requestQuery)) {
-            solrRequestBuilder.query(requestQuery);
+        if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
+            solrRequestBuilder.query(searchRequest.getQuery());
             solrRequestBuilder.filteredQuery(termQuery);
             solrRequestBuilder.searchAccession(Boolean.TRUE);
             solrRequestBuilder.searchSort(getSolrIdField() + " asc");
@@ -287,17 +247,19 @@ public abstract class BasicIdService<T, U> {
         } else {
             solrRequestBuilder.query(termQuery);
         }
-    }
 
-    // construct the query for tuple stream
-    private String createIdTermQuery(List<String> ids) {
-        StringBuilder qb = new StringBuilder();
-        qb.append("({!terms f=")
-                .append(getSolrIdField())
-                .append("}")
-                .append(String.join(",", ids))
-                .append(")");
-        return qb.toString();
+        if (Utils.notNullNotEmpty(searchRequest.getSort())) {
+            List<SolrQuery.SortClause> sort =
+                    SortUtils.parseSortClause(getUniProtDataType(), searchRequest.getSort());
+            solrRequestBuilder.searchSort(getSearchSort(sort));
+            solrRequestBuilder.searchFieldList(getFieldList(sort));
+            solrRequestBuilder.searchAccession(Boolean.TRUE);
+        }
+
+        return solrRequestBuilder
+                .queryConfig(this.queryConfig)
+                .facets(searchRequest.getFacetList())
+                .build();
     }
 
     private String getSearchSort(List<SolrQuery.SortClause> sort) {
@@ -321,5 +283,29 @@ public abstract class BasicIdService<T, U> {
         return Utils.notNullNotEmpty(searchRequest.getQuery())
                 || Utils.notNullNotEmpty(searchRequest.getFacets())
                 || Utils.notNullNotEmpty(searchRequest.getSort());
+    }
+
+    @Builder
+    @Getter
+    private static class SearchStreamRequest implements SearchRequest{
+        private final String facets;
+        private final String cursor;
+        private final String query;
+        private final String sort;
+        private final String fields;
+        private Integer size;
+
+        @Override
+        public void setSize(Integer size) {
+            this.size = size;
+        }
+
+        static SearchRequest from(StreamRequest streamRequest){
+            return SearchStreamRequest.builder()
+                    .fields(streamRequest.getFields())
+                    .query(streamRequest.getQuery())
+                    .sort(streamRequest.getSort())
+                    .build();
+        }
     }
 }
