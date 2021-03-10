@@ -237,15 +237,11 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                 .string(
                                         containsString(
                                                 "From\tEntry\tOrganisms\tUniProtKB\tFirst seen\tLast seen\tLength")))
-                .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "Q00001\tUPI0000283A01\tName 7787; Name 9606\tP10001; P12301\t2017-02-12\t2017-04-23\t11\n"
-                                                        + "Q00002\tUPI0000283A02\tName 7787; Name 9606\tP10002; P12302\t2017-02-12\t2017-04-23\t12\n"
-                                                        + "Q00003\tUPI0000283A03\tName 7787; Name 9606\tP10003; P12303\t2017-02-12\t2021-03-09\t13\n"
-                                                        + "Q00004\tUPI0000283A04\tName 7787; Name 9606\tP10004; P12304\t2017-02-12\t2017-04-23\t14\n"
-                                                        + "Q00005\tUPI0000283A05\tName 7787; Name 9606\tP10005; P12305\t2017-02-12\t2017-04-23\t15")));
+                .andExpect(content().string(containsString("Q00001\tUPI0000283A01\tName 7787; Name 9606\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
+                .andExpect(content().string(containsString("Q00002\tUPI0000283A02\tName 7787; Name 9606\tP10002; P12302\t2017-02-12\t2017-04-23\t12")))
+                .andExpect(content().string(containsString("Q00003\tUPI0000283A03\tName 7787; Name 9606\tP10003; P12303\t2017-02-12")))
+                .andExpect(content().string(containsString("Q00004\tUPI0000283A04\tName 7787; Name 9606\tP10004; P12304\t2017-02-12\t2017-04-23\t14")))
+                .andExpect(content().string(containsString("Q00005\tUPI0000283A05\tName 7787; Name 9606\tP10005; P12305\t2017-02-12\t2017-04-23\t15")));
     }
 
     @Override
