@@ -8,7 +8,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrQuery;
@@ -32,6 +31,8 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * @author sahmad
@@ -154,7 +155,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     private SolrStreamFacetResponse searchBySolrStream(
-            List<String> ids, StreamRequest streamRequest){
+            List<String> ids, StreamRequest streamRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, streamRequest);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
         return this.facetTupleStreamConverter.convert(facetTupleStream);
@@ -243,6 +244,7 @@ public abstract class BasicIdService<T, U> {
                 .facets(Collections.emptyList())
                 .build();
     }
+
     private SolrStreamFacetRequest createSolrStreamRequest(
             List<String> ids, SearchRequest searchRequest) {
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
@@ -260,7 +262,9 @@ public abstract class BasicIdService<T, U> {
                 .build();
     }
 
-    private void createSort(SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder, String sortRequest) {
+    private void createSort(
+            SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder,
+            String sortRequest) {
         if (Utils.notNullNotEmpty(sortRequest)) {
             List<SolrQuery.SortClause> sort =
                     SortUtils.parseSortClause(getUniProtDataType(), sortRequest);
@@ -270,7 +274,10 @@ public abstract class BasicIdService<T, U> {
         }
     }
 
-    private void createQuery(SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder, String termQuery, String requestQuery) {
+    private void createQuery(
+            SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder,
+            String termQuery,
+            String requestQuery) {
         if (Utils.notNullNotEmpty(requestQuery)) {
             solrRequestBuilder.query(requestQuery);
             solrRequestBuilder.filteredQuery(termQuery);

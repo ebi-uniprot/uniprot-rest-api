@@ -20,14 +20,7 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUti
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
 
 import java.util.*;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
@@ -155,8 +148,6 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
             saveEntry(i, cloudSolrClient, storeClient);
         }
     }
-
-
 
     @Test
     void testUniProtKBToUniProtKBMapping() throws Exception {

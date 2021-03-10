@@ -48,7 +48,6 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
 
     protected abstract FacetConfig getFacetConfig();
 
-
     // ---------------------------------------------------------------------------------
     // -------------------------------- PAGINATION TEST --------------------------------
     // ---------------------------------------------------------------------------------
@@ -60,8 +59,9 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         String[] ids = job.getIdMappingRequest().getIds().split(",");
 
-        MockHttpServletRequestBuilder requestBuilder = get(getIdMappingResultPath(), job.getJobId())
-                .header(ACCEPT, MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
         ResultActions response = performRequest(requestBuilder);
         // then
         response.andDo(log())
@@ -84,9 +84,10 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         String[] ids = job.getIdMappingRequest().getIds().split(",");
 
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("size", String.valueOf(size)));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("size", String.valueOf(size)));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -110,9 +111,10 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         String[] ids = job.getIdMappingRequest().getIds().split(",");
 
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("size", String.valueOf(size)));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("size", String.valueOf(size)));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -133,10 +135,11 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
 
         // when 2nd page
         response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("size", String.valueOf(size))
-                        .param("cursor", cursor));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("size", String.valueOf(size))
+                                .param("cursor", cursor));
 
         // then
         response.andDo(log())
@@ -158,9 +161,10 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("size", "0"));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("size", "0"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -175,9 +179,10 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("size", "-1"));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("size", "-1"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -193,9 +198,10 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("size", "600"));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("size", "600"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -218,8 +224,9 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         job.getIdMappingResult().setUnmappedIds(unmappedIds);
 
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))

@@ -1,18 +1,7 @@
 package org.uniprot.benchmark.idmapping;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Strings;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.uniprot.core.util.Utils;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -22,8 +11,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StopWatch;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.uniprot.core.util.Utils;
+
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Strings;
 
 /**
  * Created 09/03/2021
@@ -107,7 +109,9 @@ public class IdMappingCheckResponseTimes {
         int truncateIdsPos = Math.min(ids.length(), 40);
         log.info("\tIds: {} ...", ids.substring(0, truncateIdsPos));
         log.info("\tId count: {}", ids.chars().filter(c -> c == ',').count() + 1);
-        log.info("\tResult request params: {}", Utils.notNullNotEmpty(resultsParams)? resultsParams : "<NONE>");
+        log.info(
+                "\tResult request params: {}",
+                Utils.notNullNotEmpty(resultsParams) ? resultsParams : "<NONE>");
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(runUrl());
 
@@ -164,8 +168,8 @@ public class IdMappingCheckResponseTimes {
                 // ---- FETCH RESULTS OF JOB ----
                 String resultsUrl = host + location.toString() + resultsParams;
                 stopWatch.start(resultsUrl);
-                ResponseEntity<String> responseEntity = restTemplate
-                        .exchange(resultsUrl, HttpMethod.GET, httpEntity, String.class);
+                ResponseEntity<String> responseEntity =
+                        restTemplate.exchange(resultsUrl, HttpMethod.GET, httpEntity, String.class);
                 log.info("Results headers: {}", responseEntity.getHeaders());
                 stopWatch.stop();
             }

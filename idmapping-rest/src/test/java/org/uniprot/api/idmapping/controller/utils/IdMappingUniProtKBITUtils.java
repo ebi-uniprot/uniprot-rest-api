@@ -1,5 +1,13 @@
 package org.uniprot.api.idmapping.controller.utils;
 
+import static org.mockito.Mockito.mock;
+
+import java.io.IOException;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
@@ -37,23 +45,13 @@ import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.mockito.Mockito.mock;
-
 /**
  * @author lgonzales
  * @since 08/03/2021
  */
 public class IdMappingUniProtKBITUtils {
 
-    private IdMappingUniProtKBITUtils(){
-
-    }
+    private IdMappingUniProtKBITUtils() {}
 
     public static final String UNIPROTKB_AC_ID_STR = "UniProtKB_AC-ID";
     public static final String UNIPROTKB_STR = "UniProtKB";
@@ -105,7 +103,9 @@ public class IdMappingUniProtKBITUtils {
         return value;
     }
 
-    public static void saveEntry(int i, SolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient) throws IOException, SolrServerException {
+    public static void saveEntry(
+            int i, SolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient)
+            throws IOException, SolrServerException {
         UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
         String acc = String.format("Q%05d", i);
         entryBuilder.primaryAccession(acc);
@@ -116,8 +116,7 @@ public class IdMappingUniProtKBITUtils {
         }
 
         List<Comment> comments = createAllComments();
-        entryBuilder.extraAttributesAdd(
-                UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
+        entryBuilder.extraAttributesAdd(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
         entryBuilder.lineagesAdd(TaxonomyLineageTest.getCompleteTaxonomyLineage());
         entryBuilder.geneLocationsAdd(GeneLocationTest.getGeneLocation());
         Gene gene =
@@ -168,8 +167,7 @@ public class IdMappingUniProtKBITUtils {
                         .collect(Collectors.toList());
 
         goAssertionCodes.addAll(
-                Arrays.asList(
-                        "rca", "nd", "ibd", "ikr", "ird", "unknown")); // TODO: is it correct?
+                Arrays.asList("rca", "nd", "ibd", "ikr", "ird", "unknown")); // TODO: is it correct?
 
         goAssertionCodes.forEach(
                 code ->
@@ -245,7 +243,7 @@ public class IdMappingUniProtKBITUtils {
 
     private static List<UniProtKBFeature> getFeatures() {
         return Arrays.stream(UniprotKBFeatureType.values())
-                        .map(FeatureTest::getFeature)
-                        .collect(Collectors.toList());
+                .map(FeatureTest::getFeature)
+                .collect(Collectors.toList());
     }
 }

@@ -1,5 +1,15 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.saveEntries;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -61,8 +71,7 @@ class UniRefIdMappingStreamControllerIT extends AbstractIdMappingStreamControlle
     private static final String UNIREF_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniref/results/stream/{jobId}";
 
-    @Autowired
-    private UniProtStoreClient<UniRefEntryLight> storeClient;
+    @Autowired private UniProtStoreClient<UniRefEntryLight> storeClient;
 
     @Qualifier("uniRefFacetTupleStreamTemplate")
     @Autowired

@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.controller.utils;
 
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
+
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
@@ -13,9 +16,6 @@ import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
-
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ACC_PREF;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.ID_PREF_50;
 
 /**
  * @author lgonzales
@@ -54,7 +54,9 @@ public class IdMappingUniRefITUtils {
         return value;
     }
 
-    public static void saveEntries(CloudSolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient) throws Exception {
+    public static void saveEntries(
+            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient)
+            throws Exception {
         for (int i = 1; i <= 20; i++) {
             saveEntry(i, UniRefType.UniRef50, cloudSolrClient, storeClient);
             saveEntry(i, UniRefType.UniRef90, cloudSolrClient, storeClient);
@@ -63,7 +65,12 @@ public class IdMappingUniRefITUtils {
         cloudSolrClient.commit(SolrCollection.uniref.name());
     }
 
-    private static void saveEntry(int i, UniRefType type, CloudSolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient) throws Exception {
+    private static void saveEntry(
+            int i,
+            UniRefType type,
+            CloudSolrClient cloudSolrClient,
+            UniProtStoreClient<UniRefEntryLight> storeClient)
+            throws Exception {
         UniRefEntry entry = UniRefEntryMocker.createEntry(i, type);
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);

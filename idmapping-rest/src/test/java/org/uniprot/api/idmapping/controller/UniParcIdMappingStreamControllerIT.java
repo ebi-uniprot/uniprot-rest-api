@@ -1,5 +1,12 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -57,8 +64,7 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
     private static final String UNIPARC_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniparc/results/stream/{jobId}";
 
-    @Autowired
-    private UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniParcEntry> storeClient;
 
     @Qualifier("uniParcFacetTupleStreamTemplate")
     @Autowired

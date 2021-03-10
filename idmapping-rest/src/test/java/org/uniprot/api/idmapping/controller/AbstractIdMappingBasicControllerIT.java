@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -154,9 +153,10 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
 
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("sort", sortField + " desc"));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("sort", sortField + " desc"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -221,9 +221,10 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         String searchQuery = getDefaultSearchQuery();
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
 
-        MockHttpServletRequestBuilder requestBuilder = get(getIdMappingResultPath(), job.getJobId())
-                .param("query", searchQuery)
-                .header(ACCEPT, APPLICATION_JSON_VALUE);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId())
+                        .param("query", searchQuery)
+                        .header(ACCEPT, APPLICATION_JSON_VALUE);
         ResultActions response = performRequest(requestBuilder);
 
         // then
@@ -239,9 +240,10 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         String searchQuery = UUID.randomUUID().toString();
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
 
-        MockHttpServletRequestBuilder requestBuilder = get(getIdMappingResultPath(), job.getJobId())
-                .param("query", searchQuery)
-                .header(ACCEPT, APPLICATION_JSON_VALUE);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId())
+                        .param("query", searchQuery)
+                        .header(ACCEPT, APPLICATION_JSON_VALUE);
         ResultActions response = performRequest(requestBuilder);
 
         // then
@@ -288,9 +290,10 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("fields", name));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", name));
 
         // then
         ResultActions resultActions =
@@ -305,7 +308,8 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         }
     }
 
-    protected ResultActions performRequest(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+    protected ResultActions performRequest(MockHttpServletRequestBuilder requestBuilder)
+            throws Exception {
         return getMockMvc().perform(requestBuilder);
     }
 

@@ -1,5 +1,12 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -61,8 +68,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
     private static final String UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniprotkb/results/stream/{jobId}";
 
-    @Autowired
-    private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 
     @Qualifier("uniproKBfacetTupleStreamTemplate")
     @Autowired
