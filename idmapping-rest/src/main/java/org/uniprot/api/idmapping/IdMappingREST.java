@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Import;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 
 /**
- * Starts the ID Mapping service.
+ * Starts the Id mapping service.
  *
  * <p>Created 15/02/2021
  *

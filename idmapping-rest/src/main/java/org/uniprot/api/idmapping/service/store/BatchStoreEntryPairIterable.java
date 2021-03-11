@@ -15,6 +15,7 @@ import org.uniprot.store.datastore.UniProtStoreClient;
  * @author lgonzales
  * @since 05/03/2021
  */
+// TODO: 11/03/2021 needs tests
 public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
         implements Iterable<Collection<T>> {
     private final Iterator<IdMappingStringPair> sourceIterator;
@@ -22,7 +23,7 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
     private final UniProtStoreClient<S> storeClient;
     private final RetryPolicy<Object> retryPolicy;
 
-    public BatchStoreEntryPairIterable(
+    protected BatchStoreEntryPairIterable(
             Iterable<IdMappingStringPair> sourceIterable,
             int batchSize,
             UniProtStoreClient<S> storeClient,
@@ -35,7 +36,7 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
 
     @Override
     public Iterator<Collection<T>> iterator() {
-        return new Iterator<Collection<T>>() {
+        return new Iterator<>() {
             @Override
             public boolean hasNext() {
                 return sourceIterator.hasNext();

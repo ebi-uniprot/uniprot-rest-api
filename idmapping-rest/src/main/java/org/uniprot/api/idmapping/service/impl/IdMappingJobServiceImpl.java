@@ -38,11 +38,6 @@ import com.google.common.base.Preconditions;
 @Slf4j
 public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final String RESULTS_SUBPATH = "results/";
-    private final IdMappingJobCacheService cacheService;
-    private final IdMappingPIRService pirService;
-    private final ThreadPoolTaskExecutor jobTaskExecutor;
-    private final HashGenerator hashGenerator;
-    private final String contextPath;
     private static final Set<String> UNIREF_SET;
     private static final String UNIPARC;
     private static final Set<String> UNIPROTKB_SET;
@@ -79,6 +74,12 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                         + IdMappingFieldConfig.class.getName());
     }
 
+    private final IdMappingJobCacheService cacheService;
+    private final IdMappingPIRService pirService;
+    private final ThreadPoolTaskExecutor jobTaskExecutor;
+    private final HashGenerator hashGenerator;
+    private final String contextPath;
+
     public IdMappingJobServiceImpl(
             IdMappingJobCacheService cacheService,
             IdMappingPIRService pirService,
@@ -100,14 +101,10 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
 
         if (!this.cacheService.exists(jobId)) {
             this.cacheService.put(jobId, idMappingJob);
-            String logIds = idMappingJob.getIdMappingRequest().getIds();
-            if (logIds.length() > 40) { // TODO: SHOULD WE REMOVE IT?
-                logIds = logIds.substring(0, 40);
-            }
             log.debug(
                     "Put into cache, {} ids: {}...",
                     idMappingJob.getIdMappingRequest().getIds().split(",").length,
-                    logIds);
+                    idsForLog(idMappingJob.getIdMappingRequest().getIds()));
             // create task and submit
             JobTask jobTask = new JobTask(idMappingJob, pirService);
             jobTaskExecutor.execute(jobTask);
@@ -139,6 +136,14 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                 + dbType
                 + RESULTS_SUBPATH
                 + job.getJobId();
+    }
+
+    private String idsForLog(String logIds) {
+        if (logIds.length() > 40) {
+            return logIds.substring(0, 40);
+        } else {
+            return logIds;
+        }
     }
 
     private IdMappingJob createJob(String jobId, IdMappingJobRequest request) {
