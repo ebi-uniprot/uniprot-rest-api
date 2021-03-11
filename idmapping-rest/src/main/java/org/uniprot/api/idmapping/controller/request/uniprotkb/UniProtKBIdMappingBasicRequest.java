@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniProtKBIdMappingBasicRequest extends IdMappingPageRequest {
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
+    @Parameter(description = "Criteria to search the proteins. It can take any valid lucene query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPROTKB,
