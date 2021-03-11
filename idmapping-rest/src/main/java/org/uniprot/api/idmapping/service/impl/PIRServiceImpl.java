@@ -27,7 +27,7 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 @Service
 public class PIRServiceImpl extends IdMappingPIRService {
     public static final String PIR_ID_MAPPING_URL =
-            "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async_test";
+            UriComponentsBuilder.fromHttpUrl("https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async_test").toUriString();
     static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
     private final RestTemplate restTemplate;
     private final PIRResponseConverter pirResponseConverter;
@@ -47,14 +47,12 @@ public class PIRServiceImpl extends IdMappingPIRService {
 
     @Override
     public IdMappingResult mapIds(IdMappingJobRequest request) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(PIR_ID_MAPPING_URL);
-
         HttpEntity<MultiValueMap<String, String>> requestBody =
                 new HttpEntity<>(createPostBody(request), HTTP_HEADERS);
 
         return pirResponseConverter.convertToIDMappings(
                 request,
-                restTemplate.postForEntity(builder.toUriString(), requestBody, String.class));
+                restTemplate.postForEntity(PIR_ID_MAPPING_URL, requestBody, String.class));
     }
 
     private MultiValueMap<String, String> createPostBody(IdMappingJobRequest request) {
