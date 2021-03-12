@@ -191,6 +191,17 @@ public abstract class BasicIdService<T, U> {
                 .map(mId -> convertToPair(mId, idEntryMap));
     }
 
+    /**
+     * This method is responsible to sort mappedIdPairs by solrToIds.
+     *
+     * Initially we create a Map<To,List<From>> to expose our order attribute "to"
+     * Then we iterate over solrToIds (that is our sort reference)
+     * and map to all possible "from" that was previously created (Map<To,List<From>>).
+     *
+     * @param mappedIdPairs Mapped Ids returned by PIR service
+     * @param solrToIds Sorted Ids returned by Solr
+     * @return mappedIdPairs sorted by solrToIds
+     */
     private List<IdMappingStringPair> applySort(
             List<IdMappingStringPair> mappedIdPairs, List<String> solrToIds) {
         // create a Map<To,List<From>>

@@ -73,14 +73,14 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     }
 
     @Override
-    public String getSolrIdField() {
+    protected String getSolrIdField() {
         return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
                 .getSearchFieldItemByName("accession_id")
                 .getFieldName();
     }
 
     @Override
-    public UniProtDataType getUniProtDataType() {
+    protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
     }
 
