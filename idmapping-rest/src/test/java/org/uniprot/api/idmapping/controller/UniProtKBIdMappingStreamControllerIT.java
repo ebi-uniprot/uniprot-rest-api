@@ -1,8 +1,15 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
 
 import java.util.List;
@@ -22,9 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -38,21 +43,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
-
 /**
  * @author lgonzales
  * @since 08/03/2021
@@ -63,7 +53,7 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUti
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamControllerIT{
+class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamControllerIT {
 
     private static final String UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniprotkb/results/stream/{jobId}";
@@ -156,14 +146,14 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                         jsonPath(
                                 "$.results.*.from",
                                 contains(
-                                        "Q00020", "Q00018", "Q00016", "Q00014", "Q00012",
-                                        "Q00010", "Q00008", "Q00006", "Q00004", "Q00002")))
+                                        "Q00020", "Q00018", "Q00016", "Q00014", "Q00012", "Q00010",
+                                        "Q00008", "Q00006", "Q00004", "Q00002")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.to.primaryAccession",
                                 contains(
-                                        "Q00020", "Q00018", "Q00016", "Q00014", "Q00012",
-                                        "Q00010", "Q00008", "Q00006", "Q00004", "Q00002")))
+                                        "Q00020", "Q00018", "Q00016", "Q00014", "Q00012", "Q00010",
+                                        "Q00008", "Q00006", "Q00004", "Q00002")))
                 .andExpect(jsonPath("$.results.*.to.sequence").exists())
                 .andExpect(jsonPath("$.results.*.to.organism").doesNotExist());
     }

@@ -166,8 +166,7 @@ public class IdMappingUniProtKBITUtils {
                         .map(String::toLowerCase)
                         .collect(Collectors.toList());
 
-        goAssertionCodes.addAll(
-                Arrays.asList("rca", "nd", "ibd", "ikr", "ird", "unknown"));
+        goAssertionCodes.addAll(Arrays.asList("rca", "nd", "ibd", "ikr", "ird", "unknown"));
 
         goAssertionCodes.forEach(
                 code ->

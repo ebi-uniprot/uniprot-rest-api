@@ -1,8 +1,14 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.saveEntries;
 
@@ -23,9 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -40,23 +44,6 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.contains;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.saveEntries;
-
 /**
  * @author lgonzales
  * @since 08/03/2021
@@ -66,7 +53,7 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.
 @WebMvcTest(UniRefIdMappingResultsController.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniRefIdMappingStreamControllerIT extends AbstractIdMappingStreamControllerIT{
+class UniRefIdMappingStreamControllerIT extends AbstractIdMappingStreamControllerIT {
 
     private static final String UNIREF_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniref/results/stream/{jobId}";
@@ -155,12 +142,12 @@ class UniRefIdMappingStreamControllerIT extends AbstractIdMappingStreamControlle
 
         ResultActions response =
                 performRequest(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .param("query", "identity:0.5")
-                                        .param("fields", "id,name,common_taxon,sequence")
-                                        .param("sort", "id desc")
-                                        .param("download", "true")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .param("query", "identity:0.5")
+                                .param("fields", "id,name,common_taxon,sequence")
+                                .param("sort", "id desc")
+                                .param("download", "true")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
@@ -171,10 +158,10 @@ class UniRefIdMappingStreamControllerIT extends AbstractIdMappingStreamControlle
                         jsonPath(
                                 "$.results.*.from",
                                 contains(
-                                        "Q00020", "Q00019", "Q00018", "Q00017", "Q00016",
-                                        "Q00015", "Q00014", "Q00013", "Q00012", "Q00011",
-                                        "Q00010", "Q00009", "Q00008", "Q00007", "Q00006",
-                                        "Q00005", "Q00004", "Q00003", "Q00002", "Q00001")))
+                                        "Q00020", "Q00019", "Q00018", "Q00017", "Q00016", "Q00015",
+                                        "Q00014", "Q00013", "Q00012", "Q00011", "Q00010", "Q00009",
+                                        "Q00008", "Q00007", "Q00006", "Q00005", "Q00004", "Q00003",
+                                        "Q00002", "Q00001")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.to.id",

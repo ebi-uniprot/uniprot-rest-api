@@ -1,23 +1,24 @@
 package org.uniprot.api.idmapping.service.store;
 
-import lombok.*;
-import net.jodah.failsafe.RetryPolicy;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.idmapping.model.EntryPair;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.datastore.voldemort.RetrievalException;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import lombok.*;
+import net.jodah.failsafe.RetryPolicy;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.store.datastore.UniProtStoreClient;
+import org.uniprot.store.datastore.voldemort.RetrievalException;
 
 class BatchStoreEntryPairIterableTest {
     private UniProtStoreClient<FakeName> storeClient;
@@ -69,8 +70,7 @@ class BatchStoreEntryPairIterableTest {
         FakeBatchStoreEntryPairIterable batchStoreEntryPairIterable =
                 new FakeBatchStoreEntryPairIterable(sourceIterable, 2, storeClient, retryPolicy);
 
-        when(storeClient.getEntries(Set.of("to1", "to2")))
-                .thenThrow(RetrievalException.class);
+        when(storeClient.getEntries(Set.of("to1", "to2"))).thenThrow(RetrievalException.class);
 
         Iterator<Collection<FakeResultPair>> iterator = batchStoreEntryPairIterable.iterator();
         assertThat(iterator.hasNext(), is(true));

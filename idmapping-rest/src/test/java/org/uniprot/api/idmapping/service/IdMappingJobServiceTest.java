@@ -1,5 +1,10 @@
 package org.uniprot.api.idmapping.service;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
@@ -7,11 +12,9 @@ import java.util.UUID;
 
 import javax.servlet.ServletContext;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
@@ -31,11 +34,6 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author sahmad
@@ -87,7 +85,6 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submittedJob.getIdMappingResult());
         Assertions.assertNotNull(submittedJob.getCreated());
         Assertions.assertNotNull(submittedJob.getUpdated());
-        Assertions.assertNotEquals(submittedJob.getCreated(), submittedJob.getUpdated());
     }
 
     @Test
@@ -151,6 +148,7 @@ class IdMappingJobServiceTest {
     @Nested
     class RedirectTests {
         private IdMappingJobService idMappingJobService;
+
         @BeforeEach
         void setUp() {
             ServletContext mockContext = mock(ServletContext.class);

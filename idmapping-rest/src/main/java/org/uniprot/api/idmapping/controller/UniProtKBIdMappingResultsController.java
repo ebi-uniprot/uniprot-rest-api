@@ -58,7 +58,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "results", description = "APIs to get result of the submitted job.")
 @Slf4j
 @RestController
-@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/" + UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH)
+@RequestMapping(
+        value =
+                IdMappingJobController.IDMAPPING_PATH
+                        + "/"
+                        + UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH)
 public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKBEntryPair> {
     public static final String UNIPROTKB_ID_MAPPING_PATH = "uniprotkb";
     private final UniProtKBIdService idService;

@@ -1,5 +1,14 @@
 package org.uniprot.api.idmapping.service;
 
+import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
+
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,15 +20,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
 
 class PIRResponseConverterTest {
     private PIRResponseConverter converter;

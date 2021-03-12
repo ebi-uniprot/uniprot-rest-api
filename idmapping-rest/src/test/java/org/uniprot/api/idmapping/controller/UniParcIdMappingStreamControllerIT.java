@@ -1,8 +1,15 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
 
 import java.util.List;
@@ -19,9 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -35,21 +40,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
-
 /**
  * @author lgonzales
  * @since 08/03/2021
@@ -59,7 +49,7 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils
 @WebMvcTest(UniParcIdMappingResultsController.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControllerIT{
+class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControllerIT {
 
     private static final String UNIPARC_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniparc/results/stream/{jobId}";
@@ -135,11 +125,11 @@ class UniParcIdMappingStreamControllerIT extends AbstractIdMappingStreamControll
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
                 performRequest(
-                                get(getIdMappingResultPath(), job.getJobId())
-                                        .param("query", "database:EnsemblMetazoa")
-                                        .param("fields", "upi,accession")
-                                        .param("sort", "length desc")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .param("query", "database:EnsemblMetazoa")
+                                .param("fields", "upi,accession")
+                                .param("sort", "length desc")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())

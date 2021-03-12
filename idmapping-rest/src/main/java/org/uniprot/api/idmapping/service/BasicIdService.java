@@ -138,7 +138,7 @@ public abstract class BasicIdService<T, U> {
 
             long start = System.currentTimeMillis();
 
-            SearchRequest searchRequest= SearchStreamRequest.from(streamRequest);
+            SearchRequest searchRequest = SearchStreamRequest.from(streamRequest);
             SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
             long end = System.currentTimeMillis();
             log.debug("Time taken to search solr in ms {}", (end - start));
@@ -194,9 +194,9 @@ public abstract class BasicIdService<T, U> {
     /**
      * This method is responsible to sort mappedIdPairs by solrToIds.
      *
-     * Initially we create a Map<To,List<From>> to expose our order attribute "to"
-     * Then we iterate over solrToIds (that is our sort reference)
-     * and map to all possible "from" that was previously created (Map<To,List<From>>).
+     * <p>Initially we create a Map<To,List<From>> to expose our order attribute "to" Then we
+     * iterate over solrToIds (that is our sort reference) and map to all possible "from" that was
+     * previously created (Map<To,List<From>>).
      *
      * @param mappedIdPairs Mapped Ids returned by PIR service
      * @param solrToIds Sorted Ids returned by Solr
@@ -298,7 +298,7 @@ public abstract class BasicIdService<T, U> {
 
     @Builder
     @Getter
-    private static class SearchStreamRequest implements SearchRequest{
+    private static class SearchStreamRequest implements SearchRequest {
         private final String facets;
         private final String cursor;
         private final String query;
@@ -311,7 +311,7 @@ public abstract class BasicIdService<T, U> {
             this.size = size;
         }
 
-        static SearchRequest from(StreamRequest streamRequest){
+        static SearchRequest from(StreamRequest streamRequest) {
             return SearchStreamRequest.builder()
                     .fields(streamRequest.getFields())
                     .query(streamRequest.getQuery())
