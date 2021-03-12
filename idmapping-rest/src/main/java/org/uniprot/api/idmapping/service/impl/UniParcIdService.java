@@ -75,7 +75,7 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryP
     }
 
     @Override
-    public UniProtDataType getUniProtDataType() {
+    protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPARC;
     }
 
