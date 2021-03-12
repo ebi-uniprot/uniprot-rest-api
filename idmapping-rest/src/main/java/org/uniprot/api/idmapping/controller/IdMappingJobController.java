@@ -72,8 +72,7 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobSubmitResponse> submitJob(
-            @Valid @ModelAttribute IdMappingJobRequest request)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
+            @Valid @ModelAttribute IdMappingJobRequest request) {
         JobSubmitResponse response = this.idMappingJobService.submitJob(request);
         return ResponseEntity.ok(response);
     }

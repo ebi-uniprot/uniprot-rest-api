@@ -73,7 +73,7 @@ public abstract class BasicIdService<T, U> {
             long start = System.currentTimeMillis();
             SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
             long end = System.currentTimeMillis();
-            log.info("Time taken to search solr in ms {}", (end - start));
+            log.debug("Time taken to search solr in ms {}", (end - start));
 
             facets = solrStreamResponse.getFacets();
 
@@ -94,7 +94,7 @@ public abstract class BasicIdService<T, U> {
         long start = System.currentTimeMillis();
         Stream<U> result = getPagedEntries(mappedIds, cursor);
         long end = System.currentTimeMillis();
-        log.info("Total time taken to call voldemort in ms {}", (end - start));
+        log.debug("Total time taken to call voldemort in ms {}", (end - start));
 
         return QueryResult.of(result, cursor, facets, null, mappingResult.getUnmappedIds());
     }
@@ -141,7 +141,7 @@ public abstract class BasicIdService<T, U> {
             SearchRequest searchRequest= SearchStreamRequest.from(streamRequest);
             SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
             long end = System.currentTimeMillis();
-            log.info("Time taken to search solr in ms {}", (end - start));
+            log.debug("Time taken to search solr in ms {}", (end - start));
 
             List<String> solrToIds = solrStreamResponse.getAccessions();
             if (Utils.notNullNotEmpty(streamRequest.getQuery())) {
