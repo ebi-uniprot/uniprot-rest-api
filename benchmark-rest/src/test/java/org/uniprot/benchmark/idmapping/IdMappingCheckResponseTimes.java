@@ -1,19 +1,10 @@
 package org.uniprot.benchmark.idmapping;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Strings;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
@@ -23,12 +14,34 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.core.util.Utils;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Strings;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 /**
- * Created 09/03/2021
+ * Interrogate a running Id Mapping service and determine how long fetching from PIR takes, and how
+ * long it takes to process the results (including facet computation).
+ *
+ * <p>The following shows sample program arguments one might wish to pass:
+ *
+ * <ul>
+ *   <li>-to UniProtKB
+ *   <li>-from EMBL-GenBank-DDBJ_CDS
+ *   <li>-host http://localhost:8090
+ *   <li>-idMappingPath /uniprot/api/idmapping
+ *   <li>-idFile <MY_FILE_WITH_ID_ON_EACH_NEW_LINE
+ *   <li>-resultsParams
+ *       "facets=reviewed,model_organism,proteins_with,existence,annotation_score,length"
+ * </ul>
+ *
+ * <p>Created 09/03/2021
  *
  * @author Edd
  */
