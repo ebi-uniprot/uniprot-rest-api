@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.idmapping.controller.IdMappingJobController;
 import org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController;
 import org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController;
@@ -21,8 +22,6 @@ import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import javax.servlet.ServletContext;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -93,10 +92,10 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     }
 
     @Override
-    public JobSubmitResponse submitJob(IdMappingJobRequest request)
-            throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public JobSubmitResponse submitJob(IdMappingJobRequest request) {
+        String jobId = null;
+        jobId = this.hashGenerator.generateHash(request);
 
-        String jobId = this.hashGenerator.generateHash(request);
         IdMappingJob idMappingJob = createJob(jobId, request);
 
         if (!this.cacheService.exists(jobId)) {
