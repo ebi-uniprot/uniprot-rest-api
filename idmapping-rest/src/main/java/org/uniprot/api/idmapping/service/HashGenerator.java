@@ -17,11 +17,9 @@ import org.uniprot.core.util.Utils;
  * @created 22/02/2021
  */
 public class HashGenerator {
-    // TODO: 11/03/2021 externalise since this is open-source on github?
     private static final String ALGORITHM_NAME = "PBKDF2WithHmacSHA1";
     private static final int ITERATION_COUNT = 16;
     private static final int KEY_LENGTH = 160;
-    // TODO: 11/03/2021 externalise since this is open-source on github?
     private static final String SALT_STR = "UNIPROT_SALT";
     private static final byte[] SALT = SALT_STR.getBytes(StandardCharsets.UTF_8);
 
