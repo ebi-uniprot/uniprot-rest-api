@@ -60,28 +60,7 @@ public class PIRResponseConverter {
                         .filter(line -> !line.startsWith("Taxonomy ID:"))
                         .filter(Utils::notNullNotEmpty)
                         .filter(line -> !line.startsWith("MSG:"))
-                        .forEach(
-                                line -> {
-                                    String[] rowParts = line.split("\t");
-                                    if (rowParts.length == 1) {
-                                        builder.unmappedId(rowParts[0]);
-                                    } else {
-                                        String fromValue = rowParts[0];
-                                        Arrays.stream(rowParts[1].split(";"))
-                                                // filter based on valid to
-                                                .filter(
-                                                        toValue ->
-                                                                isValidIdPattern(
-                                                                        request.getTo(), toValue))
-                                                .map(
-                                                        toValue ->
-                                                                IdMappingStringPair.builder()
-                                                                        .from(fromValue)
-                                                                        .to(toValue)
-                                                                        .build())
-                                                .forEach(builder::mappedId);
-                                    }
-                                });
+                        .forEach(line -> convertLine(line, request, builder));
             }
         } else {
             throw new HttpServerErrorException(
@@ -90,5 +69,26 @@ public class PIRResponseConverter {
         }
 
         return builder.build();
+    }
+
+    private void convertLine(
+            String line, IdMappingJobRequest request,
+            IdMappingResult.IdMappingResultBuilder builder) {
+        String[] rowParts = line.split("\t");
+        if (rowParts.length == 1) {
+            builder.unmappedId(rowParts[0]);
+        } else {
+            String fromValue = rowParts[0];
+            Arrays.stream(rowParts[1].split(";"))
+                    // filter based on valid to
+                    .filter(toValue -> isValidIdPattern(request.getTo(), toValue))
+                    .map(
+                            toValue ->
+                                    IdMappingStringPair.builder()
+                                            .from(fromValue)
+                                            .to(toValue)
+                                            .build())
+                    .forEach(builder::mappedId);
+        }
     }
 }
