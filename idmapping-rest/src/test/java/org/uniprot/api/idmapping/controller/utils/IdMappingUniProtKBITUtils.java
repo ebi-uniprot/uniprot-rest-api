@@ -167,7 +167,7 @@ public class IdMappingUniProtKBITUtils {
                         .collect(Collectors.toList());
 
         goAssertionCodes.addAll(
-                Arrays.asList("rca", "nd", "ibd", "ikr", "ird", "unknown")); // TODO: is it correct?
+                Arrays.asList("rca", "nd", "ibd", "ikr", "ird", "unknown"));
 
         goAssertionCodes.forEach(
                 code ->
