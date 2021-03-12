@@ -51,9 +51,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "results", description = "APIs to get result of the submitted job.")
 @RestController
-@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniref")
+@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/" + UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH)
 public class UniRefIdMappingResultsController extends BasicSearchController<UniRefEntryPair> {
-
+    public static final String UNIREF_ID_MAPPING_PATH = "uniref";
     private final UniRefIdService idService;
     private final IdMappingJobCacheService cacheService;
 

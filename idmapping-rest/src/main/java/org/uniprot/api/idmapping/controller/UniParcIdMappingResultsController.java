@@ -53,9 +53,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = "results", description = "APIs to get result of the submitted job.")
 @RestController
-@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/uniparc")
+@RequestMapping(value = IdMappingJobController.IDMAPPING_PATH + "/"+ UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH)
 public class UniParcIdMappingResultsController extends BasicSearchController<UniParcEntryPair> {
-
+    public static final String UNIPARC_ID_MAPPING_PATH = "uniparc";
     private final UniParcIdService idService;
     private final IdMappingJobCacheService cacheService;
 

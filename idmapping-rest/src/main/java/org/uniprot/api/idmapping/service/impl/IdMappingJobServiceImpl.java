@@ -1,20 +1,13 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.ServletContext;
-
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.IdMappingJobController;
+import org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController;
+import org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController;
+import org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
@@ -27,7 +20,14 @@ import org.uniprot.api.idmapping.service.job.JobTask;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
-import com.google.common.base.Preconditions;
+import javax.servlet.ServletContext;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created 23/02/2021
@@ -123,11 +123,11 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         String toDB = job.getIdMappingRequest().getTo();
         String dbType = "";
         if (UNIREF_SET.contains(toDB)) {
-            dbType = "uniref/";
+            dbType = UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH + "/";
         } else if (UNIPARC.equals(toDB)) {
-            dbType = "uniparc/";
+            dbType = UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH + "/";
         } else if (UNIPROTKB_SET.contains(toDB)) {
-            dbType = "uniprotkb/";
+            dbType = UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH + "/";
         }
 
         return contextPath
