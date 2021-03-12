@@ -16,9 +16,4 @@ import lombok.Singular;
 public class IdMappingResult {
     @Singular private List<String> unmappedIds;
     @Singular private List<IdMappingStringPair> mappedIds;
-
-    //    public static class IdMappingResultBuilder {
-    //        private List<String> unmappedIds = new ArrayList<>();
-    //        private List<IdMappingStringPair> mappedIds = new ArrayList<>();
-    //    }
 }
