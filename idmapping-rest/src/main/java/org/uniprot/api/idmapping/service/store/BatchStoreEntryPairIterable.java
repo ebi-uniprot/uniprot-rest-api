@@ -15,7 +15,6 @@ import org.uniprot.store.datastore.UniProtStoreClient;
  * @author lgonzales
  * @since 05/03/2021
  */
-// TODO: 11/03/2021 needs tests
 public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
         implements Iterable<Collection<T>> {
     private final Iterator<IdMappingStringPair> sourceIterator;
@@ -44,30 +43,31 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
 
             @Override
             public List<T> next() {
+                Set<String> tosBatch = new HashSet<>(batchSize);
                 List<IdMappingStringPair> batch = new ArrayList<>(batchSize);
                 for (int i = 0; i < batchSize; i++) {
                     if (sourceIterator.hasNext()) {
-                        batch.add(sourceIterator.next());
+                        IdMappingStringPair nextPair = sourceIterator.next();
+                        tosBatch.add(nextPair.getTo());
+                        batch.add(nextPair);
                     } else {
                         break;
                     }
                 }
 
-                return convertBatch(batch);
+                return convertBatch(tosBatch, batch);
             }
         };
     }
 
-    protected List<T> convertBatch(List<IdMappingStringPair> batch) {
-        Set<String> toIds =
-                batch.stream().map(IdMappingStringPair::getTo).collect(Collectors.toSet());
-        List<S> entries = Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(toIds));
+    protected List<T> convertBatch(Set<String> tos, List<IdMappingStringPair> batch) {
+        List<S> entries = Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(tos));
 
-        // accession -> entry map
+        // entry -> map <entryId, entry>
         Map<String, S> idEntryMap =
                 entries.stream().collect(Collectors.toMap(this::getEntryId, Function.identity()));
 
-        // from -> uniprot entry
+        // id mapping pairs -> Ts
         return batch.stream()
                 .filter(mId -> idEntryMap.containsKey(mId.getTo()))
                 .map(mId -> convertToPair(mId, idEntryMap))
