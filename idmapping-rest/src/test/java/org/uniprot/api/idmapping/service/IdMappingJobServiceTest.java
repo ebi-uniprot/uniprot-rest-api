@@ -7,10 +7,12 @@ import java.util.UUID;
 
 import javax.servlet.ServletContext;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.mockito.internal.stubbing.answers.AnswersWithDelay;
 import org.mockito.internal.stubbing.answers.Returns;
@@ -29,6 +31,11 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author sahmad
@@ -59,7 +66,7 @@ class IdMappingJobServiceTest {
             throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
         // when
         IdMappingJobRequest request = createIdMappingRequest();
-        Mockito.when(this.pirService.mapIds(request))
+        when(this.pirService.mapIds(request))
                 .thenReturn(
                         IdMappingResult.builder()
                                 .mappedId(new IdMappingStringPair("from", "to"))
@@ -69,7 +76,7 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submitResponse);
         Assertions.assertNotNull(submitResponse.getJobId());
         // then
-        Thread.sleep(1000); // delay to make sure that job is running
+        Thread.sleep(2000); // delay to make sure that job is running
         String jobId = submitResponse.getJobId();
         IdMappingJob submittedJob = this.cacheService.getJobAsResource(jobId);
         Assertions.assertNotNull(submittedJob);
@@ -121,7 +128,7 @@ class IdMappingJobServiceTest {
         // when
         IdMappingJobRequest request = createIdMappingRequest();
         String errorMsg = "Error during rest call";
-        Mockito.when(this.pirService.mapIds(request)).thenThrow(new RestClientException(errorMsg));
+        when(this.pirService.mapIds(request)).thenThrow(new RestClientException(errorMsg));
 
         JobSubmitResponse submitResponse = this.jobService.submitJob(request);
         Assertions.assertNotNull(submitResponse);
@@ -141,7 +148,43 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submittedJob.getUpdated());
     }
 
-    // TODO: 02/03/2021 test all paths of redirect logic
+    @Nested
+    class RedirectTests {
+        private IdMappingJobService idMappingJobService;
+        @BeforeEach
+        void setUp() {
+            ServletContext mockContext = mock(ServletContext.class);
+            when(mockContext.getContextPath()).thenReturn("");
+            idMappingJobService = new IdMappingJobServiceImpl(null, null, null, mockContext);
+        }
+
+        @ParameterizedTest(name = "{index}: {0}")
+        @ValueSource(
+                strings = {
+                    "jobId + UniRef50 -> /idmapping/uniref/results/jobId",
+                    "jobId + UniRef90 -> /idmapping/uniref/results/jobId",
+                    "jobId + UniRef100 -> /idmapping/uniref/results/jobId",
+                    "jobId + UniParc -> /idmapping/uniparc/results/jobId",
+                    "jobId + UniProtKB -> /idmapping/uniprotkb/results/jobId",
+                    "jobId + ANYTHING -> /idmapping/results/jobId"
+                })
+        void checkValidRedirectionLocations(String source) {
+            String[] sourceParts = source.split(" \\+ ");
+            String jobId = sourceParts[0];
+            String remainder = sourceParts[1];
+
+            sourceParts = remainder.split(" -> ");
+            String toDb = sourceParts[0];
+            String urlPart = sourceParts[1];
+
+            IdMappingJobRequest jobRequest = new IdMappingJobRequest();
+            jobRequest.setTo(toDb);
+            IdMappingJob job =
+                    IdMappingJob.builder().jobId(jobId).idMappingRequest(jobRequest).build();
+            String redirectPathToResults = idMappingJobService.getRedirectPathToResults(job);
+            assertThat(redirectPathToResults, is(urlPart));
+        }
+    }
 
     @Test
     void testGetUnknownJob() {
