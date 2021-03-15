@@ -34,7 +34,7 @@ public class IdMappingConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available to use in UniProtKB query.",
+            summary = "List of fields available to use in IdMapping from and to dropdown lists.",
             responses = {
                 @ApiResponse(
                         content = {
