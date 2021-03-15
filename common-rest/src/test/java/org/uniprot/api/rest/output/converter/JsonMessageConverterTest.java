@@ -1,18 +1,10 @@
 package org.uniprot.api.rest.output.converter;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;
@@ -26,10 +18,17 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author lgonzales
@@ -280,6 +279,45 @@ class JsonMessageConverterTest {
         assertEquals(
                 "{\"results\":[{\"primaryAccession\":\"P00001\"},{\"primaryAccession\":\"P00001\"}]}",
                 result);
+    }
+
+    @Test
+    void writeCanWriteOkayAndFailedEntities() throws IOException {
+        List<UniProtKBEntry> entities = new ArrayList<>();
+        entities.add(getEntity());
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .fields("accession")
+                        .failedIds(List.of("id1"))
+                        .build();
+        log.debug("------- BEGIN: writeCanWriteOkayAndFailedEntities");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+        jsonMessageConverter.writeEntities(
+                entities.stream(), outputStream, Instant.now(), new AtomicInteger(0));
+        writeAfter(messageContext, outputStream);
+        String result = outputStream.toString("UTF-8");
+        log.debug(result);
+        assertEquals(
+                "{\"results\":[{\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"]}",
+                result);
+    }
+
+    @Test
+    void writeCanWriteOnlyFailedEntities() throws IOException {
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .failedIds(List.of("id1", "id2"))
+                        .build();
+        log.debug("------- BEGIN: writeCanWriteOnlyFailedEntities");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+        jsonMessageConverter.writeEntities(
+                Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
+        writeAfter(messageContext, outputStream);
+        String result = outputStream.toString("UTF-8");
+        log.debug(result);
+        assertEquals("{\"results\":[],\"failedIds\":[\"id1\",\"id2\"]}", result);
     }
 
     @Test
