@@ -13,6 +13,8 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import static java.util.Arrays.asList;
+
 /**
  * Created 17/02/2021
  *
@@ -34,6 +36,7 @@ public class PIRResponseConverter {
                     SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
                             .getSearchFieldItemByName("accession_id")
                             .getValidRegex());
+    private static final String NO_MATCHES_PIR_RESPONSE = "MSG: 200 -- No Matches.";
 
     static boolean isValidIdPattern(String to, String toValue) {
         to = to.strip();
@@ -58,7 +61,7 @@ public class PIRResponseConverter {
                         .lines()
                         .filter(line -> !line.startsWith("Taxonomy ID:"))
                         .filter(Utils::notNullNotEmpty)
-                        .filter(line -> !line.startsWith("MSG:"))
+                        //                        .filter(line -> !line.startsWith("MSG:"))
                         .forEach(line -> convertLine(line, request, builder));
             }
         } else {
@@ -72,21 +75,27 @@ public class PIRResponseConverter {
             String line,
             IdMappingJobRequest request,
             IdMappingResult.IdMappingResultBuilder builder) {
-        String[] rowParts = line.split("\t");
-        if (rowParts.length == 1) {
-            builder.unmappedId(rowParts[0]);
+        if (line.startsWith("MSG:")) {
+            if (line.endsWith(NO_MATCHES_PIR_RESPONSE)) {
+                builder.unmappedIds(asList(request.getIds().split(",")));
+            }
         } else {
-            String fromValue = rowParts[0];
-            Arrays.stream(rowParts[1].split(";"))
-                    // filter based on valid to
-                    .filter(toValue -> isValidIdPattern(request.getTo(), toValue))
-                    .map(
-                            toValue ->
-                                    IdMappingStringPair.builder()
-                                            .from(fromValue)
-                                            .to(toValue)
-                                            .build())
-                    .forEach(builder::mappedId);
+            String[] rowParts = line.split("\t");
+            if (rowParts.length == 1) {
+                builder.unmappedId(rowParts[0]);
+            } else {
+                String fromValue = rowParts[0];
+                Arrays.stream(rowParts[1].split(";"))
+                        // filter based on valid to
+                        .filter(toValue -> isValidIdPattern(request.getTo(), toValue))
+                        .map(
+                                toValue ->
+                                        IdMappingStringPair.builder()
+                                                .from(fromValue)
+                                                .to(toValue)
+                                                .build())
+                        .forEach(builder::mappedId);
+            }
         }
     }
 }

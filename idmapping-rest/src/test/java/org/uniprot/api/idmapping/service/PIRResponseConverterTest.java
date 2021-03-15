@@ -1,14 +1,5 @@
 package org.uniprot.api.idmapping.service;
 
-import static java.util.Collections.emptyList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
-
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +11,16 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
 
 class PIRResponseConverterTest {
     private PIRResponseConverter converter;
@@ -138,13 +139,28 @@ class PIRResponseConverterTest {
         assertThat(result.getUnmappedIds(), contains("gene 12", "gene 36"));
     }
 
+    @Test
+    void checkNoMatchesAreFoundCorrectly() {
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body("\n" + "\n" + "\n" + "\n" + "\n" + "MSG: 200 -- No Matches.");
+
+        List<String> ids = List.of("id1", "id2", "id3", "id4");
+        String idsStr = String.join(",", ids);
+        request.setIds(idsStr);
+        IdMappingResult result = converter.convertToIDMappings(request, responseEntity);
+
+        assertThat(result.getMappedIds(), is(emptyList()));
+        assertThat(result.getUnmappedIds(), is(ids));
+    }
+
     @ParameterizedTest
-    @MethodSource("ValidToAndIdPairs")
+    @MethodSource("validToAndIdPairs")
     void checkValidPairs(String to, String id) {
         assertThat(isValidIdPattern(to, id), is(true));
     }
 
-    private static Stream<Arguments> ValidToAndIdPairs() {
+    private static Stream<Arguments> validToAndIdPairs() {
         return Stream.of(
                 Arguments.of("EMBL", "AAAAA10001.1"),
                 Arguments.of(
