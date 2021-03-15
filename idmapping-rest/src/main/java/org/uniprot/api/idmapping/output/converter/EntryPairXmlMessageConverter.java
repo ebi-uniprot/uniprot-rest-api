@@ -12,9 +12,9 @@ import org.uniprot.core.xml.Converter;
  */
 public class EntryPairXmlMessageConverter<T extends EntryPair<U>, U, V>
         extends AbstractXmlMessageConverter<T, V> {
-    private Converter<V, U> converter;
-    private String header;
-    private String footer;
+    private final Converter<V, U> converter;
+    private final String header;
+    private final String footer;
 
     public EntryPairXmlMessageConverter(
             Class<T> messageConverterEntryClass,

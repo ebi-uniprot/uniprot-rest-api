@@ -253,13 +253,12 @@ public class MessageConverterConfig {
     }
     // prefix to. in the return field path
     private ReturnField updatePath(ReturnField returnField) {
-        ReturnField updatedReturnField = returnField;
         List<String> oldPaths =
                 returnField.getPaths().stream()
                         .map(path -> "to." + path)
                         .collect(Collectors.toList());
-        updatedReturnField.setPaths(oldPaths);
-        return updatedReturnField;
+        returnField.setPaths(oldPaths);
+        return returnField;
     }
 
     // add a required field from to be returned in the response all the time

@@ -12,7 +12,7 @@ import org.uniprot.core.parser.tsv.EntityValueMapper;
  * @created 02/03/2021
  */
 public class EntryPairValueMapper<T extends EntryPair<U>, U> implements EntityValueMapper<T> {
-    private EntityValueMapper<U> entityValueMapper;
+    private final EntityValueMapper<U> entityValueMapper;
 
     public EntryPairValueMapper(EntityValueMapper<U> entityValueMapper) {
         this.entityValueMapper = entityValueMapper;
