@@ -21,6 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.UnsupportedEncodingException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -60,6 +63,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobControllerIT {
+    @Value("${csv.max.length}")
+    private Integer maxCountCSV;
+
     private static final String JOB_SUBMIT_ENDPOINT =
             IdMappingJobController.IDMAPPING_PATH + "/run";
     private static final String JOB_STATUS_ENDPOINT =
@@ -331,5 +337,39 @@ class IdMappingJobControllerIT {
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", hasSize(1)))
                 .andExpect(jsonPath("$.messages[*]", contains("Invalid parameter 'taxId'")));
+    }
+
+    @Test
+    void jobSubmittedMoreThanAllowedIdsFailed() throws Exception {
+        // when
+        // allowedSize+1 ids
+        String ids =
+                IntStream.rangeClosed(0, this.maxCountCSV)
+                        .mapToObj(String::valueOf)
+                        .collect(Collectors.joining(","));
+        IdMappingJobRequest basicRequest = new IdMappingJobRequest();
+        basicRequest.setFrom("UniProtKB_AC-ID");
+        basicRequest.setTo("EMBL-GenBank-DDBJ");
+        basicRequest.setIds(ids);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("from", basicRequest.getFrom())
+                                .param("to", basicRequest.getTo())
+                                .param("ids", basicRequest.getIds()));
+        // then
+        response.andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "'"
+                                                + this.maxCountCSV
+                                                + "' is the maximum count limit of comma separated items for 'ids' param. You have passed '"
+                                                + (this.maxCountCSV + 1)
+                                                + "' items.")));
     }
 }

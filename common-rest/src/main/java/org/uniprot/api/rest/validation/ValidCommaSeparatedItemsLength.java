@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Objects;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -11,6 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
@@ -30,11 +32,14 @@ public @interface ValidCommaSeparatedItemsLength {
     class ListLengthValidator
             implements ConstraintValidator<ValidCommaSeparatedItemsLength, String> {
 
-        private int maxLength;
+        @Value("${csv.max.length:#{null}}")
+        private Integer maxLength;
 
         @Override
         public void initialize(ValidCommaSeparatedItemsLength constraintAnnotation) {
-            this.maxLength = constraintAnnotation.maxLength();
+            if (Objects.isNull(this.maxLength)) {
+                this.maxLength = constraintAnnotation.maxLength();
+            }
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         }
 
@@ -66,7 +71,7 @@ public @interface ValidCommaSeparatedItemsLength {
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
-        int getMaxLength() {
+        Integer getMaxLength() {
             return maxLength;
         }
     }

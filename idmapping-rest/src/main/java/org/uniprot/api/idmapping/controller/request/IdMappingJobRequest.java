@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidIdType;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,7 +29,8 @@ public class IdMappingJobRequest {
 
     @NotNull(message = "{search.required}")
     @Parameter(description = "Comma separated list of ids")
-    private String ids; // TODO add validation like length, regex
+    @ValidCommaSeparatedItemsLength
+    private String ids;
 
     @Parameter(description = "Value of the taxon Id")
     private String taxId;
