@@ -46,6 +46,7 @@ public class KeywordITUtils {
                         .ancestor(Collections.singletonList("ancestor"))
                         .parent(Collections.singletonList("parent"))
                         .synonyms(Collections.singletonList("content"))
+                        .category(category.getName())
                         .keywordObj(getKeywordBinary(keywordEntry))
                         .build();
         return document;

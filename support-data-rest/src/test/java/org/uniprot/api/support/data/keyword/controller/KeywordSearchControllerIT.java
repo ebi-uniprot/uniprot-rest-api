@@ -5,7 +5,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -27,6 +29,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
+import org.uniprot.api.support.data.keyword.repository.KeywordFacetConfig;
 import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
@@ -46,12 +49,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             KeywordSearchControllerIT.KeywordSearchContentTypeParamResolver.class,
             KeywordSearchControllerIT.KeywordSearchParameterResolver.class
         })
-public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
+class KeywordSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private KeywordRepository repository;
 
     @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
+
+    @Autowired private KeywordFacetConfig facetConfig;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -119,6 +124,11 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse KeywordEntry to binary json: ", e);
         }
+    }
+
+    @Override
+    protected List<String> getAllFacetFields() {
+        return new ArrayList<>(facetConfig.getFacetNames());
     }
 
     static class KeywordSearchParameterResolver extends AbstractSearchParameterResolver {
@@ -225,7 +235,25 @@ public class KeywordSearchControllerIT extends AbstractSearchControllerIT {
 
         @Override
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
-            return SearchParameter.builder().build();
+            return SearchParameter.builder()
+                    .queryParam("query", Collections.singletonList("*:*"))
+                    .queryParam("facets", List.of("category"))
+                    .resultMatcher(
+                            jsonPath("$.results.*.keyword.id", contains("KW-0001", "KW-0002")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.keyword.name",
+                                    contains("my keyword KW-0001", "my keyword KW-0002")))
+                    .resultMatcher(jsonPath("$.facets", notNullValue()))
+                    .resultMatcher(jsonPath("$.facets", not(empty())))
+                    .resultMatcher(jsonPath("$.facets.*.name", contains("category")))
+                    .resultMatcher(jsonPath("$.facets.*.label", contains("Category")))
+                    .resultMatcher(jsonPath("$.facets[0].values.size()", is(1)))
+                    .resultMatcher(jsonPath("$.facets[0].values.size()", is(1)))
+                    .resultMatcher(jsonPath("$.facets[0].values[0].count", is(2)))
+                    .resultMatcher(jsonPath("$.facets[0].values[0].value", is("Ligand")))
+                    .resultMatcher(jsonPath("$.facets[0].values[0].label").doesNotExist())
+                    .build();
         }
     }
 

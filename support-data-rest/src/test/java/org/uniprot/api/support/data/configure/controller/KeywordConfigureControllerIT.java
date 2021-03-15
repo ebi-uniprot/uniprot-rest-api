@@ -28,10 +28,10 @@ import org.uniprot.api.support.data.SupportDataRestApplication;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
-@WebMvcTest(TaxonomyConfigureController.class)
-class TaxonomyConfigureControllerIT {
+@WebMvcTest(KeywordConfigureController.class)
+class KeywordConfigureControllerIT {
 
-    private static final String CONFIGURE_RESOURCE = "/configure/taxonomy/";
+    private static final String CONFIGURE_RESOURCE = "/configure/keyword/";
 
     @Autowired private MockMvc mockMvc;
 

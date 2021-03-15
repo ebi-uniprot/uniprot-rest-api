@@ -2,6 +2,7 @@ package org.uniprot.api.support.data.taxonomy.controller;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.List;
 
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -43,7 +44,7 @@ public class TaxonomyITUtils {
                         .inactiveReason(new TaxonomyInactiveReasonBuilder().build())
                         .build();
 
-        TaxonomyDocument document =
+        TaxonomyDocument.TaxonomyDocumentBuilder docBuilder =
                 TaxonomyDocument.builder()
                         .id(String.valueOf(taxId))
                         .taxId(taxId)
@@ -54,16 +55,14 @@ public class TaxonomyITUtils {
                         .rank("rank")
                         .strain(Collections.singletonList("strain"))
                         .host(Collections.singletonList(10L))
-                        .proteome(facet)
-                        .reference(facet)
-                        .reviewed(facet)
-                        .annotated(facet)
                         .linked(facet)
                         .active(facet)
-                        .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
-                        .build();
-
-        return document;
+                        .taxonomyObj(getTaxonomyBinary(taxonomyEntry));
+        if (facet) {
+            docBuilder.taxonomiesWith(List.of("proteome", "reference", "reviewed", "annotated"));
+            docBuilder.superkingdom("Bacteria");
+        }
+        return docBuilder.build();
     }
 
     private static ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {

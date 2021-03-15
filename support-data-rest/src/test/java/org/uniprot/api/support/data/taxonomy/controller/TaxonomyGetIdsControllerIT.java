@@ -11,6 +11,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -151,18 +152,18 @@ class TaxonomyGetIdsControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(TAX_IDS_RESOURCE + "9606,9607,9608")
-                                .queryParam("facets", "reference,reviewed")
+                                .queryParam("facets", "superkingdom,taxonomies_with")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("reference", "reviewed")))
-                .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(2, 2)))
+                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("superkingdom", "taxonomies_with")))
+                .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(1, 2)))
                 .andExpect(
-                        jsonPath("$.facets.*.values[0].value", containsInAnyOrder("true", "true")))
-                .andExpect(jsonPath("$.facets.*.values[0].count", containsInAnyOrder(2, 2)))
+                        jsonPath("$.facets[0].values[0].value", is("Bacteria")))
+                .andExpect(jsonPath("$.facets[0].values[0].count", is(3)))
                 .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)))
                 .andExpect(
                         jsonPath(
@@ -176,22 +177,22 @@ class TaxonomyGetIdsControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(TAX_IDS_RESOURCE + "9606,9607,9608")
-                                .queryParam("facetFilter", "reference:false")
-                                .queryParam("facets", "reference,reviewed")
+                                .queryParam("facetFilter", "taxonomies_with:reviewed")
+                                .queryParam("facets", "superkingdom,taxonomies_with")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("reference", "reviewed")))
-                .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(1, 1)))
+                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("superkingdom", "taxonomies_with")))
+                .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(1, 2)))
                 .andExpect(
                         jsonPath(
-                                "$.facets.*.values[0].value", containsInAnyOrder("false", "false")))
-                .andExpect(jsonPath("$.facets.*.values[0].count", containsInAnyOrder(1, 1)))
-                .andExpect(jsonPath("$.results.*.taxonId", contains(9607)))
-                .andExpect(jsonPath("$.results.*.scientificName", contains("scientific")));
+                                "$.facets[0].values[0].value", is("Bacteria")))
+                .andExpect(jsonPath("$.facets[0].values[0].count", is(2)))
+                .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9608)))
+                .andExpect(jsonPath("$.results.*.scientificName", contains("scientific","scientific")));
     }
 
     @Test
@@ -312,7 +313,7 @@ class TaxonomyGetIdsControllerIT {
                                 containsInAnyOrder(
                                         "taxonIds value has invalid format. It should be a list of comma separated taxonIds (without spaces).",
                                         "Invalid fields parameter value 'INVALID1'",
-                                        "Invalid facet name 'INVALID'. Expected value can be [reference, reviewed, proteome, annotated].",
+                                        "Invalid facet name 'INVALID'. Expected value can be [superkingdom, taxonomies_with].",
                                         "The 'download' parameter has invalid format. It should be a boolean true or false.",
                                         "'facetFilter' parameter has an invalid syntax")));
     }
@@ -340,7 +341,7 @@ class TaxonomyGetIdsControllerIT {
                                 containsInAnyOrder(
                                         "Only '1000' ids are allowed in each request. Your request has '1002' ids.",
                                         "Invalid fields parameter value 'INVALID1'",
-                                        "Invalid facet name 'INVALID'. Expected value can be [reference, reviewed, proteome, annotated].")));
+                                        "Invalid facet name 'INVALID'. Expected value can be [superkingdom, taxonomies_with].")));
     }
 
     private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
@@ -367,19 +368,20 @@ class TaxonomyGetIdsControllerIT {
                             .linksSet(Collections.singletonList("link"))
                             .build();
 
-            TaxonomyDocument document =
+            TaxonomyDocument.TaxonomyDocumentBuilder docBuilder =
                     TaxonomyDocument.builder()
                             .id(String.valueOf(taxId))
                             .taxId((long) taxId)
                             .synonym("synonym")
                             .common("common")
                             .scientific("scientific")
-                            .reference(taxId % 2 == 0)
-                            .reviewed(taxId % 2 == 0)
-                            .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
-                            .build();
+                            .superkingdom("Bacteria")
+                            .taxonomyObj(getTaxonomyBinary(taxonomyEntry));
 
-            storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
+            if (taxId % 2 == 0) {
+                docBuilder.taxonomiesWith(List.of("reference", "reviewed"));
+            }
+            storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, docBuilder.build());
         }
     }
 }

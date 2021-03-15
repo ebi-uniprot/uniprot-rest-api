@@ -12,13 +12,13 @@ import org.uniprot.store.config.UniProtDataType;
  * @since 11/03/2021
  */
 @Service
-public class TaxonomyConfigureService {
+public class KeywordConfigureService {
 
     public List<UniProtReturnField> getResultFields() {
-        return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.TAXONOMY);
+        return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.KEYWORD);
     }
 
     public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.TAXONOMY);
+        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.KEYWORD);
     }
 }

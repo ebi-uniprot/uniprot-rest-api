@@ -108,16 +108,16 @@ public class UniRefEntryStoreRepository {
     public QueryResult<UniRefMember> getEntryMembers(UniRefMemberRequest memberRequest) {
         UniRefEntryLight entryLight = getUniRefEntryLightFromStore(memberRequest.getId());
         List<String> members = entryLight.getMembers();
-        log.info("entryLight size {}",members.size());
+        log.info("entryLight size {}", members.size());
         // Handle Facets
         members = applyFacetFilters(members, memberRequest.getFacetFilter());
         List<Facet> facets = getFacets(members, memberRequest.getFacets());
-        log.info("after facet size {}",members.size());
+        log.info("after facet size {}", members.size());
         // Build cursor page
         CursorPage page = getPage(memberRequest, members.size());
 
         // Get page member Ids
-        log.info("befor get membersIdPage size {}",members.size());
+        log.info("befor get membersIdPage size {}", members.size());
         List<String> memberIds = getMembersIdPage(page, members);
 
         // Build members

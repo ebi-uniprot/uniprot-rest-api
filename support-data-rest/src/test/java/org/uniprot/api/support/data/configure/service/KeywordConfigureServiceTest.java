@@ -12,24 +12,24 @@ import org.uniprot.api.support.data.configure.response.UniProtReturnField;
  * @author lgonzales
  * @since 11/03/2021
  */
-class TaxonomyConfigureServiceTest {
+class KeywordConfigureServiceTest {
 
     @Test
     void getResultFields() {
-        TaxonomyConfigureService service = new TaxonomyConfigureService();
+        KeywordConfigureService service = new KeywordConfigureService();
         List<UniProtReturnField> resultGroups = service.getResultFields();
 
         assertNotNull(resultGroups);
         assertEquals(1, resultGroups.size());
 
-        assertEquals(14, resultGroups.get(0).getFields().size());
+        assertEquals(11, resultGroups.get(0).getFields().size());
     }
 
     @Test
     void getSearchItems() {
-        TaxonomyConfigureService service = new TaxonomyConfigureService();
+        KeywordConfigureService service = new KeywordConfigureService();
         List<AdvancedSearchTerm> result = service.getSearchItems();
         assertNotNull(result);
-        assertEquals(8, result.size());
+        assertEquals(3, result.size());
     }
 }

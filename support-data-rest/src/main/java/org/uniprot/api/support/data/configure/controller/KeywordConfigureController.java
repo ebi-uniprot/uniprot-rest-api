@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
-import org.uniprot.api.support.data.configure.service.TaxonomyConfigureService;
+import org.uniprot.api.support.data.configure.service.KeywordConfigureService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,17 +26,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         name = "Configuration",
         description = "These services provide configuration data used in UniProt website")
 @RestController
-@RequestMapping("/configure/taxonomy")
-public class TaxonomyConfigureController {
+@RequestMapping("/configure/keyword")
+public class KeywordConfigureController {
 
-    private final TaxonomyConfigureService service;
+    private final KeywordConfigureService service;
 
-    public TaxonomyConfigureController(TaxonomyConfigureService service) {
+    public KeywordConfigureController(KeywordConfigureService service) {
         this.service = service;
     }
 
     @Operation(
-            summary = "List of return fields available in Taxonomy.",
+            summary = "List of return fields available in Keyword.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,7 @@ public class TaxonomyConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in Taxonomy advanced search.",
+            summary = "List of search fields available in Keyword advanced search.",
             responses = {
                 @ApiResponse(
                         content = {
