@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.service;
 
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpServerErrorException;
@@ -9,9 +12,6 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-
-import java.util.Arrays;
-import java.util.regex.Pattern;
 
 /**
  * Created 17/02/2021
