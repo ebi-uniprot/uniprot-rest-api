@@ -247,9 +247,10 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         String fieldValue = getFieldValueForField(searchField);
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ResultActions response =
-                performRequest(get(getIdMappingResultPath(), job.getJobId())
-                        .param("query", searchField + ":" + fieldValue)
-                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .param("query", searchField + ":" + fieldValue)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())

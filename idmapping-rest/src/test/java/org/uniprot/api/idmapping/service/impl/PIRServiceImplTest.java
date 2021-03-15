@@ -34,7 +34,7 @@ class PIRServiceImplTest {
     void createsExpectedResult() {
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom("UniProtKB_AC-ID");
-        request.setTo("UniProtKB");
+        request.setTo("EMBL");
         request.setIds("id");
         request.setTaxId("taxId");
 
@@ -51,7 +51,6 @@ class PIRServiceImplTest {
                 .thenReturn(ResponseEntity.ok().body("From1\tTo1\n"));
 
         IdMappingResult idMappingResult = pirService.mapIds(request);
-
         assertThat(
                 idMappingResult.getMappedIds(), contains(new IdMappingStringPair("From1", "To1")));
     }

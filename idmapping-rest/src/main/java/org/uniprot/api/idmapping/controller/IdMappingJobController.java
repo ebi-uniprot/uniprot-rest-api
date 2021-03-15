@@ -3,9 +3,6 @@ package org.uniprot.api.idmapping.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;

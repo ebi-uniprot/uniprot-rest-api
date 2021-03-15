@@ -1,16 +1,17 @@
 package org.uniprot.api.idmapping.service;
 
-import org.apache.commons.codec.binary.Hex;
-import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.core.util.Utils;
-
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+
+import org.apache.commons.codec.binary.Hex;
+import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author sahmad

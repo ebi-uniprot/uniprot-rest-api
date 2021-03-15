@@ -1,18 +1,7 @@
 package org.uniprot.benchmark.idmapping;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Strings;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import org.uniprot.core.util.Utils;
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -22,8 +11,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StopWatch;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.uniprot.core.util.Utils;
+
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Strings;
 
 /**
  * Interrogate a running Id Mapping service and determine how long fetching from PIR takes, and how
