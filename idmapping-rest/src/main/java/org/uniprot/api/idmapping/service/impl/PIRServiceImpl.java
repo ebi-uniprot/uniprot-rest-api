@@ -28,7 +28,7 @@ import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 public class PIRServiceImpl extends IdMappingPIRService {
     public static final String PIR_ID_MAPPING_URL =
             UriComponentsBuilder.fromHttpUrl(
-                            "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async_test")
+                            "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async")
                     .toUriString();
     static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
     private final RestTemplate restTemplate;
