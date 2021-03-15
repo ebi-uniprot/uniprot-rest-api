@@ -1,13 +1,16 @@
 package org.uniprot.api.rest.validation;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.junit.jupiter.api.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author sahmad
@@ -15,37 +18,11 @@ import org.junit.jupiter.api.Test;
  */
 class ValidCommaSeparatedItemsLengthTest {
 
-    @Test
-    void testEmptyValue() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"first", "first,second,third, fourth, fifth"})
+    void testEmptyValue(String input) {
         FakeListLengthValidator validator = new FakeListLengthValidator();
-        String input = "";
-        boolean isValid = validator.isValid(input, null);
-        assertTrue(isValid);
-        assertTrue(validator.errorList.isEmpty());
-    }
-
-    @Test
-    void testNullValue() {
-        FakeListLengthValidator validator = new FakeListLengthValidator();
-        String input = null;
-        boolean isValid = validator.isValid(input, null);
-        assertTrue(isValid);
-        assertTrue(validator.errorList.isEmpty());
-    }
-
-    @Test
-    void testSingleValue() {
-        FakeListLengthValidator validator = new FakeListLengthValidator();
-        String input = "first";
-        boolean isValid = validator.isValid(input, null);
-        assertTrue(isValid);
-        assertTrue(validator.errorList.isEmpty());
-    }
-
-    @Test
-    void testMaxValue() {
-        FakeListLengthValidator validator = new FakeListLengthValidator();
-        String input = "first,second,third, fourth, fifth";
         boolean isValid = validator.isValid(input, null);
         assertTrue(isValid);
         assertTrue(validator.errorList.isEmpty());
@@ -71,7 +48,7 @@ class ValidCommaSeparatedItemsLengthTest {
         }
 
         @Override
-        int getMaxLength() {
+        Integer getMaxLength() {
             return 5;
         }
     }
