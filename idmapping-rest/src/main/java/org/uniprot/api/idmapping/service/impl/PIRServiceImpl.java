@@ -1,7 +1,5 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -18,6 +16,8 @@ import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.PIRResponseConverter;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
 /**
  * Created 17/02/2021
  *
@@ -26,25 +26,32 @@ import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 @Profile("live")
 @Service
 public class PIRServiceImpl extends IdMappingPIRService {
-    public static final String PIR_ID_MAPPING_URL =
-            UriComponentsBuilder.fromHttpUrl(
-                            "https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async")
-                    .toUriString();
     static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
-    private final RestTemplate restTemplate;
-    private final PIRResponseConverter pirResponseConverter;
 
     static {
         HTTP_HEADERS.setContentType(APPLICATION_FORM_URLENCODED);
     }
 
+    public final String pirIdMappingUrl;
+    private final RestTemplate restTemplate;
+    private final PIRResponseConverter pirResponseConverter;
+
     @Autowired
     public PIRServiceImpl(
             RestTemplate idMappingRestTemplate,
-            @Value("${search.default.page.size:#{null}}") Integer defaultPageSize) {
+            @Value("${search.default.page.size:#{null}}") Integer defaultPageSize,
+            @Value(
+                            "${id.mapping.pir.url:https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async}")
+                    String pirMappingUrl) {
+
         super(defaultPageSize);
         this.restTemplate = idMappingRestTemplate;
         this.pirResponseConverter = new PIRResponseConverter();
+        this.pirIdMappingUrl = UriComponentsBuilder.fromHttpUrl(pirMappingUrl).toUriString();
+    }
+
+    public String getPirIdMappingUrl() {
+        return pirIdMappingUrl;
     }
 
     @Override
@@ -53,7 +60,7 @@ public class PIRServiceImpl extends IdMappingPIRService {
                 new HttpEntity<>(createPostBody(request), HTTP_HEADERS);
 
         return pirResponseConverter.convertToIDMappings(
-                request, restTemplate.postForEntity(PIR_ID_MAPPING_URL, requestBody, String.class));
+                request, restTemplate.postForEntity(pirIdMappingUrl, requestBody, String.class));
     }
 
     private MultiValueMap<String, String> createPostBody(IdMappingJobRequest request) {
