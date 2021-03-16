@@ -2,8 +2,6 @@ package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,7 +47,7 @@ public class IdMappingConfigureController {
                         })
             })
     @GetMapping("/fields")
-    public List<IdMappingField> getIdMappingFields() {
+    public IdMappingField getIdMappingFields() {
         return this.service.getIdMappingFields();
     }
 }
