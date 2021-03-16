@@ -23,7 +23,7 @@ import org.uniprot.api.idmapping.service.impl.EhCacheMappingJobService;
 @ConfigurationProperties(prefix = "id.mapping.job")
 public class IdMappingConfig {
     private static final String PIR_ID_MAPPING_CACHE = "pirIDMappingCache";
-    private final TaskExecutorProperties taskExecutorProperties = new TaskExecutorProperties();
+    private TaskExecutorProperties taskExecutorProperties = new TaskExecutorProperties();
 
     @Bean
     @Profile("live")
@@ -62,5 +62,9 @@ public class IdMappingConfig {
     @Bean
     public ThreadPoolTaskExecutor configurableJobTaskExecutor() {
         return new ThreadPoolTaskExecutor();
+    }
+
+    public void setTaskExecutorProperties(TaskExecutorProperties taskExecutorProperties) {
+        this.taskExecutorProperties = taskExecutorProperties;
     }
 }
