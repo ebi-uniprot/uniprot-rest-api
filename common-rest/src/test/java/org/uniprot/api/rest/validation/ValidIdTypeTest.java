@@ -1,7 +1,10 @@
 package org.uniprot.api.rest.validation;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.stream.Stream;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,8 +29,9 @@ class ValidIdTypeTest {
 
     @Test
     void testInvalidValue() {
+        ConstraintValidatorContextImpl context = mock(ConstraintValidatorContextImpl.class);
         String value = "invalid";
-        Assertions.assertFalse(validator.isValid(value, null));
+        Assertions.assertFalse(validator.isValid(value, context));
     }
 
     @ParameterizedTest

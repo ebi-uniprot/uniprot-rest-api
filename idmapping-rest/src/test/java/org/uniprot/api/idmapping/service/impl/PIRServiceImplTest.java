@@ -1,5 +1,11 @@
 package org.uniprot.api.idmapping.service.impl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.HTTP_HEADERS;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -12,12 +18,6 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.HTTP_HEADERS;
-
 class PIRServiceImplTest {
     private RestTemplate restTemplate;
     private PIRServiceImpl pirService;
@@ -25,7 +25,7 @@ class PIRServiceImplTest {
     @BeforeEach
     void setUp() {
         restTemplate = mock(RestTemplate.class);
-        pirService = new PIRServiceImpl(restTemplate, 5, null);
+        pirService = new PIRServiceImpl(restTemplate, 5, "http://localhost");
     }
 
     @Test
@@ -45,7 +45,7 @@ class PIRServiceImplTest {
         map.add("async", "NO");
 
         when(restTemplate.postForEntity(
-                        "PIR's URL", new HttpEntity<>(map, HTTP_HEADERS), String.class))
+                        "http://localhost", new HttpEntity<>(map, HTTP_HEADERS), String.class))
                 .thenReturn(ResponseEntity.ok().body("From1\tTo1\n"));
 
         IdMappingResult idMappingResult = pirService.mapIds(request);

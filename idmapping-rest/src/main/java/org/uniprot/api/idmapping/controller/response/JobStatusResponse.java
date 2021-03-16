@@ -1,14 +1,16 @@
 package org.uniprot.api.idmapping.controller.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 /**
  * @author sahmad
  * @created 22/02/2021
  */
-@Data
+@Getter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class JobStatusResponse {
-    private JobStatus jobStatus;
+    private final JobStatus jobStatus;
 }
