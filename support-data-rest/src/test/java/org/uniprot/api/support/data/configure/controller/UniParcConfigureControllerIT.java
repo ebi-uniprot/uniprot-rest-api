@@ -66,4 +66,20 @@ class UniParcConfigureControllerIT {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.size()", is(greaterThan(0))));
     }
+
+    @Test
+    void validateGetUniParcDatabaseDetails() throws Exception {
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(CONFIGURE_RESOURCE + "allDatabases")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()", is(greaterThan(0))));
+    }
 }

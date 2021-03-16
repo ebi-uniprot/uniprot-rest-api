@@ -1,6 +1,9 @@
 package org.uniprot.api.uniref.repository.store;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.List;
@@ -8,6 +11,9 @@ import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
@@ -160,6 +166,34 @@ class UniRefEntryFacetConfigTest {
         UniRefEntryFacetConfig facetConfig = new UniRefEntryFacetConfig();
         Map<String, FacetProperty> result = facetConfig.getFacetPropertyMap();
         assertNull(result);
+    }
+
+    @Test
+    void getUniProtMemberIdTypeFacetsSuccess() {
+        UniRefEntryLight entryLight = getUniRefEntryLight();
+        List<Facet> result =
+                UniRefEntryFacetConfig.getFacets(entryLight.getMembers(), "uniprot_member_id_type");
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        Facet memberType = result.get(0);
+        assertEquals("UniProtKB Member Types", memberType.getLabel());
+        assertEquals("uniprot_member_id_type", memberType.getName());
+        assertNotNull(memberType.getValues());
+        assertEquals(2, memberType.getValues().size());
+        FacetItem item = memberType.getValues().get(1);
+        assertEquals("UniProtKB Reviewed (Swiss-Prot)", item.getLabel());
+        assertEquals("uniprotkb_reviewed_swissprot", item.getValue());
+        assertEquals(2, item.getCount());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = " ")
+    void getFacetsEmptySuccess(String facetNames) {
+        UniRefEntryLight entryLight = getUniRefEntryLight();
+        List<Facet> result = UniRefEntryFacetConfig.getFacets(entryLight.getMembers(), facetNames);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @NotNull

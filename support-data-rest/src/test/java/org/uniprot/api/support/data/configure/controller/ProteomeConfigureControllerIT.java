@@ -31,7 +31,7 @@ import org.uniprot.api.support.data.SupportDataRestApplication;
 @WebMvcTest(ProteomeConfigureController.class)
 class ProteomeConfigureControllerIT {
 
-    private static final String CONFIGURE_RESOURCE = "/configure/proteome/";
+    private static final String CONFIGURE_RESOURCE = "/configure/proteomes/";
 
     @Autowired private MockMvc mockMvc;
 

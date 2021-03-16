@@ -285,7 +285,7 @@
 							</packageLocations>
 							<openApiDirectory>target/generated-sources/swagger</openApiDirectory>
 							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
-							<serverBaseUrl>http://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
+							<serverBaseUrl>https://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
 						</configuration>
 						<dependencies>
 							<dependency>

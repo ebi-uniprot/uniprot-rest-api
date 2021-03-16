@@ -1,14 +1,25 @@
 package org.uniprot.api.uniref.repository.store;
 
 import static org.uniprot.api.common.repository.search.facet.FacetUtils.getCleanFacetValue;
-import static org.uniprot.store.search.SolrQueryUtil.*;
+import static org.uniprot.store.search.SolrQueryUtil.getTermValue;
+import static org.uniprot.store.search.SolrQueryUtil.hasFieldTerms;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
-import org.uniprot.api.common.repository.search.facet.*;
+import org.uniprot.api.common.repository.search.facet.Facet;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetItem;
+import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.api.common.repository.search.facet.FacetUtils;
 import org.uniprot.core.uniref.UniRefMemberIdType;
 import org.uniprot.core.util.Utils;
 
@@ -77,9 +88,17 @@ public class UniRefEntryFacetConfig extends FacetConfig {
     }
 
     static List<Facet> getFacets(List<String> members, String facetNames) {
+        Set<String> facetNamesSet = new HashSet<>();
+
+        if (Utils.notNullNotEmpty(facetNames)) {
+            facetNamesSet =
+                    Arrays.stream(facetNames.split(","))
+                            .map(String::strip)
+                            .collect(Collectors.toSet());
+        }
+
         List<Facet> results = new ArrayList<>();
-        if (Utils.notNullNotEmpty(facetNames)
-                && facetNames.contains(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName())) {
+        if (facetNamesSet.contains(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName())) {
             Facet memberType =
                     Facet.builder()
                             .label(UniRefEntryFacet.MEMBER_ID_TYPE.getLabel())
@@ -92,8 +111,7 @@ public class UniRefEntryFacetConfig extends FacetConfig {
             }
         }
 
-        if (Utils.notNullNotEmpty(facetNames)
-                && facetNames.contains(UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getFacetName())) {
+        if (facetNamesSet.contains(UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getFacetName())) {
             Facet uniProtMemberType =
                     Facet.builder()
                             .label(UniRefEntryFacet.UNIPROT_MEMBER_ID_TYPE.getLabel())
