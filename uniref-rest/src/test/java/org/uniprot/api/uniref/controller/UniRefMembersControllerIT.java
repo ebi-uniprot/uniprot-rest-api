@@ -17,14 +17,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createEntry;
-import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createEntryMembers;
-import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createMember;
-import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createReprestativeMember;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 
 import java.util.ArrayList;
 import java.util.List;
