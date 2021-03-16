@@ -17,6 +17,7 @@ import javax.validation.Payload;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
@@ -80,6 +81,12 @@ public @interface ValidFromAndTo {
                                                         && !SWISSPROT_STR.equals(fromValue));
 
                 isValid = isValidFrom && isValidPair(fromValue, toValue, taxIdValue, context);
+                if (!isValid) {
+                    ConstraintValidatorContextImpl contextImpl =
+                            (ConstraintValidatorContextImpl) context;
+                    contextImpl.addMessageParameter("0", fromValue);
+                    contextImpl.addMessageParameter("1", toValue);
+                }
             } catch (Exception e) {
                 log.warn("Error during validation {}", e.getMessage());
                 isValid = false;

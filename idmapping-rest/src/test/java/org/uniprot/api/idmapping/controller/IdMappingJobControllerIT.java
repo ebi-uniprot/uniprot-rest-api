@@ -251,7 +251,7 @@ class IdMappingJobControllerIT {
                                 "$.messages[*]",
                                 containsInAnyOrder(
                                         "The parameter 'from' has an invalid value 'ACC123'.",
-                                        "Invalid 'from' and 'to' pair")));
+                                        "The combination of 'from=ACC123' and 'to=UniProtKB' parameters is invalid")));
     }
 
     @Test
@@ -275,7 +275,7 @@ class IdMappingJobControllerIT {
                                 "$.messages[*]",
                                 contains(
                                         "The parameter 'to' has an invalid value 'ACC123'.",
-                                        "Invalid 'from' and 'to' pair")));
+                                        "The combination of 'from=UniProtKB_AC-ID' and 'to=ACC123' parameters is invalid")));
     }
 
     @Test
@@ -294,7 +294,11 @@ class IdMappingJobControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages", notNullValue()))
                 .andExpect(jsonPath("$.messages", hasSize(1)))
-                .andExpect(jsonPath("$.messages[*]", contains("Invalid 'from' and 'to' pair")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages[*]",
+                                contains(
+                                        "The combination of 'from=EMBL-GenBank-DDBJ' and 'to=UniParc' parameters is invalid")));
     }
 
     @Test
@@ -318,7 +322,7 @@ class IdMappingJobControllerIT {
                         jsonPath(
                                 "$.messages[*]",
                                 containsInAnyOrder(
-                                        "Invalid 'from' and 'to' pair",
+                                        "The combination of 'from=EMBL-GenBank-DDBJ' and 'to=UniParc' parameters is invalid",
                                         "Invalid parameter 'taxId'")));
     }
 

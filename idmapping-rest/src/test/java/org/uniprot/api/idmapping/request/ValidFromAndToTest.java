@@ -1,11 +1,14 @@
 package org.uniprot.api.idmapping.request;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import javax.validation.ConstraintValidatorContext;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,7 +45,8 @@ class ValidFromAndToTest {
         FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
         ValidFromAndTo validFromTo = getMockedValidFromAndTo();
         validator.initialize(validFromTo);
-        boolean isValid = validator.isValid(request, null);
+        ConstraintValidatorContextImpl context = mock(ConstraintValidatorContextImpl.class);
+        boolean isValid = validator.isValid(request, context);
         Assertions.assertFalse(isValid);
         Assertions.assertTrue(validator.errorMesssage.isEmpty());
     }
@@ -59,7 +63,8 @@ class ValidFromAndToTest {
         FakeValidFromAndToValidator validator = new FakeValidFromAndToValidator();
         ValidFromAndTo validFromTo = getMockedValidFromAndTo();
         validator.initialize(validFromTo);
-        boolean isValid = validator.isValid(request, null);
+        ConstraintValidatorContextImpl context = mock(ConstraintValidatorContextImpl.class);
+        boolean isValid = validator.isValid(request, context);
         Assertions.assertFalse(isValid);
         Assertions.assertEquals(1, validator.errorMesssage.size());
         Assertions.assertEquals("Invalid parameter 'taxId'", validator.errorMesssage.get(0));
