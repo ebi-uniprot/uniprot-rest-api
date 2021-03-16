@@ -105,8 +105,8 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
     public QueryResult<PublicationEntry> getPublicationsByUniProtAccession(
             final String accession, PublicationRequest request) {
         String solrQueryString = accessionFieldName + ":" + accession;
-        if (request.getQuery() != null) {
-            solrQueryString += " AND (" + request.getQuery() + ")";
+        if (request.getFacetFilter() != null) {
+            solrQueryString += " AND (" + request.getFacetFilter() + ")";
         }
 
         PublicationSearchRequest searchRequest =

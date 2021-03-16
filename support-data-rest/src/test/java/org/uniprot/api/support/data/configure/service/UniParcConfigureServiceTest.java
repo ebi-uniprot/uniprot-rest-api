@@ -8,6 +8,7 @@ import junit.framework.AssertionFailedError;
 
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniParcDatabaseDetail;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 
 /**
@@ -53,5 +54,20 @@ class UniParcConfigureServiceTest {
                         .orElseThrow(AssertionFailedError::new);
         assertNotNull(active.getValues());
         assertTrue(active.getValues().size() > 0);
+    }
+
+    @Test
+    void getAllUniParcDatabaseDetails() {
+        UniParcConfigureService service = new UniParcConfigureService();
+        List<UniParcDatabaseDetail> result = service.getAllUniParcDatabaseDetails();
+
+        assertNotNull(result);
+        assertEquals(39, result.size());
+
+        UniParcDatabaseDetail database = result.get(0);
+        assertEquals("EG_BACTERIA", database.getName());
+        assertEquals("EnsemblBacteria", database.getDisplayName());
+        assertTrue(database.isAlive());
+        assertEquals("https://www.ensemblgenomes.org/id/%id", database.getUriLink());
     }
 }

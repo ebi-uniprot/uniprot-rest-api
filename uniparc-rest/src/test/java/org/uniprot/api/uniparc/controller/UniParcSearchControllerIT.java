@@ -4,21 +4,29 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.uniprot.api.uniparc.controller.UniParcControllerITUtils.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
@@ -141,6 +149,36 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                 TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>()));
     }
 
+    @Test
+    void searchCanSearchDatabaseFacetsFields() throws Exception {
+        // given
+        saveEntry(SaveScenario.FACETS_SUCCESS);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "*:*")
+                                        .param("size", "0")
+                                        .param("facets", "database")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets.size()", is(1)))
+                .andExpect(jsonPath("$.facets[0].name", is("database")))
+                .andExpect(jsonPath("$.facets[0].values.size()", greaterThan(20)))
+                .andExpect(jsonPath("$.facets[0].values.*.label", is(notNullValue())))
+                .andExpect(jsonPath("$.facets[0].values.*.label", hasItem("UniProtKB")))
+                .andExpect(jsonPath("$.facets[0].values.*.label", hasItem("EnsemblBacteria")))
+                .andExpect(jsonPath("$.facets[0].values.*.label", hasItem("EMBL CDS")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
+    }
+
     @Override
     protected void saveEntry(SaveScenario saveContext) {
         saveEntry(11);
@@ -148,14 +186,8 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
         if (SaveScenario.FACETS_SUCCESS.equals(saveContext)) {
             UniParcEntry entry = createEntry(30, UPI_PREF);
             UniParcEntryBuilder builder = UniParcEntryBuilder.from(entry);
-            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_BACTERIA));
-            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EMBL));
-            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EMBL));
-            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.REFSEQ));
-            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_FUNGI));
-            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_METAZOA));
-            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_PLANTS));
-            builder.uniParcCrossReferencesAdd(getXref(UniParcDatabase.EG_PROTISTS));
+            Arrays.stream(UniParcDatabase.values())
+                    .forEach(db -> builder.uniParcCrossReferencesAdd(getXref(db)));
             saveEntry(builder.build());
         }
     }
@@ -290,7 +322,7 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                     "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20", "UPI0000083A30")))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Database", "Organisms")))
-                    .resultMatcher(jsonPath("$.facets[0].values.size()", is(8)))
+                    .resultMatcher(jsonPath("$.facets[0].values.size()", greaterThan(20)))
                     .resultMatcher(jsonPath("$.facets[0].values.*.value", hasItem("uniprot")))
                     .resultMatcher(jsonPath("$.facets[0].values.*.count", hasItem(3)))
                     .resultMatcher(

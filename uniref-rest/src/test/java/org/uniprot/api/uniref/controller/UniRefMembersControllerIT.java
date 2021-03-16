@@ -1,21 +1,48 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.http.MediaType.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpHeaders.LINK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createEntry;
+import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createEntryMembers;
+import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createMember;
+import static org.uniprot.api.uniref.controller.UniRefControllerITUtils.createReprestativeMember;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.validation.constraints.NotNull;
 
-import org.junit.jupiter.api.*;
+import lombok.extern.slf4j.Slf4j;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
@@ -28,9 +55,14 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
+import org.uniprot.api.uniref.repository.store.UniRefEntryFacetConfig;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
-import org.uniprot.core.uniref.*;
+import org.uniprot.core.uniref.RepresentativeMember;
+import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
+import org.uniprot.core.uniref.UniRefMemberIdType;
+import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.uniref.impl.RepresentativeMemberBuilder;
 import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
 import org.uniprot.core.uniref.impl.UniRefMemberBuilder;
@@ -45,6 +77,7 @@ import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
  * @author lgonzales
  * @since 08/01/2021
  */
+@Slf4j
 @ContextConfiguration(
         classes = {
             DataStoreTestConfig.class,
@@ -72,6 +105,7 @@ class UniRefMembersControllerIT {
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
     @Autowired private MockMvc mockMvc;
+    @Autowired private UniRefEntryFacetConfig uniRefEntryFacetConfig;
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
 
@@ -107,6 +141,13 @@ class UniRefMembersControllerIT {
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
         Entry entry = converter.toXml(unirefEntry);
         UniRefEntryLight entryLight = unirefLightConverter.fromXml(entry);
+        log.info(
+                "Saving Entry: {} "
+                        + "with Entry members count {} and "
+                        + "EntryLight members count {}.",
+                unirefEntry.getId().getValue(),
+                unirefEntry.getMembers().size(),
+                entryLight.getMembers().size());
         storeManager.saveToStore(DataStoreManager.StoreType.UNIREF_LIGHT, entryLight);
         List<RepresentativeMember> members = createEntryMembers(unirefEntry);
         members.forEach(
@@ -232,7 +273,7 @@ class UniRefMembersControllerIT {
     }
 
     @Test
-    void filterMemberTypes() throws Exception {
+    void facetFilterMemberTypes() throws Exception {
         // given
         UniRefEntry builder = getUniRefEntryForFilter();
         saveEntry(builder);
@@ -242,7 +283,7 @@ class UniRefMembersControllerIT {
                 mockMvc.perform(
                         get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFIX_PATH)
                                 .param("size", "10")
-                                .param("filter", "member_id_type:uniparc")
+                                .param("facetFilter", "member_id_type:uniparc")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -258,7 +299,7 @@ class UniRefMembersControllerIT {
     }
 
     @Test
-    void filterUniProtMemberTypes() throws Exception {
+    void facetFilterUniProtMemberTypes() throws Exception {
         // given
         UniRefEntry builder = getUniRefEntryForFilter();
         saveEntry(builder);
@@ -269,7 +310,7 @@ class UniRefMembersControllerIT {
                         get(MEMBER_PREFIX_PATH + ID_FILTER + MEMBER_SUFIX_PATH)
                                 .param("size", "10")
                                 .param(
-                                        "filter",
+                                        "facetFilter",
                                         "uniprot_member_id_type:uniprotkb_unreviewed_trembl")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -288,7 +329,7 @@ class UniRefMembersControllerIT {
     }
 
     @Test
-    void filterInvalidQueryField() throws Exception {
+    void facetFilterInvalidQueryField() throws Exception {
         // given
         UniRefEntry builder = getUniRefEntryForFilter();
         saveEntry(builder);
@@ -298,7 +339,7 @@ class UniRefMembersControllerIT {
                 mockMvc.perform(
                         get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFIX_PATH)
                                 .param("size", "10")
-                                .param("filter", "invalid:invalid")
+                                .param("facetFilter", "invalid:invalid")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -316,13 +357,13 @@ class UniRefMembersControllerIT {
     }
 
     @Test
-    void filterInvalidQuerySyntax() throws Exception {
+    void facetFilterInvalidQuerySyntax() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
                         get(MEMBER_PREFIX_PATH + ID_50 + MEMBER_SUFIX_PATH)
                                 .param("size", "10")
-                                .param("filter", "invalid:}invalid{")
+                                .param("facetFilter", "invalid:}invalid{")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -393,6 +434,47 @@ class UniRefMembersControllerIT {
                                         "Invalid facet name 'invalid'. Expected value can be [member_id_type, uniprot_member_id_type].")));
     }
 
+    @ParameterizedTest(name = "[{index}] search with facetName {0}")
+    @MethodSource("getAllFacetFieldsArguments")
+    void getMembersSuccessSizeZero(String facetField) throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(MEMBER_PREFIX_PATH + ID_100 + MEMBER_SUFIX_PATH)
+                                .param("size", "0")
+                                .param("facets", facetField)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets.*.name", contains(facetField)))
+                .andExpect(jsonPath("$.facets[0].values.size()", greaterThan(0)))
+                .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
+    }
+
+    @Test
+    void getMemberFailureSizeMinusOne() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(MEMBER_PREFIX_PATH + ID_100 + MEMBER_SUFIX_PATH)
+                                .param("size", "-1")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains("'size' must be greater than or equal to 0")));
+    }
+
     @NotNull
     private UniRefEntry getUniRefEntryForFilter() {
         UniRefEntryBuilder builder = new UniRefEntryBuilder();
@@ -441,5 +523,9 @@ class UniRefMembersControllerIT {
                         .build());
         builder.memberCount(6);
         return builder.build();
+    }
+
+    private Stream<Arguments> getAllFacetFieldsArguments() {
+        return this.uniRefEntryFacetConfig.getFacetNames().stream().map(Arguments::of);
     }
 }
