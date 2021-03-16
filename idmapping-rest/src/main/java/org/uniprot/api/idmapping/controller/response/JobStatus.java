@@ -9,6 +9,5 @@ public enum JobStatus {
     NEW,
     RUNNING,
     FINISHED,
-    ERROR,
-    NOT_FOUND
+    ERROR
 }

@@ -250,7 +250,8 @@ class IdMappingJobControllerIT {
                         jsonPath(
                                 "$.messages[*]",
                                 containsInAnyOrder(
-                                        "Invalid 'from' value", "Invalid 'from' and 'to' pair")));
+                                        "The parameter 'from' has an invalid value 'ACC123'.",
+                                        "Invalid 'from' and 'to' pair")));
     }
 
     @Test
@@ -272,7 +273,9 @@ class IdMappingJobControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.messages[*]",
-                                contains("Invalid 'to' value", "Invalid 'from' and 'to' pair")));
+                                contains(
+                                        "The parameter 'to' has an invalid value 'ACC123'.",
+                                        "Invalid 'from' and 'to' pair")));
     }
 
     @Test

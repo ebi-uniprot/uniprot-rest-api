@@ -1,10 +1,7 @@
 package org.uniprot.api.idmapping.service.impl;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 
@@ -25,10 +22,7 @@ import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
-import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Created 23/02/2021
@@ -44,35 +38,19 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final Set<String> UNIPROTKB_SET;
 
     static {
-        Map<String, String> dbDetails =
-                IdMappingFieldConfig.getAllIdMappingTypes().stream()
-                        .collect(
-                                Collectors.toMap(
-                                        UniProtDatabaseDetail::getDisplayName,
-                                        UniProtDatabaseDetail::getName));
+        UNIPARC = IdMappingFieldConfig.UPARC_STR;
 
         UNIREF_SET =
-                Stream.of("UniRef50", "UniRef90", "UniRef100")
-                        .map(dbDetails::get)
-                        .collect(Collectors.toSet());
-        UNIPARC = dbDetails.get("UniParc");
-        UNIPROTKB_SET =
-                Stream.of("UniProtKB AC/ID", "UniProtKB", "UniProtKB Swiss-Prot")
-                        .map(dbDetails::get)
-                        .collect(Collectors.toSet());
+                Set.of(
+                        IdMappingFieldConfig.UNIREF50_STR,
+                        IdMappingFieldConfig.UNIREF90_STR,
+                        IdMappingFieldConfig.UNIREF100_STR);
 
-        Preconditions.checkState(
-                UNIREF_SET.size() == 3,
-                "Expected to extract 3 UniRef database types from: "
-                        + IdMappingFieldConfig.class.getName());
-        Preconditions.checkNotNull(
-                UNIPARC,
-                "Expected to extract UniParc database type from: "
-                        + IdMappingFieldConfig.class.getName());
-        Preconditions.checkState(
-                UNIPROTKB_SET.size() == 3,
-                "Expected to extract 3 UniProtKB database types from: "
-                        + IdMappingFieldConfig.class.getName());
+        UNIPROTKB_SET =
+                Set.of(
+                        IdMappingFieldConfig.ACC_ID_STR,
+                        IdMappingFieldConfig.ACC_STR,
+                        IdMappingFieldConfig.SWISSPROT_STR);
     }
 
     private final IdMappingJobCacheService cacheService;

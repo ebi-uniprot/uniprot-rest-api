@@ -10,5 +10,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class JobSubmitResponse {
-    private String jobId;
+    private final String jobId;
 }

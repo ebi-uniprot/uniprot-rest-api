@@ -12,6 +12,7 @@ import javax.validation.Payload;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
@@ -31,9 +32,14 @@ public @interface ValidIdType {
     @Slf4j
     class ValidIdTypeValidator implements ConstraintValidator<ValidIdType, String> {
         @Override
-        public boolean isValid(
-                String idType, ConstraintValidatorContext constraintValidatorContext) {
-            return IdMappingFieldConfig.isValidDbName(idType);
+        public boolean isValid(String idType, ConstraintValidatorContext context) {
+            boolean isValid = IdMappingFieldConfig.isValidDbName(idType);
+            if (!isValid) {
+                ConstraintValidatorContextImpl contextImpl =
+                        (ConstraintValidatorContextImpl) context;
+                contextImpl.addMessageParameter("0", idType);
+            }
+            return isValid;
         }
     }
 }
