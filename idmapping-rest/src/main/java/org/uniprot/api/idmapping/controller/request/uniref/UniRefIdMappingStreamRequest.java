@@ -21,6 +21,6 @@ public class UniRefIdMappingStreamRequest extends UniRefIdMappingBasicRequest
     @Parameter(
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
-    @Pattern(regexp = "^true|false$", message = "{search.uniref.invalid.download}")
+    @Pattern(regexp = "^(?:true|false)$", message = "{search.uniref.invalid.download}")
     private String download;
 }

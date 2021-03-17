@@ -21,6 +21,6 @@ public class UniParcIdMappingStreamRequest extends UniParcIdMappingBasicRequest
     @Parameter(
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
-    @Pattern(regexp = "^true|false$", message = "{search.uniparc.invalid.download}")
+    @Pattern(regexp = "^(?:true|false)$", message = "{search.uniparc.invalid.download}")
     private String download;
 }

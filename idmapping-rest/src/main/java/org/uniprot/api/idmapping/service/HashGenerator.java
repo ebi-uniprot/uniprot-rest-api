@@ -24,6 +24,7 @@ public class HashGenerator {
     private static final String SALT_STR = "UNIPROT_SALT";
     private static final byte[] SALT = SALT_STR.getBytes(StandardCharsets.UTF_8);
 
+    @SuppressWarnings("squid:S2053")
     public String generateHash(IdMappingJobRequest request) throws ServiceException {
         try {
             char[] requestArray = convertRequestToArray(request);
