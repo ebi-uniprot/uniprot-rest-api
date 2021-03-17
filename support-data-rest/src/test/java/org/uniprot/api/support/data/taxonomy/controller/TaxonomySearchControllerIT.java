@@ -230,18 +230,24 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                             jsonPath("$.results.*.mnemonic", contains("mnemonic10", "mnemonic20")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
-                    .resultMatcher(jsonPath("$.facets.*.name", contains("superkingdom", "taxonomies_with")))
-                    .resultMatcher(jsonPath("$.facets.*.label", contains("Superkingdom", "Taxons with")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets.*.name", contains("superkingdom", "taxonomies_with")))
+                    .resultMatcher(
+                            jsonPath("$.facets.*.label", contains("Superkingdom", "Taxons with")))
                     .resultMatcher(jsonPath("$.facets[1].values.size()", is(4)))
                     .resultMatcher(jsonPath("$.facets[1].values[0].count", is(1)))
                     .resultMatcher(jsonPath("$.facets[1].values[0].value", is("annotated")))
-                    .resultMatcher(jsonPath("$.facets[1].values[0].label",is("Unreviewed (TrEMBL)")))
+                    .resultMatcher(
+                            jsonPath("$.facets[1].values[0].label", is("Unreviewed (TrEMBL)")))
                     .resultMatcher(jsonPath("$.facets[1].values[1].value", is("proteome")))
-                    .resultMatcher(jsonPath("$.facets[1].values[1].label",is("Proteomes")))
+                    .resultMatcher(jsonPath("$.facets[1].values[1].label", is("Proteomes")))
                     .resultMatcher(jsonPath("$.facets[1].values[2].value", is("reference")))
-                    .resultMatcher(jsonPath("$.facets[1].values[2].label",is("Reference proteomes")))
+                    .resultMatcher(
+                            jsonPath("$.facets[1].values[2].label", is("Reference proteomes")))
                     .resultMatcher(jsonPath("$.facets[1].values[3].value", is("reviewed")))
-                    .resultMatcher(jsonPath("$.facets[1].values[3].label",is("Reviewed (Swiss-Prot)")))
+                    .resultMatcher(
+                            jsonPath("$.facets[1].values[3].label", is("Reviewed (Swiss-Prot)")))
                     .build();
         }
     }

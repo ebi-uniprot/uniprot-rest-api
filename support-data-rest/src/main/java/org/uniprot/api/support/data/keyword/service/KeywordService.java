@@ -31,7 +31,12 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             KeywordFacetConfig facetConfig,
             SearchFieldConfig keywordSearchFieldConfig,
             @Qualifier("keywordRDFStreamer") RDFStreamer rdfStreamer) {
-        super(repository, keywordEntryConverter, keywordSortClause, keywordSolrQueryConf, facetConfig);
+        super(
+                repository,
+                keywordEntryConverter,
+                keywordSortClause,
+                keywordSolrQueryConf,
+                facetConfig);
         this.fieldConfig = keywordSearchFieldConfig;
         this.queryProcessor = keywordQueryProcessor;
         this.rdfStreamer = rdfStreamer;

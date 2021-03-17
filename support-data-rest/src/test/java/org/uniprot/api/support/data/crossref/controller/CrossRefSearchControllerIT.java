@@ -54,7 +54,7 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
             CrossRefSearchControllerIT.CrossRefSearchContentTypeParamResolver.class,
             CrossRefSearchControllerIT.CrossRefSearchParameterResolver.class
         })
-public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     private static final String SEARCH_ACCESSION1 =
             "DB-" + ThreadLocalRandom.current().nextLong(1000, 9999);
@@ -236,7 +236,7 @@ public class CrossRefSearchControllerIT extends AbstractSearchWithFacetControlle
                             jsonPath(
                                     "$.results.*.id",
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
-                    .resultMatcher(jsonPath("$.results.*.reviewedProteinCount").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.statistics").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.id", notNullValue()))
                     .resultMatcher(jsonPath("$.results.*.name", notNullValue()))
                     .build();

@@ -40,6 +40,7 @@ import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
@@ -159,10 +160,12 @@ class TaxonomyGetIdsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("superkingdom", "taxonomies_with")))
-                .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(1, 2)))
                 .andExpect(
-                        jsonPath("$.facets[0].values[0].value", is("Bacteria")))
+                        jsonPath(
+                                "$.facets.*.name",
+                                containsInAnyOrder("superkingdom", "taxonomies_with")))
+                .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(1, 2)))
+                .andExpect(jsonPath("$.facets[0].values[0].value", is("Bacteria")))
                 .andExpect(jsonPath("$.facets[0].values[0].count", is(3)))
                 .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)))
                 .andExpect(
@@ -185,14 +188,18 @@ class TaxonomyGetIdsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.facets.*.name", containsInAnyOrder("superkingdom", "taxonomies_with")))
-                .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(1, 2)))
                 .andExpect(
                         jsonPath(
-                                "$.facets[0].values[0].value", is("Bacteria")))
+                                "$.facets.*.name",
+                                containsInAnyOrder("superkingdom", "taxonomies_with")))
+                .andExpect(jsonPath("$.facets.*.values.size()", containsInAnyOrder(1, 2)))
+                .andExpect(jsonPath("$.facets[0].values[0].value", is("Bacteria")))
                 .andExpect(jsonPath("$.facets[0].values[0].count", is(2)))
                 .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9608)))
-                .andExpect(jsonPath("$.results.*.scientificName", contains("scientific","scientific")));
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.scientificName",
+                                contains("scientific", "scientific")));
     }
 
     @Test
@@ -364,7 +371,12 @@ class TaxonomyGetIdsControllerIT {
                             .scientificName("scientific")
                             .commonName("common")
                             .mnemonic("mnemonic")
-                            .parentId(9000L)
+                            .parent(
+                                    new TaxonomyBuilder()
+                                            .taxonId(9000L)
+                                            .scientificName("name9000")
+                                            .commonName("common9000")
+                                            .build())
                             .linksSet(Collections.singletonList("link"))
                             .build();
 

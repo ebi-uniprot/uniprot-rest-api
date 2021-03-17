@@ -20,8 +20,10 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterReso
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
+import org.uniprot.core.Statistics;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
@@ -64,6 +66,12 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
 
+        Statistics statistics =
+                new StatisticsBuilder()
+                        .reviewedProteinCount(10L)
+                        .unreviewedProteinCount(5L)
+                        .build();
+
         CrossRefEntryBuilder entryBuilder = new CrossRefEntryBuilder();
         CrossRefEntry crossRefEntry =
                 entryBuilder
@@ -76,8 +84,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .server("http://tigrfams.jcvi.org/cgi-bin/index.cgi")
                         .dbUrl("http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")
                         .category("Family and domain databases")
-                        .reviewedProteinCount(10L)
-                        .unreviewedProteinCount(5L)
+                        .statistics(statistics)
                         .build();
 
         CrossRefDocument document =
@@ -91,8 +98,8 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .server(crossRefEntry.getServer())
                         .dbUrl(crossRefEntry.getDbUrl())
                         .category(crossRefEntry.getCategory())
-                        .reviewedProteinCount(crossRefEntry.getReviewedProteinCount())
-                        .unreviewedProteinCount(crossRefEntry.getUnreviewedProteinCount())
+                        .reviewedProteinCount(statistics.getReviewedProteinCount())
+                        .unreviewedProteinCount(statistics.getUnreviewedProteinCount())
                         .build();
 
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.CROSSREF, document);
@@ -107,7 +114,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.linkType", is("Explicit")))
                     .resultMatcher(
                             jsonPath("$.server", is("http://tigrfams.jcvi.org/cgi-bin/index.cgi")))
-                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(5)))
+                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", is(5)))
                     .resultMatcher(jsonPath("$.name", is("TIGRFAMs; a protein family database")))
                     .resultMatcher(
                             jsonPath(
@@ -117,7 +124,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.pubMedId", is("17151080")))
                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.abbrev", is("TIGRFAMs")))
-                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(10)))
+                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", is(10)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
                     .resultMatcher(jsonPath("$.doiId", is("10.1093/nar/gkl1043")))
                     .build();
@@ -152,9 +159,9 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .fields("id,category,unreviewed_protein_count")
                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
-                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(5)))
+                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", is(5)))
                     .resultMatcher(jsonPath("$.name").doesNotExist())
-                    .resultMatcher(jsonPath("$.reviewedProteinCount").doesNotExist())
+                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount").doesNotExist())
                     .build();
         }
 
@@ -188,7 +195,8 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     "$.server",
                                                     is(
                                                             "http://tigrfams.jcvi.org/cgi-bin/index.cgi")))
-                                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(5)))
+                                    .resultMatcher(
+                                            jsonPath("$.statistics.unreviewedProteinCount", is(5)))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.name",
@@ -201,7 +209,8 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(jsonPath("$.pubMedId", is("17151080")))
                                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                                     .resultMatcher(jsonPath("$.abbrev", is("TIGRFAMs")))
-                                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(10)))
+                                    .resultMatcher(
+                                            jsonPath("$.statistics.reviewedProteinCount", is(10)))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.category",

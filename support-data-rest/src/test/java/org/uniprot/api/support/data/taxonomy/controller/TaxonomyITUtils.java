@@ -34,7 +34,12 @@ public class TaxonomyITUtils {
                         .synonymsAdd("synonym" + taxId)
                         .otherNamesAdd("other names" + taxId)
                         .rank(TaxonomyRank.FAMILY)
-                        .parentId(taxId - 1)
+                        .parent(
+                                new TaxonomyBuilder()
+                                        .taxonId(taxId - 1)
+                                        .scientificName("name" + (taxId - 1))
+                                        .commonName("commonname" + (taxId - 1))
+                                        .build())
                         .statistics(new TaxonomyStatisticsBuilder().build())
                         .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 1).build())
                         .strainsAdd(new TaxonomyStrainBuilder().name("str name").build())

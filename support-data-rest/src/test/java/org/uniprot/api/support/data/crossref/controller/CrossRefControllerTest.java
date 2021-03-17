@@ -22,8 +22,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.service.CrossRefService;
+import org.uniprot.core.Statistics;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.core.cv.xdb.impl.CrossRefEntryBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
@@ -56,16 +58,20 @@ class CrossRefControllerTest {
                 .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())))
                 .andExpect(
                         jsonPath(
-                                "$.reviewedProteinCount",
+                                "$.statistics.reviewedProteinCount",
                                 equalTo(
-                                        Integer.valueOf(
-                                                crossRef.getReviewedProteinCount().toString()))))
+                                        Long.valueOf(
+                                                        crossRef.getStatistics()
+                                                                .getReviewedProteinCount())
+                                                .intValue())))
                 .andExpect(
                         jsonPath(
-                                "$.unreviewedProteinCount",
+                                "$.statistics.unreviewedProteinCount",
                                 equalTo(
-                                        Integer.valueOf(
-                                                crossRef.getUnreviewedProteinCount().toString()))));
+                                        Long.valueOf(
+                                                        crossRef.getStatistics()
+                                                                .getUnreviewedProteinCount())
+                                                .intValue())));
     }
 
     private CrossRefEntry createDBXRef() {
@@ -80,10 +86,13 @@ class CrossRefControllerTest {
         String du = random + "-DU-";
         String ct = random + "-CT-";
 
+        Statistics statistics =
+                new StatisticsBuilder().reviewedProteinCount(2L).unreviewedProteinCount(3L).build();
+
         CrossRefEntryBuilder builder = new CrossRefEntryBuilder();
         builder.abbrev(ab).id(ac).category(ct).dbUrl(du);
         builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).server(sr);
-        builder.reviewedProteinCount(2L).unreviewedProteinCount(3L);
+        builder.statistics(statistics);
         return builder.build();
     }
 }
