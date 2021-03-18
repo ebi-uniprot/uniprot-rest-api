@@ -19,7 +19,7 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.service.BasicIdService;
 import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
-import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -43,7 +43,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             @Qualifier("uniProtKBStoreRetryPolicy") RetryPolicy<Object> storeFetchRetryPolicy,
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
-            UniprotKBFacetConfig facetConfig,
+            UniProtKBFacetConfig facetConfig,
             RDFStreamer uniProtKBRDFStreamer,
             UniProtStoreClient<UniProtKBEntry> storeClient,
             SolrQueryConfig uniProtKBSolrQueryConf) {

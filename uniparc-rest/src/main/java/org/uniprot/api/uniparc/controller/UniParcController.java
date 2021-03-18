@@ -39,6 +39,7 @@ import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
 import org.uniprot.api.uniparc.request.UniParcStreamRequest;
@@ -414,6 +415,21 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         UniParcEntry entry = queryService.getBySequence(sequenceRequest);
 
         return super.getEntityResponse(entry, sequenceRequest.getFields(), request);
+    }
+
+    @GetMapping("/upis")
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> getByIds(
+            @Valid @ModelAttribute UniParcIdsSearchRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniParcEntry> results = queryService.getByIds(idsSearchRequest);
+
+        return super.getSearchResponse(
+                results,
+                idsSearchRequest.getFields(),
+                idsSearchRequest.isDownload(),
+                request,
+                response);
     }
 
     @Override

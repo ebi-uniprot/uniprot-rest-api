@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.store.config.UniProtDataType;
@@ -29,7 +29,7 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 @WebAppConfiguration
 @SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
 class ValidateFacetPropertiesAreSearchFieldsTest {
-    @Autowired private UniprotKBFacetConfig config;
+    @Autowired private UniProtKBFacetConfig config;
     private SearchFieldConfig searchFieldConfig =
             SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
 
@@ -44,6 +44,6 @@ class ValidateFacetPropertiesAreSearchFieldsTest {
     }
 
     @TestConfiguration
-    @Import(UniprotKBFacetConfig.class)
+    @Import(UniProtKBFacetConfig.class)
     static class TestFacetConfig {}
 }

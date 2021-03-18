@@ -10,7 +10,7 @@ import lombok.Data;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidAccessionList;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
@@ -23,7 +23,7 @@ import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
-public class GetByAccessionsRequest implements IdsSearchRequest {
+public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
 
     @NotNull(message = "{search.required}")
     @Parameter(description = "Comma separated list of accessions")
@@ -36,7 +36,7 @@ public class GetByAccessionsRequest implements IdsSearchRequest {
     private String fields;
 
     @Parameter(description = "Name of the facet search")
-    @ValidFacets(facetConfig = UniprotKBFacetConfig.class)
+    @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
@@ -44,7 +44,7 @@ public class GetByAccessionsRequest implements IdsSearchRequest {
             description =
                     "Criteria to filter by facet value. It can any supported valid solr query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFacetFields(facetConfig = UniprotKBFacetConfig.class)
+    @ValidSolrQueryFacetFields(facetConfig = UniProtKBFacetConfig.class)
     private String facetFilter;
 
     @Parameter(

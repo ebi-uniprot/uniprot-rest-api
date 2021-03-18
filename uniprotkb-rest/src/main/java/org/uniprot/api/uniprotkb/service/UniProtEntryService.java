@@ -19,7 +19,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.UniProtSolrQueryConfig;
@@ -55,7 +55,7 @@ public class UniProtEntryService
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
-            UniprotKBFacetConfig uniprotKBFacetConfig,
+            UniProtKBFacetConfig uniprotKBFacetConfig,
             UniProtTermsConfig uniProtTermsConfig,
             UniProtSolrSortClause uniProtSolrSortClause,
             SolrQueryConfig uniProtKBSolrQueryConf,
