@@ -43,8 +43,8 @@ public class KeywordOBOMessageConverter extends AbstractOBOMessageConverter<Keyw
         for (GoTerm goTerm : keywordEntry.getGeneOntologies()) {
             frame.addClause(getXRefClause(goTerm));
         }
-        for (String site : keywordEntry.getSites()) {
-            frame.addClause(getXRefClause(site));
+        for (String link : keywordEntry.getLinks()) {
+            frame.addClause(getXRefClause(link));
         }
 
         for (KeywordEntry parent : keywordEntry.getParents()) {
@@ -70,24 +70,18 @@ public class KeywordOBOMessageConverter extends AbstractOBOMessageConverter<Keyw
     }
 
     private Clause getDefClause(KeywordEntry keywordEntry) {
-        Clause clause =
-                new Clause(OBOFormatConstants.OboFormatTag.TAG_DEF, keywordEntry.getDefinition());
-        return clause;
+        return new Clause(OBOFormatConstants.OboFormatTag.TAG_DEF, keywordEntry.getDefinition());
     }
 
     private Clause getIdClause(KeywordEntry keywordEntry) {
-        Clause clause =
-                new Clause(
-                        OBOFormatConstants.OboFormatTag.TAG_ID, keywordEntry.getKeyword().getId());
-        return clause;
+        return new Clause(
+                OBOFormatConstants.OboFormatTag.TAG_ID, keywordEntry.getKeyword().getId());
     }
 
     private Clause getNameClause(KeywordEntry keywordEntry) {
-        Clause clause =
-                new Clause(
-                        OBOFormatConstants.OboFormatTag.TAG_NAME,
-                        keywordEntry.getKeyword().getName());
-        return clause;
+        return new Clause(
+                OBOFormatConstants.OboFormatTag.TAG_NAME,
+                keywordEntry.getKeyword().getName());
     }
 
     private Clause getSynonymClause(String synonym) {

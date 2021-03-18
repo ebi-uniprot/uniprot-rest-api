@@ -34,7 +34,7 @@ public class KeywordITUtils {
                         .childrenAdd(new KeywordEntryBuilder().keyword(keyword).build())
                         .geneOntologiesAdd(
                                 new GoTermBuilder().id("idValue").name("nameValue").build())
-                        .sitesAdd("siteValue")
+                        .linksAdd("linkValue")
                         .statistics(new StatisticsBuilder().build())
                         .build();
 
