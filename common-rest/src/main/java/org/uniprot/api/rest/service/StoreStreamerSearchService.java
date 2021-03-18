@@ -67,8 +67,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         this.storeStreamer = storeStreamer;
         this.solrQueryConfig = solrQueryConfig;
         this.tupleStreamTemplate = tupleStreamTemplate;
-        this.tupleStreamConverter =
-                new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
+        this.tupleStreamConverter = new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
     }
 
     public abstract R findByUniqueId(final String uniqueId, final String filters);
@@ -124,6 +123,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     }
 
     protected abstract UniProtDataType getUniProtDataType();
+
     protected abstract String getSolrIdField();
 
     private SolrStreamFacetResponse searchBySolrStream(IdsSearchRequest idsRequest) {
@@ -169,8 +169,6 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
         return solrRequestBuilder.queryConfig(this.solrQueryConfig).facets(facets).build();
     }
-
-
 
     private boolean solrStreamNeeded(IdsSearchRequest idsRequest) {
         return (Utils.nullOrEmpty(idsRequest.getCursor())

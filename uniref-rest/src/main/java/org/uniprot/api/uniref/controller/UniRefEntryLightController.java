@@ -38,6 +38,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.uniref.request.UniRefIdsSearchRequest;
 import org.uniprot.api.uniref.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.request.UniRefStreamRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
@@ -238,6 +239,16 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             Stream<UniRefEntryLight> result = service.stream(streamRequest);
             return super.stream(result, streamRequest, contentType, request);
         }
+    }
+
+    @GetMapping("/ids")
+    public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIds(
+            @Valid @ModelAttribute UniRefIdsSearchRequest idsRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniRefEntryLight> results = service.getByIds(idsRequest);
+        return super.getSearchResponse(
+                results, idsRequest.getFields(), idsRequest.isDownload(), request, response);
     }
 
     @Override

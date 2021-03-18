@@ -42,7 +42,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniprotkb.controller.request.GetByAccessionsRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
@@ -306,7 +306,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessions(
-            @Valid @ModelAttribute GetByAccessionsRequest accessionsRequest,
+            @Valid @ModelAttribute UniProtKBIdsSearchRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<UniProtKBEntry> result = entryService.getByIds(accessionsRequest);

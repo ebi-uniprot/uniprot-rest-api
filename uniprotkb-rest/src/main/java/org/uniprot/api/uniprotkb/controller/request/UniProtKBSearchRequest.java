@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 
@@ -40,7 +40,7 @@ public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements Sea
     private String cursor;
 
     @Parameter(description = "Name of the facet search")
-    @ValidFacets(facetConfig = UniprotKBFacetConfig.class)
+    @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
