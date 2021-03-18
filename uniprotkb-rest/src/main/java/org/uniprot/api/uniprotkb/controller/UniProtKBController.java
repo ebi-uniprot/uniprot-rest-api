@@ -309,7 +309,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             @Valid @ModelAttribute GetByAccessionsRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<UniProtKBEntry> result = entryService.getByAccessions(accessionsRequest);
+        QueryResult<UniProtKBEntry> result = entryService.getByIds(accessionsRequest);
         return super.getSearchResponse(
                 result,
                 accessionsRequest.getFields(),

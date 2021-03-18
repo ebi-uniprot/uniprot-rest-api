@@ -33,6 +33,7 @@ import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
@@ -73,7 +74,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 solrSortClause,
                 facetConfig,
                 storeStreamer,
-                uniParcSolrQueryConf);
+                uniParcSolrQueryConf,
+                null);
         this.searchFieldConfig = uniParcSearchFieldConfig;
         this.queryProcessor = uniParcQueryProcessor;
         this.repository = repository;
@@ -140,6 +142,16 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     @Override
     public UniParcEntry findByUniqueId(String uniqueId, String filters) {
         return findByUniqueId(uniqueId);
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPARC;
+    }
+
+    @Override
+    protected String getSolrIdField() {
+        return null;//FIXME
     }
 
     @Override

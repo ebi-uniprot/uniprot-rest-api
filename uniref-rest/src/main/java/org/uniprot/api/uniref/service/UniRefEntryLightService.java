@@ -25,6 +25,7 @@ import org.uniprot.api.uniref.request.UniRefStreamRequest;
 import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
@@ -62,7 +63,8 @@ public class UniRefEntryLightService
                 uniRefSortClause,
                 facetConfig,
                 storeStreamer,
-                uniRefSolrQueryConf);
+                uniRefSolrQueryConf,
+                null);
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.queryProcessor = uniRefQueryProcessor;
         this.solrQueryConfig = uniRefSolrQueryConf;
@@ -116,6 +118,16 @@ public class UniRefEntryLightService
             result = result.map(this::cleanMemberId);
         }
         return result;
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIREF;
+    }
+
+    @Override
+    protected String getSolrIdField() {
+        return null;
     }
 
     public Stream<String> streamRDF(UniRefStreamRequest streamRequest) {
