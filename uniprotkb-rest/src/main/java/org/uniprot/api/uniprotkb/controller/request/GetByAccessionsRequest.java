@@ -1,25 +1,29 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
-import org.uniprot.api.rest.validation.*;
+import org.uniprot.api.rest.validation.ValidAccessionList;
+import org.uniprot.api.rest.validation.ValidContentTypes;
+import org.uniprot.api.rest.validation.ValidFacets;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
-public class GetByAccessionsRequest implements SearchRequest {
+public class GetByAccessionsRequest implements IdsSearchRequest {
 
     @NotNull(message = "{search.required}")
     @Parameter(description = "Comma separated list of accessions")
@@ -47,7 +51,7 @@ public class GetByAccessionsRequest implements SearchRequest {
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
-            regexp = "^true|false$",
+            regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.uniprot.invalid.download}")
     private String download;
@@ -60,23 +64,7 @@ public class GetByAccessionsRequest implements SearchRequest {
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Override
-    public String getQuery() {
-        return null;
-    }
-
-    @Override
-    public String getSort() {
-        return null;
-    }
-
-    public List<String> getAccessionsList() {
-        return Arrays.asList(getAccessions().split(",")).stream()
-                .map(String::toUpperCase)
-                .collect(Collectors.toList());
-    }
-
-    public boolean isDownload() {
-        return Boolean.parseBoolean(download);
+    public String getCommaSeparatedIds() {
+        return this.accessions;
     }
 }
