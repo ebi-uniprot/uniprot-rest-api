@@ -46,7 +46,7 @@ class OutputFieldsParserTest {
         ReturnFieldConfig returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
         List<ReturnField> returnField =
-                OutputFieldsParser.parse("id,name,description", returnFieldConfig);
+                OutputFieldsParser.parse("id,name,definition", returnFieldConfig);
 
         Map<String, String> mappedFields = new HashMap<>();
         mappedFields.put("id", "idValue");

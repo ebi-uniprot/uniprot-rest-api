@@ -297,7 +297,7 @@ class KeywordSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Keyword ID\tName\tDescription\tCategory")))
+                                                                    "Keyword ID\tName\tDefinition\tCategory")))
                                     .resultMatcher(
                                             content()
                                                     .string(

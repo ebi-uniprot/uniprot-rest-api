@@ -236,7 +236,7 @@ class KeywordStreamControllerIT extends AbstractRDFStreamControllerIT {
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
                 .andExpect(
-                        content().string(containsString("Keyword ID\tName\tDescription\tCategory")))
+                        content().string(containsString("Keyword ID\tName\tDefinition\tCategory")))
                 .andExpect(
                         content()
                                 .string(
