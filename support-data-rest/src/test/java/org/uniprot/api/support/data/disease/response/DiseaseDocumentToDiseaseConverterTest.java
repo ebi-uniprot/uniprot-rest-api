@@ -1,21 +1,24 @@
 package org.uniprot.api.support.data.disease.response;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.uniprot.core.Statistics;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
@@ -59,9 +62,12 @@ class DiseaseDocumentToDiseaseConverterTest {
         DiseaseEntryBuilder builder = new DiseaseEntryBuilder();
         builder.name(id).id(accession).acronym(acronym).definition(def);
         builder.alternativeNamesSet(altNames).crossReferencesAdd(cr);
-        builder.keywordsAdd(keyword)
-                .reviewedProteinCount(reviwedProteinCount)
-                .unreviewedProteinCount(unreviwedProteinCount);
+        Statistics statistics =
+                new StatisticsBuilder()
+                        .reviewedProteinCount(reviwedProteinCount)
+                        .unreviewedProteinCount(unreviwedProteinCount)
+                        .build();
+        builder.keywordsAdd(keyword).statistics(statistics);
 
         DiseaseEntry disease = builder.build();
 
@@ -76,18 +82,19 @@ class DiseaseDocumentToDiseaseConverterTest {
         DiseaseEntry convertedDisease = this.toDiseaseConverter.apply(diseaseDocument);
 
         // verify the result
-        Assertions.assertEquals(disease.getName(), convertedDisease.getName());
-        Assertions.assertEquals(disease.getId(), convertedDisease.getId());
-        Assertions.assertEquals(disease.getAcronym(), convertedDisease.getAcronym());
-        Assertions.assertEquals(disease.getDefinition(), convertedDisease.getDefinition());
-        Assertions.assertEquals(
-                disease.getReviewedProteinCount(), convertedDisease.getReviewedProteinCount());
-        Assertions.assertEquals(
-                disease.getUnreviewedProteinCount(), convertedDisease.getUnreviewedProteinCount());
-        Assertions.assertEquals(
-                disease.getAlternativeNames(), convertedDisease.getAlternativeNames());
-        Assertions.assertEquals(
-                disease.getCrossReferences(), convertedDisease.getCrossReferences());
-        Assertions.assertEquals(disease.getKeywords(), convertedDisease.getKeywords());
+        assertEquals(disease.getName(), convertedDisease.getName());
+        assertEquals(disease.getId(), convertedDisease.getId());
+        assertEquals(disease.getAcronym(), convertedDisease.getAcronym());
+        assertEquals(disease.getDefinition(), convertedDisease.getDefinition());
+        assertNotNull(disease.getStatistics());
+        assertEquals(
+                disease.getStatistics().getReviewedProteinCount(),
+                convertedDisease.getStatistics().getReviewedProteinCount());
+        assertEquals(
+                disease.getStatistics().getUnreviewedProteinCount(),
+                convertedDisease.getStatistics().getUnreviewedProteinCount());
+        assertEquals(disease.getAlternativeNames(), convertedDisease.getAlternativeNames());
+        assertEquals(disease.getCrossReferences(), convertedDisease.getCrossReferences());
+        assertEquals(disease.getKeywords(), convertedDisease.getKeywords());
     }
 }
