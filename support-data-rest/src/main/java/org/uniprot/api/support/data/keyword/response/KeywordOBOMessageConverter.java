@@ -80,8 +80,7 @@ public class KeywordOBOMessageConverter extends AbstractOBOMessageConverter<Keyw
 
     private Clause getNameClause(KeywordEntry keywordEntry) {
         return new Clause(
-                OBOFormatConstants.OboFormatTag.TAG_NAME,
-                keywordEntry.getKeyword().getName());
+                OBOFormatConstants.OboFormatTag.TAG_NAME, keywordEntry.getKeyword().getName());
     }
 
     private Clause getSynonymClause(String synonym) {
