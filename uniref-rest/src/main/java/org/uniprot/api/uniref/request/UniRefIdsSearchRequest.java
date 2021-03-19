@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
-import org.uniprot.api.rest.validation.ValidAccessionList;
+import org.uniprot.api.rest.validation.ValidUniqueIdList;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniRefIdsSearchRequest implements IdsSearchRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Comma separated list of UniRef ids")
-    @ValidAccessionList
+    @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIREF)
     private String ids;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniref-return-fields.json")

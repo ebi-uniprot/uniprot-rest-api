@@ -11,10 +11,10 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
-import org.uniprot.api.rest.validation.ValidAccessionList;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidUniqueIdList;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Comma separated list of UniParc ids(upis)")
-    @ValidAccessionList
+    @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIPARC)
     private String upis;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
@@ -47,7 +47,7 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
-            message = "{search.uniprot.invalid.download}")
+            message = "{search.uniparc.invalid.download}")
     private String download;
 
     @Parameter(hidden = true)
