@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -241,7 +242,16 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
         }
     }
 
-    @GetMapping("/ids")
+    @RequestMapping(
+            value = "/ids",
+            method = {RequestMethod.GET, RequestMethod.POST},
+            produces = {
+                    TSV_MEDIA_TYPE_VALUE,
+                    FASTA_MEDIA_TYPE_VALUE,
+                    LIST_MEDIA_TYPE_VALUE,
+                    APPLICATION_JSON_VALUE,
+                    XLS_MEDIA_TYPE_VALUE
+            })
     public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIds(
             @Valid @ModelAttribute UniRefIdsSearchRequest idsRequest,
             HttpServletRequest request,
