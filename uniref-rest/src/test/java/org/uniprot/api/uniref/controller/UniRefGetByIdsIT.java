@@ -64,6 +64,18 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
         "UniRef100_P03903",
         "UniRef50_P03904"
     };
+    private static final String[] TEST_IDS_ARRAY_SORTED = {
+        "UniRef100_P03901",
+        "UniRef100_P03902",
+        "UniRef100_P03903",
+        "UniRef50_P03901",
+        "UniRef50_P03902",
+        "UniRef50_P03903",
+        "UniRef50_P03904",
+        "UniRef90_P03901",
+        "UniRef90_P03902",
+        "UniRef90_P03903"
+    };
     private static final String MISSING_ID1 = "UniRef50_P00000";
     private static final String MISSING_ID2 = "UniRef90_Q00000";
 
@@ -265,5 +277,20 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
         return new String[] {
             "Invalid facet name 'invalid_facet1'. Expected value can be [identity]."
         };
+    }
+
+    @Override
+    protected String getFacetFilter() {
+        return "identity:0.5 OR identity:0.9 OR identity:1.0";
+    }
+
+    @Override
+    protected ResultMatcher getSortedIdResultMatcher() {
+        return jsonPath("$.results.*.id", contains(TEST_IDS_ARRAY_SORTED));
+    }
+
+    @Override
+    protected String getUnmatchedFacetFilter() {
+        return "identity:2";
     }
 }

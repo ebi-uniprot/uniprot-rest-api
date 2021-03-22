@@ -12,7 +12,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,7 +50,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -71,7 +70,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -93,7 +92,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(10)));
@@ -117,7 +116,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)));
@@ -187,7 +186,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(10)));
@@ -213,7 +212,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", String.valueOf(pageSize)));
 
         // then first page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "10"))
@@ -241,7 +240,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", String.valueOf(pageSize)));
 
         // then 2nd page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "10"))
@@ -270,7 +269,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", String.valueOf(pageSize)));
 
         // then last page
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "10"))
@@ -296,7 +295,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", "8"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(6)))
@@ -340,7 +339,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", "10"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.*", containsInAnyOrder(getErrorMessages())));
@@ -359,7 +358,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("facets", facetList)
                                         .param("size", "10"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
@@ -388,6 +387,53 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                 .andExpect(jsonPath("$.results.size()", is(10)));
 
         verifyResults(response);
+    }
+
+    @Test
+    void getByIdsWithFacetFilterSuccess() throws Exception {
+        String facetFilter = getFacetFilter();
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(
+                                                org.apache.http.HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), getCommaSeparatedIds())
+                                        .param("facetFilter", facetFilter)
+                                        .param("size", "10"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(getSortedIdResultMatcher())
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
+    void getByIdsWithFacetFilterEmptyResponse() throws Exception {
+        String facetFilter = getUnmatchedFacetFilter();
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(
+                                                org.apache.http.HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), getCommaSeparatedIds())
+                                        .param("facetFilter", facetFilter)
+                                        .param("size", "10"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets").doesNotExist());
     }
 
     protected abstract String getCommaSeparatedIds();
@@ -423,6 +469,12 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     protected abstract String[] getErrorMessages();
 
     protected abstract String[] getInvalidFacetErrorMessage();
+
+    protected abstract String getFacetFilter();
+
+    protected abstract ResultMatcher getSortedIdResultMatcher();
+
+    protected abstract String getUnmatchedFacetFilter();
 
     private void verifyResults(ResultActions response) throws Exception {
         for (ResultMatcher matcher : getResultsResultMatchers()) {
