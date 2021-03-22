@@ -246,11 +246,11 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             value = "/ids",
             method = {RequestMethod.GET, RequestMethod.POST},
             produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIds(
             @Valid @ModelAttribute UniRefIdsSearchRequest idsRequest,

@@ -30,8 +30,8 @@ class FacetTupleStreamConverterTest {
         assertNotNull(response);
         assertNotNull(response.getFacets());
         assertEquals(0, response.getFacets().size());
-        assertNotNull(response.getAccessions());
-        assertEquals(0, response.getAccessions().size());
+        assertNotNull(response.getIds());
+        assertEquals(0, response.getIds().size());
     }
 
     @Test
@@ -50,8 +50,8 @@ class FacetTupleStreamConverterTest {
         SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
         assertNotNull(response);
         List<Facet> facets = response.getFacets();
-        assertNotNull(response.getAccessions());
-        assertEquals(0, response.getAccessions().size());
+        assertNotNull(response.getIds());
+        assertEquals(0, response.getIds().size());
         assertNotNull(facets);
         assertEquals(2, facets.size());
 
@@ -111,8 +111,8 @@ class FacetTupleStreamConverterTest {
         SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
 
         List<Facet> facets = response.getFacets();
-        assertNotNull(response.getAccessions());
-        assertEquals(0, response.getAccessions().size());
+        assertNotNull(response.getIds());
+        assertEquals(0, response.getIds().size());
         assertNotNull(facets);
         assertEquals(1, facets.size());
         Facet lengthFacet = facets.get(0);
@@ -160,11 +160,11 @@ class FacetTupleStreamConverterTest {
         SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
         assertNotNull(response);
         List<Facet> facets = response.getFacets();
-        assertNotNull(response.getAccessions());
+        assertNotNull(response.getIds());
         assertNotNull(facets);
         assertEquals(2, facets.size());
-        assertEquals(2, response.getAccessions().size());
-        assertEquals(Arrays.asList("P12345", "Q12345"), response.getAccessions());
+        assertEquals(2, response.getIds().size());
+        assertEquals(Arrays.asList("P12345", "Q12345"), response.getIds());
     }
 
     private Tuple getTuple(String facet, Object value, Long count) {

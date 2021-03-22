@@ -77,7 +77,7 @@ public abstract class BasicIdService<T, U> {
 
             facets = solrStreamResponse.getFacets();
 
-            List<String> solrToIds = solrStreamResponse.getAccessions();
+            List<String> solrToIds = solrStreamResponse.getIds();
             if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
                 // Apply Filter in PIR result
                 mappedIds = applyQueryFilter(mappedIds, solrToIds);
@@ -143,7 +143,7 @@ public abstract class BasicIdService<T, U> {
             long end = System.currentTimeMillis();
             log.debug("Time taken to search solr in ms {}", (end - start));
 
-            List<String> solrToIds = solrStreamResponse.getAccessions();
+            List<String> solrToIds = solrStreamResponse.getIds();
             if (Utils.notNullNotEmpty(streamRequest.getQuery())) {
                 // Apply Filter in PIR result
                 mappedIds = applyQueryFilter(mappedIds, solrToIds);
