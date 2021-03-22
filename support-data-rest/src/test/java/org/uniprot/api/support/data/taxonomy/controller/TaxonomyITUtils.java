@@ -64,7 +64,7 @@ public class TaxonomyITUtils {
                         .active(facet)
                         .taxonomyObj(getTaxonomyBinary(taxonomyEntry));
         if (facet) {
-            docBuilder.taxonomiesWith(List.of("proteome", "reference", "reviewed", "annotated"));
+            docBuilder.taxonomiesWith(List.of("proteome", "reference", "reviewed", "uniprotkb"));
             docBuilder.superkingdom("Bacteria");
         }
         return docBuilder.build();
