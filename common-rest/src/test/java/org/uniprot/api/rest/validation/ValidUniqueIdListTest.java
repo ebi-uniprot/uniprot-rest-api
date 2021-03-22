@@ -19,7 +19,7 @@ import org.uniprot.store.config.UniProtDataType;
  * @author lgonzales
  * @since 23/06/2020
  */
-public class ValidUniqueIdListTest {
+class ValidUniqueIdListTest {
 
     @Test
     void isValidNullValueReturnTrue() {
@@ -79,7 +79,7 @@ public class ValidUniqueIdListTest {
 
     @ParameterizedTest
     @MethodSource("provideDataTypeAndValidValues")
-    void testValidIds(UniProtDataType dataType, String csv){
+    void testValidIds(UniProtDataType dataType, String csv) {
         ValidUniqueIdListTest.FakeValidAccessionListValidator validator =
                 new ValidUniqueIdListTest.FakeValidAccessionListValidator(dataType);
         boolean result = validator.isValid(csv, null);
@@ -88,7 +88,7 @@ public class ValidUniqueIdListTest {
 
     @ParameterizedTest
     @MethodSource("provideDataTypeAndInvalidValues")
-    void testInValidIds(UniProtDataType dataType, String csv){
+    void testInValidIds(UniProtDataType dataType, String csv) {
         ValidUniqueIdListTest.FakeValidAccessionListValidator validator =
                 new ValidUniqueIdListTest.FakeValidAccessionListValidator(dataType);
         boolean result = validator.isValid(csv, null);
@@ -98,14 +98,16 @@ public class ValidUniqueIdListTest {
         assertEquals(errorString, csv);
     }
 
-    private static Stream<Arguments> provideDataTypeAndValidValues(){
+    private static Stream<Arguments> provideDataTypeAndValidValues() {
         return Stream.of(
                 Arguments.of(UniProtDataType.UNIPROTKB, "P12345,P54321,P32542"),
                 Arguments.of(UniProtDataType.UNIPARC, "UPI0000000001,UPI0000000002,UPI0000000003"),
-                Arguments.of(UniProtDataType.UNIREF, "UniRef50_P12345,UniRef90_P12345,UniRef100_P12345"));
+                Arguments.of(
+                        UniProtDataType.UNIREF,
+                        "UniRef50_P12345,UniRef90_P12345,UniRef100_P12345"));
     }
 
-    private static Stream<Arguments> provideDataTypeAndInvalidValues(){
+    private static Stream<Arguments> provideDataTypeAndInvalidValues() {
         return Stream.of(
                 Arguments.of(UniProtDataType.UNIPROTKB, "P1234,UniRef90_P12345,UPI0000000001"),
                 Arguments.of(UniProtDataType.UNIPARC, "P12345,UniRef100_P12345,UPI000000000"),
@@ -117,14 +119,13 @@ public class ValidUniqueIdListTest {
         final List<String> errorList = new ArrayList<>();
         final UniProtDataType dataType;
 
-        FakeValidAccessionListValidator(){
+        FakeValidAccessionListValidator() {
             this(UniProtDataType.UNIPROTKB);
         }
 
-        FakeValidAccessionListValidator(UniProtDataType dataType){
+        FakeValidAccessionListValidator(UniProtDataType dataType) {
             this.dataType = dataType;
         }
-
 
         @Override
         void buildInvalidAccessionLengthMessage(ConstraintValidatorContextImpl contextImpl) {
@@ -143,7 +144,7 @@ public class ValidUniqueIdListTest {
         }
 
         @Override
-        UniProtDataType getDataType(){
+        UniProtDataType getDataType() {
             return this.dataType;
         }
     }

@@ -1,5 +1,22 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
+
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -31,13 +48,6 @@ import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -45,16 +55,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 /**
  * @author jluo
@@ -422,12 +422,12 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/upis",
             method = {RequestMethod.GET, RequestMethod.POST},
             produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE,
-                    APPLICATION_XML_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpis(
             @Valid @ModelAttribute UniParcIdsSearchRequest idsSearchRequest,

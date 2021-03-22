@@ -67,8 +67,8 @@ public @interface ValidUniqueIdList {
             return isValid;
         }
 
-        private boolean isIdValid(String id){
-            switch (getDataType()){
+        private boolean isIdValid(String id) {
+            switch (getDataType()) {
                 case UNIPROTKB:
                     return id.toUpperCase().matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
                 case UNIPARC:
@@ -97,7 +97,7 @@ public @interface ValidUniqueIdList {
             return Integer.parseInt(maxLength);
         }
 
-        UniProtDataType getDataType(){
+        UniProtDataType getDataType() {
             return this.dataType;
         }
     }

@@ -89,25 +89,24 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
                         ? searchBySolrStream(idsRequest)
                         : new SolrStreamFacetResponse();
 
-        // use the accessions returned by solr stream if facetFilter is passed
-        // otherwise use the passed accessions
-        List<String> accessions =
+        // use the ids returned by solr stream if facetFilter is passed
+        // otherwise use the passed ids
+        List<String> ids =
                 Utils.notNullNotEmpty(idsRequest.getFacetFilter())
-                        ? solrStreamResponse.getAccessions()
+                        ? solrStreamResponse.getIds()
                         : idsRequest.getIdList();
-        // default page size to number of accessions passed
-        int pageSize =
-                Objects.isNull(idsRequest.getSize()) ? accessions.size() : idsRequest.getSize();
+        // default page size to number of ids passed
+        int pageSize = Objects.isNull(idsRequest.getSize()) ? ids.size() : idsRequest.getSize();
 
-        // compute the cursor and get subset of accessions as per cursor
-        CursorPage cursorPage = CursorPage.of(idsRequest.getCursor(), pageSize, accessions.size());
+        // compute the cursor and get subset of ids as per cursor
+        CursorPage cursorPage = CursorPage.of(idsRequest.getCursor(), pageSize, ids.size());
 
-        List<String> accessionsInPage =
-                accessions.subList(
+        List<String> idsInPage =
+                ids.subList(
                         cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
 
-        // get n accessions from store
-        Stream<R> entries = this.storeStreamer.streamEntries(accessionsInPage);
+        // get n entries from store
+        Stream<R> entries = this.storeStreamer.streamEntries(idsInPage);
 
         // facets may be set when facetList is passed but that should not be returned with cursor
         List<Facet> facets = solrStreamResponse.getFacets();

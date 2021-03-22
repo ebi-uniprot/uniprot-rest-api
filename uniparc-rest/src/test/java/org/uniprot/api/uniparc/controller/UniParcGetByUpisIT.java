@@ -1,9 +1,22 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,6 +26,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsControllerIT;
+import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -23,28 +37,10 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import lombok.extern.slf4j.Slf4j;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 /**
  * @author sahmad
  * @created 19/03/2021
  */
-@Slf4j
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniParcController.class)
 @ExtendWith(value = SpringExtension.class)
@@ -54,21 +50,29 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     private static final String GET_BY_UPIS_PATH = "/uniparc/upis";
     private final UniParcDocumentConverter documentConverter =
             new UniParcDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo(), new HashMap<>());
-    private static final String TEST_IDS = "UPI0000000004,UPI0000000003,UPI0000000002,UPI0000000001,UPI0000000005," +
-            "UPI0000000006,UPI0000000007,UPI0000000010,UPI0000000009,UPI0000000008";
-    private static final String[] TEST_IDS_ARRAY = {"UPI0000000004", "UPI0000000003", "UPI0000000002", "UPI0000000001",
-            "UPI0000000005", "UPI0000000006", "UPI0000000007", "UPI0000000010", "UPI0000000009", "UPI0000000008"};
+    private static final String TEST_IDS =
+            "UPI0000000004,UPI0000000003,UPI0000000002,UPI0000000001,UPI0000000005,"
+                    + "UPI0000000006,UPI0000000007,UPI0000000010,UPI0000000009,UPI0000000008";
+    private static final String[] TEST_IDS_ARRAY = {
+        "UPI0000000004",
+        "UPI0000000003",
+        "UPI0000000002",
+        "UPI0000000001",
+        "UPI0000000005",
+        "UPI0000000006",
+        "UPI0000000007",
+        "UPI0000000010",
+        "UPI0000000009",
+        "UPI0000000008"
+    };
     private static final String MISSING_ID1 = "UPI0000000050";
     private static final String MISSING_ID2 = "UPI0000000051";
 
-    @Autowired
-    UniProtStoreClient<UniParcEntry> storeClient;
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private FacetTupleStreamTemplate facetTupleStreamTemplate;
-    @Autowired
-    private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired UniProtStoreClient<UniParcEntry> storeClient;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired private UniParcFacetConfig facetConfig;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -91,7 +95,6 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         storeClient.saveEntry(entry);
     }
 
-
     @Override
     protected List<SolrCollection> getSolrCollections() {
         return List.of(SolrCollection.uniparc);
@@ -107,10 +110,6 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         return this.facetTupleStreamTemplate;
     }
 
-    private Stream<Arguments> getContentTypes() {
-        return super.getContentTypes(GET_BY_UPIS_PATH);
-    }
-
     @Override
     protected String getCommaSeparatedIds() {
         return TEST_IDS;
@@ -119,7 +118,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String getCommaSeparatedMixedIds() {
         // 6 present and 2 missing ids
-        String csvs = Arrays.asList(TEST_IDS_ARRAY).subList(0, 6).stream().collect(Collectors.joining(","));
+        String csvs = String.join(",", Arrays.asList(TEST_IDS_ARRAY).subList(0, 6));
         return csvs + "," + MISSING_ID1 + "," + MISSING_ID2;
     }
 
@@ -130,7 +129,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected String getCommaSeparatedFacets() {
-        return "database,organism_name";
+        return String.join(",", facetConfig.getFacetNames());
     }
 
     @Override
@@ -166,23 +165,27 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getFacetsResultMatchers() {
         ResultMatcher rm1 = jsonPath("$.facets", iterableWithSize(2));
-        ResultMatcher rm2 = jsonPath("$.facets.*.label", contains("Database", "Organisms"));
-        ResultMatcher rm3 = jsonPath("$.facets.*.name", contains("database", "organism_name"));
-        ResultMatcher rm4 = jsonPath("$.facets[0].values", iterableWithSize(1));
-        ResultMatcher rm5 = jsonPath("$.facets[0].values[0].label", is("UniProtKB"));
-        ResultMatcher rm6 = jsonPath("$.facets[0].values[0].value", is("uniprot"));
-        ResultMatcher rm7 = jsonPath("$.facets[0].values[0].count", is(10));
-        ResultMatcher rm8 = jsonPath("$.facets[1].values", iterableWithSize(2));
-        ResultMatcher rm9 = jsonPath("$.facets[1].values.*.label").doesNotExist();
-        ResultMatcher rm10 = jsonPath("$.facets[1].values.*.value", containsInAnyOrder("Homo sapiens",
-                "Torpedo californica"));
-        ResultMatcher rm11 = jsonPath("$.facets[1].values.*.count", containsInAnyOrder(10, 10));
+        ResultMatcher rm2 = jsonPath("$.facets.*.label", contains("Organisms", "Database"));
+        ResultMatcher rm3 = jsonPath("$.facets.*.name", contains("organism_name", "database"));
+        ResultMatcher rm4 = jsonPath("$.facets[1].values", iterableWithSize(1));
+        ResultMatcher rm5 = jsonPath("$.facets[1].values[0].label", is("UniProtKB"));
+        ResultMatcher rm6 = jsonPath("$.facets[1].values[0].value", is("uniprot"));
+        ResultMatcher rm7 = jsonPath("$.facets[1].values[0].count", is(10));
+        ResultMatcher rm8 = jsonPath("$.facets[0].values", iterableWithSize(2));
+        ResultMatcher rm9 = jsonPath("$.facets[0].values.*.label").doesNotExist();
+        ResultMatcher rm10 =
+                jsonPath(
+                        "$.facets[0].values.*.value",
+                        containsInAnyOrder("Homo sapiens", "Torpedo californica"));
+        ResultMatcher rm11 = jsonPath("$.facets[0].values.*.count", containsInAnyOrder(10, 10));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8, rm9, rm10, rm11);
     }
 
     @Override
-    protected List<ResultMatcher> getDownloadResultMatchers() {
-        return Arrays.stream(TEST_IDS_ARRAY).map(id -> content().string(containsString(id))).collect(Collectors.toList());
+    protected List<ResultMatcher> getIdsAsResultMatchers() {
+        return Arrays.stream(TEST_IDS_ARRAY)
+                .map(id -> content().string(containsString(id)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -190,7 +193,8 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY));
         ResultMatcher rm2 = jsonPath("$.results.*.sequence").doesNotExist();
         ResultMatcher rm3 = jsonPath("$.results.*.uniParcCrossReferences.*.geneName").exists();
-        ResultMatcher rm4 = jsonPath("$.results.*.uniParcCrossReferences.*.organism.taxonId").exists();
+        ResultMatcher rm4 =
+                jsonPath("$.results.*.uniParcCrossReferences.*.organism.taxonId").exists();
         ResultMatcher rm5 = jsonPath("$.results.*.sequenceFeatures.*.database").exists();
         ResultMatcher rm6 = jsonPath("$.results[0].sequenceFeatures[0].database", is("CDD"));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6);
@@ -198,32 +202,50 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected List<ResultMatcher> getFirstPageResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(List.of(TEST_IDS_ARRAY).subList(0, 4).toArray()));
+        ResultMatcher rm1 =
+                jsonPath(
+                        "$.results.*.uniParcId",
+                        contains(List.of(TEST_IDS_ARRAY).subList(0, 4).toArray()));
         ResultMatcher rm2 = jsonPath("$.facets", iterableWithSize(2));
-        ResultMatcher rm3 = jsonPath("$.facets.*.label", contains("Database", "Organisms"));
-        ResultMatcher rm4 = jsonPath("$.facets.*.name", contains("database", "organism_name"));
+        ResultMatcher rm3 = jsonPath("$.facets.*.label", contains("Organisms", "Database"));
+        ResultMatcher rm4 = jsonPath("$.facets.*.name", contains("organism_name", "database"));
         return List.of(rm1, rm2, rm3, rm4);
     }
 
     @Override
     protected List<ResultMatcher> getSecondPageResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(List.of(TEST_IDS_ARRAY).subList(4, 8).toArray()));
+        ResultMatcher rm1 =
+                jsonPath(
+                        "$.results.*.uniParcId",
+                        contains(List.of(TEST_IDS_ARRAY).subList(4, 8).toArray()));
         return List.of(rm1);
     }
 
     @Override
     protected List<ResultMatcher> getThirdPageResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(List.of(TEST_IDS_ARRAY).subList(8, 10).toArray()));
+        ResultMatcher rm1 =
+                jsonPath(
+                        "$.results.*.uniParcId",
+                        contains(List.of(TEST_IDS_ARRAY).subList(8, 10).toArray()));
         return List.of(rm1);
     }
 
     @Override
     protected String[] getErrorMessages() {
-        return new String[]{"UPI 'INVALID2' has invalid format. It should be a valid UniParc id.",
-                "Only '10' upis are allowed in each request.",
-                "The 'download' parameter has invalid format. It should be a boolean true or false.",
-                "Invalid fields parameter value 'invalid'",
-                "UPI 'INVALID' has invalid format. It should be a valid UniParc id.",
-                "Invalid fields parameter value 'invalid1'"};
+        return new String[] {
+            "UPI 'INVALID2' has invalid format. It should be a valid UniParc id.",
+            "Only '10' upis are allowed in each request.",
+            "The 'download' parameter has invalid format. It should be a boolean true or false.",
+            "Invalid fields parameter value 'invalid'",
+            "UPI 'INVALID' has invalid format. It should be a valid UniParc id.",
+            "Invalid fields parameter value 'invalid1'"
+        };
+    }
+
+    @Override
+    protected String[] getInvalidFacetErrorMessage() {
+        return new String[] {
+            "Invalid facet name 'invalid_facet1'. Expected value can be [organism_name, database]."
+        };
     }
 }
