@@ -65,6 +65,18 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         "UPI0000000009",
         "UPI0000000008"
     };
+    private static final String[] TEST_IDS_ARRAY_SORTED = {
+        "UPI0000000001",
+        "UPI0000000002",
+        "UPI0000000003",
+        "UPI0000000004",
+        "UPI0000000005",
+        "UPI0000000006",
+        "UPI0000000007",
+        "UPI0000000008",
+        "UPI0000000009",
+        "UPI0000000010"
+    };
     private static final String MISSING_ID1 = "UPI0000000050";
     private static final String MISSING_ID2 = "UPI0000000051";
 
@@ -77,22 +89,6 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         saveEntries();
-    }
-
-    private void saveEntries() throws Exception {
-        for (int i = 1; i <= 10; i++) {
-            saveEntry(i);
-        }
-        cloudSolrClient.commit(SolrCollection.uniparc.name());
-    }
-
-    private void saveEntry(int i) throws Exception {
-        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
-        UniParcEntryConverter converter = new UniParcEntryConverter();
-        Entry xmlEntry = converter.toXml(entry);
-        UniParcDocument doc = documentConverter.convert(xmlEntry);
-        cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
-        storeClient.saveEntry(entry);
     }
 
     @Override
@@ -247,5 +243,36 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         return new String[] {
             "Invalid facet name 'invalid_facet1'. Expected value can be [organism_name, database]."
         };
+    }
+
+    @Override
+    protected String getFacetFilter() {
+        return "database:uniprot";
+    }
+
+    @Override
+    protected ResultMatcher getSortedIdResultMatcher() {
+        return jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY_SORTED));
+    }
+
+    @Override
+    protected String getUnmatchedFacetFilter() {
+        return "organism_name:missing";
+    }
+
+    private void saveEntries() throws Exception {
+        for (int i = 1; i <= 10; i++) {
+            saveEntry(i);
+        }
+        cloudSolrClient.commit(SolrCollection.uniparc.name());
+    }
+
+    private void saveEntry(int i) throws Exception {
+        UniParcEntry entry = UniParcEntryMocker.createEntry(i, UPI_PREF);
+        UniParcEntryConverter converter = new UniParcEntryConverter();
+        Entry xmlEntry = converter.toXml(entry);
+        UniParcDocument doc = documentConverter.convert(xmlEntry);
+        cloudSolrClient.addBean(SolrCollection.uniparc.name(), doc);
+        storeClient.saveEntry(entry);
     }
 }

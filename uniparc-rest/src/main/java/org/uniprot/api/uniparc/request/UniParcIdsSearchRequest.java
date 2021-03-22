@@ -14,6 +14,8 @@ import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.rest.validation.ValidUniqueIdList;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -43,6 +45,13 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
 
     @Parameter(
             description =
+                    "Criteria to filter by facet value. It can any supported valid solr query.")
+    @ValidSolrQuerySyntax(message = "{search.invalid.query}")
+    @ValidSolrQueryFacetFields(facetConfig = UniParcFacetConfig.class)
+    private String facetFilter;
+
+    @Parameter(
+            description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
             regexp = "^(?:true|false)$",
@@ -60,10 +69,5 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
 
     public String getCommaSeparatedIds() {
         return this.upis;
-    }
-
-    @Override
-    public String getFacetFilter() {
-        return null;
     }
 }

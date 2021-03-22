@@ -79,6 +79,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         "P00003", "P00002", "P00001", "P00007", "P00006", "P00005", "P00004", "P00008", "P00010",
         "P00009"
     };
+    private static final String[] TEST_IDS_ARRAY_SORTED = {
+        "P00001", "P00002", "P00003", "P00004", "P00005", "P00006", "P00007", "P00008", "P00009",
+        "P00010"
+    };
     private static final String MISSING_ID1 = "Q00001";
     private static final String MISSING_ID2 = "Q00002";
 
@@ -284,6 +288,21 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
             "Invalid facet name 'invalid_facet1'. Expected value can be [structure_3d, proteins_with, "
                     + "fragment, existence, length, reviewed, annotation_score, model_organism, other_organism, proteome]."
         };
+    }
+
+    @Override
+    protected String getFacetFilter() {
+        return "reviewed:true OR reviewed:false";
+    }
+
+    @Override
+    protected ResultMatcher getSortedIdResultMatcher() {
+        return jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY_SORTED));
+    }
+
+    @Override
+    protected String getUnmatchedFacetFilter() {
+        return "existence:randomvalue";
     }
 
     @Override
