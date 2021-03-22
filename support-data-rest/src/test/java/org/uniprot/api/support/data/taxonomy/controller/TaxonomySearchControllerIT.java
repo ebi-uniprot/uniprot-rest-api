@@ -240,9 +240,13 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                     .resultMatcher(jsonPath("$.facets[1].values[0].value", is("proteome")))
                     .resultMatcher(jsonPath("$.facets[1].values[0].label", is("Proteomes")))
                     .resultMatcher(jsonPath("$.facets[1].values[1].value", is("reference")))
-                    .resultMatcher(jsonPath("$.facets[1].values[1].label", is("Reference proteomes")))
+                    .resultMatcher(
+                            jsonPath("$.facets[1].values[1].label", is("Reference proteomes")))
                     .resultMatcher(jsonPath("$.facets[1].values[2].value", is("reviewed")))
-                    .resultMatcher(jsonPath("$.facets[1].values[2].label", is("Reviewed (Swiss-Prot) entries")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets[1].values[2].label",
+                                    is("Reviewed (Swiss-Prot) entries")))
                     .resultMatcher(jsonPath("$.facets[1].values[3].value", is("uniprotkb")))
                     .resultMatcher(jsonPath("$.facets[1].values[3].label", is("UniProtKB entries")))
                     .build();
