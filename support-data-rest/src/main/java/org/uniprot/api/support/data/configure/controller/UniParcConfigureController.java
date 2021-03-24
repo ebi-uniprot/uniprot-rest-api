@@ -97,4 +97,26 @@ public class UniParcConfigureController {
     public List<UniParcDatabaseDetail> getUniParcDatabaseDetails() {
         return service.getAllUniParcDatabaseDetails();
     }
+
+    @Operation(
+            summary = "List of return fields available in a UniParc database(cross ref).",
+            responses = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            array =
+                                            @ArraySchema(
+                                                    schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    UniProtReturnField
+                                                                            .class)))
+                            })
+            })
+    @GetMapping("/database-result-fields")
+    public List<UniProtReturnField> getDatabaseResultFields() {
+        return service.getUniParcDatabaseResultFields();
+    }
+
 }

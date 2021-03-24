@@ -55,7 +55,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
 
     @Override
     @SuppressWarnings("squid:S2095")
-    protected void before(MessageConverterContext<T> context, OutputStream outputStream)
+    public void before(MessageConverterContext<T> context, OutputStream outputStream)
             throws IOException {
         List<ReturnField> fieldList = getFilterFieldMap(context.getFields());
         TL_FILTERS.set(fieldList);
@@ -99,7 +99,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     }
 
     @Override
-    protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
+    public void writeEntity(T entity, OutputStream outputStream) throws IOException {
         JsonGenerator generator = TL_JSON_GENERATOR.get();
         List<ReturnField> fields = TL_FILTERS.get();
         if (Utils.notNullNotEmpty(fields)) {
@@ -155,7 +155,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     }
 
     @Override
-    protected void cleanUp() {
+    public void cleanUp() {
         super.cleanUp();
         try {
             TL_JSON_GENERATOR.get().close();

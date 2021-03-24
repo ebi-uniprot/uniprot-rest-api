@@ -21,9 +21,11 @@ import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
+import org.uniprot.api.uniparc.model.UniParcEntryWrapper;
 import org.uniprot.api.uniparc.output.converter.*;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryValueMapper;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -87,9 +89,13 @@ public class MessageConverterConfig {
                                 UniParcJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniParcEntry.class,
                                 returnFieldConfig);
-                converters.add(0, uniparcJsonConverter);
-                converters.add(1, new UniParcXmlMessageConverter(""));
+                int index = 0;
+                converters.add(index++, uniparcJsonConverter);
+                converters.add(index++, new UniParcXmlMessageConverter(""));
                 converters.add(new RDFMessageConverter());
+
+                // ----------    UniParcWrapper Converters -----------------
+                appendUniParcWrapperConverters(index, converters);
             }
         };
     }
@@ -100,20 +106,54 @@ public class MessageConverterConfig {
                 new MessageConverterContextFactory<>();
 
         asList(
-                        uniparcContext(LIST_MEDIA_TYPE),
-                        uniparcContext(APPLICATION_XML),
-                        uniparcContext(APPLICATION_JSON),
-                        uniparcContext(FASTA_MEDIA_TYPE),
-                        uniparcContext(TSV_MEDIA_TYPE),
-                        uniparcContext(XLS_MEDIA_TYPE),
-                        uniparcContext(RDF_MEDIA_TYPE))
+                        uniParcContext(LIST_MEDIA_TYPE),
+                        uniParcContext(APPLICATION_XML),
+                        uniParcContext(APPLICATION_JSON),
+                        uniParcContext(FASTA_MEDIA_TYPE),
+                        uniParcContext(TSV_MEDIA_TYPE),
+                        uniParcContext(XLS_MEDIA_TYPE),
+                        uniParcContext(RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
     }
 
-    private MessageConverterContext<UniParcEntry> uniparcContext(MediaType contentType) {
+    @Bean
+    public MessageConverterContextFactory<UniParcEntryWrapper> uniParcWrapperMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniParcEntryWrapper> contextFactory =
+                new MessageConverterContextFactory<>();
+        contextFactory.addMessageConverterContext(uniParcWrapperContext(APPLICATION_XML));
+        contextFactory.addMessageConverterContext(uniParcWrapperContext(APPLICATION_JSON));
+        contextFactory.addMessageConverterContext(uniParcWrapperContext(FASTA_MEDIA_TYPE));
+        contextFactory.addMessageConverterContext(uniParcWrapperContext(TSV_MEDIA_TYPE));
+        contextFactory.addMessageConverterContext(uniParcWrapperContext(RDF_MEDIA_TYPE));
+        return contextFactory;
+    }
+
+    private MessageConverterContext<UniParcEntry> uniParcContext(MediaType contentType) {
         return MessageConverterContext.<UniParcEntry>builder()
+                .resource(MessageConverterContextFactory.Resource.UNIPARC)
+                .contentType(contentType)
+                .build();
+    }
+
+    private void appendUniParcWrapperConverters(int currentIndex, List<HttpMessageConverter<?>> converters) {
+        ReturnFieldConfig uniParcCrossRefReturnCfg =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC_CROSSREF);
+        UniParcJsonMessageConverter jsonMessageConverter = new UniParcJsonMessageConverter(UniParcEntryWrapper.class,
+                uniParcCrossRefReturnCfg);
+
+        converters.add(currentIndex++, jsonMessageConverter);
+        converters.add(currentIndex++, new UniParcWrapperXmlMessageConverter());
+        converters.add(new UniParcWrapperFastaMessageConverter());
+        UniParcTsvMessageConverter tsvConverter = new UniParcTsvMessageConverter(UniParcEntryWrapper.class,
+                uniParcCrossRefReturnCfg, new UniParcEntryCrossRefValueMapper());
+        converters.add(tsvConverter);
+
+    }
+
+    private MessageConverterContext<UniParcEntryWrapper> uniParcWrapperContext(MediaType contentType) {
+        return MessageConverterContext.<UniParcEntryWrapper>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIPARC)
                 .contentType(contentType)
                 .build();

@@ -5,9 +5,13 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 
 /**
  * @author sahmad

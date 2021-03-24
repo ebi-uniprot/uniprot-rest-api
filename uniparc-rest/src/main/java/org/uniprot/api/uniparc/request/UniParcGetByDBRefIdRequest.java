@@ -2,9 +2,9 @@ package org.uniprot.api.uniparc.request;
 
 import javax.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad

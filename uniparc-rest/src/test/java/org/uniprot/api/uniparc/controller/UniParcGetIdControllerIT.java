@@ -132,7 +132,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString(UNIPARC_ID)))
                                     .build())
                     .contentTypeParam(
@@ -153,12 +153,6 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                                     .string(
                                                             containsString(
                                                                     "UPI0000083D01\tName 7787; Name 9606\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .build();
         }

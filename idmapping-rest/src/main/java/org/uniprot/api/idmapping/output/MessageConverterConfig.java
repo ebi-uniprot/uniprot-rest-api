@@ -89,7 +89,7 @@ public class MessageConverterConfig {
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                // ------------------------- UniProtKb converters -------------------------
+                // ------------------------- UniProtKBEntryPair -------------------------
 
                 ReturnFieldConfig uniProtKBReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIPROTKB);

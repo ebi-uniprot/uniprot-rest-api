@@ -45,7 +45,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     private static final ThreadLocal<String> ENTITY_SEPARATOR = new ThreadLocal<>();
     private final Class<C> messageConverterEntryClass;
 
-    AbstractUUWHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
+    public AbstractUUWHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
         super(mediaType);
         this.messageConverterEntryClass = messageConverterEntryClass;
     }

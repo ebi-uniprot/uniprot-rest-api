@@ -17,7 +17,7 @@ public class UniSaveJsonMessageConverter extends JsonMessageConverter<UniSaveEnt
     }
 
     @Override
-    protected void writeEntity(UniSaveEntry entity, OutputStream outputStream) throws IOException {
+    public void writeEntity(UniSaveEntry entity, OutputStream outputStream) throws IOException {
         JsonGenerator generator = TL_JSON_GENERATOR.get();
         generator.writeObject(entity);
     }
