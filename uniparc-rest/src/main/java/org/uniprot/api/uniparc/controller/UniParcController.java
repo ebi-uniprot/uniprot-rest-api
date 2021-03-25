@@ -418,6 +418,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, sequenceRequest.getFields(), request);
     }
 
+    @SuppressWarnings("squid:S3752")
     @RequestMapping(
             value = "/upis",
             method = {RequestMethod.GET, RequestMethod.POST},
