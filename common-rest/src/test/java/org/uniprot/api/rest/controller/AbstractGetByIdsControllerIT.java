@@ -14,7 +14,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -452,7 +451,9 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .header(
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
-                                        .param(getRequestParamName(), getCommaSeparatedNIds(idCount))
+                                        .param(
+                                                getRequestParamName(),
+                                                getCommaSeparatedNIds(idCount))
                                         .param("facets", getCommaSeparatedFacets())
                                         .param("facetFilter", facetFilter));
 
@@ -463,11 +464,17 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                 .andExpect(jsonPath("$.results.size()", is(idCount)))
                 .andExpect(jsonPath("$.facets.size()", lessThanOrEqualTo(facetCount)));
 
-        for(int i = 0; i < facetCount; i++){ // none of the facet count should exceed total number ids passed
-            response.andExpect(jsonPath("$.facets[" + i + "].values[?(@.count > " + idCount +")]",
-                    emptyIterable()));
-            if(i < 9) // Fix test data to have all facets in UniProtKB
-                response.andExpect(jsonPath("$.facets[" + i + "].values[?(@.count <= " + idCount +")]").isArray());
+        for (int i = 0;
+                i < facetCount;
+                i++) { // none of the facet count should exceed total number ids passed
+            response.andExpect(
+                    jsonPath(
+                            "$.facets[" + i + "].values[?(@.count > " + idCount + ")]",
+                            emptyIterable()));
+            if (i < 9) // Fix test data to have all facets in UniProtKB
+            response.andExpect(
+                        jsonPath("$.facets[" + i + "].values[?(@.count <= " + idCount + ")]")
+                                .isArray());
         }
     }
 
