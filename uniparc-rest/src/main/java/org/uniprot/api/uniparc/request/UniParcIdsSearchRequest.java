@@ -45,7 +45,7 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
 
     @Parameter(
             description =
-                    "Criteria to filter by facet value. It can any supported valid solr query.")
+                    "Criteria to filter by facet value. It can support any valid lucene query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFacetFields(facetConfig = UniParcFacetConfig.class)
     private String facetFilter;

@@ -16,7 +16,7 @@ import org.uniprot.core.util.Utils;
  * @author sahmad
  */
 @Getter
-public class FacetStreamExpression extends StreamExpression {
+public class FacetStreamExpression extends UniProtStreamExpression {
     public enum MetricFunctionName {
         avg,
         count,
@@ -25,85 +25,31 @@ public class FacetStreamExpression extends StreamExpression {
         sum;
     }
 
-    private FacetStreamExpression(
-            String collection,
-            String query,
-            String buckets,
-            String metrics,
-            String bucketSorts,
-            int bucketSizeLimit)
+    public FacetStreamExpression(String collection, String facet, SolrStreamFacetRequest request)
             throws IllegalArgumentException {
         super("facet");
-        validateParams(collection, query, buckets, metrics, bucketSorts, bucketSizeLimit);
+        validateParams(
+                collection,
+                request.getQuery(),
+                facet,
+                request.getMetrics(),
+                request.getBucketSorts(),
+                request.getBucketSizeLimit());
+
         this.addParameter(new StreamExpressionValue(collection));
-        this.addParameter(new StreamExpressionNamedParameter("q", query));
-        this.addParameter(new StreamExpressionNamedParameter("buckets", buckets));
-        this.addParameter(new StreamExpressionNamedParameter("bucketSorts", bucketSorts));
+        this.addParameter(new StreamExpressionNamedParameter("q", request.getQuery()));
+        this.addParameter(new StreamExpressionNamedParameter("buckets", facet));
+        this.addParameter(
+                new StreamExpressionNamedParameter("bucketSorts", request.getBucketSorts()));
         this.addParameter(
                 new StreamExpressionNamedParameter(
-                        "bucketSizeLimit", String.valueOf(bucketSizeLimit)));
-        List<StreamExpression> metricExpressions = parseMetrics(metrics);
+                        "bucketSizeLimit", String.valueOf(request.getBucketSizeLimit())));
+        List<StreamExpression> metricExpressions = parseMetrics(request.getMetrics());
         this.getParameters().addAll(metricExpressions);
-    }
 
-    public static class FacetStreamExpressionBuilder {
-        private String collection;
-        private String query;
-        private String buckets;
-        private String metrics;
-        private String bucketSorts;
-        private int bucketSizeLimit;
-
-        public FacetStreamExpressionBuilder() {}
-
-        public FacetStreamExpressionBuilder(
-                String collection, String facet, SolrStreamFacetRequest request) {
-            this.collection = collection;
-            this.query = request.getQuery();
-            this.buckets = facet;
-            this.metrics = request.getMetrics();
-            this.bucketSorts = request.getBucketSorts();
-            this.bucketSizeLimit = request.getBucketSizeLimit();
-        }
-
-        public FacetStreamExpressionBuilder collection(String collection) {
-            this.collection = collection;
-            return this;
-        }
-
-        public FacetStreamExpressionBuilder query(String query) {
-            this.query = query;
-            return this;
-        }
-
-        public FacetStreamExpressionBuilder buckets(String buckets) {
-            this.buckets = buckets;
-            return this;
-        }
-
-        public FacetStreamExpressionBuilder metrics(String metrics) {
-            this.metrics = metrics;
-            return this;
-        }
-
-        public FacetStreamExpressionBuilder bucketSorts(String bucketSorts) {
-            this.bucketSorts = bucketSorts;
-            return this;
-        }
-
-        public FacetStreamExpressionBuilder bucketSizeLimit(int bucketSizeLimit) {
-            this.bucketSizeLimit = bucketSizeLimit;
-            return this;
-        }
-
-        public FacetStreamExpression build() {
-            return new FacetStreamExpression(
-                    this.collection,
-                    this.query,
-                    this.buckets,
-                    this.metrics,
-                    this.bucketSorts,
-                    this.bucketSizeLimit);
+        if (queryFilteredQuerySet(
+                request)) { // order of params is important. this code should be in the end
+            addFQRelatedParams(request);
         }
     }
 

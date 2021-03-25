@@ -3,7 +3,9 @@ package org.uniprot.api.rest.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
@@ -12,6 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -436,7 +439,41 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                 .andExpect(jsonPath("$.facets").doesNotExist());
     }
 
+    @Test
+    void getByIdsWithFacetsAndFacetFilterSuccess() throws Exception {
+        String facetFilter = getFacetFilter();
+        int facetCount = getCommaSeparatedFacets().split(",").length;
+        int idCount = 5;
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(
+                                                org.apache.http.HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), getCommaSeparatedNIds(idCount))
+                                        .param("facets", getCommaSeparatedFacets())
+                                        .param("facetFilter", facetFilter));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(idCount)))
+                .andExpect(jsonPath("$.facets.size()", lessThanOrEqualTo(facetCount)));
+
+        for(int i = 0; i < facetCount; i++){ // none of the facet count should exceed total number ids passed
+            response.andExpect(jsonPath("$.facets[" + i + "].values[?(@.count > " + idCount +")]",
+                    emptyIterable()));
+            if(i < 9) // Fix test data to have all facets in UniProtKB
+                response.andExpect(jsonPath("$.facets[" + i + "].values[?(@.count <= " + idCount +")]").isArray());
+        }
+    }
+
     protected abstract String getCommaSeparatedIds();
+
+    protected abstract String getCommaSeparatedNIds(int n);
 
     protected abstract String getCommaSeparatedMixedIds();
 

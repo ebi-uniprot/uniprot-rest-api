@@ -1,6 +1,7 @@
 package org.uniprot.api.common.repository.solrstream;
 
 import java.util.List;
+import java.util.Objects;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import org.uniprot.core.util.Utils;
 public class SolrStreamFacetRequest {
     private static final Integer BUCKET_SIZE = 1000;
     private static final String BUCKET_SORTS = "count(*) desc";
-    private static final String METRICS = "count(*)";
+    private static final String DEFAULT_METRICS = "count(*)";
     private String query;
     private List<String> facets;
     private String bucketSorts; // comma separated list of sorts
@@ -40,7 +41,10 @@ public class SolrStreamFacetRequest {
             String searchSort,
             String searchFieldList,
             String filteredQuery,
-            SolrQueryConfig queryConfig) {
+            SolrQueryConfig queryConfig,
+            Integer bucketSizeLimit,
+            String metrics,
+            String bucketSorts) {
         this.query = query;
         this.facets = facets;
         this.searchAccession = searchAccession;
@@ -49,11 +53,27 @@ public class SolrStreamFacetRequest {
         if (Utils.notNullNotEmpty(searchSort)) {
             this.searchSort = searchSort;
         }
+
         if (Utils.notNullNotEmpty(searchFieldList)) {
             this.searchFieldList = searchFieldList;
         }
-        this.bucketSizeLimit = BUCKET_SIZE;
-        this.bucketSorts = BUCKET_SORTS;
-        this.metrics = METRICS;
+
+        if (Objects.isNull(bucketSizeLimit)) {
+            this.bucketSizeLimit = BUCKET_SIZE;
+        } else {
+            this.bucketSizeLimit = bucketSizeLimit;
+        }
+
+        if (Utils.nullOrEmpty(metrics)) {
+            this.metrics = DEFAULT_METRICS;
+        } else {
+            this.metrics = metrics;
+        }
+
+        if (Utils.nullOrEmpty(bucketSorts)) {
+            this.bucketSorts = BUCKET_SORTS;
+        } else {
+            this.bucketSorts = bucketSorts;
+        }
     }
 }
