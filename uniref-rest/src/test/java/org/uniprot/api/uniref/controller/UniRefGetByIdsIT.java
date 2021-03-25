@@ -132,7 +132,7 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
-    protected String getCommaSeparatedNIds(int n){
+    protected String getCommaSeparatedNIds(int n) {
         return String.join(",", Arrays.asList(TEST_IDS_ARRAY).subList(0, n));
     }
 
