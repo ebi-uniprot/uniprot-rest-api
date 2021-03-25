@@ -12,9 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
-import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
-import org.uniprot.core.util.Utils;
 
 /**
  * This class is responsible for simplifying the creation of {@link TupleStream} instances for facet
@@ -43,16 +41,6 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
             if (request.isSearchAccession()) {
                 StreamExpression searchExpression =
                         new SearchStreamExpression(this.collection, request);
-
-                if (queryFilteredQuerySet(request)) {
-                    searchExpression.addParameter(
-                            new StreamExpressionNamedParameter("defType", "edismax"));
-                    searchExpression.addParameter(
-                            new StreamExpressionNamedParameter(
-                                    "qf", request.getQueryConfig().getQueryFields()));
-                    searchExpression.addParameter(
-                            new StreamExpressionNamedParameter("fq", request.getFilteredQuery()));
-                }
                 expressions.add(searchExpression);
             }
             // create a solr streaming facet function call for each `facet`
@@ -60,9 +48,8 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
                     request.getFacets().stream()
                             .map(
                                     facet ->
-                                            new FacetStreamExpression.FacetStreamExpressionBuilder(
-                                                            this.collection, facet, request)
-                                                    .build())
+                                            new FacetStreamExpression(
+                                                    this.collection, facet, request))
                             .collect(Collectors.toList());
 
             expressions.addAll(facetExpressions);
@@ -77,10 +64,5 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
             log.error("Could not create TupleStream", e);
             throw new IllegalStateException();
         }
-    }
-
-    private boolean queryFilteredQuerySet(SolrStreamFacetRequest request) {
-        return Utils.notNullNotEmpty(request.getFilteredQuery())
-                && Utils.notNullNotEmpty(request.getQuery());
     }
 }

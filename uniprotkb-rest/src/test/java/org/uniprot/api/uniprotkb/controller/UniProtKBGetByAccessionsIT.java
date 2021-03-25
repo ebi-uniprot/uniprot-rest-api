@@ -123,6 +123,11 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
+    protected String getCommaSeparatedNIds(int n){
+        return String.join(",", Arrays.asList(TEST_IDS_ARRAY).subList(0, n));
+    }
+
+    @Override
     protected String getCommaSeparatedMixedIds() {
         // 6 present and 2 missing ids
         String csvs = String.join(",", Arrays.asList(TEST_IDS_ARRAY).subList(0, 6));
@@ -137,8 +142,6 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String getCommaSeparatedFacets() {
         return String.join(",", facetConfig.getFacetNames());
-        //        return "reviewed,fragment,structure_3d,model_organism,other_organism,existence,"
-        //                + "annotation_score,proteome,proteins_with,length";
     }
 
     @Override
