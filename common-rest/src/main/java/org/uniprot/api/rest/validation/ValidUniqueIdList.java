@@ -49,7 +49,7 @@ public @interface ValidUniqueIdList {
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;
                 // verify if id is valid.
-                String[] ids = value.split("\\s*,\\s*");
+                String[] ids = value.split(",");
                 for (String id : ids) {
                     if (!isIdValid(id)) {
                         buildInvalidAccessionMessage(id, contextImpl);
@@ -70,11 +70,13 @@ public @interface ValidUniqueIdList {
         private boolean isIdValid(String id) {
             switch (getDataType()) {
                 case UNIPROTKB:
-                    return id.toUpperCase().matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
+                    return id.strip()
+                            .toUpperCase()
+                            .matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
                 case UNIPARC:
-                    return id.toUpperCase().matches(FieldRegexConstants.UNIPARC_UPI_REGEX);
+                    return id.strip().toUpperCase().matches(FieldRegexConstants.UNIPARC_UPI_REGEX);
                 case UNIREF:
-                    return id.matches(FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX);
+                    return id.strip().matches(FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX);
                 default:
                     throw new IllegalArgumentException("Unknown UniProtDataType " + this.dataType);
             }
@@ -83,7 +85,7 @@ public @interface ValidUniqueIdList {
         void buildInvalidAccessionMessage(
                 String accession, ConstraintValidatorContextImpl contextImpl) {
             String errorMessage = "{ids.invalid.ids.value}";
-            contextImpl.addMessageParameter("0", accession);
+            contextImpl.addMessageParameter("0", accession.strip());
             contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 

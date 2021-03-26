@@ -135,7 +135,7 @@ class ValidUniqueIdListTest {
         @Override
         void buildInvalidAccessionMessage(
                 String accession, ConstraintValidatorContextImpl contextImpl) {
-            errorList.add(accession);
+            errorList.add(accession.strip());
         }
 
         @Override

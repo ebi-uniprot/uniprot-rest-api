@@ -28,6 +28,7 @@ public interface IdsSearchRequest extends SearchRequest {
 
     default List<String> getIdList() {
         return List.of(getCommaSeparatedIds().split(",")).stream()
+                .map(String::strip)
                 .map(String::toUpperCase)
                 .collect(Collectors.toList());
     }

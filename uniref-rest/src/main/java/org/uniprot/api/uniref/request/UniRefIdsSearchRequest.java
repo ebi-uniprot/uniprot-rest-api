@@ -76,6 +76,8 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
 
     @Override
     public List<String> getIdList() {
-        return List.of(getCommaSeparatedIds().split(",")).stream().collect(Collectors.toList());
+        return List.of(getCommaSeparatedIds().split(",")).stream()
+                .map(String::strip)
+                .collect(Collectors.toList());
     }
 }
