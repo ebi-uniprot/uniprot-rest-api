@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
@@ -21,6 +22,7 @@ import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.request.UniParcDatabasesRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
@@ -30,6 +32,7 @@ import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
@@ -156,6 +159,19 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
         BestGuessAnalyser analyser = new BestGuessAnalyser(searchFieldConfig);
         return analyser.analyseBestGuess(streamResult, request);
+    }
+
+    public QueryResult<UniParcCrossReference> getDatabasesByUniParcId(
+            String upi, UniParcDatabasesRequest request) {
+        UniParcEntry uniParcEntry = getEntity(UNIPARC_ID_FIELD, upi);
+        UniParcEntry filteredUniParcEntry = filterUniParcStream(Stream.of(uniParcEntry), request).findFirst().orElse(null);
+        List<UniParcCrossReference> databases = filteredUniParcEntry.getUniParcCrossReferences();
+        int pageSize = Objects.isNull(request.getSize()) ? getDefaultPageSize() : request.getSize();
+        CursorPage cursorPage = CursorPage.of(request.getCursor(), pageSize, databases.size());
+        List<UniParcCrossReference> entries =
+                databases.subList(
+                        cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
+        return QueryResult.of(entries.stream(), cursorPage);
     }
 
     private Stream<UniParcEntry> filterUniParcStream(

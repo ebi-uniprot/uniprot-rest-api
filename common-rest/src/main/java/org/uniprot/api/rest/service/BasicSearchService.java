@@ -211,4 +211,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     protected RDFStreamer getRDFStreamer() {
         throw new UnsupportedOperationException("Override this method");
     }
+
+    protected Integer getDefaultPageSize() {
+        return this.defaultPageSize;
+    }
 }

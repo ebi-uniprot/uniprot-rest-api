@@ -72,7 +72,7 @@ class UniParcConfigureServiceTest {
     }
 
     @Test
-    void getUniParcEntryDatabaseResultFields(){
+    void getUniParcEntryDatabaseResultFields() {
         UniParcConfigureService service = new UniParcConfigureService();
         List<UniProtReturnField> result = service.getUniParcDatabaseResultFields();
         assertNotNull(result);

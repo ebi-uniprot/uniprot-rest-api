@@ -54,7 +54,7 @@ public class UniParcConfigureService {
                 .collect(Collectors.toList());
     }
 
-    public List<UniProtReturnField> getUniParcDatabaseResultFields(){
+    public List<UniProtReturnField> getUniParcDatabaseResultFields() {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPARC_CROSSREF);
     }
 
