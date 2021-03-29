@@ -70,4 +70,15 @@ class UniParcConfigureServiceTest {
         assertTrue(database.isAlive());
         assertEquals("https://www.ensemblgenomes.org/id/%id", database.getUriLink());
     }
+
+    @Test
+    void getUniParcEntryDatabaseResultFields(){
+        UniParcConfigureService service = new UniParcConfigureService();
+        List<UniProtReturnField> result = service.getUniParcDatabaseResultFields();
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals("Names & Taxonomy", result.get(0).getGroupName());
+        assertEquals("Miscellaneous", result.get(1).getGroupName());
+        assertEquals("Date of", result.get(2).getGroupName());
+    }
 }
