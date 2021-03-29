@@ -19,7 +19,6 @@ import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
-import org.uniprot.api.uniparc.model.UniParcEntryWrapper;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
@@ -83,13 +82,12 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.uniParcRDFStreamer = uniParcRDFStreamer;
     }
 
-    public UniParcEntryWrapper getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
+    public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
 
         UniParcEntry uniParcEntry = getEntity(UNIPARC_ID_FIELD, getByUniParcIdRequest.getUpi());
 
-         return filterUniParcStream(Stream.of(uniParcEntry), getByUniParcIdRequest)
+        return filterUniParcStream(Stream.of(uniParcEntry), getByUniParcIdRequest)
                 .findFirst()
-                 .map(entry -> UniParcEntryWrapper.builder().entry(entry).build())
                 .orElse(null);
     }
 

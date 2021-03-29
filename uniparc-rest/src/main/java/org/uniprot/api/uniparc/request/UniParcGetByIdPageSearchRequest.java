@@ -6,13 +6,9 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 
 /**
  * @author sahmad
@@ -29,11 +25,6 @@ public abstract class UniParcGetByIdPageSearchRequest extends UniParcGetByIdRequ
 
     @Parameter(hidden = true)
     private String cursor;
-
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in the response")
-    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
-    private String fields;
 
     @Override
     public String getSort() {

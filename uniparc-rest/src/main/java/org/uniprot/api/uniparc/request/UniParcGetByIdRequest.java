@@ -29,4 +29,9 @@ public class UniParcGetByIdRequest {
     @Parameter(description = "Comma separated list of taxonomy Ids")
     @ValidCommaSeparatedItemsLength(maxLength = 100)
     private String taxonIds;
+
+    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
+    @Parameter(description = "Comma separated list of fields to be returned in the response")
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
+    private String fields;
 }
