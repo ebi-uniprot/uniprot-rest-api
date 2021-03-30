@@ -179,6 +179,10 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return QueryResult.of(entries.stream(), cursorPage);
     }
 
+    public String getRDFXml(String upi) {
+        return this.uniParcRDFStreamer.streamRDFXML(Stream.of(upi)).collect(Collectors.joining());
+    }
+
     private Stream<UniParcEntry> filterUniParcStream(
             Stream<UniParcEntry> uniParcEntryStream, UniParcGetByIdRequest request) {
         // convert comma separated values to list

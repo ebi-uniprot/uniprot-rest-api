@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -101,7 +101,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -128,7 +128,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                                         .param("size", String.valueOf(size)));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "5"))
@@ -149,7 +149,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("cursor", cursor));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(header().string("X-TotalRecords", "5"))
@@ -168,7 +168,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("active", active));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -190,7 +190,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("taxonIds", taxonIds));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -212,7 +212,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("dbTypes", dbTypes));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
@@ -236,7 +236,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                         .param("active", active));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))

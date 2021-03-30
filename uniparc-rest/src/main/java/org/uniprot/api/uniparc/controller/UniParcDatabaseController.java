@@ -31,7 +31,11 @@ import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -62,6 +66,17 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
     @GetMapping(
             value = "/{upi}/databases",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = "Retrieve UniParc databases by a upi.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniParcCrossReference.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE)
+                        })
+            })
     public ResponseEntity<MessageConverterContext<UniParcCrossReference>> getDatabasesByUpi(
             @PathVariable
                     @Pattern(

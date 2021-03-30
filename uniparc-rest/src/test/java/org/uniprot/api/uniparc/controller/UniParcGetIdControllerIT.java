@@ -6,21 +6,30 @@ import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
@@ -45,6 +54,8 @@ import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
             UniParcGetIdControllerIT.UniParcGetIdContentTypeParamResolver.class
         })
 public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
+    @Autowired private RestTemplate restTemplate;
+
     @Override
     protected String getIdPathValue() {
         return UNIPARC_ID;
@@ -53,6 +64,12 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
     @Override
     protected String getIdRequestPath() {
         return "/uniparc/{upi}";
+    }
+
+    @BeforeAll
+    void init() {
+        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
+        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     static class UniParcGetIdParameterResolver extends AbstractGetIdParameterResolver {
@@ -132,27 +149,25 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString(UNIPARC_ID)))
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            startsWith(
+                                                                    RDFPrologs.UNIPARC_RDF_PROLOG)))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "    <sample>text</sample>\n"
+                                                                            + "    <anotherSample>text2</anotherSample>\n"
+                                                                            + "    <someMore>text3</someMore>\n"
+                                                                            + "</rdf:RDF>")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString(UNIPARC_ID)))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "Entry\tOrganisms\tUniProtKB\tFirst seen\tLast seen\tLength")))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "UPI0000083D01\tName 7787; Name 9606\tP10001; P12301\t2017-02-12\t2017-04-23\t11")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -188,13 +203,12 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
