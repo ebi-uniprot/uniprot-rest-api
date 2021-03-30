@@ -1,16 +1,17 @@
 package org.uniprot.api.uniparc.request;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.PositiveOrZero;
+
+import lombok.Data;
+
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.PositiveOrZero;
-
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad
@@ -23,7 +24,7 @@ public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements Se
             path = "uniparc-crossref-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC_CROSSREF)
-    protected String fields;
+    private String fields;
 
     @Parameter(hidden = true)
     private String cursor;

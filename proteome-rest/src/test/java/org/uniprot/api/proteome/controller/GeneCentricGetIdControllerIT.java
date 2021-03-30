@@ -156,7 +156,7 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/genecentric/";
+        return "/genecentric/{accession}";
     }
 
     static class GeneCentricGetIdParameterResolver extends AbstractGetIdParameterResolver {

@@ -69,7 +69,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Autowired private ObjectMapper objectMapper;
 
-    private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/";
+    private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/{accession}";
 
     private static final String ACCESSION_ID = "Q8DIA7";
 
@@ -140,7 +140,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE + ACCESSION_ID)
+                                get(ACCESSION_RESOURCE, ACCESSION_ID)
                                         .param("fields", "invalid, organism_name, invalid2")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -171,7 +171,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE + "P21802-2")
+                                get(ACCESSION_RESOURCE, "P21802-2")
                                         .param("fields", "accession,organism_name")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -200,7 +200,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE + "P21802-1")
+                                get(ACCESSION_RESOURCE, "P21802-1")
                                         .param("fields", "accession,organism_name")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -229,7 +229,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE + "B4DFC2")
+                                get(ACCESSION_RESOURCE, "B4DFC2")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -258,7 +258,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE + "Q00007")
+                                get(ACCESSION_RESOURCE, "Q00007")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -288,7 +288,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE + "I8FBX2")
+                                get(ACCESSION_RESOURCE, "I8FBX2")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

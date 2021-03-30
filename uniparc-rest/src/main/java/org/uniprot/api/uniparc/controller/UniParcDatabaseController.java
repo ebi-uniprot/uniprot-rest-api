@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,7 +71,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
                     @NotNull(message = "{search.required}")
                     @Parameter(description = "UniParc ID (UPI)")
                     String upi,
-            UniParcDatabasesRequest databasesRequest,
+            @Valid @ModelAttribute UniParcDatabasesRequest databasesRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<UniParcCrossReference> results =

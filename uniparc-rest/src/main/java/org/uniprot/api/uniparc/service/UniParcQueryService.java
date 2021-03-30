@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -164,7 +165,11 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     public QueryResult<UniParcCrossReference> getDatabasesByUniParcId(
             String upi, UniParcDatabasesRequest request) {
         UniParcEntry uniParcEntry = getEntity(UNIPARC_ID_FIELD, upi);
-        UniParcEntry filteredUniParcEntry = filterUniParcStream(Stream.of(uniParcEntry), request).findFirst().orElse(null);
+        UniParcEntry filteredUniParcEntry =
+                filterUniParcStream(Stream.of(uniParcEntry), request)
+                        .findFirst()
+                        .orElseThrow(() -> new ServiceException("Unable to filter UniParc entry"));
+
         List<UniParcCrossReference> databases = filteredUniParcEntry.getUniParcCrossReferences();
         int pageSize = Objects.isNull(request.getSize()) ? getDefaultPageSize() : request.getSize();
         CursorPage cursorPage = CursorPage.of(request.getCursor(), pageSize, databases.size());

@@ -52,7 +52,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
 
     @Override
     protected String getIdRequestPath() {
-        return "/uniparc/";
+        return "/uniparc/{upi}";
     }
 
     static class UniParcGetIdParameterResolver extends AbstractGetIdParameterResolver {

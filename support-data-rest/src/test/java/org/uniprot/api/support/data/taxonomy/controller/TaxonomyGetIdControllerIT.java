@@ -52,7 +52,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             TaxonomyGetIdControllerIT.TaxonomyGetIdParameterResolver.class,
             TaxonomyGetIdControllerIT.TaxonomyGetIdContentTypeParamResolver.class
         })
-public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
+class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final String TAX_ID = "9606";
 
@@ -77,7 +77,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/taxonomy/";
+        return "/taxonomy/{taxonId}";
     }
 
     @Override
@@ -114,7 +114,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdRequestPath() + MERGED_TAX_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
+                get(getIdRequestPath(), MERGED_TAX_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 

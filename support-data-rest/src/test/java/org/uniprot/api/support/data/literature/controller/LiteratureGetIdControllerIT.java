@@ -111,7 +111,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/citations/";
+        return "/citations/{pubMedId}";
     }
 
     private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {

@@ -6,8 +6,12 @@ import javax.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
+import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -24,4 +28,9 @@ public class UniParcGetByUniParcIdRequest extends UniParcGetByIdRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "UniParc ID (UPI)")
     private String upi;
+
+    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
+    @Parameter(description = "Comma separated list of fields to be returned in the response")
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
+    private String fields;
 }

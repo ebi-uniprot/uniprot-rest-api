@@ -33,6 +33,7 @@ import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.api.uniparc.output.converter.UniParcFastaMessageConverter;
 import org.uniprot.api.uniparc.output.converter.UniParcXmlMessageConverter;
+import org.uniprot.core.json.parser.uniparc.UniParcCrossRefJsonConfig;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryCrossRefValueMapper;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryValueMapper;
@@ -109,7 +110,7 @@ public class MessageConverterConfig {
                                 UniProtDataType.UNIPARC_CROSSREF);
                 JsonMessageConverter<UniParcCrossReference> uniParcCrossRefJsonConverter =
                         new JsonMessageConverter<>(
-                                UniParcJsonConfig.getInstance().getSimpleObjectMapper(),
+                                UniParcCrossRefJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniParcCrossReference.class,
                                 uniParcCrossRefReturnField);
                 converters.add(2, uniParcCrossRefJsonConverter);
