@@ -56,12 +56,7 @@ public class ControllerITUtils {
                                 requestMappingInfo ->
                                         requestMappingInfo.getPatternsCondition().getPatterns()
                                                 .stream()
-                                                .anyMatch(path -> path.startsWith(requestPath)))
-                        .filter(
-                                requestMappingInfo ->
-                                        requestMappingInfo.getPatternsCondition().getPatterns()
-                                                .stream()
-                                                .anyMatch(path -> path.endsWith("}")))
+                                                .anyMatch(path -> path.equals(requestPath)))
                         .findFirst()
                         .orElse(null);
         assertThat(mappingInfo, notNullValue());

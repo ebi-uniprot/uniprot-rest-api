@@ -81,7 +81,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/uniref/";
+        return "/uniref/{id}";
     }
 
     @BeforeAll

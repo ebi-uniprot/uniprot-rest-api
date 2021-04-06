@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.groupingBy;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import lombok.Builder;
@@ -62,12 +63,13 @@ public class UniProtReturnField {
             List<UniProtReturnField> groups,
             Map<String, List<UniProtReturnField>> groupToFieldsMap) {
         return groups.stream()
-                .peek(
+                .map(
                         group -> {
                             List<UniProtReturnField> fieldsForGroup =
                                     groupToFieldsMap.get(group.getId());
                             fieldsForGroup.sort(CHILD_ORDER_COMPARATOR);
                             group.setFields(fieldsForGroup);
+                            return group;
                         })
                 .collect(Collectors.toList());
     }
@@ -76,6 +78,7 @@ public class UniProtReturnField {
             List<ReturnField> allFields) {
         return allFields.stream()
                 .filter(field -> field.getItemType().equals(ReturnFieldItemType.SINGLE))
+                .filter(field -> Objects.nonNull(field.getParentId()))
                 .map(
                         field ->
                                 UniProtReturnField.builder()

@@ -160,7 +160,7 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/proteomes/";
+        return "/proteomes/{upid}";
     }
 
     static class ProteomeGetIdParameterResolver extends AbstractGetIdParameterResolver {

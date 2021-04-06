@@ -43,7 +43,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/database/";
+        return "/database/{id}";
     }
 
     @Override

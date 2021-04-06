@@ -52,7 +52,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
 
     @Override
     protected String getIdRequestPath() {
-        return "/uniparc/accession/";
+        return "/uniparc/accession/{accession}";
     }
 
     @Override

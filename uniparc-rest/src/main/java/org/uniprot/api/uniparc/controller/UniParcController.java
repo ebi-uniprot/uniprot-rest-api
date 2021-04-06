@@ -134,9 +134,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @GetMapping(
             value = "/{upi}",
             produces = {
-                TSV_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE
@@ -152,8 +151,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                             @Content(
                                     mediaType = APPLICATION_XML_VALUE,
                                     schema = @Schema(implementation = Entry.class)),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
                         })
@@ -161,6 +159,13 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpId(
             @Valid @ModelAttribute UniParcGetByUniParcIdRequest getByUniParcIdRequest,
             HttpServletRequest request) {
+
+        MediaType contentType = getAcceptHeader(request);
+        if (contentType.equals(RDF_MEDIA_TYPE)) {
+            String result = queryService.getRDFXml(getByUniParcIdRequest.getUpi());
+            return super.getEntityResponseRDF(result, contentType, request);
+        }
+
         UniParcEntry entry = queryService.getByUniParcId(getByUniParcIdRequest);
         return super.getEntityResponse(entry, getByUniParcIdRequest.getFields(), request);
     }

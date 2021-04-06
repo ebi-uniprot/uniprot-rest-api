@@ -38,7 +38,7 @@ public abstract class AbstractStreamControllerIT {
 
     private static final String SOLR_SYSTEM_PROPERTIES = "solr-system.properties";
 
-    protected static final String SAMPLE_RDF =
+    public static final String SAMPLE_RDF =
             "<?xml version='1.0' encoding='UTF-8'?>\n"
                     + "<rdf:RDF>\n"
                     + "    <owl:Ontology rdf:about=\"\">\n"

@@ -105,7 +105,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
+                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
                                         .param("dbTypes", dbTypes));
 
         // then
@@ -132,7 +132,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
+                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
                                         .param("dbTypes", dbTypes));
 
         // then
@@ -156,7 +156,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
+                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
                                         .param("taxonIds", taxonIds));
 
         // then
@@ -181,7 +181,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
+                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
                                         .param("active", active));
 
         // then
@@ -210,7 +210,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                MockMvcRequestBuilders.get(getIdRequestPath() + getIdPathValue())
+                                MockMvcRequestBuilders.get(getIdRequestPath(), getIdPathValue())
                                         .param("active", active));
 
         // then

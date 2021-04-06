@@ -76,6 +76,15 @@ public abstract class BasicSearchController<T> {
         return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
     }
 
+    protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRDF(
+            String entity, MediaType contentType, HttpServletRequest request) {
+        MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
+        context.setFileType(getBestFileTypeFromRequest(request));
+        context.setEntityIds(Stream.of(entity));
+        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok();
+        return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
+    }
+
     protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
             QueryResult<T> result,
             String fields,
