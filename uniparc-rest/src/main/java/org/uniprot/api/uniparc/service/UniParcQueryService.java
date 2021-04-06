@@ -14,6 +14,7 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
@@ -37,7 +38,9 @@ import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
@@ -69,7 +72,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SolrQueryConfig uniParcSolrQueryConf,
             QueryProcessor uniParcQueryProcessor,
             SearchFieldConfig uniParcSearchFieldConfig,
-            RDFStreamer uniParcRDFStreamer) {
+            RDFStreamer uniParcRDFStreamer,
+            FacetTupleStreamTemplate facetTupleStreamTemplate) {
 
         super(
                 repository,
@@ -77,7 +81,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 solrSortClause,
                 facetConfig,
                 storeStreamer,
-                uniParcSolrQueryConf);
+                uniParcSolrQueryConf,
+                facetTupleStreamTemplate);
         this.searchFieldConfig = uniParcSearchFieldConfig;
         this.queryProcessor = uniParcQueryProcessor;
         this.repository = repository;
@@ -144,6 +149,18 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     @Override
     public UniParcEntry findByUniqueId(String uniqueId, String filters) {
         return findByUniqueId(uniqueId);
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPARC;
+    }
+
+    @Override
+    protected String getSolrIdField() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC)
+                .getSearchFieldItemByName(UNIPARC_ID_FIELD)
+                .getFieldName();
     }
 
     @Override

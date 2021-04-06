@@ -4,7 +4,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
@@ -17,7 +17,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument> {
     public UniprotQueryRepository(
             SolrClient solrClient,
-            UniprotKBFacetConfig facetConfig,
+            UniProtKBFacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
         super(
                 solrClient,

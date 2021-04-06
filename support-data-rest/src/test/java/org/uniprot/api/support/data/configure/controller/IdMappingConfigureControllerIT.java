@@ -1,5 +1,6 @@
 package org.uniprot.api.support.data.configure.controller;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
@@ -43,84 +44,116 @@ class IdMappingConfigureControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.fields.length()", is(95)))
-                .andExpect(jsonPath("$.fields.[?(@.groupName=='UniProt')]", iterableWithSize(9)))
+                .andExpect(jsonPath("$.groups.length()", is(18)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Sequence databases')]",
-                                iterableWithSize(3)))
+                                "$.groups.*.groupName",
+                                contains(
+                                        "UniProt",
+                                        "Sequence databases",
+                                        "3D structure databases",
+                                        "Protein-protein interaction databases",
+                                        "Chemistry",
+                                        "Protein family/group databases",
+                                        "PTM databases",
+                                        "Polymorphism and mutation databases",
+                                        "2D gel databases",
+                                        "Proteomic databases",
+                                        "Protocols and materials databases",
+                                        "Genome annotation databases",
+                                        "Organism-specific databases",
+                                        "Phylogenomic databases",
+                                        "Enzyme and pathway databases",
+                                        "Other",
+                                        "Gene expression databases",
+                                        "Family and domain databases")))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='3D structure databases')]",
+                                "$.groups.[?(@.groupName=='UniProt')].items.*",
+                                iterableWithSize(9)))
+                .andExpect(
+                        jsonPath(
+                                "$.groups.[?(@.groupName=='Sequence databases')].items.*",
+                                iterableWithSize(5)))
+                .andExpect(
+                        jsonPath(
+                                "$.groups.[?(@.groupName=='3D structure databases')].items.*",
                                 iterableWithSize(1)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Protein-protein interaction databases')]",
+                                "$.groups.[?(@.groupName=='Protein-protein interaction databases')].items.*",
                                 iterableWithSize(4)))
-                .andExpect(jsonPath("$.fields.[?(@.groupName=='Chemistry')]", iterableWithSize(4)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Protein family/group databases')]",
+                                "$.groups.[?(@.groupName=='Chemistry')].items.*",
+                                iterableWithSize(4)))
+                .andExpect(
+                        jsonPath(
+                                "$.groups.[?(@.groupName=='Protein family/group databases')].items.*",
                                 iterableWithSize(8)))
                 .andExpect(
-                        jsonPath("$.fields.[?(@.groupName=='PTM databases')]", iterableWithSize(1)))
-                .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Polymorphism and mutation databases')]",
-                                iterableWithSize(2)))
-                .andExpect(
-                        jsonPath(
-                                "$.fields.[?(@.groupName=='2D gel databases')]",
+                                "$.groups.[?(@.groupName=='PTM databases')].items.*",
                                 iterableWithSize(1)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Proteomic databases')]",
+                                "$.groups.[?(@.groupName=='Polymorphism and mutation databases')].items.*",
                                 iterableWithSize(2)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Protocols and materials databases')]",
+                                "$.groups.[?(@.groupName=='2D gel databases')].items.*",
                                 iterableWithSize(1)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Genome annotation databases')]",
+                                "$.groups.[?(@.groupName=='Proteomic databases')].items.*",
+                                iterableWithSize(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.groups.[?(@.groupName=='Protocols and materials databases')].items.*",
+                                iterableWithSize(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.groups.[?(@.groupName=='Genome annotation databases')].items.*",
                                 iterableWithSize(12)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Organism-specific databases')]",
+                                "$.groups.[?(@.groupName=='Organism-specific databases')].items.*",
                                 iterableWithSize(32)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Phylogenomic databases')]",
+                                "$.groups.[?(@.groupName=='Phylogenomic databases')].items.*",
                                 iterableWithSize(6)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Enzyme and pathway databases')]",
+                                "$.groups.[?(@.groupName=='Enzyme and pathway databases')].items.*",
                                 iterableWithSize(4)))
-                .andExpect(jsonPath("$.fields.[?(@.groupName=='Other')]", iterableWithSize(3)))
+                .andExpect(
+                        jsonPath("$.groups.[?(@.groupName=='Other')].items.*", iterableWithSize(3)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Gene expression databases')]",
+                                "$.groups.[?(@.groupName=='Gene expression databases')].items.*",
                                 iterableWithSize(1)))
                 .andExpect(
                         jsonPath(
-                                "$.fields.[?(@.groupName=='Sequence databases')]",
-                                iterableWithSize(3)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId==1)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId==2)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId==3)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId==4)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId==5)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId==6)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId==7)]", iterableWithSize(87)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId>=8)]", iterableWithSize(0)))
-                .andExpect(jsonPath("$.fields.[?(@.ruleId<=0)]", iterableWithSize(0)))
-                .andExpect(jsonPath("$.fields.[?(@.from==true)]", iterableWithSize(93)))
-                .andExpect(jsonPath("$.fields.[?(@.from==false)]", iterableWithSize(2)))
-                .andExpect(jsonPath("$.fields.[?(@.to==true)]", iterableWithSize(94)))
-                .andExpect(jsonPath("$.fields.[?(@.to==false)]", iterableWithSize(1)))
+                                "$.groups.[?(@.groupName=='Family and domain databases')].items.*",
+                                iterableWithSize(1)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==1)]", iterableWithSize(1)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==2)]", iterableWithSize(1)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==3)]", iterableWithSize(1)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==4)]", iterableWithSize(1)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==5)]", iterableWithSize(1)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==6)]", iterableWithSize(1)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(89)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId>=8)]", iterableWithSize(0)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId<=0)]", iterableWithSize(0)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(95)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.from==false)]", iterableWithSize(2)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(96)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.to==false)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.rules.length()", is(7)))
                 .andExpect(jsonPath("$.rules.[?(@.taxonId==false)]", iterableWithSize(6)))
                 .andExpect(jsonPath("$.rules.[?(@.taxonId==true)]", iterableWithSize(1)))
+                .andExpect(jsonPath("$.rules.[?(@.defaultTo=='UniProtKB')]", iterableWithSize(7)))
                 .andExpect(jsonPath("$.rules.*.ruleId", containsInAnyOrder(1, 2, 3, 4, 5, 6, 7)));
     }
 }

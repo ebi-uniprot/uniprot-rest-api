@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -39,6 +40,7 @@ import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
 import org.uniprot.api.uniparc.request.UniParcStreamRequest;
@@ -419,6 +421,62 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         UniParcEntry entry = queryService.getBySequence(sequenceRequest);
 
         return super.getEntityResponse(entry, sequenceRequest.getFields(), request);
+    }
+
+    @SuppressWarnings("squid:S3752")
+    @RequestMapping(
+            value = "/upis",
+            method = {RequestMethod.GET, RequestMethod.POST},
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Get UniParc entries by a list of upis.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            org.uniprot.core.xml
+                                                                                    .jaxb.uniparc
+                                                                                    .Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpis(
+            @Valid @ModelAttribute UniParcIdsSearchRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniParcEntry> results = queryService.getByIds(idsSearchRequest);
+
+        return super.getSearchResponse(
+                results,
+                idsSearchRequest.getFields(),
+                idsSearchRequest.isDownload(),
+                request,
+                response);
     }
 
     @Override

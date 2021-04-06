@@ -17,5 +17,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SolrStreamFacetResponse {
     private List<Facet> facets;
-    private List<String> accessions;
+    private List<String> ids;
 }

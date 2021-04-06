@@ -1,13 +1,21 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -218,7 +226,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
-                                        "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
+                                        "P00013,P00012,P00011,P00017,P00016,P00014,P00018,P00020,P00015")
                                 .param("facetFilter", facetFilter)
                                 .param("facets", facets)
                                 .param("fields", "accession")
@@ -228,11 +236,11 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(jsonPath("$.results.size()", is(4)))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.primaryAccession",
-                                contains("P00011", "P00013", "P00015", "P00017", "P00019")))
+                                contains("P00011", "P00013", "P00015", "P00017")))
                 .andExpect(jsonPath("$.facets.*.label", contains("Protein Existence", "Status")))
                 .andExpect(jsonPath("$.facets.*.name", contains("existence", "reviewed")))
                 .andExpect(
@@ -243,10 +251,10 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.facets[0].values.*.value",
                                 contains("HOMOLOGY", "TRANSCRIPT_LEVEL")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(4, 1)))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 1)))
                 .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
-                .andExpect(jsonPath("$.facets[1].values[0].count", equalTo(5)));
+                .andExpect(jsonPath("$.facets[1].values[0].count", equalTo(4)));
     }
 
     @Test

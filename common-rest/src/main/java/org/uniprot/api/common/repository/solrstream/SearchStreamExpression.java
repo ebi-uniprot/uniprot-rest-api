@@ -2,7 +2,6 @@ package org.uniprot.api.common.repository.solrstream;
 
 import lombok.Getter;
 
-import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
 import org.uniprot.core.util.Utils;
@@ -13,7 +12,7 @@ import org.uniprot.core.util.Utils;
  * @author sahmad
  */
 @Getter
-public class SearchStreamExpression extends StreamExpression {
+public class SearchStreamExpression extends UniProtStreamExpression {
     public SearchStreamExpression(String collection, SolrStreamFacetRequest request)
             throws IllegalArgumentException {
         super("search");
@@ -23,6 +22,11 @@ public class SearchStreamExpression extends StreamExpression {
         this.addParameter(new StreamExpressionNamedParameter("fl", request.getSearchFieldList()));
         this.addParameter(new StreamExpressionNamedParameter("sort", request.getSearchSort()));
         this.addParameter(new StreamExpressionNamedParameter("qt", request.getRequestHandler()));
+
+        if (queryFilteredQuerySet(
+                request)) { // order of params is important. this code should be in the end
+            addFQRelatedParams(request);
+        }
     }
 
     private void validateParams(String collection, SolrStreamFacetRequest request) {

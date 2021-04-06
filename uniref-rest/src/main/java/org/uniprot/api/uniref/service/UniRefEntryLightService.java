@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -25,7 +26,9 @@ import org.uniprot.api.uniref.request.UniRefStreamRequest;
 import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
@@ -40,7 +43,6 @@ public class UniRefEntryLightService
     private final SolrQueryConfig solrQueryConfig;
     private static final int ID_LIMIT = 10;
     public static final String UNIREF_ID = "id";
-    public static final String UNIREF_UPI = "upi";
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor queryProcessor;
     private final RDFStreamer uniRefRDFStreamer;
@@ -55,14 +57,16 @@ public class UniRefEntryLightService
             SolrQueryConfig uniRefSolrQueryConf,
             QueryProcessor uniRefQueryProcessor,
             SearchFieldConfig uniRefSearchFieldConfig,
-            RDFStreamer uniRefRDFStreamer) {
+            RDFStreamer uniRefRDFStreamer,
+            FacetTupleStreamTemplate facetTupleStreamTemplate) {
         super(
                 repository,
                 uniRefQueryResultConverter,
                 uniRefSortClause,
                 facetConfig,
                 storeStreamer,
-                uniRefSolrQueryConf);
+                uniRefSolrQueryConf,
+                facetTupleStreamTemplate);
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.queryProcessor = uniRefQueryProcessor;
         this.solrQueryConfig = uniRefSolrQueryConf;
@@ -116,6 +120,18 @@ public class UniRefEntryLightService
             result = result.map(this::cleanMemberId);
         }
         return result;
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIREF;
+    }
+
+    @Override
+    protected String getSolrIdField() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIREF)
+                .getSearchFieldItemByName(UNIREF_ID)
+                .getFieldName();
     }
 
     public Stream<String> streamRDF(UniRefStreamRequest streamRequest) {
