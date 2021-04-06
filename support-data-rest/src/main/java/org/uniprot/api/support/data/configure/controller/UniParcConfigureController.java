@@ -98,8 +98,8 @@ public class UniParcConfigureController {
         return service.getAllUniParcDatabaseDetails();
     }
 
-    @GetMapping("/database-result-fields")
-    public List<UniProtReturnField> getDatabaseResultFields() {
-        return service.getUniParcDatabaseResultFields();
+    @GetMapping("/entry-result-fields")
+    public List<UniProtReturnField> getEntryResultFields() {
+        return service.getUniParcEntryResultFields();
     }
 }

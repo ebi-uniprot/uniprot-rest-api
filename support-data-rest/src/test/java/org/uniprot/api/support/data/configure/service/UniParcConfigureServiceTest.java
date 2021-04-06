@@ -74,7 +74,7 @@ class UniParcConfigureServiceTest {
     @Test
     void getUniParcEntryDatabaseResultFields() {
         UniParcConfigureService service = new UniParcConfigureService();
-        List<UniProtReturnField> result = service.getUniParcDatabaseResultFields();
+        List<UniProtReturnField> result = service.getUniParcEntryResultFields();
         assertNotNull(result);
         assertEquals(3, result.size());
         assertEquals("Names & Taxonomy", result.get(0).getGroupName());

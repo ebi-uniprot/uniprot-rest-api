@@ -90,7 +90,7 @@ class UniParcConfigureControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(CONFIGURE_RESOURCE + "database-result-fields")
+                        get(CONFIGURE_RESOURCE + "entry-result-fields")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
