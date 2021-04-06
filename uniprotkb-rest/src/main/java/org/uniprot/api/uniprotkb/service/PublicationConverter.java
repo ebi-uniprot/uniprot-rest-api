@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,8 +16,6 @@ import org.uniprot.core.json.parser.publication.MappedPublicationsJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.publication.MappedPublications;
 import org.uniprot.core.publication.MappedReference;
-import org.uniprot.core.publication.UniProtKBMappedReference;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.publication.PublicationDocument;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,29 +28,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 @Slf4j
 public class PublicationConverter
-        implements BiFunction<PublicationDocument, Map<Long, LiteratureEntry>, PublicationEntry> {
+        implements BiFunction<PublicationDocument, Map<String, LiteratureEntry>, PublicationEntry> {
     private static final ObjectMapper OBJECT_MAPPER =
             MappedPublicationsJsonConfig.getInstance().getFullObjectMapper();
 
     @Override
     public PublicationEntry apply(
-            PublicationDocument pubDocument, Map<Long, LiteratureEntry> pubmedLiteratureEntryMap) {
+            PublicationDocument pubDocument,
+            Map<String, LiteratureEntry> pubmedLiteratureEntryMap) {
         PublicationEntry.PublicationEntryBuilder pubEntryBuilder = PublicationEntry.builder();
         Optional<MappedPublications> mappedPub = extractObject(pubDocument);
-        // pubmed present => get Citation from map; otherwise, use the citation in the binary
-        if (Utils.notNullNotEmpty(pubDocument.getPubMedId())) {
-            LiteratureEntry literatureEntry =
-                    pubmedLiteratureEntryMap.get(Long.parseLong(pubDocument.getPubMedId()));
 
-            pubEntryBuilder.citation(literatureEntry.getCitation());
-            pubEntryBuilder.statistics(literatureEntry.getStatistics());
-        } else {
-            mappedPub.ifPresent(
-                    mappedPublications ->
-                            addCitationIfPresent(
-                                    mappedPublications::getUniProtKBMappedReference,
-                                    pubEntryBuilder));
-        }
+        LiteratureEntry literatureEntry = pubmedLiteratureEntryMap.get(pubDocument.getCitationId());
+
+        pubEntryBuilder.citation(literatureEntry.getCitation());
+        pubEntryBuilder.statistics(literatureEntry.getStatistics());
 
         mappedPub.ifPresent(
                 mappedPubs -> {
@@ -68,15 +57,6 @@ public class PublicationConverter
                 });
 
         return pubEntryBuilder.build();
-    }
-
-    private void addCitationIfPresent(
-            Supplier<UniProtKBMappedReference> referenceSupplier,
-            PublicationEntry.PublicationEntryBuilder pubEntryBuilder) {
-        UniProtKBMappedReference reference = referenceSupplier.get();
-        if (reference != null && reference.getCitation() != null) {
-            pubEntryBuilder.citation(reference.getCitation());
-        }
     }
 
     static Optional<MappedPublications> extractObject(PublicationDocument document) {

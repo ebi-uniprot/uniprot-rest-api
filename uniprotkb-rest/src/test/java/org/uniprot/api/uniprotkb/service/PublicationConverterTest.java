@@ -15,9 +15,13 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
+import org.uniprot.core.CrossReference;
+import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.JournalArticle;
 import org.uniprot.core.citation.Submission;
 import org.uniprot.core.citation.impl.JournalArticleBuilder;
+import org.uniprot.core.citation.impl.SubmissionBuilder;
+import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
 import org.uniprot.core.literature.impl.LiteratureStatisticsBuilder;
@@ -36,17 +40,23 @@ class PublicationConverterTest {
     }
 
     @Test
-    void convertPublicationDocumentThatHasPubmedId() {
-        PublicationDocument document = PublicationDocumentMocker.create(1, 1);
-        Map<Long, LiteratureEntry> pubmedLiteratureEntryMap = new HashMap<>();
-        JournalArticle journalArticle = new JournalArticleBuilder().build();
+    void convertPublicationDocumentThatHasPubmedIdAsCitationId() {
+        PublicationDocument document = PublicationDocumentMocker.create(1, "1");
+        Map<String, LiteratureEntry> pubmedLiteratureEntryMap = new HashMap<>();
+        CrossReference<CitationDatabase> pubmedXref =
+                new CrossReferenceBuilder<CitationDatabase>()
+                        .id("1")
+                        .database(CitationDatabase.PUBMED)
+                        .build();
+        JournalArticle journalArticle =
+                new JournalArticleBuilder().citationCrossReferencesAdd(pubmedXref).build();
         LiteratureEntry literatureEntry =
                 new LiteratureEntryBuilder()
                         .citation(journalArticle)
                         .statistics(
                                 new LiteratureStatisticsBuilder().reviewedProteinCount(1L).build())
                         .build();
-        pubmedLiteratureEntryMap.put(1L, literatureEntry);
+        pubmedLiteratureEntryMap.put("1", literatureEntry);
         PublicationEntry entry = converter.apply(document, pubmedLiteratureEntryMap);
 
         // check the journal object is the one from the map
@@ -71,9 +81,18 @@ class PublicationConverterTest {
     }
 
     @Test
-    void convertPublicationDocumentWithoutPubMedId() {
-        PublicationDocument document = PublicationDocumentMocker.createWithoutPubmed(1);
-        Map<Long, LiteratureEntry> emptyMap = emptyMap();
+    void convertPublicationDocumentWithCitationId() {
+        String citationId = "CI-1234567890";
+        PublicationDocument document = PublicationDocumentMocker.create(1, citationId);
+        Map<String, LiteratureEntry> emptyMap = new HashMap<>();
+        Submission submission = new SubmissionBuilder().title("Submission").build();
+        LiteratureEntry literatureEntry =
+                new LiteratureEntryBuilder()
+                        .citation(submission)
+                        .statistics(
+                                new LiteratureStatisticsBuilder().reviewedProteinCount(1L).build())
+                        .build();
+        emptyMap.put(citationId, literatureEntry);
         PublicationEntry entry = converter.apply(document, emptyMap);
 
         // check the citation is a submission
@@ -81,8 +100,13 @@ class PublicationConverterTest {
         assertThat(entry.getCitation(), instanceOf(Submission.class));
         assertThat(entry.getCitation().getTitle(), is("Submission"));
 
-        assertThat(entry.getStatistics(), is(nullValue()));
-        assertThat(entry.getReferences(), hasSize(1));
+        assertThat(entry.getStatistics(), is(notNullValue()));
+        assertTrue(entry.getStatistics().hasReviewedProteinCount());
+        assertThat(entry.getStatistics().getReviewedProteinCount(), is(1L));
+        assertFalse(entry.getStatistics().hasUnreviewedProteinCount());
+        assertFalse(entry.getStatistics().hasComputationallyMappedProteinCount());
+        assertFalse(entry.getStatistics().hasCommunityMappedProteinCount());
+        assertThat(entry.getReferences(), hasSize(3));
 
         Set<String> sources =
                 entry.getReferences().stream()
@@ -90,12 +114,12 @@ class PublicationConverterTest {
                         .map(MappedSource::getName)
                         .collect(Collectors.toSet());
 
-        assertThat(sources, contains("source 3"));
+        assertThat(sources, contains("source P00001"));
     }
 
     @Test
     void validObjectIsDeserialised() {
-        PublicationDocument document = PublicationDocumentMocker.create(1, 1);
+        PublicationDocument document = PublicationDocumentMocker.create(1, "1");
         Optional<MappedPublications> mappedPublications = extractObject(document);
 
         assertDoesNotThrow(() -> mappedPublications.orElseThrow(IllegalStateException::new));

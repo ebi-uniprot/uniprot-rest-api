@@ -27,7 +27,7 @@ public class UniProtKBPublicationsSolrSortClause extends AbstractSolrSortClause 
                 SolrQuery.ORDER.asc);
         addDefaultFieldOrderPair(
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.PUBLICATION)
-                        .getSearchFieldItemByName("pubmed_id")
+                        .getSearchFieldItemByName("citation_id")
                         .getFieldName(),
                 SolrQuery.ORDER.desc);
         addDefaultFieldOrderPair("id", SolrQuery.ORDER.desc);

@@ -1,15 +1,8 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.nio.ByteBuffer;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,12 +107,11 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         return "/citations/";
     }
 
-    private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
+    private byte[] getLiteratureBinary(LiteratureEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    LiteratureJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return LiteratureJsonConfig.getInstance()
+                    .getFullObjectMapper()
+                    .writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse LiteratureEntry to binary json: ", e);
         }
@@ -141,11 +133,12 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
-                                    contains("The PubMed id value should be a number")))
+                                    contains(
+                                            "The citation id value should be a PubMedId (number) or start with CI- or start with IND")))
                     .build();
         }
 
@@ -153,7 +146,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id("999")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -163,7 +156,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
                     .fields("id,title")
-                    .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
+                    .resultMatcher(jsonPath("$.citation.id", is("100")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                     .resultMatcher(jsonPath("$.citation.authors").doesNotExist())
                     .build();
@@ -174,7 +167,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -217,7 +210,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "PubMed ID\tTitle\tReference\tAbstract/Summary")))
+                                                                    "Citation Id\tTitle\tReference\tAbstract/Summary")))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -236,31 +229,31 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         @Override
         public GetIdContentTypeParam idBadRequestContentTypesParam() {
             return GetIdContentTypeParam.builder()
-                    .id("INVALID")
+                    .id(null)
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The PubMed id value should be a number")))
+                                                            "The citation id value should be a PubMedId (number) or start with CI- or start with IND")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .build();
         }

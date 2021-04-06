@@ -29,7 +29,6 @@ import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationSolrQueryConfig;
-import org.uniprot.core.citation.Literature;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
@@ -92,7 +91,8 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
                         pubDocsForAccessionSolrRequest, request.getCursor());
         List<PublicationDocument> content = results.getContent().collect(Collectors.toList());
 
-        Map<Long, LiteratureEntry> pubmedLiteratureEntryMap = getPubMedLiteratureEntryMap(content);
+        Map<String, LiteratureEntry> pubmedLiteratureEntryMap =
+                getPubMedLiteratureEntryMap(content);
 
         Stream<PublicationEntry> converted =
                 content.stream()
@@ -130,12 +130,11 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         return publicationQueryProcessor;
     }
 
-    private Map<Long, LiteratureEntry> getPubMedLiteratureEntryMap(
+    private Map<String, LiteratureEntry> getPubMedLiteratureEntryMap(
             List<PublicationDocument> content) {
         BooleanQuery.Builder pubmedIdsQuery = new BooleanQuery.Builder();
         content.stream()
-                .map(PublicationDocument::getPubMedId)
-                .filter(Objects::nonNull)
+                .map(PublicationDocument::getCitationId)
                 .forEach(
                         pubmedId ->
                                 pubmedIdsQuery.add(
@@ -146,12 +145,11 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         return all.map(literatureEntryConverter)
                 .collect(
                         Collectors.toMap(
-                                this::getPubmedIdFromEntry, literatureEntry -> literatureEntry));
+                                this::getCitationIdFromEntry, literatureEntry -> literatureEntry));
     }
 
-    private Long getPubmedIdFromEntry(LiteratureEntry entry) {
-        Literature literature = (Literature) entry.getCitation();
-        return literature.getPubmedId();
+    private String getCitationIdFromEntry(LiteratureEntry entry) {
+        return entry.getCitation().getId();
     }
 
     private SolrRequest getSolrRequest(String query) {

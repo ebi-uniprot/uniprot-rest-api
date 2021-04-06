@@ -1,15 +1,11 @@
 package org.uniprot.api.uniprotkb;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.uniprot.core.CrossReference;
-import org.uniprot.core.citation.Author;
-import org.uniprot.core.citation.CitationDatabase;
-import org.uniprot.core.citation.Literature;
-import org.uniprot.core.citation.SubmissionDatabase;
+import org.uniprot.core.citation.*;
 import org.uniprot.core.citation.impl.AuthorBuilder;
 import org.uniprot.core.citation.impl.JournalArticleBuilder;
 import org.uniprot.core.citation.impl.LiteratureBuilder;
@@ -78,6 +74,7 @@ public class UniProtKBObjectsForTests {
                                         .title("Submission title")
                                         .authorsAdd("Submission Author")
                                         .submittedToDatabase(SubmissionDatabase.PDB)
+                                        .publicationDate("2021")
                                         .build())
                         .build());
         return references;
@@ -108,6 +105,32 @@ public class UniProtKBObjectsForTests {
                 .published(literature.getPublicationDate().getValue())
                 .literatureObj(UniProtKBObjectsForTests.getLiteratureBinary(entry))
                 .build();
+    }
+
+    public static LiteratureDocument getLiteratureDocumentWithSubmission(Submission submission) {
+        LiteratureEntry entry = getLiteratureEntryWithSubmission(submission);
+        return LiteratureDocument.builder()
+                .id(submission.getId())
+                .title(submission.getTitle())
+                .author(
+                        submission.getAuthors().stream()
+                                .map(Author::getValue)
+                                .collect(Collectors.toSet()))
+                .published(submission.getPublicationDate().getValue())
+                .literatureObj(UniProtKBObjectsForTests.getLiteratureBinary(entry))
+                .build();
+    }
+
+    public static LiteratureEntry getLiteratureEntryWithSubmission(Submission submission) {
+        LiteratureStatistics statistics =
+                new LiteratureStatisticsBuilder()
+                        .reviewedProteinCount(10)
+                        .unreviewedProteinCount(20)
+                        .computationallyMappedProteinCount(30)
+                        .communityMappedProteinCount(40)
+                        .build();
+
+        return new LiteratureEntryBuilder().citation(submission).statistics(statistics).build();
     }
 
     public static LiteratureEntry getLiteratureEntry(long pubMedId) {
@@ -142,12 +165,11 @@ public class UniProtKBObjectsForTests {
         return new CrossReferenceBuilder<CitationDatabase>().database(pubmed2).id(s).build();
     }
 
-    public static ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
+    public static byte[] getLiteratureBinary(LiteratureEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    LiteratureJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return LiteratureJsonConfig.getInstance()
+                    .getFullObjectMapper()
+                    .writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse LiteratureEntry to binary json: ", e);
         }

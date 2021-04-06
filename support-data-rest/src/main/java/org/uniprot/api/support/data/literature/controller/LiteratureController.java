@@ -38,7 +38,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.support.data.literature.request.LiteratureSearchRequest;
 import org.uniprot.api.support.data.literature.request.LiteratureStreamRequest;
 import org.uniprot.api.support.data.literature.service.LiteratureService;
-import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.Citation;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -64,7 +64,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class LiteratureController extends BasicSearchController<LiteratureEntry> {
 
     private final LiteratureService literatureService;
-    private static final String LITERATURE_ID_REGEX = "^[0-9]+$";
+    private static final String LITERATURE_ID_REGEX = "^[0-9]+$|CI-\\w{13}$|IND[0-9]+$";
 
     public LiteratureController(
             ApplicationEventPublisher eventPublisher,
@@ -82,7 +82,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     }
 
     @Operation(
-            summary = "Get literature by PubMed id.",
+            summary = "Get literature by citation id.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -95,7 +95,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                         })
             })
     @GetMapping(
-            value = "/{pubMedId}",
+            value = "/{citationId}",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
@@ -103,19 +103,19 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> getByLiteratureId(
-            @Parameter(description = "PubMed id to find")
-                    @PathVariable("pubMedId")
+            @Parameter(description = "Citation id to find")
+                    @PathVariable("citationId")
                     @Pattern(
                             regexp = LITERATURE_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.literature.invalid.id}")
-                    String pubMedId,
+                    String citationId,
             @Parameter(description = "Comma separated list of fields to be returned in response")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(pubMedId);
+        LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(citationId);
         return super.getEntityResponse(literatureEntry, fields, request);
     }
 
@@ -199,8 +199,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
 
     @Override
     protected String getEntityId(LiteratureEntry entity) {
-        Literature literature = (Literature) entity.getCitation();
-        return String.valueOf(literature.getPubmedId());
+        Citation literature = entity.getCitation();
+        return String.valueOf(literature.getId());
     }
 
     @Override

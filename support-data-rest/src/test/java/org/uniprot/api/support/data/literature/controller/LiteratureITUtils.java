@@ -1,7 +1,8 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.uniprot.core.CrossReference;
@@ -59,34 +60,36 @@ public class LiteratureITUtils {
                         .statistics(new LiteratureStatisticsBuilder().build())
                         .build();
 
-        LiteratureDocument document =
-                LiteratureDocument.builder()
-                        .id(String.valueOf(pubMedId))
-                        .doi(literature.getDoiId())
-                        .title(literature.getTitle())
-                        .authorGroups(new HashSet<>(literature.getAuthoringGroups()))
-                        .litAbstract(literature.getLiteratureAbstract())
-                        .author(
-                                literature.getAuthors().stream()
-                                        .map(Author::getValue)
-                                        .collect(Collectors.toSet()))
-                        .journal(literature.getJournal().getName())
-                        .published(literature.getPublicationDate().getValue())
-                        .isUniprotkbMapped(facet)
-                        .isComputationallyMapped(facet)
-                        .isCommunityMapped(facet)
-                        .literatureObj(getLiteratureBinary(entry))
-                        .build();
-
-        return document;
+        List<String> citationsWith = new ArrayList<>();
+        if (facet) {
+            citationsWith.add("1_uniprotkb");
+            citationsWith.add("2_reviewed");
+            citationsWith.add("3_unreviewed");
+            citationsWith.add("4_computationally");
+            citationsWith.add("5_community");
+        }
+        return LiteratureDocument.builder()
+                .id(String.valueOf(pubMedId))
+                .doi(literature.getDoiId())
+                .title(literature.getTitle())
+                .authorGroups(new HashSet<>(literature.getAuthoringGroups()))
+                .litAbstract(literature.getLiteratureAbstract())
+                .author(
+                        literature.getAuthors().stream()
+                                .map(Author::getValue)
+                                .collect(Collectors.toSet()))
+                .journal(literature.getJournal().getName())
+                .published(literature.getPublicationDate().getValue())
+                .citationsWith(citationsWith)
+                .literatureObj(getLiteratureBinary(entry))
+                .build();
     }
 
-    private static ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
+    private static byte[] getLiteratureBinary(LiteratureEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    LiteratureJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return LiteratureJsonConfig.getInstance()
+                    .getFullObjectMapper()
+                    .writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse LiteratureEntry to binary json: ", e);
         }
