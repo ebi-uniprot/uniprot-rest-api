@@ -16,7 +16,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.LongStream;
 
@@ -86,8 +88,11 @@ class KeywordStreamControllerIT extends AbstractRDFStreamControllerIT {
         return repository;
     }
 
+    private Set<String> keywords;
+
     @Override
     protected int saveEntries() {
+        this.keywords = new HashSet<>();
         int numberOfEntries = 12;
         LongStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
         return numberOfEntries;
@@ -405,9 +410,7 @@ class KeywordStreamControllerIT extends AbstractRDFStreamControllerIT {
     }
 
     private void saveEntry(long suffix) {
-        String accPrefix = "KW-";
-        long num = ThreadLocalRandom.current().nextLong(1000, 9999);
-        String accession = accPrefix + num;
+        String accession = getNextAccession();
         searchAccession = accession;
         allAccessions.add(searchAccession);
         Collections.sort(allAccessions, Collections.reverseOrder());
@@ -432,5 +435,15 @@ class KeywordStreamControllerIT extends AbstractRDFStreamControllerIT {
     @Override
     protected String getRDFProlog() {
         return RDFPrologs.KEYWORD_PROLOG;
+    }
+
+    private String getNextAccession(){
+        String accPrefix = "KW-";
+        long num = ThreadLocalRandom.current().nextLong(1000, 9999);
+        String accession = accPrefix + num;
+        if(this.keywords.contains(accession)){
+            return getSearchAccession();
+        }
+        return accession;
     }
 }
