@@ -246,7 +246,7 @@ class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("category_facet"))
+                    .queryParam("facets", Collections.singletonList("category_exact"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.category",
@@ -259,7 +259,7 @@ class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     containsInAnyOrder(SEARCH_ACCESSION1, SEARCH_ACCESSION2)))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
-                    .resultMatcher(jsonPath("$.facets.*.name", contains("category_facet")))
+                    .resultMatcher(jsonPath("$.facets.*.name", contains("category_exact")))
                     .build();
         }
     }

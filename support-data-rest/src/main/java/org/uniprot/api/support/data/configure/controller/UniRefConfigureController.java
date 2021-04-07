@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(
         name = "Configuration",
-        description = "These services provide configuration data used in UniProt website")
+        description = "These services provide configuration data used in the UniProt website")
 @RestController
 @RequestMapping("/configure/uniref")
 public class UniRefConfigureController {
@@ -35,7 +35,7 @@ public class UniRefConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in UniRef search.",
+            summary = "List of return fields available in the UniRef end-points.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -56,7 +56,7 @@ public class UniRefConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in UniRef advanced search.",
+            summary = "List of search fields available in the UniRef end-points.",
             responses = {
                 @ApiResponse(
                         content = {

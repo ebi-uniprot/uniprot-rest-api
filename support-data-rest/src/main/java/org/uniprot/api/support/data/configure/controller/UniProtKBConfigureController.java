@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(
         name = "Configuration",
-        description = "These services provide configuration data used in UniProt website")
+        description = "These services provide configuration data used in the UniProt website")
 @RestController
 @RequestMapping("/configure/uniprotkb")
 public class UniProtKBConfigureController {
@@ -81,7 +81,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of annotation evidences available in UniProtKB search.",
+            summary = "List of annotation evidences available in the UniProtKB end-points.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -101,7 +101,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of GO annotation evidences available in UniProtKB search.",
+            summary = "List of GO annotation evidences available in the UniProtKB end-points.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -121,7 +121,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of databases available in UniProtKB search.",
+            summary = "List of databases available in the UniProtKB end-points.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -147,7 +147,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in UniProtKB search.",
+            summary = "List of return fields available in the UniProtKB end-points.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -168,7 +168,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of database details available for UniProtKB entry page.",
+            summary = "List of database details available in the UniProtKB entry page.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -189,7 +189,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of evidence database details available for UniProtKB entry page.",
+            summary = "List of evidence database details available in the UniProtKB entry page.",
             responses = {
                 @ApiResponse(
                         content = {

@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(
         name = "Configuration",
-        description = "These services provide configuration data used in UniProt website")
+        description = "These services provide configuration data used in the UniProt website")
 @RestController
 @RequestMapping("/configure/database")
 public class CrossRefConfigureController {
@@ -36,7 +36,7 @@ public class CrossRefConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in database.",
+            summary = "List of return fields available in the database end-points.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,7 @@ public class CrossRefConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in database advanced search.",
+            summary = "List of search fields available in the database end-points.",
             responses = {
                 @ApiResponse(
                         content = {
