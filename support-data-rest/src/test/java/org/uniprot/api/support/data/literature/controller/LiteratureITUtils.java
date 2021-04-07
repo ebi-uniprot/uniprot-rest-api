@@ -85,7 +85,7 @@ public class LiteratureITUtils {
                 .build();
     }
 
-    private static byte[] getLiteratureBinary(LiteratureEntry entry) {
+    public static byte[] getLiteratureBinary(LiteratureEntry entry) {
         try {
             return LiteratureJsonConfig.getInstance()
                     .getFullObjectMapper()

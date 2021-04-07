@@ -1,16 +1,24 @@
 package org.uniprot.api.support.data.literature.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -25,9 +33,12 @@ import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.Submission;
+import org.uniprot.core.citation.SubmissionDatabase;
 import org.uniprot.core.citation.impl.AuthorBuilder;
 import org.uniprot.core.citation.impl.LiteratureBuilder;
 import org.uniprot.core.citation.impl.PublicationDateBuilder;
+import org.uniprot.core.citation.impl.SubmissionBuilder;
 import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
@@ -54,6 +65,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final long PUBMED_ID = 100L;
+    private static final String SUBMISSION_ID = "CI-423LKJ7NFLSSR";
 
     @Autowired private LiteratureRepository repository;
 
@@ -100,6 +112,44 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .build();
 
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
+
+        Submission submission =
+                new SubmissionBuilder()
+                        .title("The Submission Title")
+                        .authorsAdd(new AuthorBuilder("The Submission Author").build())
+                        .publicationDate(new PublicationDateBuilder("2021").build())
+                        .submittedToDatabase(SubmissionDatabase.PDB)
+                        .build();
+
+        literatureEntry = new LiteratureEntryBuilder().citation(submission).build();
+
+        document =
+                LiteratureDocument.builder()
+                        .id(SUBMISSION_ID)
+                        .literatureObj(getLiteratureBinary(literatureEntry))
+                        .build();
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
+    }
+
+    @Test
+    void validSubmissionId() throws Exception {
+        // given
+        saveEntry();
+
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath() + SUBMISSION_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.citation.id", is(SUBMISSION_ID)))
+                .andExpect(jsonPath("$.citation.authors", contains("The Submission Author")))
+                .andExpect(jsonPath("$.citation.title", is("The Submission Title")));
     }
 
     @Override
@@ -123,6 +173,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
+                    .resultMatcher(jsonPath("$.citation.id", is("100")))
                     .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
                     .resultMatcher(jsonPath("$.citation.authors", contains("The Author")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
