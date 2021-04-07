@@ -664,6 +664,10 @@
     "type": "String"
   },
   {
+    "name": "lit_citation_id",
+    "type": "String"
+  },
+  {
     "name": "lit_journal",
     "type": "String"
   },
