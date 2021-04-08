@@ -36,7 +36,7 @@ public class KeywordConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the Keyword end-points.",
+            summary = "List of return fields available in the keyword services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,7 @@ public class KeywordConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the Keyword end-points.",
+            summary = "List of search fields available in the keyword services.",
             responses = {
                 @ApiResponse(
                         content = {

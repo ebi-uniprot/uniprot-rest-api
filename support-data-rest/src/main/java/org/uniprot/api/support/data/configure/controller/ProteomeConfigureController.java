@@ -35,7 +35,7 @@ public class ProteomeConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the Proteome end-points.",
+            summary = "List of return fields available in the proteomes services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -56,7 +56,7 @@ public class ProteomeConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the Proteome end-points.",
+            summary = "List of search fields available in the proteomes services.",
             responses = {
                 @ApiResponse(
                         content = {

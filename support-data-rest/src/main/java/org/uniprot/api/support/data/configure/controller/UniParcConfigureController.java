@@ -36,7 +36,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the UniParc end-points.",
+            summary = "List of return fields available in the UniParc services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the UniParc end-points.",
+            summary = "List of search fields available in the UniParc services.",
             responses = {
                 @ApiResponse(
                         content = {

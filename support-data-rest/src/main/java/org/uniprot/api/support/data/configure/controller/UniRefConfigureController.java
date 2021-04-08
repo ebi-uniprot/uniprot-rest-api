@@ -35,7 +35,7 @@ public class UniRefConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the UniRef end-points.",
+            summary = "List of return fields available in the UniRef services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -56,7 +56,7 @@ public class UniRefConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the UniRef end-points.",
+            summary = "List of search fields available in the UniRef services.",
             responses = {
                 @ApiResponse(
                         content = {

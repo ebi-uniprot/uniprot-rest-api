@@ -36,7 +36,7 @@ public class TaxonomyConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the taxonomy end-points.",
+            summary = "List of return fields available in the taxonomy services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,7 @@ public class TaxonomyConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in taxonomy end-points.",
+            summary = "List of search fields available in taxonomy services.",
             responses = {
                 @ApiResponse(
                         content = {

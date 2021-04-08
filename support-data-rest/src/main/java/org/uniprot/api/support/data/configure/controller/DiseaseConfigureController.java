@@ -36,7 +36,7 @@ public class DiseaseConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the disease end-points.",
+            summary = "List of return fields available in the disease services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,7 @@ public class DiseaseConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the disease end-points.",
+            summary = "List of search fields available in the disease services.",
             responses = {
                 @ApiResponse(
                         content = {

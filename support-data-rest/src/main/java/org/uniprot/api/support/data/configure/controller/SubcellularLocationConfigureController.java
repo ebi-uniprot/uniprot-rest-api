@@ -36,7 +36,7 @@ public class SubcellularLocationConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the locations end-points.",
+            summary = "List of return fields available in the locations services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,7 @@ public class SubcellularLocationConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the locations end-points.",
+            summary = "List of search fields available in the locations services.",
             responses = {
                 @ApiResponse(
                         content = {

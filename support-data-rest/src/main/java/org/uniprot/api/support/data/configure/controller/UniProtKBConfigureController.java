@@ -81,7 +81,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of annotation evidences available in the UniProtKB end-points.",
+            summary = "List of annotation evidences available in the UniProtKB services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -101,7 +101,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of GO annotation evidences available in the UniProtKB end-points.",
+            summary = "List of GO annotation evidences available in the UniProtKB services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -121,7 +121,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of databases available in the UniProtKB end-points.",
+            summary = "List of databases available in the UniProtKB services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -147,7 +147,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the UniProtKB end-points.",
+            summary = "List of return fields available in the UniProtKB services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -168,7 +168,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of database details available in the UniProtKB entry page.",
+            summary = "List of database details available in the UniProtKB services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -189,7 +189,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of evidence database details available in the UniProtKB entry page.",
+            summary = "List of evidence database details available in the UniProtKB services.",
             responses = {
                 @ApiResponse(
                         content = {
