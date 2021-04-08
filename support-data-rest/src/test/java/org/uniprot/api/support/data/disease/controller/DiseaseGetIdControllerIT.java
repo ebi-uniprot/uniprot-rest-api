@@ -35,12 +35,14 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
+import org.uniprot.core.Statistics;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -100,6 +102,10 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                 new DiseaseCrossReferenceBuilder().databaseType("MeSH").id("D000015").build();
         DiseaseCrossReference xref4 =
                 DiseaseCrossReferenceBuilder.from(xref3).id("D008607").build();
+
+        Statistics statistics =
+                new StatisticsBuilder().reviewedProteinCount(1L).unreviewedProteinCount(0L).build();
+
         DiseaseEntry diseaseEntry =
                 diseaseBuilder
                         .name("ZTTK syndrome")
@@ -113,8 +119,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                                         "ZTTK multiple congenital anomalies-mental retardation syndrome"))
                         .crossReferencesSet(Arrays.asList(xref1, xref2, xref3, xref4))
                         .keywordsAdd(keyword)
-                        .reviewedProteinCount(1L)
-                        .unreviewedProteinCount(0L)
+                        .statistics(statistics)
                         .build();
 
         List<String> kwIds;
@@ -169,8 +174,8 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                             jsonPath(
                                     "$.definition",
                                     containsString("characterized by intellectual disability")))
-                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
-                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
+                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", is(0)))
+                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", is(1)))
                     .resultMatcher(jsonPath("$.keywords.length()", is(1)))
                     .resultMatcher(jsonPath("$.keywords[0].name", is("Mental retardation")))
                     .resultMatcher(jsonPath("$.keywords[0].id", is("KW-0991")))
@@ -214,9 +219,9 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .fields("name,id,reviewed_protein_count")
                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.name", is("ZTTK syndrome")))
-                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
+                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", is(1)))
                     .resultMatcher(jsonPath("$.alternativeNames").doesNotExist())
-                    .resultMatcher(jsonPath("$.unreviewedProteinCount").doesNotExist())
+                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount").doesNotExist())
                     .resultMatcher(jsonPath("$.acronym").doesNotExist())
                     .build();
         }
@@ -263,8 +268,10 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                                     .resultMatcher(jsonPath("$.name", is("ZTTK syndrome")))
                                     .resultMatcher(jsonPath("$.acronym", is("ZTTKS")))
-                                    .resultMatcher(jsonPath("$.unreviewedProteinCount", is(0)))
-                                    .resultMatcher(jsonPath("$.reviewedProteinCount", is(1)))
+                                    .resultMatcher(
+                                            jsonPath("$.statistics.unreviewedProteinCount", is(0)))
+                                    .resultMatcher(
+                                            jsonPath("$.statistics.reviewedProteinCount", is(1)))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.definition",

@@ -8,9 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
-import org.uniprot.api.support.data.configure.response.UniParcDatabaseDetail;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
-import org.uniprot.api.support.data.configure.service.UniParcConfigureService;
+import org.uniprot.api.support.data.configure.service.CrossRefConfigureService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -20,23 +19,24 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * @author jluo
- * @date: 20 Jun 2019
+ * @author lgonzales
+ * @since 18/03/2021
  */
 @Tag(
         name = "Configuration",
         description = "These services provide configuration data used in the UniProt website")
 @RestController
-@RequestMapping("/configure/uniparc")
-public class UniParcConfigureController {
-    private final UniParcConfigureService service;
+@RequestMapping("/configure/database")
+public class CrossRefConfigureController {
 
-    public UniParcConfigureController(UniParcConfigureService service) {
+    private final CrossRefConfigureService service;
+
+    public CrossRefConfigureController(CrossRefConfigureService service) {
         this.service = service;
     }
 
     @Operation(
-            summary = "List of return fields available in the UniParc services.",
+            summary = "List of return fields available in the database services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +57,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in the UniParc services.",
+            summary = "List of search fields available in the database services.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -75,31 +75,5 @@ public class UniParcConfigureController {
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getSearchFields() {
         return service.getSearchItems();
-    }
-
-    @Operation(
-            summary = "List of database details available for UniParc entry page.",
-            responses = {
-                @ApiResponse(
-                        content = {
-                            @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            UniParcDatabaseDetail
-                                                                                    .class)))
-                        })
-            })
-    @GetMapping("/allDatabases")
-    public List<UniParcDatabaseDetail> getUniParcDatabaseDetails() {
-        return service.getAllUniParcDatabaseDetails();
-    }
-
-    @GetMapping("/entry-result-fields")
-    public List<UniProtReturnField> getEntryResultFields() {
-        return service.getUniParcEntryResultFields();
     }
 }

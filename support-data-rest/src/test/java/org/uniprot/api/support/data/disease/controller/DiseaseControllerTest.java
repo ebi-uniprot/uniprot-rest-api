@@ -27,12 +27,14 @@ import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.disease.service.DiseaseService;
+import org.uniprot.core.Statistics;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
@@ -68,16 +70,20 @@ class DiseaseControllerTest {
                                 equalTo(disease.getCrossReferences().size())))
                 .andExpect(
                         jsonPath(
-                                "$.reviewedProteinCount",
+                                "$.statistics.reviewedProteinCount",
                                 equalTo(
-                                        Integer.valueOf(
-                                                disease.getReviewedProteinCount().toString()))))
+                                        Long.valueOf(
+                                                        disease.getStatistics()
+                                                                .getReviewedProteinCount())
+                                                .intValue())))
                 .andExpect(
                         jsonPath(
-                                "$.unreviewedProteinCount",
+                                "$.statistics.unreviewedProteinCount",
                                 equalTo(
-                                        Integer.valueOf(
-                                                disease.getUnreviewedProteinCount().toString()))));
+                                        Long.valueOf(
+                                                        disease.getStatistics()
+                                                                .getUnreviewedProteinCount())
+                                                .intValue())));
     }
 
     @Test
@@ -151,8 +157,8 @@ class DiseaseControllerTest {
                         new KeywordIdBuilder().name("keyword1").id("kw-1").build(),
                         new KeywordIdBuilder().name("keyword2").id("kw-2").build());
 
-        Long reviewedProteinCount = 10L;
-        Long unreviewedProteinCount = 20L;
+        long reviewedProteinCount = 10L;
+        long unreviewedProteinCount = 20L;
 
         DiseaseEntryBuilder builder = new DiseaseEntryBuilder();
         builder.name(id)
@@ -161,8 +167,12 @@ class DiseaseControllerTest {
                 .definition(definition)
                 .alternativeNamesSet(alternativeNames);
         builder.crossReferencesSet(xrefs).keywordsSet(keywords);
-        builder.reviewedProteinCount(reviewedProteinCount)
-                .unreviewedProteinCount(unreviewedProteinCount);
+        Statistics statistics =
+                new StatisticsBuilder()
+                        .reviewedProteinCount(reviewedProteinCount)
+                        .unreviewedProteinCount(unreviewedProteinCount)
+                        .build();
+        builder.statistics(statistics);
 
         return builder.build();
     }

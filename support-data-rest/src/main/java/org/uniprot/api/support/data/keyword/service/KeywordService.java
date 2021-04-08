@@ -7,6 +7,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.support.data.keyword.repository.KeywordFacetConfig;
 import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -27,9 +28,15 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             KeywordSortClause keywordSortClause,
             SolrQueryConfig keywordSolrQueryConf,
             QueryProcessor keywordQueryProcessor,
+            KeywordFacetConfig facetConfig,
             SearchFieldConfig keywordSearchFieldConfig,
             @Qualifier("keywordRDFStreamer") RDFStreamer rdfStreamer) {
-        super(repository, keywordEntryConverter, keywordSortClause, keywordSolrQueryConf, null);
+        super(
+                repository,
+                keywordEntryConverter,
+                keywordSortClause,
+                keywordSolrQueryConf,
+                facetConfig);
         this.fieldConfig = keywordSearchFieldConfig;
         this.queryProcessor = keywordQueryProcessor;
         this.rdfStreamer = rdfStreamer;

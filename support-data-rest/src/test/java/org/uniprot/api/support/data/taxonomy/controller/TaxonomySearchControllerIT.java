@@ -1,14 +1,6 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -163,7 +155,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("scientific:[1 TO 10]"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -179,22 +171,17 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                             "query",
                             Collections.singletonList(
                                     "tax_id:INVALID OR id:INVALID "
-                                            + "OR host:INVALID OR linked:invalid OR active:invalid OR proteome:invalid "
-                                            + "OR reference:invalid OR reviewed:invalid OR annotated:invalid"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                            + "OR host:INVALID OR linked:invalid OR active:invalid"))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
                                     containsInAnyOrder(
                                             "The taxonomy active filter value should be a boolean",
-                                            "The taxonomy proteome filter value should be a boolean",
-                                            "The taxonomy reference filter value should be a boolean",
                                             "The taxonomy id filter value should be a number",
                                             "The taxonomy linked filter value should be a boolean",
                                             "The taxonomy id filter value should be a number",
-                                            "The taxonomy host filter value should be a number",
-                                            "The taxonomy reviewed filter value should be a boolean",
-                                            "The taxonomy annotated filter value should be a boolean")))
+                                            "The taxonomy host filter value should be a number")))
                     .build();
         }
 
@@ -231,7 +218,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("reviewed,reference"))
+                    .queryParam("facets", Collections.singletonList("superkingdom,taxonomies_with"))
                     .resultMatcher(jsonPath("$.results.*.taxonId", contains(10, 20)))
                     .resultMatcher(
                             jsonPath(
@@ -243,7 +230,25 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                             jsonPath("$.results.*.mnemonic", contains("mnemonic10", "mnemonic20")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
-                    .resultMatcher(jsonPath("$.facets.*.name", contains("reviewed", "reference")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets.*.name", contains("superkingdom", "taxonomies_with")))
+                    .resultMatcher(
+                            jsonPath("$.facets.*.label", contains("Superkingdom", "Taxons with")))
+                    .resultMatcher(jsonPath("$.facets[1].values.size()", is(4)))
+                    .resultMatcher(jsonPath("$.facets[1].values[0].count", is(1)))
+                    .resultMatcher(jsonPath("$.facets[1].values[0].value", is("proteome")))
+                    .resultMatcher(jsonPath("$.facets[1].values[0].label", is("Proteomes")))
+                    .resultMatcher(jsonPath("$.facets[1].values[1].value", is("reference")))
+                    .resultMatcher(
+                            jsonPath("$.facets[1].values[1].label", is("Reference proteomes")))
+                    .resultMatcher(jsonPath("$.facets[1].values[2].value", is("reviewed")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets[1].values[2].label",
+                                    is("Reviewed (Swiss-Prot) entries")))
+                    .resultMatcher(jsonPath("$.facets[1].values[3].value", is("uniprotkb")))
+                    .resultMatcher(jsonPath("$.facets[1].values[3].label", is("UniProtKB entries")))
                     .build();
         }
     }
