@@ -38,7 +38,7 @@ class QueryFieldMetaReaderImplTest {
 
         assertTrue(
                 validateFieldMap(
-                        result, "description", "Search by crossref id which is accession"));
+                        result, "description", "Search cross-reference by id which is accession"));
         assertTrue(validateFieldMap(result, "dataType", "string"));
         assertTrue(validateFieldMap(result, "example", "DB-0236"));
         assertTrue(validateFieldMap(result, "regex", "^DB-[0-9]{4}$"));
