@@ -37,6 +37,7 @@ import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyInactiveReasonType;
 import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
 import org.uniprot.core.taxonomy.impl.TaxonomyInactiveReasonBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.impl.TaxonomyBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
@@ -52,7 +53,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             TaxonomyGetIdControllerIT.TaxonomyGetIdParameterResolver.class,
             TaxonomyGetIdControllerIT.TaxonomyGetIdContentTypeParamResolver.class
         })
-public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
+class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final String TAX_ID = "9606";
 
@@ -77,7 +78,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/taxonomy/";
+        return "/taxonomy/{taxonId}";
     }
 
     @Override
@@ -91,7 +92,12 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .scientificName("scientific")
                         .commonName("common")
                         .mnemonic("mnemonic")
-                        .parentId(9000L)
+                        .parent(
+                                new TaxonomyBuilder()
+                                        .taxonId(9000L)
+                                        .scientificName("name9000")
+                                        .commonName("common9000")
+                                        .build())
                         .linksSet(Collections.singletonList("link"))
                         .build();
 
@@ -114,7 +120,7 @@ public class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdRequestPath() + MERGED_TAX_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
+                get(getIdRequestPath(), MERGED_TAX_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 

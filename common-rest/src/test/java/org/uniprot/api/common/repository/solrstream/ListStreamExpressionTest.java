@@ -22,16 +22,18 @@ public class ListStreamExpressionTest {
     }
 
     private FacetStreamExpression createExpression() {
-        FacetStreamExpression.FacetStreamExpressionBuilder builder =
-                new FacetStreamExpression.FacetStreamExpressionBuilder();
+        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
+                SolrStreamFacetRequest.builder();
         String collection = "sample collection";
         String query = "q:*:*";
         String buckets = "facet";
         String metrics = "count(facet)";
         String bucketSorts = "count(facet)";
         int bucketSizeLimit = ThreadLocalRandom.current().nextInt(10, Integer.MAX_VALUE);
-        builder.collection(collection).query(query).buckets(buckets);
-        builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
-        return builder.build();
+        builder.query(query)
+                .metrics(metrics)
+                .bucketSorts(bucketSorts)
+                .bucketSizeLimit(bucketSizeLimit);
+        return new FacetStreamExpression(collection, buckets, builder.build());
     }
 }

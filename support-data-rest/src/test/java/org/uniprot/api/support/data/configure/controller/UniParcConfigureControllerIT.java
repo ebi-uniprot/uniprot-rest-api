@@ -6,8 +6,9 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,6 +75,22 @@ class UniParcConfigureControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(CONFIGURE_RESOURCE + "allDatabases")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()", is(greaterThan(0))));
+    }
+
+    @Test
+    void validateGetUniParcDatabaseFields() throws Exception {
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(CONFIGURE_RESOURCE + "entry-result-fields")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

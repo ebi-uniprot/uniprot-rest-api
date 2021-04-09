@@ -10,9 +10,12 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.page.impl.CursorPage;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
@@ -21,6 +24,7 @@ import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.request.UniParcDatabasesRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
@@ -30,10 +34,13 @@ import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.filter.UniParcCrossReferenceTaxonomyFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseFilter;
 import org.uniprot.api.uniparc.service.filter.UniParcDatabaseStatusFilter;
+import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.MessageDigestUtil;
 import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
 
@@ -65,7 +72,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SolrQueryConfig uniParcSolrQueryConf,
             QueryProcessor uniParcQueryProcessor,
             SearchFieldConfig uniParcSearchFieldConfig,
-            RDFStreamer uniParcRDFStreamer) {
+            RDFStreamer uniParcRDFStreamer,
+            FacetTupleStreamTemplate facetTupleStreamTemplate) {
 
         super(
                 repository,
@@ -73,7 +81,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 solrSortClause,
                 facetConfig,
                 storeStreamer,
-                uniParcSolrQueryConf);
+                uniParcSolrQueryConf,
+                facetTupleStreamTemplate);
         this.searchFieldConfig = uniParcSearchFieldConfig;
         this.queryProcessor = uniParcQueryProcessor;
         this.repository = repository;
@@ -143,6 +152,18 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPARC;
+    }
+
+    @Override
+    protected String getSolrIdField() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC)
+                .getSearchFieldItemByName(UNIPARC_ID_FIELD)
+                .getFieldName();
+    }
+
+    @Override
     protected QueryProcessor getQueryProcessor() {
         return queryProcessor;
     }
@@ -156,6 +177,27 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
 
         BestGuessAnalyser analyser = new BestGuessAnalyser(searchFieldConfig);
         return analyser.analyseBestGuess(streamResult, request);
+    }
+
+    public QueryResult<UniParcCrossReference> getDatabasesByUniParcId(
+            String upi, UniParcDatabasesRequest request) {
+        UniParcEntry uniParcEntry = getEntity(UNIPARC_ID_FIELD, upi);
+        UniParcEntry filteredUniParcEntry =
+                filterUniParcStream(Stream.of(uniParcEntry), request)
+                        .findFirst()
+                        .orElseThrow(() -> new ServiceException("Unable to filter UniParc entry"));
+
+        List<UniParcCrossReference> databases = filteredUniParcEntry.getUniParcCrossReferences();
+        int pageSize = Objects.isNull(request.getSize()) ? getDefaultPageSize() : request.getSize();
+        CursorPage cursorPage = CursorPage.of(request.getCursor(), pageSize, databases.size());
+        List<UniParcCrossReference> entries =
+                databases.subList(
+                        cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
+        return QueryResult.of(entries.stream(), cursorPage);
+    }
+
+    public String getRDFXml(String upi) {
+        return this.uniParcRDFStreamer.streamRDFXML(Stream.of(upi)).collect(Collectors.joining());
     }
 
     private Stream<UniParcEntry> filterUniParcStream(

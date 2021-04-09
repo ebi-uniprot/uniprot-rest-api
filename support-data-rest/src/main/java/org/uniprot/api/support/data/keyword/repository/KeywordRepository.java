@@ -11,7 +11,15 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 @Repository
 public class KeywordRepository extends SolrQueryRepository<KeywordDocument> {
 
-    protected KeywordRepository(SolrClient solrClient, SolrRequestConverter requestConverter) {
-        super(solrClient, SolrCollection.keyword, KeywordDocument.class, null, requestConverter);
+    protected KeywordRepository(
+            SolrClient solrClient,
+            SolrRequestConverter requestConverter,
+            KeywordFacetConfig facetConfig) {
+        super(
+                solrClient,
+                SolrCollection.keyword,
+                KeywordDocument.class,
+                facetConfig,
+                requestConverter);
     }
 }

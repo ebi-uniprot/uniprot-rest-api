@@ -21,10 +21,10 @@ public class SortUtils {
         List<SolrQuery.SortClause> fieldSortPairs = new ArrayList<>();
 
         String[] tokenizedSortClause =
-                sortClause.split("\\s*,\\s*"); // e.g. field1 asc, field2 desc, field3 asc
+                sortClause.split(","); // e.g. field1 asc, field2 desc, field3 asc
 
         for (String singleSortPairStr : tokenizedSortClause) {
-            String[] fieldSortPairArr = singleSortPairStr.split("\\s+");
+            String[] fieldSortPairArr = singleSortPairStr.strip().split("\\s+");
             if (fieldSortPairArr.length != 2) {
                 throw new IllegalArgumentException("You must pass the field and sort direction.");
             }

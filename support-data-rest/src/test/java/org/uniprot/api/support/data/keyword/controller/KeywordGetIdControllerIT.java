@@ -87,7 +87,7 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/keywords/";
+        return "/keywords/{id}";
     }
 
     private ByteBuffer getKeywordBinary(KeywordEntry entry) {
@@ -186,7 +186,7 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Keyword ID\tName\tDescription\tCategory")))
+                                                                    "Keyword ID\tName\tDefinition\tCategory")))
                                     .resultMatcher(
                                             content()
                                                     .string(

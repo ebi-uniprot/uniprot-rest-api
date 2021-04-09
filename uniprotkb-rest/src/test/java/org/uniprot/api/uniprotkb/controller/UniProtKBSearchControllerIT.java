@@ -44,7 +44,7 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -112,7 +112,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     private UniProtKBStoreClient storeClient;
 
-    @Autowired private UniprotKBFacetConfig facetConfig;
+    @Autowired private UniProtKBFacetConfig facetConfig;
 
     @BeforeAll
     void initUniprotKbDataStore() {

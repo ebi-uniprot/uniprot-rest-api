@@ -59,7 +59,7 @@ public abstract class AbstractGetByIdControllerIT {
 
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdRequestPath() + idParameter.getId())
+                get(getIdRequestPath(), idParameter.getId())
                         .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);
@@ -83,7 +83,7 @@ public abstract class AbstractGetByIdControllerIT {
         checkParameterInput(idParameter);
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdRequestPath() + idParameter.getId())
+                get(getIdRequestPath(), idParameter.getId())
                         .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);
@@ -107,7 +107,7 @@ public abstract class AbstractGetByIdControllerIT {
         checkParameterInput(idParameter);
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdRequestPath() + idParameter.getId())
+                get(getIdRequestPath(), idParameter.getId())
                         .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);
@@ -137,7 +137,7 @@ public abstract class AbstractGetByIdControllerIT {
             saveEntry();
 
             MockHttpServletRequestBuilder requestBuilder =
-                    get(getIdRequestPath() + idParameter.getId())
+                    get(getIdRequestPath(), idParameter.getId())
                             .header(ACCEPT, MediaType.APPLICATION_JSON)
                             .param("fields", idParameter.getFields());
 
@@ -169,7 +169,7 @@ public abstract class AbstractGetByIdControllerIT {
 
             // when
             MockHttpServletRequestBuilder requestBuilder =
-                    get(getIdRequestPath() + idParameter.getId())
+                    get(getIdRequestPath(), idParameter.getId())
                             .header(ACCEPT, MediaType.APPLICATION_JSON)
                             .param("fields", idParameter.getFields());
 
@@ -203,7 +203,7 @@ public abstract class AbstractGetByIdControllerIT {
         for (ContentTypeParam contentType : contentTypeParam.getContentTypeParams()) {
             // when
             MockHttpServletRequestBuilder requestBuilder =
-                    get(getIdRequestPath() + contentTypeParam.getId())
+                    get(getIdRequestPath(), contentTypeParam.getId())
                             .header(ACCEPT, contentType.getContentType());
 
             ResultActions response = mockMvc.perform(requestBuilder);
@@ -231,7 +231,7 @@ public abstract class AbstractGetByIdControllerIT {
         for (ContentTypeParam contentType : contentTypeParam.getContentTypeParams()) {
             // when
             MockHttpServletRequestBuilder requestBuilder =
-                    get(getIdRequestPath() + contentTypeParam.getId())
+                    get(getIdRequestPath(), contentTypeParam.getId())
                             .header(ACCEPT, contentType.getContentType());
 
             ResultActions response = mockMvc.perform(requestBuilder);
@@ -265,7 +265,7 @@ public abstract class AbstractGetByIdControllerIT {
         saveEntry();
 
         // when
-        ResultActions response = mockMvc.perform(get(getIdRequestPath() + idParameter.getId()));
+        ResultActions response = mockMvc.perform(get(getIdRequestPath(), idParameter.getId()));
 
         // then
         response.andDo(log())
@@ -284,7 +284,7 @@ public abstract class AbstractGetByIdControllerIT {
         // when
         String extension = "json";
         ResultActions response =
-                mockMvc.perform(get(getIdRequestPath() + idParameter.getId() + "." + extension));
+                mockMvc.perform(get(getIdRequestPath() + "." + extension, idParameter.getId()));
 
         // then
         response.andDo(log())
@@ -327,7 +327,7 @@ public abstract class AbstractGetByIdControllerIT {
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), not(empty()));
         ControllerITUtils.verifyIdContentTypes(
-                getIdRequestPath() + "{",
+                getIdRequestPath(),
                 requestMappingHandlerMapping,
                 contentTypeParam.getContentTypeParams());
     }

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -38,6 +39,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.uniref.request.UniRefIdsSearchRequest;
 import org.uniprot.api.uniref.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.request.UniRefStreamRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
@@ -238,6 +240,46 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             Stream<UniRefEntryLight> result = service.stream(streamRequest);
             return super.stream(result, streamRequest, contentType, request);
         }
+    }
+
+    @SuppressWarnings("squid:S3752")
+    @RequestMapping(
+            value = "/ids",
+            method = {RequestMethod.GET, RequestMethod.POST},
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Get UniRef entries by a list of ids.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniRefEntryLight
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIds(
+            @Valid @ModelAttribute UniRefIdsSearchRequest idsRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniRefEntryLight> results = service.getByIds(idsRequest);
+        return super.getSearchResponse(
+                results, idsRequest.getFields(), idsRequest.isDownload(), request, response);
     }
 
     @Override

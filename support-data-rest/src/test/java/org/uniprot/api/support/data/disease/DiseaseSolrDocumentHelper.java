@@ -7,13 +7,16 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.uniprot.core.Statistics;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
 import org.uniprot.core.cv.disease.impl.DiseaseCrossReferenceBuilder;
 import org.uniprot.core.cv.disease.impl.DiseaseEntryBuilder;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
+import org.uniprot.core.impl.StatisticsBuilder;
 import org.uniprot.core.json.parser.disease.DiseaseJsonConfig;
+import org.uniprot.store.search.document.DocumentConversionException;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,6 +51,13 @@ public class DiseaseSolrDocumentHelper {
                         .databaseType("MeSH" + suffix)
                         .id("D008607" + suffix)
                         .build();
+
+        Statistics statistics =
+                new StatisticsBuilder()
+                        .reviewedProteinCount(suffix)
+                        .unreviewedProteinCount(suffix)
+                        .build();
+
         DiseaseEntry diseaseEntry =
                 diseaseBuilder
                         .name("ZTTK syndrome" + suffix)
@@ -61,8 +71,7 @@ public class DiseaseSolrDocumentHelper {
                                         "ZTTK multiple congenital anomalies-mental retardation syndrome"))
                         .crossReferencesSet(Arrays.asList(xref1, xref2, xref3, xref4))
                         .keywordsAdd(keyword)
-                        .reviewedProteinCount(suffix)
-                        .unreviewedProteinCount(suffix)
+                        .statistics(statistics)
                         .build();
 
         List<String> kwIds;
@@ -85,14 +94,11 @@ public class DiseaseSolrDocumentHelper {
                                         kwIds.stream()),
                                 diseaseEntry.getAlternativeNames().stream())
                         .collect(Collectors.toList());
-        DiseaseDocument document =
-                DiseaseDocument.builder()
-                        .id(accession)
-                        .name(name)
-                        .diseaseObj(getDiseaseBinary(diseaseEntry))
-                        .build();
-
-        return document;
+        return DiseaseDocument.builder()
+                .id(accession)
+                .name(name)
+                .diseaseObj(getDiseaseBinary(diseaseEntry))
+                .build();
     }
 
     private static ByteBuffer getDiseaseBinary(DiseaseEntry entry) {
@@ -100,7 +106,8 @@ public class DiseaseSolrDocumentHelper {
             return ByteBuffer.wrap(
                     DiseaseJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse DiseaseEntry entry to binary json: ", e);
+            throw new DocumentConversionException(
+                    "Unable to parse DiseaseEntry entry to binary json: ", e);
         }
     }
 }

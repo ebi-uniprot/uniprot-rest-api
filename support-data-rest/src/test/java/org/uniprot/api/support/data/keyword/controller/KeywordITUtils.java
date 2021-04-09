@@ -34,7 +34,7 @@ public class KeywordITUtils {
                         .childrenAdd(new KeywordEntryBuilder().keyword(keyword).build())
                         .geneOntologiesAdd(
                                 new GoTermBuilder().id("idValue").name("nameValue").build())
-                        .sitesAdd("siteValue")
+                        .linksAdd("linkValue")
                         .statistics(new StatisticsBuilder().build())
                         .build();
 
@@ -46,6 +46,7 @@ public class KeywordITUtils {
                         .ancestor(Collections.singletonList("ancestor"))
                         .parent(Collections.singletonList("parent"))
                         .synonyms(Collections.singletonList("content"))
+                        .category(category.getName())
                         .keywordObj(getKeywordBinary(keywordEntry))
                         .build();
         return document;

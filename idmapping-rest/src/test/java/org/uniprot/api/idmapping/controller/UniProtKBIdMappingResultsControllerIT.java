@@ -19,7 +19,6 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUti
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_AC_ID_STR;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
 
-import java.util.*;
 import java.util.List;
 
 import org.hamcrest.Matchers;
@@ -51,7 +50,7 @@ import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.respository.facet.impl.UniprotKBFacetConfig;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -74,7 +73,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     private static final String UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH =
             "/idmapping/uniprotkb/results/stream/{jobId}";
 
-    @Autowired private UniprotKBFacetConfig facetConfig;
+    @Autowired private UniProtKBFacetConfig facetConfig;
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 

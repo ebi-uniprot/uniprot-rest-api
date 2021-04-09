@@ -54,6 +54,10 @@ public class UniParcConfigureService {
                 .collect(Collectors.toList());
     }
 
+    public List<UniProtReturnField> getUniParcEntryResultFields() {
+        return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPARC_CROSSREF);
+    }
+
     private UniParcDatabaseDetail getUniParcDatabaseDetail(UniParcDatabase database) {
         return UniParcDatabaseDetail.builder()
                 .name(database.name())

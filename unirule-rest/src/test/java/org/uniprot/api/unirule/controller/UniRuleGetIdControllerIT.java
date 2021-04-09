@@ -94,7 +94,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/unirule/";
+        return "/unirule/{uniruleid}";
     }
 
     static class UniRuleGetIdParameterResolver extends AbstractGetIdParameterResolver {
