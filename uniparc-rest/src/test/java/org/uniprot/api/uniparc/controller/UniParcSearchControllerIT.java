@@ -221,6 +221,8 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("upi:UPI0000083A11"))
                     .resultMatcher(jsonPath("$.results.*.uniParcId", contains("UPI0000083A11")))
+                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(1)))
+                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(1)))
                     .build();
         }
 
@@ -240,6 +242,8 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                             jsonPath(
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
+                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(2)))
+                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(2)))
                     .build();
         }
 
@@ -285,6 +289,8 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                             jsonPath(
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A20", "UPI0000083A11")))
+                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(2)))
+                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(2)))
                     .build();
         }
 
@@ -308,6 +314,8 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                                     .doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequenceFeatures").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated").doesNotExist())
                     .build();
         }
 
