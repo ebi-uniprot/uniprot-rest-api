@@ -242,7 +242,7 @@ class LiteratureStreamControllerIT extends AbstractRDFStreamControllerIT {
                         content()
                                 .string(
                                         containsString(
-                                                "PubMed ID\tTitle\tReference\tAbstract/Summary")))
+                                                "Citation Id\tTitle\tReference\tAbstract/Summary")))
                 .andExpect(
                         content()
                                 .string(

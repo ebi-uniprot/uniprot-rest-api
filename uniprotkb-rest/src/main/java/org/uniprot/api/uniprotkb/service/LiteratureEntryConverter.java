@@ -29,7 +29,7 @@ public class LiteratureEntryConverter implements Function<LiteratureDocument, Li
     public LiteratureEntry apply(LiteratureDocument literatureDocument) {
         try {
             return objectMapper.readValue(
-                    literatureDocument.getLiteratureObj().array(), LiteratureEntry.class);
+                    literatureDocument.getLiteratureObj(), LiteratureEntry.class);
         } catch (Exception e) {
             log.info("Error converting solr binary to LiteratureEntry: ", e);
         }

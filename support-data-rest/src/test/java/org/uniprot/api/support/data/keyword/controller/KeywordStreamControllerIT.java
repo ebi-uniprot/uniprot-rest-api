@@ -437,11 +437,11 @@ class KeywordStreamControllerIT extends AbstractRDFStreamControllerIT {
         return RDFPrologs.KEYWORD_PROLOG;
     }
 
-    private String getNextAccession(){
+    private String getNextAccession() {
         String accPrefix = "KW-";
         long num = ThreadLocalRandom.current().nextLong(1000, 9999);
         String accession = accPrefix + num;
-        if(this.keywords.contains(accession)){
+        if (this.keywords.contains(accession)) {
             return getSearchAccession();
         }
         return accession;

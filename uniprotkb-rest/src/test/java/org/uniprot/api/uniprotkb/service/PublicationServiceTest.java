@@ -79,7 +79,7 @@ class PublicationServiceTest {
                                                         new MappedPublicationsBuilder()
                                                                 .uniProtKBMappedReference(ref)
                                                                 .build()))
-                                        .pubMedId("2")
+                                        .citationId("2")
                                         .build()),
                         CursorPage.of(null, 1),
                         emptyList());

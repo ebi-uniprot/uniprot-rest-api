@@ -1,11 +1,7 @@
 package org.uniprot.api.rest.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyIterable;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
@@ -321,7 +317,7 @@ public abstract class AbstractGetByIdControllerIT {
     private void checkParameterInput(GetIdParameter idParameter) {
         assertThat(idParameter, notNullValue());
         assertThat(idParameter.getId(), notNullValue());
-        assertThat(idParameter.getId(), not(isEmptyOrNullString()));
+        assertThat(idParameter.getId(), not(emptyOrNullString()));
         assertThat(idParameter.getResultMatchers(), notNullValue());
         assertThat(idParameter.getResultMatchers(), not(emptyIterable()));
     }

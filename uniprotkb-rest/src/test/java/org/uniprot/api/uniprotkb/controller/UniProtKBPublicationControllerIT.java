@@ -38,6 +38,8 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.core.citation.Submission;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.PublicationDocumentMocker;
 import org.uniprot.store.search.SolrCollection;
@@ -157,6 +159,33 @@ class UniProtKBPublicationControllerIT {
                                 "$.results[0].statistics.computationallyMappedProteinCount",
                                 is(30)))
                 .andExpect(jsonPath("$.results[0].statistics.communityMappedProteinCount", is(40)));
+    }
+
+    @Test
+    void getPublicationsWithSubmissionReturnSuccess() throws Exception {
+        // given
+        saveEntryWithSubmission(12, ACCESSION);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results[*].citation.id", contains("CI-F4UM8V2OKRCK4", "12")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].citation.citationType",
+                                contains("submission", "UniProt indexed literatures")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[*].citation.title",
+                                contains("Submission title", "title 12")));
     }
 
     @Test
@@ -364,8 +393,39 @@ class UniProtKBPublicationControllerIT {
         }
     }
 
-    private void saveUniProtEntryInStore(String accession, String... pubmedIds) {
+    private void saveEntryWithSubmission(long pubMedId, String accession) {
+        System.out.println("Document for PUBMED_ID: " + pubMedId);
+        UniProtKBEntry entry =
+                UniProtKBObjectsForTests.getUniprotEntryForPublication(
+                        accession, String.valueOf(pubMedId));
+
+        entry.getReferences()
+                .forEach(
+                        reference -> {
+                            if (reference.getCitation() instanceof Submission) {
+                                LiteratureDocument doc =
+                                        UniProtKBObjectsForTests
+                                                .getLiteratureDocumentWithSubmission(
+                                                        (Submission) reference.getCitation());
+                                storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, doc);
+                                storeManager.saveDocs(
+                                        DataStoreManager.StoreType.PUBLICATION,
+                                        PublicationDocumentMocker.create(accession, doc.getId()));
+                            } else {
+                                LiteratureDocument doc =
+                                        UniProtKBObjectsForTests.getLiteratureDocument(
+                                                Long.parseLong(reference.getCitation().getId()));
+                                storeManager.saveDocs(DataStoreManager.StoreType.LITERATURE, doc);
+                                storeManager.saveDocs(
+                                        DataStoreManager.StoreType.PUBLICATION,
+                                        PublicationDocumentMocker.create(accession, doc.getId()));
+                            }
+                        });
+        storeClient.saveEntry(entry);
+    }
+
+    private void saveUniProtEntryInStore(String accession, String... citationIds) {
         storeClient.saveEntry(
-                UniProtKBObjectsForTests.getUniprotEntryForPublication(accession, pubmedIds));
+                UniProtKBObjectsForTests.getUniprotEntryForPublication(accession, citationIds));
     }
 }

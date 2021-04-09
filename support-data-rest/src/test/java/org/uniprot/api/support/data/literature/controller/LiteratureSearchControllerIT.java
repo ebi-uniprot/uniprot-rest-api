@@ -1,31 +1,31 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.text.IsEmptyString.emptyOrNullString;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.LongStream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
@@ -39,7 +39,11 @@ import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
+import org.uniprot.core.citation.Submission;
+import org.uniprot.core.citation.SubmissionDatabase;
 import org.uniprot.core.citation.impl.*;
+import org.uniprot.core.literature.LiteratureEntry;
+import org.uniprot.core.literature.impl.LiteratureEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -58,7 +62,9 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
             LiteratureSearchControllerIT.LiteratureSearchContentTypeParamResolver.class,
             LiteratureSearchControllerIT.LiteratureSearchParameterResolver.class
         })
-public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+
+    private static final String SUBMISSION_ID = "CI-6LG40CJ34FGTT";
 
     @Autowired private LiteratureFacetConfig facetConfig;
 
@@ -122,6 +128,49 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
     protected void saveEntry(SaveScenario saveContext) {
         saveEntry(10, true);
         saveEntry(20, false);
+
+        Submission submission =
+                new SubmissionBuilder()
+                        .title("The Submission Title")
+                        .authorsAdd(new AuthorBuilder("The Submission Author").build())
+                        .publicationDate(new PublicationDateBuilder("2021").build())
+                        .submittedToDatabase(SubmissionDatabase.PDB)
+                        .build();
+
+        LiteratureEntry literatureEntry = new LiteratureEntryBuilder().citation(submission).build();
+
+        LiteratureDocument document =
+                LiteratureDocument.builder()
+                        .id(SUBMISSION_ID)
+                        .literatureObj(LiteratureITUtils.getLiteratureBinary(literatureEntry))
+                        .build();
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
+    }
+
+    @Test
+    void validSubmissionSearch() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_SUCCESS);
+
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getSearchRequestPath())
+                        .param("query", "id:" + SUBMISSION_ID)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].citation.id", is(SUBMISSION_ID)))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].citation.authors", contains("The Submission Author")))
+                .andExpect(jsonPath("$.results[0].citation.title", is("The Submission Title")));
     }
 
     private void saveEntry(long pubMedId, boolean facet) {
@@ -137,6 +186,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("id:10"))
+                    .resultMatcher(jsonPath("$.results.*.citation.id", contains("10")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.citation.citationCrossReferences[0].id",
@@ -161,16 +211,20 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .queryParam("query", Collections.singletonList("title:*"))
                     .resultMatcher(
                             jsonPath(
+                                    "$.results.*.citation.id", contains("10", "20", SUBMISSION_ID)))
+                    .resultMatcher(
+                            jsonPath(
                                     "$.results.*.citation.citationCrossReferences[0].id",
                                     containsInAnyOrder("10", "20")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.citation.title",
-                                    containsInAnyOrder("title 10", "title 20")))
+                                    containsInAnyOrder(
+                                            "title 10", "title 20", "The Submission Title")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.citation.publicationDate",
-                                    containsInAnyOrder("2019", "2019")))
+                                    containsInAnyOrder("2019", "2019", "2021")))
                     .build();
         }
 
@@ -178,7 +232,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("title:[1 TO 10]"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -190,19 +244,13 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         @Override
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam(
-                            "query",
-                            Collections.singletonList(
-                                    "id:INVALID OR is_uniprotkb_mapped:INVALID OR is_computationally_mapped:INVALID OR is_community_mapped:INVALID"))
+                    .queryParam("query", Collections.singletonList("id:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
-                                    containsInAnyOrder(
-                                            "The PubMed id value should be a number",
-                                            "The literature is_uniprotkb_mapped filter value should be a boolean",
-                                            "The literature is_community_mapped filter value should be a boolean",
-                                            "The literature is_computationally_mapped filter value should be a boolean")))
+                                    contains(
+                                            "The citation id value should be a PubMedId (number) or start with CI- or start with IND")))
                     .build();
         }
 
@@ -217,7 +265,11 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                                     contains("20", "10")))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.citation.title", contains("title 20", "title 10")))
+                                    "$.results.*.citation.id", contains("20", "10", SUBMISSION_ID)))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.results.*.citation.title",
+                                    contains("title 20", "title 10", "The Submission Title")))
                     .build();
         }
 
@@ -228,11 +280,11 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .queryParam("fields", Collections.singletonList("id,title"))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.citation.citationCrossReferences[0].id",
-                                    contains("10", "20")))
+                                    "$.results.*.citation.id", contains("10", "20", SUBMISSION_ID)))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.citation.title", contains("title 10", "title 20")))
+                                    "$.results.*.citation.title",
+                                    contains("title 10", "title 20", "The Submission Title")))
                     .resultMatcher(jsonPath("$.results.*.citation.authors").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.citation.journal").doesNotExist())
                     .build();
@@ -242,26 +294,42 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam(
-                            "facets",
-                            Collections.singletonList(
-                                    "is_uniprotkb_mapped,is_computationally_mapped,is_community_mapped"))
+                    .queryParam("facets", Collections.singletonList("citations_with"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.citation.citationCrossReferences[0].id",
                                     contains("10", "20")))
                     .resultMatcher(
                             jsonPath(
-                                    "$.results.*.citation.title", contains("title 10", "title 20")))
-                    .resultMatcher(jsonPath("$.facets", notNullValue()))
-                    .resultMatcher(jsonPath("$.facets", not(empty())))
+                                    "$.results.*.citation.id", contains("10", "20", SUBMISSION_ID)))
                     .resultMatcher(
                             jsonPath(
-                                    "$.facets.*.name",
-                                    contains(
-                                            "is_uniprotkb_mapped",
-                                            "is_computationally_mapped",
-                                            "is_community_mapped")))
+                                    "$.results.*.citation.title",
+                                    contains("title 10", "title 20", "The Submission Title")))
+                    .resultMatcher(jsonPath("$.facets", notNullValue()))
+                    .resultMatcher(jsonPath("$.facets.size()", is(1)))
+                    .resultMatcher(jsonPath("$.facets[0].name", is("citations_with")))
+                    .resultMatcher(jsonPath("$.facets[0].values.size()", is(5)))
+                    .resultMatcher(jsonPath("$.facets[0].values[0].label", is("UniProtKB entries")))
+                    .resultMatcher(jsonPath("$.facets[0].values[0].value", is("1_uniprotkb")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets[0].values[1].label",
+                                    is("UniProtKB reviewed entries")))
+                    .resultMatcher(jsonPath("$.facets[0].values[1].value", is("2_reviewed")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets[0].values[2].label",
+                                    is("UniProtKB unreviewed entries")))
+                    .resultMatcher(jsonPath("$.facets[0].values[2].value", is("3_unreviewed")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.facets[0].values[3].label",
+                                    is("Computationally mapped entries")))
+                    .resultMatcher(jsonPath("$.facets[0].values[3].value", is("4_computationally")))
+                    .resultMatcher(
+                            jsonPath("$.facets[0].values[4].label", is("Community mapped entries")))
+                    .resultMatcher(jsonPath("$.facets[0].values[4].value", is("5_community")))
                     .build();
         }
     }
@@ -302,7 +370,7 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "PubMed ID\tTitle\tReference\tAbstract/Summary")))
+                                                                    "Citation Id\tTitle\tReference\tAbstract/Summary")))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -330,27 +398,27 @@ public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControl
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The PubMed id value should be a number")))
+                                                            "The citation id value should be a PubMedId (number) or start with CI- or start with IND")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .build();
         }

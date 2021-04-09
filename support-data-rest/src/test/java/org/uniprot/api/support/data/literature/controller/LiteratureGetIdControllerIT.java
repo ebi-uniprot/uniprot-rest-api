@@ -1,23 +1,24 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
-import java.nio.ByteBuffer;
-
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -32,9 +33,12 @@ import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.CitationDatabase;
 import org.uniprot.core.citation.Literature;
+import org.uniprot.core.citation.Submission;
+import org.uniprot.core.citation.SubmissionDatabase;
 import org.uniprot.core.citation.impl.AuthorBuilder;
 import org.uniprot.core.citation.impl.LiteratureBuilder;
 import org.uniprot.core.citation.impl.PublicationDateBuilder;
+import org.uniprot.core.citation.impl.SubmissionBuilder;
 import org.uniprot.core.impl.CrossReferenceBuilder;
 import org.uniprot.core.json.parser.literature.LiteratureJsonConfig;
 import org.uniprot.core.literature.LiteratureEntry;
@@ -61,6 +65,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final long PUBMED_ID = 100L;
+    private static final String SUBMISSION_ID = "CI-6LG40CJ34FGTT";
 
     @Autowired private LiteratureRepository repository;
 
@@ -107,19 +112,56 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .build();
 
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
+
+        Submission submission =
+                new SubmissionBuilder()
+                        .title("The Submission Title")
+                        .authorsAdd(new AuthorBuilder("The Submission Author").build())
+                        .publicationDate(new PublicationDateBuilder("2021").build())
+                        .submittedToDatabase(SubmissionDatabase.PDB)
+                        .build();
+
+        literatureEntry = new LiteratureEntryBuilder().citation(submission).build();
+
+        document =
+                LiteratureDocument.builder()
+                        .id(SUBMISSION_ID)
+                        .literatureObj(getLiteratureBinary(literatureEntry))
+                        .build();
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.LITERATURE, document);
+    }
+
+    @Test
+    void validSubmissionId() throws Exception {
+        // given
+        saveEntry();
+
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), SUBMISSION_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.citation.id", is(SUBMISSION_ID)))
+                .andExpect(jsonPath("$.citation.authors", contains("The Submission Author")))
+                .andExpect(jsonPath("$.citation.title", is("The Submission Title")));
     }
 
     @Override
     protected String getIdRequestPath() {
-        return "/citations/{pubMedId}";
+        return "/citations/{citationId}";
     }
 
-    private ByteBuffer getLiteratureBinary(LiteratureEntry entry) {
+    private byte[] getLiteratureBinary(LiteratureEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    LiteratureJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return LiteratureJsonConfig.getInstance()
+                    .getFullObjectMapper()
+                    .writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse LiteratureEntry to binary json: ", e);
         }
@@ -131,6 +173,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
+                    .resultMatcher(jsonPath("$.citation.id", is("100")))
                     .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
                     .resultMatcher(jsonPath("$.citation.authors", contains("The Author")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
@@ -141,11 +184,12 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
-                                    contains("The PubMed id value should be a number")))
+                                    contains(
+                                            "The citation id value should be a PubMedId (number) or start with CI- or start with IND")))
                     .build();
         }
 
@@ -153,7 +197,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id("999")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -163,7 +207,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
                     .fields("id,title")
-                    .resultMatcher(jsonPath("$.citation.citationCrossReferences[0].id", is("100")))
+                    .resultMatcher(jsonPath("$.citation.id", is("100")))
                     .resultMatcher(jsonPath("$.citation.title", is("The Title")))
                     .resultMatcher(jsonPath("$.citation.authors").doesNotExist())
                     .build();
@@ -174,7 +218,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -217,7 +261,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "PubMed ID\tTitle\tReference\tAbstract/Summary")))
+                                                                    "Citation Id\tTitle\tReference\tAbstract/Summary")))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -240,27 +284,27 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The PubMed id value should be a number")))
+                                                            "The citation id value should be a PubMedId (number) or start with CI- or start with IND")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .build();
         }
