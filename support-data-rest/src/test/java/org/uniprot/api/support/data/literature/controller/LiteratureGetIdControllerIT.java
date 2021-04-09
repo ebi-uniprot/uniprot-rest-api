@@ -138,7 +138,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdRequestPath() + SUBMISSION_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
+                get(getIdRequestPath(), SUBMISSION_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
@@ -154,7 +154,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/citations/{pubMedId}";
+        return "/citations/{citationId}";
     }
 
     private byte[] getLiteratureBinary(LiteratureEntry entry) {
@@ -280,7 +280,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         @Override
         public GetIdContentTypeParam idBadRequestContentTypesParam() {
             return GetIdContentTypeParam.builder()
-                    .id(null)
+                    .id("INVALID")
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
