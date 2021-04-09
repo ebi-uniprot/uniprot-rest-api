@@ -79,6 +79,8 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
             return GetIdParameter.builder()
                     .id(UNIPARC_ID)
                     .resultMatcher(jsonPath("$.uniParcId", is(UNIPARC_ID)))
+                    .resultMatcher(jsonPath("$.oldestCrossRefCreated").exists())
+                    .resultMatcher(jsonPath("$.mostRecentCrossRefUpdated").exists())
                     .build();
         }
 
@@ -113,6 +115,8 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .resultMatcher(jsonPath("$.uniParcCrossReferences.*.organism").exists())
                     .resultMatcher(jsonPath("$.sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated").doesNotExist())
                     .build();
         }
 
