@@ -62,9 +62,9 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
             LiteratureSearchControllerIT.LiteratureSearchContentTypeParamResolver.class,
             LiteratureSearchControllerIT.LiteratureSearchParameterResolver.class
         })
-public class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
-    private static final String SUBMISSION_ID = "CI-423LKJ7NFLSSR";
+    private static final String SUBMISSION_ID = "CI-6LG40CJ34FGTT";
 
     @Autowired private LiteratureFacetConfig facetConfig;
 

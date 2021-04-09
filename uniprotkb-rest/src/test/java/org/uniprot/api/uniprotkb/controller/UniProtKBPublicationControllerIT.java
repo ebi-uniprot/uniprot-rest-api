@@ -178,7 +178,7 @@ class UniProtKBPublicationControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results[*].citation.id", contains("CI-29RR6S6794F4B", "12")))
+                .andExpect(jsonPath("$.results[*].citation.id", contains("CI-F4UM8V2OKRCK4", "12")))
                 .andExpect(
                         jsonPath(
                                 "$.results[*].citation.citationType",

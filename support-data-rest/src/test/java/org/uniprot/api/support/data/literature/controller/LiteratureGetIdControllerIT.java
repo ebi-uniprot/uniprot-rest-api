@@ -65,7 +65,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final long PUBMED_ID = 100L;
-    private static final String SUBMISSION_ID = "CI-423LKJ7NFLSSR";
+    private static final String SUBMISSION_ID = "CI-6LG40CJ34FGTT";
 
     @Autowired private LiteratureRepository repository;
 
