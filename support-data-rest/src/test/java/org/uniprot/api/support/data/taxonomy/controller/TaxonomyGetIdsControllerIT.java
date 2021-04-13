@@ -193,7 +193,7 @@ class TaxonomyGetIdsControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(TAX_IDS_RESOURCE + "9606,9607,9608")
-                                .queryParam("facetFilter", "taxonomies_with:reviewed")
+                                .queryParam("facetFilter", "taxonomies_with:2_reviewed")
                                 .queryParam("facets", "superkingdom,taxonomies_with")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -404,7 +404,7 @@ class TaxonomyGetIdsControllerIT {
                             .taxonomyObj(getTaxonomyBinary(taxonomyEntry));
 
             if (taxId % 2 == 0) {
-                docBuilder.taxonomiesWith(List.of("reference", "reviewed"));
+                docBuilder.taxonomiesWith(List.of("5_reference", "2_reviewed"));
             }
             storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, docBuilder.build());
         }

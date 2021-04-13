@@ -235,20 +235,25 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                     "$.facets.*.name", contains("superkingdom", "taxonomies_with")))
                     .resultMatcher(
                             jsonPath("$.facets.*.label", contains("Superkingdom", "Taxons with")))
-                    .resultMatcher(jsonPath("$.facets[1].values.size()", is(4)))
+                    .resultMatcher(jsonPath("$.facets[1].values.size()", is(5)))
                     .resultMatcher(jsonPath("$.facets[1].values[0].count", is(1)))
-                    .resultMatcher(jsonPath("$.facets[1].values[0].value", is("proteome")))
-                    .resultMatcher(jsonPath("$.facets[1].values[0].label", is("Proteomes")))
-                    .resultMatcher(jsonPath("$.facets[1].values[1].value", is("reference")))
+                    .resultMatcher(jsonPath("$.facets[1].values[0].value", is("1_uniprotkb")))
+                    .resultMatcher(jsonPath("$.facets[1].values[0].label", is("UniProtKB entries")))
+                    .resultMatcher(jsonPath("$.facets[1].values[1].value", is("2_reviewed")))
                     .resultMatcher(
-                            jsonPath("$.facets[1].values[1].label", is("Reference proteomes")))
-                    .resultMatcher(jsonPath("$.facets[1].values[2].value", is("reviewed")))
+                            jsonPath(
+                                    "$.facets[1].values[1].label",
+                                    is("Reviewed (Swiss-Prot) entries")))
+                    .resultMatcher(jsonPath("$.facets[1].values[2].value", is("3_unreviewed")))
                     .resultMatcher(
                             jsonPath(
                                     "$.facets[1].values[2].label",
-                                    is("Reviewed (Swiss-Prot) entries")))
-                    .resultMatcher(jsonPath("$.facets[1].values[3].value", is("uniprotkb")))
-                    .resultMatcher(jsonPath("$.facets[1].values[3].label", is("UniProtKB entries")))
+                                    is("Unreviewed (TrEMBL) entries")))
+                    .resultMatcher(jsonPath("$.facets[1].values[3].value", is("4_proteome")))
+                    .resultMatcher(jsonPath("$.facets[1].values[3].label", is("Proteomes")))
+                    .resultMatcher(jsonPath("$.facets[1].values[4].value", is("5_reference")))
+                    .resultMatcher(
+                            jsonPath("$.facets[1].values[4].label", is("Reference proteomes")))
                     .build();
         }
     }
