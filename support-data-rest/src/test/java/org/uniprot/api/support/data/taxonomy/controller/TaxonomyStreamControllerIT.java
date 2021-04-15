@@ -13,12 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.LongStream;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,6 +41,8 @@ import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
+import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
@@ -62,14 +61,14 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 @WebMvcTest(TaxonomyController.class)
 @ExtendWith(value = {SpringExtension.class})
 class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
+    private static final String INACTIVE_ID = "9999";
     @Autowired private TaxonomyRepository repository;
 
     @Autowired
     @Qualifier("taxonomyRDFRestTemplate")
     private RestTemplate restTemplate;
 
-    private int searchAccession;
-    private List<Integer> allAccessions = new ArrayList<>();
+    private static final int searchAccession = 12;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -89,7 +88,22 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
     @Override
     protected int saveEntries() {
         int numberOfEntries = 12;
-        LongStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
+        IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
+
+        TaxonomyEntry inactiveEntry =
+                new TaxonomyEntryBuilder()
+                        .taxonId(Long.parseLong(INACTIVE_ID))
+                        .active(false)
+                        .build();
+        TaxonomyDocument inactiveDoc =
+                TaxonomyDocument.builder()
+                        .id(INACTIVE_ID)
+                        .taxId(Long.parseLong(INACTIVE_ID))
+                        .active(false)
+                        .taxonomyObj(getTaxonomyBinary(inactiveEntry))
+                        .build();
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, inactiveDoc);
+
         return numberOfEntries;
     }
 
@@ -158,6 +172,25 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
     }
 
     @Test
+    void inactiveQueryEmptyResults() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "id:" + INACTIVE_ID);
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
+    @Test
     void taxonomyIdSortWorks() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
@@ -178,19 +211,7 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.taxonId",
-                                contains(
-                                        allAccessions.get(0),
-                                        allAccessions.get(1),
-                                        allAccessions.get(2),
-                                        allAccessions.get(3),
-                                        allAccessions.get(4),
-                                        allAccessions.get(5),
-                                        allAccessions.get(6),
-                                        allAccessions.get(7),
-                                        allAccessions.get(8),
-                                        allAccessions.get(9),
-                                        allAccessions.get(10),
-                                        allAccessions.get(11))));
+                                contains(9, 8, 7, 6, 5, 4, 3, 2, 12, 11, 10, 1)));
     }
 
     @Test
@@ -318,9 +339,7 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getStreamPath())
-                        .queryParam(
-                                "query",
-                                "id:" + allAccessions.get(0) + " OR id:" + allAccessions.get(1))
+                        .queryParam("query", "id:11 OR id:12")
                         .header(ACCEPT, UniProtMediaType.LIST_MEDIA_TYPE_VALUE);
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -334,8 +353,8 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(containsString(String.valueOf(allAccessions.get(0)))))
-                .andExpect(content().string(containsString(String.valueOf(allAccessions.get(1)))));
+                .andExpect(content().string(containsString("12")))
+                .andExpect(content().string(containsString("11")));
     }
 
     @Test
@@ -356,16 +375,8 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
                 .andExpect(content().string(emptyString()));
     }
 
-    private void saveEntry(long suffix) {
-        int taxonId = ThreadLocalRandom.current().nextInt(1000, 9999);
-        searchAccession = taxonId;
-        allAccessions.add(searchAccession);
-        Collections.sort(allAccessions, Collections.reverseOrder());
-        saveEntry(taxonId, suffix);
-    }
-
-    private void saveEntry(long taxonId, long suffix) {
-        TaxonomyDocument document = TaxonomyITUtils.createSolrDoc(taxonId, suffix % 2 == 0);
+    private void saveEntry(int taxonId) {
+        TaxonomyDocument document = createSolrDoc(taxonId, true);
         storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
     }
 

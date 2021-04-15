@@ -1,21 +1,30 @@
 package org.uniprot.api.proteome.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getExcludedProteomeDocument;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.util.*;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.proteome.ProteomeRestApplication;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
@@ -61,8 +70,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             ProteomeGetIdControllerIT.ProteomeGetIdParameterResolver.class,
             ProteomeGetIdControllerIT.ProteomeGetIdContentTypeParamResolver.class
         })
-public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
+class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String UPID = "UP000005640";
+    private static final String EXCLUDED_PROTEOME = "UP999999999";
     @Autowired private MockMvc mockMvc;
 
     @Autowired private ProteomeQueryRepository repository;
@@ -90,6 +100,30 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         document.proteomeStored = getBinary(entry);
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.PROTEOME, document);
+
+        saveExcluded();
+    }
+
+    @Override
+    protected String getIdRequestPath() {
+        return "/proteomes/{upid}";
+    }
+
+    @Test
+    void excludedIdReturnSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc().perform(
+                        get(getIdRequestPath(), EXCLUDED_PROTEOME)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id", is(EXCLUDED_PROTEOME)))
+                .andExpect(jsonPath("$.proteomeType", is("Excluded")))
+                .andExpect(jsonPath("$.exclusionReasons", contains("contaminated")));
     }
 
     private ByteBuffer getBinary(ProteomeEntry entry) {
@@ -158,9 +192,9 @@ public class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         return builder.build();
     }
 
-    @Override
-    protected String getIdRequestPath() {
-        return "/proteomes/{upid}";
+    private void saveExcluded() {
+        ProteomeDocument excludedProteomeDoc = getExcludedProteomeDocument(EXCLUDED_PROTEOME);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.PROTEOME, excludedProteomeDoc);
     }
 
     static class ProteomeGetIdParameterResolver extends AbstractGetIdParameterResolver {

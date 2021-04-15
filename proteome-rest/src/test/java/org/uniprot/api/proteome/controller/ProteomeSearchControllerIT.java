@@ -1,22 +1,31 @@
 package org.uniprot.api.proteome.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.proteome.ProteomeRestApplication;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
@@ -55,8 +64,9 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
             ProteomeSearchControllerIT.ProteomeSearchContentTypeParamResolver.class,
             ProteomeSearchControllerIT.ProteomeSearchParameterResolver.class
         })
-public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
+    private static final String EXCLUDED_PROTEOME = "UP999999999";
     @Autowired private ProteomeQueryRepository repository;
 
     @Autowired private ProteomeFacetConfig facetConfig;
@@ -99,7 +109,7 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
         String value = "";
         switch (searchField) {
             case "upid":
-                value = ProteomeControllerITUtils.UPID_PREF + 231;
+                value = UPID_PREF + 231;
                 break;
             case "organism_id":
             case "taxonomy_id":
@@ -131,17 +141,40 @@ public class ProteomeSearchControllerIT extends AbstractSearchWithFacetControlle
     protected void saveEntry(SaveScenario saveContext) {
         saveEntry(231);
         saveEntry(520);
+        saveExcluded();
     }
 
     @Override
     protected void saveEntries(int numberOfEntries) {
         IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
+        saveExcluded();
     }
 
     private void saveEntry(int i) {
-        ProteomeDocument document = ProteomeControllerITUtils.getProteomeDocument(i);
+        ProteomeDocument document = getProteomeDocument(i);
 
         getStoreManager().saveDocs(DataStoreManager.StoreType.PROTEOME, document);
+    }
+
+    private void saveExcluded() {
+        ProteomeDocument excludedProteomeDoc = getExcludedProteomeDocument(EXCLUDED_PROTEOME);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.PROTEOME, excludedProteomeDoc);
+    }
+
+    @Test
+    void excludedIdReturnEmptyResult() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc().perform(
+                        get(getSearchRequestPath())
+                                .param("query","upid:"+EXCLUDED_PROTEOME)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)));
     }
 
     static class ProteomeSearchParameterResolver extends AbstractSearchParameterResolver {

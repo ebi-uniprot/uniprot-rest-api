@@ -53,6 +53,7 @@ public class TaxonomyITUtils {
                 TaxonomyDocument.builder()
                         .id(String.valueOf(taxId))
                         .taxId(taxId)
+                        .ancestor(taxId - 1)
                         .synonym("synonym" + taxId)
                         .scientific("scientific" + taxId)
                         .common("common " + taxId)
@@ -76,7 +77,7 @@ public class TaxonomyITUtils {
         return docBuilder.build();
     }
 
-    private static ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
+    public static ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
         try {
             return ByteBuffer.wrap(
                     TaxonomyJsonConfig.getInstance()

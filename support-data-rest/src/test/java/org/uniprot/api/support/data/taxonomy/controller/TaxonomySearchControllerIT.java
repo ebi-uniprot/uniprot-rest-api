@@ -92,6 +92,9 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
             case "host":
                 value = "10";
                 break;
+            case "ancestor":
+                value = "9";
+                break;
         }
         return value;
     }
@@ -103,12 +106,13 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry(i, i % 2 == 0));
+        LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry(i, true));
     }
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
         saveEntry(10, true);
+        saveEntry(15, true);
         saveEntry(20, false);
     }
 
@@ -141,13 +145,13 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("scientific:*"))
-                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(10, 20)))
+                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(10, 15)))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.scientificName",
-                                    contains("scientific10", "scientific20")))
+                                    contains("scientific10", "scientific15")))
                     .resultMatcher(
-                            jsonPath("$.results.*.commonName", contains("common10", "common20")))
+                            jsonPath("$.results.*.commonName", contains("common10", "common15")))
                     .build();
         }
 
@@ -171,13 +175,13 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                             "query",
                             Collections.singletonList(
                                     "tax_id:INVALID OR id:INVALID "
-                                            + "OR host:INVALID OR linked:invalid OR active:invalid"))
+                                            + "OR host:INVALID OR linked:invalid OR ancestor:invalid"))
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
                                     containsInAnyOrder(
-                                            "The taxonomy active filter value should be a boolean",
+                                            "The taxonomy ancestor filter value should be a number",
                                             "The taxonomy id filter value should be a number",
                                             "The taxonomy linked filter value should be a boolean",
                                             "The taxonomy id filter value should be a number",
@@ -190,13 +194,13 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("scientific desc"))
-                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(20, 10)))
+                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(15, 10)))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.scientificName",
-                                    contains("scientific20", "scientific10")))
+                                    contains("scientific15", "scientific10")))
                     .resultMatcher(
-                            jsonPath("$.results.*.commonName", contains("common20", "common10")))
+                            jsonPath("$.results.*.commonName", contains("common15", "common10")))
                     .build();
         }
 
@@ -205,12 +209,12 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("common_name,mnemonic"))
-                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(10, 20)))
+                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(10, 15)))
                     .resultMatcher(jsonPath("$.results.*.scientificName").doesNotExist())
                     .resultMatcher(
-                            jsonPath("$.results.*.commonName", contains("common10", "common20")))
+                            jsonPath("$.results.*.commonName", contains("common10", "common15")))
                     .resultMatcher(
-                            jsonPath("$.results.*.mnemonic", contains("mnemonic10", "mnemonic20")))
+                            jsonPath("$.results.*.mnemonic", contains("mnemonic10", "mnemonic15")))
                     .build();
         }
 
@@ -219,15 +223,15 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("superkingdom,taxonomies_with"))
-                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(10, 20)))
+                    .resultMatcher(jsonPath("$.results.*.taxonId", contains(10, 15)))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.scientificName",
-                                    contains("scientific10", "scientific20")))
+                                    contains("scientific10", "scientific15")))
                     .resultMatcher(
-                            jsonPath("$.results.*.commonName", contains("common10", "common20")))
+                            jsonPath("$.results.*.commonName", contains("common10", "common15")))
                     .resultMatcher(
-                            jsonPath("$.results.*.mnemonic", contains("mnemonic10", "mnemonic20")))
+                            jsonPath("$.results.*.mnemonic", contains("mnemonic10", "mnemonic15")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(
@@ -236,7 +240,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                     .resultMatcher(
                             jsonPath("$.facets.*.label", contains("Superkingdom", "Taxons with")))
                     .resultMatcher(jsonPath("$.facets[1].values.size()", is(5)))
-                    .resultMatcher(jsonPath("$.facets[1].values[0].count", is(1)))
+                    .resultMatcher(jsonPath("$.facets[1].values[0].count", is(2)))
                     .resultMatcher(jsonPath("$.facets[1].values[0].value", is("1_uniprotkb")))
                     .resultMatcher(jsonPath("$.facets[1].values[0].label", is("UniProtKB entries")))
                     .resultMatcher(jsonPath("$.facets[1].values[1].value", is("2_reviewed")))
@@ -264,26 +268,26 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("tax_id:10 OR tax_id:20")
+                    .query("tax_id:10 OR tax_id:15 OR tax_id:20")
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
-                                            jsonPath("$.results.*.taxonId", contains(10, 20)))
+                                            jsonPath("$.results.*.taxonId", contains(10, 15)))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.results.*.scientificName",
-                                                    contains("scientific10", "scientific20")))
+                                                    contains("scientific10", "scientific15")))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.results.*.commonName",
-                                                    contains("common10", "common20")))
+                                                    contains("common10", "common15")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString("10")))
-                                    .resultMatcher(content().string(containsString("20")))
+                                    .resultMatcher(content().string(containsString("15")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -302,7 +306,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "20\tmnemonic20\tscientific20\tcommon20\tother names20\t\tfamily\t\t19")))
+                                                                    "15\tmnemonic15\tscientific15\tcommon15\tother names15\t\tfamily\t\t14")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -320,7 +324,7 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -330,17 +334,17 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(emptyString()))
                                     .build())
                     .build();
         }

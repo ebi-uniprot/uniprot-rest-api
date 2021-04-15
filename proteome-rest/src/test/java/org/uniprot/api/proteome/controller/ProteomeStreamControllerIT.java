@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
+import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getExcludedProteomeDocument;
 
 import java.util.stream.IntStream;
 
@@ -50,6 +51,8 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 @ExtendWith(value = {SpringExtension.class})
 class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
 
+    private static final String EXCLUDED_PROTEOME = "UP999999999";
+
     @Autowired private ProteomeQueryRepository repository;
 
     @Override
@@ -76,6 +79,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
     protected int saveEntries() {
         int numberOfEntries = 12;
         IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
+        saveExcluded();
         return numberOfEntries;
     }
 
@@ -349,6 +353,30 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
                 .andExpect(content().string(emptyString()));
+    }
+
+    @Test
+    void excludedIdReturnEmptyResult() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getStreamPath())
+                        .param("query", "upid:"+EXCLUDED_PROTEOME)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+        Assertions.assertNotNull(response);
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
+    private void saveExcluded() {
+        ProteomeDocument excludedProteomeDoc = getExcludedProteomeDocument(EXCLUDED_PROTEOME);
+        storeManager.saveDocs(DataStoreManager.StoreType.PROTEOME, excludedProteomeDoc);
     }
 
     private void saveEntry(int i) {

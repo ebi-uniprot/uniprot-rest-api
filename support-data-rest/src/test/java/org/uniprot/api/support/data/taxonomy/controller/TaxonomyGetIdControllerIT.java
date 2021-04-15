@@ -59,6 +59,8 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     private static final String MERGED_TAX_ID = "100";
 
+    private static final String DELETED_TAX_ID = "200";
+
     @Autowired private TaxonomyRepository repository;
 
     @Override
@@ -136,6 +138,27 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.inactiveReason.mergedTo", is(99)));
     }
 
+    @Test
+    void validDeletedEntryReturnSuccess() throws Exception {
+        // given
+        saveDeletedEntry();
+
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), DELETED_TAX_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.taxonId", is(Integer.parseInt(DELETED_TAX_ID))))
+                .andExpect(jsonPath("$.active", is(false)))
+                .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DELETED")));
+    }
+
     private void saveMergedEntry() {
         long mergedTaxId = Long.parseLong(MERGED_TAX_ID);
 
@@ -155,6 +178,31 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                 TaxonomyDocument.builder()
                         .id(MERGED_TAX_ID)
                         .taxId(Long.valueOf(MERGED_TAX_ID))
+                        .active(false)
+                        .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
+                        .build();
+
+        this.getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
+    }
+
+    private void saveDeletedEntry() {
+        long deletedTaxId = Long.parseLong(DELETED_TAX_ID);
+
+        TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
+        TaxonomyEntry taxonomyEntry =
+                entryBuilder
+                        .taxonId(deletedTaxId)
+                        .active(false)
+                        .inactiveReason(
+                                new TaxonomyInactiveReasonBuilder()
+                                        .inactiveReasonType(TaxonomyInactiveReasonType.DELETED)
+                                        .build())
+                        .build();
+
+        TaxonomyDocument document =
+                TaxonomyDocument.builder()
+                        .id(DELETED_TAX_ID)
+                        .taxId(deletedTaxId)
                         .active(false)
                         .taxonomyObj(getTaxonomyBinary(taxonomyEntry))
                         .build();
