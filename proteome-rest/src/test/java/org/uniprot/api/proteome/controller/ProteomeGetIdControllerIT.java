@@ -122,7 +122,7 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id", is(EXCLUDED_PROTEOME)))
-                .andExpect(jsonPath("$.proteomeType", is("Excluded")))
+                .andExpect(jsonPath("$.proteomeType", is(ProteomeType.EXCLUDED.getName())))
                 .andExpect(jsonPath("$.exclusionReasons", contains("contaminated")));
     }
 

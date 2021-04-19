@@ -156,7 +156,7 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.taxonId", is(Integer.parseInt(DELETED_TAX_ID))))
                 .andExpect(jsonPath("$.active", is(false)))
-                .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DELETED")));
+                .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is(TaxonomyInactiveReasonType.DELETED.getName())));
     }
 
     private void saveMergedEntry() {
