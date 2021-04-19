@@ -73,6 +73,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 class TaxonomyGetIdsControllerIT {
 
     private static final String TAX_IDS_RESOURCE = "/taxonomy/taxonIds/";
+    public static final String INACTIVE_ID = "9999";
     @Autowired private MockMvc mockMvc;
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();
@@ -311,6 +312,20 @@ class TaxonomyGetIdsControllerIT {
     }
 
     @Test
+    void deletedIdsReturnSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(TAX_IDS_RESOURCE + INACTIVE_ID).header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)));
+    }
+
+    @Test
     void invalidInputReturnBadRequest() throws Exception {
         // when
         ResultActions response =
@@ -397,6 +412,7 @@ class TaxonomyGetIdsControllerIT {
                     TaxonomyDocument.builder()
                             .id(String.valueOf(taxId))
                             .taxId((long) taxId)
+                            .active(true)
                             .synonym("synonym")
                             .common("common")
                             .scientific("scientific")
@@ -408,5 +424,18 @@ class TaxonomyGetIdsControllerIT {
             }
             storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, docBuilder.build());
         }
+        TaxonomyEntry inactiveEntry =
+                new TaxonomyEntryBuilder()
+                        .taxonId(Long.parseLong(INACTIVE_ID))
+                        .active(false)
+                        .build();
+        TaxonomyDocument inactiveDoc =
+                TaxonomyDocument.builder()
+                        .id(INACTIVE_ID)
+                        .taxId(Long.parseLong(INACTIVE_ID))
+                        .active(false)
+                        .taxonomyObj(getTaxonomyBinary(inactiveEntry))
+                        .build();
+        storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, inactiveDoc);
     }
 }

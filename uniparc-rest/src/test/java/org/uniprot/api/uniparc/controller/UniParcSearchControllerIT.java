@@ -72,7 +72,7 @@ import org.uniprot.store.search.SolrCollection;
             UniParcSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
             UniParcSearchControllerIT.UniParcSearchParameterResolver.class
         })
-public class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;
@@ -221,8 +221,10 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("upi:UPI0000083A11"))
                     .resultMatcher(jsonPath("$.results.*.uniParcId", contains("UPI0000083A11")))
-                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(1)))
-                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(1)))
+                    .resultMatcher(
+                            jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(1)))
+                    .resultMatcher(
+                            jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(1)))
                     .build();
         }
 
@@ -242,8 +244,10 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                             jsonPath(
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20")))
-                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(2)))
-                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(2)))
+                    .resultMatcher(
+                            jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(2)))
+                    .resultMatcher(
+                            jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(2)))
                     .build();
         }
 
@@ -289,8 +293,10 @@ public class UniParcSearchControllerIT extends AbstractSearchWithFacetController
                             jsonPath(
                                     "$.results.*.uniParcId",
                                     contains("UPI0000083A20", "UPI0000083A11")))
-                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(2)))
-                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(2)))
+                    .resultMatcher(
+                            jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(2)))
+                    .resultMatcher(
+                            jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(2)))
                     .build();
         }
 

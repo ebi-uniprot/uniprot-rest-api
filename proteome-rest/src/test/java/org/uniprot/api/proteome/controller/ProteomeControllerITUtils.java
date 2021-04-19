@@ -31,6 +31,22 @@ class ProteomeControllerITUtils {
     static final String UPID_PREF = "UP000005";
 
     @NotNull
+    static ProteomeDocument getExcludedProteomeDocument(String upId) {
+        ProteomeEntry entry = new ProteomeEntryBuilder()
+                .proteomeType(ProteomeType.EXCLUDED)
+                .proteomeId(upId)
+                .exclusionReasonsAdd(ExclusionReason.CONTAMINATED)
+                .build();
+        ProteomeConverter converter = new ProteomeConverter();
+        Proteome proteome = converter.toXml(entry);
+        ProteomeDocumentConverter documentConverter =
+                new ProteomeDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
+        ProteomeDocument document = documentConverter.convert(proteome);
+        document.proteomeStored = ByteBuffer.wrap(documentConverter.getBinaryObject(entry));
+        return document;
+    }
+
+    @NotNull
     static ProteomeDocument getProteomeDocument(int i) {
         ProteomeEntry entry = createEntry(i);
         ProteomeConverter converter = new ProteomeConverter();
@@ -38,9 +54,10 @@ class ProteomeControllerITUtils {
         ProteomeDocumentConverter documentConverter =
                 new ProteomeDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         ProteomeDocument document = documentConverter.convert(proteome);
-        document.proteomeStored = getBinary(entry);
+        document.proteomeStored = ByteBuffer.wrap(documentConverter.getBinaryObject(entry));
         document.isRedundant = i % 2 != 0;
         document.isReferenceProteome = i % 2 != 0;
+        document.isExcluded = false;
         return document;
     }
 
@@ -170,16 +187,5 @@ class ProteomeControllerITUtils {
         } else if (i < 100) {
             return prefix + "0" + i;
         } else return prefix + i;
-    }
-
-    static ByteBuffer getBinary(ProteomeEntry entry) {
-        try {
-            return ByteBuffer.wrap(
-                    ProteomeJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
-        }
     }
 }
