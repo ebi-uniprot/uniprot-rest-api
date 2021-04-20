@@ -360,7 +360,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getStreamPath())
-                        .param("query", "upid:"+EXCLUDED_PROTEOME)
+                        .param("query", "upid:" + EXCLUDED_PROTEOME)
                         .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();

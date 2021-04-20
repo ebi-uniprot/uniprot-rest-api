@@ -1,6 +1,5 @@
 package org.uniprot.api.support.data.taxonomy.service;
 
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -55,9 +54,9 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
         SolrRequest.SolrRequestBuilder builder =
                 super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
 
-        if(!(request instanceof GetByTaxonIdsRequest)) {
-            //We do not add active filter query for get by Taxon Ids
-            //Because this endpoint need to return excluded taxon ids
+        if (!(request instanceof GetByTaxonIdsRequest)) {
+            // We do not add active filter query for get by Taxon Ids
+            // Because this endpoint need to return excluded taxon ids
             builder.filterQuery(getActiveTaxonomyFilterQuery());
         }
         return builder;

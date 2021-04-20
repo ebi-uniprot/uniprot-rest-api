@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.impl.JournalArticleBuilder;
 import org.uniprot.core.impl.CrossReferenceBuilder;
-import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
 import org.uniprot.core.proteome.*;
 import org.uniprot.core.proteome.impl.*;
 import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
@@ -21,8 +20,6 @@ import org.uniprot.store.indexer.proteome.ProteomeDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 /**
  * @author lgonzales
  * @since 23/11/2020
@@ -32,11 +29,12 @@ class ProteomeControllerITUtils {
 
     @NotNull
     static ProteomeDocument getExcludedProteomeDocument(String upId) {
-        ProteomeEntry entry = new ProteomeEntryBuilder()
-                .proteomeType(ProteomeType.EXCLUDED)
-                .proteomeId(upId)
-                .exclusionReasonsAdd(ExclusionReason.CONTAMINATED)
-                .build();
+        ProteomeEntry entry =
+                new ProteomeEntryBuilder()
+                        .proteomeType(ProteomeType.EXCLUDED)
+                        .proteomeId(upId)
+                        .exclusionReasonsAdd(ExclusionReason.CONTAMINATED)
+                        .build();
         ProteomeConverter converter = new ProteomeConverter();
         Proteome proteome = converter.toXml(entry);
         ProteomeDocumentConverter documentConverter =

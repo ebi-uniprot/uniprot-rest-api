@@ -113,9 +113,10 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
     void excludedIdReturnSuccess() throws Exception {
         // when
         ResultActions response =
-                getMockMvc().perform(
-                        get(getIdRequestPath(), EXCLUDED_PROTEOME)
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                getMockMvc()
+                        .perform(
+                                get(getIdRequestPath(), EXCLUDED_PROTEOME)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())

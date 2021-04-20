@@ -165,10 +165,11 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     void excludedIdReturnEmptyResult() throws Exception {
         // when
         ResultActions response =
-                getMockMvc().perform(
-                        get(getSearchRequestPath())
-                                .param("query","upid:"+EXCLUDED_PROTEOME)
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath())
+                                        .param("query", "upid:" + EXCLUDED_PROTEOME)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
