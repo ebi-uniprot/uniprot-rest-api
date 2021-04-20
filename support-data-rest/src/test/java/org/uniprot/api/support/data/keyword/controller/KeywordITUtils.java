@@ -38,18 +38,16 @@ public class KeywordITUtils {
                         .statistics(new StatisticsBuilder().build())
                         .build();
 
-        KeywordDocument document =
-                KeywordDocument.builder()
-                        .id(keywordId)
-                        .name("my keyword " + keywordId)
-                        .definition("Definition value " + keywordId)
-                        .ancestor(Collections.singletonList("ancestor"))
-                        .parent(Collections.singletonList("parent"))
-                        .synonyms(Collections.singletonList("content"))
-                        .category(category.getName())
-                        .keywordObj(getKeywordBinary(keywordEntry))
-                        .build();
-        return document;
+        return KeywordDocument.builder()
+                .id(keywordId)
+                .name("my keyword " + keywordId)
+                .definition("Definition value " + keywordId)
+                .ancestor(Collections.singletonList("ancestor"))
+                .parent(Collections.singletonList("parent"))
+                .synonyms(Collections.singletonList("content"))
+                .category(category.getName().toLowerCase())
+                .keywordObj(getKeywordBinary(keywordEntry))
+                .build();
     }
 
     private static ByteBuffer getKeywordBinary(KeywordEntry entry) {

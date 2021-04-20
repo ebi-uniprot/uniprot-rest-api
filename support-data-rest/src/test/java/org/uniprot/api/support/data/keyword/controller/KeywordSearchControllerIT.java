@@ -251,8 +251,8 @@ class KeywordSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .resultMatcher(jsonPath("$.facets[0].values.size()", is(1)))
                     .resultMatcher(jsonPath("$.facets[0].values.size()", is(1)))
                     .resultMatcher(jsonPath("$.facets[0].values[0].count", is(2)))
-                    .resultMatcher(jsonPath("$.facets[0].values[0].value", is("Ligand")))
-                    .resultMatcher(jsonPath("$.facets[0].values[0].label").doesNotExist())
+                    .resultMatcher(jsonPath("$.facets[0].values[0].value", is("ligand")))
+                    .resultMatcher(jsonPath("$.facets[0].values[0].label", is("Ligand")))
                     .build();
         }
     }
