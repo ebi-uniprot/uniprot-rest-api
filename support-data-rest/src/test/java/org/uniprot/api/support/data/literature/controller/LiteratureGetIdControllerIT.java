@@ -189,7 +189,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "The citation id value should be a PubMedId (number) or start with CI- or start with IND")))
+                                            "The citation id has invalid format. It should be a PubMedId (number) or with CI-\\w{13} or IND[0-9]+")))
                     .build();
         }
 
@@ -289,7 +289,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The citation id value should be a PubMedId (number) or start with CI- or start with IND")))
+                                                            "The citation id has invalid format. It should be a PubMedId (number) or with CI-\\w{13} or IND[0-9]+")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
