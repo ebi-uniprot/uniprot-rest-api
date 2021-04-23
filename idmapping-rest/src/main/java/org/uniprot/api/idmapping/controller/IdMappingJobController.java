@@ -25,7 +25,6 @@ import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,13 +59,7 @@ public class IdMappingJobController {
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            JobSubmitResponse
-                                                                                    .class)))
+                                    schema = @Schema(implementation = JobSubmitResponse.class))
                         })
             })
     public ResponseEntity<JobSubmitResponse> submitJob(
@@ -83,15 +76,9 @@ public class IdMappingJobController {
             responses = {
                 @ApiResponse(
                         content = {
-                            @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
-                                    array =
-                                            @ArraySchema(
-                                                    schema =
-                                                            @Schema(
-                                                                    implementation =
-                                                                            JobStatusResponse
-                                                                                    .class)))
+                                @Content(
+                                        mediaType = APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = JobStatusResponse.class))
                         })
             })
     public ResponseEntity<JobStatusResponse> getStatus(@PathVariable String jobId) {
@@ -105,18 +92,12 @@ public class IdMappingJobController {
     @Operation(
             summary = "Get the details of a job.",
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            array =
-                                            @ArraySchema(
-                                                    schema =
-                                                    @Schema(
-                                                            implementation =
-                                                                    IdMappingJobRequest
-                                                                            .class)))
-                            })
+                @ApiResponse(
+                        content = {
+                                @Content(
+                                        mediaType = APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = JobDetailResponse.class))
+                        })
             })
     public ResponseEntity<JobDetailResponse> getDetails(@PathVariable String jobId) {
         IdMappingJob job = cacheService.getJobAsResource(jobId);

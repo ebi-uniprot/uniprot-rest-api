@@ -70,9 +70,9 @@ class IdMappingJobControllerIT {
     private static final String JOB_SUBMIT_ENDPOINT =
             IdMappingJobController.IDMAPPING_PATH + "/run";
     private static final String JOB_STATUS_ENDPOINT =
-            IdMappingJobController.IDMAPPING_PATH + "/status";
+            IdMappingJobController.IDMAPPING_PATH + "/status/{jobId}";
     private static final String JOB_DETAILS_ENDPOINT =
-            IdMappingJobController.IDMAPPING_PATH + "/details";
+            IdMappingJobController.IDMAPPING_PATH + "/details/{jobId}";
 
     @Autowired private MockMvc mockMvc;
     @MockBean private IdMappingJobCacheService cacheService;
@@ -121,7 +121,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                        get(JOB_STATUS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -140,7 +140,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                        get(JOB_STATUS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -165,7 +165,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                        get(JOB_STATUS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -191,7 +191,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                        get(JOB_STATUS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -217,7 +217,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT + "/" + jobId)
+                        get(JOB_STATUS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -405,7 +405,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT + "/" + jobId)
+                        get(JOB_DETAILS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -440,7 +440,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT + "/" + jobId)
+                        get(JOB_DETAILS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -462,7 +462,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT + "/" + jobId)
+                        get(JOB_DETAILS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
