@@ -51,6 +51,7 @@ import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
  * @author sahmad
@@ -70,6 +71,8 @@ class IdMappingJobControllerIT {
             IdMappingJobController.IDMAPPING_PATH + "/run";
     private static final String JOB_STATUS_ENDPOINT =
             IdMappingJobController.IDMAPPING_PATH + "/status";
+    private static final String JOB_DETAILS_ENDPOINT =
+            IdMappingJobController.IDMAPPING_PATH + "/details";
 
     @Autowired private MockMvc mockMvc;
     @MockBean private IdMappingJobCacheService cacheService;
@@ -378,5 +381,92 @@ class IdMappingJobControllerIT {
                                                 + "' is the maximum count limit of comma separated items for 'ids' param. You have passed '"
                                                 + (this.maxCountCSV + 1)
                                                 + "' items.")));
+    }
+
+    @Test
+    void validJobDetailsReturnDetails() throws Exception {
+        String jobId = "ID";
+        String ids = "Q1,Q2";
+        String taxId = "9606";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(IdMappingFieldConfig.ACC_ID_STR);
+        request.setTo(IdMappingFieldConfig.GENE_NAME_STR);
+        request.setIds(ids);
+        request.setTaxId(taxId);
+
+        IdMappingJob job =
+                IdMappingJob.builder()
+                        .idMappingRequest(request)
+                        .jobStatus(JobStatus.NEW)
+                        .jobId(jobId)
+                        .build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_DETAILS_ENDPOINT + "/" + jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.from", is(IdMappingFieldConfig.ACC_ID_STR)))
+                .andExpect(jsonPath("$.to", is(IdMappingFieldConfig.GENE_NAME_STR)))
+                .andExpect(jsonPath("$.ids", is(ids)))
+                .andExpect(jsonPath("$.taxId", is(taxId)))
+                .andExpect(jsonPath("$.redirectURL").doesNotExist());
+    }
+
+    @Test
+    void validJobDetailsStatusFinishedReturnDetailsWithRedirectURL() throws Exception {
+        String jobId = "ID";
+        String ids = "Q1,Q2";
+        String taxId = "9606";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(IdMappingFieldConfig.ACC_ID_STR);
+        request.setTo(IdMappingFieldConfig.UNIPARC_STR);
+        request.setIds(ids);
+        request.setTaxId(taxId);
+
+        IdMappingJob job =
+                IdMappingJob.builder()
+                        .idMappingRequest(request)
+                        .jobStatus(JobStatus.FINISHED)
+                        .jobId(jobId)
+                        .build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_DETAILS_ENDPOINT + "/" + jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.from", is(IdMappingFieldConfig.ACC_ID_STR)))
+                .andExpect(jsonPath("$.to", is(IdMappingFieldConfig.UNIPARC_STR)))
+                .andExpect(jsonPath("$.ids", is(ids)))
+                .andExpect(jsonPath("$.taxId", is(taxId)))
+                .andExpect(jsonPath("$.redirectURL", is("/idmapping/uniparc/results/"+jobId)));
+    }
+
+    @Test
+    void nonExistentJobDetailsIsNotFound() throws Exception {
+        String jobId = "JOB_ID_THAT_DOES_NOT_EXIST";
+
+        when(cacheService.getJobAsResource(jobId)).thenThrow(ResourceNotFoundException.class);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_DETAILS_ENDPOINT + "/" + jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
     }
 }

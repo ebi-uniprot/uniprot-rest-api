@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+import org.uniprot.api.idmapping.controller.response.JobDetailResponse;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobStatusResponse;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
@@ -97,6 +98,42 @@ public class IdMappingJobController {
         return createStatus(cacheService.getJobAsResource(jobId));
     }
 
+
+    @GetMapping(
+            value = "/details/{jobId}",
+            produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = "Get the details of a job.",
+            responses = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            array =
+                                            @ArraySchema(
+                                                    schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    IdMappingJobRequest
+                                                                            .class)))
+                            })
+            })
+    public ResponseEntity<JobDetailResponse> getDetails(@PathVariable String jobId) {
+        IdMappingJob job = cacheService.getJobAsResource(jobId);
+        IdMappingJobRequest jobRequest = job.getIdMappingRequest();
+
+        JobDetailResponse detailResponse = new JobDetailResponse();
+        detailResponse.setFrom(jobRequest.getFrom());
+        detailResponse.setTo(jobRequest.getTo());
+        detailResponse.setIds(jobRequest.getIds());
+        detailResponse.setTaxId(jobRequest.getTaxId());
+        if(JobStatus.FINISHED == job.getJobStatus()){
+            detailResponse.setRedirectURL(idMappingJobService.getRedirectPathToResults(job));
+        }
+
+        return ResponseEntity.ok(detailResponse);
+    }
+
     private ResponseEntity<JobStatusResponse> createStatus(IdMappingJob job) {
         ResponseEntity<JobStatusResponse> response;
         switch (job.getJobStatus()) {
@@ -122,3 +159,4 @@ public class IdMappingJobController {
         return response;
     }
 }
+
