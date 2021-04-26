@@ -77,7 +77,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                OBO_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get Keyword by keywordId.",
@@ -89,7 +91,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                                     schema = @Schema(implementation = KeywordEntry.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(
@@ -106,6 +110,10 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                     String fields,
             HttpServletRequest request) {
 
+        if (isRDFAccept(request)) {
+            String result = this.keywordService.getRDFXml(id);
+            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        }
         KeywordEntry keywordEntry = this.keywordService.findByUniqueId(id);
         return super.getEntityResponse(keywordEntry, fields, request);
     }

@@ -196,8 +196,9 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return QueryResult.of(entries.stream(), cursorPage);
     }
 
-    public String getRDFXml(String upi) {
-        return this.uniParcRDFStreamer.streamRDFXML(Stream.of(upi)).collect(Collectors.joining());
+    @Override
+    protected RDFStreamer getRDFStreamer() {
+        return this.uniParcRDFStreamer;
     }
 
     private Stream<UniParcEntry> filterUniParcStream(

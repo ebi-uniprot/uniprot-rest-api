@@ -3,9 +3,9 @@ package org.uniprot.api.support.data.disease.controller;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,19 +19,22 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.support.data.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
@@ -59,7 +62,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             DiseaseGetIdControllerIT.DiseaseGetIdParameterResolver.class,
             DiseaseGetIdControllerIT.DiseaseGetIdContentTypeParamResolver.class
         })
-public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
+public class DiseaseGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
+
+    @Autowired
+    @Qualifier("diseaseRDFRestTemplate")
+    private RestTemplate restTemplate;
 
     private static final String ACCESSION = "DI-04860";
 
@@ -161,6 +168,26 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         }
     }
 
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return ACCESSION;
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.DISEASE_PROLOG;
+    }
+
+    @Override
+    protected String getIdRequestPathWithoutPathVariable() {
+        return "/diseases/";
+    }
+
     static class DiseaseGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override
@@ -194,7 +221,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -207,7 +234,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id("DI-00000")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -231,7 +258,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(ACCESSION)
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -312,6 +339,12 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(content().string(containsString(defaultNSStr)))
                                     .resultMatcher(content().string(containsString(termStr)))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -322,7 +355,7 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -332,22 +365,31 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The disease id value has invalid format")))
                                     .build())
                     .build();
         }

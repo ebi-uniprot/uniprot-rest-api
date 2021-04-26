@@ -80,12 +80,13 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                         content = {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = CrossRefEntry.class))
+                                    schema = @Schema(implementation = CrossRefEntry.class)),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
             value = "/{id}",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {APPLICATION_JSON_VALUE, RDF_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> findByAccession(
             @Parameter(description = "cross-references database id to find")
                     @PathVariable("id")
@@ -99,6 +100,12 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
+
+        if (isRDFAccept(request)) {
+            String result = this.crossRefService.getRDFXml(id);
+            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        }
+
         CrossRefEntry crossRefEntry = this.crossRefService.findByUniqueId(id);
 
         return super.getEntityResponse(crossRefEntry, fields, request);

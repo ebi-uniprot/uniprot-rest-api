@@ -1,22 +1,27 @@
 package org.uniprot.api.support.data.crossref.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.support.data.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
@@ -37,15 +42,24 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
             CrossRefGetIdControllerIT.CrossRefGetIdParameterResolver.class,
             CrossRefGetIdControllerIT.CrossRefGetIdContentTypeParamResolver.class
         })
-public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
+public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
 
     private static final String ACCESSION = "DB-0104";
 
     @Autowired private CrossRefRepository repository;
 
+    @Autowired
+    @Qualifier("xrefRDFRestTemplate")
+    private RestTemplate restTemplate;
+
     @Override
     protected String getIdRequestPath() {
         return "/database/{id}";
+    }
+
+    @Override
+    protected String getIdRequestPathWithoutPathVariable() {
+        return "/database/";
     }
 
     @Override
@@ -103,6 +117,21 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                         .build();
 
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.CROSSREF, document);
+    }
+
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return ACCESSION;
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.XREF_PROLOG;
     }
 
     static class CrossRefGetIdParameterResolver extends AbstractGetIdParameterResolver {
@@ -217,6 +246,12 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     is("Family and domain databases")))
                                     .resultMatcher(jsonPath("$.doiId", is("10.1093/nar/gkl1043")))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -233,6 +268,15 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     "$.messages.*",
                                                     contains(
                                                             "The cross ref id value should be in the form of DB-XXXX")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The cross ref id value should be in the form of DB-XXXX")))
                                     .build())
                     .build();
         }

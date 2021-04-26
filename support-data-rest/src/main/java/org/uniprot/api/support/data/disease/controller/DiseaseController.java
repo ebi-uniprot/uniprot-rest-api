@@ -84,7 +84,8 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
@@ -94,7 +95,8 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                OBO_MEDIA_TYPE_VALUE
+                OBO_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<DiseaseEntry>> getByAccession(
             @Parameter(description = "disease id to find")
@@ -109,6 +111,12 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
+
+        if (isRDFAccept(request)) {
+            String result = this.diseaseService.getRDFXml(id);
+            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        }
+
         DiseaseEntry disease = this.diseaseService.findByUniqueId(id);
         return super.getEntityResponse(disease, fields, request);
     }

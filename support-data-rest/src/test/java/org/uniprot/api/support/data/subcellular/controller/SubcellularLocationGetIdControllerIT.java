@@ -8,19 +8,22 @@ import java.nio.ByteBuffer;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.support.data.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.subcellular.repository.SubcellularLocationRepository;
@@ -44,7 +47,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             SubcellularLocationGetIdControllerIT.SubcellularLocationGetIdContentTypeParamResolver
                     .class
         })
-public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControllerIT {
+public class SubcellularLocationGetIdControllerIT
+        extends AbstractGetByIdWithTypeExtensionControllerIT {
+
+    @Autowired
+    @Qualifier("locationRDFRestTemplate")
+    private RestTemplate restTemplate;
 
     private static final String SUBCELL_ACCESSION = "SL-0005";
 
@@ -102,6 +110,26 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
         }
     }
 
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return SUBCELL_ACCESSION;
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.SUBCELLULAR_LOCATION_PROLOG;
+    }
+
+    @Override
+    protected String getIdRequestPathWithoutPathVariable() {
+        return "/locations/";
+    }
+
     static class SubcellularLocationGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override
@@ -119,7 +147,7 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -132,7 +160,7 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id("SL-0000")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -154,7 +182,7 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
             return GetIdParameter.builder()
                     .id(SUBCELL_ACCESSION)
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -231,6 +259,12 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
                                                             containsString(
                                                                     "def: \"Definition value\" []\n")))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -241,7 +275,7 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -251,22 +285,31 @@ public class SubcellularLocationGetIdControllerIT extends AbstractGetByIdControl
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The subcellular location id value has invalid format")))
                                     .build())
                     .build();
         }

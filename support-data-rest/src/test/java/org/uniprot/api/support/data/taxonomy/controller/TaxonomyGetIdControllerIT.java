@@ -12,6 +12,7 @@ import java.util.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,14 +22,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.support.data.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
@@ -53,7 +56,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             TaxonomyGetIdControllerIT.TaxonomyGetIdParameterResolver.class,
             TaxonomyGetIdControllerIT.TaxonomyGetIdContentTypeParamResolver.class
         })
-class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
+class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
+
+    @Autowired
+    @Qualifier("taxonomyRDFRestTemplate")
+    private RestTemplate restTemplate;
 
     private static final String TAX_ID = "9606";
 
@@ -224,6 +231,26 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
         }
     }
 
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return TAX_ID;
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.TAXONOMY_PROLOG;
+    }
+
+    @Override
+    protected String getIdRequestPathWithoutPathVariable() {
+        return "/taxonomy/";
+    }
+
     static class TaxonomyGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override
@@ -242,7 +269,7 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -254,7 +281,7 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id("10")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -277,7 +304,7 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id("9606")
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -327,6 +354,12 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -337,7 +370,7 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -347,17 +380,26 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The taxonomy id value should be a number")))
                                     .build())
                     .build();
         }

@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.controller.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 
 /**
@@ -13,5 +14,4 @@ import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 public class JobDetailResponse extends IdMappingJobRequest {
 
     private String redirectURL;
-
 }

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -90,7 +91,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                                     schema = @Schema(implementation = LiteratureEntry.class)),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
@@ -99,7 +101,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> getByLiteratureId(
             @Parameter(description = "Citation id to find")
@@ -114,6 +117,13 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
+        if (isRDFAccept(request)) {
+            if (citationId.startsWith("CI") || citationId.startsWith("IND")) {
+                throw new ResourceNotFoundException("Unable to find citation " + citationId);
+            }
+            String result = this.literatureService.getRDFXml(citationId);
+            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        }
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(citationId);
         return super.getEntityResponse(literatureEntry, fields, request);
     }
