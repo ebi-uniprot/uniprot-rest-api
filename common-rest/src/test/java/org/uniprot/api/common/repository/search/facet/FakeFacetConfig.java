@@ -39,6 +39,12 @@ public class FakeFacetConfig extends FacetConfig {
         organism.setAllowmultipleselection(true);
         result.put("model_organism", organism);
 
+        FacetProperty annotation = new FacetProperty();
+        annotation.setLabel("Annotation");
+        annotation.setAllowmultipleselection(true);
+        annotation.setSort("desc");
+        result.put("annotation", annotation);
+
         // Interval facet
         FacetProperty length = new FacetProperty();
         length.setLabel("Sequence Length");
