@@ -48,10 +48,10 @@ import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
  * @author sahmad
@@ -121,8 +121,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+                        get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
@@ -140,8 +139,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+                        get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
@@ -165,8 +163,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+                        get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -191,8 +188,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+                        get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -217,8 +213,7 @@ class IdMappingJobControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(JOB_STATUS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+                        get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
@@ -450,7 +445,7 @@ class IdMappingJobControllerIT {
                 .andExpect(jsonPath("$.to", is(IdMappingFieldConfig.UNIPARC_STR)))
                 .andExpect(jsonPath("$.ids", is(ids)))
                 .andExpect(jsonPath("$.taxId", is(taxId)))
-                .andExpect(jsonPath("$.redirectURL", is("/idmapping/uniparc/results/"+jobId)));
+                .andExpect(jsonPath("$.redirectURL", is("/idmapping/uniparc/results/" + jobId)));
     }
 
     @Test

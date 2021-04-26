@@ -2,6 +2,7 @@ package org.uniprot.api.rest.service;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -206,6 +207,10 @@ public abstract class BasicSearchService<D extends Document, R> {
                         .totalRows(Integer.MAX_VALUE)
                         .build();
         return getRDFStreamer().idsToRDFStoreStream(solrRequest);
+    }
+
+    public String getRDFXml(String id) {
+        return getRDFStreamer().streamRDFXML(Stream.of(id)).collect(Collectors.joining());
     }
 
     protected RDFStreamer getRDFStreamer() {

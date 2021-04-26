@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.controller;
 
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
@@ -214,5 +215,10 @@ public abstract class BasicSearchController<T> {
             path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
         }
         return path;
+    }
+
+    protected boolean isRDFAccept(HttpServletRequest request) {
+        MediaType contentType = getAcceptHeader(request);
+        return contentType.equals(RDF_MEDIA_TYPE);
     }
 }

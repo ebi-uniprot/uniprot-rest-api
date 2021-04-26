@@ -76,15 +76,14 @@ public class IdMappingJobController {
             responses = {
                 @ApiResponse(
                         content = {
-                                @Content(
-                                        mediaType = APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = JobStatusResponse.class))
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = JobStatusResponse.class))
                         })
             })
     public ResponseEntity<JobStatusResponse> getStatus(@PathVariable String jobId) {
         return createStatus(cacheService.getJobAsResource(jobId));
     }
-
 
     @GetMapping(
             value = "/details/{jobId}",
@@ -94,9 +93,9 @@ public class IdMappingJobController {
             responses = {
                 @ApiResponse(
                         content = {
-                                @Content(
-                                        mediaType = APPLICATION_JSON_VALUE,
-                                        schema = @Schema(implementation = JobDetailResponse.class))
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = JobDetailResponse.class))
                         })
             })
     public ResponseEntity<JobDetailResponse> getDetails(@PathVariable String jobId) {
@@ -108,7 +107,7 @@ public class IdMappingJobController {
         detailResponse.setTo(jobRequest.getTo());
         detailResponse.setIds(jobRequest.getIds());
         detailResponse.setTaxId(jobRequest.getTaxId());
-        if(JobStatus.FINISHED == job.getJobStatus()){
+        if (JobStatus.FINISHED == job.getJobStatus()) {
             detailResponse.setRedirectURL(idMappingJobService.getRedirectPathToResults(job));
         }
 
@@ -140,4 +139,3 @@ public class IdMappingJobController {
         return response;
     }
 }
-

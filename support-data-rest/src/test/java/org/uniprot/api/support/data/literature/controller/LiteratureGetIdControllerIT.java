@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,14 +20,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.support.data.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
@@ -62,7 +65,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             LiteratureGetIdControllerIT.LiteratureGetIdParameterResolver.class,
             LiteratureGetIdControllerIT.LiteratureGetIdContentTypeParamResolver.class
         })
-class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
+class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
+    @Autowired
+    @Qualifier("literatureRDFRestTemplate")
+    private RestTemplate restTemplate;
 
     private static final long PUBMED_ID = 100L;
     private static final String SUBMISSION_ID = "CI-6LG40CJ34FGTT";
@@ -167,6 +173,38 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         }
     }
 
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return String.valueOf(PUBMED_ID);
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.LITERATURE_PROLOG;
+    }
+
+    @Override
+    protected String getIdRequestPathWithoutPathVariable() {
+        return "/citations/";
+    }
+
+    @Test
+    void getBySubmissionIdWithRDFExtensionFailure() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPathWithoutPathVariable() + SUBMISSION_ID + ".rdf")
+                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+        // then
+        response.andDo(log()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+    }
+
     static class LiteratureGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override
@@ -184,7 +222,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("INVALID")
-                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -197,7 +235,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id("999")
-                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -218,7 +256,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(String.valueOf(PUBMED_ID))
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -274,6 +312,12 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -284,7 +328,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -305,6 +349,15 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(content().string(emptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The citation id has invalid format")))
                                     .build())
                     .build();
         }

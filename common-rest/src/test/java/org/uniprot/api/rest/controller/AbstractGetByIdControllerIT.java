@@ -314,6 +314,10 @@ public abstract class AbstractGetByIdControllerIT {
 
     protected abstract String getIdRequestPath();
 
+    protected RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+        return requestMappingHandlerMapping;
+    }
+
     private void checkParameterInput(GetIdParameter idParameter) {
         assertThat(idParameter, notNullValue());
         assertThat(idParameter.getId(), notNullValue());
