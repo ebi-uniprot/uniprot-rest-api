@@ -37,7 +37,7 @@ public abstract class FacetConverter<F, T> implements Converter<F, T> {
         FacetProperty facetProperty =
                 getFacetConfig().getFacetPropertyMap().getOrDefault(facetName, null);
         if (facetProperty != null && facetProperty.getValue() != null) {
-            result = facetProperty.getValue().getOrDefault(facetItem, null);
+            result = facetProperty.getValue().getOrDefault(facetItem.toLowerCase(), null);
         }
         return result;
     }
@@ -54,6 +54,22 @@ public abstract class FacetConverter<F, T> implements Converter<F, T> {
                 getFacetConfig().getFacetPropertyMap().getOrDefault(facetName, null);
         if (facetProperty != null) {
             result = facetProperty.getAllowmultipleselection();
+        }
+        return result;
+    }
+
+    /**
+     * this method returns sort property for a facet value
+     *
+     * @param facetName facet name returned in Solr query response
+     * @return sort property from facet.properties
+     */
+    protected String getSort(String facetName) {
+        String result = "asc";
+        FacetProperty facetProperty =
+                getFacetConfig().getFacetPropertyMap().getOrDefault(facetName, null);
+        if (facetProperty != null) {
+            result = facetProperty.getSort();
         }
         return result;
     }

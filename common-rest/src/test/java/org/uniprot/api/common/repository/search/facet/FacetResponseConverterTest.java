@@ -80,6 +80,36 @@ class FacetResponseConverterTest {
     }
 
     @Test
+    void convertFacetWithoutLabelDescendingValueSort() {
+        List<FacetField> fieldList = getFacetFields("annotation");
+
+        when(queryResponse.getFacetFields()).thenReturn(fieldList);
+
+        FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
+        List<Facet> facets = facetConverter.convert(queryResponse);
+        assertNotNull(facets);
+
+        Facet annotation = facets.get(0);
+        assertEquals("Annotation", annotation.getLabel());
+        assertEquals("annotation", annotation.getName());
+        assertTrue(annotation.isAllowMultipleSelection());
+        assertNotNull(annotation.getValues());
+        assertEquals(5, annotation.getValues().size());
+
+        FacetItem itemValue = annotation.getValues().get(0);
+        assertNotNull(itemValue);
+        assertNull(itemValue.getLabel());
+        assertEquals("5", itemValue.getValue());
+        assertEquals(Long.valueOf(51L), itemValue.getCount());
+
+        itemValue = annotation.getValues().get(1);
+        assertNotNull(itemValue);
+        assertNull(itemValue.getLabel());
+        assertEquals("4", itemValue.getValue());
+        assertEquals(Long.valueOf(41L), itemValue.getCount());
+    }
+
+    @Test
     void convertIntervalFacet() throws Exception {
         IntervalFacet intervalFacet = getLengthIntervalFacet();
         when(queryResponse.getIntervalFacets())
@@ -122,6 +152,15 @@ class FacetResponseConverterTest {
             ffield.add("Human", 11L);
             ffield.add("Mouse", 21L);
             ffield.add("Rat", 31L);
+            fieldList.add(ffield);
+        }
+        if (Arrays.binarySearch(name, "annotation") >= 0) {
+            FacetField ffield = new FacetField("annotation");
+            ffield.add("1", 11L);
+            ffield.add("2", 21L);
+            ffield.add("3", 31L);
+            ffield.add("4", 41L);
+            ffield.add("5", 51L);
             fieldList.add(ffield);
         }
         return fieldList;

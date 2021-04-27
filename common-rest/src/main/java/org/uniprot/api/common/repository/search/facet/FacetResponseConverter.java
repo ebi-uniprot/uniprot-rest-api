@@ -1,6 +1,7 @@
 package org.uniprot.api.common.repository.search.facet;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.solr.client.solrj.response.FacetField;
@@ -109,6 +110,9 @@ public class FacetResponseConverter extends FacetConverter<QueryResponse, List<F
                                     .count(count.getCount())
                                     .build());
                 }
+            }
+            if ("desc".equals(getSort(facetField.getName()))) {
+                Collections.reverse(values);
             }
         }
         // build a facet
