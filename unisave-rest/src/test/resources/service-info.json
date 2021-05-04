@@ -1,4 +1,5 @@
 {
-  "release": "Latest REST API",
+  "releaseNumber": "2021_02 stub release file",
+  "releaseDate": "20-Apr-2021",
   "description": "This is the UniSave REST API"
 }

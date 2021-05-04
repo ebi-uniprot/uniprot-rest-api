@@ -84,7 +84,7 @@ class AllowAllOriginsResponseFilterIT {
     }
 
     @Test
-    void requestHasXReleaseHeader() throws Exception {
+    void requestHasXReleaseNumberHeader() throws Exception {
         MvcResult result =
                 mockMvc.perform(get(FAKE_RESOURCE_BASE + FAKE_RESOURCE_1_URL))
                         .andDo(log())
@@ -92,8 +92,21 @@ class AllowAllOriginsResponseFilterIT {
                         .andReturn();
 
         assertThat(
-                result.getResponse().getHeader(HttpCommonHeaderConfig.X_RELEASE),
-                is("2020_02 stub release file"));
+                result.getResponse().getHeader(HttpCommonHeaderConfig.X_RELEASE_NUMBER),
+                is("2021_02 stub release file"));
+    }
+
+    @Test
+    void requestHasXReleaseDateHeader() throws Exception {
+        MvcResult result =
+                mockMvc.perform(get(FAKE_RESOURCE_BASE + FAKE_RESOURCE_1_URL))
+                        .andDo(log())
+                        .andExpect(status().isOk())
+                        .andReturn();
+
+        assertThat(
+                result.getResponse().getHeader(HttpCommonHeaderConfig.X_RELEASE_DATE),
+                is("20-Apr-2021"));
     }
 
     private HttpHeaders originHeader(String origin) {

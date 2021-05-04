@@ -2,7 +2,7 @@
 	"id": "e4d5e710-4495-47ed-8e71-ef27f942473a",
 	"values": [
 		{
-			"key": "x_release",
+			"key": "x_releaseNumber",
 			"value": "20-November-2020",
 			"enabled": true
 		},
