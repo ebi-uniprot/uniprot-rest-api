@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -279,7 +280,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -322,7 +323,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -352,7 +353,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00019")))

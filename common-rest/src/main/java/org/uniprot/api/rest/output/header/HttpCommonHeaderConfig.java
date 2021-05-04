@@ -30,8 +30,10 @@ import org.uniprot.api.rest.service.ServiceInfoConfig;
 @Configuration
 @Import({ServiceInfoConfig.class})
 public class HttpCommonHeaderConfig {
-    public static final String X_RELEASE = "X-Release";
+    public static final String X_RELEASE_NUMBER = "x-release-number";
+    public static final String X_RELEASE_DATE = "x-release-date";
     static final String ALLOW_ALL_ORIGINS = "*";
+    public static final String X_TOTAL_RECORDS = "x-total-records";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
     private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 
@@ -64,9 +66,15 @@ public class HttpCommonHeaderConfig {
 
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(
-                        ACCESS_CONTROL_EXPOSE_HEADERS, "Link, X-TotalRecords, " + X_RELEASE);
-                response.addHeader(X_RELEASE, serviceInfo.getRelease());
-
+                        ACCESS_CONTROL_EXPOSE_HEADERS,
+                        "Link, "
+                                + X_TOTAL_RECORDS
+                                + ", "
+                                + X_RELEASE_NUMBER
+                                + ", "
+                                + X_RELEASE_DATE);
+                response.addHeader(X_RELEASE_NUMBER, serviceInfo.getReleaseNumber());
+                response.addHeader(X_RELEASE_DATE, serviceInfo.getReleaseDate());
                 chain.doFilter(mutableRequest, response);
             }
         };

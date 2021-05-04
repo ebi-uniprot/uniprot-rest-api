@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -675,7 +676,7 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", String.valueOf(savedEntries)))
+                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(savedEntries)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(
                         header().string(
@@ -702,7 +703,7 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(5)));
     }
@@ -724,7 +725,7 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "" + (getDefaultPageSize() + 10)))
+                .andExpect(header().string(X_TOTAL_RECORDS, "" + (getDefaultPageSize() + 10)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", is(getDefaultPageSize() + 1)));
     }
@@ -746,7 +747,7 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "6"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "6"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=5")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -769,7 +770,7 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "6"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "6"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(1)));
     }

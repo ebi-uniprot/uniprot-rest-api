@@ -20,7 +20,7 @@
 									"script": {
 										"id": "8a65c635-cadc-4ae0-af51-ddfd5dd329bd",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, undefined, undefined, ",
@@ -65,7 +65,7 @@
 									"script": {
 										"id": "dcac8d8c-259a-4a7d-8416-d0d4dddd77a0",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, undefined, undefined, ",
@@ -103,7 +103,7 @@
 									"script": {
 										"id": "808e6869-05e7-4f55-aebd-42bce93f4f04",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"",
@@ -158,7 +158,7 @@
 									"script": {
 										"id": "c56e6769-7686-4141-8930-b6e4db1a7ed4",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
@@ -202,7 +202,7 @@
 									"script": {
 										"id": "271f8d79-23cd-4dd2-bd3f-85c291507bca",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"application/xml\", undefined, ",
@@ -249,7 +249,7 @@
 									"script": {
 										"id": "ddf39974-bf71-4a56-9b5c-fed381acf939",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/fasta\", undefined, ",
@@ -297,7 +297,7 @@
 									"script": {
 										"id": "c6b9631f-1366-4c51-9ca7-f1389d452c41",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/flatfile\", undefined, ",
@@ -345,7 +345,7 @@
 									"script": {
 										"id": "ec130d89-ec13-4447-930a-b11adfaf08ca",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/tsv\", undefined, ",
@@ -394,7 +394,7 @@
 									"script": {
 										"id": "84b60f06-fe92-46ca-854a-564caa58b4ed",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/list\", undefined, ",
@@ -441,7 +441,7 @@
 									"script": {
 										"id": "ed45d26e-014a-44f1-b612-ce3dc000df1b",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/gff\", undefined, ",
@@ -489,7 +489,7 @@
 									"script": {
 										"id": "adee6afb-89ca-42b0-a5e5-7a0232be48f7",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"application/vnd.ms-excel\", undefined, ",
@@ -531,7 +531,7 @@
 									"script": {
 										"id": "33a0b7d4-d9aa-4231-92b4-617acfb761d7",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(\"none\", 400, \"application/json\", undefined, ",
@@ -620,7 +620,7 @@
 									"script": {
 										"id": "3837b392-2db7-4311-bd23-f625433b8416",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, undefined, undefined, ",
@@ -681,7 +681,7 @@
 									"script": {
 										"id": "0f2fd2a9-2026-426a-a468-15b5eb17b0bf",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
@@ -744,7 +744,7 @@
 									"script": {
 										"id": "5d9888fd-d0bd-4ce3-b2f4-5c860616cde9",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"application/xml\", undefined, ",
@@ -815,7 +815,7 @@
 									"script": {
 										"id": "9b1fc95d-4c32-45d8-9627-225ac8147f1f",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/fasta\", undefined, ",
@@ -885,7 +885,7 @@
 									"script": {
 										"id": "4721f46a-6b9f-45df-9d5b-482ed235e36a",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/flatfile\", undefined, ",
@@ -955,7 +955,7 @@
 									"script": {
 										"id": "bbd0e0bd-9c7a-471f-b6f3-80c6e98435d8",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/tsv\", undefined, ",
@@ -1024,7 +1024,7 @@
 									"script": {
 										"id": "1ef4060c-014b-4c92-a757-4ac976bc96f9",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/list\", undefined, ",
@@ -1093,7 +1093,7 @@
 									"script": {
 										"id": "2381b66d-a1e7-4608-82db-10ee9d790c73",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"text/gff\", undefined, ",
@@ -1162,7 +1162,7 @@
 									"script": {
 										"id": "da3f28e7-a14a-477d-ac10-948124d1c875",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"application/vnd.ms-excel\", undefined, ",
@@ -1209,7 +1209,7 @@
 									"script": {
 										"id": "4014a17e-e66b-4946-85c3-45bc32d44864",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(\"none\", 400, \"application/json\", undefined, ",
@@ -1280,7 +1280,7 @@
 									"script": {
 										"id": "af3b08a6-fc9d-4b40-93ed-97a4dc39932c",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
@@ -1873,7 +1873,7 @@
 									"script": {
 										"id": "2321a074-42b1-4bb6-87a3-7f19dc65a073",
 										"exec": [
-											"let xRelease = pm.globals.get('x_release');",
+											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 											"verifyHeaders(undefined, 200, \"application/json\", undefined, ",
@@ -1969,7 +1969,7 @@
 							"script": {
 								"id": "a0b13c64-bea5-412b-ac1a-b1bfe698d3fd",
 								"exec": [
-									"let xRelease = pm.globals.get('x_release');",
+									"let xRelease = pm.globals.get('x_releaseNumber');",
 									"let controlAllow = pm.globals.get('control_origin');",
 									"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
 									"verifyHeaders(undefined, 200, \"application/json\", undefined, ",

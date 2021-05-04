@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -139,7 +140,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -168,7 +169,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -198,7 +199,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "5"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083C05")))

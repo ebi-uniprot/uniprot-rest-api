@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 
 import java.util.ArrayList;
@@ -164,7 +165,7 @@ class UniRefMembersControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", is("28")))
+                .andExpect(header().string(X_TOTAL_RECORDS, is("28")))
                 .andExpect(header().string(LINK, notNullValue()))
                 .andExpect(header().string(LINK, containsString("size=25")))
                 .andExpect(header().string(LINK, containsString("cursor=3v5g94y9lqs")))
@@ -219,7 +220,7 @@ class UniRefMembersControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "15"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "15"))
                 .andExpect(header().string(LINK, notNullValue()))
                 .andExpect(header().string(LINK, containsString("size=10")))
                 .andExpect(header().string(LINK, containsString("cursor=3sbq7rwffis")))
@@ -254,7 +255,7 @@ class UniRefMembersControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "15"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "15"))
                 .andExpect(header().string(LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(5)))
                 .andExpect(
@@ -286,7 +287,7 @@ class UniRefMembersControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "2"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "2"))
                 .andExpect(header().string(LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(
@@ -314,7 +315,7 @@ class UniRefMembersControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "1"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "1"))
                 .andExpect(header().string(LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results[*].memberId", contains("P32180_HUMAN")))

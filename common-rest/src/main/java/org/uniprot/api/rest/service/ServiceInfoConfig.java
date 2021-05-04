@@ -49,18 +49,27 @@ public class ServiceInfoConfig {
     @Getter
     @Builder
     public static class ServiceInfo {
-        static final String RELEASE = "release";
+        static final String RELEASE_NUMBER = "releaseNumber";
+        static final String RELEASE_DATE = "releaseDate";
         private Map<String, Object> map;
 
         void validate() {
-            if (!map.containsKey(RELEASE)) {
+            if (!map.containsKey(RELEASE_NUMBER)) {
                 throw new IllegalStateException(
-                        "Service information must contain a 'release' key. Please define it.");
+                        "Service information must contain a 'releaseNumber' key. Please define it.");
+            }
+            if (!map.containsKey(RELEASE_DATE)) {
+                throw new IllegalStateException(
+                        "Service information must contain a 'releaseDate' key. Please define it.");
             }
         }
 
-        public String getRelease() {
-            return map.get(RELEASE).toString();
+        public String getReleaseNumber() {
+            return map.get(RELEASE_NUMBER).toString();
+        }
+
+        public String getReleaseDate() {
+            return map.get(RELEASE_DATE).toString();
         }
     }
 }

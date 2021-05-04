@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -217,7 +218,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "10"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "10"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=4")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -245,7 +246,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "10"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "10"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=4")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -274,7 +275,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "10"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "10"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.facets").doesNotExist());
@@ -384,7 +385,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "10"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "10"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(10)));
 
