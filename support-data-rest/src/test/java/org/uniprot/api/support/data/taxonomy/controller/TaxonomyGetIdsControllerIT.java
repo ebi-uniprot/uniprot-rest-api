@@ -21,6 +21,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -271,7 +272,7 @@ class TaxonomyGetIdsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "4"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "4"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -292,7 +293,7 @@ class TaxonomyGetIdsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "4"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "4"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(2)));
     }

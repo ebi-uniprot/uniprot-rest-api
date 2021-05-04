@@ -8,6 +8,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -349,7 +350,7 @@ class UniProtKBPublicationControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "7"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "7"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=5")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -372,7 +373,7 @@ class UniProtKBPublicationControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "7"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "7"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(2)));
     }

@@ -30,10 +30,10 @@ import org.uniprot.api.rest.service.ServiceInfoConfig;
 @Configuration
 @Import({ServiceInfoConfig.class})
 public class HttpCommonHeaderConfig {
-    public static final String X_RELEASE_NUMBER = "X-ReleaseNumber";
-    public static final String X_RELEASE_DATE = "X-ReleaseDate";
+    public static final String X_RELEASE_NUMBER = "x-release-number";
+    public static final String X_RELEASE_DATE = "x-release-date";
     static final String ALLOW_ALL_ORIGINS = "*";
-    public static final String X_TOTAL_RECORDS = "X-TotalRecords";
+    public static final String X_TOTAL_RECORDS = "x-total-records";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
     private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 

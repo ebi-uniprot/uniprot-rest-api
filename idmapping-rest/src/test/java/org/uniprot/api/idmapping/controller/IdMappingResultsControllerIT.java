@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -75,7 +76,7 @@ class IdMappingResultsControllerIT {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(defaultPageSize)))
@@ -101,7 +102,7 @@ class IdMappingResultsControllerIT {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
@@ -130,7 +131,7 @@ class IdMappingResultsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -157,7 +158,7 @@ class IdMappingResultsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -181,7 +182,7 @@ class IdMappingResultsControllerIT {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(0)));

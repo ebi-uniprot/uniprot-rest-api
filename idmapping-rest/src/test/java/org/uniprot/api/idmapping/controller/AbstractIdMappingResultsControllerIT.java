@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -66,7 +67,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(defaultPageSize)))
@@ -91,7 +92,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
@@ -119,7 +120,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -145,7 +146,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -168,7 +169,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string("X-TotalRecords", "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(0)));

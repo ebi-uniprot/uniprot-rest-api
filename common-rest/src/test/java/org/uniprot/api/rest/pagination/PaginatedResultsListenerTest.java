@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.pagination;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.math.BigInteger;
 
@@ -33,8 +34,8 @@ class PaginatedResultsListenerTest {
         listener.onApplicationEvent(event);
 
         // then
-        assertNotNull(response.getHeader("X-TotalRecords"));
-        assertEquals("120", response.getHeader("X-TotalRecords"));
+        assertNotNull(response.getHeader(X_TOTAL_RECORDS));
+        assertEquals("120", response.getHeader(X_TOTAL_RECORDS));
 
         assertNotNull(response.getHeader("Link"));
         String expectedNextLink =
@@ -63,7 +64,7 @@ class PaginatedResultsListenerTest {
         // then
         assertNull(response.getHeader("Link"));
 
-        assertNotNull(response.getHeader("X-TotalRecords"));
-        assertEquals("12", response.getHeader("X-TotalRecords"));
+        assertNotNull(response.getHeader(X_TOTAL_RECORDS));
+        assertEquals("12", response.getHeader(X_TOTAL_RECORDS));
     }
 }

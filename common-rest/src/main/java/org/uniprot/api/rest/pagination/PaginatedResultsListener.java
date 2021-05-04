@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.pagination;
 
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
+
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -13,7 +15,8 @@ import org.uniprot.api.common.repository.search.page.Page;
 import org.uniprot.core.util.Utils;
 
 /**
- * Event Listener Class responsible to build Link pagination header and also X-TotalRecords
+ * Event Listener Class responsible to build Link pagination header and also
+ * HttpCommonHeaderConfig.X_TOTAL_RECORDS
  *
  * @author lgonzales
  */
@@ -40,7 +43,7 @@ public class PaginatedResultsListener implements ApplicationListener<PaginatedRe
 
             Long totalRecords = page.getTotalElements();
             if (totalRecords > 0) {
-                response.addHeader("X-TotalRecords", totalRecords.toString());
+                response.addHeader(X_TOTAL_RECORDS, totalRecords.toString());
             }
         }
     }
