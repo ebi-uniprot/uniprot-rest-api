@@ -11,8 +11,10 @@ import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 
-public class FacetStreamExpressionTest {
+class FacetStreamExpressionTest {
 
     @Test
     void testCreate() {
@@ -20,14 +22,15 @@ public class FacetStreamExpressionTest {
                 SolrStreamFacetRequest.builder();
         String collection = "sample collection";
         String query = "q:*:*";
-        String buckets = "facet";
-        String metrics = "count(facet)";
-        String bucketSorts = "count(facet)";
+        String buckets = "reviewed";
+        String metrics = "count(reviewed)";
+        String bucketSorts = "count(reviewed)";
         int bucketSizeLimit = 10;
         builder.query(query);
         builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
+        FacetConfig facetConfig = new FakeFacetConfig();
         FacetStreamExpression facetExpression =
-                new FacetStreamExpression(collection, buckets, builder.build());
+                new FacetStreamExpression(collection, buckets, builder.build(), facetConfig);
         Assertions.assertNotNull(facetExpression);
         Assertions.assertEquals("facet", facetExpression.getFunctionName());
         Assertions.assertEquals(6, facetExpression.getParameters().size());
@@ -71,10 +74,13 @@ public class FacetStreamExpressionTest {
         int bucketSizeLimit = -1;
         builder.query(query);
         builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
+        FacetConfig facetConfig = new FakeFacetConfig();
         IllegalArgumentException exception =
                 Assertions.assertThrows(
                         IllegalArgumentException.class,
-                        () -> new FacetStreamExpression(collection, buckets, builder.build()));
+                        () ->
+                                new FacetStreamExpression(
+                                        collection, buckets, builder.build(), facetConfig));
         Assertions.assertEquals(
                 "bucketSizeLimit should be a positive integer", exception.getMessage());
     }
@@ -84,10 +90,13 @@ public class FacetStreamExpressionTest {
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
                 SolrStreamFacetRequest.builder();
         String collection = "sample collection";
+        FacetConfig facetConfig = new FakeFacetConfig();
         IllegalArgumentException exception =
                 Assertions.assertThrows(
                         IllegalArgumentException.class,
-                        () -> new FacetStreamExpression(collection, "buckets", builder.build()));
+                        () ->
+                                new FacetStreamExpression(
+                                        collection, "buckets", builder.build(), facetConfig));
         Assertions.assertEquals("query is a mandatory param", exception.getMessage());
     }
 
@@ -95,10 +104,13 @@ public class FacetStreamExpressionTest {
     void testCreateFailureWithoutCollection() {
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder builder =
                 SolrStreamFacetRequest.builder();
+        FacetConfig facetConfig = new FakeFacetConfig();
         IllegalArgumentException exception =
                 Assertions.assertThrows(
                         IllegalArgumentException.class,
-                        () -> new FacetStreamExpression(null, "buckets", builder.build()));
+                        () ->
+                                new FacetStreamExpression(
+                                        null, "buckets", builder.build(), facetConfig));
         Assertions.assertEquals("collection is a mandatory param", exception.getMessage());
     }
 
@@ -108,16 +120,19 @@ public class FacetStreamExpressionTest {
                 SolrStreamFacetRequest.builder();
         String collection = "sample collection";
         String query = "q:*:*";
-        String buckets = "facet";
-        String metrics = "median(facet)";
-        String bucketSorts = "count(facet)";
+        String buckets = "reviewed";
+        String metrics = "median(reviewed)";
+        String bucketSorts = "count(reviewed)";
         int bucketSizeLimit = 1;
         builder.query(query);
         builder.metrics(metrics).bucketSorts(bucketSorts).bucketSizeLimit(bucketSizeLimit);
+        FacetConfig facetConfig = new FakeFacetConfig();
         IllegalArgumentException exception =
                 Assertions.assertThrows(
                         IllegalArgumentException.class,
-                        () -> new FacetStreamExpression(collection, buckets, builder.build()));
-        Assertions.assertEquals("Unknown function median(facet)", exception.getMessage());
+                        () ->
+                                new FacetStreamExpression(
+                                        collection, buckets, builder.build(), facetConfig));
+        Assertions.assertEquals("Unknown function median(reviewed)", exception.getMessage());
     }
 }

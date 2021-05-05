@@ -36,7 +36,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     private final Function<D, R> entryConverter;
     protected final AbstractSolrSortClause solrSortClause;
     protected final SolrQueryConfig queryBoosts;
-    private final FacetConfig facetConfig;
+    protected final FacetConfig facetConfig;
 
     // If this property is not set then it is set to empty and later it is set to
     // DEFAULT_SOLR_BATCH_SIZE

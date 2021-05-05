@@ -8,6 +8,8 @@ import lombok.Getter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -25,7 +27,11 @@ public class FacetStreamExpression extends UniProtStreamExpression {
         sum;
     }
 
-    public FacetStreamExpression(String collection, String facet, SolrStreamFacetRequest request)
+    public FacetStreamExpression(
+            String collection,
+            String facet,
+            SolrStreamFacetRequest request,
+            FacetConfig facetConfig)
             throws IllegalArgumentException {
         super("facet");
         validateParams(
@@ -36,11 +42,13 @@ public class FacetStreamExpression extends UniProtStreamExpression {
                 request.getBucketSorts(),
                 request.getBucketSizeLimit());
 
+        FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facet);
         this.addParameter(new StreamExpressionValue(collection));
         this.addParameter(new StreamExpressionNamedParameter("q", request.getQuery()));
         this.addParameter(new StreamExpressionNamedParameter("buckets", facet));
         this.addParameter(
-                new StreamExpressionNamedParameter("bucketSorts", request.getBucketSorts()));
+                new StreamExpressionNamedParameter(
+                        "bucketSorts", getBucketSorts(request, facet, facetProperty)));
         this.addParameter(
                 new StreamExpressionNamedParameter(
                         "bucketSizeLimit", String.valueOf(request.getBucketSizeLimit())));
@@ -51,6 +59,15 @@ public class FacetStreamExpression extends UniProtStreamExpression {
                 request)) { // order of params is important. this code should be in the end
             addFQRelatedParams(request);
         }
+    }
+
+    private String getBucketSorts(
+            SolrStreamFacetRequest request, String facet, FacetProperty facetProperty) {
+        String bucketSorts = request.getBucketSorts();
+        if ("desc".equals(facetProperty.getSort())) {
+            bucketSorts = facet + " " + facetProperty.getSort();
+        }
+        return bucketSorts;
     }
 
     private void validateParams(
