@@ -7,8 +7,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 
-public class ListStreamExpressionTest {
+class ListStreamExpressionTest {
 
     @Test
     void testCreateList() {
@@ -26,14 +28,15 @@ public class ListStreamExpressionTest {
                 SolrStreamFacetRequest.builder();
         String collection = "sample collection";
         String query = "q:*:*";
-        String buckets = "facet";
-        String metrics = "count(facet)";
-        String bucketSorts = "count(facet)";
+        String buckets = "reviewed";
+        String metrics = "count(reviewed)";
+        String bucketSorts = "count(reviewed)";
         int bucketSizeLimit = ThreadLocalRandom.current().nextInt(10, Integer.MAX_VALUE);
+        FacetConfig facetConfig = new FakeFacetConfig();
         builder.query(query)
                 .metrics(metrics)
                 .bucketSorts(bucketSorts)
                 .bucketSizeLimit(bucketSizeLimit);
-        return new FacetStreamExpression(collection, buckets, builder.build());
+        return new FacetStreamExpression(collection, buckets, builder.build(), facetConfig);
     }
 }
