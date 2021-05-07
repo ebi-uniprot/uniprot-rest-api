@@ -626,14 +626,22 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                         .perform(
                                 get(SEARCH_RESOURCE)
                                         .param("query", "HGNC:3689 AND accession:P21802")
-                                        .param("fields", "accession")
+                                        .param("fields", "accession,cc_interaction")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.comments[0].interactions[0].interactantOne.uniProtKBAccession",
+                                contains("P21802")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.comments[0].interactions[0].interactantTwo.uniProtKBAccession",
+                                contains("P03968")));
     }
 
     @Test
