@@ -1,6 +1,5 @@
 {
   "releaseNumber": "2021_02 stub release file",
   "releaseDate": "20-Apr-2021",
-  "description": "This is a test data release",
-  "maxAgeInSeconds": "86400"
+  "description": "This is a test data release"
 }
