@@ -51,6 +51,7 @@ public class ServiceInfoConfig {
     public static class ServiceInfo {
         static final String RELEASE_NUMBER = "releaseNumber";
         static final String RELEASE_DATE = "releaseDate";
+        static final String CACHE_CONTROL_MAX_AGE = "maxAgeInSeconds";
         private Map<String, Object> map;
 
         void validate() {
@@ -62,6 +63,11 @@ public class ServiceInfoConfig {
                 throw new IllegalStateException(
                         "Service information must contain a 'releaseDate' key. Please define it.");
             }
+
+            if (!map.containsKey(CACHE_CONTROL_MAX_AGE)) {
+                throw new IllegalStateException(
+                        "Service information must contain a 'maxAgeInSeconds' key. Please define it.");
+            }
         }
 
         public String getReleaseNumber() {
@@ -70,6 +76,10 @@ public class ServiceInfoConfig {
 
         public String getReleaseDate() {
             return map.get(RELEASE_DATE).toString();
+        }
+
+        public String getMaxAgeInSeconds() {
+            return map.get(CACHE_CONTROL_MAX_AGE).toString();
         }
     }
 }
