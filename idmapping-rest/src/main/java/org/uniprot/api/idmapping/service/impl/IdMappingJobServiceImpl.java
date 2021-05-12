@@ -1,6 +1,12 @@
 package org.uniprot.api.idmapping.service.impl;
 
+import java.util.Date;
+import java.util.Set;
+
+import javax.servlet.ServletContext;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.IdMappingJobController;
@@ -17,10 +23,6 @@ import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
-
-import javax.servlet.ServletContext;
-import java.util.Date;
-import java.util.Set;
 
 /**
  * Created 23/02/2021

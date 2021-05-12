@@ -26,6 +26,9 @@ public class ServiceInfoConfig {
     @Value("${serviceInfoPath}")
     private Resource serviceInfoPath;
 
+    @Value("${cache.control.max.age:#{3600}}")
+    private Integer cacheControlMaxAge;
+
     @Bean
     @SuppressWarnings("unchecked")
     public ServiceInfo serviceInfo() {
@@ -37,7 +40,11 @@ public class ServiceInfoConfig {
                 serviceInfoMap = Collections.emptyMap();
             }
 
-            ServiceInfo serviceInfo = ServiceInfo.builder().map(serviceInfoMap).build();
+            ServiceInfo serviceInfo =
+                    ServiceInfo.builder()
+                            .map(serviceInfoMap)
+                            .cacheControlMaxAge(cacheControlMaxAge)
+                            .build();
             serviceInfo.validate();
             return serviceInfo;
         } catch (IOException e) {
@@ -53,6 +60,7 @@ public class ServiceInfoConfig {
         static final String RELEASE_DATE = "releaseDate";
         static final String CACHE_CONTROL_MAX_AGE = "maxAgeInSeconds";
         private Map<String, Object> map;
+        private Integer cacheControlMaxAge;
 
         void validate() {
             if (!map.containsKey(RELEASE_NUMBER)) {
@@ -62,11 +70,6 @@ public class ServiceInfoConfig {
             if (!map.containsKey(RELEASE_DATE)) {
                 throw new IllegalStateException(
                         "Service information must contain a 'releaseDate' key. Please define it.");
-            }
-
-            if (!map.containsKey(CACHE_CONTROL_MAX_AGE)) {
-                throw new IllegalStateException(
-                        "Service information must contain a 'maxAgeInSeconds' key. Please define it.");
             }
         }
 
@@ -78,8 +81,8 @@ public class ServiceInfoConfig {
             return map.get(RELEASE_DATE).toString();
         }
 
-        public String getMaxAgeInSeconds() {
-            return map.get(CACHE_CONTROL_MAX_AGE).toString();
+        public Integer getMaxAgeInSeconds() {
+            return this.cacheControlMaxAge;
         }
     }
 }
