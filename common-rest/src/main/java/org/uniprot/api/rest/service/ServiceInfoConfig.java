@@ -26,6 +26,9 @@ public class ServiceInfoConfig {
     @Value("${serviceInfoPath}")
     private Resource serviceInfoPath;
 
+    @Value("${cache.control.max.age:#{3600}}")
+    private Integer cacheControlMaxAge;
+
     @Bean
     @SuppressWarnings("unchecked")
     public ServiceInfo serviceInfo() {
@@ -37,7 +40,11 @@ public class ServiceInfoConfig {
                 serviceInfoMap = Collections.emptyMap();
             }
 
-            ServiceInfo serviceInfo = ServiceInfo.builder().map(serviceInfoMap).build();
+            ServiceInfo serviceInfo =
+                    ServiceInfo.builder()
+                            .map(serviceInfoMap)
+                            .cacheControlMaxAge(cacheControlMaxAge)
+                            .build();
             serviceInfo.validate();
             return serviceInfo;
         } catch (IOException e) {
@@ -51,7 +58,9 @@ public class ServiceInfoConfig {
     public static class ServiceInfo {
         static final String RELEASE_NUMBER = "releaseNumber";
         static final String RELEASE_DATE = "releaseDate";
+        static final String CACHE_CONTROL_MAX_AGE = "maxAgeInSeconds";
         private Map<String, Object> map;
+        private Integer cacheControlMaxAge;
 
         void validate() {
             if (!map.containsKey(RELEASE_NUMBER)) {
@@ -70,6 +79,10 @@ public class ServiceInfoConfig {
 
         public String getReleaseDate() {
             return map.get(RELEASE_DATE).toString();
+        }
+
+        public Integer getMaxAgeInSeconds() {
+            return this.cacheControlMaxAge;
         }
     }
 }

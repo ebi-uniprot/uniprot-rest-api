@@ -33,6 +33,6 @@ class UniRefConfigureServiceTest {
         UniRefConfigureService service = new UniRefConfigureService();
         List<AdvancedSearchTerm> result = service.getSearchItems();
         assertNotNull(result);
-        assertEquals(9, result.size());
+        assertEquals(10, result.size());
     }
 }
