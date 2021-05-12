@@ -283,10 +283,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                 .andExpect(jsonPath("$.results.size()", is(9)))
                 .andExpect(jsonPath("$.facets.*.label", contains("Annotation Score")))
                 .andExpect(jsonPath("$.facets.*.name", contains(facets)))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.value",
-                                contains("4", "3", "2")))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("4", "3", "2")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 1, 5)));
     }
 
