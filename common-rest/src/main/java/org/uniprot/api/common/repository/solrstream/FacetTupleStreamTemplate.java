@@ -13,6 +13,7 @@ import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
 
 /**
  * This class is responsible for simplifying the creation of {@link TupleStream} instances for facet
@@ -34,7 +35,7 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
     private final String collection;
     private final HttpClient httpClient;
 
-    public TupleStream create(SolrStreamFacetRequest request) {
+    public TupleStream create(SolrStreamFacetRequest request, FacetConfig facetConfig) {
         try {
             List<StreamExpression> expressions = new ArrayList<>();
             // add search function if needed
@@ -49,7 +50,7 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
                             .map(
                                     facet ->
                                             new FacetStreamExpression(
-                                                    this.collection, facet, request))
+                                                    this.collection, facet, request, facetConfig))
                             .collect(Collectors.toList());
 
             expressions.addAll(facetExpressions);

@@ -123,7 +123,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
     private SolrStreamFacetResponse searchBySolrStream(IdsSearchRequest idsRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(idsRequest);
-        TupleStream tupleStream = this.tupleStreamTemplate.create(solrStreamRequest);
+        TupleStream tupleStream = this.tupleStreamTemplate.create(solrStreamRequest, facetConfig);
         return this.tupleStreamConverter.convert(tupleStream);
     }
 

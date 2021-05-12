@@ -2,8 +2,7 @@ package org.uniprot.api.idmapping.service;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -12,6 +11,8 @@ import java.util.UUID;
 
 import javax.servlet.ServletContext;
 
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.collection.IsIn;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -125,7 +126,9 @@ class IdMappingJobServiceTest {
         // when
         IdMappingJobRequest request = createIdMappingRequest();
         String errorMsg = "Error during rest call";
-        when(this.pirService.mapIds(request)).thenThrow(new RestClientException(errorMsg));
+        when(this.pirService.mapIds(request))
+                .thenThrow(new RestClientException(errorMsg))
+                .thenReturn(IdMappingResult.builder().build());
 
         JobSubmitResponse submitResponse = this.jobService.submitJob(request);
         Assertions.assertNotNull(submitResponse);
@@ -143,6 +146,13 @@ class IdMappingJobServiceTest {
         Assertions.assertNull(submittedJob.getIdMappingResult());
         Assertions.assertNotNull(submittedJob.getCreated());
         Assertions.assertNotNull(submittedJob.getUpdated());
+        Mockito.verify(pirService, times(1)).mapIds(request);
+
+        this.jobService.submitJob(request);
+        IdMappingJob newJobAsResource = this.cacheService.getJobAsResource(jobId);
+        MatcherAssert.assertThat(
+                newJobAsResource.getJobStatus(), IsIn.oneOf(JobStatus.NEW, JobStatus.RUNNING));
+        Mockito.verify(pirService, times(2)).mapIds(request);
     }
 
     @Nested
