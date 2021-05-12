@@ -21,6 +21,7 @@ class ServiceInfoConfigTest {
         Map<String, Object> map = new HashMap<>();
         map.put(RELEASE_NUMBER, "value");
         map.put(RELEASE_DATE, "value");
+        map.put(CACHE_CONTROL_MAX_AGE, "200");
         ServiceInfoConfig.ServiceInfo serviceInfo =
                 ServiceInfoConfig.ServiceInfo.builder().map(map).build();
         assertDoesNotThrow(serviceInfo::validate);

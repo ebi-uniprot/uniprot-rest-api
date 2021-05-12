@@ -2,6 +2,7 @@ package org.uniprot.api.rest.output.header;
 
 import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS;
+import static org.springframework.http.HttpHeaders.CACHE_CONTROL;
 
 import java.io.IOException;
 
@@ -34,6 +35,7 @@ public class HttpCommonHeaderConfig {
     public static final String X_RELEASE_DATE = "x-release-date";
     static final String ALLOW_ALL_ORIGINS = "*";
     public static final String X_TOTAL_RECORDS = "x-total-records";
+    private static final String PUBLIC_MAX_AGE = "public, max-age=";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
     private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 
@@ -75,6 +77,8 @@ public class HttpCommonHeaderConfig {
                                 + X_RELEASE_DATE);
                 response.addHeader(X_RELEASE_NUMBER, serviceInfo.getReleaseNumber());
                 response.addHeader(X_RELEASE_DATE, serviceInfo.getReleaseDate());
+                response.addHeader(
+                        CACHE_CONTROL, PUBLIC_MAX_AGE + serviceInfo.getMaxAgeInSeconds());
                 chain.doFilter(mutableRequest, response);
             }
         };
