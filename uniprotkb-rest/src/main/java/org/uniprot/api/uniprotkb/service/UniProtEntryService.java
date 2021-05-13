@@ -167,6 +167,11 @@ public class UniProtEntryService
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
 
         UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
+
+        if ("*".equals(uniProtRequest.getQuery())) {
+            uniProtRequest.setQuery(getQueryFieldName("active") + ":" + true);
+        }
+
         // fill the common params from the basic service class
         SolrRequest solrRequest = super.createSearchSolrRequest(uniProtRequest);
 
@@ -188,10 +193,7 @@ public class UniProtEntryService
 
     private void addIsoformFilter(SolrRequest solrRequest) {
         List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
-        queries.add(
-                searchFieldConfig.getSearchFieldItemByName("is_isoform").getFieldName()
-                        + ":"
-                        + false);
+        queries.add(getQueryFieldName("is_isoform") + ":" + false);
         solrRequest.setFilterQueries(queries);
     }
 
@@ -209,14 +211,18 @@ public class UniProtEntryService
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(
                         query,
-                        searchFieldConfig.getSearchFieldItemByName(ACCESSION).getFieldName(),
-                        searchFieldConfig.getSearchFieldItemByName("id").getFieldName(),
-                        searchFieldConfig.getSearchFieldItemByName("is_isoform").getFieldName());
+                        getQueryFieldName(ACCESSION),
+                        getQueryFieldName("id"),
+                        getQueryFieldName("is_isoform"));
 
         if (!hasIdFieldTerms) {
             return !isIncludeIsoform;
         } else {
             return false;
         }
+    }
+
+    private String getQueryFieldName(String active) {
+        return searchFieldConfig.getSearchFieldItemByName(active).getFieldName();
     }
 }
