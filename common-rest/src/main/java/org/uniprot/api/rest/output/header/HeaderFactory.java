@@ -5,6 +5,7 @@ import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_RELEAS
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -76,8 +77,6 @@ public class HeaderFactory {
      */
     private static void handleGatewayCaching(HttpHeaders httpHeaders) {
         // used so that gate-way caching uses accept/accept-encoding headers as a key
-        httpHeaders.addIfAbsent(VARY, ACCEPT);
-        httpHeaders.addIfAbsent(VARY, ACCEPT_ENCODING);
-        httpHeaders.addIfAbsent(VARY, X_RELEASE_NUMBER);
+        httpHeaders.addAll(VARY, List.of(ACCEPT, ACCEPT_ENCODING, X_RELEASE_NUMBER));
     }
 }
