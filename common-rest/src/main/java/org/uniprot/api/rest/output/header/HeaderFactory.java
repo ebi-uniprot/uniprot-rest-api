@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.output.header;
 
 import static org.springframework.http.HttpHeaders.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_RELEASE_NUMBER;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -75,7 +76,8 @@ public class HeaderFactory {
      */
     private static void handleGatewayCaching(HttpHeaders httpHeaders) {
         // used so that gate-way caching uses accept/accept-encoding headers as a key
-        httpHeaders.add(VARY, ACCEPT);
-        httpHeaders.add(VARY, ACCEPT_ENCODING);
+        httpHeaders.addIfAbsent(VARY, ACCEPT);
+        httpHeaders.addIfAbsent(VARY, ACCEPT_ENCODING);
+        httpHeaders.addIfAbsent(VARY, X_RELEASE_NUMBER);
     }
 }
