@@ -74,7 +74,7 @@ public abstract class BasicSearchController<T> {
                                                         getLocationURLForId(id)))
                         .orElse(ResponseEntity.ok());
 
-        return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
+        return responseBuilder.headers(createHttpSearchHeader(request, contentType)).body(context);
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRDF(
@@ -83,7 +83,7 @@ public abstract class BasicSearchController<T> {
         context.setFileType(getBestFileTypeFromRequest(request));
         context.setEntityIds(Stream.of(entity));
         ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok();
-        return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
+        return responseBuilder.headers(createHttpSearchHeader(request, contentType)).body(context);
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
@@ -115,7 +115,7 @@ public abstract class BasicSearchController<T> {
             context.setFailedIds(result.getFailedIds());
         }
 
-        HttpHeaders headers = createHttpSearchHeader(contentType);
+        HttpHeaders headers = createHttpSearchHeader(request, contentType);
         if (isDownload) {
             context.setDownloadContentDispositionHeader(true);
             headers = createHttpDownloadHeader(context, request);
@@ -159,7 +159,6 @@ public abstract class BasicSearchController<T> {
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>>
             getDeferredResultResponseEntity(
                     HttpServletRequest request, MessageConverterContext<T> context) {
-
         // timeout in millis
         Long timeoutInMillis = (long) downloadTaskExecutor.getKeepAliveSeconds() * 1000;
 
