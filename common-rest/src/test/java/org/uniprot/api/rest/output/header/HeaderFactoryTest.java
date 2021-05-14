@@ -1,6 +1,5 @@
 package org.uniprot.api.rest.output.header;
 
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -9,38 +8,18 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_RELEASE_NUMBER;
 
 /**
  * @author lgonzales
  * @since 13/07/2020
  */
 class HeaderFactoryTest {
-
     @Test
     void createHttpSearchHeaderThatRequiresCaching() {
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        when(mockRequest.getServletPath()).thenReturn("/uniprotkb/accession/P12345");
-        HttpHeaders result =
-                HeaderFactory.createHttpSearchHeader(mockRequest, MediaType.APPLICATION_JSON);
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("application/json", result.getFirst("Content-Type"));
-        MatcherAssert.assertThat(
-                result.get("Vary"),
-                containsInAnyOrder("Accept", "Accept-Encoding", X_RELEASE_NUMBER));
-    }
-
-    @Test
-    void createHttpSearchHeaderThatDoesNotRequiresCaching() {
-        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        when(mockRequest.getServletPath()).thenReturn("/idmapping/status/12345");
-        HttpHeaders result =
-                HeaderFactory.createHttpSearchHeader(mockRequest, MediaType.APPLICATION_JSON);
+        HttpHeaders result = HeaderFactory.createHttpSearchHeader(MediaType.APPLICATION_JSON);
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
@@ -54,9 +33,8 @@ class HeaderFactoryTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertEquals(1, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
-        assertEquals("Accept", result.getFirst("Vary"));
     }
 
     @Test
@@ -69,9 +47,8 @@ class HeaderFactoryTest {
         when(request.getQueryString()).thenReturn("gene:CDC7");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
-        assertEquals(3, result.size());
+        assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
-        assertEquals("Accept", result.getFirst("Vary"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
@@ -89,9 +66,8 @@ class HeaderFactoryTest {
         when(request.getQueryString()).thenReturn("*");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
-        assertEquals(3, result.size());
+        assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
-        assertEquals("Accept", result.getFirst("Vary"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
@@ -109,9 +85,8 @@ class HeaderFactoryTest {
                 .thenReturn("gene:INeedHereAVeryBigQuery OR gene:itAlsoNeedToBeBiggerThan60");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
-        assertEquals(3, result.size());
+        assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
-        assertEquals("Accept", result.getFirst("Vary"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
@@ -129,9 +104,8 @@ class HeaderFactoryTest {
         when(request.getQueryString()).thenReturn("");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
-        assertEquals(3, result.size());
+        assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
-        assertEquals("Accept", result.getFirst("Vary"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")

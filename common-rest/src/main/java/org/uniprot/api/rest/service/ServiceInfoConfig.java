@@ -1,19 +1,20 @@
 package org.uniprot.api.rest.service;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created 31/03/20
@@ -23,11 +24,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Slf4j
 @Configuration
 public class ServiceInfoConfig {
+    private static final String DEFAULT_NON_CACHEABLE_PATHS_CSV = ".*/idmapping/.*";
+
     @Value("${serviceInfoPath}")
     private Resource serviceInfoPath;
 
     @Value("${cache.control.max.age:#{3600}}")
     private Integer cacheControlMaxAge;
+
+    @Value("${cache.ignore.paths:" + DEFAULT_NON_CACHEABLE_PATHS_CSV + "}")
+    private List<String> nonCacheableEndPoints;
 
     @Bean
     @SuppressWarnings("unchecked")
@@ -44,6 +50,10 @@ public class ServiceInfoConfig {
                     ServiceInfo.builder()
                             .map(serviceInfoMap)
                             .cacheControlMaxAge(cacheControlMaxAge)
+                            .nonCacheablePaths(
+                                    nonCacheableEndPoints.stream()
+                                            .map(Pattern::compile)
+                                            .collect(Collectors.toList()))
                             .build();
             serviceInfo.validate();
             return serviceInfo;
@@ -61,6 +71,7 @@ public class ServiceInfoConfig {
         static final String CACHE_CONTROL_MAX_AGE = "maxAgeInSeconds";
         private Map<String, Object> map;
         private Integer cacheControlMaxAge;
+        private List<Pattern> nonCacheablePaths;
 
         void validate() {
             if (!map.containsKey(RELEASE_NUMBER)) {
@@ -83,6 +94,10 @@ public class ServiceInfoConfig {
 
         public Integer getMaxAgeInSeconds() {
             return this.cacheControlMaxAge;
+        }
+
+        public List<Pattern> getNonCacheablePaths() {
+            return this.nonCacheablePaths;
         }
     }
 }

@@ -12,9 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.springframework.http.HttpHeaders.*;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_RELEASE_NUMBER;
-
 /**
  * Used by standard search/download controllers for creating headers used when searching and
  * downloading.
@@ -24,16 +21,11 @@ import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_RELEAS
  * @author Edd
  */
 public class HeaderFactory {
-    private static final List<Pattern> PATHS_WITH_NO_CACHING =
-            List.of(Pattern.compile(".*/idmapping/.*"));
-
     private HeaderFactory() {}
 
-    public static HttpHeaders createHttpSearchHeader(
-            HttpServletRequest request, MediaType mediaType) {
+    public static HttpHeaders createHttpSearchHeader(MediaType mediaType) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(mediaType);
-        handleGatewayCaching(request, httpHeaders);
         return httpHeaders;
     }
 
@@ -42,7 +34,6 @@ public class HeaderFactory {
         HttpHeaders httpHeaders = new HttpHeaders();
         MediaType mediaType = context.getContentType();
         httpHeaders.setContentType(mediaType);
-        handleGatewayCaching(request, httpHeaders);
         if (context.isDownloadContentDispositionHeader()) {
             String actualFileName = getContentDispositionFileName(context, request, mediaType);
             httpHeaders.setContentDispositionFormData("attachment", actualFileName);
@@ -70,27 +61,5 @@ public class HeaderFactory {
             queryString = now.format(dateTimeFormatter);
         }
         return "uniprot-" + queryString + suffix;
-    }
-
-    /**
-     * Ensure gate-way caching uses accept/accept-encoding headers as a key
-     *
-     * @param request the request
-     * @param httpHeaders the headers to modify
-     */
-    private static void handleGatewayCaching(HttpServletRequest request, HttpHeaders httpHeaders) {
-        boolean requiresCachingHeaders = true;
-        for (Pattern pattern : PATHS_WITH_NO_CACHING) {
-            if (Utils.notNull(request)
-                    && Utils.notNullNotEmpty(request.getServletPath())
-                    && pattern.matcher(request.getServletPath()).matches()) {
-                requiresCachingHeaders = false;
-                break;
-            }
-        }
-        if (requiresCachingHeaders) {
-            // used so that gate-way caching uses accept/accept-encoding headers as a key
-            httpHeaders.addAll(VARY, List.of(ACCEPT, ACCEPT_ENCODING, X_RELEASE_NUMBER));
-        }
     }
 }

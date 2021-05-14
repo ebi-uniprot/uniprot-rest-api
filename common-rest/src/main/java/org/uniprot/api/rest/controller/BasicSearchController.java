@@ -74,7 +74,7 @@ public abstract class BasicSearchController<T> {
                                                         getLocationURLForId(id)))
                         .orElse(ResponseEntity.ok());
 
-        return responseBuilder.headers(createHttpSearchHeader(request, contentType)).body(context);
+        return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRDF(
@@ -83,7 +83,7 @@ public abstract class BasicSearchController<T> {
         context.setFileType(getBestFileTypeFromRequest(request));
         context.setEntityIds(Stream.of(entity));
         ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok();
-        return responseBuilder.headers(createHttpSearchHeader(request, contentType)).body(context);
+        return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
@@ -115,7 +115,7 @@ public abstract class BasicSearchController<T> {
             context.setFailedIds(result.getFailedIds());
         }
 
-        HttpHeaders headers = createHttpSearchHeader(request, contentType);
+        HttpHeaders headers = createHttpSearchHeader(contentType);
         if (isDownload) {
             context.setDownloadContentDispositionHeader(true);
             headers = createHttpDownloadHeader(context, request);
