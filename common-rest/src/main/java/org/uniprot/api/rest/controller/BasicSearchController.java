@@ -159,7 +159,6 @@ public abstract class BasicSearchController<T> {
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>>
             getDeferredResultResponseEntity(
                     HttpServletRequest request, MessageConverterContext<T> context) {
-
         // timeout in millis
         Long timeoutInMillis = (long) downloadTaskExecutor.getKeepAliveSeconds() * 1000;
 
