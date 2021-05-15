@@ -1,17 +1,16 @@
 package org.uniprot.api.rest.output.header;
 
-import static org.springframework.http.HttpHeaders.*;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Used by standard search/download controllers for creating headers used when searching and
@@ -22,14 +21,11 @@ import org.uniprot.core.util.Utils;
  * @author Edd
  */
 public class HeaderFactory {
-
     private HeaderFactory() {}
 
     public static HttpHeaders createHttpSearchHeader(MediaType mediaType) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(mediaType);
-
-        handleGatewayCaching(httpHeaders);
         return httpHeaders;
     }
 
@@ -38,7 +34,6 @@ public class HeaderFactory {
         HttpHeaders httpHeaders = new HttpHeaders();
         MediaType mediaType = context.getContentType();
         httpHeaders.setContentType(mediaType);
-        handleGatewayCaching(httpHeaders);
         if (context.isDownloadContentDispositionHeader()) {
             String actualFileName = getContentDispositionFileName(context, request, mediaType);
             httpHeaders.setContentDispositionFormData("attachment", actualFileName);
@@ -66,16 +61,5 @@ public class HeaderFactory {
             queryString = now.format(dateTimeFormatter);
         }
         return "uniprot-" + queryString + suffix;
-    }
-
-    /**
-     * Ensure gate-way caching uses accept/accept-encoding headers as a key
-     *
-     * @param httpHeaders the headers to modify
-     */
-    private static void handleGatewayCaching(HttpHeaders httpHeaders) {
-        // used so that gate-way caching uses accept/accept-encoding headers as a key
-        httpHeaders.add(VARY, ACCEPT);
-        httpHeaders.add(VARY, ACCEPT_ENCODING);
     }
 }

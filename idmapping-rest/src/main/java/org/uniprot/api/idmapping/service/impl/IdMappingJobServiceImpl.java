@@ -78,7 +78,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
 
         IdMappingJob idMappingJob = createJob(jobId, request);
 
-        if (!this.cacheService.exists(jobId)) {
+        if (needToRunJob(jobId)) {
             this.cacheService.put(jobId, idMappingJob);
             log.debug(
                     "Put into cache, {} ids: {}...",
@@ -115,6 +115,20 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                 + dbType
                 + RESULTS_SUBPATH
                 + job.getJobId();
+    }
+
+    private boolean needToRunJob(String jobId) {
+        boolean exists = this.cacheService.exists(jobId);
+        if (exists) {
+            IdMappingJob job = this.cacheService.get(jobId);
+            if (job.getJobStatus().equals(JobStatus.ERROR)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 
     private String idsForLog(String logIds) {

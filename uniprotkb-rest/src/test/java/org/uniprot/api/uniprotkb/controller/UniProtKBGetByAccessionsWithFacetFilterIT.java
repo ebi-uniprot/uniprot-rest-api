@@ -109,10 +109,13 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
             if (i % 2 == 0) {
                 entryBuilder.proteinExistence(ProteinExistence.PROTEIN_LEVEL);
+                entryBuilder.annotationScore(2);
             } else if (i % 3 == 0) {
                 entryBuilder.proteinExistence(ProteinExistence.TRANSCRIPT_LEVEL);
+                entryBuilder.annotationScore(3);
             } else {
                 entryBuilder.proteinExistence(ProteinExistence.HOMOLOGY);
+                entryBuilder.annotationScore(4);
             }
 
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
@@ -256,6 +259,32 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                 .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
                 .andExpect(jsonPath("$.facets[1].values[0].count", equalTo(4)));
+    }
+
+    @Test
+    void getByAccessionsWithAnnotationWithDescendingValuesFacetSuccess() throws Exception {
+        String facets = "annotation_score";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "P00013,P00012,P00011,P00017,P00016,P00014,P00018,P00020,P00015")
+                                .param("facets", facets)
+                                .param("fields", "accession")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(9)))
+                .andExpect(jsonPath("$.facets.*.label", contains("Annotation Score")))
+                .andExpect(jsonPath("$.facets.*.name", contains(facets)))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("4", "3", "2")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 1, 5)));
     }
 
     @Test

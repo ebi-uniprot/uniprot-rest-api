@@ -45,6 +45,7 @@ public abstract class BasicIdService<T, U> {
     private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final RDFStreamer rdfStreamer;
     private final SolrQueryConfig queryConfig;
+    private final FacetConfig facetConfig;
 
     @Value("${search.default.page.size:#{null}}")
     private Integer defaultPageSize;
@@ -57,6 +58,7 @@ public abstract class BasicIdService<T, U> {
             SolrQueryConfig queryConfig) {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
+        this.facetConfig = facetConfig;
         this.facetTupleStreamConverter =
                 new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
         this.rdfStreamer = rdfStreamer;
@@ -159,7 +161,7 @@ public abstract class BasicIdService<T, U> {
     private SolrStreamFacetResponse searchBySolrStream(
             List<String> ids, SearchRequest searchRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
-        TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest);
+        TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest, facetConfig);
         return this.facetTupleStreamConverter.convert(facetTupleStream);
     }
 
