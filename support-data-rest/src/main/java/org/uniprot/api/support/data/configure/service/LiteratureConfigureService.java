@@ -18,7 +18,7 @@ public class LiteratureConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.LITERATURE);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.LITERATURE);
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.LITERATURE);
     }
 }

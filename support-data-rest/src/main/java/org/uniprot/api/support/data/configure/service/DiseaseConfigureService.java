@@ -18,7 +18,7 @@ public class DiseaseConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.DISEASE);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.DISEASE);
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.DISEASE);
     }
 }

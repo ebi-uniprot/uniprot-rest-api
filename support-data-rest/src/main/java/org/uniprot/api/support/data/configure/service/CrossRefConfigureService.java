@@ -18,7 +18,7 @@ public class CrossRefConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.CROSSREF);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.CROSSREF);
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.CROSSREF);
     }
 }

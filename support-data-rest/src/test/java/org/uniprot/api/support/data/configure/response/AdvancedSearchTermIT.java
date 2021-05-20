@@ -20,7 +20,7 @@ import org.uniprot.store.search.domain.impl.GoEvidences;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 class AdvancedSearchTermIT {
-
+    private static final String CONTEXT_PATH = "/uniprot/api";
     private static List<AdvancedSearchTerm> SEARCH_TERMS;
     private static final List<String> EXPECTED_TOP_LEVEL_TERMS =
             Arrays.asList(
@@ -73,7 +73,8 @@ class AdvancedSearchTermIT {
 
     @BeforeAll
     static void setUp() {
-        SEARCH_TERMS = AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIPROTKB);
+        SEARCH_TERMS =
+                AdvancedSearchTerm.getAdvancedSearchTerms(CONTEXT_PATH, UniProtDataType.UNIPROTKB);
     }
 
     @ParameterizedTest(name = "[{0}] == \"{1}\" ?")

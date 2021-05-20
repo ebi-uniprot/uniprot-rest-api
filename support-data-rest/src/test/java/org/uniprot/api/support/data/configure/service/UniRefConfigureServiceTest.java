@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.support.data.configure.service.UtilServiceTest.CONTEXT_PATH;
 
 import java.util.List;
 
@@ -13,7 +14,6 @@ import org.uniprot.api.support.data.configure.response.UniProtReturnField;
  * @since 27/05/2020
  */
 class UniRefConfigureServiceTest {
-
     @Test
     void getResultFields() {
         UniRefConfigureService service = new UniRefConfigureService();
@@ -31,7 +31,7 @@ class UniRefConfigureServiceTest {
     @Test
     void getSearchItems() {
         UniRefConfigureService service = new UniRefConfigureService();
-        List<AdvancedSearchTerm> result = service.getSearchItems();
+        List<AdvancedSearchTerm> result = service.getSearchItems(CONTEXT_PATH);
         assertNotNull(result);
         assertEquals(10, result.size());
     }

@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,12 +41,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UniProtKBConfigureController {
     private final UniProtKBConfigureService service;
     private String searchTermResponse;
+    private final ServletContext servletContext;
 
-    public UniProtKBConfigureController(UniProtKBConfigureService service) {
+    public UniProtKBConfigureController(
+            UniProtKBConfigureService service, ServletContext servletContext) {
         this.service = service;
+        this.servletContext = servletContext;
     }
 
-    // FIXME Delete this method once UI team starts consuming response of api search-terms.
+    // FIXME Delete this method once UI team starts consuming response of api search-fields.
     //  See method getUniProtSearchTerms
     @Operation(hidden = true)
     @GetMapping("/search_terms")
@@ -77,7 +82,7 @@ public class UniProtKBConfigureController {
             })
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getUniProtSearchTerms() {
-        return service.getUniProtSearchItems();
+        return service.getUniProtSearchItems(servletContext.getContextPath());
     }
 
     @Operation(

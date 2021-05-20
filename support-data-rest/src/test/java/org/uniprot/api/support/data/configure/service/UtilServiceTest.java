@@ -7,7 +7,7 @@ import org.uniprot.api.support.data.configure.response.SolrJsonQuery;
 
 /** @author lgonzales */
 class UtilServiceTest {
-
+    static final String CONTEXT_PATH = "/uniprot/api";
     private final UtilService service = new UtilService();
 
     @Test

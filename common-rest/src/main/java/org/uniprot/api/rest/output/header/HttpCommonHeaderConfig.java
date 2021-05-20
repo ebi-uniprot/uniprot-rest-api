@@ -1,5 +1,15 @@
 package org.uniprot.api.rest.output.header;
 
+import static org.springframework.http.HttpHeaders.*;
+
+import java.io.IOException;
+import java.util.regex.Pattern;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,16 +20,6 @@ import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.api.rest.service.ServiceInfoConfig;
 import org.uniprot.core.util.Utils;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import static org.springframework.http.HttpHeaders.*;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.

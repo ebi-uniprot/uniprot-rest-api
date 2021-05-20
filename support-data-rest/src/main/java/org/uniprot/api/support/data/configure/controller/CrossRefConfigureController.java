@@ -4,6 +4,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +30,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/configure/database")
 public class CrossRefConfigureController {
+    private final ServletContext servletContext;
 
     private final CrossRefConfigureService service;
 
-    public CrossRefConfigureController(CrossRefConfigureService service) {
+    public CrossRefConfigureController(
+            CrossRefConfigureService service, ServletContext servletContext) {
         this.service = service;
+        this.servletContext = servletContext;
     }
 
     @Operation(
@@ -74,6 +79,6 @@ public class CrossRefConfigureController {
             })
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getSearchFields() {
-        return service.getSearchItems();
+        return service.getSearchItems(servletContext.getContextPath());
     }
 }

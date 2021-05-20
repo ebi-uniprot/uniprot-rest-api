@@ -13,12 +13,11 @@ import org.uniprot.store.config.UniProtDataType;
  */
 @Service
 public class UniRefConfigureService {
-
     public List<UniProtReturnField> getResultFields() {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIREF);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIREF);
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.UNIREF);
     }
 }

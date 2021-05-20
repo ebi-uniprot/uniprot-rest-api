@@ -19,7 +19,11 @@ import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.FieldGroup;
 import org.uniprot.store.search.domain.Tuple;
-import org.uniprot.store.search.domain.impl.*;
+import org.uniprot.store.search.domain.impl.AnnotationEvidences;
+import org.uniprot.store.search.domain.impl.DatabaseGroupImpl;
+import org.uniprot.store.search.domain.impl.GoEvidences;
+import org.uniprot.store.search.domain.impl.TupleImpl;
+import org.uniprot.store.search.domain.impl.UniProtResultFields;
 
 @Service
 public class UniProtKBConfigureService {
@@ -38,9 +42,9 @@ public class UniProtKBConfigureService {
     private static final UniProtDatabaseTypes DBX_TYPES = UniProtDatabaseTypes.INSTANCE;
     private static final EvidenceDatabaseTypes EVIDENCE_DBS = EvidenceDatabaseTypes.INSTANCE;
 
-    public List<AdvancedSearchTerm> getUniProtSearchItems() {
+    public List<AdvancedSearchTerm> getUniProtSearchItems(String contextPath) {
         List<AdvancedSearchTerm> result =
-                AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIPROTKB);
+                AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.UNIPROTKB);
         // ADD UniProtkb databases
         AdvancedSearchTerm xRef =
                 result.stream()

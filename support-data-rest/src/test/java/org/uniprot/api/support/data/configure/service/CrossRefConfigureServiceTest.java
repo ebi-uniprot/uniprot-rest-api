@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.support.data.configure.service.UtilServiceTest.CONTEXT_PATH;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ class CrossRefConfigureServiceTest {
     @Test
     void getSearchItems() {
         CrossRefConfigureService service = new CrossRefConfigureService();
-        List<AdvancedSearchTerm> result = service.getSearchItems();
+        List<AdvancedSearchTerm> result = service.getSearchItems(CONTEXT_PATH);
         assertNotNull(result);
         assertEquals(2, result.size());
     }

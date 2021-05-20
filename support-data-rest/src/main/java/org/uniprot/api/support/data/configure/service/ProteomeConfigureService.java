@@ -18,7 +18,7 @@ public class ProteomeConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.PROTEOME);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.PROTEOME);
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.PROTEOME);
     }
 }
