@@ -14,6 +14,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.search.domain.EvidenceGroup;
+import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.AnnotationEvidences;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
@@ -146,8 +148,21 @@ class AdvancedSearchTermIT {
         Assertions.assertNotNull(goEvidence);
         Assertions.assertEquals("evidence", goEvidence.getFieldType());
         Assertions.assertNotNull(goEvidence.getEvidenceGroups());
+        List<EvidenceGroup> goEvidences = goEvidence.getEvidenceGroups();
         Assertions.assertEquals(
-                GoEvidences.INSTANCE.getEvidences(), goEvidence.getEvidenceGroups());
+                GoEvidences.INSTANCE.getEvidences().size(), goEvidences.size());
+        EvidenceGroup anyGroup = goEvidences.get(0);
+        Assertions.assertEquals("Any", anyGroup.getGroupName());
+        Assertions.assertNotNull(anyGroup.getItems());
+
+        EvidenceGroup manualGroup = goEvidences.get(1);
+        Assertions.assertEquals("Manual assertions", manualGroup.getGroupName());
+        Assertions.assertNotNull(manualGroup.getItems());
+        Assertions.assertFalse(manualGroup.getItems().isEmpty());
+
+        EvidenceItem evidenceItem = manualGroup.getItems().get(0);
+        Assertions.assertEquals("Inferred from experiment [EXP]", evidenceItem.getName());
+        Assertions.assertEquals("exp", evidenceItem.getCode());
     }
 
     @Test
