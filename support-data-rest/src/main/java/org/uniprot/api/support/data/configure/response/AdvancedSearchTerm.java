@@ -54,7 +54,8 @@ public class AdvancedSearchTerm implements Serializable {
         private String value;
     }
 
-    public static List<AdvancedSearchTerm> getAdvancedSearchTerms(UniProtDataType uniProtDataType) {
+    public static List<AdvancedSearchTerm> getAdvancedSearchTerms(
+            String contextPath, UniProtDataType uniProtDataType) {
         SearchFieldConfig config = SearchFieldConfigFactory.getSearchFieldConfig(uniProtDataType);
         List<SearchFieldItem> rootFieldItems = getTopLevelFieldItems(config);
         Comparator<AdvancedSearchTerm> comparatorBySeqNumber =
@@ -62,14 +63,15 @@ public class AdvancedSearchTerm implements Serializable {
         Comparator<AdvancedSearchTerm> comparatorByChildNumber =
                 Comparator.comparing(AdvancedSearchTerm::getChildNumber);
         List<AdvancedSearchTerm> rootSearchTermConfigs =
-                convert(rootFieldItems, comparatorBySeqNumber);
+                convert(contextPath, rootFieldItems, comparatorBySeqNumber);
 
         Queue<AdvancedSearchTerm> queue = new LinkedList<>(rootSearchTermConfigs);
 
         while (!queue.isEmpty()) { // BFS logic
             AdvancedSearchTerm currentItem = queue.remove();
             List<SearchFieldItem> childFieldItems = getChildFieldItems(config, currentItem.getId());
-            List<AdvancedSearchTerm> children = convert(childFieldItems, comparatorByChildNumber);
+            List<AdvancedSearchTerm> children =
+                    convert(contextPath, childFieldItems, comparatorByChildNumber);
             queue.addAll(children);
             if (currentItem.getItemType().equals("sibling_group")) {
                 currentItem.setSiblings(children);
@@ -93,13 +95,14 @@ public class AdvancedSearchTerm implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    private static AdvancedSearchTerm from(SearchFieldItem fi) {
+    private static AdvancedSearchTerm from(String contextPath, SearchFieldItem fi) {
         AdvancedSearchTerm.AdvancedSearchTermBuilder b = AdvancedSearchTerm.builder();
         b.id(fi.getId()).parentId(fi.getParentId()).childNumber(fi.getChildNumber());
         b.seqNumber(fi.getSeqNumber()).label(fi.getLabel()).term(fi.getFieldName());
         b.description(fi.getDescription())
                 .example(fi.getExample())
-                .autoComplete(fi.getAutoComplete());
+                .autoComplete(fi.getAutoComplete(contextPath));
+
         b.autoCompleteQueryTerm(fi.getAutoCompleteQueryField())
                 .autoCompleteQueryFieldValidRegex(fi.getAutoCompleteQueryFieldValidRegex());
         b.regex(fi.getValidRegex());
@@ -136,9 +139,11 @@ public class AdvancedSearchTerm implements Serializable {
     }
 
     private static List<AdvancedSearchTerm> convert(
-            List<SearchFieldItem> fieldItems, Comparator<AdvancedSearchTerm> comparator) {
+            String contextPath,
+            List<SearchFieldItem> fieldItems,
+            Comparator<AdvancedSearchTerm> comparator) {
         return fieldItems.stream()
-                .map(AdvancedSearchTerm::from)
+                .map(fi -> from(contextPath, fi))
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }

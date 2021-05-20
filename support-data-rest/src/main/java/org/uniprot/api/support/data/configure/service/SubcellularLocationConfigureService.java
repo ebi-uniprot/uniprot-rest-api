@@ -18,7 +18,8 @@ public class SubcellularLocationConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.SUBCELLLOCATION);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.SUBCELLLOCATION);
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(
+                contextPath, UniProtDataType.SUBCELLLOCATION);
     }
 }

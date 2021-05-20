@@ -18,7 +18,7 @@ public class KeywordConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.KEYWORD);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.KEYWORD);
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.KEYWORD);
     }
 }

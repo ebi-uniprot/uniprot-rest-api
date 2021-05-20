@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.support.data.configure.service.UtilServiceTest.CONTEXT_PATH;
 
 import java.util.List;
 
@@ -20,13 +21,13 @@ class UniProtKBConfigureServiceTest {
 
     @Test
     void testGetUniProtSearchItems() {
-        List<AdvancedSearchTerm> items = service.getUniProtSearchItems();
+        List<AdvancedSearchTerm> items = service.getUniProtSearchItems(CONTEXT_PATH);
         assertEquals(27, items.size());
     }
 
     @Test
     void testGetUniProtSearchCrossReferences() {
-        List<AdvancedSearchTerm> searchTerms = service.getUniProtSearchItems();
+        List<AdvancedSearchTerm> searchTerms = service.getUniProtSearchItems(CONTEXT_PATH);
         assertNotNull(searchTerms);
         AdvancedSearchTerm crossRefGroup =
                 searchTerms.stream()

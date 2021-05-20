@@ -4,6 +4,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,9 +31,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/configure/uniref")
 public class UniRefConfigureController {
     private final UniRefConfigureService service;
+    private final ServletContext servletContext;
 
-    public UniRefConfigureController(UniRefConfigureService service) {
+    public UniRefConfigureController(
+            UniRefConfigureService service, ServletContext servletContext) {
         this.service = service;
+        this.servletContext = servletContext;
     }
 
     @Operation(
@@ -73,6 +78,6 @@ public class UniRefConfigureController {
             })
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getSearchFields() {
-        return service.getSearchItems();
+        return service.getSearchItems(servletContext.getContextPath());
     }
 }

@@ -18,7 +18,7 @@ public class TaxonomyConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.TAXONOMY);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
-        return AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.TAXONOMY);
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
+        return AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.TAXONOMY);
     }
 }

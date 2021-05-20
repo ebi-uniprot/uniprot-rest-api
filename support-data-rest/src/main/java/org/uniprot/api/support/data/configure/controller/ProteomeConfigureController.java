@@ -4,6 +4,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,10 +30,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/configure/proteomes")
 public class ProteomeConfigureController {
+    private final ServletContext servletContext;
     private final ProteomeConfigureService service;
 
-    public ProteomeConfigureController(ProteomeConfigureService service) {
+    public ProteomeConfigureController(
+            ProteomeConfigureService service, ServletContext servletContext) {
         this.service = service;
+        this.servletContext = servletContext;
     }
 
     @Operation(
@@ -73,6 +78,6 @@ public class ProteomeConfigureController {
             })
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getSearchFields() {
-        return service.getSearchItems();
+        return service.getSearchItems(servletContext.getContextPath());
     }
 }

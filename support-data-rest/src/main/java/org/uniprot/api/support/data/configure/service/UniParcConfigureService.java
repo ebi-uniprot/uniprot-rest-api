@@ -26,11 +26,11 @@ public class UniParcConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPARC);
     }
 
-    public List<AdvancedSearchTerm> getSearchItems() {
+    public List<AdvancedSearchTerm> getSearchItems(String contextPath) {
         List<AdvancedSearchTerm.Value> databases = getUniParcAllDatabaseValues();
         List<AdvancedSearchTerm.Value> aliveDabases = getUniParcAliveDatabaseValues();
         List<AdvancedSearchTerm> result =
-                AdvancedSearchTerm.getAdvancedSearchTerms(UniProtDataType.UNIPARC);
+                AdvancedSearchTerm.getAdvancedSearchTerms(contextPath, UniProtDataType.UNIPARC);
 
         for (int i = 0; i < result.size(); i++) {
             AdvancedSearchTerm searchTerm = result.get(i);

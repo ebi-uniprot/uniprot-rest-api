@@ -1,20 +1,21 @@
 package org.uniprot.api.rest.output.header;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.rest.service.ServiceInfoConfig;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpHeaders.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.PUBLIC_MAX_AGE;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_RELEASE_NUMBER;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.http.HttpHeaders.*;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.PUBLIC_MAX_AGE;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_RELEASE_NUMBER;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.rest.service.ServiceInfoConfig;
 
 class HttpCommonHeaderConfigTest {
 
