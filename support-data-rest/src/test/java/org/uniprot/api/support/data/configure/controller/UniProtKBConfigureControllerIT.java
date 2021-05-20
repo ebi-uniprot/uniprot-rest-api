@@ -1,5 +1,18 @@
 package org.uniprot.api.support.data.configure.controller;
 
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import javax.servlet.ServletContext;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,19 +27,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 
-import javax.servlet.ServletContext;
-
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /** @author lgonzales */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
@@ -36,8 +36,7 @@ class UniProtKBConfigureControllerIT {
     private static final String BASIC_RESOURCE = "/configure/uniprotkb";
 
     @Autowired private MockMvc mockMvc;
-    @MockBean
-    private ServletContext servletContext;
+    @MockBean private ServletContext servletContext;
 
     @Test
     void canGetUniProtSearchTermsTemp() throws Exception {
@@ -64,7 +63,8 @@ class UniProtKBConfigureControllerIT {
 
         // then
         validateResponse(response);
-        response.andExpect(jsonPath("$.[4].autoComplete", is("/uniprot/api/suggester?dict=organism&query=?")));
+        response.andExpect(
+                jsonPath("$.[4].autoComplete", is("/uniprot/api/suggester?dict=organism&query=?")));
     }
 
     @Test

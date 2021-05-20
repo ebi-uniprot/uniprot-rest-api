@@ -151,8 +151,7 @@ class AdvancedSearchTermIT {
         Assertions.assertEquals("go_evidence", goEvidence.getTerm());
         Assertions.assertNotNull(goEvidence.getEvidenceGroups());
         List<EvidenceGroup> goEvidences = goEvidence.getEvidenceGroups();
-        Assertions.assertEquals(
-                GoEvidences.INSTANCE.getEvidences().size(), goEvidences.size());
+        Assertions.assertEquals(GoEvidences.INSTANCE.getEvidences().size(), goEvidences.size());
         EvidenceGroup anyGroup = goEvidences.get(0);
         Assertions.assertEquals("Any", anyGroup.getGroupName());
         Assertions.assertNotNull(anyGroup.getItems());

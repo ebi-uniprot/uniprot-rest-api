@@ -865,7 +865,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
             goAssertionCodes.addAll(
                     Arrays.asList(
-                            "rca", "nd", "ibd", "ikr", "ird", "unknown")); // TODO: is it correct?
+                            "rca", "nd", "ibd", "ikr", "ird", "unknown", "evidence"));
 
             goAssertionCodes.forEach(
                     code ->
