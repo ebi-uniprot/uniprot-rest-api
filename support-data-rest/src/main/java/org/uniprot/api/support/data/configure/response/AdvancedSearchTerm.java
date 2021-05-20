@@ -15,7 +15,10 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.config.searchfield.model.SearchFieldType;
 import org.uniprot.store.search.domain.EvidenceGroup;
+import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.AnnotationEvidences;
+import org.uniprot.store.search.domain.impl.EvidenceGroupImpl;
+import org.uniprot.store.search.domain.impl.EvidenceItemImpl;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -116,7 +119,11 @@ public class AdvancedSearchTerm implements Serializable {
             b.fieldType(fi.getFieldType().name().toLowerCase());
             if (fi.getFieldType() == SearchFieldType.EVIDENCE) {
                 if (fi.getId().equalsIgnoreCase("go_evidence")) {
-                    b.evidenceGroups(GoEvidences.INSTANCE.getEvidences());
+                    List<EvidenceGroup> goEvidences =
+                            GoEvidences.INSTANCE.getEvidences().stream()
+                                    .map(AdvancedSearchTerm::mapGoEvidenceGroup)
+                                    .collect(Collectors.toList());
+                    b.evidenceGroups(goEvidences);
                 } else {
                     b.evidenceGroups(AnnotationEvidences.INSTANCE.getEvidences());
                 }
@@ -136,6 +143,23 @@ public class AdvancedSearchTerm implements Serializable {
         }
 
         return b.build();
+    }
+
+    private static EvidenceGroup mapGoEvidenceGroup(EvidenceGroup evidenceGroup) {
+        EvidenceGroupImpl result = new EvidenceGroupImpl();
+        result.setGroupName(evidenceGroup.getGroupName());
+        result.setItems(
+                evidenceGroup.getItems().stream()
+                        .map(AdvancedSearchTerm::mapGoEvidenceItem)
+                        .collect(Collectors.toList()));
+        return result;
+    }
+
+    private static EvidenceItem mapGoEvidenceItem(EvidenceItem evidenceItem) {
+        EvidenceItemImpl result = new EvidenceItemImpl();
+        result.setName(evidenceItem.getName());
+        result.setCode(evidenceItem.getCode().toLowerCase()); // lower case code for search fields
+        return result;
     }
 
     private static List<AdvancedSearchTerm> convert(
