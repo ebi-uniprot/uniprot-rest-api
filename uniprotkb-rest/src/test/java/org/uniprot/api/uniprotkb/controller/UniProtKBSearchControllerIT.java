@@ -863,9 +863,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             .map(String::toLowerCase)
                             .collect(Collectors.toList());
 
-            goAssertionCodes.addAll(
-                    Arrays.asList(
-                            "rca", "nd", "ibd", "ikr", "ird", "unknown", "evidence"));
+            goAssertionCodes.addAll(Arrays.asList("rca", "nd", "ibd", "ikr", "ird", "unknown"));
 
             goAssertionCodes.forEach(
                     code ->
