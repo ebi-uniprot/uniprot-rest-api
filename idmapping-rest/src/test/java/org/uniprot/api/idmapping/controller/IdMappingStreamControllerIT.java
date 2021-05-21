@@ -77,6 +77,7 @@ class IdMappingStreamControllerIT {
                                         startsWith(
                                                 "form-data; name=\"attachment\"; filename=\"uniprot-")))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, containsString("max-age")))
                 .andExpect(content().contentTypeCompatibleWith(mediaType))
                 .andExpect(content().string(not(containsString("facets"))));
     }

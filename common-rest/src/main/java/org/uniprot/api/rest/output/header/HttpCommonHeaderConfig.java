@@ -1,25 +1,25 @@
 package org.uniprot.api.rest.output.header;
 
-import static org.springframework.http.HttpHeaders.*;
-
-import java.io.IOException;
-import java.util.regex.Pattern;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.api.rest.service.ServiceInfoConfig;
 import org.uniprot.core.util.Utils;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.regex.Pattern;
+
+import static org.springframework.http.HttpHeaders.*;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.
@@ -36,6 +36,7 @@ public class HttpCommonHeaderConfig {
     static final String ALLOW_ALL_ORIGINS = "*";
     public static final String X_TOTAL_RECORDS = "x-total-records";
     static final String PUBLIC_MAX_AGE = "public, max-age=";
+    static final String NO_CACHE = "no-cache";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
     private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 
@@ -102,11 +103,14 @@ public class HttpCommonHeaderConfig {
         if (requiresCachingHeaders) {
             // request gateway caching
             response.addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + serviceInfo.getMaxAgeInSeconds());
-
-            // used so that gate-way caching uses accept/accept-encoding headers as a key
-            response.addHeader(VARY, ACCEPT);
-            response.addHeader(VARY, ACCEPT_ENCODING);
-            response.addHeader(VARY, X_RELEASE_NUMBER);
+        } else {
+            // explictly assert to any gate-way cache that we do not want caching
+            response.addHeader(CACHE_CONTROL, NO_CACHE);
         }
+
+        // used so that any gate-way caching that takes place uses accept/accept-encoding headers as a key
+        response.addHeader(VARY, ACCEPT);
+        response.addHeader(VARY, ACCEPT_ENCODING);
+        response.addHeader(VARY, X_RELEASE_NUMBER);
     }
 }
