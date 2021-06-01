@@ -148,7 +148,7 @@ class AdvancedSearchTermIT {
                         .orElseThrow(AssertionFailedError::new);
         Assertions.assertNotNull(goEvidence);
         Assertions.assertEquals("evidence", goEvidence.getFieldType());
-        Assertions.assertEquals("go_manual", goEvidence.getTerm());
+        Assertions.assertEquals("go", goEvidence.getTerm());
         Assertions.assertNotNull(goEvidence.getEvidenceGroups());
         List<EvidenceGroup> goEvidences = goEvidence.getEvidenceGroups();
         Assertions.assertEquals(GoEvidences.INSTANCE.getEvidences().size(), goEvidences.size());
