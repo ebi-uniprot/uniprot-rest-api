@@ -1,10 +1,9 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.util.List;
-
-import javax.servlet.ServletContext;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,13 +29,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/configure/locations")
 public class SubcellularLocationConfigureController {
-    private final ServletContext servletContext;
     private final SubcellularLocationConfigureService service;
 
     public SubcellularLocationConfigureController(
-            SubcellularLocationConfigureService service, ServletContext servletContext) {
+            SubcellularLocationConfigureService service) {
         this.service = service;
-        this.servletContext = servletContext;
     }
 
     @Operation(
@@ -78,6 +75,6 @@ public class SubcellularLocationConfigureController {
             })
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getSearchFields() {
-        return service.getSearchItems(servletContext.getContextPath());
+        return service.getSearchItems(PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS);
     }
 }

@@ -1,13 +1,12 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
-
-import javax.servlet.ServletContext;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -41,12 +40,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UniProtKBConfigureController {
     private final UniProtKBConfigureService service;
     private String searchTermResponse;
-    private final ServletContext servletContext;
 
     public UniProtKBConfigureController(
-            UniProtKBConfigureService service, ServletContext servletContext) {
+            UniProtKBConfigureService service) {
         this.service = service;
-        this.servletContext = servletContext;
     }
 
     // FIXME Delete this method once UI team starts consuming response of api search-fields.
@@ -82,7 +79,7 @@ public class UniProtKBConfigureController {
             })
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getUniProtSearchTerms() {
-        return service.getUniProtSearchItems(servletContext.getContextPath());
+        return service.getUniProtSearchItems(PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS);
     }
 
     @Operation(

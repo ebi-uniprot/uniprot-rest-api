@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AdvancedSearchTerm implements Serializable {
+    public static final String PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS = "";
     private static final long serialVersionUID = -5776203445383103470L;
     private String id;
     @JsonIgnore private String parentId;

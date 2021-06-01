@@ -1,10 +1,9 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.util.List;
-
-import javax.servlet.ServletContext;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,12 +30,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/configure/uniref")
 public class UniRefConfigureController {
     private final UniRefConfigureService service;
-    private final ServletContext servletContext;
 
     public UniRefConfigureController(
-            UniRefConfigureService service, ServletContext servletContext) {
+            UniRefConfigureService service) {
         this.service = service;
-        this.servletContext = servletContext;
     }
 
     @Operation(
@@ -78,6 +75,6 @@ public class UniRefConfigureController {
             })
     @GetMapping("/search-fields")
     public List<AdvancedSearchTerm> getSearchFields() {
-        return service.getSearchItems(servletContext.getContextPath());
+        return service.getSearchItems(PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS);
     }
 }
