@@ -2,7 +2,6 @@ package org.uniprot.api.support.data.configure.controller;
 
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,13 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import javax.servlet.ServletContext;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,7 +32,6 @@ class UniProtKBConfigureControllerIT {
     private static final String BASIC_RESOURCE = "/configure/uniprotkb";
 
     @Autowired private MockMvc mockMvc;
-    @MockBean private ServletContext servletContext;
 
     @Test
     void canGetUniProtSearchTermsTemp() throws Exception {
@@ -55,7 +50,6 @@ class UniProtKBConfigureControllerIT {
     void canGetUniProtSearchTerms() throws Exception {
 
         // when
-        when(this.servletContext.getContextPath()).thenReturn("/uniprot/api");
         ResultActions response =
                 mockMvc.perform(
                         get(BASIC_RESOURCE + "/search-fields")
@@ -63,8 +57,7 @@ class UniProtKBConfigureControllerIT {
 
         // then
         validateResponse(response);
-        response.andExpect(
-                jsonPath("$.[4].autoComplete", is("/uniprot/api/suggester?dict=organism&query=?")));
+        response.andExpect(jsonPath("$.[4].autoComplete", is("/suggester?dict=organism&query=?")));
     }
 
     @Test
