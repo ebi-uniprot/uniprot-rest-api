@@ -31,8 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class TaxonomyConfigureController {
     private final TaxonomyConfigureService service;
 
-    public TaxonomyConfigureController(
-            TaxonomyConfigureService service) {
+    public TaxonomyConfigureController(TaxonomyConfigureService service) {
         this.service = service;
     }
 

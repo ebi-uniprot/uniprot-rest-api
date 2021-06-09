@@ -32,8 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UniParcConfigureController {
     private final UniParcConfigureService service;
 
-    public UniParcConfigureController(
-            UniParcConfigureService service) {
+    public UniParcConfigureController(UniParcConfigureService service) {
         this.service = service;
     }
 

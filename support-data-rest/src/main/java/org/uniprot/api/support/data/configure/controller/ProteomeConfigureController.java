@@ -31,8 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ProteomeConfigureController {
     private final ProteomeConfigureService service;
 
-    public ProteomeConfigureController(
-            ProteomeConfigureService service) {
+    public ProteomeConfigureController(ProteomeConfigureService service) {
         this.service = service;
     }
 

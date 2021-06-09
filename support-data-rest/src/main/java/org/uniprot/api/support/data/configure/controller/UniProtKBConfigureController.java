@@ -41,8 +41,7 @@ public class UniProtKBConfigureController {
     private final UniProtKBConfigureService service;
     private String searchTermResponse;
 
-    public UniProtKBConfigureController(
-            UniProtKBConfigureService service) {
+    public UniProtKBConfigureController(UniProtKBConfigureService service) {
         this.service = service;
     }
 
@@ -57,7 +56,7 @@ public class UniProtKBConfigureController {
         }
 
         final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(searchTermResponse, httpHeaders, HttpStatus.OK);
     }
 

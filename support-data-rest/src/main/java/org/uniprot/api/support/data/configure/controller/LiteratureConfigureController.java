@@ -31,8 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class LiteratureConfigureController {
     private final LiteratureConfigureService service;
 
-    public LiteratureConfigureController(
-            LiteratureConfigureService service) {
+    public LiteratureConfigureController(LiteratureConfigureService service) {
         this.service = service;
     }
 

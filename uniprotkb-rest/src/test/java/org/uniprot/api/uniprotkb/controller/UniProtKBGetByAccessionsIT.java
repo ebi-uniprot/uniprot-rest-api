@@ -1,10 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -159,7 +155,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultMatcher rm2 =
                 jsonPath(
                         "$.facets.*.label",
-                        contains(
+                        containsInAnyOrder(
                                 "3D Structure",
                                 "Proteins with",
                                 "Fragment",
@@ -227,7 +223,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultMatcher rm3 =
                 jsonPath(
                         "$.facets.*.label",
-                        contains(
+                        containsInAnyOrder(
                                 "3D Structure",
                                 "Proteins with",
                                 "Fragment",
@@ -240,7 +236,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultMatcher rm4 =
                 jsonPath(
                         "$.facets.*.name",
-                        contains(
+                        containsInAnyOrder(
                                 "structure_3d",
                                 "proteins_with",
                                 "fragment",
@@ -288,8 +284,8 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String[] getInvalidFacetErrorMessage() {
         return new String[] {
-            "Invalid facet name 'invalid_facet1'. Expected value can be [structure_3d, proteins_with, "
-                    + "fragment, existence, length, reviewed, annotation_score, model_organism, other_organism, proteome]."
+            "Invalid facet name 'invalid_facet1'. Expected value can be [structure_3d, fragment, "
+                    + "proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome]."
         };
     }
 

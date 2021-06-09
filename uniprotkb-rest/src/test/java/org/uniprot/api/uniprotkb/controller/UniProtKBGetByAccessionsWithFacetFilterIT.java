@@ -165,7 +165,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithMultiValueFacetFilterSuccess() throws Exception {
-        String facetFilter = "existence:HOMOLOGY OR existence:TRANSCRIPT_LEVEL";
+        String facetFilter = "existence:3 OR existence:2";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -200,7 +200,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithSingleAndMultiValueFacetFilterSuccess() throws Exception {
-        String facetFilter = "reviewed:true AND (existence:HOMOLOGY OR existence:TRANSCRIPT_LEVEL)";
+        String facetFilter = "reviewed:true AND (existence:3 OR existence:2)";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -251,10 +251,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.facets[0].values.*.label",
                                 contains("Homology", "Transcript level")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.value",
-                                contains("HOMOLOGY", "TRANSCRIPT_LEVEL")))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("3", "2")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 1)))
                 .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
@@ -321,10 +318,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.facets[0].values.*.label",
                                 contains("Homology", "Transcript level")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.value",
-                                contains("HOMOLOGY", "TRANSCRIPT_LEVEL")))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("3", "2")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(4, 1)))
                 .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
@@ -412,8 +406,8 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
-                                        "Invalid facet name 'invalidFacet1'. Expected value can be [structure_3d, proteins_with, fragment, existence, length, reviewed, annotation_score, model_organism, other_organism, proteome].",
-                                        "Invalid facet name 'invalidFacet2'. Expected value can be [structure_3d, proteins_with, fragment, existence, length, reviewed, annotation_score, model_organism, other_organism, proteome].")));
+                                        "Invalid facet name 'invalidFacet1'. Expected value can be [structure_3d, fragment, proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome].",
+                                        "Invalid facet name 'invalidFacet2'. Expected value can be [structure_3d, fragment, proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome].")));
     }
 
     @Test
