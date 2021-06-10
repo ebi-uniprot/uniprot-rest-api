@@ -31,8 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class DiseaseConfigureController {
     private final DiseaseConfigureService service;
 
-    public DiseaseConfigureController(
-            DiseaseConfigureService service) {
+    public DiseaseConfigureController(DiseaseConfigureService service) {
         this.service = service;
     }
 

@@ -1,12 +1,14 @@
 package org.uniprot.api.idmapping.controller.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.Pattern;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+
 import org.uniprot.api.rest.request.StreamRequest;
 
-import javax.validation.constraints.Pattern;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * Created 20/05/2021

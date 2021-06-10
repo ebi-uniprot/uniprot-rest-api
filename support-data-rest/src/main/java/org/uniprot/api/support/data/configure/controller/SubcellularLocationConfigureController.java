@@ -31,8 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class SubcellularLocationConfigureController {
     private final SubcellularLocationConfigureService service;
 
-    public SubcellularLocationConfigureController(
-            SubcellularLocationConfigureService service) {
+    public SubcellularLocationConfigureController(SubcellularLocationConfigureService service) {
         this.service = service;
     }
 

@@ -113,7 +113,9 @@ public class MessageConverterConfig {
                 // ------------------------- IdMappingStringPair -------------------------
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
-                                new ObjectMapper(), IdMappingStringPair.class, ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING));
+                                new ObjectMapper(),
+                                IdMappingStringPair.class,
+                                ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING));
                 converters.add(index++, idMappingPairJsonMessageConverter);
                 converters.add(index++, new ListMessageConverter());
                 converters.add(

@@ -31,8 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class CrossRefConfigureController {
     private final CrossRefConfigureService service;
 
-    public CrossRefConfigureController(
-            CrossRefConfigureService service) {
+    public CrossRefConfigureController(CrossRefConfigureService service) {
         this.service = service;
     }
 
