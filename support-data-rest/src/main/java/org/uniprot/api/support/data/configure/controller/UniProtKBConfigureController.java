@@ -41,8 +41,7 @@ public class UniProtKBConfigureController {
     private final UniProtKBConfigureService service;
     private String searchTermResponse;
 
-    public UniProtKBConfigureController(
-            UniProtKBConfigureService service) {
+    public UniProtKBConfigureController(UniProtKBConfigureService service) {
         this.service = service;
     }
 

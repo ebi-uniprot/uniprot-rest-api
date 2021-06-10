@@ -31,8 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class KeywordConfigureController {
     private final KeywordConfigureService service;
 
-    public KeywordConfigureController(
-            KeywordConfigureService service) {
+    public KeywordConfigureController(KeywordConfigureService service) {
         this.service = service;
     }
 

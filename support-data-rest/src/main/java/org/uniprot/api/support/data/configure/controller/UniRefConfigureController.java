@@ -31,8 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UniRefConfigureController {
     private final UniRefConfigureService service;
 
-    public UniRefConfigureController(
-            UniRefConfigureService service) {
+    public UniRefConfigureController(UniRefConfigureService service) {
         this.service = service;
     }
 

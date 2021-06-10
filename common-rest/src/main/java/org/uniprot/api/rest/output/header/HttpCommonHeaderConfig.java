@@ -1,25 +1,25 @@
 package org.uniprot.api.rest.output.header;
 
+import static org.springframework.http.HttpHeaders.*;
+
+import java.io.IOException;
+import java.util.regex.Pattern;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.api.rest.service.ServiceInfoConfig;
 import org.uniprot.core.util.Utils;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.regex.Pattern;
-
-import static org.springframework.http.HttpHeaders.*;
 
 /**
  * Defines common HTTP headers which can be imported to any REST module.
@@ -108,7 +108,8 @@ public class HttpCommonHeaderConfig {
             response.addHeader(CACHE_CONTROL, NO_CACHE);
         }
 
-        // used so that any gate-way caching that takes place uses accept/accept-encoding headers as a key
+        // used so that any gate-way caching that takes place uses accept/accept-encoding headers as
+        // a key
         response.addHeader(VARY, ACCEPT);
         response.addHeader(VARY, ACCEPT_ENCODING);
         response.addHeader(VARY, X_RELEASE_NUMBER);
