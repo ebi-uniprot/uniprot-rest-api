@@ -1,82 +1,82 @@
 variables:
-  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=true"
-  SONAR_PROPS: "-Dsonar.organization=ebi-uniprot -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true"
-  SONAR_HOST_URL: "https://sonarcloud.io"
-  MAVEN_SETTINGS: "maven-settings.xml"
-  URL_MAVEN_SETTINGS: "https://gitlab.ebi.ac.uk/api/v4/projects/${CONFIG_PROJECT_ID}/repository/files/${MAVEN_SETTINGS}/raw?ref=master&private_token=${GITLAB_USER_API_TOKEN}"
-  UNIPROT_RESOURCES: "-Dcv.db.types.location=ftp://ftp.ebi.ac.uk/pub/databases/uniprot/current_release/knowledgebase/complete/docs/dbxref.txt"
-  GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-  JACOCO_AGGREGATE_REPORT: "jacoco-aggregate-report/target/site/jacoco-aggregate/jacoco.xml"
+    MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.springframework.boot.test.autoconfigure.web.servlet=ERROR -Dorg.slf4j.simpleLogger.log.org.springframework.boot.test.context.SpringBootTestContextBootstrapper=ERROR -Dorg.slf4j.simpleLogger.log.org.springframework.test.context.transaction.TransactionContext=ERROR -Dorg.slf4j.simpleLogger.log.org.apache.zookeeper=ERROR -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+    MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=true"
+    SONAR_PROPS: "-Dsonar.organization=ebi-uniprot -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true"
+    SONAR_HOST_URL: "https://sonarcloud.io"
+    MAVEN_SETTINGS: "maven-settings.xml"
+    URL_MAVEN_SETTINGS: "https://gitlab.ebi.ac.uk/api/v4/projects/${CONFIG_PROJECT_ID}/repository/files/${MAVEN_SETTINGS}/raw?ref=master&private_token=${GITLAB_USER_API_TOKEN}"
+    UNIPROT_RESOURCES: "-Dcv.db.types.location=ftp://ftp.ebi.ac.uk/pub/databases/uniprot/current_release/knowledgebase/complete/docs/dbxref.txt"
+    GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    JACOCO_AGGREGATE_REPORT: "jacoco-aggregate-report/target/site/jacoco-aggregate/jacoco.xml"
 
-image: maven:3.6.3-jdk-11
-cache:
-  key: "$CI_COMMIT_REF_SLUG"
-  paths:
-    - .m2/repository
-    - .sonar/cache
+  image: maven:3.6.3-jdk-11
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - .m2/repository
+      - .sonar/cache
 
-stages:
-  - setup
-  - test
-  - quality
-  - deploy
+  stages:
+    - setup
+    - test
+    - quality
+    - deploy
 
-api:settings:
-  stage: setup
-  before_script:
-    - 'wget --no-cache --no-cookies -O ${MAVEN_SETTINGS} "${URL_MAVEN_SETTINGS}"'
-  script:
-    - if [ ! -f ${MAVEN_SETTINGS} ];
+  api:settings:
+    stage: setup
+    before_script:
+      - 'wget --no-cache --no-cookies -O ${MAVEN_SETTINGS} "${URL_MAVEN_SETTINGS}"'
+    script:
+      - if [ ! -f ${MAVEN_SETTINGS} ];
         then echo "CI settings missing";
-      fi
-  artifacts:
-    when: always
-    expire_in: 2 days
-    paths:
-      - ./${MAVEN_SETTINGS}
+        fi
+    artifacts:
+      when: always
+      expire_in: 2 days
+      paths:
+        - ./${MAVEN_SETTINGS}
 
-api:test:
-  stage: test
-  script:
-    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS}'
-    - 'mkdir -p ./jacoco-report'
-    - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
-    - 'echo =====before removing jars====='
-    - 'ls ./*/target/*.jar'
-    - 'rm -rfv ./*/target/*.jar'
-    - 'echo =====after removing jars====='
-    - 'ls ./*/target/*.jar'
-    - 'echo done.'
-  artifacts:
-    when: always
-    expire_in: 2 days
-    paths:
-      - ./*/target
-      - ./jacoco-report
-    reports:
-      junit:
-        - ./*/target/surefire-reports/TEST-*.xml
+  api:test:
+    stage: test
+    script:
+      - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS}'
+      - 'mkdir -p ./jacoco-report'
+      - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
+      - 'echo =====before removing jars====='
+      - 'ls ./*/target/*.jar'
+      - 'rm -rfv ./*/target/*.jar'
+      - 'echo =====after removing jars====='
+      - 'ls ./*/target/*.jar'
+      - 'echo done.'
+    artifacts:
+      when: always
+      expire_in: 2 days
+      paths:
+        - ./*/target
+        - ./jacoco-report
+      reports:
+        junit:
+          - ./*/target/surefire-reports/TEST-*.xml
 
-api:sonar:
-  stage: quality
-  script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=$(pwd)/jacoco-report/jacoco.xml sonar:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api
-  dependencies:
-    - api:test
-    - api:settings
+  api:sonar:
+    stage: quality
+    script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=$(pwd)/jacoco-report/jacoco.xml sonar:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api
+    dependencies:
+      - api:test
+      - api:settings
 
-api:deploy:
-  stage: deploy
-  script: mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
-  dependencies:
-    - api:settings
-  only:
-    - master
-    
-#after_script:
-#  - 'pwd'
-#  - 'ls -al'
-#  - 'ls -al */'
-#  - 'ls -al */*/'
-#  - 'ls -al */*/*/'
+  api:deploy:
+    stage: deploy
+    script: mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
+    dependencies:
+      - api:settings
+    only:
+      - master
+
+  #after_script:
+  #  - 'pwd'
+  #  - 'ls -al'
+  #  - 'ls -al */'
+  #  - 'ls -al */*/'
+  #  - 'ls -al */*/*/'
