@@ -48,6 +48,7 @@ api:test:
     - 'rm -rfv ./*/target/*.jar'
     - 'echo =====after removing jars====='
     - 'ls ./*/target/*.jar'
+    - 'echo done.'
   artifacts:
     when: always
     expire_in: 2 days
