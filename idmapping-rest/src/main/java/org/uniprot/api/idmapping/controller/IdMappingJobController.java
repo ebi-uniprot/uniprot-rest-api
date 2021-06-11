@@ -1,20 +1,15 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
-
-import javax.validation.Valid;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobDetailResponse;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -24,11 +19,11 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
 
 /**
  * @author sahmad
@@ -81,8 +76,10 @@ public class IdMappingJobController {
                                     schema = @Schema(implementation = JobStatusResponse.class))
                         })
             })
-    public ResponseEntity<JobStatusResponse> getStatus(@PathVariable String jobId) {
-        return createStatus(cacheService.getJobAsResource(jobId));
+    public ResponseEntity<JobStatusResponse> getStatus(
+            @PathVariable String jobId, HttpServletRequest servletRequest) {
+        return createStatus(
+                cacheService.getJobAsResource(jobId), servletRequest.getRequestURL().toString());
     }
 
     @GetMapping(
@@ -98,7 +95,8 @@ public class IdMappingJobController {
                                     schema = @Schema(implementation = JobDetailResponse.class))
                         })
             })
-    public ResponseEntity<JobDetailResponse> getDetails(@PathVariable String jobId) {
+    public ResponseEntity<JobDetailResponse> getDetails(
+            @PathVariable String jobId, HttpServletRequest servletRequest) {
         IdMappingJob job = cacheService.getJobAsResource(jobId);
         IdMappingJobRequest jobRequest = job.getIdMappingRequest();
 
@@ -108,13 +106,15 @@ public class IdMappingJobController {
         detailResponse.setIds(jobRequest.getIds());
         detailResponse.setTaxId(jobRequest.getTaxId());
         if (JobStatus.FINISHED == job.getJobStatus()) {
-            detailResponse.setRedirectURL(idMappingJobService.getRedirectPathToResults(job));
+            detailResponse.setRedirectURL(
+                    idMappingJobService.getRedirectPathToResults(
+                            job, servletRequest.getRequestURL().toString()));
         }
 
         return ResponseEntity.ok(detailResponse);
     }
 
-    private ResponseEntity<JobStatusResponse> createStatus(IdMappingJob job) {
+    private ResponseEntity<JobStatusResponse> createStatus(IdMappingJob job, String url) {
         ResponseEntity<JobStatusResponse> response;
         switch (job.getJobStatus()) {
             case NEW:
@@ -122,7 +122,7 @@ public class IdMappingJobController {
                 response = ResponseEntity.ok(new JobStatusResponse(job.getJobStatus()));
                 break;
             case FINISHED:
-                String redirectUrl = idMappingJobService.getRedirectPathToResults(job);
+                String redirectUrl = idMappingJobService.getRedirectPathToResults(job, url);
 
                 response =
                         ResponseEntity.status(HttpStatus.SEE_OTHER)
