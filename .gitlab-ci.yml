@@ -47,6 +47,7 @@ api:test:
     when: always
     expire_in: 2 days
     paths:
+      - ./*/target
       - ./jacoco-report
     reports:
       junit:
