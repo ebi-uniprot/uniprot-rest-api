@@ -169,15 +169,15 @@ class IdMappingJobServiceTest {
         @ParameterizedTest(name = "{index}: {0}")
         @ValueSource(
                 strings = {
-                    "jobId + UniRef50 -> https://www.ebi.ac.uk/uniprot/beta/idmapping/uniref/results/jobId",
-                    "jobId + UniRef90 -> https://www.ebi.ac.uk/uniprot/beta/idmapping/uniref/results/jobId",
-                    "jobId + UniRef100 -> https://www.ebi.ac.uk/uniprot/beta/idmapping/uniref/results/jobId",
-                    "jobId + UniParc -> https://www.ebi.ac.uk/uniprot/beta/idmapping/uniparc/results/jobId",
-                    "jobId + UniProtKB -> https://www.ebi.ac.uk/uniprot/beta/idmapping/uniprotkb/results/jobId",
-                    "jobId + ANYTHING -> https://www.ebi.ac.uk/uniprot/beta/idmapping/results/jobId"
+                    "jobId + UniRef50 -> http://localhost/idmapping/uniref/results/jobId",
+                    "jobId + UniRef90 -> http://localhost/idmapping/uniref/results/jobId",
+                    "jobId + UniRef100 -> http://localhost/idmapping/uniref/results/jobId",
+                    "jobId + UniParc -> http://localhost/idmapping/uniparc/results/jobId",
+                    "jobId + UniProtKB -> http://localhost/idmapping/uniprotkb/results/jobId",
+                    "jobId + ANYTHING -> http://localhost/idmapping/results/jobId"
                 })
         void checkValidRedirectionLocations(String source) {
-            String requestUrl = "https://www.ebi.ac.uk/uniprot/beta/idmapping/run?a=parameter&another=parameter";
+            String requestUrl = "http://localhost/idmapping/run?a=parameter&another=parameter";
             String[] sourceParts = source.split(" \\+ ");
             String jobId = sourceParts[0];
             String remainder = sourceParts[1];
