@@ -43,9 +43,11 @@ api:test:
     - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS}'
     - 'mkdir -p ./jacoco-report'
     - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
-    - 'ls ./target' 
-    - 'rm -rfv ./target/*.jar'
-    - 'ls ./target'
+    - 'echo =====before removing jars====='
+    - 'ls ./*/target/*.jar'
+    - 'rm -rfv ./*/target/*.jar'
+    - 'echo =====after removing jars====='
+    - 'ls ./*/target/*.jar'
   artifacts:
     when: always
     expire_in: 2 days
