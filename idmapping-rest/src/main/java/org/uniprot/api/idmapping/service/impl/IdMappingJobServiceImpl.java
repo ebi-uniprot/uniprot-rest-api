@@ -1,12 +1,6 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import java.util.Date;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.IdMappingJobController;
@@ -24,6 +18,9 @@ import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
+import java.util.Date;
+import java.util.Set;
+
 /**
  * Created 23/02/2021
  *
@@ -36,6 +33,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final Set<String> UNIREF_SET;
     private static final String UNIPARC;
     private static final Set<String> UNIPROTKB_SET;
+    private static String requestUrlBase = null;
 
     static {
         UNIPARC = IdMappingFieldConfig.UPARC_STR;
@@ -57,18 +55,15 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
-    private final String contextPath;
 
     public IdMappingJobServiceImpl(
             IdMappingJobCacheService cacheService,
             IdMappingPIRService pirService,
-            ThreadPoolTaskExecutor jobTaskExecutor,
-            ServletContext servletContext) {
+            ThreadPoolTaskExecutor jobTaskExecutor) {
         this.cacheService = cacheService;
         this.pirService = pirService;
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = new HashGenerator();
-        this.contextPath = servletContext.getContextPath();
     }
 
     @Override
@@ -98,7 +93,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     }
 
     @Override
-    public String getRedirectPathToResults(IdMappingJob job) {
+    public String getRedirectPathToResults(IdMappingJob job, String requestUrl) {
         String toDB = job.getIdMappingRequest().getTo();
         String dbType = "";
         if (UNIREF_SET.contains(toDB)) {
@@ -109,12 +104,17 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
             dbType = UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH + "/";
         }
 
-        return contextPath
-                + IdMappingJobController.IDMAPPING_PATH
-                + "/"
-                + dbType
-                + RESULTS_SUBPATH
-                + job.getJobId();
+        initRequestBase(requestUrl);
+        return requestUrlBase + "/" + dbType + RESULTS_SUBPATH + job.getJobId();
+    }
+
+    private static void initRequestBase(String requestUrl) {
+        if (requestUrlBase == null) {
+            int endOfIdMappingPath =
+                    requestUrl.indexOf(IdMappingJobController.IDMAPPING_PATH)
+                            + IdMappingJobController.IDMAPPING_PATH.length();
+            requestUrlBase = requestUrl.substring(0, endOfIdMappingPath);
+        }
     }
 
     private boolean needToRunJob(String jobId) {
