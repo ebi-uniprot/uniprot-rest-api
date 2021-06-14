@@ -111,6 +111,8 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                     jsonPath("$.sequenceFeatures[*].interproGroup.id", notNullValue()));
             idParam.resultMatcher(
                     jsonPath("$.sequenceFeatures[*].interproGroup.name", notNullValue()));
+            idParam.resultMatcher(jsonPath("$.oldestCrossRefCreated", notNullValue()));
+            idParam.resultMatcher(jsonPath("$.mostRecentCrossRefUpdated", notNullValue()));
             return idParam.build();
         }
 
@@ -146,6 +148,9 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
                     .resultMatcher(jsonPath("$.uniParcCrossReferences.*.organism").exists())
                     .resultMatcher(jsonPath("$.sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
+                    .resultMatcher(jsonPath("$.sequenceFeatures").doesNotExist())
+                    .resultMatcher(jsonPath("$.oldestCrossRefCreated").exists())
+                    .resultMatcher(jsonPath("$.mostRecentCrossRefUpdated").exists())
                     .build();
         }
 

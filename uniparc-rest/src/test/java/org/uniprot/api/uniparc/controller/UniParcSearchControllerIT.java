@@ -320,8 +320,10 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     .doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequence").doesNotExist())
                     .resultMatcher(jsonPath("$.results[*].sequenceFeatures").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.oldestCrossRefCreated").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.mostRecentCrossRefUpdated").doesNotExist())
+                    .resultMatcher(
+                            jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(2)))
+                    .resultMatcher(
+                            jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(2)))
                     .build();
         }
 
@@ -334,6 +336,10 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             jsonPath(
                                     "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20", "UPI0000083A30")))
+                    .resultMatcher(
+                            jsonPath("$.results.*.oldestCrossRefCreated", iterableWithSize(3)))
+                    .resultMatcher(
+                            jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(3)))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Database", "Organisms")))
                     .resultMatcher(jsonPath("$.facets[0].values.size()", greaterThan(20)))
                     .resultMatcher(jsonPath("$.facets[0].values.*.value", hasItem("uniprot")))
