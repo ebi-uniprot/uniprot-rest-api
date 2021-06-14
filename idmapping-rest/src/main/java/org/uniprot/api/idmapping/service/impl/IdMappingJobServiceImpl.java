@@ -33,7 +33,6 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final Set<String> UNIREF_SET;
     private static final String UNIPARC;
     private static final Set<String> UNIPROTKB_SET;
-    private static String requestUrlBase = null;
 
     static {
         UNIPARC = IdMappingFieldConfig.UPARC_STR;
@@ -104,17 +103,15 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
             dbType = UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH + "/";
         }
 
-        initRequestBase(requestUrl);
+        String requestUrlBase = extractRequestBase(requestUrl);
         return requestUrlBase + "/" + dbType + RESULTS_SUBPATH + job.getJobId();
     }
 
-    private static void initRequestBase(String requestUrl) {
-        if (requestUrlBase == null) {
-            int endOfIdMappingPath =
-                    requestUrl.indexOf(IdMappingJobController.IDMAPPING_PATH)
-                            + IdMappingJobController.IDMAPPING_PATH.length();
-            requestUrlBase = requestUrl.substring(0, endOfIdMappingPath);
-        }
+    private String extractRequestBase(String requestUrl) {
+        int endOfIdMappingPath =
+                requestUrl.indexOf(IdMappingJobController.IDMAPPING_PATH)
+                        + IdMappingJobController.IDMAPPING_PATH.length();
+        return requestUrl.substring(0, endOfIdMappingPath);
     }
 
     private boolean needToRunJob(String jobId) {
