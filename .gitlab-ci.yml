@@ -40,7 +40,7 @@ api:settings:
 api:test:
   stage: test
   script:
-    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS} 2>&1 | grep "\[\(INFO\|ERROR\)\]"'
+    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS} 2>&1 | grep "\[\(INFO\|ERROR\|WARN\)\]"'
     - |
       if  [ ${PIPESTATUS[1]} -ne 0 ]; then
         echo "mvn failed"
