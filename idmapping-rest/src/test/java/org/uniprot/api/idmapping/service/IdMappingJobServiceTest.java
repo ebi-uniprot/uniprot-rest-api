@@ -134,9 +134,16 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submitResponse);
         Assertions.assertNotNull(submitResponse.getJobId());
         // then
-        Thread.sleep(1000); // delay to make sure that thread is picked to run
         String jobId = submitResponse.getJobId();
-        IdMappingJob submittedJob = this.cacheService.getJobAsResource(jobId);
+        IdMappingJob submittedJob = null;
+        int attemptsRemaining = 5;
+        while (attemptsRemaining-- > 0) {
+            Thread.sleep(1000); // delay to make sure that thread is picked to run
+            submittedJob = this.cacheService.getJobAsResource(jobId);
+            if (submittedJob != null) {
+                break;
+            }
+        }
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
         Assertions.assertEquals(JobStatus.ERROR, submittedJob.getJobStatus());
