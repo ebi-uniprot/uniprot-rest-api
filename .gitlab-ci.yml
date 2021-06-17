@@ -46,6 +46,7 @@ api:test:
         echo "Maven failed. Pipe status = ${PIPESTATUS[0]}"
         false
       fi
+    - 'echo "Maven install successful'
     - 'mkdir -p ./jacoco-report'
     - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
     - 'rm -rfv ./*/target/*.jar'
