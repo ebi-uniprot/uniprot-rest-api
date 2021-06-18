@@ -149,7 +149,7 @@ class UniProtKBInteractionControllerIT {
                 .andExpect(jsonPath("$.interactionMatrix[0].interactions.size()", is(1)))
                 .andExpect(
                         jsonPath(
-                                "$.interactionMatrix[0].interactions[0].interactantOne.uniProtkbAccession",
+                                "$.interactionMatrix[0].interactions[0].interactantOne.uniProtKBAccession",
                                 is(ENTRY_WITH_INTERACTION)))
                 .andExpect(
                         jsonPath(
@@ -157,7 +157,7 @@ class UniProtKBInteractionControllerIT {
                                 is("EBI-00001")))
                 .andExpect(
                         jsonPath(
-                                "$.interactionMatrix[0].interactions[0].interactantTwo.uniProtkbAccession",
+                                "$.interactionMatrix[0].interactions[0].interactantTwo.uniProtKBAccession",
                                 is(CROSS_REFERENCED_ASSOCIATION)))
                 .andExpect(
                         jsonPath(
