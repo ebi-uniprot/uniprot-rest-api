@@ -159,7 +159,7 @@
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniprot-indexer-integration-test</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
+			<version>${uniprot-store.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

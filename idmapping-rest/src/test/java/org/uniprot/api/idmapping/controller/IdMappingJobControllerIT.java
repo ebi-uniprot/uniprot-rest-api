@@ -5,7 +5,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -444,7 +443,10 @@ class IdMappingJobControllerIT {
                 .andExpect(jsonPath("$.ids", is(ids)))
                 .andExpect(jsonPath("$.taxId", is(taxId)))
                 .andExpect(
-                        jsonPath("$.redirectURL", matchesPattern(".*/idmapping/uniparc/results/" + jobId)));
+                        jsonPath(
+                                "$.redirectURL",
+                                matchesPattern(
+                                        "https://localhost/idmapping/uniparc/results/" + jobId)));
     }
 
     @Test
