@@ -176,11 +176,44 @@ class SolrRequestConverterTest {
         }
 
         @Test
+        void doNotCreateQueryBoostsAndFunctionsForPageSizeZero() throws IOException {
+            // given
+            SolrRequest request =
+                    SolrRequest.builder()
+                            .query("value1 value2")
+                            .rows(0)
+                            .queryConfig(
+                                    SolrQueryConfig.builder()
+                                            .defaultSearchBoost("field1:value3^3")
+                                            .defaultSearchBoostFunctions("f1,f2")
+                                            .queryFields("field1,field2")
+                                            .build())
+                            .build();
+
+            // when
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
+
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            assertNotNull(result);
+            Map<String, Object> params = (Map<String, Object>) result.get("params");
+            // then
+            assertThat(params.get("bq"), is(nullValue()));
+            assertThat(params.get("boost"), is(nullValue()));
+            assertThat(params.get("qf"), is("field1 field2"));
+        }
+
+        @Test
         void queryBoostsWithPlaceholderIsReplacedCorrectly() throws IOException {
             // given
             SolrRequest request =
                     SolrRequest.builder()
                             .query("value1 value2")
+                            .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1:{query}^3")
@@ -209,6 +242,7 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("9606")
+                            .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1=number:{query}^3")
@@ -233,11 +267,12 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void intQueryBoostWithPlaceholderAndStringQueryIsReplacedCorrectly() {
+        void intQueryBoostWithPlaceholderAndStringQueryIsReplacedCorrectly() throws IOException {
             // given
             SolrRequest request =
                     SolrRequest.builder()
                             .query("hello")
+                            .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1=number:{query}^3")
@@ -246,10 +281,19 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
+
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            assertNotNull(result);
+            Map<String, Object> params = (Map<String, Object>) result.get("params");
 
             // then
-            assertThat(solrQuery.getParams().get("bq"), is(nullValue()));
-            assertThat(solrQuery.getParams().get("boost"), is(nullValue()));
+            assertThat(params.get("bq"), is(nullValue()));
+            assertThat(params.get("boost"), is(nullValue()));
         }
 
         @Test
@@ -258,6 +302,7 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("value1 value2")
+                            .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1:value3^3")
@@ -313,6 +358,7 @@ class SolrRequestConverterTest {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("field1:value1 value2")
+                            .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
                                             .advancedSearchBoost("field1:value3^3")

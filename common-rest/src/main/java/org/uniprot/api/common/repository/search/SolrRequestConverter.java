@@ -20,6 +20,7 @@ import org.apache.solr.client.solrj.request.json.TermsFacetMap;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.core.util.Utils;
 
 /**
  * Created 14/06/19
@@ -61,7 +62,10 @@ public class SolrRequestConverter {
         }
 
         if (notNull(request.getQueryConfig())) {
-            setQueryConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
+            if (request.getRows() > 1) {
+                setQueryBoostConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
+            }
+            setQueryFields(solrQuery, request.getQueryConfig());
         }
 
         log.debug("Solr Query: " + solrQuery);
@@ -165,7 +169,7 @@ public class SolrRequestConverter {
             solrQuery.setSort(sort);
         }
 
-        static void setQueryConfigs(
+        static void setQueryBoostConfigs(
                 JsonQueryRequest solrQuery, String query, SolrQueryConfig boosts) {
             Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
             if (fieldQueryMatcher.find()) {
@@ -187,7 +191,9 @@ public class SolrRequestConverter {
                     solrQuery.withParam(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
                 }
             }
+        }
 
+        static void setQueryFields(JsonQueryRequest solrQuery, SolrQueryConfig boosts) {
             if (notNullNotEmpty(boosts.getQueryFields())) {
                 solrQuery.withParam(QUERY_FIELDS, boosts.getQueryFields());
             }
@@ -213,7 +219,9 @@ public class SolrRequestConverter {
                     boostQueries.add(processedBoost);
                 }
             }
-            solrQuery.withParam(BOOST_QUERY, String.join(" ", boostQueries));
+            if (Utils.notNullNotEmpty(boostQueries)) {
+                solrQuery.withParam(BOOST_QUERY, String.join(" ", boostQueries));
+            }
         }
 
         /**
