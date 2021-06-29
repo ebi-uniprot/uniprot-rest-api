@@ -160,7 +160,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                 get(getSearchRequestPath())
                                         .param("query", "*:*")
                                         .param("size", "0")
-                                        .param("facets", "database")
+                                        .param("facets", "database_facet")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -169,7 +169,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.facets.size()", is(1)))
-                .andExpect(jsonPath("$.facets[0].name", is("database")))
+                .andExpect(jsonPath("$.facets[0].name", is("database_facet")))
                 .andExpect(jsonPath("$.facets[0].values.size()", greaterThan(20)))
                 .andExpect(jsonPath("$.facets[0].values.*.label", is(notNullValue())))
                 .andExpect(jsonPath("$.facets[0].values.*.label", hasItem("UniProtKB")))
@@ -329,20 +329,20 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("database,organism_name"))
+                    .queryParam("facets", Collections.singletonList("database_facet,organism_name"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].uniParcId",
                                     contains("UPI0000083A11", "UPI0000083A20", "UPI0000083A30")))
-                    .resultMatcher(jsonPath("$.facets.*.label", contains("Database", "Organisms")))
-                    .resultMatcher(jsonPath("$.facets[0].values.size()", greaterThan(20)))
-                    .resultMatcher(jsonPath("$.facets[0].values.*.value", hasItem("uniprot")))
-                    .resultMatcher(jsonPath("$.facets[0].values.*.count", hasItem(3)))
+                    .resultMatcher(jsonPath("$.facets.*.label", contains("Organisms", "Database")))
+                    .resultMatcher(jsonPath("$.facets[1].values.size()", greaterThan(20)))
+                    .resultMatcher(jsonPath("$.facets[1].values.*.value", hasItem("1")))
+                    .resultMatcher(jsonPath("$.facets[1].values.*.count", hasItem(3)))
                     .resultMatcher(
                             jsonPath(
-                                    "$.facets[1].values.*.value",
+                                    "$.facets[0].values.*.value",
                                     contains("Homo sapiens", "Torpedo californica")))
-                    .resultMatcher(jsonPath("$.facets[1].values.*.count", contains(3, 3)))
+                    .resultMatcher(jsonPath("$.facets[0].values.*.count", contains(3, 3)))
                     .build();
         }
     }

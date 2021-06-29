@@ -45,6 +45,7 @@ class FacetTupleStreamTemplateTest {
         List<String> facets = Arrays.asList(facet1, facet2, facet3);
         SolrStreamFacetRequest request = builder.query(query).facets(facets).build();
         FacetConfig facetConfig = new FakeFacetConfig();
+        facetConfig.setLimit(5);
         TupleStream tupleStream = tupleStreamTemplate.create(request, facetConfig);
         assertThat(tupleStream, Matchers.is(Matchers.notNullValue()));
         assertThat(tupleStream.children(), Matchers.is(Matchers.iterableWithSize(3)));

@@ -11,8 +11,8 @@ import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.uniprot.store.search.SolrCollection;
@@ -28,7 +28,7 @@ public class SolrResultsIterator<T extends Document> implements Iterator<List<T>
     private SolrClient solrClient;
     private SolrCollection collection;
     private Class<T> documentType;
-    private SolrQuery query;
+    private JsonQueryRequest query;
     private boolean finished;
     private String currentCursorMark;
     private List<T> batch;
@@ -37,7 +37,7 @@ public class SolrResultsIterator<T extends Document> implements Iterator<List<T>
     public SolrResultsIterator(
             SolrClient solrClient,
             SolrCollection collection,
-            SolrQuery query,
+            JsonQueryRequest query,
             Class<T> documentType) {
         this.solrClient = solrClient;
         this.collection = collection;
@@ -87,8 +87,8 @@ public class SolrResultsIterator<T extends Document> implements Iterator<List<T>
 
     private void loadMoreResults() {
         try {
-            this.query.set(CursorMarkParams.CURSOR_MARK_PARAM, currentCursorMark);
-            QueryResponse response = solrClient.query(collection.toString(), this.query);
+            this.query.withParam(CursorMarkParams.CURSOR_MARK_PARAM, currentCursorMark);
+            QueryResponse response = query.process(solrClient, collection.toString());
             if (response == null) {
                 finished();
             } else {
@@ -129,7 +129,7 @@ public class SolrResultsIterator<T extends Document> implements Iterator<List<T>
         return documentType;
     }
 
-    SolrQuery getQuery() {
+    JsonQueryRequest getQuery() {
         return query;
     }
 

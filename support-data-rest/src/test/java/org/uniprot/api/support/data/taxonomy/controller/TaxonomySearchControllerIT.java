@@ -253,11 +253,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
                             jsonPath(
                                     "$.facets[1].values[2].label",
                                     is("Unreviewed (TrEMBL) entries")))
-                    .resultMatcher(jsonPath("$.facets[1].values[3].value", is("4_proteome")))
-                    .resultMatcher(jsonPath("$.facets[1].values[3].label", is("Proteomes")))
-                    .resultMatcher(jsonPath("$.facets[1].values[4].value", is("5_reference")))
+                    .resultMatcher(jsonPath("$.facets[1].values[3].value", is("4_reference")))
                     .resultMatcher(
-                            jsonPath("$.facets[1].values[4].label", is("Reference proteomes")))
+                            jsonPath("$.facets[1].values[3].label", is("Reference proteomes")))
+                    .resultMatcher(jsonPath("$.facets[1].values[4].value", is("5_proteome")))
+                    .resultMatcher(jsonPath("$.facets[1].values[4].label", is("Proteomes")))
                     .build();
         }
     }

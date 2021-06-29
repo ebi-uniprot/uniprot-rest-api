@@ -14,6 +14,7 @@ import static org.uniprot.store.search.document.suggest.SuggestDictionary.TAXONO
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -126,12 +127,12 @@ class SuggesterControllerWithServerErrorsIT {
         public SolrRequestConverter requestConverter() {
             return new SolrRequestConverter() {
                 @Override
-                public SolrQuery toSolrQuery(SolrRequest request) {
-                    SolrQuery solrQuery = super.toSolrQuery(request);
+                public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
+                    JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
 
                     // required for tests, because EmbeddedSolrServer is not sharded
-                    solrQuery.setParam("distrib", "false");
-                    solrQuery.setParam("terms.mincount", "1");
+                    solrQuery.withParam("distrib", "false");
+                    solrQuery.withParam("terms.mincount", "1");
 
                     return solrQuery;
                 }

@@ -2,9 +2,16 @@ package org.uniprot.api.common.repository.search;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,11 +19,16 @@ import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 
+import voldemort.utils.StringOutputStream;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * Created 17/06/19
  *
  * @author Edd
  */
+@Slf4j
 class SolrRequestConverterTest {
     private SolrRequestConverter converter;
 
@@ -28,8 +40,10 @@ class SolrRequestConverterTest {
     @Nested
     @DisplayName("Testing SolrQuery creation")
     class SolrQueryConverterTest {
+        ObjectMapper mapper = new ObjectMapper();
+
         @Test
-        void canCreateSolrQueryWithFacetsAndTermFields() {
+        void canCreateSolrQueryWithFacetsAndTermFields() throws IOException {
             // given
             String queryString = "query";
             int rows = 25;
@@ -66,53 +80,87 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            SolrQuery solrQuery = converter.toSolrQuery(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
+
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            assertNotNull(result);
 
             // then
-            assertThat(solrQuery.getQuery(), is(queryString));
-            assertThat(solrQuery.getRows(), is(rows));
-            assertThat(solrQuery.getFacetFields(), arrayContainingInAnyOrder(facet1));
-            assertThat(solrQuery.getParams("facet.interval"), arrayContainingInAnyOrder(facet2));
-            assertThat(
-                    solrQuery.getParams("f.length.facet.interval.set"),
-                    arrayContainingInAnyOrder(
-                            "[1,200]", "[201,400]", "[401,600]", "[601,800]", "[801,*]"));
-            assertThat(solrQuery.getFacetLimit(), is(facetLimit));
-            assertThat(solrQuery.getFacetMinCount(), is(facetMinCount));
-            assertThat(
-                    solrQuery.getTermsFields(), arrayContainingInAnyOrder(termField1, termField2));
-            assertThat(solrQuery.getTermsMinCount(), is(1));
-            assertThat(
-                    solrQuery.getFilterQueries(),
-                    arrayContainingInAnyOrder(filterQuery1, filterQuery2));
-            assertThat(
-                    solrQuery.getSorts(),
-                    contains(
-                            new SolrQuery.SortClause(sortField1, SolrQuery.ORDER.asc),
-                            new SolrQuery.SortClause(sortField2, SolrQuery.ORDER.desc)));
-            assertThat(solrQuery.get("q.op"), is(defaultQueryOperator.name()));
+            List<String> filters = (List<String>) result.get("filter");
+            assertThat(filters, containsInAnyOrder(filterQuery1, filterQuery2));
+            assertThat(result.get("query"), is(queryString));
+            assertThat(result.get("limit"), is(rows));
+            assertThat(result.get("sort"), is(sortField1 + " asc," + sortField2 + " desc"));
+
+            Map<String, Object> params = (Map<String, Object>) result.get("params");
+            assertThat(params.get("defType"), is("edismax"));
+            assertThat(params.get("distrib"), is("true"));
+            assertThat(params.get("terms"), is("true"));
+            assertThat(params.get("terms.mincount"), is("1"));
+            assertThat(params.get("terms.list"), is("query"));
+            assertThat(params.get("q.op"), is(defaultQueryOperator.name()));
+            List<String> termFields = (List<String>) params.get("terms.fl");
+            assertThat(termFields, containsInAnyOrder("term field 1", "term field 2"));
+
+            Map<String, Object> facets = (Map<String, Object>) result.get("facet");
+            assertThat(facets.keySet(), containsInAnyOrder(facet1, facet2));
+
+            Map<String, Object> fragment = (Map<String, Object>) facets.get(facet1);
+            assertThat(fragment.get("type"), is("terms"));
+            assertThat(fragment.get("field"), is(facet1));
+            assertThat(fragment.get("mincount"), is(10));
+            assertThat(fragment.get("limit"), is(2));
+            assertThat(fragment.get("refine"), is(true));
+
+            Map<String, Object> lengthFacet = (Map<String, Object>) facets.get(facet2);
+            assertThat(lengthFacet.get("type"), is("range"));
+            assertThat(lengthFacet.get("field"), is(facet2));
+            assertThat(lengthFacet.get("refine"), is("true"));
+            List ranges = (List) lengthFacet.get("ranges");
+            assertNotNull(ranges);
+            assertThat(((Map) ranges.get(0)).get("range"), is("[1,200]"));
+            assertThat(((Map) ranges.get(1)).get("range"), is("[201,400]"));
+            assertThat(((Map) ranges.get(2)).get("range"), is("[401,600]"));
+            assertThat(((Map) ranges.get(3)).get("range"), is("[601,800]"));
+            assertThat(((Map) ranges.get(4)).get("range"), is("[801,*]"));
         }
 
         @Test
-        void entryRequestDoesNotSetDefaults() {
+        void entryRequestDoesNotSetDefaults() throws IOException {
             // given
             String queryString = "query";
             SolrRequest request = SolrRequest.builder().query(queryString).build();
 
             // when
-            SolrQuery solrQuery = converter.toSolrQuery(request, true);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, true);
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
+
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            Map<String, Object> params = (Map<String, Object>) result.get("params");
+            assertNotNull(result);
 
             // then
-            assertThat(solrQuery.getQuery(), is(queryString));
-            assertThat(solrQuery.get("df"), is(nullValue()));
-            assertThat(solrQuery.get("defType"), is(nullValue()));
+            assertThat(result.get("query"), is(queryString));
+            assertThat(params.get("df"), is(nullValue()));
+            assertThat(params.get("defType"), is(nullValue()));
         }
 
         @Test
         void requestingTermFieldsWithoutTermQueryCausesException() {
             SolrRequest request =
                     SolrRequest.builder().query("too long").termField("field 1").build();
-            assertThrows(InvalidRequestException.class, () -> converter.toSolrQuery(request));
+            assertThrows(
+                    InvalidRequestException.class, () -> converter.toJsonQueryRequest(request));
         }
 
         @Test
@@ -123,11 +171,12 @@ class SolrRequestConverterTest {
                             .termQuery("too long")
                             .termField("field 1")
                             .build();
-            assertThrows(InvalidRequestException.class, () -> converter.toSolrQuery(request));
+            assertThrows(
+                    InvalidRequestException.class, () -> converter.toJsonQueryRequest(request));
         }
 
         @Test
-        void queryBoostsWithPlaceholderIsReplacedCorrectly() {
+        void queryBoostsWithPlaceholderIsReplacedCorrectly() throws IOException {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -140,17 +189,22 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            SolrQuery solrQuery = converter.toSolrQuery(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
 
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            assertNotNull(result);
             // then
-            assertThat(
-                    solrQuery.getParams("bq"),
-                    is(arrayContainingInAnyOrder("field1:(value1 value2)^3", "field2:value3^2")));
-            assertThat(solrQuery.get("boost"), is(nullValue()));
+            assertTrue(jsonRequest.contains("field1:(value1 value2)^3 field2:value3^2"));
+            assertFalse(jsonRequest.contains("boost"));
         }
 
         @Test
-        void intQueryBoostWithPlaceholderAndIntQueryIsReplacedCorrectly() {
+        void intQueryBoostWithPlaceholderAndIntQueryIsReplacedCorrectly() throws IOException {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -162,11 +216,20 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            SolrQuery solrQuery = converter.toSolrQuery(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
+
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            Map<String, Object> params = (Map<String, Object>) result.get("params");
+            assertNotNull(result);
 
             // then
-            assertThat(solrQuery.getParams("bq"), is(arrayContaining("field1:(9606)^3")));
-            assertThat(solrQuery.get("boost"), is(nullValue()));
+            assertThat(params.get("bq"), is("field1:(9606)^3"));
+            assertThat(params.get("boost"), is(nullValue()));
         }
 
         @Test
@@ -182,15 +245,15 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            SolrQuery solrQuery = converter.toSolrQuery(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
 
             // then
-            assertThat(solrQuery.getParams("bq"), is(nullValue()));
-            assertThat(solrQuery.get("boost"), is(nullValue()));
+            assertThat(solrQuery.getParams().get("bq"), is(nullValue()));
+            assertThat(solrQuery.getParams().get("boost"), is(nullValue()));
         }
 
         @Test
-        void defaultQueryBoostsAndFunctionsCreatedCorrectly() {
+        void defaultQueryBoostsAndFunctionsCreatedCorrectly() throws IOException {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -204,17 +267,23 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            SolrQuery solrQuery = converter.toSolrQuery(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
 
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            assertNotNull(result);
+            Map<String, Object> params = (Map<String, Object>) result.get("params");
             // then
-            assertThat(
-                    solrQuery.getParams("bq"),
-                    is(arrayContainingInAnyOrder("field1:value3^3", "field2:value4^2")));
-            assertThat(solrQuery.get("boost"), is("f1,f2"));
+            assertThat(params.get("bq"), is("field1:value3^3 field2:value4^2"));
+            assertThat(params.get("boost"), is("f1,f2"));
         }
 
         @Test
-        void queryFieldsQFCreatedCorrectly() {
+        void queryFieldsQFCreatedCorrectly() throws IOException {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -224,14 +293,22 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            SolrQuery solrQuery = converter.toSolrQuery(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
 
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            assertNotNull(result);
+            Map<String, Object> params = (Map<String, Object>) result.get("params");
             // then
-            assertThat(solrQuery.get("qf"), is("field1 field2"));
+            assertThat(params.get("qf"), is("field1 field2"));
         }
 
         @Test
-        void advancedSearchQueryBoostsAndFunctionsCreatedCorrectly() {
+        void advancedSearchQueryBoostsAndFunctionsCreatedCorrectly() throws IOException {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -245,13 +322,19 @@ class SolrRequestConverterTest {
                             .build();
 
             // when
-            SolrQuery solrQuery = converter.toSolrQuery(request);
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            StringOutputStream out = new StringOutputStream();
+            solrQuery.getContentWriter("").write(out);
+            String jsonRequest = out.getString();
+            log.debug("request: {}", jsonRequest);
+            assertNotNull(jsonRequest);
 
+            Map result = mapper.readValue(jsonRequest, Map.class);
+            assertNotNull(result);
+            Map<String, Object> params = (Map<String, Object>) result.get("params");
             // then
-            assertThat(
-                    solrQuery.getParams("bq"),
-                    is(arrayContainingInAnyOrder("field1:value3^3", "field2:value4^2")));
-            assertThat(solrQuery.get("boost"), is("f1,f2"));
+            assertThat(params.get("bq"), is("field1:value3^3 field2:value4^2"));
+            assertThat(params.get("boost"), is("f1,f2"));
         }
     }
 }

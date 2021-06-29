@@ -31,8 +31,7 @@ public class FacetStreamExpression extends UniProtStreamExpression {
             String collection,
             String facet,
             SolrStreamFacetRequest request,
-            FacetConfig facetConfig)
-            throws IllegalArgumentException {
+            FacetConfig facetConfig) {
         super("facet");
         validateParams(
                 collection,
@@ -48,24 +47,23 @@ public class FacetStreamExpression extends UniProtStreamExpression {
         this.addParameter(new StreamExpressionNamedParameter("buckets", facet));
         this.addParameter(
                 new StreamExpressionNamedParameter(
-                        "bucketSorts", getBucketSorts(request, facet, facetProperty)));
+                        "bucketSorts", getBucketSorts(request, facetProperty)));
         this.addParameter(
                 new StreamExpressionNamedParameter(
                         "bucketSizeLimit", String.valueOf(request.getBucketSizeLimit())));
         List<StreamExpression> metricExpressions = parseMetrics(request.getMetrics());
         this.getParameters().addAll(metricExpressions);
 
-        if (queryFilteredQuerySet(
-                request)) { // order of params is important. this code should be in the end
+        // order of params is important. this code should be in the end
+        if (queryFilteredQuerySet(request)) {
             addFQRelatedParams(request);
         }
     }
 
-    private String getBucketSorts(
-            SolrStreamFacetRequest request, String facet, FacetProperty facetProperty) {
+    private String getBucketSorts(SolrStreamFacetRequest request, FacetProperty facetProperty) {
         String bucketSorts = request.getBucketSorts();
-        if ("desc".equals(facetProperty.getSort())) {
-            bucketSorts = facet + " " + facetProperty.getSort();
+        if (facetProperty.getSort() != null) {
+            bucketSorts = facetProperty.getSort();
         }
         return bucketSorts;
     }

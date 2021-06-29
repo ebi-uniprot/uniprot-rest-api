@@ -6,8 +6,8 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.slf4j.Logger;
@@ -83,8 +83,8 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     public Optional<T> getEntry(SolrRequest request) {
         try {
-            SolrQuery solrQuery = requestConverter.toSolrQuery(request, true);
-            QueryResponse response = solrClient.query(collection.toString(), solrQuery);
+            JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request, true);
+            QueryResponse response = solrQuery.process(solrClient, collection.toString());
             if (!response.getResults().isEmpty()) {
                 if (response.getResults().size() > 1) {
                     LOGGER.warn(
@@ -104,7 +104,10 @@ public abstract class SolrQueryRepository<T extends Document> {
     public Stream<T> getAll(SolrRequest request) {
         SolrResultsIterator<T> resultsIterator =
                 new SolrResultsIterator<>(
-                        solrClient, collection, requestConverter.toSolrQuery(request), tClass);
+                        solrClient,
+                        collection,
+                        requestConverter.toJsonQueryRequest(request),
+                        tClass);
         return StreamSupport.stream(
                         Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
                         false)
@@ -113,13 +116,14 @@ public abstract class SolrQueryRepository<T extends Document> {
 
     private QueryResponse search(SolrRequest request, String cursor)
             throws IOException, SolrServerException {
-        SolrQuery solrQuery = requestConverter.toSolrQuery(request);
+        JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request);
         if (cursor != null && !cursor.isEmpty()) {
-            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
+            solrQuery.withParam(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
         } else {
-            solrQuery.set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
+            solrQuery.withParam(
+                    CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
         }
-        return solrClient.query(collection.toString(), solrQuery);
+        return solrQuery.process(solrClient, collection.toString());
     }
 
     private void logSolrQuery(SolrRequest request) {

@@ -18,6 +18,7 @@ import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionNamedParameter;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpressionValue;
 import org.apache.solr.client.solrj.io.stream.expr.StreamFactory;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -75,10 +76,10 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                             .rows(0)
                             .build();
             try {
+                JsonQueryRequest jsonQueryRequest =
+                        solrRequestConverter.toJsonQueryRequest(slimRequest);
                 QueryResponse response =
-                        solrClient.query(
-                                streamConfig.getCollection(),
-                                solrRequestConverter.toSolrQuery(slimRequest));
+                        jsonQueryRequest.process(solrClient, streamConfig.getCollection());
                 if (response.getResults().getNumFound()
                         > streamConfig.getStoreMaxCountToRetrieve()) {
                     throw new ServiceException(

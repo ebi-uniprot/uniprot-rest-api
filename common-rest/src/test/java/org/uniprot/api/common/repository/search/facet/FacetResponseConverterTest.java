@@ -4,15 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.IntervalFacet;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
+import org.apache.solr.common.util.NamedList;
 import org.junit.jupiter.api.Test;
 
 /** @author lgonzales */
@@ -32,16 +30,16 @@ class FacetResponseConverterTest {
 
     @Test
     void convertFacetWithLabel() {
-        List<FacetField> fieldList = getFacetFields("fragment", "reviewed");
+        NestableJsonFacet fieldList = getFacetFields("fragment", "reviewed");
 
-        when(queryResponse.getFacetFields()).thenReturn(fieldList);
+        when(queryResponse.getJsonFacetingResponse()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
         List<Facet> facets = facetConverter.convert(queryResponse);
         assertNotNull(facets);
         assertEquals(2, facets.size());
 
-        Facet reviewed = facets.get(0);
+        Facet reviewed = facets.get(1);
         assertEquals("Status", reviewed.getLabel());
         assertEquals("reviewed", reviewed.getName());
         assertFalse(reviewed.isAllowMultipleSelection());
@@ -57,9 +55,9 @@ class FacetResponseConverterTest {
 
     @Test
     void convertFacetWithoutLabel() {
-        List<FacetField> fieldList = getFacetFields("model_organism");
+        NestableJsonFacet fieldList = getFacetFields("model_organism");
 
-        when(queryResponse.getFacetFields()).thenReturn(fieldList);
+        when(queryResponse.getJsonFacetingResponse()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
         List<Facet> facets = facetConverter.convert(queryResponse);
@@ -81,9 +79,9 @@ class FacetResponseConverterTest {
 
     @Test
     void convertFacetWithoutLabelDescendingValueSort() {
-        List<FacetField> fieldList = getFacetFields("annotation");
+        NestableJsonFacet fieldList = getFacetFields("annotation");
 
-        when(queryResponse.getFacetFields()).thenReturn(fieldList);
+        when(queryResponse.getJsonFacetingResponse()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
         List<Facet> facets = facetConverter.convert(queryResponse);
@@ -111,9 +109,9 @@ class FacetResponseConverterTest {
 
     @Test
     void convertIntervalFacet() throws Exception {
-        IntervalFacet intervalFacet = getLengthIntervalFacet();
-        when(queryResponse.getIntervalFacets())
-                .thenReturn(Collections.singletonList(intervalFacet));
+        NestableJsonFacet fieldList = getFacetFields("length");
+
+        when(queryResponse.getJsonFacetingResponse()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
         List<Facet> facets = facetConverter.convert(queryResponse);
@@ -133,53 +131,127 @@ class FacetResponseConverterTest {
         assertEquals(Long.valueOf(10L), itemValue.getCount());
     }
 
-    private List<FacetField> getFacetFields(String... name) {
-        List<FacetField> fieldList = new ArrayList<>(1);
+    private NestableJsonFacet getFacetFields(String... name) {
+        NamedList<Object> fieldList = new NamedList();
         if (Arrays.binarySearch(name, "reviewed") >= 0) {
-            FacetField ffield = new FacetField("reviewed");
-            ffield.add("true", 10L);
-            ffield.add("false", 20L);
-            fieldList.add(ffield);
+            List<NamedList> values = new ArrayList<>();
+
+            NamedList<Object> item = new NamedList();
+            item.add("val", true);
+            item.add("count", 10L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", false);
+            item.add("count", 20L);
+            values.add(item);
+
+            NamedList<Object> bucketsItems = new NamedList();
+            bucketsItems.add("buckets", values);
+
+            fieldList.add("reviewed", bucketsItems);
         }
         if (Arrays.binarySearch(name, "fragment") >= 0) {
-            FacetField ffield = new FacetField("fragment");
-            ffield.add("false", 21L);
-            ffield.add("true", 11L);
-            fieldList.add(ffield);
+            List<NamedList> values = new ArrayList<>();
+            NamedList<Object> item = new NamedList();
+
+            item.add("val", false);
+            item.add("count", 21L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", true);
+            item.add("count", 11L);
+            values.add(item);
+
+            NamedList<Object> bucketsItems = new NamedList();
+            bucketsItems.add("buckets", values);
+
+            fieldList.add("fragment", bucketsItems);
         }
         if (Arrays.binarySearch(name, "model_organism") >= 0) {
-            FacetField ffield = new FacetField("model_organism");
-            ffield.add("Human", 11L);
-            ffield.add("Mouse", 21L);
-            ffield.add("Rat", 31L);
-            fieldList.add(ffield);
+            List<NamedList> values = new ArrayList<>();
+            NamedList<Object> item = new NamedList();
+
+            item.add("val", "Human");
+            item.add("count", 11L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", "Mouse");
+            item.add("count", 21L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", "Rat");
+            item.add("count", 31L);
+            values.add(item);
+
+            NamedList<Object> bucketsItems = new NamedList();
+            bucketsItems.add("buckets", values);
+
+            fieldList.add("model_organism", bucketsItems);
         }
         if (Arrays.binarySearch(name, "annotation") >= 0) {
-            FacetField ffield = new FacetField("annotation");
-            ffield.add("1", 11L);
-            ffield.add("2", 21L);
-            ffield.add("3", 31L);
-            ffield.add("4", 41L);
-            ffield.add("5", 51L);
-            fieldList.add(ffield);
+
+            List<NamedList> values = new ArrayList<>();
+            NamedList<Object> item = new NamedList();
+
+            item = new NamedList();
+            item.add("val", 5);
+            item.add("count", 51L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", 4);
+            item.add("count", 41L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", 3);
+            item.add("count", 31L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", 2);
+            item.add("count", 21L);
+            values.add(item);
+
+            item.add("val", 1);
+            item.add("count", 11L);
+            values.add(item);
+
+            NamedList<Object> bucketsItems = new NamedList();
+            bucketsItems.add("buckets", values);
+
+            fieldList.add("annotation", bucketsItems);
         }
-        return fieldList;
-    }
 
-    private IntervalFacet getLengthIntervalFacet() throws Exception {
-        List<IntervalFacet.Count> counts = new ArrayList<>();
-        Constructor countConstructor =
-                Class.forName("org.apache.solr.client.solrj.response.IntervalFacet$Count")
-                        .getDeclaredConstructor(String.class, Integer.TYPE);
-        countConstructor.setAccessible(true);
-        counts.add((IntervalFacet.Count) countConstructor.newInstance("[1,200]", 10));
-        counts.add((IntervalFacet.Count) countConstructor.newInstance("[201,400]", 15));
-        counts.add((IntervalFacet.Count) countConstructor.newInstance("[801,*]", 20));
+        if (Arrays.binarySearch(name, "length") >= 0) {
 
-        Constructor constructor =
-                Class.forName("org.apache.solr.client.solrj.response.IntervalFacet")
-                        .getDeclaredConstructor(String.class, List.class);
-        constructor.setAccessible(true);
-        return (IntervalFacet) constructor.newInstance("length", counts);
+            List<NamedList> values = new ArrayList<>();
+            NamedList<Object> item = new NamedList();
+
+            item = new NamedList();
+            item.add("val", "[1,200]");
+            item.add("count", 10L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", "[201,400]");
+            item.add("count", 15L);
+            values.add(item);
+
+            item = new NamedList();
+            item.add("val", "[801,*]");
+            item.add("count", 20L);
+            values.add(item);
+
+            NamedList<Object> bucketsItems = new NamedList();
+            bucketsItems.add("buckets", values);
+
+            fieldList.add("length", bucketsItems);
+        }
+        return new NestableJsonFacet(fieldList);
     }
 }

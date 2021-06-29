@@ -148,7 +148,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                         .perform(
                                 get(getIdMappingResultPath(), job.getJobId())
                                         .param("query", "database:EnsemblMetazoa")
-                                        .param("facets", "organism_name,database")
+                                        .param("facets", "organism_name,database_facet")
                                         .param("fields", "upi,accession")
                                         .param("sort", "length desc")
                                         .param("size", "10")
@@ -159,7 +159,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets.size()", is(2)))
-                .andExpect(jsonPath("$.facets.*.name", contains("organism_name", "database")))
+                .andExpect(jsonPath("$.facets.*.name", contains("organism_name", "database_facet")))
                 .andExpect(jsonPath("$.facets[0].values.size()", is(2)))
                 .andExpect(
                         jsonPath(

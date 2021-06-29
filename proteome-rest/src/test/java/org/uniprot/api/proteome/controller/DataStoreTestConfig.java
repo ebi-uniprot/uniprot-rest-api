@@ -2,7 +2,7 @@ package org.uniprot.api.proteome.controller;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -34,12 +34,12 @@ public class DataStoreTestConfig {
     public SolrRequestConverter requestConverter() {
         return new SolrRequestConverter() {
             @Override
-            public SolrQuery toSolrQuery(SolrRequest request) {
-                SolrQuery solrQuery = super.toSolrQuery(request);
+            public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
+                JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
 
                 // required for tests, because EmbeddedSolrServer is not sharded
-                solrQuery.setParam("distrib", "false");
-                solrQuery.setParam("terms.mincount", "1");
+                solrQuery.withParam("distrib", "false");
+                solrQuery.withParam("terms.mincount", "1");
 
                 return solrQuery;
             }
