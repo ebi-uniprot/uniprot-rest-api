@@ -60,6 +60,6 @@ public class UniProtSolrQueryConfig {
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
             SearchFieldConfig uniProtKBSearchFieldConfig) {
         return Collections.singletonList(
-                uniProtKBSearchFieldConfig.getSearchFieldItemByName("accession_id"));
+                uniProtKBSearchFieldConfig.getSearchFieldItemByName("accession"));
     }
 }
