@@ -243,6 +243,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
     }
 
     @SuppressWarnings("squid:S3752")
+    @Tag(name = "uniref")
     @RequestMapping(
             value = "/ids",
             method = {RequestMethod.GET, RequestMethod.POST},
