@@ -99,6 +99,22 @@ public class UniParcConfigureController {
         return service.getAllUniParcDatabaseDetails();
     }
 
+    @Operation(
+            summary = "List of return fields available in a UniParc entry.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniProtReturnField
+                                                                                    .class)))
+                        })
+            })
     @GetMapping("/entry-result-fields")
     public List<UniProtReturnField> getEntryResultFields() {
         return service.getUniParcEntryResultFields();

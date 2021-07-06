@@ -12,5 +12,5 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 public interface IdMappingJobService {
     JobSubmitResponse submitJob(IdMappingJobRequest request);
 
-    String getRedirectPathToResults(IdMappingJob job);
+    String getRedirectPathToResults(IdMappingJob job, String requestUrl);
 }

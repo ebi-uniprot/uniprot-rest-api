@@ -1,6 +1,6 @@
 variables:
-  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.springframework.boot.test.autoconfigure.web.servlet=ERROR -Dorg.slf4j.simpleLogger.log.org.springframework.boot.test.context.SpringBootTestContextBootstrapper=ERROR -Dorg.slf4j.simpleLogger.log.org.springframework.test.context.transaction.TransactionContext=ERROR -Dorg.slf4j.simpleLogger.log.org.apache.zookeeper=ERROR -Dorg.slf4j.simpleLogger.log.org.uniprot.store.datastore.voldemort=ERROR -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=true"
   SONAR_PROPS: "-Dsonar.organization=ebi-uniprot -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true"
   SONAR_HOST_URL: "https://sonarcloud.io"
   MAVEN_SETTINGS: "maven-settings.xml"
@@ -19,7 +19,6 @@ cache:
 
 stages:
   - setup
-  - build
   - test
   - quality
   - deploy
@@ -30,7 +29,7 @@ api:settings:
     - 'wget --no-cache --no-cookies -O ${MAVEN_SETTINGS} "${URL_MAVEN_SETTINGS}"'
   script:
     - if [ ! -f ${MAVEN_SETTINGS} ];
-        then echo "CI settings missing";
+      then echo "CI settings missing";
       fi
   artifacts:
     when: always
@@ -38,25 +37,24 @@ api:settings:
     paths:
       - ./${MAVEN_SETTINGS}
 
-api:compile:
-  stage: build
-  script: mvn $MAVEN_CLI_OPTS clean compile test-compile -s ${MAVEN_SETTINGS}
+api:test:
+  stage: test
+  script:
+    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS} 2>&1 | grep "\[\(INFO\|ERROR\|WARN\)\]"'
+    - |
+      if [ "${PIPESTATUS[0]}" != "0" ]; then
+        echo "Maven failed. Pipe status = ${PIPESTATUS[0]}";
+        false
+      fi
+    - 'echo "Maven install successful"'
+    - 'mkdir -p ./jacoco-report'
+    - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
+    - 'rm -rfv ./*/target/*.jar'
   artifacts:
     when: always
     expire_in: 2 days
     paths:
       - ./*/target
-
-api:test:
-  stage: test
-  script:
-    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS}'
-    - 'mkdir -p ./jacoco-report'
-    - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
-  artifacts:
-    when: always
-    expire_in: 2 days
-    paths:
       - ./jacoco-report
     reports:
       junit:
@@ -67,20 +65,12 @@ api:sonar:
   script: mvn $MAVEN_CLI_OPTS -s ${MAVEN_SETTINGS} -Dsonar.coverage.jacoco.xmlReportPaths=$(pwd)/jacoco-report/jacoco.xml sonar:sonar ${SONAR_PROPS} -Dsonar.projectKey=uniprot-rest-api
   dependencies:
     - api:test
-    - api:compile
     - api:settings
 
 api:deploy:
   stage: deploy
-  script: mvn $MAVEN_CLI_OPTS -Dmaven.test.skip=true deploy -s ${MAVEN_SETTINGS}
+  script: mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
   dependencies:
     - api:settings
-    - api:compile
   only:
     - master
-after_script:
-  - 'pwd'
-  - 'ls -al'
-  - 'ls -al */'
-  - 'ls -al */*/'
-  - 'ls -al */*/*/'

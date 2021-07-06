@@ -3,8 +3,6 @@ package org.uniprot.api.idmapping.service.impl;
 import java.util.Date;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -57,18 +55,15 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
-    private final String contextPath;
 
     public IdMappingJobServiceImpl(
             IdMappingJobCacheService cacheService,
             IdMappingPIRService pirService,
-            ThreadPoolTaskExecutor jobTaskExecutor,
-            ServletContext servletContext) {
+            ThreadPoolTaskExecutor jobTaskExecutor) {
         this.cacheService = cacheService;
         this.pirService = pirService;
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = new HashGenerator();
-        this.contextPath = servletContext.getContextPath();
     }
 
     @Override
@@ -98,7 +93,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     }
 
     @Override
-    public String getRedirectPathToResults(IdMappingJob job) {
+    public String getRedirectPathToResults(IdMappingJob job, String requestUrl) {
         String toDB = job.getIdMappingRequest().getTo();
         String dbType = "";
         if (UNIREF_SET.contains(toDB)) {
@@ -109,12 +104,15 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
             dbType = UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH + "/";
         }
 
-        return contextPath
-                + IdMappingJobController.IDMAPPING_PATH
-                + "/"
-                + dbType
-                + RESULTS_SUBPATH
-                + job.getJobId();
+        String requestUrlBase = extractRequestBase(requestUrl);
+        return requestUrlBase + "/" + dbType + RESULTS_SUBPATH + job.getJobId();
+    }
+
+    private String extractRequestBase(String requestUrl) {
+        int endOfIdMappingPath =
+                requestUrl.indexOf(IdMappingJobController.IDMAPPING_PATH)
+                        + IdMappingJobController.IDMAPPING_PATH.length();
+        return requestUrl.substring(0, endOfIdMappingPath).replaceFirst("http://", "https://");
     }
 
     private boolean needToRunJob(String jobId) {

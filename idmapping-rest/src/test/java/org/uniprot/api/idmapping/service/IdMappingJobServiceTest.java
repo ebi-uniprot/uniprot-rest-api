@@ -134,9 +134,16 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submitResponse);
         Assertions.assertNotNull(submitResponse.getJobId());
         // then
-        Thread.sleep(1000); // delay to make sure that thread is picked to run
         String jobId = submitResponse.getJobId();
-        IdMappingJob submittedJob = this.cacheService.getJobAsResource(jobId);
+        IdMappingJob submittedJob = null;
+        int attemptsRemaining = 5;
+        while (attemptsRemaining-- > 0) {
+            Thread.sleep(1000); // delay to make sure that thread is picked to run
+            submittedJob = this.cacheService.getJobAsResource(jobId);
+            if (submittedJob != null) {
+                break;
+            }
+        }
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
         Assertions.assertEquals(JobStatus.ERROR, submittedJob.getJobStatus());
@@ -162,26 +169,28 @@ class IdMappingJobServiceTest {
         @BeforeEach
         void setUp() {
             ServletContext mockContext = mock(ServletContext.class);
-            when(mockContext.getContextPath()).thenReturn("");
-            idMappingJobService = new IdMappingJobServiceImpl(null, null, null, mockContext);
+            when(mockContext.getContextPath()).thenReturn("/proteins/api");
+            idMappingJobService = new IdMappingJobServiceImpl(null, null, null);
         }
 
         @ParameterizedTest(name = "{index}: {0}")
         @ValueSource(
                 strings = {
-                    "jobId + UniRef50 -> /idmapping/uniref/results/jobId",
-                    "jobId + UniRef90 -> /idmapping/uniref/results/jobId",
-                    "jobId + UniRef100 -> /idmapping/uniref/results/jobId",
-                    "jobId + UniParc -> /idmapping/uniparc/results/jobId",
-                    "jobId + UniProtKB -> /idmapping/uniprotkb/results/jobId",
-                    "jobId + ANYTHING -> /idmapping/results/jobId"
+                    "jobId + UniRef50 ->  https://localhost/proteins/api/idmapping/uniref/results/jobId",
+                    "jobId + UniRef90 ->  https://localhost/proteins/api/idmapping/uniref/results/jobId",
+                    "jobId + UniRef100 -> https://localhost/proteins/api/idmapping/uniref/results/jobId",
+                    "jobId + UniParc ->   https://localhost/proteins/api/idmapping/uniparc/results/jobId",
+                    "jobId + UniProtKB -> https://localhost/proteins/api/idmapping/uniprotkb/results/jobId",
+                    "jobId + ANYTHING ->  https://localhost/proteins/api/idmapping/results/jobId"
                 })
         void checkValidRedirectionLocations(String source) {
+            String requestUrl =
+                    "http://localhost/proteins/api/idmapping/run?a=parameter&another=parameter";
             String[] sourceParts = source.split(" \\+ ");
             String jobId = sourceParts[0];
             String remainder = sourceParts[1];
 
-            sourceParts = remainder.split(" -> ");
+            sourceParts = remainder.split("[ ]+->[ ]+");
             String toDb = sourceParts[0];
             String urlPart = sourceParts[1];
 
@@ -189,7 +198,8 @@ class IdMappingJobServiceTest {
             jobRequest.setTo(toDb);
             IdMappingJob job =
                     IdMappingJob.builder().jobId(jobId).idMappingRequest(jobRequest).build();
-            String redirectPathToResults = idMappingJobService.getRedirectPathToResults(job);
+            String redirectPathToResults =
+                    idMappingJobService.getRedirectPathToResults(job, requestUrl);
             assertThat(redirectPathToResults, is(urlPart));
         }
     }

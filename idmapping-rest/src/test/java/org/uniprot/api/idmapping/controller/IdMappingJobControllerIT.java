@@ -3,10 +3,7 @@ package org.uniprot.api.idmapping.controller;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -126,7 +123,7 @@ class IdMappingJobControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(redirectedUrlPattern("/**/idmapping/results/" + jobId))
+                .andExpect(redirectedUrlPattern("**/idmapping/results/" + jobId))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.FINISHED.toString())));
     }
 
@@ -445,7 +442,11 @@ class IdMappingJobControllerIT {
                 .andExpect(jsonPath("$.to", is(IdMappingFieldConfig.UNIPARC_STR)))
                 .andExpect(jsonPath("$.ids", is(ids)))
                 .andExpect(jsonPath("$.taxId", is(taxId)))
-                .andExpect(jsonPath("$.redirectURL", is("/idmapping/uniparc/results/" + jobId)));
+                .andExpect(
+                        jsonPath(
+                                "$.redirectURL",
+                                matchesPattern(
+                                        "https://localhost/idmapping/uniparc/results/" + jobId)));
     }
 
     @Test
