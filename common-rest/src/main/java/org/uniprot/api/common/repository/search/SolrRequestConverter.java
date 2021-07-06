@@ -17,10 +17,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
-import org.uniprot.core.util.Utils;
 
 /**
  * Created 14/06/19
@@ -40,20 +40,16 @@ public class SolrRequestConverter {
     }
 
     public JsonQueryRequest toJsonQueryRequest(SolrRequest request, boolean isEntry) {
-        JsonQueryRequest solrQuery = new JsonQueryRequest();
+        final ModifiableSolrParams solrQuery = new ModifiableSolrParams();
+        solrQuery.add("q", request.getQuery());
 
-        solrQuery.setQuery(request.getQuery());
         if (!isEntry) {
             setDefaults(solrQuery, request.getDefaultField());
         }
 
-        solrQuery.setLimit(request.getRows());
+        solrQuery.add("rows", String.valueOf(request.getRows()));
         setFilterQueries(solrQuery, request.getFilterQueries());
-        setSort(solrQuery, request.getSorts());
         setQueryOperator(solrQuery, request.getDefaultQueryOperator());
-        if (!request.getFacets().isEmpty()) {
-            setFacets(solrQuery, request.getFacets(), request.getFacetConfig());
-        }
         if (!request.getTermFields().isEmpty()) {
             if (nullOrEmpty(request.getTermQuery())) {
                 throw new InvalidRequestException("Please specify required field, term query.");
@@ -68,9 +64,15 @@ public class SolrRequestConverter {
             setQueryFields(solrQuery, request.getQueryConfig());
         }
 
-        log.debug("Solr Query: " + solrQuery);
+        JsonQueryRequest result = new JsonQueryRequest(solrQuery);
+        setSort(result, request.getSorts());
+        if (!request.getFacets().isEmpty()) {
+            setFacets(result, request.getFacets(), request.getFacetConfig());
+        }
 
-        return solrQuery;
+        log.debug("Solr Query without facet and sort details: " + solrQuery);
+
+        return result;
     }
 
     static class SolrQueryConverter {
@@ -94,21 +96,21 @@ public class SolrRequestConverter {
         private SolrQueryConverter() {}
 
         static void setTermFields(
-                JsonQueryRequest solrQuery, String termQuery, List<String> termFields) {
+                ModifiableSolrParams solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
-                solrQuery.withParam(TERMS_LIST, termQuery.toLowerCase());
+                solrQuery.add(TERMS_LIST, termQuery.toLowerCase());
             } else {
                 throw new InvalidRequestException(
                         "Term information will only be returned for single value searches that do not specify a field.");
             }
 
-            solrQuery.withParam(TERMS, "true");
-            solrQuery.withParam(DISTRIB, "true");
-            solrQuery.withParam(MINCOUNT, "1");
+            solrQuery.add(TERMS, "true");
+            solrQuery.add(DISTRIB, "true");
+            solrQuery.add(MINCOUNT, "1");
 
             String[] termsFieldsArr = new String[termFields.size()];
             termsFieldsArr = termFields.toArray(termsFieldsArr);
-            solrQuery.withParam(TERMS_FIELDS, termsFieldsArr);
+            solrQuery.add(TERMS_FIELDS, termsFieldsArr);
         }
 
         static boolean isSingleTerm(String query) {
@@ -153,12 +155,14 @@ public class SolrRequestConverter {
         }
 
         static void setQueryOperator(
-                JsonQueryRequest solrQuery, QueryOperator defaultQueryOperator) {
-            solrQuery.withParam(QUERY_OPERATOR, defaultQueryOperator.name());
+                ModifiableSolrParams solrQuery, QueryOperator defaultQueryOperator) {
+            solrQuery.add(QUERY_OPERATOR, defaultQueryOperator.name());
         }
 
-        static void setFilterQueries(JsonQueryRequest solrQuery, List<String> filterQueries) {
-            filterQueries.forEach(solrQuery::withFilter);
+        static void setFilterQueries(ModifiableSolrParams solrQuery, List<String> filterQueries) {
+            String[] filterQueryArr = new String[filterQueries.size()];
+            filterQueryArr = filterQueries.toArray(filterQueryArr);
+            solrQuery.add("fq", filterQueryArr);
         }
 
         static void setSort(JsonQueryRequest solrQuery, List<SolrQuery.SortClause> sorts) {
@@ -170,60 +174,54 @@ public class SolrRequestConverter {
         }
 
         static void setQueryBoostConfigs(
-                JsonQueryRequest solrQuery, String query, SolrQueryConfig boosts) {
+                ModifiableSolrParams solrQuery, String query, SolrQueryConfig boosts) {
             Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
             if (fieldQueryMatcher.find()) {
                 // a query involving field queries
                 if (notNullNotEmpty(boosts.getAdvancedSearchBoosts())) {
-                    String boostValues = String.join(" ", boosts.getAdvancedSearchBoosts());
-                    solrQuery.withParam(BOOST_QUERY, boostValues);
+                    boosts.getAdvancedSearchBoosts()
+                            .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
                 }
                 if (!nullOrEmpty(boosts.getAdvancedSearchBoostFunctions())) {
-                    solrQuery.withParam(BOOST_FUNCTIONS, boosts.getAdvancedSearchBoostFunctions());
+                    solrQuery.add(BOOST_FUNCTIONS, boosts.getAdvancedSearchBoostFunctions());
                 }
             } else {
                 // a default query
                 if (notNullNotEmpty(boosts.getDefaultSearchBoosts())) {
                     // replace all occurrences of "{query}" with X, given that q=X
-                    addQueryBoost(solrQuery, boosts.getDefaultSearchBoosts(), query);
+                    boosts.getDefaultSearchBoosts()
+                            .forEach(boost -> addQueryBoost(solrQuery, boost, query));
                 }
                 if (!nullOrEmpty(boosts.getDefaultSearchBoostFunctions())) {
-                    solrQuery.withParam(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
+                    solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
                 }
-            }
-        }
-
-        static void setQueryFields(JsonQueryRequest solrQuery, SolrQueryConfig boosts) {
-            if (notNullNotEmpty(boosts.getQueryFields())) {
-                solrQuery.withParam(QUERY_FIELDS, boosts.getQueryFields());
             }
         }
 
         private static void addQueryBoost(
-                JsonQueryRequest solrQuery, List<String> boosts, String query) {
-            List<String> boostQueries = new ArrayList<>();
-            for (String boost : boosts) {
-                if (boostingOnANumericField(boost)) {
-                    // only apply the boost if the value is numeric
-                    if (StringUtils.isNumeric(query)) {
-                        // user query is numeric and therefore we can replace
-                        // the "{query}" placeholder with their value
-                        String processedBoost =
-                                boost.replace(BOOST_FIELD_TYPE_NUMBER, ":")
-                                        .replace(QUERY_PLACEHOLDER, "(" + query + ")");
-                        boostQueries.add(processedBoost);
-                    }
-                } else {
-                    // apply the boost as normal
-                    String processedBoost = boost.replace(QUERY_PLACEHOLDER, "(" + query + ")");
-                    boostQueries.add(processedBoost);
+                ModifiableSolrParams solrQuery, String boost, String query) {
+            if (boostingOnANumericField(boost)) {
+                // only apply the boost if the value is numeric
+                if (StringUtils.isNumeric(query)) {
+                    // user query is numeric and therefore we can replace
+                    // the "{query}" placeholder with their value
+                    String processedBoost =
+                            boost.replace(BOOST_FIELD_TYPE_NUMBER, ":")
+                                    .replace(QUERY_PLACEHOLDER, "(" + query + ")");
+                    solrQuery.add(BOOST_QUERY, processedBoost);
                 }
-            }
-            if (Utils.notNullNotEmpty(boostQueries)) {
-                solrQuery.withParam(BOOST_QUERY, String.join(" ", boostQueries));
+            } else {
+                // apply the boost as normal
+                String processedBoost = boost.replace(QUERY_PLACEHOLDER, "(" + query + ")");
+                solrQuery.add(BOOST_QUERY, processedBoost);
             }
         }
 
+        static void setQueryFields(ModifiableSolrParams solrQuery, SolrQueryConfig boosts) {
+            if (notNullNotEmpty(boosts.getQueryFields())) {
+                solrQuery.add(QUERY_FIELDS, boosts.getQueryFields());
+            }
+        }
         /**
          * @param boostDefinition the boost definition
          * @return whether a boost definition involves a numeric field
@@ -232,11 +230,11 @@ public class SolrRequestConverter {
             return boostDefinition.contains(BOOST_FIELD_TYPE_NUMBER);
         }
 
-        static void setDefaults(JsonQueryRequest solrQuery, String defaultField) {
+        static void setDefaults(ModifiableSolrParams solrQuery, String defaultField) {
             if (defaultField != null) {
-                solrQuery.withParam(DEFAULT_FIELD, defaultField);
+                solrQuery.add(DEFAULT_FIELD, defaultField);
             }
-            solrQuery.withParam(DEF_TYPE, EDISMAX);
+            solrQuery.add(DEF_TYPE, EDISMAX);
         }
     }
 }

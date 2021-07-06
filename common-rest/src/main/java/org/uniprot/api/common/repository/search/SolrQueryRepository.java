@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -118,10 +119,11 @@ public abstract class SolrQueryRepository<T extends Document> {
             throws IOException, SolrServerException {
         JsonQueryRequest solrQuery = requestConverter.toJsonQueryRequest(request);
         if (cursor != null && !cursor.isEmpty()) {
-            solrQuery.withParam(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
+            ((ModifiableSolrParams) solrQuery.getParams())
+                    .set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
         } else {
-            solrQuery.withParam(
-                    CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
+            ((ModifiableSolrParams) solrQuery.getParams())
+                    .set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
         }
         return solrQuery.process(solrClient, collection.toString());
     }

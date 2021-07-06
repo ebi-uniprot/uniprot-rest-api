@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.common.params.SolrParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -82,6 +84,25 @@ class SolrRequestConverterTest {
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
 
+            // then
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
+
+            List<String> filters = Arrays.asList(queryParams.getParams("fq"));
+            assertThat(filters, containsInAnyOrder(filterQuery1, filterQuery2));
+            assertThat(queryParams.get("q"), is(queryString));
+            assertThat(queryParams.get("rows"), is(String.valueOf(rows)));
+
+            assertThat(queryParams.get("defType"), is("edismax"));
+            assertThat(queryParams.get("distrib"), is("true"));
+            assertThat(queryParams.get("terms"), is("true"));
+            assertThat(queryParams.get("terms.mincount"), is("1"));
+            assertThat(queryParams.get("terms.list"), is("query"));
+            assertThat(queryParams.get("q.op"), is(defaultQueryOperator.name()));
+            List<String> termFields = Arrays.asList(queryParams.getParams("terms.fl"));
+            assertThat(termFields, containsInAnyOrder("term field 1", "term field 2"));
+
+            // Facets and sort must be in the json request.
             StringOutputStream out = new StringOutputStream();
             solrQuery.getContentWriter("").write(out);
             String jsonRequest = out.getString();
@@ -90,23 +111,7 @@ class SolrRequestConverterTest {
 
             Map result = mapper.readValue(jsonRequest, Map.class);
             assertNotNull(result);
-
-            // then
-            List<String> filters = (List<String>) result.get("filter");
-            assertThat(filters, containsInAnyOrder(filterQuery1, filterQuery2));
-            assertThat(result.get("query"), is(queryString));
-            assertThat(result.get("limit"), is(rows));
             assertThat(result.get("sort"), is(sortField1 + " asc," + sortField2 + " desc"));
-
-            Map<String, Object> params = (Map<String, Object>) result.get("params");
-            assertThat(params.get("defType"), is("edismax"));
-            assertThat(params.get("distrib"), is("true"));
-            assertThat(params.get("terms"), is("true"));
-            assertThat(params.get("terms.mincount"), is("1"));
-            assertThat(params.get("terms.list"), is("query"));
-            assertThat(params.get("q.op"), is(defaultQueryOperator.name()));
-            List<String> termFields = (List<String>) params.get("terms.fl");
-            assertThat(termFields, containsInAnyOrder("term field 1", "term field 2"));
 
             Map<String, Object> facets = (Map<String, Object>) result.get("facet");
             assertThat(facets.keySet(), containsInAnyOrder(facet1, facet2));
@@ -139,20 +144,13 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request, true);
-            StringOutputStream out = new StringOutputStream();
-            solrQuery.getContentWriter("").write(out);
-            String jsonRequest = out.getString();
-            log.debug("request: {}", jsonRequest);
-            assertNotNull(jsonRequest);
-
-            Map result = mapper.readValue(jsonRequest, Map.class);
-            Map<String, Object> params = (Map<String, Object>) result.get("params");
-            assertNotNull(result);
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
 
             // then
-            assertThat(result.get("query"), is(queryString));
-            assertThat(params.get("df"), is(nullValue()));
-            assertThat(params.get("defType"), is(nullValue()));
+            assertThat(queryParams.get("q"), is(queryString));
+            assertThat(queryParams.get("df"), is(nullValue()));
+            assertThat(queryParams.get("defType"), is(nullValue()));
         }
 
         @Test
@@ -192,19 +190,13 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            StringOutputStream out = new StringOutputStream();
-            solrQuery.getContentWriter("").write(out);
-            String jsonRequest = out.getString();
-            log.debug("request: {}", jsonRequest);
-            assertNotNull(jsonRequest);
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
 
-            Map result = mapper.readValue(jsonRequest, Map.class);
-            assertNotNull(result);
-            Map<String, Object> params = (Map<String, Object>) result.get("params");
             // then
-            assertThat(params.get("bq"), is(nullValue()));
-            assertThat(params.get("boost"), is(nullValue()));
-            assertThat(params.get("qf"), is("field1 field2"));
+            assertThat(queryParams.get("bq"), is(nullValue()));
+            assertThat(queryParams.get("boost"), is(nullValue()));
+            assertThat(queryParams.get("qf"), is("field1 field2"));
         }
 
         @Test
@@ -223,17 +215,12 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            StringOutputStream out = new StringOutputStream();
-            solrQuery.getContentWriter("").write(out);
-            String jsonRequest = out.getString();
-            log.debug("request: {}", jsonRequest);
-            assertNotNull(jsonRequest);
-
-            Map result = mapper.readValue(jsonRequest, Map.class);
-            assertNotNull(result);
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
             // then
-            assertTrue(jsonRequest.contains("field1:(value1 value2)^3 field2:value3^2"));
-            assertFalse(jsonRequest.contains("boost"));
+            List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
+            assertThat(boostQuery, contains("field1:(value1 value2)^3", "field2:value3^2"));
+            assertThat(queryParams.get("boost"), is(nullValue()));
         }
 
         @Test
@@ -251,19 +238,12 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            StringOutputStream out = new StringOutputStream();
-            solrQuery.getContentWriter("").write(out);
-            String jsonRequest = out.getString();
-            log.debug("request: {}", jsonRequest);
-            assertNotNull(jsonRequest);
-
-            Map result = mapper.readValue(jsonRequest, Map.class);
-            Map<String, Object> params = (Map<String, Object>) result.get("params");
-            assertNotNull(result);
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
 
             // then
-            assertThat(params.get("bq"), is("field1:(9606)^3"));
-            assertThat(params.get("boost"), is(nullValue()));
+            assertThat(queryParams.get("bq"), is("field1:(9606)^3"));
+            assertThat(queryParams.get("boost"), is(nullValue()));
         }
 
         @Test
@@ -281,19 +261,12 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            StringOutputStream out = new StringOutputStream();
-            solrQuery.getContentWriter("").write(out);
-            String jsonRequest = out.getString();
-            log.debug("request: {}", jsonRequest);
-            assertNotNull(jsonRequest);
-
-            Map result = mapper.readValue(jsonRequest, Map.class);
-            assertNotNull(result);
-            Map<String, Object> params = (Map<String, Object>) result.get("params");
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
 
             // then
-            assertThat(params.get("bq"), is(nullValue()));
-            assertThat(params.get("boost"), is(nullValue()));
+            assertThat(queryParams.get("bq"), is(nullValue()));
+            assertThat(queryParams.get("boost"), is(nullValue()));
         }
 
         @Test
@@ -313,18 +286,13 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            StringOutputStream out = new StringOutputStream();
-            solrQuery.getContentWriter("").write(out);
-            String jsonRequest = out.getString();
-            log.debug("request: {}", jsonRequest);
-            assertNotNull(jsonRequest);
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
 
-            Map result = mapper.readValue(jsonRequest, Map.class);
-            assertNotNull(result);
-            Map<String, Object> params = (Map<String, Object>) result.get("params");
             // then
-            assertThat(params.get("bq"), is("field1:value3^3 field2:value4^2"));
-            assertThat(params.get("boost"), is("f1,f2"));
+            List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
+            assertThat(boostQuery, contains("field1:value3^3", "field2:value4^2"));
+            assertThat(queryParams.get("boost"), is("f1,f2"));
         }
 
         @Test
@@ -339,17 +307,11 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            StringOutputStream out = new StringOutputStream();
-            solrQuery.getContentWriter("").write(out);
-            String jsonRequest = out.getString();
-            log.debug("request: {}", jsonRequest);
-            assertNotNull(jsonRequest);
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
 
-            Map result = mapper.readValue(jsonRequest, Map.class);
-            assertNotNull(result);
-            Map<String, Object> params = (Map<String, Object>) result.get("params");
             // then
-            assertThat(params.get("qf"), is("field1 field2"));
+            assertThat(queryParams.get("qf"), is("field1 field2"));
         }
 
         @Test
@@ -369,18 +331,14 @@ class SolrRequestConverterTest {
 
             // when
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
-            StringOutputStream out = new StringOutputStream();
-            solrQuery.getContentWriter("").write(out);
-            String jsonRequest = out.getString();
-            log.debug("request: {}", jsonRequest);
-            assertNotNull(jsonRequest);
 
-            Map result = mapper.readValue(jsonRequest, Map.class);
-            assertNotNull(result);
-            Map<String, Object> params = (Map<String, Object>) result.get("params");
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
+
             // then
-            assertThat(params.get("bq"), is("field1:value3^3 field2:value4^2"));
-            assertThat(params.get("boost"), is("f1,f2"));
+            List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
+            assertThat(boostQuery, contains("field1:value3^3", "field2:value4^2"));
+            assertThat(queryParams.get("boost"), is("f1,f2"));
         }
     }
 }
