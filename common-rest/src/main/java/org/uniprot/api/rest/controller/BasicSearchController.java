@@ -214,7 +214,7 @@ public abstract class BasicSearchController<T> {
         if (path != null) {
             path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
         }
-        return path + "?obsoleteId=" + fromId;
+        return path + "?from=" + fromId;
     }
 
     protected boolean isRDFAccept(HttpServletRequest request) {

@@ -239,7 +239,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(
                         header().string(
                                         HttpHeaders.LOCATION,
-                                        "/uniprotkb/accession/P21802?obsoleteId=B4DFC2"))
+                                        "/uniprotkb/accession/P21802?from=B4DFC2"))
                 .andExpect(jsonPath("$.primaryAccession", is("B4DFC2")))
                 .andExpect(jsonPath("$.entryType", is("Inactive")))
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("MERGED")))
