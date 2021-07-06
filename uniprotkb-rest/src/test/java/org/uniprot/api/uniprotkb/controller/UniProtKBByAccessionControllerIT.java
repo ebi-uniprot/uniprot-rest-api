@@ -236,7 +236,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/accession/P21802"))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/accession/P21802?from=B4DFC2"))
                 .andExpect(jsonPath("$.primaryAccession", is("B4DFC2")))
                 .andExpect(jsonPath("$.entryType", is("Inactive")))
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("MERGED")))
@@ -270,7 +273,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.entryType", is("Inactive")))
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DEMERGED")))
                 .andExpect(
-                        jsonPath("$.inactiveReason.mergeDemergeTo", contains("P63150", "P63151")));
+                        jsonPath("$.inactiveReason.mergeDemergeTo", contains("P21802", "P63151")));
     }
 
     @Test

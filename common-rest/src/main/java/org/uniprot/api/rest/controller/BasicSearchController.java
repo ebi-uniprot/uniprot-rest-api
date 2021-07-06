@@ -71,7 +71,8 @@ public abstract class BasicSearchController<T> {
                                         ResponseEntity.status(HttpStatus.SEE_OTHER)
                                                 .header(
                                                         HttpHeaders.LOCATION,
-                                                        getLocationURLForId(id)))
+                                                        getLocationURLForId(
+                                                                id, getEntityId(entity))))
                         .orElse(ResponseEntity.ok());
 
         return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
@@ -208,12 +209,12 @@ public abstract class BasicSearchController<T> {
         return getDeferredResultResponseEntity(request, context);
     }
 
-    public static String getLocationURLForId(String redirectId) {
+    public static String getLocationURLForId(String redirectId, String fromId) {
         String path = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
         if (path != null) {
             path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
         }
-        return path;
+        return path + "?from=" + fromId;
     }
 
     protected boolean isRDFAccept(HttpServletRequest request) {

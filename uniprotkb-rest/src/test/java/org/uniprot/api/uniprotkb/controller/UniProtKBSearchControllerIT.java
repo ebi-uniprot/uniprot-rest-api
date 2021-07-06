@@ -226,7 +226,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=accession:B4DFC2&fields=accession,gene_primary")
+                                                + "?query=sec_acc:B4DFC2&fields=accession,gene_primary")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -421,35 +421,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Test
-    void searchForMergedInactiveEntriesAlsoReturnsActiveOne() throws Exception {
-        // given
-        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        List<InactiveUniProtEntry> mergedList =
-                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
-        getStoreManager()
-                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
-
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=accession:Q14301&fields=accession,organism_name")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.primaryAccession",
-                                containsInAnyOrder("P21802", "Q14301")));
-    }
-
-    @Test
     void searchAllReturnsActiveOne() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
@@ -474,7 +445,83 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Test
-    void searchForDeMergedInactiveEntriesReturnItself() throws Exception {
+    void searchForMergedInactiveEntriesByAccession() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> mergedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
+
+        // when accession field returns only itself
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=accession:Q14301&fields=accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q14301")));
+
+        // when default search returns only itself
+        response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=Q14301&fields=accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q14301")));
+    }
+
+    @Test
+    void searchForMergedInactiveEntriesById() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> mergedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
+
+        // when accession field returns only itself
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=id:Q14301_FGFR2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].primaryAccession", is("Q14301")))
+                .andExpect(jsonPath("$.results[0].uniProtkbId", is("Q14301_FGFR2")))
+                .andExpect(jsonPath("$.results[0].inactiveReason.inactiveReasonType", is("MERGED")))
+                .andExpect(
+                        jsonPath("$.results[0].inactiveReason.mergeDemergeTo", contains("P21802")));
+
+        // when default search returns only itself
+        response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=Q14301_FGFR2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q14301")));
+    }
+
+    @Test
+    void searchForDeMergedInactiveEntriesByAccession() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -484,17 +531,17 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         getStoreManager()
                 .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, demergedList);
 
-        // when
+        // when search by accession field, returns only itself
         ResultActions response =
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE + "?query=accession:Q00007")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-        // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q00007")))
                 .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
                 .andExpect(
@@ -504,11 +551,62 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.results.*.inactiveReason.mergeDemergeTo",
-                                contains(contains("P63150", "P63151"))));
+                                contains(contains("P21802", "P63151"))));
+
+        // when search accession by default field, returns only itself
+        response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=Q00007")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q00007")));
     }
 
     @Test
-    void searchForDeletedInactiveEntriesReturnItself() throws Exception {
+    void searchForDeMergedInactiveEntriesById() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> demergedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DEMERGED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, demergedList);
+
+        // when search by id field, return the active and inactive entries
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=id:FGFR2_HUMAN")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802", "Q00007")));
+
+        // when search id by default field, it returns only the active ID
+        response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=FGFR2_HUMAN")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+    }
+
+    @Test
+    void searchForDeletedInactiveEntriesByAccession() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -518,14 +616,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         getStoreManager()
                 .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
 
-        // when
+        // when search accession by accession field, returns only itself
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=id:I8FBX2_YERPE")
+                                get(SEARCH_RESOURCE + "?query=accession:I8FBX2")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-        // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -535,6 +632,59 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                         jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
                                 contains("DELETED")));
+
+        // when search accession by default field, returns only itself
+        response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=I8FBX2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")));
+    }
+
+    @Test
+    void searchForDeletedInactiveEntriesById() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> deletedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
+
+        // when search accession by id field, returns only itself
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=id:I8FBX2_YERPE")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")))
+                .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.inactiveReason.inactiveReasonType",
+                                contains("DELETED")));
+
+        // when search accession by default field, returns only itself
+        response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=I8FBX2_YERPE")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")));
     }
 
     @Test
