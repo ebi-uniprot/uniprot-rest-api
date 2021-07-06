@@ -56,7 +56,7 @@ public class UniProtKBConfigureController {
         }
 
         final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(searchTermResponse, httpHeaders, HttpStatus.OK);
     }
 

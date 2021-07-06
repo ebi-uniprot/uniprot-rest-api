@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,12 +28,13 @@ import org.uniprot.store.search.document.Document;
  * @author Edd
  */
 class SolrCursorMarkIteratorTest {
+
     private static final String NEXT_CURSORMARK = "first cursor mark";
     private static final List<FakeDocument> FIRST_NEXT =
             asList(new FakeDocument(), new FakeDocument(), new FakeDocument());
     private static final List<FakeDocument> SECOND_NEXT =
             asList(new FakeDocument(), new FakeDocument());
-    private SolrQuery query;
+    private JsonQueryRequest query;
     private SolrClient client;
     private SolrCollection collection;
     private Class<FakeDocument> docTypeClass;
@@ -41,7 +42,7 @@ class SolrCursorMarkIteratorTest {
     @BeforeEach
     void setup() {
         this.client = mock(SolrClient.class);
-        this.query = mock(SolrQuery.class);
+        this.query = mock(JsonQueryRequest.class);
         this.collection = SolrCollection.uniprot;
         this.docTypeClass = FakeDocument.class;
     }
@@ -55,9 +56,9 @@ class SolrCursorMarkIteratorTest {
 
     @Test
     void removeNotSupported() {
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> new SolrResultsIterator<>(client, collection, query, docTypeClass).remove());
+        SolrResultsIterator<FakeDocument> resultIterator =
+                new SolrResultsIterator<>(client, collection, query, docTypeClass);
+        assertThrows(UnsupportedOperationException.class, resultIterator::remove);
     }
 
     @Test
@@ -82,12 +83,12 @@ class SolrCursorMarkIteratorTest {
 
         cursorMarkIterator.hasNext();
         verify(query, times(1))
-                .set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
+                .withParam(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
     }
 
     @Test
     void nullSolrResponseCausesNoNext() throws IOException, SolrServerException {
-        when(client.query(collection.toString(), query)).thenReturn(null);
+        when(query.process(client, collection.toString())).thenReturn(null);
 
         SolrResultsIterator<FakeDocument> cursorMarkIterator =
                 new SolrResultsIterator<>(client, collection, query, docTypeClass);
@@ -100,7 +101,7 @@ class SolrCursorMarkIteratorTest {
             throws IOException, SolrServerException {
         QueryResponse firstQueryResponse = firstQueryResponse();
         QueryResponse secondQueryResponse = secondQueryResponse();
-        when(client.query(collection.toString(), query))
+        when(query.process(client, collection.toString()))
                 .thenReturn(firstQueryResponse)
                 .thenReturn(secondQueryResponse);
 
@@ -118,7 +119,7 @@ class SolrCursorMarkIteratorTest {
     void canCallNextWithoutHasNext() throws IOException, SolrServerException {
         QueryResponse firstQueryResponse = firstQueryResponse();
         QueryResponse secondQueryResponse = secondQueryResponse();
-        when(client.query(collection.toString(), query))
+        when(query.process(client, collection.toString()))
                 .thenReturn(firstQueryResponse)
                 .thenReturn(secondQueryResponse);
 
@@ -132,7 +133,7 @@ class SolrCursorMarkIteratorTest {
 
     @Test
     void serverErrorCausesException() throws IOException, SolrServerException {
-        doThrow(SolrServerException.class).when(client).query(collection.toString(), query);
+        doThrow(SolrServerException.class).when(query).process(client, collection.toString());
 
         SolrResultsIterator<FakeDocument> cursorMarkIterator =
                 new SolrResultsIterator<>(client, collection, query, docTypeClass);

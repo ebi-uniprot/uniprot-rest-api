@@ -421,7 +421,7 @@ class TaxonomyGetIdsControllerIT {
                             .taxonomyObj(getTaxonomyBinary(taxonomyEntry));
 
             if (taxId % 2 == 0) {
-                docBuilder.taxonomiesWith(List.of("5_reference", "2_reviewed"));
+                docBuilder.taxonomiesWith(List.of("4_reference", "2_reviewed"));
             }
             storeManager.saveDocs(DataStoreManager.StoreType.TAXONOMY, docBuilder.build());
         }

@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.Test;
@@ -90,9 +91,12 @@ class TupleStreamTemplateTest {
         int acceptableHitsToRetrieve = 10;
         QueryResponse response = mock(QueryResponse.class);
         SolrDocumentList results = mock(SolrDocumentList.class);
+        JsonQueryRequest jsonQueryRequest = mock(JsonQueryRequest.class);
+        SolrRequestConverter converter = mock(SolrRequestConverter.class);
+        when(converter.toJsonQueryRequest(any())).thenReturn(jsonQueryRequest);
+        when(jsonQueryRequest.process(any(), any())).thenReturn(response);
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
 
         StreamerConfigProperties streamConfig = new StreamerConfigProperties();
         streamConfig.setCollection("uniprot");
@@ -101,7 +105,7 @@ class TupleStreamTemplateTest {
                 TupleStreamTemplate.builder()
                         .solrClient(solrClient)
                         .streamConfig(streamConfig)
-                        .solrRequestConverter(new SolrRequestConverter())
+                        .solrRequestConverter(converter)
                         .build();
 
         // then
@@ -152,9 +156,12 @@ class TupleStreamTemplateTest {
         int acceptableHitsToRetrieve = 10;
         QueryResponse response = mock(QueryResponse.class);
         SolrDocumentList results = mock(SolrDocumentList.class);
+        JsonQueryRequest jsonQueryRequest = mock(JsonQueryRequest.class);
+        SolrRequestConverter converter = mock(SolrRequestConverter.class);
+        when(converter.toJsonQueryRequest(any())).thenReturn(jsonQueryRequest);
+        when(jsonQueryRequest.process(any(), any())).thenReturn(response);
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
-        when(solrClient.query(anyString(), any())).thenReturn(response);
 
         StreamerConfigProperties streamConfig = new StreamerConfigProperties();
         streamConfig.setStoreMaxCountToRetrieve(acceptableHitsToRetrieve);
@@ -163,7 +170,7 @@ class TupleStreamTemplateTest {
                 TupleStreamTemplate.builder()
                         .solrClient(solrClient)
                         .streamConfig(streamConfig)
-                        .solrRequestConverter(new SolrRequestConverter())
+                        .solrRequestConverter(converter)
                         .build();
 
         // then

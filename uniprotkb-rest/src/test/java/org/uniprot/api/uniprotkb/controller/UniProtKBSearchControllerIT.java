@@ -1064,7 +1064,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     contains(ACCESSION_SP_CANONICAL, ACCESSION_SP, "P00001")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
-                    .resultMatcher(jsonPath("$.facets.*.name", contains("reviewed", "fragment")))
+                    .resultMatcher(
+                            jsonPath("$.facets.*.name", containsInAnyOrder("reviewed", "fragment")))
                     .build();
         }
     }

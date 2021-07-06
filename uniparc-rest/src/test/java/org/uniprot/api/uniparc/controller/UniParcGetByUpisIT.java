@@ -166,19 +166,20 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getFacetsResultMatchers() {
         ResultMatcher rm1 = jsonPath("$.facets", iterableWithSize(2));
-        ResultMatcher rm2 = jsonPath("$.facets.*.label", contains("Organisms", "Database"));
-        ResultMatcher rm3 = jsonPath("$.facets.*.name", contains("organism_name", "database"));
-        ResultMatcher rm4 = jsonPath("$.facets[1].values", iterableWithSize(1));
-        ResultMatcher rm5 = jsonPath("$.facets[1].values[0].label", is("UniProtKB"));
-        ResultMatcher rm6 = jsonPath("$.facets[1].values[0].value", is("uniprot"));
-        ResultMatcher rm7 = jsonPath("$.facets[1].values[0].count", is(10));
-        ResultMatcher rm8 = jsonPath("$.facets[0].values", iterableWithSize(2));
-        ResultMatcher rm9 = jsonPath("$.facets[0].values.*.label").doesNotExist();
+        ResultMatcher rm2 = jsonPath("$.facets.*.label", contains("Database", "Organisms"));
+        ResultMatcher rm3 =
+                jsonPath("$.facets.*.name", contains("database_facet", "organism_name"));
+        ResultMatcher rm4 = jsonPath("$.facets[0].values", iterableWithSize(1));
+        ResultMatcher rm5 = jsonPath("$.facets[0].values[0].label", is("UniProtKB"));
+        ResultMatcher rm6 = jsonPath("$.facets[0].values[0].value", is("1"));
+        ResultMatcher rm7 = jsonPath("$.facets[0].values[0].count", is(10));
+        ResultMatcher rm8 = jsonPath("$.facets[1].values", iterableWithSize(2));
+        ResultMatcher rm9 = jsonPath("$.facets[1].values.*.label").doesNotExist();
         ResultMatcher rm10 =
                 jsonPath(
-                        "$.facets[0].values.*.value",
+                        "$.facets[1].values.*.value",
                         containsInAnyOrder("Homo sapiens", "Torpedo californica"));
-        ResultMatcher rm11 = jsonPath("$.facets[0].values.*.count", containsInAnyOrder(10, 10));
+        ResultMatcher rm11 = jsonPath("$.facets[1].values.*.count", containsInAnyOrder(10, 10));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8, rm9, rm10, rm11);
     }
 
@@ -208,8 +209,10 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
                         "$.results.*.uniParcId",
                         contains(List.of(TEST_IDS_ARRAY).subList(0, 4).toArray()));
         ResultMatcher rm2 = jsonPath("$.facets", iterableWithSize(2));
-        ResultMatcher rm3 = jsonPath("$.facets.*.label", contains("Organisms", "Database"));
-        ResultMatcher rm4 = jsonPath("$.facets.*.name", contains("organism_name", "database"));
+        ResultMatcher rm3 =
+                jsonPath("$.facets.*.label", containsInAnyOrder("Organisms", "Database"));
+        ResultMatcher rm4 =
+                jsonPath("$.facets.*.name", containsInAnyOrder("organism_name", "database_facet"));
         return List.of(rm1, rm2, rm3, rm4);
     }
 
@@ -246,13 +249,13 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String[] getInvalidFacetErrorMessage() {
         return new String[] {
-            "Invalid facet name 'invalid_facet1'. Expected value can be [organism_name, database]."
+            "Invalid facet name 'invalid_facet1'. Expected value can be [database_facet, organism_name]."
         };
     }
 
     @Override
     protected String getFacetFilter() {
-        return "database:uniprot";
+        return "database_facet:1";
     }
 
     @Override

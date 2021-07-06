@@ -1,7 +1,6 @@
 package org.uniprot.api.common.repository.search.facet;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -105,6 +104,12 @@ public class FacetTupleStreamConverter
                     facetValues.getValue().stream()
                             .map(pair -> createFacetItem(pair, facetValues.getKey()))
                             .collect(Collectors.toList());
+
+            int limit = getFacetLimit(facetValues.getKey());
+            if (values.size() > limit) {
+                values = values.subList(0, limit);
+            }
+
             // build a facet
             return Facet.builder()
                     .name(facetValues.getKey())
@@ -115,6 +120,16 @@ public class FacetTupleStreamConverter
         } else { // handle length buckets differently
             return convertSolrStreamToRangeFacet(facetValues);
         }
+    }
+
+    private int getFacetLimit(String facetName) {
+        int limit = facetConfig.getLimit();
+        FacetProperty facetProperty =
+                getFacetConfig().getFacetPropertyMap().getOrDefault(facetName, null);
+        if (facetProperty != null && facetProperty.getLimit() > 0) {
+            limit = facetProperty.getLimit();
+        }
+        return limit;
     }
 
     private FacetItem createFacetItem(Pair<String, Long> pair, String facetName) {
@@ -131,7 +146,7 @@ public class FacetTupleStreamConverter
         List<FacetItem> values =
                 lengthBucketCount.entrySet().stream()
                         .filter(entry -> entry.getValue() > 0L)
-                        .sorted(new LengthBucketComparator())
+                        .sorted(Map.Entry.comparingByKey())
                         .map(
                                 entry ->
                                         FacetItem.builder()
@@ -179,18 +194,5 @@ public class FacetTupleStreamConverter
         buckets.put(RANGE_601_800, bucket601To800);
         buckets.put(RANGE_801_PLUS, bucket801Onwards);
         return buckets;
-    }
-
-    private static class LengthBucketComparator
-            implements Comparator<Map.Entry<String, Long>>, Serializable {
-        @Override
-        public int compare(Map.Entry<String, Long> o1, Map.Entry<String, Long> o2) {
-            int valueCompare = Long.compare(o2.getValue(), o1.getValue());
-            if (valueCompare != 0) {
-                return valueCompare;
-            } else {
-                return RANGE_INDEX.get(o2.getKey()).compareTo(RANGE_INDEX.get(o1.getKey()));
-            }
-        }
     }
 }

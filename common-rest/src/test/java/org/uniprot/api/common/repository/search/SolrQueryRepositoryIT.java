@@ -3,6 +3,7 @@ package org.uniprot.api.common.repository.search;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Collections;
@@ -14,38 +15,45 @@ import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsCollectionWithSize;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
+import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtDocMocker;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /** @author lgonzales */
+@ExtendWith(SpringExtension.class)
+@EnableConfigurationProperties(value = UniProtKBFacetConfig.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SolrQueryRepositoryIT {
 
     private static GeneralSolrQueryRepository queryRepo;
 
     @RegisterExtension static DataStoreManager storeManager = new DataStoreManager();;
 
+    @Autowired UniProtKBFacetConfig facetConfig;
+
     private final int defaultPageSize = 10;
 
     @BeforeAll
-    static void setUp() {
+    void setUp() {
         try {
             storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
             SolrClient solrClient = storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT);
-            queryRepo = new GeneralSolrQueryRepository(solrClient);
+            queryRepo = new GeneralSolrQueryRepository(solrClient, facetConfig);
         } catch (Exception e) {
             fail("Error to setup SolrQueryRepositoryTest", e);
         }
@@ -57,7 +65,7 @@ class SolrQueryRepositoryIT {
     }
 
     @AfterAll
-    static void close() {
+    void close() {
         storeManager.close();
     }
 
@@ -281,7 +289,7 @@ class SolrQueryRepositoryIT {
                 queryRepo.searchPage(queryWithoutFacets(accQuery), null);
 
         // then
-        assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(0));
+        assertThat(queryResult.getFacets(), hasSize(0));
     }
 
     @Test
@@ -289,6 +297,9 @@ class SolrQueryRepositoryIT {
         // given
         int docCount = 10;
         List<UniProtDocument> docs = UniProtDocMocker.createDocs(docCount);
+        for (int i = 0; i < docCount; i++) {
+            docs.get(i).reviewed = i % 3 == 0;
+        }
         storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
 
         // when attempt to fetch results with facets
@@ -297,7 +308,54 @@ class SolrQueryRepositoryIT {
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
 
         // then
-        assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(Matchers.is(1)));
+        assertThat(queryResult.getFacets(), hasSize(Matchers.is(1)));
+    }
+
+    @Test
+    void singleMultiValueFacet() {
+        // given
+        int docCount = 10;
+        List<UniProtDocument> docs = UniProtDocMocker.createDocs(docCount);
+        for (int i = 0; i < docCount; i++) {
+            docs.get(i).proteinsWith.add(i + 1);
+            docs.get(i).proteinsWith.add(i + 2);
+            docs.get(i).proteinsWith.add(i + 3);
+            docs.get(i).proteinsWith.add(i + 4);
+            docs.get(i).proteinsWith.add(i + 5);
+            docs.get(i).proteinsWith.add(i + 6);
+            docs.get(i).proteinsWith.add(i + 7);
+            docs.get(i).proteinsWith.add(i + 8);
+            docs.get(i).proteinsWith.add(i + 9);
+            docs.get(i).proteinsWith.add(i + 10);
+        }
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
+        // when attempt to fetch results with facets
+        String accQuery = "accession:*";
+        SolrRequest query =
+                queryWithFacets(accQuery, Collections.singletonList("proteins_with"), 2);
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
+
+        // then
+        assertThat(queryResult.getFacets(), hasSize(Matchers.is(1)));
+    }
+
+    @Test
+    void singleRangeFacet() {
+        // given
+        int docCount = 12;
+        List<UniProtDocument> docs = UniProtDocMocker.createDocs(docCount);
+        for (int i = 0; i < docCount; i++) {
+            docs.get(i).seqLength = i * 110;
+        }
+        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, docs);
+
+        // when attempt to fetch results with facets
+        String accQuery = "accession:*";
+        SolrRequest query = queryWithFacets(accQuery, Collections.singletonList("length"), 2);
+        QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
+
+        // then
+        assertThat(queryResult.getFacets(), hasSize(Matchers.is(1)));
     }
 
     @Test
@@ -313,7 +371,7 @@ class SolrQueryRepositoryIT {
         QueryResult<UniProtDocument> queryResult = queryRepo.searchPage(query, null);
 
         // then
-        assertThat(queryResult.getFacets(), IsCollectionWithSize.hasSize(Matchers.is(2)));
+        assertThat(queryResult.getFacets(), hasSize(Matchers.is(2)));
     }
 
     private SolrRequest queryAllReverseOrderedByAccession() {
@@ -333,7 +391,7 @@ class SolrQueryRepositoryIT {
                 .query(query)
                 .defaultQueryOperator(QueryOperator.AND)
                 .filterQuery("active:true")
-                .facetConfig(new FakeFacetConfig())
+                .facetConfig(facetConfig)
                 .facets(facets)
                 .sort(SolrQuery.SortClause.asc("accession_id"))
                 .rows(size)
@@ -364,24 +422,24 @@ class SolrQueryRepositoryIT {
     }
 
     private static class GeneralSolrQueryRepository extends SolrQueryRepository<UniProtDocument> {
-        GeneralSolrQueryRepository(SolrClient solrClient) {
+        GeneralSolrQueryRepository(SolrClient solrClient, UniProtKBFacetConfig facetConfig) {
             super(
                     solrClient,
                     SolrCollection.uniprot,
                     UniProtDocument.class,
-                    new FakeFacetConfig(),
+                    facetConfig,
                     new GeneralSolrRequestConverter());
         }
     }
 
     private static class GeneralSolrRequestConverter extends SolrRequestConverter {
         @Override
-        public SolrQuery toSolrQuery(SolrRequest request) {
-            SolrQuery solrQuery = super.toSolrQuery(request);
+        public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
+            JsonQueryRequest solrQuery = super.toJsonQueryRequest(request);
 
             // required for tests, because EmbeddedSolrServer is not sharded
-            solrQuery.setParam("distrib", "false");
-            solrQuery.setParam("terms.mincount", "1");
+            ((ModifiableSolrParams) solrQuery.getParams()).set("distrib", "false");
+            ((ModifiableSolrParams) solrQuery.getParams()).set("terms.mincount", "1");
 
             return solrQuery;
         }

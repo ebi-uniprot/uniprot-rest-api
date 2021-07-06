@@ -67,8 +67,8 @@ public class TaxonomyITUtils {
         if (facet) {
             docBuilder.taxonomiesWith(
                     List.of(
-                            "5_reference",
-                            "4_proteome",
+                            "5_proteome",
+                            "4_reference",
                             "3_unreviewed",
                             "2_reviewed",
                             "1_uniprotkb"));

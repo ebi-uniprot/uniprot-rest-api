@@ -213,25 +213,25 @@ class UniProtKBPublicationControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(
-                        jsonPath("$.facets.*.label", contains("Source", "Category", "Study type")))
+                        jsonPath("$.facets.*.label", contains("Source", "Study type", "Category")))
                 .andExpect(
                         jsonPath(
                                 "$.facets.*.name",
-                                contains("types", "categories", "is_large_scale")))
+                                contains("types", "is_large_scale", "categories")))
                 .andExpect(jsonPath("$.facets[0].values[0].label", is("Computationally mapped")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(2)))
-                .andExpect(jsonPath("$.facets[1].values.*.value", everyItem(in(VALID_CATEGORIES))))
+                .andExpect(jsonPath("$.facets[2].values.*.value", everyItem(in(VALID_CATEGORIES))))
                 .andExpect(
                         jsonPath(
-                                "$.facets[1].values.*.count",
+                                "$.facets[2].values.*.count",
                                 hasSize(lessThanOrEqualTo(VALID_CATEGORIES.size()))))
                 .andExpect(
                         jsonPath(
-                                "$.facets[2].values.*.label",
+                                "$.facets[1].values.*.label",
                                 everyItem(in(asList("Small scale", "Large scale")))))
                 .andExpect(
                         jsonPath(
-                                "$.facets[2].values.*.value",
+                                "$.facets[1].values.*.value",
                                 everyItem(in(asList("true", "false")))));
     }
 
@@ -260,16 +260,16 @@ class UniProtKBPublicationControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(3)))
                 .andExpect(
-                        jsonPath("$.facets.*.label", contains("Source", "Category", "Study type")))
+                        jsonPath("$.facets.*.label", contains("Source", "Study type", "Category")))
                 .andExpect(
                         jsonPath(
                                 "$.facets.*.name",
-                                contains("types", "categories", "is_large_scale")))
+                                contains("types", "is_large_scale", "categories")))
                 .andExpect(
                         jsonPath("$.facets[0].values.*.label", contains("Computationally mapped")))
                 .andExpect(jsonPath("$.facets[0].values.*.value", contains("1")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3)))
-                .andExpect(jsonPath("$.facets[1].values.*.value", hasItem("Interaction")));
+                .andExpect(jsonPath("$.facets[2].values.*.value", hasItem("Interaction")));
     }
 
     @Test

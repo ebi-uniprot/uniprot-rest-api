@@ -197,15 +197,15 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
         ResultMatcher rm2 = jsonPath("$.facets.*.label", contains("Clusters"));
         ResultMatcher rm3 = jsonPath("$.facets.*.name", contains("identity"));
         ResultMatcher rm4 = jsonPath("$.facets[0].values", iterableWithSize(3));
-        ResultMatcher rm5 = jsonPath("$.facets[0].values[0].label", is("50%"));
-        ResultMatcher rm6 = jsonPath("$.facets[0].values[0].value", is("0.5"));
-        ResultMatcher rm7 = jsonPath("$.facets[0].values[0].count", is(4));
+        ResultMatcher rm11 = jsonPath("$.facets[0].values[0].label", is("100%"));
+        ResultMatcher rm12 = jsonPath("$.facets[0].values[0].value", is("1.0"));
+        ResultMatcher rm13 = jsonPath("$.facets[0].values[0].count", is(3));
         ResultMatcher rm8 = jsonPath("$.facets[0].values[1].label", is("90%"));
         ResultMatcher rm9 = jsonPath("$.facets[0].values[1].value", is("0.9"));
         ResultMatcher rm10 = jsonPath("$.facets[0].values[1].count", is(3));
-        ResultMatcher rm11 = jsonPath("$.facets[0].values[2].label", is("100%"));
-        ResultMatcher rm12 = jsonPath("$.facets[0].values[2].value", is("1.0"));
-        ResultMatcher rm13 = jsonPath("$.facets[0].values[2].count", is(3));
+        ResultMatcher rm5 = jsonPath("$.facets[0].values[2].label", is("50%"));
+        ResultMatcher rm6 = jsonPath("$.facets[0].values[2].value", is("0.5"));
+        ResultMatcher rm7 = jsonPath("$.facets[0].values[2].count", is(4));
 
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8, rm9, rm10, rm11, rm12, rm13);
     }

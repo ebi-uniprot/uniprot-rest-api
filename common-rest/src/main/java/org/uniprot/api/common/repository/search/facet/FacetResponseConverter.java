@@ -1,12 +1,13 @@
 package org.uniprot.api.common.repository.search.facet;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.IntervalFacet;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
+import org.apache.solr.client.solrj.response.json.BucketJsonFacet;
+import org.apache.solr.client.solrj.response.json.NestableJsonFacet;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -18,7 +19,7 @@ import org.uniprot.core.util.Utils;
  */
 public class FacetResponseConverter extends FacetConverter<QueryResponse, List<Facet>> {
 
-    private FacetConfig facetConfig;
+    private final FacetConfig facetConfig;
 
     public FacetResponseConverter(FacetConfig facetConfig) {
         this.facetConfig = facetConfig;
@@ -39,17 +40,21 @@ public class FacetResponseConverter extends FacetConverter<QueryResponse, List<F
     @Override
     public List<Facet> convert(QueryResponse queryResponse) {
         List<Facet> facetResult = new ArrayList<>();
-        if (Utils.notNullNotEmpty(queryResponse.getFacetFields())) {
-            for (FacetField facetField : queryResponse.getFacetFields()) {
+
+        if (Utils.notNull(queryResponse.getJsonFacetingResponse())) {
+            NestableJsonFacet facetResponse = queryResponse.getJsonFacetingResponse();
+            Set<String> facetNames = facetResponse.getBucketBasedFacetNames();
+            for (String facetName : facetNames) {
                 // Iterating over all Query response Facets
-                facetResult.add(convertFieldFacets(facetField));
+                BucketBasedJsonFacet facetField = facetResponse.getBucketBasedFacets(facetName);
+                if (isIntervalFacet(facetName)) {
+                    facetResult.add(convertIntervalFacets(facetField, facetName));
+                } else {
+                    facetResult.add(convertFieldFacets(facetField, facetName));
+                }
             }
         }
-        if (Utils.notNullNotEmpty(queryResponse.getIntervalFacets())) {
-            for (IntervalFacet intervalFacet : queryResponse.getIntervalFacets()) {
-                facetResult.add(convertIntervalFacets(intervalFacet));
-            }
-        }
+
         return facetResult;
     }
 
@@ -60,31 +65,30 @@ public class FacetResponseConverter extends FacetConverter<QueryResponse, List<F
      * @param intervalFacet interval facet returned from Solr
      * @return converted facet
      */
-    private Facet convertIntervalFacets(IntervalFacet intervalFacet) {
+    private Facet convertIntervalFacets(BucketBasedJsonFacet intervalFacet, String facetName) {
         // Iterating over all Query response Interval Facets
         List<FacetItem> values = new ArrayList<>();
-        if (Utils.notNullNotEmpty(intervalFacet.getIntervals())) {
-            for (IntervalFacet.Count count : intervalFacet.getIntervals()) {
+        if (Utils.notNullNotEmpty(intervalFacet.getBuckets())) {
+            for (BucketJsonFacet count : intervalFacet.getBuckets()) {
                 // Iterating over all query response interval facet items
-                if (count != null) {
-                    String queryTerm = count.getKey().replace(",", " TO ");
+                if (count != null && count.getCount() > 0) {
+                    String value = count.getVal().toString();
+                    String queryTerm = value.replace(",", " TO ");
                     // Adding add Facet Item to facet item list
                     values.add(
                             FacetItem.builder()
                                     .value(queryTerm)
-                                    .label(
-                                            getIntervalFacetItemLabel(
-                                                    intervalFacet.getField(), count.getKey()))
-                                    .count((long) count.getCount())
+                                    .label(getIntervalFacetItemLabel(facetName, value))
+                                    .count(count.getCount())
                                     .build());
                 }
             }
         }
         // return an Interval facet
         return Facet.builder()
-                .name(intervalFacet.getField())
-                .label(getFacetLabel(intervalFacet.getField()))
-                .allowMultipleSelection(allowMultipleSelection(intervalFacet.getField()))
+                .name(facetName)
+                .label(getFacetLabel(facetName))
+                .allowMultipleSelection(allowMultipleSelection(facetName))
                 .values(values)
                 .build();
     }
@@ -96,30 +100,28 @@ public class FacetResponseConverter extends FacetConverter<QueryResponse, List<F
      * @param facetField Facet Field returned from Solr
      * @return converted field facet
      */
-    private Facet convertFieldFacets(FacetField facetField) {
+    private Facet convertFieldFacets(BucketBasedJsonFacet facetField, String facetName) {
         List<FacetItem> values = new ArrayList<>();
-        if (Utils.notNullNotEmpty(facetField.getValues())) {
-            for (FacetField.Count count : facetField.getValues()) {
+        if (Utils.notNullNotEmpty(facetField.getBuckets())) {
+            for (BucketJsonFacet count : facetField.getBuckets()) {
                 // Iterating over all query response facet items
-                if (count != null) {
+                if (count != null && count.getCount() > 0) {
                     // Adding add Facet Item to facet item list
+                    String itemValue = count.getVal().toString();
                     values.add(
                             FacetItem.builder()
-                                    .value(count.getName())
-                                    .label(getFacetItemLabel(facetField.getName(), count.getName()))
+                                    .value(itemValue)
+                                    .label(getFacetItemLabel(facetName, itemValue))
                                     .count(count.getCount())
                                     .build());
                 }
             }
-            if ("desc".equals(getSort(facetField.getName()))) {
-                Collections.reverse(values);
-            }
         }
         // build a facet
         return Facet.builder()
-                .name(facetField.getName())
-                .label(getFacetLabel(facetField.getName()))
-                .allowMultipleSelection(allowMultipleSelection(facetField.getName()))
+                .name(facetName)
+                .label(getFacetLabel(facetName))
+                .allowMultipleSelection(allowMultipleSelection(facetName))
                 .values(values)
                 .build();
     }

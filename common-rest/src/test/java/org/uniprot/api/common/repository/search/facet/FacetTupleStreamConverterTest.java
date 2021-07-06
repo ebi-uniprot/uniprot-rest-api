@@ -40,10 +40,16 @@ class FacetTupleStreamConverterTest {
         Tuple tuple2 = getTuple("reviewed", false, 24L);
         Tuple tuple3 = getTuple("model_organism", "Human", 123L);
         Tuple tuple4 = getTuple("model_organism", "Rice", 12L);
+        Tuple tuple5 = getTuple("model_organism", "Rice 1", 11L);
+        Tuple tuple6 = getTuple("model_organism", "Rice 2", 10L);
+        Tuple tuple7 = getTuple("model_organism", "Rice 3", 9L);
+        Tuple tuple8 = getTuple("model_organism", "Rice 4", 8L);
         Tuple eofTuple = new Tuple();
         eofTuple.EOF = true;
 
-        when(tupleStream.read()).thenReturn(tuple1, tuple2, tuple3, tuple4, eofTuple);
+        when(tupleStream.read())
+                .thenReturn(
+                        tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8, eofTuple);
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
@@ -79,7 +85,7 @@ class FacetTupleStreamConverterTest {
         assertEquals("model_organism", organismFacet.getName());
         assertTrue(organismFacet.isAllowMultipleSelection());
         assertNotNull(organismFacet.getValues());
-        assertEquals(2, organismFacet.getValues().size());
+        assertEquals(5, organismFacet.getValues().size());
 
         FacetItem itemValue3 = organismFacet.getValues().get(0);
         assertNotNull(itemValue3);

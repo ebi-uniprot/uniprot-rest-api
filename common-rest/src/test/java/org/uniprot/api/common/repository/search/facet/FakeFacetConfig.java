@@ -18,6 +18,7 @@ public class FakeFacetConfig extends FacetConfig {
 
         FacetProperty fragment = new FacetProperty();
         fragment.setLabel("Fragment");
+        fragment.setLimit(2);
         fragment.setAllowmultipleselection(false);
         Map<String, String> fragmentValues = new HashMap<>();
         fragmentValues.put("true", "Yes");
@@ -28,6 +29,7 @@ public class FakeFacetConfig extends FacetConfig {
         FacetProperty reviewed = new FacetProperty();
         reviewed.setLabel("Status");
         reviewed.setAllowmultipleselection(false);
+        reviewed.setLimit(2);
         Map<String, String> reviewedValues = new HashMap<>();
         reviewedValues.put("true", "Reviewed (Swiss-Prot)");
         reviewedValues.put("false", "Unreviewed (TrEMBL)");
@@ -37,12 +39,13 @@ public class FakeFacetConfig extends FacetConfig {
         FacetProperty organism = new FacetProperty();
         organism.setLabel("Model organisms");
         organism.setAllowmultipleselection(true);
+        organism.setLimit(5);
         result.put("model_organism", organism);
 
         FacetProperty annotation = new FacetProperty();
         annotation.setLabel("Annotation");
         annotation.setAllowmultipleselection(true);
-        annotation.setSort("desc");
+        annotation.setSort("index desc");
         result.put("annotation", annotation);
 
         // Interval facet

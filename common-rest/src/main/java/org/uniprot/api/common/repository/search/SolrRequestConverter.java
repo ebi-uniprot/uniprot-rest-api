@@ -3,14 +3,21 @@ package org.uniprot.api.common.repository.search;
 import static org.uniprot.api.common.repository.search.SolrRequestConverter.SolrQueryConverter.*;
 import static org.uniprot.core.util.Utils.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.client.solrj.request.json.TermsFacetMap;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
@@ -28,24 +35,21 @@ public class SolrRequestConverter {
      * @param request the request that specifies the query
      * @return the solr query
      */
-    public SolrQuery toSolrQuery(SolrRequest request) {
-        return toSolrQuery(request, false);
+    public JsonQueryRequest toJsonQueryRequest(SolrRequest request) {
+        return toJsonQueryRequest(request, false);
     }
 
-    public SolrQuery toSolrQuery(SolrRequest request, boolean isEntry) {
-        SolrQuery solrQuery = new SolrQuery(request.getQuery());
+    public JsonQueryRequest toJsonQueryRequest(SolrRequest request, boolean isEntry) {
+        final ModifiableSolrParams solrQuery = new ModifiableSolrParams();
+        solrQuery.add("q", request.getQuery());
 
         if (!isEntry) {
             setDefaults(solrQuery, request.getDefaultField());
         }
 
-        solrQuery.setRows(request.getRows());
+        solrQuery.add("rows", String.valueOf(request.getRows()));
         setFilterQueries(solrQuery, request.getFilterQueries());
-        setSort(solrQuery, request.getSorts());
         setQueryOperator(solrQuery, request.getDefaultQueryOperator());
-        if (!request.getFacets().isEmpty()) {
-            setFacets(solrQuery, request.getFacets(), request.getFacetConfig());
-        }
         if (!request.getTermFields().isEmpty()) {
             if (nullOrEmpty(request.getTermQuery())) {
                 throw new InvalidRequestException("Please specify required field, term query.");
@@ -54,12 +58,21 @@ public class SolrRequestConverter {
         }
 
         if (notNull(request.getQueryConfig())) {
-            setQueryConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
+            if (request.getRows() > 1) {
+                setQueryBoostConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
+            }
+            setQueryFields(solrQuery, request.getQueryConfig());
         }
 
-        log.debug("Solr Query: " + solrQuery);
+        JsonQueryRequest result = new JsonQueryRequest(solrQuery);
+        setSort(result, request.getSorts());
+        if (!request.getFacets().isEmpty()) {
+            setFacets(result, request.getFacets(), request.getFacetConfig());
+        }
 
-        return solrQuery;
+        log.debug("Solr Query without facet and sort details: " + solrQuery);
+
+        return result;
     }
 
     static class SolrQueryConverter {
@@ -82,64 +95,86 @@ public class SolrRequestConverter {
 
         private SolrQueryConverter() {}
 
-        static void setTermFields(SolrQuery solrQuery, String termQuery, List<String> termFields) {
+        static void setTermFields(
+                ModifiableSolrParams solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
-                solrQuery.setParam(TERMS_LIST, termQuery.toLowerCase());
+                solrQuery.add(TERMS_LIST, termQuery.toLowerCase());
             } else {
                 throw new InvalidRequestException(
                         "Term information will only be returned for single value searches that do not specify a field.");
             }
 
-            solrQuery.setParam(TERMS, "true");
-            solrQuery.setParam(DISTRIB, "true");
-            solrQuery.setParam(MINCOUNT, "1");
+            solrQuery.add(TERMS, "true");
+            solrQuery.add(DISTRIB, "true");
+            solrQuery.add(MINCOUNT, "1");
 
             String[] termsFieldsArr = new String[termFields.size()];
             termsFieldsArr = termFields.toArray(termsFieldsArr);
-            solrQuery.setParam(TERMS_FIELDS, termsFieldsArr);
+            solrQuery.add(TERMS_FIELDS, termsFieldsArr);
         }
 
         static boolean isSingleTerm(String query) {
             return SINGLE_TERM_PATTERN.matcher(query).matches();
         }
 
-        static void setFacets(SolrQuery solrQuery, List<String> facets, FacetConfig facetConfig) {
-            solrQuery.setFacet(true);
-
+        static void setFacets(
+                JsonQueryRequest solrQuery, List<String> facets, FacetConfig facetConfig) {
             for (String facetName : facets) {
                 FacetProperty facetProperty = facetConfig.getFacetPropertyMap().get(facetName);
                 if (notNullNotEmpty(facetProperty.getInterval())) {
-                    String[] facetIntervals =
-                            facetProperty.getInterval().values().toArray(new String[0]);
-                    solrQuery.addIntervalFacets(facetName, facetIntervals);
+                    Map<String, Object> rangeFacet = new HashMap<>();
+                    rangeFacet.put("field", facetName);
+                    rangeFacet.put("type", "range");
+                    rangeFacet.put("refine", "true");
+                    List<Object> ranges = new ArrayList<>();
+                    for (int i = 1; i <= facetProperty.getInterval().size(); i++) {
+                        String rangeItem = facetProperty.getInterval().get("" + i);
+                        Map<String, Object> range = new HashMap<>();
+                        range.put("range", rangeItem);
+                        ranges.add(range);
+                    }
+                    rangeFacet.put("ranges", ranges);
+                    solrQuery.withFacet(facetName, rangeFacet);
                 } else {
-                    solrQuery.addFacetField(facetName);
-                }
-                if (facetProperty.getLimit() != 0) {
-                    solrQuery.add(
-                            String.format("f.%s.facet.limit", facetName),
-                            String.valueOf(facetProperty.getLimit()));
+                    final TermsFacetMap facet = new TermsFacetMap(facetName);
+                    facet.setMinCount(facetConfig.getMincount());
+
+                    if (facetProperty.getLimit() <= 0) {
+                        facet.setLimit(facetConfig.getLimit()); // default facet.limit property
+                    } else {
+                        facet.setLimit(facetProperty.getLimit());
+                    }
+
+                    if (facetProperty.getSort() != null) {
+                        facet.setSort(facetProperty.getSort());
+                    }
+                    facet.useDistributedFacetRefining(true);
+                    solrQuery.withFacet(facetName, facet);
                 }
             }
-            solrQuery.setFacetLimit(facetConfig.getLimit());
-            solrQuery.setFacetMinCount(facetConfig.getMincount());
         }
 
-        static void setQueryOperator(SolrQuery solrQuery, QueryOperator defaultQueryOperator) {
-            solrQuery.set(QUERY_OPERATOR, defaultQueryOperator.name());
+        static void setQueryOperator(
+                ModifiableSolrParams solrQuery, QueryOperator defaultQueryOperator) {
+            solrQuery.add(QUERY_OPERATOR, defaultQueryOperator.name());
         }
 
-        static void setFilterQueries(SolrQuery solrQuery, List<String> filterQueries) {
+        static void setFilterQueries(ModifiableSolrParams solrQuery, List<String> filterQueries) {
             String[] filterQueryArr = new String[filterQueries.size()];
             filterQueryArr = filterQueries.toArray(filterQueryArr);
-            solrQuery.setFilterQueries(filterQueryArr);
+            solrQuery.add("fq", filterQueryArr);
         }
 
-        static void setSort(SolrQuery solrQuery, List<SolrQuery.SortClause> sorts) {
-            sorts.forEach(solrQuery::addSort);
+        static void setSort(JsonQueryRequest solrQuery, List<SolrQuery.SortClause> sorts) {
+            String sort =
+                    sorts.stream()
+                            .map(clause -> clause.getItem() + " " + clause.getOrder().toString())
+                            .collect(Collectors.joining(","));
+            solrQuery.setSort(sort);
         }
 
-        static void setQueryConfigs(SolrQuery solrQuery, String query, SolrQueryConfig boosts) {
+        static void setQueryBoostConfigs(
+                ModifiableSolrParams solrQuery, String query, SolrQueryConfig boosts) {
             Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
             if (fieldQueryMatcher.find()) {
                 // a query involving field queries
@@ -161,13 +196,10 @@ public class SolrRequestConverter {
                     solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
                 }
             }
-
-            if (notNullNotEmpty(boosts.getQueryFields())) {
-                solrQuery.add(QUERY_FIELDS, boosts.getQueryFields());
-            }
         }
 
-        private static void addQueryBoost(SolrQuery solrQuery, String boost, String query) {
+        private static void addQueryBoost(
+                ModifiableSolrParams solrQuery, String boost, String query) {
             if (boostingOnANumericField(boost)) {
                 // only apply the boost if the value is numeric
                 if (StringUtils.isNumeric(query)) {
@@ -185,6 +217,11 @@ public class SolrRequestConverter {
             }
         }
 
+        static void setQueryFields(ModifiableSolrParams solrQuery, SolrQueryConfig boosts) {
+            if (notNullNotEmpty(boosts.getQueryFields())) {
+                solrQuery.add(QUERY_FIELDS, boosts.getQueryFields());
+            }
+        }
         /**
          * @param boostDefinition the boost definition
          * @return whether a boost definition involves a numeric field
@@ -193,9 +230,11 @@ public class SolrRequestConverter {
             return boostDefinition.contains(BOOST_FIELD_TYPE_NUMBER);
         }
 
-        static void setDefaults(SolrQuery solrQuery, String defaultField) {
-            solrQuery.setParam(DEFAULT_FIELD, defaultField);
-            solrQuery.setParam(DEF_TYPE, EDISMAX);
+        static void setDefaults(ModifiableSolrParams solrQuery, String defaultField) {
+            if (defaultField != null) {
+                solrQuery.add(DEFAULT_FIELD, defaultField);
+            }
+            solrQuery.add(DEF_TYPE, EDISMAX);
         }
     }
 }

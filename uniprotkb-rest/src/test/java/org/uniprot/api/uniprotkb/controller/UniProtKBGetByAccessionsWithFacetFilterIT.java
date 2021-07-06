@@ -13,6 +13,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -75,6 +76,11 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     private static final String accessionsByIdPath = "/uniprotkb/accessions";
 
+    private static final List<Integer> modelOrganism =
+            List.of(
+                    9606, 10090, 10116, 9913, 7955, 7227, 6239, 44689, 3702, 39947, 83333, 224308,
+                    559292);
+
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
@@ -121,7 +127,8 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
 
             UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
-
+            convert.seqLength = i * 35;
+            convert.modelOrganism = modelOrganism.get(i - 10);
             cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
             storeClient.saveEntry(uniProtKBEntry);
         }
@@ -165,7 +172,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithMultiValueFacetFilterSuccess() throws Exception {
-        String facetFilter = "existence:HOMOLOGY OR existence:TRANSCRIPT_LEVEL";
+        String facetFilter = "existence:3 OR existence:2";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -200,7 +207,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithSingleAndMultiValueFacetFilterSuccess() throws Exception {
-        String facetFilter = "reviewed:true AND (existence:HOMOLOGY OR existence:TRANSCRIPT_LEVEL)";
+        String facetFilter = "reviewed:true AND (existence:3 OR existence:2)";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -251,10 +258,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.facets[0].values.*.label",
                                 contains("Homology", "Transcript level")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.value",
-                                contains("HOMOLOGY", "TRANSCRIPT_LEVEL")))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("3", "2")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 1)))
                 .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
@@ -321,10 +325,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.facets[0].values.*.label",
                                 contains("Homology", "Transcript level")))
-                .andExpect(
-                        jsonPath(
-                                "$.facets[0].values.*.value",
-                                contains("HOMOLOGY", "TRANSCRIPT_LEVEL")))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("3", "2")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(4, 1)))
                 .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
@@ -412,8 +413,8 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
-                                        "Invalid facet name 'invalidFacet1'. Expected value can be [structure_3d, proteins_with, fragment, existence, length, reviewed, annotation_score, model_organism, other_organism, proteome].",
-                                        "Invalid facet name 'invalidFacet2'. Expected value can be [structure_3d, proteins_with, fragment, existence, length, reviewed, annotation_score, model_organism, other_organism, proteome].")));
+                                        "Invalid facet name 'invalidFacet1'. Expected value can be [structure_3d, fragment, proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome].",
+                                        "Invalid facet name 'invalidFacet2'. Expected value can be [structure_3d, fragment, proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome].")));
     }
 
     @Test
@@ -437,6 +438,63 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                 .andExpect(
                         jsonPath(
                                 "$.messages.*", contains("query parameter has an invalid syntax")));
+    }
+
+    @Test
+    void getByAccessionsWithRangeFacetSortedCorrectlyQuerySuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00019")
+                                .param("facets", "length")
+                                .param("size", "0"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets.*.label", contains("Sequence length")))
+                .andExpect(jsonPath("$.facets.*.name", contains("length")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[0].values.*.label",
+                                contains("201 - 400", "401 - 600", "601 - 800")))
+                .andExpect(
+                        jsonPath(
+                                "$.facets[0].values.*.value",
+                                contains("[201 TO 400]", "[401 TO 600]", "[601 TO 800]")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(1, 6, 2)));
+    }
+
+    @Test
+    void getByAccessionsWithLimitQuerySuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(accessionsByIdPath)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param(
+                                        "accessions",
+                                        "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00019")
+                                .param("facets", "model_organism")
+                                .param("size", "0"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.facets.*.label", contains("Model organisms")))
+                .andExpect(jsonPath("$.facets.*.name", contains("model_organism")))
+                .andExpect(jsonPath("$.facets[0].values.size()", is(5)))
+                .andExpect(jsonPath("$.facets[0].values.*.label").exists())
+                .andExpect(jsonPath("$.facets[0].values.*.value").exists())
+                .andExpect(jsonPath("$.facets[0].values.*.count").exists());
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.core.convert.converter.Converter;
+import org.uniprot.core.util.Utils;
 
 public abstract class FacetConverter<F, T> implements Converter<F, T> {
 
@@ -70,6 +71,22 @@ public abstract class FacetConverter<F, T> implements Converter<F, T> {
                 getFacetConfig().getFacetPropertyMap().getOrDefault(facetName, null);
         if (facetProperty != null) {
             result = facetProperty.getSort();
+        }
+        return result;
+    }
+
+    /**
+     * this method returns if is an interval/range facet
+     *
+     * @param facetName facet name returned in Solr query response
+     * @return true if is an interval facet
+     */
+    protected boolean isIntervalFacet(String facetName) {
+        boolean result = false;
+        FacetProperty facetProperty =
+                getFacetConfig().getFacetPropertyMap().getOrDefault(facetName, null);
+        if (facetProperty != null && Utils.notNullNotEmpty(facetProperty.getInterval())) {
+            result = true;
         }
         return result;
     }

@@ -78,7 +78,7 @@ public abstract class AbstractStreamControllerIT {
             ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamFactory", null);
             ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamContext", null);
             cloudSolrClient = cluster.getSolrClient();
-
+            ReflectionTestUtils.setField(getTupleStreamTemplate(), "solrClient", cloudSolrClient);
             updateFacetTupleStreamTemplate();
 
             for (SolrCollection solrCollection : getSolrCollections()) {
