@@ -139,9 +139,7 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControll
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(
-                        header().string(
-                                        HttpHeaders.LOCATION,
-                                        "/taxonomy/99?from=" + MERGED_TAX_ID))
+                        header().string(HttpHeaders.LOCATION, "/taxonomy/99?from=" + MERGED_TAX_ID))
                 .andExpect(jsonPath("$.taxonId", is(100)))
                 .andExpect(jsonPath("$.active", is(false)))
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("MERGED")))
