@@ -18,7 +18,9 @@ public class HelpCentreEntry {
 
     private final String id;
 
-    private final String tittle;
+    private final String title;
+
+    private final String content;
 
     @Singular private final List<String> categories;
 

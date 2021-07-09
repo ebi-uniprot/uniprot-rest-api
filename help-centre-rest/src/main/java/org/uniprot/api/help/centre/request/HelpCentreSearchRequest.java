@@ -24,9 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class HelpCentreSearchRequest implements SearchRequest {
 
-    @ModelFieldMeta(
-            reader = QueryFieldMetaReaderImpl.class,
-            path = "help-centre-search-fields.json")
+    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "help-search-fields.json")
     @Parameter(description = "Criteria to search help centre. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
@@ -35,14 +33,12 @@ public class HelpCentreSearchRequest implements SearchRequest {
             messagePrefix = "search.helpcentre")
     private String query;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "help-centre-search-fields.json")
+    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "help-search-fields.json")
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.HELP)
     private String sort;
 
-    @ModelFieldMeta(
-            reader = ReturnFieldMetaReaderImpl.class,
-            path = "help-centre-return-fields.json")
+    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "help-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.HELP)
     private String fields;

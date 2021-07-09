@@ -1,5 +1,8 @@
 package org.uniprot.api.help.centre.service;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
@@ -11,9 +14,14 @@ import org.uniprot.store.config.UniProtDataType;
 @Component
 public class HelpCentreSortClause extends AbstractSolrSortClause {
 
+    @PostConstruct
+    public void init() {
+        addDefaultFieldOrderPair(HelpCentreService.HELP_CENTRE_ID_FIELD, SolrQuery.ORDER.asc);
+    }
+
     @Override
     protected String getSolrDocumentIdFieldName() {
-        return HelperCentreService.HELP_CENTRE_ID_FIELD;
+        return HelpCentreService.HELP_CENTRE_ID_FIELD;
     }
 
     @Override

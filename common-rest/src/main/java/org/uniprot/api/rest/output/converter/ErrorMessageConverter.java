@@ -26,7 +26,8 @@ public class ErrorMessageConverter extends AbstractGenericHttpMessageConverter<E
                 UniProtMediaType.LIST_MEDIA_TYPE,
                 UniProtMediaType.TSV_MEDIA_TYPE,
                 UniProtMediaType.XLS_MEDIA_TYPE,
-                UniProtMediaType.OBO_MEDIA_TYPE);
+                UniProtMediaType.OBO_MEDIA_TYPE,
+                UniProtMediaType.MARKDOWN_MEDIA_TYPE);
     }
 
     @Override

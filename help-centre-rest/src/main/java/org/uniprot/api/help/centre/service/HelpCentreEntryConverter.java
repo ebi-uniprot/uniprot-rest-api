@@ -17,7 +17,8 @@ public class HelpCentreEntryConverter implements Function<HelpDocument, HelpCent
     public HelpCentreEntry apply(HelpDocument helpDocument) {
         return HelpCentreEntry.builder()
                 .id(helpDocument.getId())
-                .tittle(helpDocument.getTitle())
+                .title(helpDocument.getTitle())
+                .content(helpDocument.getContent())
                 .categories(helpDocument.getCategories())
                 // TODO: matches(??)
                 .build();
