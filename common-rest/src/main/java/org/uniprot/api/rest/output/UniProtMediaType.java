@@ -2,6 +2,7 @@ package org.uniprot.api.rest.output;
 
 import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.TEXT_MARKDOWN_VALUE;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -29,6 +30,8 @@ public class UniProtMediaType {
     public static final MediaType OBO_MEDIA_TYPE = valueOf(OBO_MEDIA_TYPE_VALUE);
     public static final String RDF_MEDIA_TYPE_VALUE = "application/rdf+xml";
     public static final MediaType RDF_MEDIA_TYPE = valueOf(RDF_MEDIA_TYPE_VALUE);
+    public static final String MARKDOWN_MEDIA_TYPE_VALUE = TEXT_MARKDOWN_VALUE;
+    public static final MediaType MARKDOWN_MEDIA_TYPE = MediaType.TEXT_MARKDOWN;
     public static final String UNKNOWN_MEDIA_TYPE_VALUE = "unknown" + "/unknown";
     public static final MediaType UNKNOWN_MEDIA_TYPE = valueOf(UNKNOWN_MEDIA_TYPE_VALUE);
 

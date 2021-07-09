@@ -1,6 +1,7 @@
 package org.uniprot.api.help.centre.output;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.uniprot.api.rest.output.UniProtMediaType.MARKDOWN_MEDIA_TYPE;
 
 import java.util.List;
 
@@ -35,13 +36,16 @@ public class MessageConverterConfig {
     public WebMvcConfigurer extendedMessageConverters() {
         ReturnFieldConfig returnConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.HELP);
+        ObjectMapper jsonConfig = HelpCentreJsonConfig.getInstance().getSimpleObjectMapper();
         JsonMessageConverter<HelpCentreEntry> jsonMessageConverter =
-                new JsonMessageConverter<>(new ObjectMapper(), HelpCentreEntry.class, returnConfig);
+                new JsonMessageConverter<>(jsonConfig, HelpCentreEntry.class, returnConfig);
 
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(jsonMessageConverter);
+                converters.add(new ErrorMessageConverter());
+                converters.add(0, jsonMessageConverter);
+                converters.add(1, new HelpCentreMarkdownMessageConverter());
             }
         };
     }
@@ -52,6 +56,7 @@ public class MessageConverterConfig {
                 new MessageConverterContextFactory<>();
 
         contextFactory.addMessageConverterContext(context(APPLICATION_JSON));
+        contextFactory.addMessageConverterContext(context(MARKDOWN_MEDIA_TYPE));
 
         return contextFactory;
     }

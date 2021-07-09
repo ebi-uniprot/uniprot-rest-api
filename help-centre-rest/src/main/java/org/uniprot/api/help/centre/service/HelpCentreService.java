@@ -21,20 +21,23 @@ import org.uniprot.store.search.document.help.HelpDocument;
  */
 @Service
 @Import(HelpCentreSolrQueryConfig.class)
-public class HelperCentreService extends BasicSearchService<HelpDocument, HelpCentreEntry> {
+public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCentreEntry> {
 
-    private final SearchFieldConfig searchFieldConfig;
     static final String HELP_CENTRE_ID_FIELD = "id";
+    private final SearchFieldConfig searchFieldConfig;
+    private final QueryProcessor helpCentreQueryProcessor;
 
-    public HelperCentreService(
+    public HelpCentreService(
             SolrQueryRepository<HelpDocument> repository,
             Function<HelpDocument, HelpCentreEntry> entryConverter,
             AbstractSolrSortClause solrSortClause,
             SolrQueryConfig helpCentreSolrQueryConf,
             HelpCentreFacetConfig facetConfig,
-            SearchFieldConfig helpCentreSearchFieldConfig) {
+            SearchFieldConfig helpCentreSearchFieldConfig,
+            QueryProcessor helpCentreQueryProcessor) {
         super(repository, entryConverter, solrSortClause, helpCentreSolrQueryConf, facetConfig);
         this.searchFieldConfig = helpCentreSearchFieldConfig;
+        this.helpCentreQueryProcessor = helpCentreQueryProcessor;
     }
 
     @Override
@@ -44,6 +47,6 @@ public class HelperCentreService extends BasicSearchService<HelpDocument, HelpCe
 
     @Override
     protected QueryProcessor getQueryProcessor() {
-        return null;
+        return helpCentreQueryProcessor;
     }
 }

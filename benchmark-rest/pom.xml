@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>core-common</artifactId>
-			<version>${parent.version}</version>
+			<version>${project.parent.version}</version>
 		</dependency>
 
 		<!-- Web -->
