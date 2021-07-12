@@ -1,7 +1,5 @@
 package org.uniprot.api.help.centre.service;
 
-import java.util.function.Function;
-
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -11,9 +9,13 @@ import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.help.HelpDocument;
+
+import java.util.function.Function;
 
 /**
  * @author lgonzales
@@ -23,7 +25,10 @@ import org.uniprot.store.search.document.help.HelpDocument;
 @Import(HelpCentreSolrQueryConfig.class)
 public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCentreEntry> {
 
-    static final String HELP_CENTRE_ID_FIELD = "id";
+    static final String HELP_CENTRE_ID_FIELD =
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
+                    .getSearchFieldItemByName("id")
+                    .getFieldName();
     private final SearchFieldConfig searchFieldConfig;
     private final QueryProcessor helpCentreQueryProcessor;
 
