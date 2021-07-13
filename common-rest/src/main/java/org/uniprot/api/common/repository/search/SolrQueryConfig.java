@@ -16,16 +16,19 @@ import lombok.*;
 @Getter
 @ToString
 public class SolrQueryConfig {
-    @Singular private List<String> defaultSearchBoosts;
-    private String defaultSearchBoostFunctions;
-    @Singular private List<String> advancedSearchBoosts;
-    private String advancedSearchBoostFunctions;
+    @Singular private final List<String> defaultSearchBoosts;
+    private final String defaultSearchBoostFunctions;
+    @Singular private final List<String> advancedSearchBoosts;
+    private final String advancedSearchBoostFunctions;
 
     @Setter(AccessLevel.NONE)
     private String queryFields;
 
     @Setter(AccessLevel.NONE)
     private Set<String> stopWords;
+
+    @Setter(AccessLevel.NONE)
+    private String highlightFields;
 
     public static class SolrQueryConfigBuilder {
         public SolrQueryConfigBuilder queryFields(String queryFields) {

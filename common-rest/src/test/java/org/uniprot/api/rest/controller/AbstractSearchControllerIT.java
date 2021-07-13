@@ -479,7 +479,7 @@ public abstract class AbstractSearchControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(getSearchRequestPath())
-                                .param("query", "*:*")
+                                .param("query", getAllReturnedFieldsQuery())
                                 .param("fields", name)
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
@@ -800,6 +800,10 @@ public abstract class AbstractSearchControllerIT {
     protected abstract void saveEntries(int numberOfEntries);
 
     protected abstract String getFieldValueForValidatedField(String searchField);
+
+    protected String getAllReturnedFieldsQuery() {
+        return "*:*";
+    }
 
     private Stream<Arguments> getAllSearchFields() {
         return getSearchFieldConfig().getSearchFieldItems().stream()

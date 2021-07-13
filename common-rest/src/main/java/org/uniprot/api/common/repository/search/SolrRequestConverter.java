@@ -21,6 +21,7 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.core.util.Utils;
 
 /**
  * Created 14/06/19
@@ -60,6 +61,7 @@ public class SolrRequestConverter {
         if (notNull(request.getQueryConfig())) {
             if (request.getRows() > 1) {
                 setQueryBoostConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
+                setHighlightFieldsConfigs(solrQuery, request.getQueryConfig());
             }
             setQueryFields(solrQuery, request.getQueryConfig());
         }
@@ -92,6 +94,10 @@ public class SolrRequestConverter {
         private static final String BOOST_FIELD_TYPE_NUMBER = "=number:";
         private static final String QUERY_PLACEHOLDER = "{query}";
         private static final String QUERY_FIELDS = "qf";
+        private static final String HIGHLIGHT = "hl";
+        private static final String HIGHLIGHT_FIELDS = "hl.fl";
+        private static final String HIGHLIGHT_PRE = "hl.simple.pre";
+        private static final String HIGHLIGHT_POST = "hl.simple.post";
 
         private SolrQueryConverter() {}
 
@@ -171,6 +177,16 @@ public class SolrRequestConverter {
                             .map(clause -> clause.getItem() + " " + clause.getOrder().toString())
                             .collect(Collectors.joining(","));
             solrQuery.setSort(sort);
+        }
+
+        static void setHighlightFieldsConfigs(
+                ModifiableSolrParams solrQuery, SolrQueryConfig config) {
+            if (Utils.notNullNotEmpty(config.getHighlightFields())) {
+                solrQuery.add(HIGHLIGHT, "on");
+                solrQuery.add(HIGHLIGHT_FIELDS, config.getHighlightFields());
+                solrQuery.add(HIGHLIGHT_PRE, "<span class=\"match-highlight\">");
+                solrQuery.add(HIGHLIGHT_POST, "</span>");
+            }
         }
 
         static void setQueryBoostConfigs(

@@ -61,7 +61,7 @@ public abstract class SolrQueryRepository<T extends Document> {
             CursorPage page = CursorPage.of(cursor, request.getRows());
             QueryResponse solrResponse = search(request, page.getCursor());
 
-            List<T> resultList = solrResponse.getBeans(tClass);
+            List<T> resultList = getResponseDocuments(solrResponse);
             page.setNextCursor(solrResponse.getNextCursorMark());
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
@@ -91,7 +91,7 @@ public abstract class SolrQueryRepository<T extends Document> {
                     LOGGER.warn(
                             "More than 1 result found for a single result query, returning first entry in list");
                 }
-                return Optional.ofNullable(response.getBeans(tClass).get(0));
+                return Optional.ofNullable(getResponseDocuments(response).get(0));
             } else {
                 return Optional.empty();
             }
@@ -113,6 +113,10 @@ public abstract class SolrQueryRepository<T extends Document> {
                         Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
                         false)
                 .flatMap(Collection::stream);
+    }
+
+    protected List<T> getResponseDocuments(QueryResponse solrResponse) {
+        return solrResponse.getBeans(tClass);
     }
 
     private QueryResponse search(SolrRequest request, String cursor)

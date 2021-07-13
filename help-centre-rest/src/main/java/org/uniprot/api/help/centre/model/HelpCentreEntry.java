@@ -1,6 +1,7 @@
 package org.uniprot.api.help.centre.model;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,5 +25,5 @@ public class HelpCentreEntry {
 
     @Singular private final List<String> categories;
 
-    @Singular private final List<String> matches;
+    @Singular private final Map<String, List<String>> matches;
 }

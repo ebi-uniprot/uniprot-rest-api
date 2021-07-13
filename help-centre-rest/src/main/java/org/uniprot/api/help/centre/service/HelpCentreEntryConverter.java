@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.help.centre.model.HelpCentreEntry;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.document.help.HelpDocument;
 
 /**
@@ -15,12 +16,19 @@ public class HelpCentreEntryConverter implements Function<HelpDocument, HelpCent
 
     @Override
     public HelpCentreEntry apply(HelpDocument helpDocument) {
-        return HelpCentreEntry.builder()
+        HelpCentreEntry.HelpCentreEntryBuilder builder = HelpCentreEntry.builder()
                 .id(helpDocument.getId())
                 .title(helpDocument.getTitle())
-                .content(helpDocument.getContent())
-                .categories(helpDocument.getCategories())
-                // TODO: matches(??)
-                .build();
+                .content(helpDocument.getContent());
+
+        if(Utils.notNullNotEmpty(helpDocument.getCategories())){
+            builder.categories(helpDocument.getCategories());
+        }
+
+        if(Utils.notNullNotEmpty(helpDocument.getMatches())){
+            builder.matches(helpDocument.getMatches());
+        }
+
+        return builder.build();
     }
 }

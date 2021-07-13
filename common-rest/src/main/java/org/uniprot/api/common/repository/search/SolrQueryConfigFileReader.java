@@ -80,6 +80,9 @@ public class SolrQueryConfigFileReader {
             case STOP_WORDS:
                 builder.stopWords(line);
                 break;
+            case HIGHLIGHT_FIELDS:
+                builder.highlightFields(line);
+                break;
         }
     }
 
@@ -89,7 +92,8 @@ public class SolrQueryConfigFileReader {
         QUERY_FIELDS("# QUERY-FIELDS"),
         ADVANCED_SEARCH("# ADVANCED-SEARCH-BOOSTS"),
         ADVANCED_SEARCH_FUNCTIONS("# ADVANCED-SEARCH-BOOST-FUNCTIONS"),
-        STOP_WORDS("# STOP-WORDS");
+        STOP_WORDS("# STOP-WORDS"),
+        HIGHLIGHT_FIELDS("# HIGHLIGHT-FIELDS");
 
         private final String prefix;
 

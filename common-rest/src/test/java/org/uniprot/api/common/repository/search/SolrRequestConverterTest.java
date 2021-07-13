@@ -174,7 +174,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void doNotCreateQueryBoostsAndFunctionsForPageSizeZero() throws IOException {
+        void doNotCreateQueryBoostsAndHighlightForPageSizeZero() throws IOException {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -184,6 +184,7 @@ class SolrRequestConverterTest {
                                     SolrQueryConfig.builder()
                                             .defaultSearchBoost("field1:value3^3")
                                             .defaultSearchBoostFunctions("f1,f2")
+                                            .highlightFields("h1,h2")
                                             .queryFields("field1,field2")
                                             .build())
                             .build();
@@ -196,6 +197,8 @@ class SolrRequestConverterTest {
             // then
             assertThat(queryParams.get("bq"), is(nullValue()));
             assertThat(queryParams.get("boost"), is(nullValue()));
+            assertThat(queryParams.get("hl"), is(nullValue()));
+            assertThat(queryParams.get("hl.fl"), is(nullValue()));
             assertThat(queryParams.get("qf"), is("field1 field2"));
         }
 
@@ -339,6 +342,26 @@ class SolrRequestConverterTest {
             List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
             assertThat(boostQuery, contains("field1:value3^3", "field2:value4^2"));
             assertThat(queryParams.get("boost"), is("f1,f2"));
+        }
+
+        @Test
+        void highlightsFieldsCanBeCreatedCorrectly() throws IOException {
+            // given
+            SolrRequest request =
+                    SolrRequest.builder()
+                            .query("value1 value2")
+                            .rows(10)
+                            .queryConfig(SolrQueryConfig.builder().highlightFields("h1,h2").build())
+                            .build();
+
+            // when
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
+
+            // then
+            assertThat(queryParams.get("hl"), is("on"));
+            assertThat(queryParams.get("hl.fl"), is("h1,h2"));
         }
     }
 }
