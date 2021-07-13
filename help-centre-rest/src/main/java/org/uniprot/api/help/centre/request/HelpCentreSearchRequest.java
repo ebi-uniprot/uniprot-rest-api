@@ -1,5 +1,7 @@
 package org.uniprot.api.help.centre.request;
 
+import java.util.stream.Collectors;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -12,7 +14,10 @@ import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.*;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +28,13 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class HelpCentreSearchRequest implements SearchRequest {
+
+    private static final String fieldsWithoutContent =
+            ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.HELP).getReturnFields()
+                    .stream()
+                    .map(ReturnField::getName)
+                    .filter(fieldName -> !fieldName.equals("content"))
+                    .collect(Collectors.joining(","));
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "help-search-fields.json")
     @Parameter(description = "Criteria to search help centre. It can take any valid Lucene query.")
@@ -54,4 +66,12 @@ public class HelpCentreSearchRequest implements SearchRequest {
 
     @Parameter(hidden = true)
     private String cursor;
+
+    public String getFields() {
+        String result = fields;
+        if (Utils.nullOrEmpty(result)) {
+            result = fieldsWithoutContent;
+        }
+        return result;
+    }
 }

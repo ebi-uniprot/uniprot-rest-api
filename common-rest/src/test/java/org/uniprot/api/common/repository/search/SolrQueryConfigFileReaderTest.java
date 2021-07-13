@@ -64,4 +64,10 @@ class SolrQueryConfigFileReaderTest {
     void stopWordsLoadedCorrectly() {
         assertThat(reader.getConfig().getStopWords(), containsInAnyOrder("a", "which"));
     }
+
+    @Test
+    void highlightFieldsLoadedCorrectly() {
+        assertThat(
+                reader.getConfig().getHighlightFields(), is("highlight_field1,highlight_field2"));
+    }
 }

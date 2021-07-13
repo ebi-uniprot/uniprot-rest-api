@@ -1,18 +1,27 @@
 package org.uniprot.api.help.centre.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.help.centre.HelpCentreRestApplication;
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
@@ -52,6 +61,7 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Autowired private HelpCentreQueryRepository repository;
     @Autowired private HelpCentreFacetConfig facetConfig;
+    @Autowired private MockMvc mockMvc;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -100,15 +110,37 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
         IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
     }
 
-    private void saveEntry(int i) {
-        HelpDocument doc =
-                HelpDocument.builder()
-                        .id("id-value-" + i)
-                        .title("title-value-" + i)
-                        .content("content-value " + i)
-                        .categories(List.of("category-value", "category-value-" + i))
-                        .build();
-        getStoreManager().saveDocs(getStoreType(), doc);
+    @Override
+    protected String getAllReturnedFieldsQuery() {
+        return "content:content";
+    }
+
+    @Test
+    void searchReturnCorrectMatchedResults() throws Exception {
+        saveEntries(2);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "value")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results.*.id", contains("id-value-1", "id-value-2")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].matches.title",
+                                contains("title-<span class=\"match-highlight\">value</span>-1")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].matches.content",
+                                contains(
+                                        "content-<span class=\"match-highlight\">value</span> 1")));
     }
 
     @Override
@@ -125,6 +157,7 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                     .resultMatcher(jsonPath("$.results.size()", is(1)))
                     .resultMatcher(jsonPath("$.results[0].id", is("id-value-10")))
                     .resultMatcher(jsonPath("$.results[0].title", is("title-value-10")))
+                    .resultMatcher(jsonPath("$.results[0].content").doesNotExist())
                     .build();
         }
 
@@ -187,7 +220,7 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
         @Override
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("content:content-value"))
+                    .queryParam("query", Collections.singletonList("title:title-value"))
                     .queryParam("fields", Collections.singletonList("id"))
                     .resultMatcher(
                             jsonPath(
@@ -203,7 +236,8 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                     .queryParam("query", Collections.singletonList("*"))
                     .queryParam("facets", Collections.singletonList("category"))
                     .resultMatcher(
-                            jsonPath("$.results.*.id",
+                            jsonPath(
+                                    "$.results.*.id",
                                     contains("id-value-10", "id-value-20", "id-value-30")))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Category")))
                     .resultMatcher(jsonPath("$.facets[0].values.size()", greaterThan(3)))
@@ -227,7 +261,10 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.results.*.id",
-                                                    contains("id-value-10", "id-value-20", "id-value-30")))
+                                                    contains(
+                                                            "id-value-10",
+                                                            "id-value-20",
+                                                            "id-value-30")))
                                     .build())
                     .build();
         }
@@ -248,5 +285,16 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                                     .build())
                     .build();
         }
+    }
+
+    private void saveEntry(int i) {
+        HelpDocument doc =
+                HelpDocument.builder()
+                        .id("id-value-" + i)
+                        .title("title-value-" + i)
+                        .content("content-value " + i)
+                        .categories(List.of("category-value", "category-value-" + i))
+                        .build();
+        getStoreManager().saveDocs(getStoreType(), doc);
     }
 }
