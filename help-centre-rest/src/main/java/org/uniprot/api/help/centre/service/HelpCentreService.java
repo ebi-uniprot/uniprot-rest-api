@@ -1,5 +1,7 @@
 package org.uniprot.api.help.centre.service;
 
+import java.util.function.Function;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -14,8 +16,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.help.HelpDocument;
-
-import java.util.function.Function;
 
 /**
  * @author lgonzales

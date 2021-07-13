@@ -16,16 +16,17 @@ public class HelpCentreEntryConverter implements Function<HelpDocument, HelpCent
 
     @Override
     public HelpCentreEntry apply(HelpDocument helpDocument) {
-        HelpCentreEntry.HelpCentreEntryBuilder builder = HelpCentreEntry.builder()
-                .id(helpDocument.getId())
-                .title(helpDocument.getTitle())
-                .content(helpDocument.getContent());
+        HelpCentreEntry.HelpCentreEntryBuilder builder =
+                HelpCentreEntry.builder()
+                        .id(helpDocument.getId())
+                        .title(helpDocument.getTitle())
+                        .content(helpDocument.getContent());
 
-        if(Utils.notNullNotEmpty(helpDocument.getCategories())){
+        if (Utils.notNullNotEmpty(helpDocument.getCategories())) {
             builder.categories(helpDocument.getCategories());
         }
 
-        if(Utils.notNullNotEmpty(helpDocument.getMatches())){
+        if (Utils.notNullNotEmpty(helpDocument.getMatches())) {
             builder.matches(helpDocument.getMatches());
         }
 
