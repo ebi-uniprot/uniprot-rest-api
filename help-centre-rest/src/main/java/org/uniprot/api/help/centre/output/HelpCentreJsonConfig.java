@@ -1,12 +1,12 @@
 package org.uniprot.api.help.centre.output;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.uniprot.core.json.parser.JsonConfig;
+import java.time.LocalDate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.uniprot.core.json.parser.JsonConfig;
 import org.uniprot.core.json.parser.serializer.LocalDateSerializer;
 
-import java.time.LocalDate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * @author lgonzales
