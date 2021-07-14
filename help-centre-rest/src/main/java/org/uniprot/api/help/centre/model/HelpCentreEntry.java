@@ -1,5 +1,6 @@
 package org.uniprot.api.help.centre.model;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,8 @@ public class HelpCentreEntry {
     private final String id;
 
     private final String title;
+
+    private final LocalDate lastModified;
 
     private final String content;
 

@@ -140,7 +140,7 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                         jsonPath(
                                 "$.results[0].matches.content",
                                 contains(
-                                        "content-<span class=\"match-highlight\">value</span> 1")));
+                                        "content-<span class=\"match-highlight\">value</span>-clean 1")));
     }
 
     @Override
@@ -157,6 +157,7 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                     .resultMatcher(jsonPath("$.results.size()", is(1)))
                     .resultMatcher(jsonPath("$.results[0].id", is("id-value-10")))
                     .resultMatcher(jsonPath("$.results[0].title", is("title-value-10")))
+                    .resultMatcher(jsonPath("$.results[0].lastModified", is("2021-07-10")))
                     .resultMatcher(jsonPath("$.results[0].content").doesNotExist())
                     .build();
         }
@@ -292,7 +293,9 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                 HelpDocument.builder()
                         .id("id-value-" + i)
                         .title("title-value-" + i)
-                        .content("content-value " + i)
+                        .content("content-value-clean " + i)
+                        .contentOriginal("content-value-original " + i)
+                        .lastModified(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
                         .categories(List.of("category-value", "category-value-" + i))
                         .build();
         getStoreManager().saveDocs(getStoreType(), doc);
