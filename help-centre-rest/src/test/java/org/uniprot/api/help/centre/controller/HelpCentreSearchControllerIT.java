@@ -80,7 +80,7 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
 
     @Override
     protected String getSearchRequestPath() {
-        return "/helpcentre/search";
+        return "/help-centre/search";
     }
 
     @Override
