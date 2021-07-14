@@ -1,5 +1,6 @@
 package org.uniprot.api.help.centre.service;
 
+import java.time.ZoneId;
 import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
@@ -20,7 +21,13 @@ public class HelpCentreEntryConverter implements Function<HelpDocument, HelpCent
                 HelpCentreEntry.builder()
                         .id(helpDocument.getId())
                         .title(helpDocument.getTitle())
-                        .content(helpDocument.getContent());
+                        .lastModified(
+                                helpDocument
+                                        .getLastModified()
+                                        .toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDate())
+                        .content(helpDocument.getContentOriginal());
 
         if (Utils.notNullNotEmpty(helpDocument.getCategories())) {
             builder.categories(helpDocument.getCategories());

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.help.centre.model.HelpCentreEntry;
@@ -15,10 +16,18 @@ import org.uniprot.api.help.centre.model.HelpCentreEntry;
  */
 class HelpCentreMarkdownMessageConverterTest {
 
+    public static final String MARKDOWN_CONTENT =
+            "---\n" + "title: title value\n" + "categories: cat1,cat2\n" + "---\n" + "entity";
+
     @Test
     void canWriteEntity() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        HelpCentreEntry entity = HelpCentreEntry.builder().content("entity").build();
+        HelpCentreEntry entity =
+                HelpCentreEntry.builder()
+                        .title("title value")
+                        .categories(List.of("cat1", "cat2"))
+                        .content("entity")
+                        .build();
 
         HelpCentreMarkdownMessageConverter messageConverter =
                 new HelpCentreMarkdownMessageConverter();
@@ -26,6 +35,6 @@ class HelpCentreMarkdownMessageConverterTest {
 
         String result = outputStream.toString(StandardCharsets.UTF_8);
         assertNotNull(result);
-        assertEquals("entity", result);
+        assertEquals(MARKDOWN_CONTENT, result);
     }
 }

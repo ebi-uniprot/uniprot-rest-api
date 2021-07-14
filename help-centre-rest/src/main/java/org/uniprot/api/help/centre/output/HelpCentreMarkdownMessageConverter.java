@@ -21,6 +21,14 @@ public class HelpCentreMarkdownMessageConverter
     @Override
     protected void writeEntity(HelpCentreEntry entity, OutputStream outputStream)
             throws IOException {
+        outputStream.write("---".getBytes());
+        outputStream.write("\n".getBytes());
+        outputStream.write(("title: " + entity.getTitle()).getBytes());
+        outputStream.write("\n".getBytes());
+        outputStream.write(("categories: " + String.join(",", entity.getCategories())).getBytes());
+        outputStream.write("\n".getBytes());
+        outputStream.write("---".getBytes());
+        outputStream.write("\n".getBytes());
         outputStream.write((entity.getContent()).getBytes());
     }
 }

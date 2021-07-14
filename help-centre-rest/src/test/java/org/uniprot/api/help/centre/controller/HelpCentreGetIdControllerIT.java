@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.emptyString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,7 +52,8 @@ import org.uniprot.store.search.document.help.HelpDocument;
 class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String ID = "help_id";
     public static final String TITLE = "Help Title";
-    public static final String CONTENT = "help content";
+    public static final String CONTENT_CLEAN = "clean content";
+    public static final String CONTENT_ORIGINAL = "original content";
     public static final String CATEGORY = "categoryValue";
 
     @Autowired private HelpCentreQueryRepository repository;
@@ -76,7 +79,9 @@ class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
                 HelpDocument.builder()
                         .id(ID)
                         .title(TITLE)
-                        .content(CONTENT)
+                        .content(CONTENT_CLEAN)
+                        .contentOriginal(CONTENT_ORIGINAL)
+                        .lastModified(new GregorianCalendar(2021, Calendar.JULY, 14).getTime())
                         .categories(List.of(CATEGORY))
                         .build();
         getStoreManager().saveDocs(getStoreType(), doc);
@@ -121,6 +126,7 @@ class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .id(ID)
                     .fields("id")
                     .resultMatcher(jsonPath("$.id", is(ID)))
+                    .resultMatcher(jsonPath("$.title").doesNotExist())
                     .resultMatcher(jsonPath("$.content").doesNotExist())
                     .build();
         }
@@ -151,13 +157,19 @@ class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.id", is(ID)))
                                     .resultMatcher(jsonPath("$.title", is(TITLE)))
-                                    .resultMatcher(jsonPath("$.content", is(CONTENT)))
+                                    .resultMatcher(jsonPath("$.content", is(CONTENT_ORIGINAL)))
+                                    .resultMatcher(jsonPath("$.lastModified", is("2021-07-14")))
                                     .resultMatcher(jsonPath("$.categories", contains(CATEGORY)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.MARKDOWN_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString(CONTENT)))
+                                    .resultMatcher(
+                                            content().string(containsString(TITLE)))
+                                    .resultMatcher(
+                                            content().string(containsString(CATEGORY)))
+                                    .resultMatcher(
+                                            content().string(containsString(CONTENT_ORIGINAL)))
                                     .build())
                     .build();
         }
