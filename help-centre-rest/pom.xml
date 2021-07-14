@@ -217,7 +217,7 @@
 						<version>${openapi-maven-plugin.version}</version>
 						<configuration>
 							<packageLocations>
-								<packageLocation>org.uniprot.api.idmapping.controller</packageLocation>
+								<packageLocation>org.uniprot.api.help.centre.controller</packageLocation>
 							</packageLocations>
 							<openApiDirectory>target/generated-sources/swagger</openApiDirectory>
 							<openApiFileName>help-centre-openapi3.yaml</openApiFileName>
