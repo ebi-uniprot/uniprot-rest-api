@@ -164,10 +164,8 @@ class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.MARKDOWN_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().string(containsString(TITLE)))
-                                    .resultMatcher(
-                                            content().string(containsString(CATEGORY)))
+                                    .resultMatcher(content().string(containsString(TITLE)))
+                                    .resultMatcher(content().string(containsString(CATEGORY)))
                                     .resultMatcher(
                                             content().string(containsString(CONTENT_ORIGINAL)))
                                     .build())
