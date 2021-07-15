@@ -89,7 +89,7 @@ class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/help-centre/{id}";
+        return "/help/{id}";
     }
 
     static class HelpCentreGetIdParameterResolver extends AbstractGetIdParameterResolver {

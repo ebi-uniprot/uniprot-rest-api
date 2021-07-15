@@ -36,10 +36,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 07/07/2021
  */
-@Tag(name = "help-centre", description = "UniProt Help centre API")
+@Tag(name = "help", description = "UniProt Help centre API")
 @RestController
 @Validated
-@RequestMapping("/help-centre")
+@RequestMapping("/help")
 public class HelpCentreController extends BasicSearchController<HelpCentreEntry> {
 
     private static final String HELP_CENTRE_ID_REGEX = "(?!^[0-9]+$)^.+$";
