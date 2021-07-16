@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class HelpCentreSearchRequest implements SearchRequest {
 
+    @Parameter(hidden = true)
     private static final String fieldsWithoutContent =
             ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.HELP).getReturnFields()
                     .stream()
