@@ -810,6 +810,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
                 .andExpect(
                         jsonPath(
+                                "$.results.*.comments[0].interactions[0].organismDiffer",
+                                contains(true)))
+                .andExpect(
+                        jsonPath(
                                 "$.results.*.comments[0].interactions[0].interactantOne.uniProtKBAccession",
                                 contains("P21802")))
                 .andExpect(
