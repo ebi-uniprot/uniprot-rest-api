@@ -11,11 +11,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad
- * @created 02/12/2020
+ * @created 19/07/2021
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UniRuleStreamRequest extends UniRuleBasicRequest implements StreamRequest {
+public class ArbaStreamRequest extends ArbaBasicRequest implements StreamRequest {
     @Parameter(
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")

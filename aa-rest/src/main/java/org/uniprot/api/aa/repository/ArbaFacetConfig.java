@@ -15,23 +15,23 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 
 /**
  * @author sahmad
- * @created 11/11/2020
+ * @created 19/07/2021
  */
 @Component
 @Getter
 @Setter
-@PropertySource("classpath:unirule.facet.properties")
+@PropertySource("classpath:arba.facet.properties")
 @ConfigurationProperties(prefix = "facet")
-public class UniRuleFacetConfig extends FacetConfig {
-    private Map<String, FacetProperty> unirule = new HashMap<>();
+public class ArbaFacetConfig extends FacetConfig {
+    private Map<String, FacetProperty> arba = new HashMap<>();
 
     @Override
     public Collection<String> getFacetNames() {
-        return this.unirule.keySet();
+        return this.arba.keySet();
     }
 
     @Override
     public Map<String, FacetProperty> getFacetPropertyMap() {
-        return this.unirule;
+        return this.arba;
     }
 }

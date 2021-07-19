@@ -26,7 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.uniprot.api.aa.UniRuleRestApplication;
+import org.uniprot.api.aa.AARestApplication;
 import org.uniprot.api.aa.repository.UniRuleQueryRepository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
@@ -43,11 +43,7 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
  * @since 02/12/2020
  */
 @ContextConfiguration(
-        classes = {
-            DataStoreTestConfig.class,
-            UniRuleRestApplication.class,
-            ErrorHandlerConfig.class
-        })
+        classes = {DataStoreTestConfig.class, AARestApplication.class, ErrorHandlerConfig.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRuleController.class)
 @ExtendWith(value = {SpringExtension.class})

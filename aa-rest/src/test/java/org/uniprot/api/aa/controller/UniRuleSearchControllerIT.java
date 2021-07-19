@@ -26,7 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.uniprot.api.aa.UniRuleRestApplication;
+import org.uniprot.api.aa.AARestApplication;
 import org.uniprot.api.aa.repository.UniRuleFacetConfig;
 import org.uniprot.api.aa.repository.UniRuleQueryRepository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
@@ -50,7 +50,7 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
  * @author sahmaad
  * @since 2020-11-19
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniRuleRestApplication.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, AARestApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniRuleController.class)
 @ExtendWith(
