@@ -33,7 +33,7 @@ public class ArbaSolrQueryConfig {
 
     @Bean
     public SearchFieldConfig arbaSearchFieldConfig() {
-        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIRULE); // FIXME
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.ARBA);
     }
 
     @Bean
@@ -43,7 +43,7 @@ public class ArbaSolrQueryConfig {
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
-                                UniProtDataType.UNIRULE.toString().toLowerCase(), new HashMap<>());
+                                UniProtDataType.ARBA.toString().toLowerCase(), new HashMap<>());
         return UniProtQueryProcessor.newInstance(
                 UniProtQueryProcessorConfig.builder()
                         .optimisableFields(

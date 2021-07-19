@@ -27,6 +27,6 @@ public class ArbaSortClause extends AbstractSolrSortClause {
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.UNIRULE;
-    } // FIXME
+        return UniProtDataType.ARBA;
+    }
 }

@@ -57,6 +57,7 @@ public class MessageConverterContextFactory<T> {
         SUBCELLULAR_LOCATION,
         UNIPROTKB_INTERACTION,
         UNIRULE,
-        HELP
+        HELP,
+        ARBA
     }
 }

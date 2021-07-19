@@ -65,10 +65,10 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
     @Autowired
     public UniRuleController(
             ApplicationEventPublisher eventPublisher,
-            MessageConverterContextFactory<UniRuleEntry> converterContextFactory,
+            MessageConverterContextFactory<UniRuleEntry> uniRuleMessageConverterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             UniRuleService uniRuleService) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIRULE);
+        super(eventPublisher, uniRuleMessageConverterContextFactory, downloadTaskExecutor, UNIRULE);
         this.uniRuleService = uniRuleService;
     }
 
