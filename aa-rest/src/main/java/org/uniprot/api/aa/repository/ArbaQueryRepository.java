@@ -17,11 +17,6 @@ public class ArbaQueryRepository extends SolrQueryRepository<ArbaDocument> {
             SolrClient solrClient,
             ArbaFacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
-        super(
-                solrClient,
-                SolrCollection.unirule, // change collection name FIXME
-                ArbaDocument.class,
-                facetConfig,
-                requestConverter);
+        super(solrClient, SolrCollection.arba, ArbaDocument.class, facetConfig, requestConverter);
     }
 }

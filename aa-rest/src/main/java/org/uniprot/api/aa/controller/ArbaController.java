@@ -3,8 +3,6 @@ package org.uniprot.api.aa.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIRULE;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -64,21 +62,20 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
     @Autowired
     public ArbaController(
             ApplicationEventPublisher eventPublisher,
-            MessageConverterContextFactory<UniRuleEntry> converterContextFactory,
+            MessageConverterContextFactory<UniRuleEntry> arbaMessageConverterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             ArbaService arbaService) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIRULE);
+        super(
+                eventPublisher,
+                arbaMessageConverterContextFactory,
+                downloadTaskExecutor,
+                MessageConverterContextFactory.Resource.ARBA);
         this.arbaService = arbaService;
     }
 
     @GetMapping(
             value = "/{arbaid}",
-            produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
-            })
+            produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
             summary = "Get a rule by ARBA id.",
             responses = {
@@ -87,9 +84,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UniRuleEntry.class)),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByArbaId(
@@ -101,7 +96,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
                     String uniRuleId,
             @Parameter(description = "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE)
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.ARBA)
                     String fields,
             HttpServletRequest request) {
         UniRuleEntry entryResult = this.arbaService.findByUniqueId(uniRuleId);
@@ -110,12 +105,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
 
     @GetMapping(
             value = "/search",
-            produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
-            })
+            produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
             summary = "Search for a ARBA entry (or entries) by a SOLR query.",
             responses = {
@@ -129,9 +119,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
                                                             @Schema(
                                                                     implementation =
                                                                             UniRuleEntry.class))),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> search(
@@ -148,12 +136,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
 
     @GetMapping(
             value = "/stream",
-            produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
-            })
+            produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
             summary = "Stream a ARBA entry (or entries) by a SOLR query.",
             responses = {
@@ -168,8 +151,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
                                                                     implementation =
                                                                             UniRuleEntry.class))),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE)
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRuleEntry>>> stream(
