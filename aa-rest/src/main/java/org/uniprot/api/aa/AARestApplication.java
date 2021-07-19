@@ -15,8 +15,8 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ErrorHandlerConfig.class})
 @ComponentScan(basePackages = {"org.uniprot.api.aa", "org.uniprot.api.rest"})
-public class UniRuleRestApplication {
+public class AARestApplication {
     public static void main(String[] args) {
-        SpringApplication.run(UniRuleRestApplication.class, args);
+        SpringApplication.run(AARestApplication.class, args);
     }
 }
