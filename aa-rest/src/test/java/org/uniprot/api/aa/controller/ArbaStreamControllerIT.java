@@ -1,5 +1,18 @@
 package org.uniprot.api.aa.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,19 +39,6 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.arba.ArbaDocument;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * @author sahmad
  * @created 19/07/2021
@@ -50,8 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(value = {SpringExtension.class})
 class ArbaStreamControllerIT extends AbstractSolrStreamControllerIT {
 
-    @Autowired
-    private ArbaQueryRepository repository;
+    @Autowired private ArbaQueryRepository repository;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -82,7 +81,9 @@ class ArbaStreamControllerIT extends AbstractSolrStreamControllerIT {
 
     private void saveEntry(int suffix) {
         UniRuleEntry entry = UniRuleEntryBuilderTest.createObject(2);
-        UniRuleEntry uniRuleEntry = UniRuleControllerITUtils.updateValidValues(entry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
+        UniRuleEntry uniRuleEntry =
+                UniRuleControllerITUtils.updateValidValues(
+                        entry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
         UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
         UniRuleDocument uniRuleDocument = docConverter.convertToDocument(uniRuleEntry);
         // convert the UniRuleDocument to ArbaDocument

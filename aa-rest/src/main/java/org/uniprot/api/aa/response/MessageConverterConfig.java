@@ -1,10 +1,5 @@
 package org.uniprot.api.aa.response;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -26,6 +21,11 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 /**
  * @author sahmad
  * @created 11/11/2020
@@ -39,10 +39,10 @@ public class MessageConverterConfig {
                 new MessageConverterContextFactory<>();
 
         asList(
-                        uniRuleContext(APPLICATION_JSON),
-                        uniRuleContext(UniProtMediaType.LIST_MEDIA_TYPE),
-                        uniRuleContext(UniProtMediaType.TSV_MEDIA_TYPE),
-                        uniRuleContext(UniProtMediaType.XLS_MEDIA_TYPE))
+                uniRuleContext(APPLICATION_JSON),
+                uniRuleContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                uniRuleContext(UniProtMediaType.TSV_MEDIA_TYPE),
+                uniRuleContext(UniProtMediaType.XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -82,15 +82,6 @@ public class MessageConverterConfig {
                                 UniRuleEntry.class,
                                 returnConfig);
                 converters.add(0, uniRuleJsonMessageConverter);
-//                // arba converters
-//                ReturnFieldConfig arbaReturnConfig =
-//                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.ARBA);
-//                JsonMessageConverter<UniRuleEntry> arbaJsonMessageConverter =
-//                        new JsonMessageConverter<>(
-//                                UniRuleJsonConfig.getInstance().getSimpleObjectMapper(),
-//                                UniRuleEntry.class,
-//                                arbaReturnConfig);
-//                converters.add(1, arbaJsonMessageConverter);
             }
         };
     }

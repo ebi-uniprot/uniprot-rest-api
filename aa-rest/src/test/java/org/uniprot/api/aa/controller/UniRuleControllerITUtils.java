@@ -15,17 +15,25 @@ import org.uniprot.core.unirule.impl.UniRuleIdBuilder;
  * @created 20/11/2020
  */
 public class UniRuleControllerITUtils {
-    public enum RuleType {UR, ARBA}
-    static UniRuleEntry updateValidValues(UniRuleEntry uniRuleEntry, int suffix, RuleType ruleType) {
+    public enum RuleType {
+        UR,
+        ARBA
+    }
+
+    static UniRuleEntry updateValidValues(
+            UniRuleEntry uniRuleEntry, int suffix, RuleType ruleType) {
         UniRuleEntryBuilder builder = UniRuleEntryBuilder.from(uniRuleEntry);
         updateValidUniRuleId(builder, suffix, ruleType);
         updateMainRule(builder);
         return builder.build();
     }
 
-    private static void updateValidUniRuleId(UniRuleEntryBuilder builder, int suffix, RuleType ruleType) {
-        String uniRuleId = ruleType == RuleType.UR ? RuleType.UR + String.format("%09d", suffix)
-                : RuleType.ARBA + String.format("%08d", suffix);
+    private static void updateValidUniRuleId(
+            UniRuleEntryBuilder builder, int suffix, RuleType ruleType) {
+        String uniRuleId =
+                ruleType == RuleType.UR
+                        ? RuleType.UR + String.format("%09d", suffix)
+                        : RuleType.ARBA + String.format("%08d", suffix);
         UniRuleIdBuilder uniRuleIdBuilder = new UniRuleIdBuilder(uniRuleId);
         builder.uniRuleId(uniRuleIdBuilder.build());
     }

@@ -1,5 +1,22 @@
 package org.uniprot.api.aa.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,23 +47,6 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.arba.ArbaDocument;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 /**
  * @author sahmad
  * @created 19/07/2021
@@ -56,17 +56,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ArbaController.class)
 @ExtendWith(
         value = {
-                SpringExtension.class,
-                ArbaSearchControllerIT.ArbaSearchContentTypeParamResolver.class,
-                ArbaSearchControllerIT.ArbaSearchParameterResolver.class
+            SpringExtension.class,
+            ArbaSearchControllerIT.ArbaSearchContentTypeParamResolver.class,
+            ArbaSearchControllerIT.ArbaSearchParameterResolver.class
         })
 public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
-    @Autowired
-    private ArbaFacetConfig facetConfig;
+    @Autowired private ArbaFacetConfig facetConfig;
 
-    @Autowired
-    private ArbaQueryRepository repository;
+    @Autowired private ArbaQueryRepository repository;
 
     @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
@@ -104,8 +102,7 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @BeforeAll
     void initDataStore() {
         getStoreManager()
-                .addDocConverter(
-                        DataStoreManager.StoreType.ARBA, new UniRuleDocumentConverter());
+                .addDocConverter(DataStoreManager.StoreType.ARBA, new UniRuleDocumentConverter());
     }
 
     @Override
@@ -135,8 +132,9 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     private void saveEntry(int suffix) {
         UniRuleEntry entry = UniRuleEntryBuilderTest.createObject(2);
-        UniRuleEntry uniRuleEntry = UniRuleControllerITUtils.updateValidValues(entry, suffix,
-                UniRuleControllerITUtils.RuleType.ARBA);
+        UniRuleEntry uniRuleEntry =
+                UniRuleControllerITUtils.updateValidValues(
+                        entry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
         UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
         UniRuleDocument uniRuleDocument = docConverter.convertToDocument(uniRuleEntry);
         // convert the UniRuleDocument to ArbaDocument
@@ -237,10 +235,7 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam(
-                            "fields",
-                            Collections.singletonList(
-                                    "rule_id,annotation_covered"))
+                    .queryParam("fields", Collections.singletonList("rule_id,annotation_covered"))
                     .resultMatcher(jsonPath("$.results[*].uniRuleId", is(notNullValue())))
                     .resultMatcher(
                             jsonPath(
@@ -279,8 +274,7 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         }
     }
 
-    static class ArbaSearchContentTypeParamResolver
-            extends AbstractSearchContentTypeParamResolver {
+    static class ArbaSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
