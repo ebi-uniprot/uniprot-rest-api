@@ -39,13 +39,14 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.unirule.UniRuleEntry;
+import org.uniprot.core.unirule.impl.InformationBuilder;
+import org.uniprot.core.unirule.impl.UniRuleEntryBuilder;
 import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.arba.ArbaDocumentConverter;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.arba.ArbaDocument;
-import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
 /**
  * @author sahmad
@@ -132,25 +133,22 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     private void saveEntry(int suffix) {
         UniRuleEntry entry = UniRuleEntryBuilderTest.createObject(2);
-        UniRuleEntry uniRuleEntry =
+        // remove unnecessary fields for ARBA
+        var builder = UniRuleEntryBuilder.from(entry);
+        InformationBuilder infoBuilder = new InformationBuilder("0");
+        builder.information(infoBuilder.build());
+        UniRuleEntry thinUniRuleEntry =
+                builder.uniRuleId(entry.getUniRuleId())
+                        .otherRulesSet(null)
+                        .positionFeatureSetsSet(null)
+                        .samFeatureSetsSet(null)
+                        .build();
+        UniRuleEntry arbaEntry =
                 UniRuleControllerITUtils.updateValidValues(
-                        entry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
-        UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
-        UniRuleDocument uniRuleDocument = docConverter.convertToDocument(uniRuleEntry);
-        // convert the UniRuleDocument to ArbaDocument
-        ArbaDocument.ArbaDocumentBuilder arbaDocumentBuilder = ArbaDocument.builder();
-        arbaDocumentBuilder.ruleId(uniRuleDocument.getUniRuleId());
-        arbaDocumentBuilder.conditionValues(uniRuleDocument.getConditionValues());
-        arbaDocumentBuilder.featureTypes(uniRuleDocument.getFeatureTypes());
-        arbaDocumentBuilder.keywords(uniRuleDocument.getKeywords());
-        arbaDocumentBuilder.geneNames(uniRuleDocument.getGeneNames());
-        arbaDocumentBuilder.goTerms(uniRuleDocument.getGoTerms());
-        arbaDocumentBuilder.proteinNames(uniRuleDocument.getProteinNames());
-        arbaDocumentBuilder.organismNames(uniRuleDocument.getOrganismNames());
-        arbaDocumentBuilder.taxonomyNames(uniRuleDocument.getTaxonomyNames());
-        arbaDocumentBuilder.commentTypeValues(uniRuleDocument.getCommentTypeValues());
-        arbaDocumentBuilder.ruleObj(uniRuleDocument.getUniRuleObj());
-        getStoreManager().saveDocs(getStoreType(), arbaDocumentBuilder.build());
+                        thinUniRuleEntry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
+        var docConverter = new ArbaDocumentConverter();
+        var arbaDocument = docConverter.convertToDocument(arbaEntry);
+        getStoreManager().saveDocs(getStoreType(), arbaDocument);
     }
 
     static class ArbaSearchParameterResolver extends AbstractSearchParameterResolver {
@@ -163,9 +161,9 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                     .resultMatcher(jsonPath("$.results.*.information").exists())
                     .resultMatcher(jsonPath("$.results.*.ruleStatus", notNullValue()))
                     .resultMatcher(jsonPath("$.results.*.mainRule", notNullValue()))
-                    .resultMatcher(jsonPath("$.results.*.otherRules", notNullValue()))
-                    .resultMatcher(jsonPath("$.results.*.samFeatureSets", notNullValue()))
-                    .resultMatcher(jsonPath("$.results.*.positionFeatureSets", notNullValue()))
+                    .resultMatcher(jsonPath("$.results.*.otherRules").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.samFeatureSets").doesNotExist())
+                    .resultMatcher(jsonPath("$.results.*.positionFeatureSets").doesNotExist())
                     .resultMatcher(jsonPath("$.results.*.proteinsAnnotatedCount", notNullValue()))
                     .resultMatcher(jsonPath("$.results.*.createdBy", notNullValue()))
                     .resultMatcher(jsonPath("$.results.*.modifiedBy", notNullValue()))
@@ -238,9 +236,7 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                     .queryParam("fields", Collections.singletonList("rule_id,annotation_covered"))
                     .resultMatcher(jsonPath("$.results[*].uniRuleId", is(notNullValue())))
                     .resultMatcher(
-                            jsonPath(
-                                    "$.results[*].information.uniProtAccessions",
-                                    is(notNullValue())))
+                            jsonPath("$.results[*].information.uniProtAccessions").doesNotExist())
                     .resultMatcher(
                             jsonPath("$.results[*].mainRule.annotations", is(notNullValue())))
                     .build();

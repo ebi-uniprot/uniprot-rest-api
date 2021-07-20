@@ -30,14 +30,13 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.core.unirule.UniRuleId;
+import org.uniprot.core.unirule.impl.InformationBuilder;
 import org.uniprot.core.unirule.impl.UniRuleEntryBuilder;
 import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.core.unirule.impl.UniRuleIdBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
+import org.uniprot.store.indexer.arba.ArbaDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.arba.ArbaDocument;
-import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
 /**
  * @author sahmad
@@ -77,31 +76,22 @@ public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
         UniRuleEntry uniRuleEntry = create();
-        UniRuleDocumentConverter converter = new UniRuleDocumentConverter();
-        UniRuleDocument uniRuleDocument = converter.convertToDocument(uniRuleEntry);
-        // convert the UniRuleDocument to ArbaDocument
-        ArbaDocument.ArbaDocumentBuilder arbaDocumentBuilder = ArbaDocument.builder();
-        arbaDocumentBuilder.ruleId(uniRuleDocument.getUniRuleId());
-        arbaDocumentBuilder.conditionValues(uniRuleDocument.getConditionValues());
-        arbaDocumentBuilder.featureTypes(uniRuleDocument.getFeatureTypes());
-        arbaDocumentBuilder.keywords(uniRuleDocument.getKeywords());
-        arbaDocumentBuilder.geneNames(uniRuleDocument.getGeneNames());
-        arbaDocumentBuilder.goTerms(uniRuleDocument.getGoTerms());
-        arbaDocumentBuilder.proteinNames(uniRuleDocument.getProteinNames());
-        arbaDocumentBuilder.organismNames(uniRuleDocument.getOrganismNames());
-        arbaDocumentBuilder.taxonomyNames(uniRuleDocument.getTaxonomyNames());
-        arbaDocumentBuilder.commentTypeValues(uniRuleDocument.getCommentTypeValues());
-        arbaDocumentBuilder.ruleObj(uniRuleDocument.getUniRuleObj());
-        getStoreManager().saveDocs(getStoreType(), arbaDocumentBuilder.build());
+        var converter = new ArbaDocumentConverter();
+        var arbaDocument = converter.convertToDocument(uniRuleEntry);
+        getStoreManager().saveDocs(getStoreType(), arbaDocument);
     }
 
     private UniRuleEntry create() {
         UniRuleId uniRuleId = new UniRuleIdBuilder(ARBA_ID).build();
         UniRuleEntry uniRule = UniRuleEntryBuilderTest.createObject();
-        return UniRuleEntryBuilder.from(uniRule)
-                .uniRuleId(uniRuleId)
-                //                .information(null)
-                //                .otherRulesSet(null)
+        // remove unnecessary fields for ARBA
+        var builder = UniRuleEntryBuilder.from(uniRule);
+        InformationBuilder infoBuilder = new InformationBuilder("0");
+        builder.information(infoBuilder.build());
+        return builder.uniRuleId(uniRuleId)
+                .otherRulesSet(null)
+                .positionFeatureSetsSet(null)
+                .samFeatureSetsSet(null)
                 .build();
     }
 
@@ -120,9 +110,9 @@ public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.information", notNullValue()))
                     .resultMatcher(jsonPath("$.ruleStatus", notNullValue()))
                     .resultMatcher(jsonPath("$.mainRule", notNullValue()))
-                    .resultMatcher(jsonPath("$.otherRules", notNullValue()))
-                    .resultMatcher(jsonPath("$.samFeatureSets", notNullValue()))
-                    .resultMatcher(jsonPath("$.positionFeatureSets", notNullValue()))
+                    .resultMatcher(jsonPath("$.otherRules").doesNotExist())
+                    .resultMatcher(jsonPath("$.samFeatureSets").doesNotExist())
+                    .resultMatcher(jsonPath("$.positionFeatureSets").doesNotExist())
                     .resultMatcher(jsonPath("$.proteinsAnnotatedCount", notNullValue()))
                     .resultMatcher(jsonPath("$.createdBy", notNullValue()))
                     .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))

@@ -20,7 +20,7 @@ public class ArbaStreamRequest extends ArbaBasicRequest implements StreamRequest
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
-            regexp = "^true|false$",
+            regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.aa.invalid.download}")
     private String download;
