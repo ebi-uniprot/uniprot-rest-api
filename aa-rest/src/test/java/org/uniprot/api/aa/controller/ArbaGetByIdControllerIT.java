@@ -100,8 +100,8 @@ public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
         UniRuleEntry uniRule = UniRuleEntryBuilderTest.createObject();
         return UniRuleEntryBuilder.from(uniRule)
                 .uniRuleId(uniRuleId)
-//                .information(null)
-//                .otherRulesSet(null)
+                //                .information(null)
+                //                .otherRulesSet(null)
                 .build();
     }
 

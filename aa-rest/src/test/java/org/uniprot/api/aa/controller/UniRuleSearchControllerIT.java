@@ -134,7 +134,9 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
 
     private void saveEntry(int suffix) {
         UniRuleEntry entry = UniRuleEntryBuilderTest.createObject(2);
-        UniRuleEntry uniRuleEntry = UniRuleControllerITUtils.updateValidValues(entry, suffix, UniRuleControllerITUtils.RuleType.UR);
+        UniRuleEntry uniRuleEntry =
+                UniRuleControllerITUtils.updateValidValues(
+                        entry, suffix, UniRuleControllerITUtils.RuleType.UR);
         UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
         UniRuleDocument document = docConverter.convertToDocument(uniRuleEntry);
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIRULE, document);
