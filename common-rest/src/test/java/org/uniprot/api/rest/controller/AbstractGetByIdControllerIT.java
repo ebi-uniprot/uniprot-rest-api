@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
@@ -66,7 +67,7 @@ public abstract class AbstractGetByIdControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(log())
+                response.andDo(print())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(
@@ -90,7 +91,7 @@ public abstract class AbstractGetByIdControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(log())
+                response.andDo(print())
                         .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                         .andExpect(
                                 header().string(
@@ -114,7 +115,7 @@ public abstract class AbstractGetByIdControllerIT {
 
         // then
         ResultActions resultActions =
-                response.andDo(log())
+                response.andDo(print())
                         .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                         .andExpect(
                                 header().string(
@@ -145,7 +146,7 @@ public abstract class AbstractGetByIdControllerIT {
 
             // then
             ResultActions resultActions =
-                    response.andDo(log())
+                    response.andDo(print())
                             .andExpect(status().is(HttpStatus.OK.value()))
                             .andExpect(
                                     header().string(
@@ -177,7 +178,7 @@ public abstract class AbstractGetByIdControllerIT {
 
             // then
             ResultActions resultActions =
-                    response.andDo(log())
+                    response.andDo(print())
                             .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                             .andExpect(
                                     header().string(
@@ -210,7 +211,7 @@ public abstract class AbstractGetByIdControllerIT {
 
             // then
             ResultActions resultActions =
-                    response.andDo(log())
+                    response.andDo(print())
                             .andExpect(status().is(HttpStatus.OK.value()))
                             .andExpect(
                                     header().string(
@@ -238,7 +239,7 @@ public abstract class AbstractGetByIdControllerIT {
 
             // then
             ResultActions resultActions =
-                    response.andDo(log())
+                    response.andDo(print())
                             .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                             .andExpect(
                                     header().string(
@@ -268,7 +269,7 @@ public abstract class AbstractGetByIdControllerIT {
         ResultActions response = mockMvc.perform(get(getIdRequestPath(), idParameter.getId()));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, DEFAULT_MEDIA_TYPE_VALUE));
     }
@@ -287,7 +288,7 @@ public abstract class AbstractGetByIdControllerIT {
                 mockMvc.perform(get(getIdRequestPath() + "." + extension, idParameter.getId()));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
