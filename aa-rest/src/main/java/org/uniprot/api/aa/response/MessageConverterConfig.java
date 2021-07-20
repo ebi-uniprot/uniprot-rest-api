@@ -1,5 +1,10 @@
 package org.uniprot.api.aa.response;
 
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -18,13 +23,7 @@ import org.uniprot.core.json.parser.unirule.UniRuleJsonConfig;
 import org.uniprot.core.parser.tsv.unirule.UniRuleEntryValueMapper;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 /**
  * @author sahmad
@@ -39,10 +38,10 @@ public class MessageConverterConfig {
                 new MessageConverterContextFactory<>();
 
         asList(
-                uniRuleContext(APPLICATION_JSON),
-                uniRuleContext(UniProtMediaType.LIST_MEDIA_TYPE),
-                uniRuleContext(UniProtMediaType.TSV_MEDIA_TYPE),
-                uniRuleContext(UniProtMediaType.XLS_MEDIA_TYPE))
+                        uniRuleContext(APPLICATION_JSON),
+                        uniRuleContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                        uniRuleContext(UniProtMediaType.TSV_MEDIA_TYPE),
+                        uniRuleContext(UniProtMediaType.XLS_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -63,7 +62,7 @@ public class MessageConverterConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                ReturnFieldConfig returnConfig =
+                var returnConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIRULE);
 
                 converters.add(new ErrorMessageConverter());
