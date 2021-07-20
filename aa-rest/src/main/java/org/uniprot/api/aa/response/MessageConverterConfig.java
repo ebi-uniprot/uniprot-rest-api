@@ -31,7 +31,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
  * @created 11/11/2020
  */
 @Configuration
-public class UniRuleMessageConverterConfig {
+public class MessageConverterConfig {
 
     @Bean(name = "uniRuleMessageConverterContextFactory")
     public MessageConverterContextFactory<UniRuleEntry> uniRuleMessageConverterContextFactory() {
@@ -39,10 +39,20 @@ public class UniRuleMessageConverterConfig {
                 new MessageConverterContextFactory<>();
 
         asList(
-                        context(APPLICATION_JSON),
-                        context(UniProtMediaType.LIST_MEDIA_TYPE),
-                        context(UniProtMediaType.TSV_MEDIA_TYPE),
-                        context(UniProtMediaType.XLS_MEDIA_TYPE))
+                        uniRuleContext(APPLICATION_JSON),
+                        uniRuleContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                        uniRuleContext(UniProtMediaType.TSV_MEDIA_TYPE),
+                        uniRuleContext(UniProtMediaType.XLS_MEDIA_TYPE))
+                .forEach(contextFactory::addMessageConverterContext);
+
+        return contextFactory;
+    }
+
+    @Bean(name = "arbaMessageConverterContextFactory")
+    public MessageConverterContextFactory<UniRuleEntry> arbaMessageConverterContextFactory() {
+        MessageConverterContextFactory<UniRuleEntry> contextFactory =
+                new MessageConverterContextFactory<>();
+        asList(arbaContext(APPLICATION_JSON), arbaContext(UniProtMediaType.LIST_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -66,19 +76,35 @@ public class UniRuleMessageConverterConfig {
                         new TsvMessageConverter<>(
                                 UniRuleEntry.class, returnConfig, new UniRuleEntryValueMapper()));
 
-                JsonMessageConverter<UniRuleEntry> unirefJsonMessageConverter =
+                JsonMessageConverter<UniRuleEntry> uniRuleJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniRuleJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniRuleEntry.class,
                                 returnConfig);
-                converters.add(0, unirefJsonMessageConverter);
+                converters.add(0, uniRuleJsonMessageConverter);
+//                // arba converters
+//                ReturnFieldConfig arbaReturnConfig =
+//                        ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.ARBA);
+//                JsonMessageConverter<UniRuleEntry> arbaJsonMessageConverter =
+//                        new JsonMessageConverter<>(
+//                                UniRuleJsonConfig.getInstance().getSimpleObjectMapper(),
+//                                UniRuleEntry.class,
+//                                arbaReturnConfig);
+//                converters.add(1, arbaJsonMessageConverter);
             }
         };
     }
 
-    private MessageConverterContext<UniRuleEntry> context(MediaType contentType) {
+    private MessageConverterContext<UniRuleEntry> uniRuleContext(MediaType contentType) {
         return MessageConverterContext.<UniRuleEntry>builder()
                 .resource(MessageConverterContextFactory.Resource.UNIRULE)
+                .contentType(contentType)
+                .build();
+    }
+
+    private MessageConverterContext<UniRuleEntry> arbaContext(MediaType contentType) {
+        return MessageConverterContext.<UniRuleEntry>builder()
+                .resource(MessageConverterContextFactory.Resource.ARBA)
                 .contentType(contentType)
                 .build();
     }

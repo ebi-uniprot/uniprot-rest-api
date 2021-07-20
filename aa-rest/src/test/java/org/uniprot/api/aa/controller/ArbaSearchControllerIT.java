@@ -1,22 +1,5 @@
 package org.uniprot.api.aa.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +10,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.aa.AARestApplication;
-import org.uniprot.api.aa.repository.UniRuleFacetConfig;
-import org.uniprot.api.aa.repository.UniRuleQueryRepository;
+import org.uniprot.api.aa.repository.ArbaFacetConfig;
+import org.uniprot.api.aa.repository.ArbaQueryRepository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
@@ -44,38 +27,58 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.arba.ArbaDocument;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 /**
- * @author sahmaad
- * @since 2020-11-19
+ * @author sahmad
+ * @created 19/07/2021
  */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, AARestApplication.class})
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(UniRuleController.class)
+@WebMvcTest(ArbaController.class)
 @ExtendWith(
         value = {
-            SpringExtension.class,
-            UniRuleSearchControllerIT.UniRuleSearchContentTypeParamResolver.class,
-            UniRuleSearchControllerIT.UniRuleSearchParameterResolver.class
+                SpringExtension.class,
+                ArbaSearchControllerIT.ArbaSearchContentTypeParamResolver.class,
+                ArbaSearchControllerIT.ArbaSearchParameterResolver.class
         })
-public class UniRuleSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
-    @Autowired private UniRuleFacetConfig facetConfig;
+    @Autowired
+    private ArbaFacetConfig facetConfig;
 
-    @Autowired private UniRuleQueryRepository repository;
+    @Autowired
+    private ArbaQueryRepository repository;
 
     @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
-        return DataStoreManager.StoreType.UNIRULE;
+        return DataStoreManager.StoreType.ARBA;
     }
 
     @Override
     protected SolrCollection getSolrCollection() {
-        return SolrCollection.unirule;
+        return SolrCollection.arba;
     }
 
     @Override
@@ -85,7 +88,7 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected String getSearchRequestPath() {
-        return "/unirule/search";
+        return "/arba/search";
     }
 
     @Override
@@ -95,23 +98,21 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
 
     @Override
     protected UniProtDataType getUniProtDataType() {
-        return UniProtDataType.UNIRULE;
+        return UniProtDataType.ARBA;
     }
 
     @BeforeAll
     void initDataStore() {
         getStoreManager()
                 .addDocConverter(
-                        DataStoreManager.StoreType.UNIRULE, new UniRuleDocumentConverter());
+                        DataStoreManager.StoreType.ARBA, new UniRuleDocumentConverter());
     }
 
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "";
-        switch (searchField) {
-            case "unirule_id":
-                value = "UR000000200";
-                break;
+        if ("rule_id".equals(searchField)) {
+            value = "ARBA00000200";
         }
         return value;
     }
@@ -134,19 +135,33 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
 
     private void saveEntry(int suffix) {
         UniRuleEntry entry = UniRuleEntryBuilderTest.createObject(2);
-        UniRuleEntry uniRuleEntry = UniRuleControllerITUtils.updateValidValues(entry, suffix, UniRuleControllerITUtils.RuleType.UR);
+        UniRuleEntry uniRuleEntry = UniRuleControllerITUtils.updateValidValues(entry, suffix,
+                UniRuleControllerITUtils.RuleType.ARBA);
         UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
-        UniRuleDocument document = docConverter.convertToDocument(uniRuleEntry);
-        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIRULE, document);
+        UniRuleDocument uniRuleDocument = docConverter.convertToDocument(uniRuleEntry);
+        // convert the UniRuleDocument to ArbaDocument
+        ArbaDocument.ArbaDocumentBuilder arbaDocumentBuilder = ArbaDocument.builder();
+        arbaDocumentBuilder.ruleId(uniRuleDocument.getUniRuleId());
+        arbaDocumentBuilder.conditionValues(uniRuleDocument.getConditionValues());
+        arbaDocumentBuilder.featureTypes(uniRuleDocument.getFeatureTypes());
+        arbaDocumentBuilder.keywords(uniRuleDocument.getKeywords());
+        arbaDocumentBuilder.geneNames(uniRuleDocument.getGeneNames());
+        arbaDocumentBuilder.goTerms(uniRuleDocument.getGoTerms());
+        arbaDocumentBuilder.proteinNames(uniRuleDocument.getProteinNames());
+        arbaDocumentBuilder.organismNames(uniRuleDocument.getOrganismNames());
+        arbaDocumentBuilder.taxonomyNames(uniRuleDocument.getTaxonomyNames());
+        arbaDocumentBuilder.commentTypeValues(uniRuleDocument.getCommentTypeValues());
+        arbaDocumentBuilder.ruleObj(uniRuleDocument.getUniRuleObj());
+        getStoreManager().saveDocs(getStoreType(), arbaDocumentBuilder.build());
     }
 
-    static class UniRuleSearchParameterResolver extends AbstractSearchParameterResolver {
+    static class ArbaSearchParameterResolver extends AbstractSearchParameterResolver {
 
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("unirule_id:UR000000200"))
-                    .resultMatcher(jsonPath("$.results.*.uniRuleId", contains("UR000000200")))
+                    .queryParam("query", Collections.singletonList("rule_id:ARBA00000200"))
+                    .resultMatcher(jsonPath("$.results.*.uniRuleId", contains("ARBA00000200")))
                     .resultMatcher(jsonPath("$.results.*.information").exists())
                     .resultMatcher(jsonPath("$.results.*.ruleStatus", notNullValue()))
                     .resultMatcher(jsonPath("$.results.*.mainRule", notNullValue()))
@@ -164,7 +179,7 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         @Override
         protected SearchParameter searchCanReturnNotFoundParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("unirule_id:UR999999999"))
+                    .queryParam("query", Collections.singletonList("rule_id:ARBA99999999"))
                     .resultMatcher(jsonPath("$.results.size()", is(0)))
                     .build();
         }
@@ -172,11 +187,11 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         @Override
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("unirule_id:*"))
+                    .queryParam("query", Collections.singletonList("rule_id:*"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.uniRuleId",
-                                    contains("UR000000200", "UR000000300")))
+                                    contains("ARBA00000200", "ARBA00000300")))
                     .build();
         }
 
@@ -196,13 +211,13 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         @Override
         protected SearchParameter searchQueryWithInvalidValueQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("unirule_id:INVALID"))
+                    .queryParam("query", Collections.singletonList("rule_id:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "The unirule_id value has invalid format. It should match the regular expression 'UR[0-9]{9}'")))
+                                            "The rule_id value has invalid format. It should match the regular expression 'ARBA[0-9]{8}'")))
                     .build();
         }
 
@@ -210,11 +225,11 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchSortWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("sort", Collections.singletonList("unirule_id desc"))
+                    .queryParam("sort", Collections.singletonList("rule_id desc"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.uniRuleId",
-                                    contains("UR000000300", "UR000000200")))
+                                    contains("ARBA00000300", "ARBA00000200")))
                     .build();
         }
 
@@ -225,7 +240,7 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
                     .queryParam(
                             "fields",
                             Collections.singletonList(
-                                    "rule_id,template_entries,annotation_covered"))
+                                    "rule_id,annotation_covered"))
                     .resultMatcher(jsonPath("$.results[*].uniRuleId", is(notNullValue())))
                     .resultMatcher(
                             jsonPath(
@@ -244,7 +259,7 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.uniRuleId",
-                                    contains("UR000000200", "UR000000300")))
+                                    contains("ARBA00000200", "ARBA00000300")))
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(jsonPath("$.facets[0].label", is("Superkingdom")))
@@ -264,13 +279,13 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         }
     }
 
-    static class UniRuleSearchContentTypeParamResolver
+    static class ArbaSearchContentTypeParamResolver
             extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("unirule_id:UR000000200 OR unirule_id:UR000000300")
+                    .query("rule_id:ARBA00000200 OR rule_id:ARBA00000300")
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -278,38 +293,13 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
                                             jsonPath(
                                                     "$.results.*.uniRuleId",
                                                     containsInAnyOrder(
-                                                            "UR000000200", "UR000000300")))
+                                                            "ARBA00000200", "ARBA00000300")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString("UR000000200")))
-                                    .resultMatcher(content().string(containsString("UR000000300")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "UniRule ID\tTemplate Entries")))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "UR000000200\taccession-")))
-                                    .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            containsString(
-                                                                    "UR000000300\taccession-")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .resultMatcher(content().string(containsString("ARBA00000200")))
+                                    .resultMatcher(content().string(containsString("ARBA00000300")))
                                     .build())
                     .build();
         }
@@ -317,7 +307,7 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         @Override
         protected SearchContentTypeParam searchBadRequestContentTypesParam() {
             return SearchContentTypeParam.builder()
-                    .query("unirule_id:invalid")
+                    .query("rule_id:invalid")
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
@@ -326,21 +316,11 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The unirule_id value has invalid format. It should match the regular expression 'UR[0-9]{9}'")))
+                                                            "The rule_id value has invalid format. It should match the regular expression 'ARBA[0-9]{8}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .build();

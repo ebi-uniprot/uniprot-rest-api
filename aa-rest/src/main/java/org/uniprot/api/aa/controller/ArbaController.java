@@ -74,7 +74,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
     }
 
     @GetMapping(
-            value = "/{arbaid}",
+            value = "/{arbaId}",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
             summary = "Get a rule by ARBA id.",
@@ -88,18 +88,18 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByArbaId(
-            @PathVariable("arbaid")
+            @PathVariable("arbaId")
                     @Pattern(
                             regexp = ARBA_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.arba.invalid.id}")
-                    String uniRuleId,
+                    String arbaId,
             @Parameter(description = "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.ARBA)
                     String fields,
             HttpServletRequest request) {
-        UniRuleEntry entryResult = this.arbaService.findByUniqueId(uniRuleId);
+        UniRuleEntry entryResult = this.arbaService.findByUniqueId(arbaId);
         return super.getEntityResponse(entryResult, fields, request);
     }
 
