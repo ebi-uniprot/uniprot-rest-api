@@ -18,10 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -76,7 +73,7 @@ public class UniSaveController {
             value = "/{accession}",
             produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
-            @Valid UniSaveRequest.Entries uniSaveRequest, HttpServletRequest servletRequest) {
+            @Valid @ModelAttribute UniSaveRequest.Entries uniSaveRequest, HttpServletRequest servletRequest) {
         String acceptHeader = getAcceptHeader(servletRequest);
         setContentIfRequired(uniSaveRequest, acceptHeader);
         HttpHeaders httpHeaders =
@@ -105,7 +102,7 @@ public class UniSaveController {
             value = "/{accession}/diff",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getDiff(
-            @Valid UniSaveRequest.Diff unisaveRequest, HttpServletRequest servletRequest) {
+            @Valid  @ModelAttribute UniSaveRequest.Diff unisaveRequest, HttpServletRequest servletRequest) {
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
