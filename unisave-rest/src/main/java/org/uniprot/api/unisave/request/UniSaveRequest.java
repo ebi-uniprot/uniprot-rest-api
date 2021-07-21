@@ -18,7 +18,7 @@ public class UniSaveRequest {
 
     @Data
     public static class Entries {
-        @Parameter(description = "Size of the result. Defaults to 25")
+        @Parameter(description = "The accession of a UniProtKB entry.")
         @Pattern(regexp = ACCESSION_PATTERN, message = "{search.invalid.accession.value}")
         private String accession;
 
