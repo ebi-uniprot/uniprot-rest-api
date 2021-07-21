@@ -109,4 +109,50 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>openapi</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>uk.ac.ebi.uniprot</groupId>
+						<artifactId>openapi-maven-plugin</artifactId>
+						<version>${openapi-maven-plugin.version}</version>
+						<configuration>
+							<packageLocations>
+								<packageLocation>org.uniprot.api.unisave.controller</packageLocation>
+								<packageLocation>org.uniprot.api.unisave.model</packageLocation>
+							</packageLocations>
+							<openApiDirectory>target/generated-sources/swagger</openApiDirectory>
+							<openApiFileName>unisave-openapi3.yaml</openApiFileName>
+							<serverBaseUrl>https://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
+						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.uniprot</groupId>
+								<artifactId>uniprot-config</artifactId>
+								<version>${uniprot-store.version}</version>
+								<exclusions>
+									<exclusion>
+										<groupId>com.fasterxml.jackson.core</groupId>
+										<artifactId>*</artifactId>
+									</exclusion>
+								</exclusions>
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<phase>compile</phase>
+								<goals>
+									<goal>oas-generate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>

@@ -2,8 +2,7 @@ package org.uniprot.api.unisave.controller;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
 
 import java.util.stream.Stream;
@@ -30,6 +29,13 @@ import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * Created 20/03/20
  *
@@ -39,6 +45,9 @@ import org.uniprot.api.unisave.service.UniSaveService;
 @RequestMapping("/unisave")
 @Slf4j
 @Validated
+@Tag(
+        name = "UniSave",
+        description = "An archive of every entry version, in every UniProtKB release.")
 public class UniSaveController {
     private final MessageConverterContextFactory<UniSaveEntry> converterContextFactory;
     private final UniSaveService service;
@@ -51,6 +60,18 @@ public class UniSaveController {
         this.service = service;
     }
 
+    @Operation(
+            summary = "Gets entry information based on an accession.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniSaveEntry.class)),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE)
+                        })
+            })
     @GetMapping(
             value = "/{accession}",
             produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
@@ -70,6 +91,16 @@ public class UniSaveController {
         return ResponseEntity.ok().headers(httpHeaders).body(context);
     }
 
+    @Operation(
+            summary = "Gets the differences between the contents of two versions of an entry.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniSaveEntry.class))
+                        })
+            })
     @GetMapping(
             value = "/{accession}/diff",
             produces = {APPLICATION_JSON_VALUE})
@@ -90,11 +121,22 @@ public class UniSaveController {
         return ResponseEntity.ok(context);
     }
 
+    @Operation(
+            summary = "Gets status information of an entry.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniSaveEntry.class))
+                        })
+            })
     @GetMapping(
             value = "/{accession}/status",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getStatus(
-            @PathVariable
+            @Parameter(description = "The accession of an entry.")
+                    @PathVariable
                     @Pattern(
                             regexp = ACCESSION_PATTERN,
                             message = "{search.invalid.accession.value}")

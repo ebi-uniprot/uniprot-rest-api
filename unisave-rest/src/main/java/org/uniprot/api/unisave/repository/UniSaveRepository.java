@@ -21,7 +21,7 @@ import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.service.ServiceConfig;
 import org.uniprot.core.util.Utils;
 
-@Profile({"online", "offline"})
+@Profile({"live", "offline"})
 @Service
 @Import(ServiceConfig.class)
 @Slf4j

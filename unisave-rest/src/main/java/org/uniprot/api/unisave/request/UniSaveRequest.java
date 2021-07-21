@@ -5,6 +5,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
 import lombok.Data;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * Created 27/03/20
@@ -17,23 +18,33 @@ public class UniSaveRequest {
 
     @Data
     public static class Entries {
+        @Parameter(description = "Size of the result. Defaults to 25")
         @Pattern(regexp = ACCESSION_PATTERN, message = "{search.invalid.accession.value}")
         private String accession;
 
+        @Parameter(description = "Add download headers to response (true|false).")
         private boolean download;
+
+        @Parameter(description = "Whether or not to include the entry content (true|false).")
         private boolean includeContent;
+
+        @Parameter(description = "A comma-separated-list of entry version numbers.")
         private String versions;
     }
 
     @Data
     public static class Diff {
+        @Parameter(description = "The accession of a UniProtKB entry.")
         @Pattern(regexp = ACCESSION_PATTERN, message = "{search.invalid.accession.value}")
         private String accession;
 
+        @Parameter(
+                description = "One of the entry versions, whose contents is analysed in the diff.")
         @NotNull(message = "{search.required}")
         @Positive(message = "{search.positive}")
         private Integer version1;
 
+        @Parameter(description = "The other entry version, whose contents is analysed in the diff.")
         @NotNull(message = "{search.required}")
         @Positive(message = "{search.positive}")
         private Integer version2;
