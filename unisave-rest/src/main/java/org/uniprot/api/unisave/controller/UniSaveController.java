@@ -132,7 +132,7 @@ public class UniSaveController {
             value = "/{accession}/status",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getStatus(
-            @Parameter(description = "The accession of an entry.")
+            @Parameter(description = "The accession of a UniProtKB entry.")
                     @PathVariable
                     @Pattern(
                             regexp = ACCESSION_PATTERN,
