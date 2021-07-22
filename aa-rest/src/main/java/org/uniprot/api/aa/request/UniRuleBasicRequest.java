@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class UniRuleBasicRequest {
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "unirule-search-fields.json")
-    @Parameter(description = "Criteria to search UniRules. It can take any valid solr query.")
+    @Parameter(description = "Criteria to search UniRules. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
