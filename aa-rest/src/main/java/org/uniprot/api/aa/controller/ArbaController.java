@@ -107,7 +107,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             value = "/search",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Search for a ARBA entry (or entries) by a SOLR query.",
+            summary = "Search for a ARBA entry (or entries) by a Lucene query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -138,7 +138,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             value = "/stream",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Stream a ARBA entry (or entries) by a SOLR query.",
+            summary = "Stream a ARBA entry (or entries) by a Lucene query.",
             responses = {
                 @ApiResponse(
                         content = {

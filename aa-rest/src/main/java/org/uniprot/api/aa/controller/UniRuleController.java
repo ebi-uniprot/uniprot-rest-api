@@ -118,7 +118,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniRule entry (or entries) by a SOLR query.",
+            summary = "Search for a UniRule entry (or entries) by a Lucene query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -156,7 +156,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream a UniRule entry (or entries) by a SOLR query.",
+            summary = "Stream a UniRule entry (or entries) by a Lucene query.",
             responses = {
                 @ApiResponse(
                         content = {
