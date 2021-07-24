@@ -73,7 +73,8 @@ public class UniSaveController {
             value = "/{accession}",
             produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
-            @Valid @ModelAttribute UniSaveRequest.Entries uniSaveRequest, HttpServletRequest servletRequest) {
+            @Valid @ModelAttribute UniSaveRequest.Entries uniSaveRequest,
+            HttpServletRequest servletRequest) {
         String acceptHeader = getAcceptHeader(servletRequest);
         setContentIfRequired(uniSaveRequest, acceptHeader);
         HttpHeaders httpHeaders =
@@ -102,7 +103,8 @@ public class UniSaveController {
             value = "/{accession}/diff",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getDiff(
-            @Valid  @ModelAttribute UniSaveRequest.Diff unisaveRequest, HttpServletRequest servletRequest) {
+            @Valid @ModelAttribute UniSaveRequest.Diff unisaveRequest,
+            HttpServletRequest servletRequest) {
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
                         MessageConverterContextFactory.Resource.UNISAVE,
