@@ -51,7 +51,7 @@ api:test:
     - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
     - 'rm -rfv ./*/target/*.jar'
   artifacts:
-    when: always
+    when: on_success
     expire_in: 2 days
     paths:
       - ./*/target
