@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-    <logger name="org.apache.solr" level="WARN" />
-    <logger name="org.springframework" level="WARN" />
-    <logger name="org.apache.zookeeper" level="WARN" />
+
     <appender name="SystemErr"
               class="ch.qos.logback.core.ConsoleAppender" target="System.err">
         <target>System.err</target>
@@ -31,7 +29,7 @@
         </filter>
     </appender>
 
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="SystemErr" />
         <appender-ref ref="SystemOut" />
     </root>
