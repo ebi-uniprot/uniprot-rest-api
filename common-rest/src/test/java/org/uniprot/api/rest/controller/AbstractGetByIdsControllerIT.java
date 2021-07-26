@@ -14,6 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -342,7 +343,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                         .param("size", "10"));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.messages.*", containsInAnyOrder(getErrorMessages())));
@@ -479,6 +480,43 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
         }
     }
 
+    @Test
+    void getByIdsMoreIdsRequest() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("download", "true")
+                                        .param(getRequestParamName(), getCommaSeparatedIds()
+                                                + ",INVALID,INVALID2,INVALID3,INVALID4,invalid5,invalid6"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*", containsInAnyOrder(getInvalidDownloadErrorMessages())));
+    }
+
+    @Test
+    void getByIdsWithoutAccessionsRequest() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("download", "true"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*", containsInAnyOrder(getInvalidDownloadErrorMessages())));
+    }
+
+
     protected abstract String getCommaSeparatedIds();
 
     protected abstract String getCommaSeparatedNIds(int n);
@@ -512,6 +550,8 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     protected abstract List<ResultMatcher> getThirdPageResultMatchers();
 
     protected abstract String[] getErrorMessages();
+
+    protected abstract String[] getInvalidDownloadErrorMessages();
 
     protected abstract String[] getInvalidFacetErrorMessage();
 

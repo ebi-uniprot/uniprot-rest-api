@@ -1,16 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +32,22 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 /**
  * @author lgonzales
  * @since 2019-07-10
@@ -72,24 +77,29 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     private static final String TEST_IDS =
             "p00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009";
     private static final String[] TEST_IDS_ARRAY = {
-        "P00003", "P00002", "P00001", "P00007", "P00006", "P00005", "P00004", "P00008", "P00010",
-        "P00009"
+            "P00003", "P00002", "P00001", "P00007", "P00006", "P00005", "P00004", "P00008", "P00010",
+            "P00009"
     };
     private static final String[] TEST_IDS_ARRAY_SORTED = {
-        "P00001", "P00002", "P00003", "P00004", "P00005", "P00006", "P00007", "P00008", "P00009",
-        "P00010"
+            "P00001", "P00002", "P00003", "P00004", "P00005", "P00006", "P00007", "P00008", "P00009",
+            "P00010"
     };
     private static final String MISSING_ID1 = "Q00001";
     private static final String MISSING_ID2 = "Q00002";
 
-    @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
+    @Autowired
+    private UniProtStoreClient<UniProtKBEntry> storeClient;
 
-    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired
+    private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @Autowired private UniProtKBFacetConfig facetConfig;
+    @Autowired
+    private UniProtKBFacetConfig facetConfig;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -271,21 +281,33 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected String[] getErrorMessages() {
-        return new String[] {
-            "Only '10' accessions are allowed in each request.",
-            "Invalid fields parameter value 'invalid'",
-            "Invalid fields parameter value 'invalid1'",
-            "The 'download' parameter has invalid format. It should be a boolean true or false.",
-            "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
-            "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession."
+        return new String[]{
+                "Only '10' accessions are allowed in each request.",
+                "Invalid fields parameter value 'invalid'",
+                "Invalid fields parameter value 'invalid1'",
+                "The 'download' parameter has invalid format. It should be a boolean true or false.",
+                "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
+                "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession."
+        };
+    }
+
+    @Override
+    protected String[] getInvalidDownloadErrorMessages() {
+        return new String[]{
+                "Only '15' accessions are allowed in each request.", "Accession 'invalid5' has invalid format. It should be a valid UniProtKB accession.",
+                "Accession 'invalid6' has invalid format. It should be a valid UniProtKB accession.",
+                "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession.",
+                "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
+                "Accession 'INVALID3' has invalid format. It should be a valid UniProtKB accession.",
+                "Accession 'INVALID4' has invalid format. It should be a valid UniProtKB accession."
         };
     }
 
     @Override
     protected String[] getInvalidFacetErrorMessage() {
-        return new String[] {
-            "Invalid facet name 'invalid_facet1'. Expected value can be [structure_3d, fragment, "
-                    + "proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome]."
+        return new String[]{
+                "Invalid facet name 'invalid_facet1'. Expected value can be [structure_3d, fragment, "
+                        + "proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome]."
         };
     }
 
