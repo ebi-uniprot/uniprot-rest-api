@@ -40,12 +40,7 @@ api:settings:
 api:test:
   stage: test
   script:
-    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS} 2>&1 | grep "\[\(INFO\|ERROR\|WARN\)\]"'
-    - |
-      if [ "${PIPESTATUS[0]}" != "0" ]; then
-        echo "Maven failed. Pipe status = ${PIPESTATUS[0]}";
-        false
-      fi
+    - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS} 2>&1'
     - 'echo "Maven install successful"'
     - 'mkdir -p ./jacoco-report'
     - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
