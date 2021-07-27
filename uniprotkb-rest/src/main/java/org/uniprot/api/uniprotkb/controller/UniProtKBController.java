@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -266,7 +267,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     @Tag(name = "uniprotkb")
     @RequestMapping(
             value = "/accessions",
-            method = {RequestMethod.GET, RequestMethod.POST},
+            method = {RequestMethod.GET},
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FF_MEDIA_TYPE_VALUE,
@@ -306,10 +307,69 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessions(
-            @Valid @RequestBody @ModelAttribute UniProtKBIdsSearchRequest accessionsRequest,
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessionsGet(
+            @Valid @ModelAttribute UniProtKBIdsSearchRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
+        return getByAccessions(accessionsRequest, request, response);
+    }
+
+    @Tag(name = "uniprotkb")
+    @RequestMapping(
+            value = "/accessions",
+            method = {RequestMethod.POST},
+            produces = {
+                    TSV_MEDIA_TYPE_VALUE,
+                    FF_MEDIA_TYPE_VALUE,
+                    LIST_MEDIA_TYPE_VALUE,
+                    APPLICATION_XML_VALUE,
+                    APPLICATION_JSON_VALUE,
+                    XLS_MEDIA_TYPE_VALUE,
+                    FASTA_MEDIA_TYPE_VALUE,
+                    GFF_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Get UniProtKB entries by a list of accessions.",
+            responses = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            array =
+                                            @ArraySchema(
+                                                    schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    UniProtKBEntry.class))),
+                                    @Content(
+                                            mediaType = APPLICATION_XML_VALUE,
+                                            array =
+                                            @ArraySchema(
+                                                    schema =
+                                                    @Schema(
+                                                            implementation = Entry.class,
+                                                            name = "entries"))),
+                                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                                    @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                            })
+            })
+    public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessionsPost(
+            @Valid
+            @NotNull(message = "request body must not be null")
+            @RequestBody(required = false)
+            UniProtKBIdsSearchRequest accessionsRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        return getByAccessions(accessionsRequest, request, response);
+    }
+
+    private ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessions(UniProtKBIdsSearchRequest accessionsRequest,
+                                                                                    HttpServletRequest request,
+                                                                                    HttpServletResponse response){
         QueryResult<UniProtKBEntry> result = entryService.getByIds(accessionsRequest);
         return super.getSearchResponse(
                 result,

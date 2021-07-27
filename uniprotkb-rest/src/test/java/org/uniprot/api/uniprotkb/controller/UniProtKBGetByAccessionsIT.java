@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,8 +18,10 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsControllerIT;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsSearchRequest;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
@@ -100,6 +105,9 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Autowired
     private UniProtKBFacetConfig facetConfig;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -339,5 +347,19 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return facetTupleStreamTemplate;
+    }
+
+    protected String getJsonString(IdsSearchRequest idsSearchRequest){
+        try {
+            return this.objectMapper.writeValueAsString(idsSearchRequest);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected IdsSearchRequest getIdsSearchRequest(){
+        UniProtKBIdsSearchRequest idsSearchRequest = new UniProtKBIdsSearchRequest();
+        idsSearchRequest.setAccessions(getCommaSeparatedIds());
+        return idsSearchRequest;
     }
 }

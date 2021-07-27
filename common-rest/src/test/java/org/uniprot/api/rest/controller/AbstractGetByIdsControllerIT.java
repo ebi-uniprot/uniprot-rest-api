@@ -35,6 +35,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 
 /**
  * @author sahmad
@@ -69,8 +70,8 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                 getMockMvc()
                         .perform(
                                 post(getGetByIdsPath())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param(getRequestParamName(), getCommaSeparatedIds())
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(getJsonString(getIdsSearchRequest()))
                                         .param("size", "10"));
 
         // then
@@ -560,6 +561,10 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     protected abstract ResultMatcher getSortedIdResultMatcher();
 
     protected abstract String getUnmatchedFacetFilter();
+
+    protected abstract String getJsonString(IdsSearchRequest idsSearchRequest);
+
+    protected abstract IdsSearchRequest getIdsSearchRequest();
 
     private void verifyResults(ResultActions response) throws Exception {
         for (ResultMatcher matcher : getResultsResultMatchers()) {
