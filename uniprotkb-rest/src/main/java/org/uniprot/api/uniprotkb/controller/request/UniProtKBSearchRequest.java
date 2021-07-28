@@ -49,16 +49,16 @@ public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements Sea
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(hidden = true)
+    @Parameter(description = "Used to return matched fields ")
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.invalid.matchedFields}")
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
-    private String showMatchedFields;
+    private String showSingleTermMatchedFields;
 
-    public boolean isShowMatchedFields() {
-        return Boolean.valueOf(showMatchedFields);
+    public boolean getShowSingleTermMatchedFields() {
+        return Boolean.valueOf(showSingleTermMatchedFields);
     }
 
     @Override

@@ -182,7 +182,7 @@ public class UniProtEntryService
             addIsoformFilter(solrRequest);
         }
 
-        if (uniProtRequest.isShowMatchedFields()) {
+        if (uniProtRequest.getShowSingleTermMatchedFields()) {
             solrRequest.setTermQuery(uniProtRequest.getQuery());
             List<String> termFields = new ArrayList<>(uniProtTermsConfig.getFields());
             solrRequest.setTermFields(termFields);

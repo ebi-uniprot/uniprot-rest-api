@@ -105,18 +105,15 @@ public class SolrRequestConverter {
                 ModifiableSolrParams solrQuery, String termQuery, List<String> termFields) {
             if (isSingleTerm(termQuery)) {
                 solrQuery.add(TERMS_LIST, termQuery.toLowerCase());
-            } else {
-                throw new InvalidRequestException(
-                        "Term information will only be returned for single value searches that do not specify a field.");
+
+                solrQuery.add(TERMS, "true");
+                solrQuery.add(DISTRIB, "true");
+                solrQuery.add(MINCOUNT, "1");
+
+                String[] termsFieldsArr = new String[termFields.size()];
+                termsFieldsArr = termFields.toArray(termsFieldsArr);
+                solrQuery.add(TERMS_FIELDS, termsFieldsArr);
             }
-
-            solrQuery.add(TERMS, "true");
-            solrQuery.add(DISTRIB, "true");
-            solrQuery.add(MINCOUNT, "1");
-
-            String[] termsFieldsArr = new String[termFields.size()];
-            termsFieldsArr = termFields.toArray(termsFieldsArr);
-            solrQuery.add(TERMS_FIELDS, termsFieldsArr);
         }
 
         static boolean isSingleTerm(String query) {

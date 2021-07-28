@@ -162,15 +162,24 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void tooLongQueryWithTermsRequestCausesException() {
+        void doNotAddTermParametersForPhrasalQueryTermRequest() {
             SolrRequest request =
                     SolrRequest.builder()
                             .query("too long")
                             .termQuery("too long")
                             .termField("field 1")
                             .build();
-            assertThrows(
-                    InvalidRequestException.class, () -> converter.toJsonQueryRequest(request));
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+            assertNotNull(solrQuery);
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
+
+            assertThat(queryParams.get("defType"), is("edismax"));
+            assertThat(queryParams.get("distrib"), nullValue());
+            assertThat(queryParams.get("terms"), nullValue());
+            assertThat(queryParams.get("terms.mincount"), nullValue());
+            assertThat(queryParams.get("terms.list"), nullValue());
+            assertThat(queryParams.get("terms.fl"), nullValue());
         }
 
         @Test

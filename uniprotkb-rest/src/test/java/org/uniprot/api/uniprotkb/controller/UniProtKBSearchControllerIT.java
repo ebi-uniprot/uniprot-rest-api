@@ -6,6 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
@@ -688,7 +689,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Test
-    void defaultSearchWithMatchedFields() throws Exception {
+    void defaultSingleTermShowSingleTermMatchedFieldsReturnMatchedFields() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -704,7 +705,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=Familial&fields=accession,gene_primary&showMatchedFields=true")
+                                                + "?query=Familial&fields=accession,gene_primary&showSingleTermMatchedFields=true")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -717,7 +718,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Test
-    void badDefaultSearchWithMatchedFields() throws Exception {
+    void notDefaultSearchWithMatchedFieldsDoesNotReturnMatchedFields() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -727,17 +728,37 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=gene:Fibroblast&fields=accession,gene_primary&showMatchedFields=true")
+                                                + "?query=gene:FGFR2&fields=accession,gene_primary&showSingleTermMatchedFields=true")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "Term information will only be returned for single value searches that do not specify a field")));
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(jsonPath("$.matchedFields").doesNotExist());
+    }
+
+    @Test
+    void defaultPhrasalSearchWithMatchedFieldsDoesNotReturnMatchedFields() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE
+                                                + "?query=Fibroblast growth&fields=accession,gene_primary&showSingleTermMatchedFields=true")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(jsonPath("$.matchedFields").doesNotExist());
     }
 
     @Test
@@ -752,7 +773,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=Familial&fields=accession,gene_primary&showMatchedFields=true")
+                                                + "?query=Familial&fields=accession,gene_primary&showSingleTermMatchedFields=true")
                                         .header(ACCEPT, APPLICATION_XML_VALUE));
 
         // then
