@@ -10,12 +10,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 @Constraint(validatedBy = ValidUniqueIdList.AccessionListValidator.class)
 @Target({ElementType.METHOD, ElementType.FIELD})
@@ -29,7 +26,8 @@ public @interface ValidUniqueIdList {
 
     Class<? extends Payload>[] payload() default {};
 
-    class AccessionListValidator implements ConstraintValidator<ValidUniqueIdList, String> {
+    class AccessionListValidator extends CommonIdsRequestValidator
+            implements ConstraintValidator<ValidUniqueIdList, String> {
 
         @Value("${ids.max.length}")
         private String maxLength;
@@ -44,55 +42,13 @@ public @interface ValidUniqueIdList {
 
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
-            boolean isValid = true;
-            if (Utils.notNullNotEmpty(value)) {
-                ConstraintValidatorContextImpl contextImpl =
-                        (ConstraintValidatorContextImpl) context;
-                // verify if id is valid.
-                String[] ids = value.split(",");
-                for (String id : ids) {
-                    if (!isIdValid(id)) {
-                        buildInvalidAccessionMessage(id, contextImpl);
-                        isValid = false;
-                    }
-                }
-                if (ids.length > getMaxLength()) {
-                    buildInvalidAccessionLengthMessage(contextImpl);
-                    isValid = false;
-                }
-                if (!isValid && contextImpl != null) {
-                    contextImpl.disableDefaultConstraintViolation();
-                }
+            boolean isValid =
+                    validateIdsAndPopulateErrorMessage(
+                            value, getMaxLength(), getDataType(), context);
+            if (!isValid && context != null) {
+                context.disableDefaultConstraintViolation();
             }
             return isValid;
-        }
-
-        private boolean isIdValid(String id) {
-            switch (getDataType()) {
-                case UNIPROTKB:
-                    return id.strip()
-                            .toUpperCase()
-                            .matches(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
-                case UNIPARC:
-                    return id.strip().toUpperCase().matches(FieldRegexConstants.UNIPARC_UPI_REGEX);
-                case UNIREF:
-                    return id.strip().matches(FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX);
-                default:
-                    throw new IllegalArgumentException("Unknown UniProtDataType " + this.dataType);
-            }
-        }
-
-        void buildInvalidAccessionMessage(
-                String accession, ConstraintValidatorContextImpl contextImpl) {
-            String errorMessage = "{ids.invalid.ids.value}";
-            contextImpl.addMessageParameter("0", accession.strip());
-            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
-        }
-
-        void buildInvalidAccessionLengthMessage(ConstraintValidatorContextImpl contextImpl) {
-            String errorMessage = "{ids.invalid.ids.size}";
-            contextImpl.addMessageParameter("0", getMaxLength());
-            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         int getMaxLength() {

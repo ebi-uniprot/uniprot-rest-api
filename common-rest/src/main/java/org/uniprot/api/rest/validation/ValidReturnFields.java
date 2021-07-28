@@ -13,7 +13,6 @@ import javax.validation.Payload;
 import lombok.extern.slf4j.Slf4j;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -40,7 +39,8 @@ public @interface ValidReturnFields {
     Class<? extends Payload>[] payload() default {};
 
     @Slf4j
-    class ReturnFieldsValidatorImpl implements ConstraintValidator<ValidReturnFields, String> {
+    class ReturnFieldsValidatorImpl extends CommonIdsRequestValidator
+            implements ConstraintValidator<ValidReturnFields, String> {
 
         private ReturnFieldConfig returnFieldConfig;
 
@@ -56,36 +56,16 @@ public @interface ValidReturnFields {
 
         @Override
         public boolean isValid(String value, ConstraintValidatorContext context) {
-            boolean isValid = true;
-            if (Utils.notNullNotEmpty(value)) {
-                ConstraintValidatorContextImpl contextImpl =
-                        (ConstraintValidatorContextImpl) context;
-                String[] fieldList = value.split("\\s*,\\s*");
-                for (String field : fieldList) {
-                    if (!hasValidReturnField(field)) {
-                        buildErrorMessage(field, contextImpl);
-                        isValid = false;
-                    }
-                }
-                if (!isValid) {
-                    disableDefaultErrorMessage(contextImpl);
-                }
+            boolean isValid = isValidReturnFields(value, this.returnFieldConfig, context);
+            ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
+            if (!isValid) {
+                disableDefaultErrorMessage(contextImpl);
             }
             return isValid;
         }
 
         public void disableDefaultErrorMessage(ConstraintValidatorContextImpl contextImpl) {
             contextImpl.disableDefaultConstraintViolation();
-        }
-
-        public void buildErrorMessage(String field, ConstraintValidatorContextImpl contextImpl) {
-            String errorMessage = "{search.invalid.return.field}";
-            contextImpl.addMessageParameter("0", field);
-            contextImpl.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
-        }
-
-        private boolean hasValidReturnField(String fieldName) {
-            return returnFieldConfig.returnFieldExists(fieldName);
         }
     }
 }
