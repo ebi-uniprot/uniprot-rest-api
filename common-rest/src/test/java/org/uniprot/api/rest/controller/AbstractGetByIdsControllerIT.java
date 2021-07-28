@@ -12,14 +12,13 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RECORDS;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -48,26 +47,6 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                 getMockMvc()
                         .perform(
                                 get(getGetByIdsPath())
-                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                        .param(getRequestParamName(), getCommaSeparatedIds())
-                                        .param("size", "10"));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(10)));
-        verifyResults(response);
-    }
-
-    @Test
-    void getByIdsPostSuccess() throws Exception {
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                post(getGetByIdsPath())
                                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                                         .param(getRequestParamName(), getCommaSeparatedIds())
                                         .param("size", "10"));
