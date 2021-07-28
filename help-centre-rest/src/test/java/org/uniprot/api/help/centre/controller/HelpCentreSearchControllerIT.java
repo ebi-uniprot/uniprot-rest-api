@@ -57,7 +57,7 @@ import org.uniprot.store.search.document.help.HelpDocument;
             HelpCentreSearchControllerIT.HelpCentreSearchContentTypeParamResolver.class,
             HelpCentreSearchControllerIT.HelpCentreSearchParameterResolver.class
         })
-public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private HelpCentreQueryRepository repository;
     @Autowired private HelpCentreFacetConfig facetConfig;
@@ -141,6 +141,66 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                                 "$.results[0].matches.content",
                                 contains(
                                         "content-<span class=\"match-highlight\">value</span>-clean 1")));
+    }
+
+    @Test
+    void searchReturnsTitleFirst() throws Exception {
+        saveEntry("1", "something else", "title is lovely", "category");
+        saveEntry("2", "title is lovely", "content", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "title")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results.*.id", contains("2", "1")));
+    }
+
+    @Test
+    void canFindPartialMatchInTitle() throws Exception {
+        saveEntry("1", "something else", "content contains a word in title", "category");
+        saveEntry("2", "title is lovely", "content", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "som")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.id", contains("1")));
+    }
+
+    @Test
+    void canFindPartialMatchesInContent() throws Exception {
+        saveEntry("1", "something else", "content has a word in title", "category");
+        saveEntry("2", "title is lovely", "content", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "con")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results.*.id", contains("2", "1")));
     }
 
     @Override
@@ -298,6 +358,20 @@ public class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControl
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
                         .categories(List.of("category-value", "category-value-" + i))
                         .build();
+        getStoreManager().saveDocs(getStoreType(), doc);
+    }
+
+    private void saveEntry(String id, String title, String content, String... categories) {
+        HelpDocument doc =
+                HelpDocument.builder()
+                        .id(id)
+                        .title(title)
+                        .content(content)
+                        .contentOriginal(content + "-original")
+                        .lastModified(new GregorianCalendar(2021, Calendar.JULY, 1).getTime())
+                        .categories(List.of(categories))
+                        .build();
+
         getStoreManager().saveDocs(getStoreType(), doc);
     }
 }
