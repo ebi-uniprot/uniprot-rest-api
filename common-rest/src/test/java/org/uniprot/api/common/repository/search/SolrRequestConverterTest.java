@@ -162,11 +162,11 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void doNotAddTermParametersForPhrasalQueryTermRequest() {
+        void doNotAddTermParametersForMultiWordQueryTermRequest() {
             SolrRequest request =
                     SolrRequest.builder()
-                            .query("too long")
-                            .termQuery("too long")
+                            .query("multi word")
+                            .termQuery("multi word")
                             .termField("field 1")
                             .build();
             JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);

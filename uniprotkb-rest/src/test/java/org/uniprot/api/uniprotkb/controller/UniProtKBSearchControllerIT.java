@@ -740,7 +740,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Test
-    void defaultPhrasalSearchWithMatchedFieldsDoesNotReturnMatchedFields() throws Exception {
+    void multiWordDefaultSearchWithMatchedFieldsDoesNotReturnMatchedFields() throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
