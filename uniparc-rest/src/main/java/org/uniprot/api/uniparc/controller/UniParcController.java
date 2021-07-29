@@ -43,7 +43,7 @@ import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.request.UniParcIdsDownloadRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
 import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
@@ -520,7 +520,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpisPost(
             @Valid @NotNull(message = "{download.required}") @RequestBody(required = false)
-                    UniParcIdsDownloadRequest idsSearchRequest,
+                    UniParcIdsPostRequest idsSearchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         return getByUpis(idsSearchRequest, request, response);

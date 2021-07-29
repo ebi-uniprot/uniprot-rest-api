@@ -45,7 +45,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsDownloadRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsPostRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
@@ -361,7 +361,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessionsPost(
             @Valid @NotNull(message = "{download.required}") @RequestBody(required = false)
-                    UniProtKBIdsDownloadRequest accessionsRequest,
+                    UniProtKBIdsPostRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         return getByAccessions(accessionsRequest, request, response);

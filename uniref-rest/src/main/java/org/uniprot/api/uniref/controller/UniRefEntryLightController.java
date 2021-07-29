@@ -42,7 +42,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniref.request.UniRefIdsDownloadRequest;
+import org.uniprot.api.uniref.request.UniRefIdsPostRequest;
 import org.uniprot.api.uniref.request.UniRefIdsSearchRequest;
 import org.uniprot.api.uniref.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.request.UniRefStreamRequest;
@@ -319,7 +319,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIdsPost(
             @Valid @NotNull(message = "{download.required}") @RequestBody(required = false)
-                    UniRefIdsDownloadRequest idsRequest,
+                    UniRefIdsPostRequest idsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
         return getByIds(idsRequest, request, response);

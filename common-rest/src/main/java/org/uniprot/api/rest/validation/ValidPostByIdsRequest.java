@@ -25,10 +25,10 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
  * @author sahmad
  * @created 26/07/2021
  */
-@Constraint(validatedBy = ValidDownloadByIdsRequest.AccessionListValidator.class)
+@Constraint(validatedBy = ValidPostByIdsRequest.PostByIdsRequestValidator.class)
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidDownloadByIdsRequest {
+public @interface ValidPostByIdsRequest {
     String message() default "invalid ids download request";
 
     String accessions() default "accessions";
@@ -44,8 +44,8 @@ public @interface ValidDownloadByIdsRequest {
     Class<? extends Payload>[] payload() default {};
 
     @Slf4j
-    class AccessionListValidator extends CommonIdsRequestValidator
-            implements ConstraintValidator<ValidDownloadByIdsRequest, Object> {
+    class PostByIdsRequestValidator extends CommonIdsRequestValidator
+            implements ConstraintValidator<ValidPostByIdsRequest, Object> {
 
         @Value("${ids.max.download.length}")
         private String maxDownloadLength;
@@ -59,7 +59,7 @@ public @interface ValidDownloadByIdsRequest {
         private ReturnFieldConfig returnFieldConfig;
 
         @Override
-        public void initialize(ValidDownloadByIdsRequest constraintAnnotation) {
+        public void initialize(ValidPostByIdsRequest constraintAnnotation) {
             this.uniProtDataType = constraintAnnotation.uniProtDataType();
             this.download = constraintAnnotation.download();
             this.accessions = constraintAnnotation.accessions();
@@ -134,11 +134,6 @@ public @interface ValidDownloadByIdsRequest {
         void buildInvalidDownloadValueMessage(ConstraintValidatorContext context) {
             String errorMessage = "{search.uniprot.invalid.download.only}";
             context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
-        }
-
-        void buildEmptyAccessionMessage(ConstraintValidatorContext context) {
-            context.buildConstraintViolationWithTemplate("{search.required}")
-                    .addConstraintViolation();
         }
 
         int getMaxDownloadLength() {

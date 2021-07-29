@@ -1,24 +1,25 @@
-package org.uniprot.api.rest.validation;
+package org.uniprot.api.uniparc.request;
 
-import lombok.Builder;
 import lombok.Data;
 
 import org.uniprot.api.rest.request.IdsSearchRequest;
+import org.uniprot.api.rest.validation.ValidPostByIdsRequest;
+import org.uniprot.store.config.UniProtDataType;
 
 /**
  * @author sahmad
- * @created 26/07/2021
+ * @created 28/07/2021
  */
 @Data
-@Builder
-public class FakeIdsDownloadRequest implements IdsSearchRequest {
-    private String accessions;
+@ValidPostByIdsRequest(accessions = "upis", uniProtDataType = UniProtDataType.UNIPARC)
+public class UniParcIdsPostRequest implements IdsSearchRequest {
+    private String upis;
     private String fields;
     private String download;
     private Integer size;
 
     public String getCommaSeparatedIds() {
-        return this.accessions;
+        return this.upis;
     }
 
     @Override

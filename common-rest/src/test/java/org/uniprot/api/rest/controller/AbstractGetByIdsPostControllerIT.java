@@ -1,7 +1,20 @@
 package org.uniprot.api.rest.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,25 +29,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RECORDS;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author sahmad
@@ -109,85 +105,6 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
     }
 
     @Test
-    void downloadByIdsWithPagination() throws Exception {
-        IdsSearchRequest idsSearchRequest = getIdsDownloadWithFieldsAndSizeRequest();
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                post(getGetByIdsPath())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(getJsonString(idsSearchRequest)));
-
-        // then first page
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().exists("Content-Disposition"))
-                .andExpect(header().string(X_TOTAL_RECORDS, "10"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("size=4")))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
-                .andExpect(jsonPath("$.results.size()", is(idsSearchRequest.getSize())));
-
-        // verify first page results
-        for (ResultMatcher matcher : getFirstPageResultMatchers()) {
-            response.andExpect(matcher);
-        }
-        String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
-        assertThat(linkHeader, notNullValue());
-        String cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
-        // when 2nd page
-        idsSearchRequest.setCursor(cursor);
-        response =
-                getMockMvc()
-                        .perform(
-                                post(getGetByIdsPath())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(getJsonString(idsSearchRequest)));
-
-        // then 2nd page
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().exists("Content-Disposition"))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "10"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("size=4")))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
-                .andExpect(jsonPath("$.results.size()", is(idsSearchRequest.getSize())));
-        for (ResultMatcher matcher : getSecondPageResultMatchers()) {
-            response.andExpect(matcher);
-        }
-
-        linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
-        assertThat(linkHeader, notNullValue());
-        cursor = linkHeader.split("\\?")[1].split("&")[0].split("=")[1];
-
-        // when last page
-        idsSearchRequest.setCursor(cursor);
-        response =
-                getMockMvc()
-                        .perform(
-                                post(getGetByIdsPath())
-                                        .contentType(MediaType.APPLICATION_JSON)
-                                        .content(getJsonString(idsSearchRequest)));
-
-        // then last page
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().exists("Content-Disposition"))
-                .andExpect(header().string(X_TOTAL_RECORDS, "10"))
-                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
-                .andExpect(jsonPath("$.results.size()", is(2)));
-
-        for (ResultMatcher matcher : getThirdPageResultMatchers()) {
-            response.andExpect(matcher);
-        }
-    }
-
-    @Test
     void getByIdsBadRequestFailure() throws Exception {
         // when
         ResultActions response =
@@ -242,7 +159,7 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
     }
 
     @Test
-    void getByIdsWithPassedFacetsIgnoredPostSuccess() throws Exception {
+    void getByIdsWithDownloadTruePassedFacetsIgnoredPostSuccess() throws Exception {
         // when
         ResultActions response =
                 getMockMvc()
@@ -261,7 +178,7 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
     }
 
     @Test
-    void getByIdsWithPassedFacetFilterIgnoredPostSuccess() throws Exception {
+    void getByIdsWithDownloadTruePassedFacetFilterIgnoredPostSuccess() throws Exception {
         // when
         ResultActions response =
                 getMockMvc()
@@ -279,6 +196,27 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
                 .andExpect(jsonPath("$.facets").doesNotExist());
     }
 
+    @Test
+    void getByIdsDownloadFalseFailure() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                post(getGetByIdsPath())
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content("{\"download\":\"false\"}"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(getErrorMessagesForDownloadFalse())));
+    }
+
+    protected abstract String[] getErrorMessagesForDownloadFalse();
+
     protected abstract String getJsonRequestBodyWithFacets();
 
     protected abstract String getJsonRequestBodyWithFacetFilter();
@@ -288,8 +226,6 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
     protected abstract IdsSearchRequest getIdsDownloadWithFieldsRequest();
 
     protected abstract String getCommaSeparatedIds();
-
-    protected abstract IdsSearchRequest getIdsDownloadWithFieldsAndSizeRequest();
 
     protected abstract List<ResultMatcher> getResultsResultMatchers();
 
@@ -302,12 +238,6 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
     protected abstract String getCommaSeparatedReturnFields();
 
     protected abstract List<ResultMatcher> getFieldsResultMatchers();
-
-    protected abstract List<ResultMatcher> getFirstPageResultMatchers();
-
-    protected abstract List<ResultMatcher> getSecondPageResultMatchers();
-
-    protected abstract List<ResultMatcher> getThirdPageResultMatchers();
 
     protected abstract String[] getErrorMessages();
 

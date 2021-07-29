@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import lombok.Data;
 
 import org.uniprot.api.rest.request.IdsSearchRequest;
-import org.uniprot.api.rest.validation.ValidDownloadByIdsRequest;
+import org.uniprot.api.rest.validation.ValidPostByIdsRequest;
 import org.uniprot.store.config.UniProtDataType;
 
 /**
@@ -14,13 +14,12 @@ import org.uniprot.store.config.UniProtDataType;
  * @created 28/07/2021
  */
 @Data
-@ValidDownloadByIdsRequest(accessions = "ids", uniProtDataType = UniProtDataType.UNIREF)
-public class UniRefIdsDownloadRequest implements IdsSearchRequest {
+@ValidPostByIdsRequest(accessions = "ids", uniProtDataType = UniProtDataType.UNIREF)
+public class UniRefIdsPostRequest implements IdsSearchRequest {
     private String ids;
     private String fields;
     private String download;
     private Integer size;
-    private String cursor;
 
     public String getCommaSeparatedIds() {
         return this.ids;
@@ -32,7 +31,17 @@ public class UniRefIdsDownloadRequest implements IdsSearchRequest {
     }
 
     @Override
+    public void setCursor(String cursor) {
+        // do nothing
+    }
+
+    @Override
     public String getFacets() {
+        return null;
+    }
+
+    @Override
+    public String getCursor() {
         return null;
     }
 

@@ -27,7 +27,7 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsPostControllerIT;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
-import org.uniprot.api.uniparc.request.UniParcIdsDownloadRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
@@ -95,7 +95,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
 
     @Override
     protected IdsSearchRequest getInvalidDownloadRequest() {
-        UniParcIdsDownloadRequest idsSearchRequest = new UniParcIdsDownloadRequest();
+        UniParcIdsPostRequest idsSearchRequest = new UniParcIdsPostRequest();
         idsSearchRequest.setUpis(getCommaSeparatedIds() + ",INVALID , INVALID2");
         idsSearchRequest.setDownload("INVALID");
         idsSearchRequest.setFields("invalid, invalid1");
@@ -103,8 +103,16 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     }
 
     @Override
+    protected String[] getErrorMessagesForDownloadFalse() {
+        return new String[] {
+            "'upis' is a required parameter",
+            "The 'download' parameter has invalid format. It should set to true."
+        };
+    }
+
+    @Override
     protected IdsSearchRequest getIdsDownloadRequest() {
-        UniParcIdsDownloadRequest idsSearchRequest = new UniParcIdsDownloadRequest();
+        UniParcIdsPostRequest idsSearchRequest = new UniParcIdsPostRequest();
         idsSearchRequest.setUpis(getCommaSeparatedIds());
         idsSearchRequest.setDownload("true");
         return idsSearchRequest;
@@ -112,7 +120,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
 
     @Override
     protected IdsSearchRequest getIdsDownloadWithFieldsRequest() {
-        UniParcIdsDownloadRequest idsSearchRequest = new UniParcIdsDownloadRequest();
+        UniParcIdsPostRequest idsSearchRequest = new UniParcIdsPostRequest();
         idsSearchRequest.setUpis(getCommaSeparatedIds());
         idsSearchRequest.setDownload("true");
         idsSearchRequest.setFields(getCommaSeparatedReturnFields());
@@ -122,16 +130,6 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     @Override
     protected String getCommaSeparatedIds() {
         return TEST_IDS;
-    }
-
-    @Override
-    protected IdsSearchRequest getIdsDownloadWithFieldsAndSizeRequest() {
-        UniParcIdsDownloadRequest idsSearchRequest = new UniParcIdsDownloadRequest();
-        idsSearchRequest.setUpis(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
-        idsSearchRequest.setFields(getCommaSeparatedReturnFields());
-        idsSearchRequest.setSize(4);
-        return idsSearchRequest;
     }
 
     @Override
@@ -176,33 +174,6 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         ResultMatcher rm5 = jsonPath("$.results.*.sequenceFeatures.*.database").exists();
         ResultMatcher rm6 = jsonPath("$.results[0].sequenceFeatures[0].database", is("CDD"));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6);
-    }
-
-    @Override
-    protected List<ResultMatcher> getFirstPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.uniParcId",
-                        contains(List.of(TEST_IDS_ARRAY).subList(0, 4).toArray()));
-        return List.of(rm1);
-    }
-
-    @Override
-    protected List<ResultMatcher> getSecondPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.uniParcId",
-                        contains(List.of(TEST_IDS_ARRAY).subList(4, 8).toArray()));
-        return List.of(rm1);
-    }
-
-    @Override
-    protected List<ResultMatcher> getThirdPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.uniParcId",
-                        contains(List.of(TEST_IDS_ARRAY).subList(8, 10).toArray()));
-        return List.of(rm1);
     }
 
     @Override
