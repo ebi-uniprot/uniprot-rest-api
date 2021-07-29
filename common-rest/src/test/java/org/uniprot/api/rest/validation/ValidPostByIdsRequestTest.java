@@ -19,14 +19,12 @@ import org.uniprot.store.config.UniProtDataType;
  * @author sahmad
  * @created 26/07/2021
  */
-class ValidIdsDownloadRequestTest {
+class ValidPostByIdsRequestTest {
 
     @Test
     void isValidWithSingleValueWithEmptyDownloadReturnTrue() {
-        ValidIdsDownloadRequestTest.FakeValidAccessionListValidator validator =
-                new ValidIdsDownloadRequestTest.FakeValidAccessionListValidator();
-        FakeIdsDownloadRequest.FakeIdsDownloadRequestBuilder builder =
-                FakeIdsDownloadRequest.builder();
+        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
+        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
         builder.accessions("P12345");
         boolean result = validator.isValid(builder.build(), null);
         assertFalse(result);
@@ -37,10 +35,8 @@ class ValidIdsDownloadRequestTest {
 
     @Test
     void isValidWithDownloadFalse() {
-        FakeIdsDownloadRequest.FakeIdsDownloadRequestBuilder builder =
-                FakeIdsDownloadRequest.builder();
-        ValidIdsDownloadRequestTest.FakeValidAccessionListValidator validator =
-                new ValidIdsDownloadRequestTest.FakeValidAccessionListValidator();
+        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
+        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
         builder.download("tru");
         boolean result = validator.isValid(builder.build(), null);
         assertFalse(result);
@@ -52,10 +48,8 @@ class ValidIdsDownloadRequestTest {
 
     @Test
     void isValidWithEmptyAccessionsFalse() {
-        FakeIdsDownloadRequest.FakeIdsDownloadRequestBuilder builder =
-                FakeIdsDownloadRequest.builder();
-        ValidIdsDownloadRequestTest.FakeValidAccessionListValidator validator =
-                new ValidIdsDownloadRequestTest.FakeValidAccessionListValidator();
+        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
+        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
         builder.download("true");
         boolean result = validator.isValid(builder.build(), null);
         assertFalse(result);
@@ -66,10 +60,8 @@ class ValidIdsDownloadRequestTest {
 
     @Test
     void isValidWithSingleValueReturnTrue() {
-        ValidIdsDownloadRequestTest.FakeValidAccessionListValidator validator =
-                new ValidIdsDownloadRequestTest.FakeValidAccessionListValidator();
-        FakeIdsDownloadRequest.FakeIdsDownloadRequestBuilder builder =
-                FakeIdsDownloadRequest.builder();
+        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
+        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
         builder.accessions("P12345").download("TRUE");
         boolean result = validator.isValid(builder.build(), null);
         assertTrue(result);
@@ -77,10 +69,8 @@ class ValidIdsDownloadRequestTest {
 
     @Test
     void isValidWithSingleValueWithFieldsReturnTrue() {
-        ValidIdsDownloadRequestTest.FakeValidAccessionListValidator validator =
-                new ValidIdsDownloadRequestTest.FakeValidAccessionListValidator();
-        FakeIdsDownloadRequest.FakeIdsDownloadRequestBuilder builder =
-                FakeIdsDownloadRequest.builder();
+        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
+        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
         builder.accessions("P12345,B6J853").download("TRUE").fields("gene_names,accession");
         boolean result = validator.isValid(builder.build(), null);
         assertTrue(result);
@@ -88,10 +78,8 @@ class ValidIdsDownloadRequestTest {
 
     @Test
     void isValidFieldsReturnFalse() {
-        ValidIdsDownloadRequestTest.FakeValidAccessionListValidator validator =
-                new ValidIdsDownloadRequestTest.FakeValidAccessionListValidator();
-        FakeIdsDownloadRequest.FakeIdsDownloadRequestBuilder builder =
-                FakeIdsDownloadRequest.builder();
+        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
+        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
         builder.accessions("P12345").download("TRUE").fields("field1,field2,field3");
         boolean result = validator.isValid(builder.build(), null);
         assertFalse(result);
@@ -107,10 +95,8 @@ class ValidIdsDownloadRequestTest {
 
     @Test
     void inValidMaxLengthReturnFalse() {
-        ValidIdsDownloadRequestTest.FakeValidAccessionListValidator validator =
-                new ValidIdsDownloadRequestTest.FakeValidAccessionListValidator();
-        FakeIdsDownloadRequest.FakeIdsDownloadRequestBuilder builder =
-                FakeIdsDownloadRequest.builder();
+        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
+        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
         boolean result =
                 validator.isValid(
                         builder.accessions("P10000,P20000, P30000, P40000, P50000, P60000")
@@ -123,25 +109,24 @@ class ValidIdsDownloadRequestTest {
         assertTrue(validator.errorList.contains("invalidLength"));
     }
 
-    static class FakeValidAccessionListValidator
-            extends ValidDownloadByIdsRequest.AccessionListValidator {
+    static class FakeValidPostByIdsRequestValidator
+            extends ValidPostByIdsRequest.PostByIdsRequestValidator {
 
         final List<String> errorList = new ArrayList<>();
         final UniProtDataType dataType;
 
-        FakeValidAccessionListValidator() {
+        FakeValidPostByIdsRequestValidator() {
             this(UniProtDataType.UNIPROTKB);
         }
 
-        FakeValidAccessionListValidator(UniProtDataType dataType) {
+        FakeValidPostByIdsRequestValidator(UniProtDataType dataType) {
             this.dataType = dataType;
-            ValidDownloadByIdsRequest validIdsRequest = getMockedValidIdsRequest();
+            ValidPostByIdsRequest validIdsRequest = getMockedValidIdsRequest();
             this.initialize(validIdsRequest);
         }
 
-        private ValidDownloadByIdsRequest getMockedValidIdsRequest() {
-            ValidDownloadByIdsRequest validIdsRequest =
-                    Mockito.mock(ValidDownloadByIdsRequest.class);
+        private ValidPostByIdsRequest getMockedValidIdsRequest() {
+            ValidPostByIdsRequest validIdsRequest = Mockito.mock(ValidPostByIdsRequest.class);
             Mockito.when(validIdsRequest.accessions()).thenReturn("accessions");
             Mockito.when(validIdsRequest.download()).thenReturn("download");
             Mockito.when(validIdsRequest.fields()).thenReturn("fields");
@@ -158,11 +143,6 @@ class ValidIdsDownloadRequestTest {
         void buildInvalidAccessionLengthMessage(
                 ConstraintValidatorContextImpl contextImpl, int length) {
             errorList.add("invalidLength");
-        }
-
-        @Override
-        void buildEmptyAccessionMessage(ConstraintValidatorContext context) {
-            errorList.add("ids cannot be empty or null.");
         }
 
         @Override

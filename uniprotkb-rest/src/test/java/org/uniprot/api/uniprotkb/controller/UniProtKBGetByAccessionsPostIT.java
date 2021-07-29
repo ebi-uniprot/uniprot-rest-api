@@ -31,7 +31,7 @@ import org.uniprot.api.rest.controller.AbstractGetByIdsPostControllerIT;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsDownloadRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsPostRequest;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
@@ -117,26 +117,16 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
 
     @Override
     protected IdsSearchRequest getIdsDownloadWithFieldsRequest() {
-        UniProtKBIdsDownloadRequest idsSearchRequest = new UniProtKBIdsDownloadRequest();
+        UniProtKBIdsPostRequest idsSearchRequest = new UniProtKBIdsPostRequest();
         idsSearchRequest.setAccessions(getCommaSeparatedIds());
         idsSearchRequest.setDownload("true");
         idsSearchRequest.setFields(getCommaSeparatedReturnFields());
-        return idsSearchRequest;
-    }
-
-    @Override
-    protected IdsSearchRequest getIdsDownloadWithFieldsAndSizeRequest() {
-        UniProtKBIdsDownloadRequest idsSearchRequest = new UniProtKBIdsDownloadRequest();
-        idsSearchRequest.setAccessions(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
-        idsSearchRequest.setFields(getCommaSeparatedReturnFields());
-        idsSearchRequest.setSize(4);
         return idsSearchRequest;
     }
 
     @Override
     protected IdsSearchRequest getInvalidDownloadRequest() {
-        UniProtKBIdsDownloadRequest idsSearchRequest = new UniProtKBIdsDownloadRequest();
+        UniProtKBIdsPostRequest idsSearchRequest = new UniProtKBIdsPostRequest();
         idsSearchRequest.setAccessions(getCommaSeparatedIds() + ",INVALID , INVALID2");
         idsSearchRequest.setDownload("INVALID");
         idsSearchRequest.setFields("invalid, invalid1");
@@ -144,8 +134,16 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
     }
 
     @Override
+    protected String[] getErrorMessagesForDownloadFalse() {
+        return new String[] {
+            "'accessions' is a required parameter",
+            "The 'download' parameter has invalid format. It should set to true."
+        };
+    }
+
+    @Override
     protected IdsSearchRequest getIdsDownloadRequest() {
-        UniProtKBIdsDownloadRequest idsSearchRequest = new UniProtKBIdsDownloadRequest();
+        UniProtKBIdsPostRequest idsSearchRequest = new UniProtKBIdsPostRequest();
         idsSearchRequest.setAccessions(getCommaSeparatedIds());
         idsSearchRequest.setDownload("true");
         return idsSearchRequest;
@@ -203,34 +201,6 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
                         "$.results[0].organism.lineage",
                         equalTo(TEMPLATE_ENTRY.getOrganism().getLineages()));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8, rm9);
-    }
-
-    @Override
-    protected List<ResultMatcher> getFirstPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.primaryAccession",
-                        contains(List.of(TEST_IDS_ARRAY).subList(0, 4).toArray()));
-
-        return List.of(rm1);
-    }
-
-    @Override
-    protected List<ResultMatcher> getSecondPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.primaryAccession",
-                        contains(List.of(TEST_IDS_ARRAY).subList(4, 8).toArray()));
-        return List.of(rm1);
-    }
-
-    @Override
-    protected List<ResultMatcher> getThirdPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.primaryAccession",
-                        contains(List.of(TEST_IDS_ARRAY).subList(8, 10).toArray()));
-        return List.of(rm1);
     }
 
     @Override

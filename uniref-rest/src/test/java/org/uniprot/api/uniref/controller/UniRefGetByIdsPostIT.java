@@ -23,7 +23,7 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsPostControllerIT;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
-import org.uniprot.api.uniref.request.UniRefIdsDownloadRequest;
+import org.uniprot.api.uniref.request.UniRefIdsPostRequest;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
@@ -112,7 +112,7 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
 
     @Override
     protected IdsSearchRequest getInvalidDownloadRequest() {
-        UniRefIdsDownloadRequest idsSearchRequest = new UniRefIdsDownloadRequest();
+        UniRefIdsPostRequest idsSearchRequest = new UniRefIdsPostRequest();
         idsSearchRequest.setIds(getCommaSeparatedIds() + ",INVALID , INVALID2");
         idsSearchRequest.setDownload("INVALID");
         idsSearchRequest.setFields("invalid, invalid1");
@@ -120,8 +120,16 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
     }
 
     @Override
+    protected String[] getErrorMessagesForDownloadFalse() {
+        return new String[] {
+            "'ids' is a required parameter",
+            "The 'download' parameter has invalid format. It should set to true."
+        };
+    }
+
+    @Override
     protected IdsSearchRequest getIdsDownloadRequest() {
-        UniRefIdsDownloadRequest idsSearchRequest = new UniRefIdsDownloadRequest();
+        UniRefIdsPostRequest idsSearchRequest = new UniRefIdsPostRequest();
         idsSearchRequest.setIds(getCommaSeparatedIds());
         idsSearchRequest.setDownload("true");
         return idsSearchRequest;
@@ -129,7 +137,7 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
 
     @Override
     protected IdsSearchRequest getIdsDownloadWithFieldsRequest() {
-        UniRefIdsDownloadRequest idsSearchRequest = new UniRefIdsDownloadRequest();
+        UniRefIdsPostRequest idsSearchRequest = new UniRefIdsPostRequest();
         idsSearchRequest.setIds(getCommaSeparatedIds());
         idsSearchRequest.setDownload("true");
         idsSearchRequest.setFields(getCommaSeparatedReturnFields());
@@ -139,16 +147,6 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
     @Override
     protected String getCommaSeparatedIds() {
         return TEST_IDS;
-    }
-
-    @Override
-    protected IdsSearchRequest getIdsDownloadWithFieldsAndSizeRequest() {
-        UniRefIdsDownloadRequest idsSearchRequest = new UniRefIdsDownloadRequest();
-        idsSearchRequest.setIds(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
-        idsSearchRequest.setFields(getCommaSeparatedReturnFields());
-        idsSearchRequest.setSize(4);
-        return idsSearchRequest;
     }
 
     @Override
@@ -207,33 +205,6 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
         ResultMatcher rm12 = jsonPath("$.results[0].organisms").isArray();
         ResultMatcher rm13 = jsonPath("$.results[0].goTerms").doesNotExist();
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8, rm9, rm10, rm11, rm12, rm13);
-    }
-
-    @Override
-    protected List<ResultMatcher> getFirstPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.id",
-                        contains(List.of(TEST_IDS_ARRAY).subList(0, 4).toArray()));
-        return List.of(rm1);
-    }
-
-    @Override
-    protected List<ResultMatcher> getSecondPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.id",
-                        contains(List.of(TEST_IDS_ARRAY).subList(4, 8).toArray()));
-        return List.of(rm1);
-    }
-
-    @Override
-    protected List<ResultMatcher> getThirdPageResultMatchers() {
-        ResultMatcher rm1 =
-                jsonPath(
-                        "$.results.*.id",
-                        contains(List.of(TEST_IDS_ARRAY).subList(8, 10).toArray()));
-        return List.of(rm1);
     }
 
     @Override
