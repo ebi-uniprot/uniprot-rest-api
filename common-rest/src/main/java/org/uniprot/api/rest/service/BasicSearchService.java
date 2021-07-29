@@ -1,10 +1,5 @@
 package org.uniprot.api.rest.service;
 
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -23,6 +18,11 @@ import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.Document;
+
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @param <D> the type of the input to the class. a type of Document
@@ -98,7 +98,13 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
         Stream<R> converted = results.getContent().map(entryConverter).filter(Objects::nonNull);
-        return QueryResult.of(converted, results.getPage(), results.getFacets());
+        return QueryResult.of(
+                converted,
+                results.getPage(),
+                results.getFacets(),
+                null,
+                null,
+                results.getSuggestions());
     }
 
     public Stream<R> stream(StreamRequest request) {

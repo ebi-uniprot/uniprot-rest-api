@@ -108,6 +108,7 @@ public abstract class BasicSearchController<T> {
         context.setFacets(result.getFacets());
         context.setFileType(getBestFileTypeFromRequest(request));
         context.setMatchedFields(result.getMatchedFields());
+        context.setSuggestions(result.getSuggestions());
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             Stream<String> accList = result.getContent().map(this::getEntityId);
             context.setEntityIds(accList);

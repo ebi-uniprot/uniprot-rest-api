@@ -203,6 +203,60 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.id", contains("2", "1")));
     }
 
+    @Test
+    void suggestionGivenForSingleWordQuery() throws Exception {
+        saveEntry("id1", "title", "content 1", "category");
+        saveEntry("id2", "ball", "content 2", "category");
+        saveEntry("id3", "ball", "content 3", "category");
+        saveEntry("id4", "bill", "content 4", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "bell")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.suggestions.size()", is(1)))
+                .andExpect(jsonPath("$.suggestions[0].original", is("bell")))
+                .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains("ball", "bill")))
+                .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(2, 1)));
+    }
+
+    // TODO: 29/07/2021
+    @Test
+    void singleSuggestionGivenForMultiWordQuery() {}
+
+    // TODO: 29/07/2021
+    @Test
+    void multipleSuggestionsGivenForMultiWordQuery() {}
+
+    @Test
+    void suggestionNotGivenIfNotRequired() throws Exception {
+        saveEntry("1", "title", "content", "category");
+        saveEntry("2", "ball", "content", "category");
+        saveEntry("3", "bell", "content", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "bell")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.id", contains("3")));
+    }
+
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());

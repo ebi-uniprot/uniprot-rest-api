@@ -66,6 +66,8 @@ public class SolrRequestConverter {
             setQueryFields(solrQuery, request.getQueryConfig());
         }
 
+        solrQuery.add("spellcheck", "true");
+
         JsonQueryRequest result = new JsonQueryRequest(solrQuery);
         setSort(result, request.getSorts());
         if (!request.getFacets().isEmpty()) {
