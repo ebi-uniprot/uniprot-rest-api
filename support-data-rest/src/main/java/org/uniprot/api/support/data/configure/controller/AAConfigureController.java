@@ -17,11 +17,15 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author sahmad
  * @created 29/07/2021
  */
+@Tag(
+        name = "Configuration",
+        description = "These services provide configuration data used in the UniProt website")
 @RestController
 @RequestMapping("/configure")
 public class AAConfigureController {
