@@ -14,11 +14,14 @@ import org.uniprot.api.rest.request.IdsSearchRequest;
 public class FakeIdsPostRequest implements IdsSearchRequest {
     private String accessions;
     private String fields;
-    private String download;
-    private Integer size;
 
     public String getCommaSeparatedIds() {
         return this.accessions;
+    }
+
+    @Override
+    public String getDownload() {
+        return null;
     }
 
     @Override
@@ -39,5 +42,15 @@ public class FakeIdsPostRequest implements IdsSearchRequest {
     @Override
     public String getCursor() {
         return null;
+    }
+
+    @Override
+    public Integer getSize() {
+        return null;
+    }
+
+    @Override
+    public void setSize(Integer size) {
+
     }
 }

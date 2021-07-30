@@ -25,7 +25,6 @@ class ValidPostByIdsRequestTest {
     void isValidWithEmptyAccessionsFalse() {
         FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
         FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
-        builder.download("true");
         boolean result = validator.isValid(builder.build(), null);
         assertFalse(result);
         assertNotNull(validator.errorList);
@@ -37,7 +36,7 @@ class ValidPostByIdsRequestTest {
     void isValidWithSingleValueReturnTrue() {
         FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
         FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
-        builder.accessions("P12345").download("TRUE");
+        builder.accessions("P12345");
         boolean result = validator.isValid(builder.build(), null);
         assertTrue(result);
     }
@@ -46,7 +45,7 @@ class ValidPostByIdsRequestTest {
     void isValidWithSingleValueWithFieldsReturnTrue() {
         FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
         FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
-        builder.accessions("P12345,B6J853").download("TRUE").fields("gene_names,accession");
+        builder.accessions("P12345,B6J853").fields("gene_names,accession");
         boolean result = validator.isValid(builder.build(), null);
         assertTrue(result);
     }
@@ -55,7 +54,7 @@ class ValidPostByIdsRequestTest {
     void isValidFieldsReturnFalse() {
         FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
         FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
-        builder.accessions("P12345").download("TRUE").fields("field1,field2,field3");
+        builder.accessions("P12345").fields("field1,field2,field3");
         boolean result = validator.isValid(builder.build(), null);
         assertFalse(result);
         assertNotNull(validator.errorList);
@@ -75,7 +74,6 @@ class ValidPostByIdsRequestTest {
         boolean result =
                 validator.isValid(
                         builder.accessions("P10000,P20000, P30000, P40000, P50000, P60000")
-                                .download("true")
                                 .build(),
                         null);
         assertFalse(result);
