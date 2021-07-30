@@ -5,6 +5,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.*;
@@ -228,13 +229,59 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(2, 1)));
     }
 
-    // TODO: 29/07/2021
     @Test
-    void singleSuggestionGivenForMultiWordQuery() {}
+    void singleSuggestionGivenForMultiWordQuery() throws Exception {
+        saveEntry("id1", "title", "content 1", "category");
+        saveEntry("id2", "protein ball", "content 2", "category");
+        saveEntry("id3", "protein ball", "content 3", "category");
+        saveEntry("id4", "protein bill", "content 4", "category");
 
-    // TODO: 29/07/2021
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "protein bell")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.suggestions.size()", is(1)))
+                .andExpect(jsonPath("$.suggestions[0].original", is("bell")))
+                .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains("ball", "bill")))
+                .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(2, 1)));
+    }
+
     @Test
-    void multipleSuggestionsGivenForMultiWordQuery() {}
+    void multipleSuggestionsGivenForMultiWordQuery() throws Exception {
+        saveEntry("id1", "title", "content 1", "category");
+        saveEntry("id2", "goat cabbage protein ball", "content 2", "category");
+        saveEntry("id3", "rigorous protein ball", "content 3", "category");
+        saveEntry("id4", "pink fluffy protein bill", "content 4", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "protin bell")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.suggestions.size()", is(2)))
+                .andExpect(jsonPath("$.suggestions[0].original", is("protin")))
+                .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains("protein")))
+                .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(3)))
+                .andExpect(jsonPath("$.suggestions[1].original", is("bell")))
+                .andExpect(jsonPath("$.suggestions[1].alternatives[*].term", contains("ball", "bill")))
+                .andExpect(jsonPath("$.suggestions[1].alternatives[*].count", contains(2, 1)));
+
+    }
 
     @Test
     void suggestionNotGivenIfNotRequired() throws Exception {
