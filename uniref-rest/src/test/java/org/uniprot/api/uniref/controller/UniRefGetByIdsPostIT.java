@@ -114,24 +114,19 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
     protected IdsSearchRequest getInvalidDownloadRequest() {
         UniRefIdsPostRequest idsSearchRequest = new UniRefIdsPostRequest();
         idsSearchRequest.setIds(getCommaSeparatedIds() + ",INVALID , INVALID2");
-        idsSearchRequest.setDownload("INVALID");
         idsSearchRequest.setFields("invalid, invalid1");
         return idsSearchRequest;
     }
 
     @Override
-    protected String[] getErrorMessagesForDownloadFalse() {
-        return new String[] {
-            "'ids' is a required parameter",
-            "The 'download' parameter has invalid format. It should set to true."
-        };
+    protected String[] getErrorMessage() {
+        return new String[] {"'ids' is a required parameter"};
     }
 
     @Override
     protected IdsSearchRequest getIdsDownloadRequest() {
         UniRefIdsPostRequest idsSearchRequest = new UniRefIdsPostRequest();
         idsSearchRequest.setIds(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
         return idsSearchRequest;
     }
 
@@ -139,7 +134,6 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
     protected IdsSearchRequest getIdsDownloadWithFieldsRequest() {
         UniRefIdsPostRequest idsSearchRequest = new UniRefIdsPostRequest();
         idsSearchRequest.setIds(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
         idsSearchRequest.setFields(getCommaSeparatedReturnFields());
         return idsSearchRequest;
     }
@@ -214,14 +208,8 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
             "UniRef id 'INVALID2' has invalid format. It should be a valid UniRef id.",
             "Invalid fields parameter value 'invalid'",
             "UniRef id 'INVALID' has invalid format. It should be a valid UniRef id.",
-            "Only '10' UniRef ids are allowed in each request.",
-            "The 'download' parameter has invalid format. It should set to true."
+            "Only '10' UniRef ids are allowed in each request."
         };
-    }
-
-    @Override
-    protected String[] getErrorMessagesForEmptyJson() {
-        return new String[] {"'download' is a required parameter", "'ids' is a required parameter"};
     }
 
     @Override
@@ -229,7 +217,6 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
         String facets = String.join(",", facetConfig.getFacetNames());
         StringBuilder builder = new StringBuilder("{");
         builder.append("\"ids\":\"" + getCommaSeparatedIds() + "\",");
-        builder.append("\"download\":\"true\",");
         builder.append("\"facets\":\"" + facets + "\"");
         builder.append("}");
         return builder.toString();
@@ -240,8 +227,17 @@ class UniRefGetByIdsPostIT extends AbstractGetByIdsPostControllerIT {
         String facetFilter = "identity:0.5 OR identity:0.9 OR identity:1.0";
         StringBuilder builder = new StringBuilder("{");
         builder.append("\"ids\":\"" + getCommaSeparatedIds() + "\",");
-        builder.append("\"download\":\"true\",");
         builder.append("\"facetFilter\":\"" + facetFilter + "\"");
+        builder.append("}");
+        return builder.toString();
+    }
+
+    @Override
+    protected String getJsonRequestBodyWithDownloadParam() {
+        String download = "false";
+        StringBuilder builder = new StringBuilder("{");
+        builder.append("\"ids\":\"" + getCommaSeparatedIds() + "\",");
+        builder.append("\"download\":\"" + download + "\"");
         builder.append("}");
         return builder.toString();
     }

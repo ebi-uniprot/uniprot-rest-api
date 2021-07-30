@@ -119,7 +119,6 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
     protected IdsSearchRequest getIdsDownloadWithFieldsRequest() {
         UniProtKBIdsPostRequest idsSearchRequest = new UniProtKBIdsPostRequest();
         idsSearchRequest.setAccessions(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
         idsSearchRequest.setFields(getCommaSeparatedReturnFields());
         return idsSearchRequest;
     }
@@ -128,24 +127,14 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
     protected IdsSearchRequest getInvalidDownloadRequest() {
         UniProtKBIdsPostRequest idsSearchRequest = new UniProtKBIdsPostRequest();
         idsSearchRequest.setAccessions(getCommaSeparatedIds() + ",INVALID , INVALID2");
-        idsSearchRequest.setDownload("INVALID");
         idsSearchRequest.setFields("invalid, invalid1");
         return idsSearchRequest;
-    }
-
-    @Override
-    protected String[] getErrorMessagesForDownloadFalse() {
-        return new String[] {
-            "'accessions' is a required parameter",
-            "The 'download' parameter has invalid format. It should set to true."
-        };
     }
 
     @Override
     protected IdsSearchRequest getIdsDownloadRequest() {
         UniProtKBIdsPostRequest idsSearchRequest = new UniProtKBIdsPostRequest();
         idsSearchRequest.setAccessions(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
         return idsSearchRequest;
     }
 
@@ -209,17 +198,14 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
             "Only '10' accessions are allowed in each request.",
             "Invalid fields parameter value 'invalid'",
             "Invalid fields parameter value 'invalid1'",
-            "The 'download' parameter has invalid format. It should set to true.",
             "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
             "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession."
         };
     }
 
     @Override
-    protected String[] getErrorMessagesForEmptyJson() {
-        return new String[] {
-            "'download' is a required parameter", "'accessions' is a required parameter"
-        };
+    protected String[] getErrorMessage() {
+        return new String[] {"'accessions' is a required parameter"};
     }
 
     @Override
@@ -242,7 +228,6 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
         String facets = String.join(",", facetConfig.getFacetNames());
         StringBuilder builder = new StringBuilder("{");
         builder.append("\"accessions\":\"" + getCommaSeparatedIds() + "\",");
-        builder.append("\"download\":\"true\",");
         builder.append("\"facets\":\"" + facets + "\"");
         builder.append("}");
         return builder.toString();
@@ -253,8 +238,17 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
         String facetFilter = "reviewed:true OR reviewed:false";
         StringBuilder builder = new StringBuilder("{");
         builder.append("\"accessions\":\"" + getCommaSeparatedIds() + "\",");
-        builder.append("\"download\":\"true\",");
         builder.append("\"facetFilter\":\"" + facetFilter + "\"");
+        builder.append("}");
+        return builder.toString();
+    }
+
+    @Override
+    protected String getJsonRequestBodyWithDownloadParam() {
+        String download = "false";
+        StringBuilder builder = new StringBuilder("{");
+        builder.append("\"accessions\":\"" + getCommaSeparatedIds() + "\",");
+        builder.append("\"download\":\"" + download + "\"");
         builder.append("}");
         return builder.toString();
     }

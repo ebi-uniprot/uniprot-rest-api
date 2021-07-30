@@ -22,31 +22,6 @@ import org.uniprot.store.config.UniProtDataType;
 class ValidPostByIdsRequestTest {
 
     @Test
-    void isValidWithSingleValueWithEmptyDownloadReturnTrue() {
-        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
-        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
-        builder.accessions("P12345");
-        boolean result = validator.isValid(builder.build(), null);
-        assertFalse(result);
-        assertNotNull(validator.errorList);
-        assertEquals(1, validator.errorList.size());
-        assertTrue(validator.errorList.contains("'download' is a required parameter"));
-    }
-
-    @Test
-    void isValidWithDownloadFalse() {
-        FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
-        FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
-        builder.download("tru");
-        boolean result = validator.isValid(builder.build(), null);
-        assertFalse(result);
-        assertNotNull(validator.errorList);
-        assertEquals(2, validator.errorList.size());
-        assertTrue(validator.errorList.contains("Invalid download value"));
-        assertTrue(validator.errorList.contains("'accessions' is a required parameter"));
-    }
-
-    @Test
     void isValidWithEmptyAccessionsFalse() {
         FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
         FakeValidPostByIdsRequestValidator validator = new FakeValidPostByIdsRequestValidator();
@@ -128,7 +103,6 @@ class ValidPostByIdsRequestTest {
         private ValidPostByIdsRequest getMockedValidIdsRequest() {
             ValidPostByIdsRequest validIdsRequest = Mockito.mock(ValidPostByIdsRequest.class);
             Mockito.when(validIdsRequest.accessions()).thenReturn("accessions");
-            Mockito.when(validIdsRequest.download()).thenReturn("download");
             Mockito.when(validIdsRequest.fields()).thenReturn("fields");
             Mockito.when(validIdsRequest.uniProtDataType()).thenReturn(UniProtDataType.UNIPROTKB);
             return validIdsRequest;
@@ -154,11 +128,6 @@ class ValidPostByIdsRequestTest {
         @Override
         void buildErrorMessage(String field, ConstraintValidatorContextImpl contextImpl) {
             errorList.add("invalid field " + field);
-        }
-
-        @Override
-        void buildInvalidDownloadValueMessage(ConstraintValidatorContext context) {
-            errorList.add("Invalid download value");
         }
 
         @Override
