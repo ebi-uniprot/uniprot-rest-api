@@ -2,6 +2,7 @@ package org.uniprot.api.rest.validation;
 
 import javax.validation.ConstraintValidatorContext;
 
+import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
@@ -13,6 +14,14 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
  * @created 27/07/2021
  */
 public class CommonIdsRequestValidator {
+    /**
+     * FIXME  fields.split("\\s*,\\s*") pattern
+     * https://www.ebi.ac.uk/panda/jira/browse/TRM-26413
+     * See other classes for same issue
+     * {@link ValidEnumDisplayValue} {@link org.uniprot.api.rest.request.SearchRequest}
+     * {@link ValidFacets}
+     */
+    @SuppressWarnings("squid:S5852")
     boolean isValidReturnFields(
             String fields,
             ReturnFieldConfig returnFieldConfig,
