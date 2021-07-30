@@ -6,7 +6,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -152,14 +151,11 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                containsInAnyOrder(getErrorMessagesForEmptyJson())));
+                .andExpect(jsonPath("$.messages.*", containsInAnyOrder(getErrorMessage())));
     }
 
     @Test
-    void getByIdsWithDownloadTruePassedFacetsIgnoredPostSuccess() throws Exception {
+    void getByIdsWithPassedFacetsIgnoredPostSuccess() throws Exception {
         // when
         ResultActions response =
                 getMockMvc()
@@ -178,7 +174,7 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
     }
 
     @Test
-    void getByIdsWithDownloadTruePassedFacetFilterIgnoredPostSuccess() throws Exception {
+    void getByIdsWithPassedFacetFilterIgnoredPostSuccess() throws Exception {
         // when
         ResultActions response =
                 getMockMvc()
@@ -197,25 +193,25 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
     }
 
     @Test
-    void getByIdsDownloadFalseFailure() throws Exception {
+    void getByIdsDownloadFalseIgnored() throws Exception {
         // when
         ResultActions response =
                 getMockMvc()
                         .perform(
                                 post(getGetByIdsPath())
                                         .contentType(MediaType.APPLICATION_JSON)
-                                        .content("{\"download\":\"false\"}"));
+                                        .content(getJsonRequestBodyWithDownloadParam()));
         // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().exists("Content-Disposition"))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.messages.*",
-                                containsInAnyOrder(getErrorMessagesForDownloadFalse())));
+                .andExpect(jsonPath("$.results.size()", is(10)));
     }
 
-    protected abstract String[] getErrorMessagesForDownloadFalse();
+    protected abstract String getJsonRequestBodyWithDownloadParam();
+
+    protected abstract String[] getErrorMessage();
 
     protected abstract String getJsonRequestBodyWithFacets();
 
@@ -240,8 +236,6 @@ public abstract class AbstractGetByIdsPostControllerIT extends AbstractStreamCon
     protected abstract List<ResultMatcher> getFieldsResultMatchers();
 
     protected abstract String[] getErrorMessages();
-
-    protected abstract String[] getErrorMessagesForEmptyJson();
 
     protected String getJsonString(IdsSearchRequest idsSearchRequest) {
         try {

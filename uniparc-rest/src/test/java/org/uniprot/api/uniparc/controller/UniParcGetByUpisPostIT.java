@@ -97,16 +97,14 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     protected IdsSearchRequest getInvalidDownloadRequest() {
         UniParcIdsPostRequest idsSearchRequest = new UniParcIdsPostRequest();
         idsSearchRequest.setUpis(getCommaSeparatedIds() + ",INVALID , INVALID2");
-        idsSearchRequest.setDownload("INVALID");
         idsSearchRequest.setFields("invalid, invalid1");
         return idsSearchRequest;
     }
 
     @Override
-    protected String[] getErrorMessagesForDownloadFalse() {
+    protected String[] getErrorMessage() {
         return new String[] {
             "'upis' is a required parameter",
-            "The 'download' parameter has invalid format. It should set to true."
         };
     }
 
@@ -114,7 +112,6 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     protected IdsSearchRequest getIdsDownloadRequest() {
         UniParcIdsPostRequest idsSearchRequest = new UniParcIdsPostRequest();
         idsSearchRequest.setUpis(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
         return idsSearchRequest;
     }
 
@@ -122,7 +119,6 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     protected IdsSearchRequest getIdsDownloadWithFieldsRequest() {
         UniParcIdsPostRequest idsSearchRequest = new UniParcIdsPostRequest();
         idsSearchRequest.setUpis(getCommaSeparatedIds());
-        idsSearchRequest.setDownload("true");
         idsSearchRequest.setFields(getCommaSeparatedReturnFields());
         return idsSearchRequest;
     }
@@ -181,17 +177,9 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         return new String[] {
             "UPI 'INVALID2' has invalid format. It should be a valid UniParc id.",
             "Only '10' upis are allowed in each request.",
-            "The 'download' parameter has invalid format. It should set to true.",
             "Invalid fields parameter value 'invalid'",
             "UPI 'INVALID' has invalid format. It should be a valid UniParc id.",
             "Invalid fields parameter value 'invalid1'"
-        };
-    }
-
-    @Override
-    protected String[] getErrorMessagesForEmptyJson() {
-        return new String[] {
-            "'upis' is a required parameter", "'download' is a required parameter"
         };
     }
 
@@ -200,7 +188,6 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         String facets = String.join(",", facetConfig.getFacetNames());
         StringBuilder builder = new StringBuilder("{");
         builder.append("\"upis\":\"" + getCommaSeparatedIds() + "\",");
-        builder.append("\"download\":\"true\",");
         builder.append("\"facets\":\"" + facets + "\"");
         builder.append("}");
         return builder.toString();
@@ -211,8 +198,17 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
         String facetFilter = "database_facet:1";
         StringBuilder builder = new StringBuilder("{");
         builder.append("\"upis\":\"" + getCommaSeparatedIds() + "\",");
-        builder.append("\"download\":\"true\",");
         builder.append("\"facetFilter\":\"" + facetFilter + "\"");
+        builder.append("}");
+        return builder.toString();
+    }
+
+    @Override
+    protected String getJsonRequestBodyWithDownloadParam() {
+        String download = "false";
+        StringBuilder builder = new StringBuilder("{");
+        builder.append("\"upis\":\"" + getCommaSeparatedIds() + "\",");
+        builder.append("\"download\":\"" + download + "\"");
         builder.append("}");
         return builder.toString();
     }

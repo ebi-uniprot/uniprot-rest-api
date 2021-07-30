@@ -4,7 +4,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.regex.Pattern;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -33,8 +32,6 @@ public @interface ValidPostByIdsRequest {
 
     String accessions() default "accessions";
 
-    String download() default "download";
-
     String fields() default "fields";
 
     UniProtDataType uniProtDataType();
@@ -52,16 +49,12 @@ public @interface ValidPostByIdsRequest {
 
         private UniProtDataType uniProtDataType;
         private String accessions;
-        private String download;
         private String fields;
-        private static final Pattern DOWNLOAD_PATTERN =
-                Pattern.compile("^(true)$", Pattern.CASE_INSENSITIVE);
         private ReturnFieldConfig returnFieldConfig;
 
         @Override
         public void initialize(ValidPostByIdsRequest constraintAnnotation) {
             this.uniProtDataType = constraintAnnotation.uniProtDataType();
-            this.download = constraintAnnotation.download();
             this.accessions = constraintAnnotation.accessions();
             this.fields = constraintAnnotation.fields();
             this.returnFieldConfig = ReturnFieldConfigFactory.getReturnFieldConfig(uniProtDataType);
@@ -73,17 +66,15 @@ public @interface ValidPostByIdsRequest {
             boolean isValid;
             try {
                 String idList = BeanUtils.getProperty(value, this.accessions);
-                String downloadValue = BeanUtils.getProperty(value, this.download);
                 String fieldsValue = BeanUtils.getProperty(value, this.fields);
 
-                boolean isDownloadValid = validateDownloadValue(downloadValue, context);
                 boolean isValidReturnFields =
                         isValidReturnFields(fieldsValue, this.returnFieldConfig, context);
 
                 boolean isIdListValid =
                         validateIdsAndPopulateErrorMessage(
                                 idList, getMaxDownloadLength(), getDataType(), context);
-                isValid = isDownloadValid && isValidReturnFields && isIdListValid;
+                isValid = isValidReturnFields && isIdListValid;
 
                 if (!isValid && context != null) {
                     context.disableDefaultConstraintViolation();
@@ -93,19 +84,6 @@ public @interface ValidPostByIdsRequest {
                 isValid = false;
             }
 
-            return isValid;
-        }
-
-        private boolean validateDownloadValue(
-                String downloadValue, ConstraintValidatorContext context) {
-            boolean isValid = true;
-            if (Utils.nullOrEmpty(downloadValue)) {
-                isValid = false;
-                buildRequiredFieldMessage(context, "'download' is a required parameter");
-            } else if (!DOWNLOAD_PATTERN.matcher(downloadValue).find()) {
-                isValid = false;
-                buildInvalidDownloadValueMessage(context);
-            }
             return isValid;
         }
 
@@ -129,11 +107,6 @@ public @interface ValidPostByIdsRequest {
 
         void buildRequiredFieldMessage(ConstraintValidatorContext context, String message) {
             context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
-        }
-
-        void buildInvalidDownloadValueMessage(ConstraintValidatorContext context) {
-            String errorMessage = "{search.uniprot.invalid.download.only}";
-            context.buildConstraintViolationWithTemplate(errorMessage).addConstraintViolation();
         }
 
         int getMaxDownloadLength() {
