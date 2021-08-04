@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -18,8 +19,7 @@ public class UniSaveRequest {
 
     @Data
     public static class Entries {
-        @Parameter(description = "The accession of a UniProtKB entry.")
-        @Pattern(regexp = ACCESSION_PATTERN, message = "{search.invalid.accession.value}")
+        @Parameter(hidden = true)
         private String accession;
 
         @Parameter(description = "Add download headers to response (true|false).")
@@ -34,10 +34,6 @@ public class UniSaveRequest {
 
     @Data
     public static class Diff {
-        @Parameter(description = "The accession of a UniProtKB entry.")
-        @Pattern(regexp = ACCESSION_PATTERN, message = "{search.invalid.accession.value}")
-        private String accession;
-
         @Parameter(
                 description = "One of the entry versions, whose contents is analysed in the diff.")
         @NotNull(message = "{search.required}")
