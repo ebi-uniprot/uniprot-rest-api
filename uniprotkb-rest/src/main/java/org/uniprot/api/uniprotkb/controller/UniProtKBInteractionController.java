@@ -25,6 +25,8 @@ import org.uniprot.api.uniprotkb.service.UniProtKBEntryInteractionService;
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * Controller for interactions.
  *
@@ -35,6 +37,7 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb/accession")
+@Tag(name = "Miscellaneous")
 public class UniProtKBInteractionController extends BasicSearchController<InteractionEntry> {
 
     private final UniProtKBEntryInteractionService interactionService;
