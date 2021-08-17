@@ -73,8 +73,7 @@ class ValidPostByIdsRequestTest {
         FakeIdsPostRequest.FakeIdsPostRequestBuilder builder = FakeIdsPostRequest.builder();
         boolean result =
                 validator.isValid(
-                        builder.accessions("P10000,P20000, P30000, P40000, P50000, P60000")
-                                .build(),
+                        builder.accessions("P10000,P20000, P30000, P40000, P50000, P60000").build(),
                         null);
         assertFalse(result);
         assertNotNull(validator.errorList);

@@ -50,7 +50,5 @@ public class FakeIdsPostRequest implements IdsSearchRequest {
     }
 
     @Override
-    public void setSize(Integer size) {
-
-    }
+    public void setSize(Integer size) {}
 }

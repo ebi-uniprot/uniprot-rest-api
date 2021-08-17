@@ -1,10 +1,8 @@
 package org.uniprot.api.unisave.request;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.Parameter;
 

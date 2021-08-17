@@ -1,12 +1,19 @@
 package org.uniprot.api.unisave.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
+
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,16 +27,12 @@ import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import java.util.stream.Stream;
-
-import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Created 20/03/20
@@ -72,10 +75,10 @@ public class UniSaveController {
             produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
             @Parameter(description = "The accession of a UniProtKB entry.")
-            @PathVariable("accession")
-            @Pattern(
-                    regexp = ACCESSION_PATTERN,
-                    message = "{search.invalid.accession.value}")
+                    @PathVariable("accession")
+                    @Pattern(
+                            regexp = ACCESSION_PATTERN,
+                            message = "{search.invalid.accession.value}")
                     String accession,
             @Valid @ModelAttribute UniSaveRequest.Entries uniSaveRequest,
             HttpServletRequest servletRequest) {
@@ -109,10 +112,10 @@ public class UniSaveController {
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getDiff(
             @Parameter(description = "The accession of a UniProtKB entry.")
-            @PathVariable("accession")
-            @Pattern(
-                    regexp = ACCESSION_PATTERN,
-                    message = "{search.invalid.accession.value}")
+                    @PathVariable("accession")
+                    @Pattern(
+                            regexp = ACCESSION_PATTERN,
+                            message = "{search.invalid.accession.value}")
                     String accession,
             @Valid @ModelAttribute UniSaveRequest.Diff unisaveRequest,
             HttpServletRequest servletRequest) {

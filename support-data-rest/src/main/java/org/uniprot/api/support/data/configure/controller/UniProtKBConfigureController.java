@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtDatabaseDetailResponse;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.api.support.data.configure.service.UniProtKBConfigureService;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
@@ -185,7 +186,7 @@ public class UniProtKBConfigureController {
                         })
             })
     @GetMapping("/allDatabases")
-    public List<UniProtDatabaseDetail> getUniProtAllDatabase() {
+    public List<UniProtDatabaseDetailResponse> getUniProtAllDatabase() {
         return service.getAllDatabases();
     }
 

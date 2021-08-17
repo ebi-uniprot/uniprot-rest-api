@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtDatabaseDetailResponse;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
@@ -91,8 +92,10 @@ public class UniProtKBConfigureService {
         return UniProtReturnField.getReturnFieldsForClients(UniProtDataType.UNIPROTKB);
     }
 
-    public List<UniProtDatabaseDetail> getAllDatabases() {
-        return DBX_TYPES.getAllDbTypes();
+    public List<UniProtDatabaseDetailResponse> getAllDatabases() {
+        return DBX_TYPES.getAllDbTypes().stream()
+                .map(UniProtDatabaseDetailResponse::getUniProtDatabaseDetailResponse)
+                .collect(Collectors.toList());
     }
 
     public List<EvidenceDatabaseDetail> getEvidenceDatabases() {
