@@ -38,7 +38,7 @@ class AAConfigureServiceTest {
     void getUniRuleSearchItems() {
         List<AdvancedSearchTerm> result = SERVICE.getUniRuleSearchItems(CONTEXT_PATH);
         assertNotNull(result);
-        assertEquals(6, result.size());
+        assertEquals(10, result.size());
     }
 
     @Test
@@ -56,6 +56,6 @@ class AAConfigureServiceTest {
     void getArbaSearchItems() {
         List<AdvancedSearchTerm> result = SERVICE.getArbaSearchItems(CONTEXT_PATH);
         assertNotNull(result);
-        assertEquals(4, result.size());
+        assertEquals(7, result.size());
     }
 }

@@ -143,9 +143,11 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                         .positionFeatureSetsSet(null)
                         .samFeatureSetsSet(null)
                         .build();
+        UniRuleEntry updatedCommentEntry =
+                UniRuleControllerITUtils.updateAllCommentTypes(thinUniRuleEntry);
         UniRuleEntry arbaEntry =
                 UniRuleControllerITUtils.updateValidValues(
-                        thinUniRuleEntry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
+                        updatedCommentEntry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
         var docConverter = new ArbaDocumentConverter();
         var arbaDocument = docConverter.convertToDocument(arbaEntry);
         getStoreManager().saveDocs(getStoreType(), arbaDocument);
