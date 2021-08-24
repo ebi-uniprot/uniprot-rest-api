@@ -7,14 +7,20 @@ import lombok.Getter;
 import org.uniprot.core.cv.xdb.UniProtDatabaseAttribute;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UniProtDatabaseDetailResponse {
     private String name;
     private String displayName;
     private String category;
     private String uriLink;
     private List<UniProtDatabaseAttribute> attributes;
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean implicit;
+
     private String linkedReason;
     private String idMappingName;
 
