@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,8 +39,10 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.uniref.request.UniRefIdsPostRequest;
 import org.uniprot.api.uniref.request.UniRefIdsSearchRequest;
 import org.uniprot.api.uniref.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.request.UniRefStreamRequest;
@@ -246,7 +250,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
     @Tag(name = "uniref")
     @RequestMapping(
             value = "/ids",
-            method = {RequestMethod.GET, RequestMethod.POST},
+            method = {RequestMethod.GET},
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
@@ -274,13 +278,51 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIds(
+    public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIdsGet(
             @Valid @ModelAttribute UniRefIdsSearchRequest idsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<UniRefEntryLight> results = service.getByIds(idsRequest);
-        return super.getSearchResponse(
-                results, idsRequest.getFields(), idsRequest.isDownload(), request, response);
+        return getByIds(idsRequest, request, response);
+    }
+
+    @SuppressWarnings("squid:S3752")
+    @Tag(name = "uniref")
+    @RequestMapping(
+            value = "/ids",
+            method = {RequestMethod.POST},
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Get UniRef entries by a list of ids.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniRefEntryLight
+                                                                                    .class))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIdsPost(
+            @Valid @NotNull(message = "{download.required}") @RequestBody(required = false)
+                    UniRefIdsPostRequest idsRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        return getByIds(idsRequest, request, response);
     }
 
     @Override
@@ -297,5 +339,12 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }
+    }
+
+    private ResponseEntity<MessageConverterContext<UniRefEntryLight>> getByIds(
+            IdsSearchRequest idsRequest, HttpServletRequest request, HttpServletResponse response) {
+        QueryResult<UniRefEntryLight> results = service.getByIds(idsRequest);
+        return super.getSearchResponse(
+                results, idsRequest.getFields(), idsRequest.isDownload(), request, response);
     }
 }

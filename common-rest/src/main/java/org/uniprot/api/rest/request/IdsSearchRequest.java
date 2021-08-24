@@ -14,6 +14,8 @@ public interface IdsSearchRequest extends SearchRequest {
 
     String getFacetFilter();
 
+    void setCursor(String cursor);
+
     default String getQuery() {
         return null;
     }

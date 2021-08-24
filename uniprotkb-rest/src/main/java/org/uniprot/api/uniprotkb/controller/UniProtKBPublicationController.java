@@ -29,6 +29,8 @@ import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.service.PublicationService;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * @author lgonzales
  * @since 2019-12-09
@@ -36,6 +38,7 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb/accession")
+@Tag(name = "Miscellaneous")
 public class UniProtKBPublicationController extends BasicSearchController<PublicationEntry> {
     private final PublicationService publicationService;
 

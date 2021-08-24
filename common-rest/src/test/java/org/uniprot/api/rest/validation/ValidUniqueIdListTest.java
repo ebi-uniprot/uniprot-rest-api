@@ -60,7 +60,7 @@ class ValidUniqueIdListTest {
         assertFalse(result);
         assertNotNull(validator.errorList);
         assertEquals(1, validator.errorList.size());
-        assertTrue(validator.errorList.contains("invalidLength"));
+        assertTrue(validator.errorList.contains("invalidLength. Max allowed length 5"));
     }
 
     @Test
@@ -73,7 +73,7 @@ class ValidUniqueIdListTest {
         assertFalse(result);
         assertNotNull(validator.errorList);
         assertEquals(2, validator.errorList.size());
-        assertTrue(validator.errorList.contains("invalidLength"));
+        assertTrue(validator.errorList.contains("invalidLength. Max allowed length 5"));
         assertTrue(validator.errorList.contains("P4INVALID"));
     }
 
@@ -128,8 +128,9 @@ class ValidUniqueIdListTest {
         }
 
         @Override
-        void buildInvalidAccessionLengthMessage(ConstraintValidatorContextImpl contextImpl) {
-            errorList.add("invalidLength");
+        void buildInvalidAccessionLengthMessage(
+                ConstraintValidatorContextImpl contextImpl, int length) {
+            errorList.add("invalidLength. " + "Max allowed length " + length);
         }
 
         @Override

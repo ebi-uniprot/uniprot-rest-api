@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -201,22 +200,6 @@ class SolrQueryRepositoryIT {
         List<String> retrievedAccs =
                 docStream.map(doc -> doc.accession).collect(Collectors.toList());
         assertThat(savedAccs, is(retrievedAccs));
-    }
-
-    @Test
-    void invalidDefaultSearchWithMatchedFieldsRequested() {
-        // given
-        UniProtDocument doc1 = UniProtDocMocker.createDoc("P21802");
-        String findMe = "FIND_ME";
-        doc1.proteinNames.add("this is a protein name " + findMe + ".");
-        UniProtDocument doc2 = UniProtDocMocker.createDoc("P21803");
-        doc2.keywords.add("this is a keyword " + findMe + ", yes it is.");
-
-        storeManager.saveDocs(DataStoreManager.StoreType.UNIPROT, doc1, doc2);
-
-        // when attempt to fetch then error occurs
-        SolrRequest request = queryWithMatchedFields("accession:" + findMe);
-        assertThrows(InvalidRequestException.class, () -> queryRepo.searchPage(request, null));
     }
 
     @Test

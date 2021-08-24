@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,6 +26,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,11 +37,13 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
 import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
@@ -426,7 +430,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @SuppressWarnings("squid:S3752")
     @RequestMapping(
             value = "/upis",
-            method = {RequestMethod.GET, RequestMethod.POST},
+            method = {RequestMethod.GET},
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
@@ -465,18 +469,61 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
                         })
             })
-    public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpis(
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpisGet(
             @Valid @ModelAttribute UniParcIdsSearchRequest idsSearchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<UniParcEntry> results = queryService.getByIds(idsSearchRequest);
+        return getByUpis(idsSearchRequest, request, response);
+    }
 
-        return super.getSearchResponse(
-                results,
-                idsSearchRequest.getFields(),
-                idsSearchRequest.isDownload(),
-                request,
-                response);
+    @SuppressWarnings("squid:S3752")
+    @RequestMapping(
+            value = "/upis",
+            method = {RequestMethod.POST},
+            produces = {
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE
+            })
+    @Operation(
+            summary = "Get UniParc entries by a list of upis.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            UniParcEntry.class))),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            org.uniprot.core.xml
+                                                                                    .jaxb.uniparc
+                                                                                    .Entry.class,
+                                                                    name = "entries"))),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                        })
+            })
+    public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpisPost(
+            @Valid @NotNull(message = "{download.required}") @RequestBody(required = false)
+                    UniParcIdsPostRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        return getByUpis(idsSearchRequest, request, response);
     }
 
     @Override
@@ -493,5 +540,19 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }
+    }
+
+    private ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpis(
+            IdsSearchRequest idsSearchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        QueryResult<UniParcEntry> results = queryService.getByIds(idsSearchRequest);
+
+        return super.getSearchResponse(
+                results,
+                idsSearchRequest.getFields(),
+                idsSearchRequest.isDownload(),
+                request,
+                response);
     }
 }

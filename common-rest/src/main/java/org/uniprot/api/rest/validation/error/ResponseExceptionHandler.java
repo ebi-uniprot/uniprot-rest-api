@@ -5,13 +5,16 @@ import static java.util.Collections.singletonList;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
 import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.addDebugError;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.getBadRequestResponseEntity;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.getContentTypeFromRequest;
 import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
@@ -21,6 +24,7 @@ import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +33,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -200,6 +205,27 @@ public class ResponseExceptionHandler {
 
         addDebugError(request, ex, messages);
 
+        return getBadRequestResponseEntity(request, messages);
+    }
+
+    /**
+     * Bad Request exception handler that was caught during POST request This method is POST
+     * equivalent of constraintViolationException
+     *
+     * @param ex MethodArgumentNotValidException
+     * @param request HttpServletRequest
+     * @return 400 Bad request error response with error message details
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorInfo> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
+        // collect constraintViolationException error messages through
+        // MethodArgumentNotValidException
+        List<String> messages =
+                ex.getBindingResult().getGlobalErrors().stream()
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                        .collect(Collectors.toList());
+        addDebugError(request, ex, messages);
         return getBadRequestResponseEntity(request, messages);
     }
 

@@ -1905,7 +1905,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query=cdc7&showMatchedFields=true",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/search?query=cdc7&showSingleTermMatchedFields=true",
 									"host": [
 										"{{base_url}}"
 									],
@@ -1920,7 +1920,7 @@
 											"value": "cdc7"
 										},
 										{
-											"key": "showMatchedFields",
+											"key": "showSingleTermMatchedFields",
 											"value": "true"
 										}
 									]

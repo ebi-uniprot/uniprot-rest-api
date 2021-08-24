@@ -2,7 +2,8 @@ package org.uniprot.api.unisave.controller;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
 
 import java.util.stream.Stream;
@@ -73,8 +74,15 @@ public class UniSaveController {
             value = "/{accession}",
             produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
+            @Parameter(description = "The accession of a UniProtKB entry.")
+                    @PathVariable("accession")
+                    @Pattern(
+                            regexp = ACCESSION_PATTERN,
+                            message = "{search.invalid.accession.value}")
+                    String accession,
             @Valid @ModelAttribute UniSaveRequest.Entries uniSaveRequest,
             HttpServletRequest servletRequest) {
+        uniSaveRequest.setAccession(accession);
         String acceptHeader = getAcceptHeader(servletRequest);
         setContentIfRequired(uniSaveRequest, acceptHeader);
         HttpHeaders httpHeaders =
@@ -103,6 +111,12 @@ public class UniSaveController {
             value = "/{accession}/diff",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getDiff(
+            @Parameter(description = "The accession of a UniProtKB entry.")
+                    @PathVariable("accession")
+                    @Pattern(
+                            regexp = ACCESSION_PATTERN,
+                            message = "{search.invalid.accession.value}")
+                    String accession,
             @Valid @ModelAttribute UniSaveRequest.Diff unisaveRequest,
             HttpServletRequest servletRequest) {
         MessageConverterContext<UniSaveEntry> context =
@@ -113,7 +127,7 @@ public class UniSaveController {
         context.setEntities(
                 Stream.of(
                         service.getDiff(
-                                unisaveRequest.getAccession(),
+                                accession,
                                 unisaveRequest.getVersion1(),
                                 unisaveRequest.getVersion2())));
 
@@ -135,7 +149,7 @@ public class UniSaveController {
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getStatus(
             @Parameter(description = "The accession of a UniProtKB entry.")
-                    @PathVariable
+                    @PathVariable("accession")
                     @Pattern(
                             regexp = ACCESSION_PATTERN,
                             message = "{search.invalid.accession.value}")
