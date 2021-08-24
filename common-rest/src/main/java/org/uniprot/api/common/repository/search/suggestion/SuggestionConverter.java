@@ -24,22 +24,23 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
         SpellCheckResponse spellCheckResponse = queryResponse.getSpellCheckResponse();
         if (Utils.notNull(spellCheckResponse)) {
             return spellCheckResponse.getSuggestions().stream()
-                    .map(
-                            s -> {
-                                Suggestion.SuggestionBuilder suggestionBuilder =
-                                        Suggestion.builder().original(s.getToken());
-                                for (int i = 0; i < s.getAlternatives().size(); i++) {
-                                    suggestionBuilder.alternative(
-                                            Alternative.builder()
-                                                    .term(s.getAlternatives().get(i))
-                                                    .count(s.getAlternativeFrequencies().get(i))
-                                                    .build());
-                                }
-                                return suggestionBuilder.build();
-                            })
+                    .map(this::getSuggestion)
                     .collect(Collectors.toList());
         } else {
             return emptyList();
         }
+    }
+
+    private Suggestion getSuggestion(SpellCheckResponse.Suggestion s) {
+        Suggestion.SuggestionBuilder suggestionBuilder =
+                Suggestion.builder().original(s.getToken());
+        for (int i = 0; i < s.getAlternatives().size(); i++) {
+            suggestionBuilder.alternative(
+                    Alternative.builder()
+                            .term(s.getAlternatives().get(i))
+                            .count(s.getAlternativeFrequencies().get(i))
+                            .build());
+        }
+        return suggestionBuilder.build();
     }
 }
