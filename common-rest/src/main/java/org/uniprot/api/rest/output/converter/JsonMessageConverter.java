@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -145,6 +146,15 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 generator.writeStartArray();
                 for (Object matchedField : context.getFailedIds()) {
                     writeElement(generator, matchedField);
+                }
+                generator.writeEndArray();
+            }
+
+            if (notNullNotEmpty(context.getSuggestions())) {
+                generator.writeFieldName("suggestions");
+                generator.writeStartArray();
+                for (Suggestion suggestion : context.getSuggestions()) {
+                    writeElement(generator, suggestion);
                 }
                 generator.writeEndArray();
             }
