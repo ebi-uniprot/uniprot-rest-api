@@ -63,7 +63,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                                 UniSaveEntry.builder()
                                         .entryVersion(version2)
                                         .content(
-                                                diff.getEntryOne()
+                                                diff.getEntryTwo()
                                                         .getEntryContent()
                                                         .getFullContent())
                                         .build())
