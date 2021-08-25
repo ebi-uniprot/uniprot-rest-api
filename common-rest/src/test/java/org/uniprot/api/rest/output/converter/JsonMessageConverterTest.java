@@ -1,6 +1,24 @@
 package org.uniprot.api.rest.output.converter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.repository.search.facet.Facet;
+import org.uniprot.api.common.repository.search.facet.FacetItem;
+import org.uniprot.api.common.repository.search.suggestion.Alternative;
+import org.uniprot.api.common.repository.search.suggestion.Suggestion;
+import org.uniprot.api.common.repository.search.term.TermInfo;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
+import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,25 +30,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.common.repository.search.facet.Facet;
-import org.uniprot.api.common.repository.search.facet.FacetItem;
-import org.uniprot.api.common.repository.search.term.TermInfo;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
-import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author lgonzales
@@ -320,6 +320,42 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals("{\"results\":[],\"failedIds\":[\"id1\",\"id2\"]}", result);
+    }
+
+    @Test
+    void writeCanWriteOnlySuggestions() throws IOException {
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .suggestions(
+                                List.of(
+                                        Suggestion.builder()
+                                                .original("orig 1")
+                                                .alternative(
+                                                        Alternative.builder()
+                                                                .term("one")
+                                                                .count(1)
+                                                                .build())
+                                                .build(),
+                                        Suggestion.builder()
+                                                .original("orig 2")
+                                                .alternative(
+                                                        Alternative.builder()
+                                                                .term("two")
+                                                                .count(2)
+                                                                .build())
+                                                .build()))
+                        .build();
+        log.debug("------- BEGIN: writeCanWriteOnlySuggestions");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+        jsonMessageConverter.writeEntities(
+                Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
+        writeAfter(messageContext, outputStream);
+        String result = outputStream.toString("UTF-8");
+        log.debug(result);
+        assertEquals(
+                "{\"results\":[],\"suggestions\":[{\"original\":\"orig 1\",\"alternatives\":[{\"term\":\"one\",\"count\":1}]},{\"original\":\"orig 2\",\"alternatives\":[{\"term\":\"two\",\"count\":2}]}]}",
+                result);
     }
 
     @Test

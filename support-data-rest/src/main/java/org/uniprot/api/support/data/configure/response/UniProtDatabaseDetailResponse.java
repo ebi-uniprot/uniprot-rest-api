@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.response;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 
@@ -16,7 +17,7 @@ public class UniProtDatabaseDetailResponse {
     private String displayName;
     private String category;
     private String uriLink;
-    private List<UniProtDatabaseAttribute> attributes;
+    private List<UniProtDatabaseAttributeResponse> attributes;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private boolean implicit;
@@ -29,7 +30,7 @@ public class UniProtDatabaseDetailResponse {
             String displayName,
             String category,
             String uriLink,
-            List<UniProtDatabaseAttribute> attributes,
+            List<UniProtDatabaseAttributeResponse> attributes,
             boolean implicit,
             String linkedReason,
             String idMappingName) {
@@ -43,6 +44,27 @@ public class UniProtDatabaseDetailResponse {
         this.idMappingName = idMappingName;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Getter
+    static class UniProtDatabaseAttributeResponse{
+        private String name;
+        private String xmlTag;
+        private String uriLink;
+        public UniProtDatabaseAttributeResponse(String name, String xmlTag, String uriLink) {
+            this.name = name;
+            this.xmlTag = xmlTag;
+            this.uriLink = uriLink;
+        }
+        static UniProtDatabaseAttributeResponse getUniProtDatabaseAttributeResponse(UniProtDatabaseAttribute attribute){
+            return new UniProtDatabaseAttributeResponse(attribute.getName(), attribute.getXmlTag(), attribute.getUriLink());
+        }
+
+        static List<UniProtDatabaseAttributeResponse> getUniProtDatabaseAttributeResponses(List<UniProtDatabaseAttribute> attributes){
+            return attributes.stream().map(UniProtDatabaseAttributeResponse::getUniProtDatabaseAttributeResponse)
+                    .collect(Collectors.toList());
+        }
+    }
+
     public static UniProtDatabaseDetailResponse getUniProtDatabaseDetailResponse(
             UniProtDatabaseDetail dbDetail) {
         return new UniProtDatabaseDetailResponse(
@@ -50,7 +72,7 @@ public class UniProtDatabaseDetailResponse {
                 dbDetail.getDisplayName(),
                 dbDetail.getCategory().getName(),
                 dbDetail.getUriLink(),
-                dbDetail.getAttributes(),
+                UniProtDatabaseAttributeResponse.getUniProtDatabaseAttributeResponses(dbDetail.getAttributes()),
                 dbDetail.isImplicit(),
                 dbDetail.getLinkedReason(),
                 dbDetail.getIdMappingName());

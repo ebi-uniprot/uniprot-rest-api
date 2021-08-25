@@ -18,6 +18,8 @@ import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetResponseConverter;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
+import org.uniprot.api.common.repository.search.suggestion.Suggestion;
+import org.uniprot.api.common.repository.search.suggestion.SuggestionConverter;
 import org.uniprot.api.common.repository.search.term.TermInfo;
 import org.uniprot.api.common.repository.search.term.TermInfoConverter;
 import org.uniprot.store.search.SolrCollection;
@@ -41,6 +43,7 @@ public abstract class SolrQueryRepository<T extends Document> {
     private final SolrCollection collection;
     private final Class<T> tClass;
     private final FacetResponseConverter facetConverter;
+    private final SuggestionConverter suggestionConverter;
 
     protected SolrQueryRepository(
             SolrClient solrClient,
@@ -54,6 +57,7 @@ public abstract class SolrQueryRepository<T extends Document> {
         this.facetConverter = new FacetResponseConverter(facetConfig);
         this.requestConverter = requestConverter;
         this.termInfoConverter = new TermInfoConverter();
+        this.suggestionConverter = new SuggestionConverter();
     }
 
     public QueryResult<T> searchPage(SolrRequest request, String cursor) {
@@ -67,8 +71,9 @@ public abstract class SolrQueryRepository<T extends Document> {
 
             List<Facet> facets = facetConverter.convert(solrResponse);
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
+            List<Suggestion> suggestions = suggestionConverter.convert(solrResponse);
 
-            return QueryResult.of(resultList.stream(), page, facets, termInfos);
+            return QueryResult.of(resultList.stream(), page, facets, termInfos, null, suggestions);
         } catch (InvalidRequestException ire) {
             throw ire;
         } catch (Exception e) {

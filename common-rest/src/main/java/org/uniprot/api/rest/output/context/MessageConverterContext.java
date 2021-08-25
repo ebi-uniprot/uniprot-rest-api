@@ -8,6 +8,7 @@ import lombok.Data;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.search.facet.Facet;
+import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
 
 /**
@@ -27,6 +28,7 @@ public class MessageConverterContext<T> {
     private String fields;
     private Collection<Facet> facets;
     private Collection<TermInfo> matchedFields;
+    private Collection<Suggestion> suggestions;
     private boolean entityOnly;
     private boolean downloadContentDispositionHeader;
     private Collection<String> failedIds;
@@ -44,6 +46,7 @@ public class MessageConverterContext<T> {
                 .entityOnly(this.entityOnly)
                 .downloadContentDispositionHeader(downloadContentDispositionHeader)
                 .failedIds(this.failedIds)
+                .suggestions(this.suggestions)
                 .build();
     }
 }

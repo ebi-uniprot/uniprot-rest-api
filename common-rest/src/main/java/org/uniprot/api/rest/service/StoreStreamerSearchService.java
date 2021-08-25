@@ -110,7 +110,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             facets = null; // do not return facet in case of next page and facetFilter
         }
 
-        return QueryResult.of(entries, cursorPage, facets, null);
+        return QueryResult.of(entries, cursorPage, facets, null, null, null);
     }
 
     protected SolrRequest createDownloadSolrRequest(StreamRequest request) {
