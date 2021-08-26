@@ -197,6 +197,23 @@ class UniSaveRepositoryIT {
     }
 
     @Test
+    void retrieveEntryStatusInfoWhenZeroEventsSucceeds() {
+        // given
+        EntryImpl entry = createEntry(1);
+        testEntityManager.persist(entry);
+        String sourceAccession = entry.getAccession();
+
+        // Note that there is no event data in the DB for this accession, even though this accession exists
+        
+        // when
+        AccessionStatusInfoImpl statusInfo = repository.retrieveEntryStatusInfo(sourceAccession);
+
+        // then
+        assertThat(statusInfo.getAccession(), is(sourceAccession));
+        assertThat(statusInfo.getEvents(), hasSize(0));
+    }
+
+    @Test
     void retrieveEntryStatusInfoThrowsExceptionWhenEntryNotFound() {
         assertThrows(
                 UniSaveEntryNotFoundException.class,
