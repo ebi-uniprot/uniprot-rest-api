@@ -179,6 +179,12 @@ public class UniSaveRepository {
 
     public AccessionStatusInfoImpl retrieveEntryStatusInfo(String accession) {
         try {
+            // ensure this entry exists by trying to fetch it first
+            // if it does not, a UniSaveEntryNotFoundException will be thrown => 404
+            retrieveEntryInfo(accession, 1);
+
+            // reaching here => entry exists
+
             TypedQuery<IdentifierStatus> q =
                     session.createNamedQuery(
                             IdentifierStatus.Query.FIND_BY_FIRST_COLUMN.query(),
@@ -186,12 +192,6 @@ public class UniSaveRepository {
 
             q.setParameter("acc", accession);
             List<IdentifierStatus> resultList = q.getResultList();
-            if (resultList.isEmpty()) {
-                throw new UniSaveEntryNotFoundException(
-                        "Accession "
-                                + accession
-                                + " could not be found, or the accession is active");
-            }
 
             AccessionStatusInfoImpl accessionStatusInfo = new AccessionStatusInfoImpl();
             accessionStatusInfo.setAccession(accession);
@@ -201,7 +201,12 @@ public class UniSaveRepository {
             }
 
             return accessionStatusInfo;
-        } catch (PersistenceException e) {
+        }
+        catch (UniSaveEntryNotFoundException e) {
+            throw new UniSaveEntryNotFoundException(
+                    "No entry for " + accession + " was found");
+        }
+        catch (PersistenceException e) {
             log.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }
