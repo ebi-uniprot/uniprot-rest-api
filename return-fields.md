@@ -1,3 +1,7 @@
+### UniProtKB column names for programmatic access
+
+This document lists the differences between the returned column names by RESTful APIs.
+
 ### Names & Taxonomy
 
 **Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
