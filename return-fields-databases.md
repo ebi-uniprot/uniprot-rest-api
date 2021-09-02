@@ -246,10 +246,10 @@ IDEAL|database(IDEAL)|**See Protein family/group**
 InterPro|database(InterPro)|xref\_interpro
 PANTHER|database(PANTHER)|xref\_panther
 Pfam|database(Pfam)|xref\_pfam
-PIRSF|database(PRINTS)|xref\_pirsf
-PRINTS|database(PROSITE)|xref\_prints
+PIRSF|database(PIRSF)|xref\_pirsf
+PRINTS|database(PRINTS)|xref\_prints
 ProDom|NA|xref\_prodom
-PROSITE|database(PIRSF)|xref\_prosite
+PROSITE|database(PROSITE)|xref\_prosite
 SFLD|database(SFLD)|xref\_sfld
 SMART|database(SMART)|xref\_smart
 SUPFAM|database(SUPFAM)|xref\_supfam
