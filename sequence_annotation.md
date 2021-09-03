@@ -124,9 +124,9 @@ Feature identifiers currently exist for the following annotation topics: Propept
 |--- |--- |--- |--- |
 |**Molecule processing**||||
 |[Propeptide](https://beta.uniprot.org/help/propep)|PRO|Any processed propeptide|[Q7XAD0](https://beta.uniprot.org/uniprotkb/Q7XAD0/entry#ptm_processing)|
-|[Chain](https://beta.uniprot.org/help/chain) [Peptide](https://beta.uniprot.org/help/peptide)|PRO|Any mature polypeptide|[Q9W568](https://beta.uniprot.org/uniprotkb/Q9W568/entry#ptm_processing) [P15515](https://beta.uniprot.org/uniprotkb/P15515/entry/entry#ptm_processing)|
+|[Chain](https://beta.uniprot.org/help/chain) [Peptide](https://beta.uniprot.org/help/peptide)|PRO|Any mature polypeptide|[Q9W568](https://beta.uniprot.org/uniprotkb/Q9W568/entry#ptm-processing) [P15515](https://beta.uniprot.org/uniprotkb/P15515/entry#ptm-processing)|
 |**Amino acid modifications**||||
-|[Glycosylation](https://beta.uniprot.org/help/carbohyd)|CAR|Only for residues attached to an oligosaccharide structure annotated in the [GlyConnect](https://glyconnect.expasy.org) database|[P02771](https://beta.uniprot.org/uniprotkb/P02771/entry#ptm_processing)|
+|[Glycosylation](https://beta.uniprot.org/help/carbohyd)|CAR|Only for residues attached to an oligosaccharide structure annotated in the [GlyConnect](https://glyconnect.expasy.org) database|[P02771](https://beta.uniprot.org/uniprotkb/P02771/entry#ptm-processing)|
 |**Natural variations**||||
 |[Alternative sequence](https://beta.uniprot.org/help/var_seq)|VSP|Any sequence with an ‘Alternative sequence’ feature|[P81278](https://beta.uniprot.org/uniprotkb/P81278/entry#sequences)|
 |[Natural variant](https://beta.uniprot.org/help/variant)|VAR|Only for protein sequence variants of Hominidae (great apes and humans)|[P11171](https://beta.uniprot.org/uniprotkb/P11171/entry#sequences)|
