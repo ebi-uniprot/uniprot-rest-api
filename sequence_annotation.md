@@ -134,54 +134,15 @@ The format of the identifiers is a 3-letter prefix, specific for an annotation t
 
 Feature identifiers currently exist for the following annotation topics: Propeptide, Chain, Peptide, Glycosylation, Alternative sequence and Natural variant.
 
-| **Subsection** | **Identifier prefix** | **Availability** | **Example** | 
-| **Molecule processing**
+|**Subsection**|**Identifier prefix**|**Availability**|**Example**|
+|--- |--- |--- |--- |
+|**Molecule processing**||||
+|[Propeptide](https://beta.uniprot.org/help/propep)|PRO|Any processed propeptide|[Q7XAD0](https://beta.uniprot.org/uniprotkb/Q7XAD0/entry#ptm-processing)|
+|[Chain](https://beta.uniprot.org/help/chain) <br /> [Peptide](https://beta.uniprot.org/help/peptide)|PRO|Any mature polypeptide|[Q9W568](https://beta.uniprot.org/uniprotkb/Q9W568/entry#ptm-processing) [P15515](https://beta.uniprot.org/uniprotkb/P15515/entry#ptm-processing)|
+|**Amino acid modifications**||||
+|[Glycosylation](https://beta.uniprot.org/help/carbohyd)|CAR|Only for residues attached to an oligosaccharide structure annotated in the [GlyConnect](https://glyconnect.expasy.org) database|[P02771](https://beta.uniprot.org/uniprotkb/P02771/entry#ptm-processing)|
+|**Natural variations**||||
+|[Alternative sequence](https://beta.uniprot.org/help/var_seq)|VSP|Any sequence with an ‘Alternative sequence’ feature|[P81278](https://beta.uniprot.org/uniprotkb/P81278/entry#sequences)|
+|[Natural variant](https://beta.uniprot.org/help/variant)|VAR|Only for protein sequence variants of Hominidae (great apes and humans)|[P11171](https://beta.uniprot.org/uniprotkb/P11171/entry#sequences)|
 
-[Propeptide](http://www.uniprot.org/manual/propep)
-
-PRO
-
-Any processed propeptide
-
-[Q7XAD0](http://www.uniprot.org/uniprot/Q7XAD0#ptm_processing)
-
-[Chain](http://www.uniprot.org/manual/chain)
-
-[Peptide](http://www.uniprot.org/manual/peptide)
-
-PRO
-
-Any mature polypeptide
-
-[Q9W568](http://www.uniprot.org/uniprot/Q9W568#ptm_processing)
-
-[P15515](http://www.uniprot.org/uniprot/P15515#ptm_processing)
-
-**Amino acid modifications**
-
-[Glycosylation](http://www.uniprot.org/manual/carbohyd)
-
-CAR
-
-Only for residues attached to an oligosaccharide structure annotated in the [GlyConnect](https://glyconnect.expasy.org/) database
-
-[P02771](http://www.uniprot.org/uniprot/P02771#ptm_processing)
-
-**Natural variations**
-
-[Alternative sequence](http://www.uniprot.org/manual/var_seq)
-
-VSP
-
-Any sequence with an ‘Alternative sequence’ feature
-
-[P81278](http://www.uniprot.org/uniprot/P81278#sequences)
-
-[Natural variant](http://www.uniprot.org/manual/variant)
-
-VAR
-
-Only for protein sequence variants of Hominidae (great apes and humans)
-
-[P11171](http://www.uniprot.org/uniprot/P11171#sequences)
         
