@@ -123,7 +123,7 @@ Feature identifiers currently exist for the following annotation topics: Propept
 |**Subsection**|**Identifier prefix**|**Availability**|**Example**|
 |--- |--- |--- |--- |
 |**Molecule processing**||||
-|[Propeptide](https://beta.uniprot.org/help/propep)|PRO|Any processed propeptide|[Q7XAD0](https://beta.uniprot.org/uniprotkb/Q7XAD0/entry#ptm_processing)|
+|[Propeptide](https://beta.uniprot.org/help/propep)|PRO|Any processed propeptide|[Q7XAD0](https://beta.uniprot.org/uniprotkb/Q7XAD0/entry#ptm-processing)|
 |[Chain](https://beta.uniprot.org/help/chain) [Peptide](https://beta.uniprot.org/help/peptide)|PRO|Any mature polypeptide|[Q9W568](https://beta.uniprot.org/uniprotkb/Q9W568/entry#ptm-processing) [P15515](https://beta.uniprot.org/uniprotkb/P15515/entry#ptm-processing)|
 |**Amino acid modifications**||||
 |[Glycosylation](https://beta.uniprot.org/help/carbohyd)|CAR|Only for residues attached to an oligosaccharide structure annotated in the [GlyConnect](https://glyconnect.expasy.org) database|[P02771](https://beta.uniprot.org/uniprotkb/P02771/entry#ptm-processing)|
