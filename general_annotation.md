@@ -31,3 +31,24 @@ The current entry view disp lays annotation by subject (Function, PTM & processi
 [Sequence similarities](https://beta.uniprot.org/help/sequence\_similarities)|cc\_similarity|Description of the sequence similaritie(s) with other proteins and family attribution
 [Caution](https://beta.uniprot.org/help/caution)|cc\_caution|Warning about possible errors and/or grounds for confusion
 [Sequence caution](https://beta.uniprot.org/help/sequence\_caution)|cc\_sequence\_caution|Warning about possible errors related to the protein sequence
+
+## Querying Comments
+
+Individual comments can be queried using the query fields described in the tables above. Querying is of the form:
+
+```bash
+curl "http://www.ebi.ac.uk/uniprot/api/uniprotkb/search?query=FIELD:VALUE"
+```
+
+For example, to find all Human entries with catalyctic activity, we could run the following `curl` command:
+
+```bash
+curl "http://www.ebi.ac.uk/uniprot/api/uniprotkb/search?query=cc_catalytic_activity:* AND organism_id:9606"
+```
+
+
+### Comments evidences
+For any comment field, a corresponding field exists denoting its attached evidences (for a complete list of evidences, refer to [Evidences](evidences.md). Given a comment, `cc_XXXX`, its evidences can be queried via, `ccev_XXXX`. For example, to find Human entries with comment catalytic activity and a non-traceable evidence, we can execute the following command:
+```
+curl "http://www.ebi.ac.uk/uniprot/api/uniprotkb/search?query=cc_catalytic_activity:* AND ccev_catalytic_activity:ECO_0000303 AND organism_id:9606"
+```
