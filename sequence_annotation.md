@@ -16,67 +16,67 @@ The current entry view displays annotation by subject (Function, PTM & processin
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Initiator methionine](init_met) | ft_init_met | Cleavage of the initiator methionine |
-| [Signal](signal) | ft_signal | Sequence targeting proteins to the secretory pathway or periplasmic space |
-| [Transit peptide](transit) | ft_transit | Extent of a transit peptide for organelle targeting             |
-| [Propeptide](propep) | ft_propep | Part of a protein that is cleaved during maturation or activation      |
-| [Chain](chain) | ft_chain | Extent of a polypeptide chain in the mature protein                          |
-| [Peptide](peptide) | ft_peptide | Extent of an active peptide in the mature protein                        |
+| [Initiator methionine](../init_met) | ft_init_met | Cleavage of the initiator methionine |
+| [Signal](../signal) | ft_signal | Sequence targeting proteins to the secretory pathway or periplasmic space |
+| [Transit peptide](../transit) | ft_transit | Extent of a transit peptide for organelle targeting             |
+| [Propeptide](../propep) | ft_propep | Part of a protein that is cleaved during maturation or activation      |
+| [Chain](../chain) | ft_chain | Extent of a polypeptide chain in the mature protein                          |
+| [Peptide](../peptide) | ft_peptide | Extent of an active peptide in the mature protein                        |
 
 ### Regions
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Topological domain](topo_dom) | ft_topo_dom | Location of non-membrane regions of membrane-spanning proteins|
-| [Transmembrane](transmem) | ft_transmem | Extent of a membrane-spanning region                               |
-| [Intramembrane](intramem) | ft_intramem | Extent of a region located in a membrane without crossing it       |
-| [Domain](domain) | ft_domain | Position and type of each modular protein domain                            |
-| [Repeat](repeat) | ft_repeat | Positions of repeated sequence motifs or repeated domains                   |
-| [Calcium binding](ca_bind) | ft_ca_bind | Position(s) of calcium binding region(s) within the protein       |
-| [Zinc finger](zn_fing) | ft_zn_fing | Position(s) and type(s) of zinc fingers within the protein           |
-| [DNA binding](dna_bind)  | ft_dna_bind | Position and type of a DNA\-binding domain                          |
-| [Nucleotide binding](np_bind)  | ft_np_bind | Nucleotide phosphate binding region                           |
-| [Region](region) | ft_region | Region of interest in the sequence                                         |
-| [Coiled coil](coiled) | ft_coiled | Positions of regions of coiled coil within the protein                |
-| [Motif](motif) | ft_motif | Short (up to 20 amino acids) sequence motif of biological interest           |
-| [Compositional bias](compbias) | ft_compbias | Region of compositional bias in the protein                  |
+| [Topological domain](../topo_dom) | ft_topo_dom | Location of non-membrane regions of membrane-spanning proteins|
+| [Transmembrane](../transmem) | ft_transmem | Extent of a membrane-spanning region                               |
+| [Intramembrane](../intramem) | ft_intramem | Extent of a region located in a membrane without crossing it       |
+| [Domain](../domain) | ft_domain | Position and type of each modular protein domain                            |
+| [Repeat](../repeat) | ft_repeat | Positions of repeated sequence motifs or repeated domains                   |
+| [Calcium binding](../ca_bind) | ft_ca_bind | Position(s) of calcium binding region(s) within the protein       |
+| [Zinc finger](../zn_fing) | ft_zn_fing | Position(s) and type(s) of zinc fingers within the protein           |
+| [DNA binding](../dna_bind)  | ft_dna_bind | Position and type of a DNA\-binding domain                          |
+| [Nucleotide binding](../np_bind)  | ft_np_bind | Nucleotide phosphate binding region                           |
+| [Region](../region) | ft_region | Region of interest in the sequence                                         |
+| [Coiled coil](../coiled) | ft_coiled | Positions of regions of coiled coil within the protein                |
+| [Motif](../motif) | ft_motif | Short (up to 20 amino acids) sequence motif of biological interest           |
+| [Compositional bias](../compbias) | ft_compbias | Region of compositional bias in the protein                  |
 
 ### Sites
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Active site](act_site) | ft_act_site | Amino acid(s) directly involved in the activity of an enzyme
-| [Metal binding](metal) | ft_metal | Binding site for a metal ion
-| [Binding site](binding) | ft_binding | Binding site for any chemical group (co-enzyme, prosthetic group, etc.)
-| [Site](site) | ft_site | Any interesting single amino acid site on the sequence
+| [Active site](../act_site) | ft_act_site | Amino acid(s) directly involved in the activity of an enzyme
+| [Metal binding](../metal) | ft_metal | Binding site for a metal ion
+| [Binding site](../binding) | ft_binding | Binding site for any chemical group (co-enzyme, prosthetic group, etc.)
+| [Site](../site) | ft_site | Any interesting single amino acid site on the sequence
 
 ### Amino acid modifications
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Non-standard residue](non_std) | ft_non_std | Occurence of non-standard amino acids (selenocysteine and pyrrolysine) in the protein sequence  | 
-| [Modified residue](mod_res) | ft_mod_res | Modified residues excluding lipids, glycans and protein cross-links                                 | 
-| [Lipidation](lipid) | ft_lipid | Covalently attached lipid group(s)                                                                          | 
-| [Glycosylation](carbohyd) | ft_carbohyd | Covalently attached glycan group(s)                                                                   | 
-| [Disulfide bond](disulfid) | ft_disulfid | Cysteine residues participating in disulfide bonds                                                   | 
-| [Cross-link](crosslnk) | ft_crosslnk | Residues participating in covalent linkage(s) between proteins                                           | 
+| [Non-standard residue](../non_std) | ft_non_std | Occurence of non-standard amino acids (selenocysteine and pyrrolysine) in the protein sequence  | 
+| [Modified residue](../mod_res) | ft_mod_res | Modified residues excluding lipids, glycans and protein cross-links                                 | 
+| [Lipidation](../lipid) | ft_lipid | Covalently attached lipid group(s)                                                                          | 
+| [Glycosylation](../carbohyd) | ft_carbohyd | Covalently attached glycan group(s)                                                                   | 
+| [Disulfide bond](../disulfid) | ft_disulfid | Cysteine residues participating in disulfide bonds                                                   | 
+| [Cross-link](../crosslnk) | ft_crosslnk | Residues participating in covalent linkage(s) between proteins                                           | 
 
 ### Natural variations
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Alternative sequence](var_seq) | ft_var_seq | Amino acid change(s) producing alternate protein isoforms | 
-| [Natural variant](variant) | ft_variant | Description of a natural variant of the protein                |
+| [Alternative sequence](../var_seq) | ft_var_seq | Amino acid change(s) producing alternate protein isoforms | 
+| [Natural variant](../variant) | ft_variant | Description of a natural variant of the protein                |
 
 ### Experimental info
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Mutagenesis](mutagen) | ft_mutagen | Site which has been experimentally altered by mutagenesis|
-| [Sequence uncertainty](unsure) | ft_unsure | Regions of uncertainty in the sequence|
-| [Sequence conflict](conflict) |ft_conflict  | Description of sequence discrepancies of unknown origin|
-| [Non-adjacent residues](non_cons) | ft_non_cons | Indicates that two residues in a sequence are not consecutive|
-| [Non-terminal residue](non_ter) | ft_non_ter | The sequence is incomplete. Indicate that a residue is not the terminal residue of the complete protein|
+| [Mutagenesis](../mutagen) | ft_mutagen | Site which has been experimentally altered by mutagenesis|
+| [Sequence uncertainty](../unsure) | ft_unsure | Regions of uncertainty in the sequence|
+| [Sequence conflict](../conflict) |ft_conflict  | Description of sequence discrepancies of unknown origin|
+| [Non-adjacent residues](../non_cons) | ft_non_cons | Indicates that two residues in a sequence are not consecutive|
+| [Non-terminal residue](../non_ter) | ft_non_ter | The sequence is incomplete. Indicate that a residue is not the terminal residue of the complete protein|
 
 ### Secondary structure
 
