@@ -6,7 +6,7 @@ categories: manual,Technical
 
 Sequence annotations describe regions or sites of interest in the protein sequence, such as post-translational modifications, binding sites, enzyme active sites, local secondary structure or other characteristics reported in the cited references. Sequence conflicts between references are also described in this manner.
 
-Sequence annotations (position-specific annotations) used to be found in the 'Sequence annotation (Features)' section in the previous version of the UniProtKB entry view. The flat file and XML formats still group all position-specific annotation together in a "feature table" (FT, <feature>). Each sequence annotation consists of a "feature key", "from" and "to" positions as well as a short description.
+Sequence annotations (position-specific annotations) used to be found in the 'Sequence annotation (Features)' section in the previous version of the UniProtKB entry view. The flat file and XML formats still group all position-specific annotation together in a "feature table" (FT). Each sequence annotation consists of a "feature key", "from" and "to" positions as well as a short description.
 
 The current entry view displays annotation by subject (Function, PTM & processing, etc), and the various position-specific annotations are now distributed to the relevant new sections.
 
@@ -16,75 +16,75 @@ The current entry view displays annotation by subject (Function, PTM & processin
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Initiator methionine](http://www.uniprot.org/manual/init_met) | ft_init_met | Cleavage of the initiator methionine |
-| [Signal](http://www.uniprot.org/manual/signal) | ft_signal | Sequence targeting proteins to the secretory pathway or periplasmic space |
-| [Transit peptide](http://www.uniprot.org/manual/transit) | ft_transit | Extent of a transit peptide for organelle targeting             |
-| [Propeptide](http://www.uniprot.org/manual/propep) | ft_propep | Part of a protein that is cleaved during maturation or activation      |
-| [Chain](http://www.uniprot.org/manual/chain) | ft_chain | Extent of a polypeptide chain in the mature protein                          |
-| [Peptide](http://www.uniprot.org/manual/peptide) | ft_peptide | Extent of an active peptide in the mature protein                        |
+| [Initiator methionine](init_met) | ft_init_met | Cleavage of the initiator methionine |
+| [Signal](signal) | ft_signal | Sequence targeting proteins to the secretory pathway or periplasmic space |
+| [Transit peptide](transit) | ft_transit | Extent of a transit peptide for organelle targeting             |
+| [Propeptide](propep) | ft_propep | Part of a protein that is cleaved during maturation or activation      |
+| [Chain](chain) | ft_chain | Extent of a polypeptide chain in the mature protein                          |
+| [Peptide](peptide) | ft_peptide | Extent of an active peptide in the mature protein                        |
 
 ### Regions
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Topological domain](http://www.uniprot.org/manual/topo_dom) | ft_topo_dom | Location of non-membrane regions of membrane-spanning proteins|
-| [Transmembrane](http://www.uniprot.org/manual/transmem) | ft_transmem | Extent of a membrane-spanning region                               |
-| [Intramembrane](http://www.uniprot.org/manual/intramem) | ft_intramem | Extent of a region located in a membrane without crossing it       |
-| [Domain](http://www.uniprot.org/manual/domain) | ft_domain | Position and type of each modular protein domain                            |
-| [Repeat](http://www.uniprot.org/manual/repeat) | ft_repeat | Positions of repeated sequence motifs or repeated domains                   |
-| [Calcium binding](http://www.uniprot.org/manual/ca_bind) | ft_ca_bind | Position(s) of calcium binding region(s) within the protein       |
-| [Zinc finger](http://www.uniprot.org/manual/zn_fing) | ft_zn_fing | Position(s) and type(s) of zinc fingers within the protein           |
-| [DNA binding](http://www.uniprot.org/manual/dna_bind)  | ft_dna_bind | Position and type of a DNA\-binding domain                          |
-| [Nucleotide binding](http://www.uniprot.org/manual/np_bind)  | ft_np_bind | Nucleotide phosphate binding region                           |
-| [Region](http://www.uniprot.org/manual/region) | ft_region | Region of interest in the sequence                                         |
-| [Coiled coil](http://www.uniprot.org/manual/coiled) | ft_coiled | Positions of regions of coiled coil within the protein                |
-| [Motif](http://www.uniprot.org/manual/motif) | ft_motif | Short (up to 20 amino acids) sequence motif of biological interest           |
-| [Compositional bias](http://www.uniprot.org/manual/compbias) | ft_compbias | Region of compositional bias in the protein                  |
+| [Topological domain](topo_dom) | ft_topo_dom | Location of non-membrane regions of membrane-spanning proteins|
+| [Transmembrane](transmem) | ft_transmem | Extent of a membrane-spanning region                               |
+| [Intramembrane](intramem) | ft_intramem | Extent of a region located in a membrane without crossing it       |
+| [Domain](domain) | ft_domain | Position and type of each modular protein domain                            |
+| [Repeat](repeat) | ft_repeat | Positions of repeated sequence motifs or repeated domains                   |
+| [Calcium binding](ca_bind) | ft_ca_bind | Position(s) of calcium binding region(s) within the protein       |
+| [Zinc finger](zn_fing) | ft_zn_fing | Position(s) and type(s) of zinc fingers within the protein           |
+| [DNA binding](dna_bind)  | ft_dna_bind | Position and type of a DNA\-binding domain                          |
+| [Nucleotide binding](np_bind)  | ft_np_bind | Nucleotide phosphate binding region                           |
+| [Region](region) | ft_region | Region of interest in the sequence                                         |
+| [Coiled coil](coiled) | ft_coiled | Positions of regions of coiled coil within the protein                |
+| [Motif](motif) | ft_motif | Short (up to 20 amino acids) sequence motif of biological interest           |
+| [Compositional bias](compbias) | ft_compbias | Region of compositional bias in the protein                  |
 
 ### Sites
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Active site](http://www.uniprot.org/manual/act_site) | ft_act_site | Amino acid(s) directly involved in the activity of an enzyme
-| [Metal binding](http://www.uniprot.org/manual/metal) | ft_metal | Binding site for a metal ion
-| [Binding site](http://www.uniprot.org/manual/binding) | ft_binding | Binding site for any chemical group (co-enzyme, prosthetic group, etc.)
-| [Site](http://www.uniprot.org/manual/site) | ft_site | Any interesting single amino acid site on the sequence
+| [Active site](act_site) | ft_act_site | Amino acid(s) directly involved in the activity of an enzyme
+| [Metal binding](metal) | ft_metal | Binding site for a metal ion
+| [Binding site](binding) | ft_binding | Binding site for any chemical group (co-enzyme, prosthetic group, etc.)
+| [Site](site) | ft_site | Any interesting single amino acid site on the sequence
 
 ### Amino acid modifications
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Non-standard residue](http://www.uniprot.org/manual/non_std) | ft_non_std | Occurence of non-standard amino acids (selenocysteine and pyrrolysine) in the protein sequence  | 
-| [Modified residue](http://www.uniprot.org/manual/mod_res) | ft_mod_res | Modified residues excluding lipids, glycans and protein cross-links                                 | 
-| [Lipidation](http://www.uniprot.org/manual/lipid) | ft_lipid | Covalently attached lipid group(s)                                                                          | 
-| [Glycosylation](http://www.uniprot.org/manual/carbohyd) | ft_carbohyd | Covalently attached glycan group(s)                                                                   | 
-| [Disulfide bond](http://www.uniprot.org/manual/disulfid) | ft_disulfid | Cysteine residues participating in disulfide bonds                                                   | 
-| [Cross-link](http://www.uniprot.org/manual/crosslnk) | ft_crosslnk | Residues participating in covalent linkage(s) between proteins                                           | 
+| [Non-standard residue](non_std) | ft_non_std | Occurence of non-standard amino acids (selenocysteine and pyrrolysine) in the protein sequence  | 
+| [Modified residue](mod_res) | ft_mod_res | Modified residues excluding lipids, glycans and protein cross-links                                 | 
+| [Lipidation](lipid) | ft_lipid | Covalently attached lipid group(s)                                                                          | 
+| [Glycosylation](carbohyd) | ft_carbohyd | Covalently attached glycan group(s)                                                                   | 
+| [Disulfide bond](disulfid) | ft_disulfid | Cysteine residues participating in disulfide bonds                                                   | 
+| [Cross-link](crosslnk) | ft_crosslnk | Residues participating in covalent linkage(s) between proteins                                           | 
 
 ### Natural variations
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Alternative sequence](http://www.uniprot.org/manual/var_seq) | ft_var_seq | Amino acid change(s) producing alternate protein isoforms | 
-| [Natural variant](http://www.uniprot.org/manual/variant) | ft_variant | Description of a natural variant of the protein                |
+| [Alternative sequence](var_seq) | ft_var_seq | Amino acid change(s) producing alternate protein isoforms | 
+| [Natural variant](variant) | ft_variant | Description of a natural variant of the protein                |
 
 ### Experimental info
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Mutagenesis](http://www.uniprot.org/manual/mutagen) | ft_mutagen | Site which has been experimentally altered by mutagenesis|
-| [Sequence uncertainty](http://www.uniprot.org/manual/unsure) | ft_unsure | Regions of uncertainty in the sequence|
-| [Sequence conflict](http://www.uniprot.org/manual/conflict) |ft_conflict  | Description of sequence discrepancies of unknown origin|
-| [Non-adjacent residues](http://www.uniprot.org/manual/non_cons) | ft_non_cons | Indicates that two residues in a sequence are not consecutive|
-| [Non-terminal residue](http://www.uniprot.org/manual/non_ter) | ft_non_ter | The sequence is incomplete. Indicate that a residue is not the terminal residue of the complete protein|
+| [Mutagenesis](mutagen) | ft_mutagen | Site which has been experimentally altered by mutagenesis|
+| [Sequence uncertainty](unsure) | ft_unsure | Regions of uncertainty in the sequence|
+| [Sequence conflict](conflict) |ft_conflict  | Description of sequence discrepancies of unknown origin|
+| [Non-adjacent residues](non_cons) | ft_non_cons | Indicates that two residues in a sequence are not consecutive|
+| [Non-terminal residue](non_ter) | ft_non_ter | The sequence is incomplete. Indicate that a residue is not the terminal residue of the complete protein|
 
 ### Secondary structure
 
 | **Subsection** | **Query Field** | **Content** |
 |----------------|-----------------|-------------|
-| [Helix](http://www.uniprot.org/manual/helix) | ft_helix | Helical regions within the experimentally determined protein structure |
-| [Turn](http://www.uniprot.org/manual/turn) | ft_turn | Turns within the experimentally determined protein structure |
-| [Beta strand](http://www.uniprot.org/manual/strand) | ft_strand | Beta strand regions within the experimentally determined protein structure |
+| [Helix](helix) | ft_helix | Helical regions within the experimentally determined protein structure |
+| [Turn](turn) | ft_turn | Turns within the experimentally determined protein structure |
+| [Beta strand](strand) | ft_strand | Beta strand regions within the experimentally determined protein structure |
 
 The exact boundaries of the described sequence feature, as well as its length, are provided. When a feature is known to extend beyond the position that is given in this section, the endpoint specification will be preceded by '<' (less than) for features which continue to the N-terminal direction or by '>' (greater than) for features which continue to the C-terminal direction.
 
