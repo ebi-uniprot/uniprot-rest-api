@@ -1,7 +1,12 @@
 ## Databases/External links
+
+This document also explains about differences in the names of the returned fields between new and old APIs.
+This document is only for external cross-references. <br />
+Please see example in [Return Fields](return-fields.md) for usage in API.
+
 ### Sequences
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 CCDS|database(CCDS)|xref\_ccds
 EMBL|database(EMBL)|xref\_embl
@@ -11,7 +16,7 @@ RefSeq|database(RefSeq)|xref\_refseq
 _* Unless otherwise specified_
 ### 3D structure
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 BMRB|database(BMRB)|xref\_bmrb
 PCDDB|database(PCDDB)|xref\_pcddb
@@ -22,7 +27,7 @@ SMR|database(SMR)|xref\_smr
 
 ### Protein-protein interaction
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 BioGRID|database(BioGRID)|xref\_biogrid
 ComplexPortal|database(ComplexPortal)|xref\_corum
@@ -35,7 +40,7 @@ STRING|database(STRING)|xref\_string
 
 ### Chemistry
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 BindingDB|database(BindingDB)|xref\_bindingdb
 ChEMBL|database(ChEMBL)|xref\_chembl
@@ -46,7 +51,7 @@ SwissLipids|database(SwissLipids)|xref\_swisslipids
 
 ### Protein family/group
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Allergome|database(Allergome)|xref\_allergome
 CAZy|database(CAZy)|xref\_cazy
@@ -64,7 +69,7 @@ UniLectin|database(UniLectin)|xref\_unilectin
 
 ### PTM
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 CarbonylDB|database(CarbonylDB)|xref\_carbonyldb
 DEPOD|database(DEPOD)|xref\_depod
@@ -78,7 +83,7 @@ UniCarbKB|NA|xref\_unicarbkb
 
 ### Genetic variation/Polymorphism and mutation
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 BioMuta|database(BioMuta)|xref\_biomuta
 dbSNP|database(dbSNP)|xref\_dbsnp
@@ -86,7 +91,7 @@ DMDM|database(DMDM)|xref\_dmdm
 
 ### 2D gel
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 COMPLUYEAST-2DPAGE|database(COMPLUYEAST-2DPAGE)|xref\_compluyeast-2dpage
 DOSAC-COBS-2DPAGE|database(DOSAC-COBS-2DPAGE)|xref\_dosac-cobs-2dpage
@@ -98,7 +103,7 @@ World-2DPAGE|database(World-2DPAGE)|xref\_world-2dpage
 
 ### Proteomic
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 CPTAC|database(CPTAC)|xref\_cptac
 EPD|database(EPD)|xref\_epd
@@ -114,7 +119,7 @@ TopDownProteomics|database(TopDownProteomics)|xref\_jpost
 
 ### Protocols and materials
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 ABCD|database(ABCD)|xref\_abcd
 Antibodypedia|database(Antibodypedia)|xref\_antibodypedia
@@ -123,7 +128,7 @@ DNASU|database(DNASU)|xref\_dnasu
 
 ### Genome annotation
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Ensembl|database(Ensembl)|xref\_ensembl
 EnsemblBacteria|database(EnsemblBacteria)|xref\_ensemblbacteria
@@ -145,7 +150,7 @@ WBParaSite|database(WBParaSite)|xref\_wbparasite
 **ArachnoServer**|**database(ArachnoServer)**|**xref\_arachnoserver**
 :-----:|:-----:|:-----:
 Araport|database(Araport)|xref\_araport
-Column label in old and new website*|Column name in url of old API|Column name in url of new API
+Label*|Returned Field|New Returned Field
 CGD|database(CGD)|xref\_cgd
 ConoServer|database(ConoServer)|xref\_conoserver
 CTD|database(CTD)|xref\_ctd
@@ -184,7 +189,7 @@ ZFIN|database(ZFIN)|xref\_zfin
 
 ### Phylogenomic
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 eggNOG|database(eggNOG)|xref\_eggnog
 GeneTree|database(GeneTree)|xref\_genetree
@@ -198,7 +203,7 @@ TreeFam|database(TreeFam)|xref\_treefam
 
 ### Enzyme and pathway
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 BioCyc|database(BioCyc)|xref\_biocyc
 BRENDA|database(BRENDA)|xref\_brenda
@@ -212,7 +217,7 @@ UniPathway|database(UniPathway)|xref\_unipathway
 
 ### Miscellaneous/Other
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 BioGRID-ORCS|database(BioGRID-ORCS)|xref\_biogrid-orcs
 ChiTaRS|database(ChiTaRS)|xref\_chitars
@@ -226,7 +231,7 @@ RNAct|database(RNAct)|xref\_rnact
 
 ### Gene expression
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Bgee|database(Bgee)|xref\_bgee
 CollecTF|database(CollecTF)|xref\_collectf
@@ -236,7 +241,7 @@ CleanEx|NA|xref\_cleanex
 
 ### Family and domain
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 CDD|database(CDD)|xref\_cdd
 DisProt|database(DisProt)|xref\_disprot

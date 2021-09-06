@@ -1,10 +1,22 @@
 ### UniProtKB column names for programmatic access
 
-This document lists the differences between the returned column names by RESTful APIs.
+This document lists the differences between the returned columns by RESTful APIs.
+User can ask required columns returned by an API by passing the _Returned Field_ in the request url 
+and the response will have those requested fields.
+
+For example, to get UniProtKB entry with accession and proteomes in new API run the below `curl` command:
+```bash
+curl https://www.ebi.ac.uk/uniprot/beta/api/uniprotkb/search?query=human&fields=accession,xref_proteomes
+```
+Equivalent request in the current website would be :
+```
+https://www.uniprot.org/uniprot/?query=human&columns=id,proteome  
+```
+The `Label` is the readable name of the returned field. The `Label`  is shown on the website/TSV or in Excel format.
 
 ### Names & Taxonomy
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Entry|id|accession
 Entry name|entry name|id
@@ -20,9 +32,11 @@ Proteomes|proteome|xref\_proteomes
 Taxonomic lineage|lineage(ALL)|lineage
 Virus hosts|virus hosts|virus\_hosts
 
+_* Label in old and new API unless otherwise specified_
+
 ### Sequences
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Alternative products|comment(ALTERNATIVE PRODUCTS)|cc\_alternative\_products
 Alternative sequence|feature(ALTERNATIVE SEQUENCE)|ft\_var\_seq
@@ -46,7 +60,7 @@ Sequence version|version(sequence)|sequence\_version
 
 ### Function
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Absorption|comment(ABSORPTION)|absorption
 Active site|feature(ACTIVE SITE)|ft\_act\_site
@@ -70,7 +84,7 @@ Temperature dependence|comment(TEMPERATURE DEPENDENCE)|temp\_dependence
 
 ### Miscellaneous
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Annotation|annotation score|annotation\_score
 Caution|comment(CAUTION)|cc\_caution
@@ -88,14 +102,14 @@ UniParc|uniparcid|uniparc\_id
 
 ### Interaction
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Interacts with|interactor|cc\_interaction
 Subunit structure[CC]|comment(SUBUNIT)|cc\_subunit
 
 ### Expression
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Developmental stage|comment(DEVELOPMENTAL STAGE)|cc\_developmental\_stage
 Induction|comment(INDUCTION)|cc\_induction
@@ -103,7 +117,7 @@ Tissue specificity|comment(TISSUE SPECIFICITY)|cc\_tissue\_specificity
 
 ### Gene Ontology (GO)
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Gene ontology (biological process)|go(biological process)|go\_p
 Gene ontology (cellular component)|go(cellular component)|go\_c
@@ -113,7 +127,7 @@ Gene ontology IDs|go-id|go\_id
 
 ### Pathology & Biotech
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Allergenic properties|comment(ALLERGEN)|cc\_allergen
 Biotechnological use|comment(BIOTECHNOLOGY)|cc\_biotechnology
@@ -125,7 +139,7 @@ Toxic dose|comment(TOXIC DOSE)|cc\_toxic\_dose
 
 ### Subcellular location
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Intramembrane|feature(INTRAMEMBRANE)|ft\_intramem
 Subcellular location[CC]|comment(SUBCELLULAR LOCATION)|cc\_subcellular\_location
@@ -134,7 +148,7 @@ Transmembrane|feature(TRANSMEMBRANE)|ft\_transmem
 
 ### PTM / Processsing
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Chain|feature(CHAIN)|ft\_chain
 Cross-link|feature(CROSS LINK)|ft\_crosslnk
@@ -151,7 +165,7 @@ Transit peptide|feature(TRANSIT)|ft\_transit
 
 ### Structure
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 3D|3d|structure\_3d
 Beta strand|feature(BETA STRAND)|ft\_strand
@@ -160,14 +174,14 @@ Turn|feature(TURN)|ft\_turn
 
 ### Publications
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Mapped PubMed ID|citationmapping|NA
 PubMed ID|citation|lit\_pubmed\_id
 
 ### Date of
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Date of creation|created|date\_created
 Date of last modification|last-modified|date\_modified
@@ -176,7 +190,7 @@ Entry version|version(entry)|version
 
 ### Family & Domains
 
-**Column label in old and new website***|**Column name in url of old API**|**Column name in url of new API**
+**Label***|**Returned Field**|**New Returned Field**
 :-----:|:-----:|:-----:
 Coiled coil|feature(COILED COIL)|ft\_coiled
 Compositional bias|feature(COMPOSITIONAL BIAS)|ft\_compbias
