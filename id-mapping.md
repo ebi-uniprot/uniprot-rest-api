@@ -87,3 +87,32 @@ curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f
 ## Fetching details about a job
 
 > GET /idmapping/details/{jobId}
+
+## Parameters _from_ and _to_ databases possible values
+
+You can map `from` one database `to` another database. To find the name of all the possible valid databases pairs (both from and to), use the below curl command:
+
+```bash
+% curl https://www.ebi.ac.uk/uniprot/beta/api/configure/idmapping/fields
+```
+The response has two top sections :
+- groups
+    - items
+- rules
+
+Each group represents a logical group of databases. It contains an array of `items`.
+The value of `groupName` is used by UI to group the similar kind of databases together.
+Each item of `items` array has the following attributes:
+- displayName : Used by the [UI](https://beta.uniprot.org/id-mapping)
+- name : Name of `from` or `to` database to be passed in the request.
+- from: Boolean flag to tell if the `name` can be used as a `from` database. Defaults to false
+- to: Boolean flag to tell if the `name` can be used as a `to` database. Defaults to false
+- ruleId: Refers a rule in the `rules` section to find all possible values of `to` databases.
+
+Each rule of `rules` array represents all possible `to` databases for a `from` database.
+It has the following attributes:
+
+- ruleId : Unique id of the rule. Referred by item of `groups`' `items`.
+- tos: List of possible `to` databases for a given `from` item.
+- defaultTo: Used by  UI to be selected by default in dropdown.
+- taxonId: Flag to tell if a third optional param `taxonId`(Taxonomy Id) is allowed apart `from` and `to` databases.
