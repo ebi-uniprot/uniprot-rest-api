@@ -1,3 +1,10 @@
+
+---
+title: UniProtKB return fields for cross-references
+categories: Text_search,Technical,Website,help
+---
+
+
 ## Databases/External links
 
 This document also explains about differences in the names of the returned fields between new and old APIs.

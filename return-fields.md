@@ -1,3 +1,9 @@
+
+---
+title: UniProtKB return fields
+categories: Text_search,Technical,Website,help
+---
+
 ### UniProtKB column names for programmatic access
 
 This document lists the differences between the returned columns by RESTful APIs.
