@@ -17,12 +17,24 @@ for convenience.
 
 > POST /idmapping/run
 
+For example: 
+
+```bash
+% curl --location --request POST 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/run' --form 'ids="P12345"' --form 'from="UniProtKB_AC-ID"' --form 'to="UniRef90"'
+{"jobId":"81016d9d7fb55c00999015039ae9e9178b4d001c"}
+```
+
 * Mention from/to rules -- See API
 * Check rules in UI
 
 ## Polling the status of a job
 
 > GET /idmapping/status/{jobId}
+
+```bash
+% curl -- request GET 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/status/81016d9d7fb55c00999015039ae9e9178b4d001c'
+{"jobStatus":"FINISHED"}
+```
 
 ## Fetching the results of a job
       
