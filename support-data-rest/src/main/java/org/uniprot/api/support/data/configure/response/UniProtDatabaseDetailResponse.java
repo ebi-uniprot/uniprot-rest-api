@@ -46,21 +46,27 @@ public class UniProtDatabaseDetailResponse {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @Getter
-    static class UniProtDatabaseAttributeResponse{
+    static class UniProtDatabaseAttributeResponse {
         private String name;
         private String xmlTag;
         private String uriLink;
+
         public UniProtDatabaseAttributeResponse(String name, String xmlTag, String uriLink) {
             this.name = name;
             this.xmlTag = xmlTag;
             this.uriLink = uriLink;
         }
-        static UniProtDatabaseAttributeResponse getUniProtDatabaseAttributeResponse(UniProtDatabaseAttribute attribute){
-            return new UniProtDatabaseAttributeResponse(attribute.getName(), attribute.getXmlTag(), attribute.getUriLink());
+
+        static UniProtDatabaseAttributeResponse getUniProtDatabaseAttributeResponse(
+                UniProtDatabaseAttribute attribute) {
+            return new UniProtDatabaseAttributeResponse(
+                    attribute.getName(), attribute.getXmlTag(), attribute.getUriLink());
         }
 
-        static List<UniProtDatabaseAttributeResponse> getUniProtDatabaseAttributeResponses(List<UniProtDatabaseAttribute> attributes){
-            return attributes.stream().map(UniProtDatabaseAttributeResponse::getUniProtDatabaseAttributeResponse)
+        static List<UniProtDatabaseAttributeResponse> getUniProtDatabaseAttributeResponses(
+                List<UniProtDatabaseAttribute> attributes) {
+            return attributes.stream()
+                    .map(UniProtDatabaseAttributeResponse::getUniProtDatabaseAttributeResponse)
                     .collect(Collectors.toList());
         }
     }
@@ -72,7 +78,8 @@ public class UniProtDatabaseDetailResponse {
                 dbDetail.getDisplayName(),
                 dbDetail.getCategory().getName(),
                 dbDetail.getUriLink(),
-                UniProtDatabaseAttributeResponse.getUniProtDatabaseAttributeResponses(dbDetail.getAttributes()),
+                UniProtDatabaseAttributeResponse.getUniProtDatabaseAttributeResponses(
+                        dbDetail.getAttributes()),
                 dbDetail.isImplicit(),
                 dbDetail.getLinkedReason(),
                 dbDetail.getIdMappingName());

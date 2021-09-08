@@ -1,10 +1,10 @@
 package org.uniprot.api.common.repository.search.suggestion;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
-
-import java.util.List;
 
 /**
  * The purpose of this class is to represent a suggestion returned from a Solr spellchecker entity.
@@ -22,6 +22,5 @@ import java.util.List;
 @Builder
 public class Suggestion {
     private String original;
-    @Singular
-    private List<Alternative> alternatives;
+    @Singular private List<Alternative> alternatives;
 }

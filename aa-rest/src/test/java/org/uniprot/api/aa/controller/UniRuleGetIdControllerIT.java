@@ -106,7 +106,9 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.otherRules", notNullValue()))
                     .resultMatcher(jsonPath("$.samFeatureSets", notNullValue()))
                     .resultMatcher(jsonPath("$.positionFeatureSets", notNullValue()))
-                    .resultMatcher(jsonPath("$.proteinsAnnotatedCount", notNullValue()))
+                    .resultMatcher(jsonPath("$.statistics", notNullValue()))
+                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", notNullValue()))
+                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", notNullValue()))
                     .resultMatcher(jsonPath("$.createdBy", notNullValue()))
                     .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
                     .resultMatcher(jsonPath("$.createdDate", notNullValue()))
@@ -148,7 +150,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.otherRules").doesNotExist())
                     .resultMatcher(jsonPath("$.samFeatureSets").doesNotExist())
                     .resultMatcher(jsonPath("$.positionFeatureSets").doesNotExist())
-                    .resultMatcher(jsonPath("$.proteinsAnnotatedCount").doesNotExist())
+                    .resultMatcher(jsonPath("$.statistics").doesNotExist())
                     .resultMatcher(jsonPath("$.createdBy").doesNotExist())
                     .resultMatcher(jsonPath("$.modifiedBy").doesNotExist())
                     .resultMatcher(jsonPath("$.createdDate").doesNotExist())
@@ -196,8 +198,9 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             jsonPath(
                                                     "$.positionFeatureSets",
                                                     Matchers.hasSize(greaterThan(0))))
-                                    .resultMatcher(
-                                            jsonPath("$.proteinsAnnotatedCount", notNullValue()))
+                                    .resultMatcher(jsonPath("$.statistics", notNullValue()))
+                                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", notNullValue()))
+                                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", notNullValue()))
                                     .resultMatcher(jsonPath("$.createdBy", notNullValue()))
                                     .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
                                     .resultMatcher(jsonPath("$.createdDate", notNullValue()))

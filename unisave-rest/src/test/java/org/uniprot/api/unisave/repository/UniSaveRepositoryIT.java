@@ -203,8 +203,9 @@ class UniSaveRepositoryIT {
         testEntityManager.persist(entry);
         String sourceAccession = entry.getAccession();
 
-        // Note that there is no event data in the DB for this accession, even though this accession exists
-        
+        // Note that there is no event data in the DB for this accession, even though this accession
+        // exists
+
         // when
         AccessionStatusInfoImpl statusInfo = repository.retrieveEntryStatusInfo(sourceAccession);
 
