@@ -31,7 +31,7 @@ class AAConfigureServiceTest {
         assertNotNull(resultGroups);
         assertEquals(1, resultGroups.size());
 
-        assertEquals(6, resultGroups.get(0).getFields().size());
+        assertEquals(7, resultGroups.get(0).getFields().size());
     }
 
     @Test
@@ -49,7 +49,7 @@ class AAConfigureServiceTest {
         assertNotNull(resultGroups);
         assertEquals(1, resultGroups.size());
 
-        assertEquals(4, resultGroups.get(0).getFields().size());
+        assertEquals(5, resultGroups.get(0).getFields().size());
     }
 
     @Test

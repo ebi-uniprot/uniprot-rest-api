@@ -201,12 +201,9 @@ public class UniSaveRepository {
             }
 
             return accessionStatusInfo;
-        }
-        catch (UniSaveEntryNotFoundException e) {
-            throw new UniSaveEntryNotFoundException(
-                    "No entry for " + accession + " was found");
-        }
-        catch (PersistenceException e) {
+        } catch (UniSaveEntryNotFoundException e) {
+            throw new UniSaveEntryNotFoundException("No entry for " + accession + " was found");
+        } catch (PersistenceException e) {
             log.error(QUERY_RESULTS_ERROR_MESSAGE, e);
             throw new QueryRetrievalException(QUERY_RESULTS_ERROR_MESSAGE, e);
         }

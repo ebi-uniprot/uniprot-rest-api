@@ -1,14 +1,14 @@
 package org.uniprot.api.common.repository.search.suggestion;
 
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
-import org.springframework.core.convert.converter.Converter;
-import org.uniprot.core.util.Utils;
+import static java.util.Collections.emptyList;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Collections.emptyList;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+import org.springframework.core.convert.converter.Converter;
+import org.uniprot.core.util.Utils;
 
 /**
  * Converts a {@link QueryResponse}'s spellcheck component to a list of {@link Suggestion}s. Created

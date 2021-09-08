@@ -5,7 +5,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.*;
@@ -225,7 +224,8 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.suggestions.size()", is(1)))
                 .andExpect(jsonPath("$.suggestions[0].original", is("bell")))
-                .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains("ball", "bill")))
+                .andExpect(
+                        jsonPath("$.suggestions[0].alternatives[*].term", contains("ball", "bill")))
                 .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(2, 1)));
     }
 
@@ -250,7 +250,8 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.suggestions.size()", is(1)))
                 .andExpect(jsonPath("$.suggestions[0].original", is("bell")))
-                .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains("ball", "bill")))
+                .andExpect(
+                        jsonPath("$.suggestions[0].alternatives[*].term", contains("ball", "bill")))
                 .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(2, 1)));
     }
 
@@ -278,9 +279,9 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains("protein")))
                 .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(3)))
                 .andExpect(jsonPath("$.suggestions[1].original", is("bell")))
-                .andExpect(jsonPath("$.suggestions[1].alternatives[*].term", contains("ball", "bill")))
+                .andExpect(
+                        jsonPath("$.suggestions[1].alternatives[*].term", contains("ball", "bill")))
                 .andExpect(jsonPath("$.suggestions[1].alternatives[*].count", contains(2, 1)));
-
     }
 
     @Test

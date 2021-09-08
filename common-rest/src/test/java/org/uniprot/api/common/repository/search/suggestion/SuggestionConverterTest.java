@@ -1,19 +1,19 @@
 package org.uniprot.api.common.repository.search.suggestion;
 
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SpellCheckResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class SuggestionConverterTest {
 
@@ -85,7 +85,7 @@ class SuggestionConverterTest {
 
         // when --------------------------------------------------------------
         List<Suggestion> suggestions = converter.convert(mockQueryResponse);
-        
+
         // then --------------------------------------------------------------
         assertThat(suggestions, hasSize(2));
         assertThat(suggestions.get(0).getOriginal(), is(token0));

@@ -1,13 +1,14 @@
 package org.uniprot.api.common.repository.search;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
 import lombok.Getter;
+
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.page.Page;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
-
-import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * Solr Repository response entity
