@@ -21,11 +21,17 @@ please refer to the comprehensive [API documentation](http://www.ebi.ac.uk/unipr
 > POST /idmapping/run
 
 <a name="example"></a>For example, to map UniProtKB entries P21802, P12345, we could POST a request to the above REST end-point as follows: 
+   
 
-```bash
-% curl --request POST 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/run' --form 'ids="P21802,P12345"' --form 'from="UniProtKB_AC-ID"' --form 'to="UniRef90"'
-{"jobId":"27a020f6334184c4eb382111fbcad0e848f40300"}
-```
+> **Request**
+> ```bash
+> % curl --request POST 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/run' --form 'ids="P21802,P12345"' --form 'from="UniProtKB_AC-ID"' --form 'to="UniRef90"'
+> ```
+> **Reponse**
+> ```bash
+> {"jobId":"27a020f6334184c4eb382111fbcad0e848f40300"}
+> ```
+
 Be sure to take note of the `jobId`. This will be used later to:
 
 * poll the status of the job
@@ -38,17 +44,20 @@ Be sure to take note of the `jobId`. This will be used later to:
 
 Continuing the above [example](#example), we can use the `jobId` to find out the status of the job as follows:
 
-```bash
-% curl -i 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/status/27a020f6334184c4eb382111fbcad0e848f40300'
-HTTP/1.1 303 
-Server: nginx/1.17.7
-Location: https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f6334184c4eb382111fbcad0e848f40300
-Content-Type: application/json
-Access-Control-Allow-Origin: *
-...
-
-{"jobStatus":"FINISHED"}
-```
+> **Request**
+> ```bash
+> % curl -i 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/status/27a020f6334184c4eb382111fbcad0e848f40300'
+> ```
+> **Response**
+> ```bash
+> HTTP/1.1 303 
+> Server: nginx/1.17.7
+> Location: https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f6334184c4eb382111fbcad0e848f40300
+> Content-Type: application/json
+> Access-Control-Allow-Origin: *
+> ...
+> {"jobStatus":"FINISHED"}
+> ```
 
 Note that the `jobStatus` is finished, indicating that the job's results are ready to be fetched. Note also the [HTTP 303](https://httpstatuses.com/303)
 header that indicates the results can be retrieved via the URL in the `Location` header. 
@@ -62,21 +71,25 @@ The results of a job can be retrieved one page at a time using one of following 
 > GET /idmapping/results/{jobId}<br>
 > GET /idmapping/{uniprot_db}/results/{jobId} ## where {uniprot_db} is one of UniParc, UniProtKB or UniRef
 
-For example, when mapping [P21802, P12345 to UniRef90](#example) we get the following response:
-              
-```bash
-% curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f6334184c4eb382111fbcad0e848f40300"
-{
-  "results": [
-    {
-      "from": "P21802",
-      "to": {
-        "id": "UniRef90_P21802",
-        "name": "Cluster: Fibroblast growth factor receptor 2",
-        "updated": "2021-06-02",
-        "entryType": "UniRef90",
-  ...
-```
+For example, when mapping [P21802, P12345 to UniRef90](#example) could do:
+
+> **Request**            
+> ```bash
+> % curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f6334184c4eb382111fbcad0e848f40300"
+> ```
+> **Response**
+> ```bash
+> {
+>   "results": [
+>     {
+>       "from": "P21802",
+>       "to": {
+>         "id": "UniRef90_P21802",
+>         "name": "Cluster: Fibroblast growth factor receptor 2",
+>         "updated": "2021-06-02",
+>         "entryType": "UniRef90",
+>   ...
+> ```
                                                                                  
 Note the `from` and `to` attributes, denoting the source identifiers and corresponding mapped identifier. Also,
 since the `to` database is UniRef90, we return also the target entry details.
@@ -89,20 +102,24 @@ Downloading the results of a job is achieved via one of the following end-points
 > GET /idmapping/{uniprot_db}/results/stream/{jobId}
                                                      
 Continuing our [example above](#example), we would download the results by making a request to the following URL:
-
-```bash
-% curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/stream/27a020f6334184c4eb382111fbcad0e848f40300"
-{
-  "results": [
-    {
-      "from": "P21802",
-      "to": {
-        "id": "UniRef90_P21802",
-        "name": "Cluster: Fibroblast growth factor receptor 2",
-        "updated": "2021-06-02",
-        "entryType": "UniRef90",
-  ...
-```
+   
+> **Request**
+> ```bash
+> % curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/stream/27a020f6334184c4eb382111fbcad0e848f40300"
+> ```
+> **Response**
+> ```bash
+> {
+>   "results": [
+>     {
+>       "from": "P21802",
+>       "to": {
+>         "id": "UniRef90_P21802",
+>         "name": "Cluster: Fibroblast growth factor receptor 2",
+>         "updated": "2021-06-02",
+>         "entryType": "UniRef90",
+>   ...
+> ```
        
 > **NOTE** to add the content-disposition header, e.g., so that a download file dialogue appears in a browwer, include
 >          the request parameter, `download=true`.          
@@ -116,16 +133,20 @@ Details of a submitted job, including the `from`, `to` and `ids` to map, can be 
 
 For example:
 
-```bash
-% curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/details/27a020f6334184c4eb382111fbcad0e848f40300"
-{
-  "from": "UniProtKB_AC-ID",
-  "to": "UniRef90",
-  "ids": "P21802,P12345",
-  "taxId": null,
-  "redirectURL": "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f6334184c4eb382111fbcad0e848f40300"
-}
-```
+> **Request**
+> ```bash
+> % curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/details/27a020f6334184c4eb382111fbcad0e848f40300"
+> ```
+> **Response**
+> ```bash
+> {
+>   "from": "UniProtKB_AC-ID",
+>   "to": "UniRef90",
+>   "ids": "P21802,P12345",
+>   "taxId": null,
+>   "redirectURL": "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f6334184c4eb382111fbcad0e848f40300"
+> }
+> ```
 
 ## Valid _from_ and _to_ databases pairs
 
