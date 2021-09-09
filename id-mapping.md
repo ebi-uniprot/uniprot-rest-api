@@ -156,3 +156,35 @@ It has the following attributes:
 - tos: List of possible `to` databases for a given `from` item.
 - defaultTo: Used by  UI to be selected by default in dropdown.
 - taxonId: Flag to tell if a third optional param `taxonId`(Taxonomy Id) is allowed apart `from` and `to` databases.
+
+Example: One item of `groupName` `UniProt` is given below:
+```js
+{
+"displayName": "UniParc",
+"name": "UniParc",
+"from": true,
+"to": true,
+"ruleId": 2
+}
+```
+- The `displayName` value is used by the UI to show in the dropdown. It is not relevant for API call.
+- The `from` flag is set to true. It tells that value `UniParc` of field `name` can be used as `from` parameter value during POST call `/idmapping/run`. See in the beginning of the page for the POST call details.
+- Similarly, `to` flag is also set to true to tell that `UniParc` can be used as `to` field during  `/idmapping/run` call.
+- The `ruleId` value 2 references a `rules` object with `ruleId` 2. The rule of `rules` with `ruleId` 2 is given below:
+```js
+{
+"ruleId": 2,
+"tos": [
+"UniProtKB",
+"UniProtKB-Swiss-Prot",
+"UniParc"
+],
+"defaultTo": "UniProtKB",
+"taxonId": false
+}
+```
+- The `ruleId` is unique identifier of the rule.
+- The `tos` array lists possible valid `to` values for POST call `/idmapping/run` when `UniParc` is chosen as `from` value. 
+Passing anything other than values listed in `tos` will result in error.
+- `defaultTo` field is set to `UniProtKB` to be used by UI to preselect a `to` value in the dropdown list. It is not relevant for API call.
+- The `taxonId` flag is set to false. It tells that this `from` and `to` combination doesn't accept optional `taxonId` (taxonomy id) as a third parameter during  POST call `/idmapping/run`.
