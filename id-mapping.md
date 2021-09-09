@@ -221,3 +221,11 @@ optional `taxonId` (taxonomy identifier) when submitting the job.
     --form 'to="<UniProtKB or UniProtKB-Swiss-Prot or UniParc>"'
 ```
 
+Giving a concrete example:
+
+```bash
+% curl --request POST 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/run' \ 
+   --form 'ids="UPI0000000001,UPI0000000002"' \ 
+   --form 'from="UniParc"' \ 
+   --form 'to="UniProtKB"'
+```
