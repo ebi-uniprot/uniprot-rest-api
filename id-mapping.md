@@ -148,3 +148,9 @@ Example: One item of `groupName` `UniProt` is given below:
 Passing anything other than values listed in `tos` will result in error.
 - `defaultTo` field is set to `UniProtKB` to be used by UI to preselect a `to` value in the dropdown list. It is not relevant for API call.
 - The `taxonId` flag is set to false. It tells that this `from` and `to` combination doesn't accept optional `taxonId` (taxonomy id) as a third parameter during  POST call `/idmapping/run`.
+
+Example of a POST call `/idmapping/run` using ruleId 2:
+
+```bash
+% curl --location --request POST 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/run' --form 'ids="UPI0000000001,UPI0000000002"' --form 'from="UniParc"' --form 'to="UniProtKB"'
+```
