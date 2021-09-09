@@ -13,11 +13,14 @@ The ID Mapping service can map between the identifiers used in one database, to 
 Ensembl to PomBase. If you map to UniProtKB, UniParc or UniRef data, the full entries will be returned to you
 for convenience.
 
+This document serves as a basic guide to using the ID Mapping services offered. For more information about the API,
+please refer to the comprehensive [API documentation](http://www.ebi.ac.uk/uniprot/beta/api/docs/).
+
 ## Submitting an ID Mapping job
 
 > POST /idmapping/run
 
-<a name="example"></a>For example, to map UniProtKB entries P21802,P12345, we could POST a request to the above REST end-point as follows: 
+<a name="example"></a>For example, to map UniProtKB entries P21802, P12345, we could POST a request to the above REST end-point as follows: 
 
 ```bash
 % curl --location --request POST 'http://www.ebi.ac.uk/uniprot/beta/api/idmapping/run' --form 'ids="P21802,P12345"' --form 'from="UniProtKB_AC-ID"' --form 'to="UniRef90"'
@@ -28,9 +31,6 @@ Be sure to take note of the `jobId`. This will be used later to:
 * poll the status of the job
 * fetch/download the results
 * get details about the job
-  
-* Mention from/to rules -- See API
-* Check rules in UI
 
 ## Polling the status of a job
 
@@ -57,15 +57,15 @@ header that indicates the results can be retrieved via the URL in the `Location`
                                                                
 ### Paged results
 
-The results of a job are retrieved one of following end-points:
+The results of a job can be retrieved one page at a time using one of following end-points:
       
 > GET /idmapping/results/{jobId}<br>
 > GET /idmapping/{uniprot_db}/results/{jobId} ## where {uniprot_db} is one of UniParc, UniProtKB or UniRef
 
-For example, when mapping [P21802,P12345 to UniRef90](#example) we get the following response:
+For example, when mapping [P21802, P12345 to UniRef90](#example) we get the following response:
               
 ```bash
-curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f6334184c4eb382111fbcad0e848f40300" | jq
+% curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/27a020f6334184c4eb382111fbcad0e848f40300" | jq
 {
   "results": [
     {
@@ -88,10 +88,10 @@ Downloading the results of a job is achieved via one of the following end-points
 > GET /idmapping/stream/{jobId}<br>
 > GET /idmapping/{uniprot_db}/results/stream/{jobId}
                                                      
-Continuing our [example above](#example), we would download the results using a query like the following:
+Continuing our [example above](#example), we would download the results by making a request to the following URL:
 
 ```bash
-curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/stream/27a020f6334184c4eb382111fbcad0e848f40300" | jq
+% curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/results/stream/27a020f6334184c4eb382111fbcad0e848f40300" | jq
 {
   "results": [
     {
@@ -117,7 +117,7 @@ Details of a submitted job, including the `from`, `to` and `ids` to map, can be 
 For example:
 
 ```bash
-curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/details/27a020f6334184c4eb382111fbcad0e848f40300" | jq
+% curl -s "https://www.ebi.ac.uk/uniprot/beta/api/idmapping/uniref/details/27a020f6334184c4eb382111fbcad0e848f40300" | jq
 {
   "from": "UniProtKB_AC-ID",
   "to": "UniRef90",
