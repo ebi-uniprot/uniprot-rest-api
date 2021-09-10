@@ -46,7 +46,7 @@ The `200 OK` status code indicates the request succeeded. For example:
 > }
 > ```
 
-###303 See Other
+### 303 See Other
 The `303 See Other` status code indicates that you are being redirected to another resource via the "Location" response
 header.
 
@@ -65,7 +65,7 @@ header.
 >  ...
 > ```
 
-###400 Bad request
+### 400 Bad request
 The `400 Bad request` status code indicates that the server was unable to process the request due to invalid information
 sent by the client. In other words, the client request needs modification. If this happens, please refer to our
 [API documentation](https://www.ebi.ac.uk/uniprot/beta/api/docs/) for guidance.
@@ -104,7 +104,7 @@ The following two subsections give examples of bad requests:
 > }
 > ```
 
-###404 Resource not found 
+### 404 Resource not found 
 The `404 Resource not found` status code indicates the server was unable to find the resource that was requested. For
 example:
 
@@ -122,12 +122,12 @@ example:
 > }
 > ```
 
-###500 Internal server error
+### 500 Internal server error
 The `500 Internal server error` status code indicates that the processing of the request on the server failed unexpectedly.
 If you are able to replicate this error consistently, please [report it to us](mailto:help@uniprot.org).
 
 
-##x-release-date
+## x-release-date
 This response header indicates the last date that the API was updated. Refer to, [200 OK above](#200-ok), to see an example 
 of its generation.
 
@@ -135,13 +135,13 @@ of its generation.
 > x-release-date: 25-July-2021
 > ```
 
-##x-release-number
+## x-release-number
 This response header indicates the current UniProt data release number.
 > ```bash
 > x-release-number: 2021_03 
 > ```
 
-##x-total-records
+## x-total-records
 This response header indicates the number of entities found in your search. See more details in the [Paginating results](rest-pagination) 
 help page.
 
@@ -149,7 +149,7 @@ help page.
 > x-total-records: 49524 
 > ```
 
-##link
+## link
 This response header indicates the URL link to the next page of entities. See more details in the [Paginating results](rest-pagination) 
 help page.
 
