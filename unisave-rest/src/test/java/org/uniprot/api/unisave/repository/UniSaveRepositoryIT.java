@@ -174,15 +174,15 @@ class UniSaveRepositoryIT {
     @Test
     void retrieveEntryStatusInfoSucceeds() {
         // given
-        String sourceAccession = "P11111";
+        EntryImpl sourceEntry = createEntry(1);
+        String sourceAccession = sourceEntry.getAccession();
+        testEntityManager.persist(sourceEntry);
         String targetAccession = "P22222";
         EventTypeEnum eventType = EventTypeEnum.REPLACING;
         IdentifierStatus identifierStatus =
                 mockIdentifierStatus(eventType, sourceAccession, targetAccession);
-        ReleaseImpl release = mockRelease("1");
-        identifierStatus.setEventRelease(release);
+        identifierStatus.setEventRelease(sourceEntry.getFirstRelease());
 
-        testEntityManager.persist(release);
         testEntityManager.persist(identifierStatus);
 
         // when
@@ -193,7 +193,7 @@ class UniSaveRepositoryIT {
         assertThat(statusInfo.getEvents(), hasSize(1));
         assertThat(statusInfo.getEvents().get(0).getTargetAccession(), is(targetAccession));
         assertThat(statusInfo.getEvents().get(0).getEventTypeEnum(), is(eventType));
-        assertThat(statusInfo.getEvents().get(0).getEventRelease(), is(release));
+        assertThat(statusInfo.getEvents().get(0).getEventRelease(), is(sourceEntry.getFirstRelease()));
     }
 
     @Test

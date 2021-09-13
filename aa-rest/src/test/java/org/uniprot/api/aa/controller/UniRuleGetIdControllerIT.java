@@ -199,8 +199,14 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                     "$.positionFeatureSets",
                                                     Matchers.hasSize(greaterThan(0))))
                                     .resultMatcher(jsonPath("$.statistics", notNullValue()))
-                                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", notNullValue()))
-                                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", notNullValue()))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.statistics.reviewedProteinCount",
+                                                    notNullValue()))
+                                    .resultMatcher(
+                                            jsonPath(
+                                                    "$.statistics.unreviewedProteinCount",
+                                                    notNullValue()))
                                     .resultMatcher(jsonPath("$.createdBy", notNullValue()))
                                     .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
                                     .resultMatcher(jsonPath("$.createdDate", notNullValue()))
