@@ -101,7 +101,6 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .id(UNIRULE_ID)
                     .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
                     .resultMatcher(jsonPath("$.information", notNullValue()))
-                    .resultMatcher(jsonPath("$.ruleStatus", notNullValue()))
                     .resultMatcher(jsonPath("$.mainRule", notNullValue()))
                     .resultMatcher(jsonPath("$.otherRules", notNullValue()))
                     .resultMatcher(jsonPath("$.samFeatureSets", notNullValue()))
@@ -109,8 +108,6 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.statistics", notNullValue()))
                     .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", notNullValue()))
                     .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", notNullValue()))
-                    .resultMatcher(jsonPath("$.createdBy", notNullValue()))
-                    .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
                     .resultMatcher(jsonPath("$.createdDate", notNullValue()))
                     .resultMatcher(jsonPath("$.modifiedDate", notNullValue()))
                     .build();
@@ -145,14 +142,11 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .fields("template_entries")
                     .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
                     .resultMatcher(jsonPath("$.information", notNullValue()))
-                    .resultMatcher(jsonPath("$.ruleStatus").doesNotExist())
                     .resultMatcher(jsonPath("$.mainRule").doesNotExist())
                     .resultMatcher(jsonPath("$.otherRules").doesNotExist())
                     .resultMatcher(jsonPath("$.samFeatureSets").doesNotExist())
                     .resultMatcher(jsonPath("$.positionFeatureSets").doesNotExist())
                     .resultMatcher(jsonPath("$.statistics").doesNotExist())
-                    .resultMatcher(jsonPath("$.createdBy").doesNotExist())
-                    .resultMatcher(jsonPath("$.modifiedBy").doesNotExist())
                     .resultMatcher(jsonPath("$.createdDate").doesNotExist())
                     .resultMatcher(jsonPath("$.modifiedDate").doesNotExist())
                     .build();
@@ -184,7 +178,6 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
                                     .resultMatcher(jsonPath("$.information", notNullValue()))
-                                    .resultMatcher(jsonPath("$.ruleStatus", notNullValue()))
                                     .resultMatcher(jsonPath("$.mainRule", notNullValue()))
                                     .resultMatcher(
                                             jsonPath(
@@ -207,8 +200,6 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             jsonPath(
                                                     "$.statistics.unreviewedProteinCount",
                                                     notNullValue()))
-                                    .resultMatcher(jsonPath("$.createdBy", notNullValue()))
-                                    .resultMatcher(jsonPath("$.modifiedBy", notNullValue()))
                                     .resultMatcher(jsonPath("$.createdDate", notNullValue()))
                                     .resultMatcher(jsonPath("$.modifiedDate", notNullValue()))
                                     .build())

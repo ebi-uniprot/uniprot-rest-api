@@ -193,7 +193,8 @@ class UniSaveRepositoryIT {
         assertThat(statusInfo.getEvents(), hasSize(1));
         assertThat(statusInfo.getEvents().get(0).getTargetAccession(), is(targetAccession));
         assertThat(statusInfo.getEvents().get(0).getEventTypeEnum(), is(eventType));
-        assertThat(statusInfo.getEvents().get(0).getEventRelease(), is(sourceEntry.getFirstRelease()));
+        assertThat(
+                statusInfo.getEvents().get(0).getEventRelease(), is(sourceEntry.getFirstRelease()));
     }
 
     @Test
