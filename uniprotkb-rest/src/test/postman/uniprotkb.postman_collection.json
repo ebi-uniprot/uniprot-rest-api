@@ -43,7 +43,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_swissprot}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_swissprot}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -81,7 +81,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -129,7 +129,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/WRONG_FORMAT",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/WRONG_FORMAT",
 									"host": [
 										"{{base_url}}"
 									],
@@ -180,7 +180,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -227,7 +227,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -275,7 +275,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -323,7 +323,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -372,7 +372,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -419,7 +419,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -467,7 +467,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -509,7 +509,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -562,7 +562,7 @@
 									}
 								],
 								"url": {
-									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/accession/{{accession_trembl}}",
+									"raw": "{{base_url}}/{{path_context}}/{{uniprotkb_path}}/{{accession_trembl}}",
 									"host": [
 										"{{base_url}}"
 									],
@@ -581,7 +581,7 @@
 					"_postman_isSubFolder": true
 				}
 			],
-			"description": "Test suite for /accession/{accession} API.",
+			"description": "Test suite for /{accession} API.",
 			"event": [
 				{
 					"listen": "prerequest",

@@ -149,7 +149,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
 
     @Tag(name = "uniprotkb")
     @GetMapping(
-            value = "/accession/{accession}",
+            value = "/{accession}",
             produces = {
                 TSV_MEDIA_TYPE_VALUE,
                 FF_MEDIA_TYPE_VALUE,
