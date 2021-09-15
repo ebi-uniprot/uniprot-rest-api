@@ -37,7 +37,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Validated
 @RestController
-@RequestMapping(value = "/uniprotkb/accession")
+@RequestMapping(value = "/uniprotkb")
 @Tag(name = "Miscellaneous")
 public class UniProtKBPublicationController extends BasicSearchController<PublicationEntry> {
     private final PublicationService publicationService;

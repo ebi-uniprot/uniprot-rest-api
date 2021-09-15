@@ -69,7 +69,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Autowired private ObjectMapper objectMapper;
 
-    private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/accession/{accession}";
+    private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/{accession}";
 
     private static final String ACCESSION_ID = "Q8DIA7";
 
@@ -239,7 +239,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(
                         header().string(
                                         HttpHeaders.LOCATION,
-                                        "/uniprotkb/accession/P21802?from=B4DFC2"))
+                                        "/uniprotkb/P21802?from=B4DFC2"))
                 .andExpect(jsonPath("$.primaryAccession", is("B4DFC2")))
                 .andExpect(jsonPath("$.entryType", is("Inactive")))
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("MERGED")))

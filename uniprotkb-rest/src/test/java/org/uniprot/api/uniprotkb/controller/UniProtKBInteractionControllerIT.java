@@ -68,7 +68,7 @@ import org.uniprot.store.search.SolrCollection;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniProtKBInteractionControllerIT {
 
-    private static final String UNIPROTKB_ACCESSION_PATH = "/uniprotkb/accession/";
+    private static final String UNIPROTKB_ACCESSION_PATH = "/uniprotkb/";
     private static final String ENTRY_WITH_INTERACTION_BUT_NO_ASSOCIATED_ENTRIES = "P99992";
     private static final String ENTRY_WITH_INTERACTION = "P99990";
     private static final String CROSS_REFERENCED_ASSOCIATION = "P99991";

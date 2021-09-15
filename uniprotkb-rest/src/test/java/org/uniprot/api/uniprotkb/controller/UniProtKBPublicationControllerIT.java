@@ -59,7 +59,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniProtKBPublicationControllerIT {
 
-    private static final String MAPPED_PROTEIN_PATH = "/uniprotkb/accession/";
+    private static final String MAPPED_PROTEIN_PATH = "/uniprotkb/";
     private static final String ACCESSION = "P12312";
     private static final List<String> VALID_CATEGORIES =
             asList(
