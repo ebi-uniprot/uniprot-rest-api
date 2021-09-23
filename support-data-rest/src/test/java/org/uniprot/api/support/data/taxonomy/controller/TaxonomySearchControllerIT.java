@@ -92,8 +92,11 @@ public class TaxonomySearchControllerIT extends AbstractSearchWithFacetControlle
             case "host":
                 value = "10";
                 break;
-            case "ancestor":
+            case "parent":
                 value = "9";
+                break;
+            case "ancestor":
+                value = "11";
                 break;
         }
         return value;
