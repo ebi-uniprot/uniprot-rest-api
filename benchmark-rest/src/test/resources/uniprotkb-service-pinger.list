@@ -4,7 +4,7 @@ url#format
 /uniprot/api/uniprotkb/accession/A2TI06#text/flatfile
 /uniprot/api/uniprotkb/search?query=H9BV98#text/list
 /uniprot/api/uniprotkb/download?query=C0LL04#application/xml
-/uniprot/api/uniprotkb/accession/Q6SEJ2#application/vnd.ms-excel
+/uniprot/api/uniprotkb/accession/Q6SEJ2#application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 /uniprot/api/uniprotkb/search?query=Q6L779#text/fasta
 /uniprot/api/uniprotkb/download?query=B3W014#text/gff
 /uniprot/api/uniprotkb/accession/A2TI13#application/json
