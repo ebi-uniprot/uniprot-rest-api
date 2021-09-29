@@ -144,7 +144,9 @@ public class UniProtKBConfigureService {
         AdvancedSearchTerm.AdvancedSearchTermBuilder builder = AdvancedSearchTerm.builder();
         builder.id("xref_" + item.getValue());
         builder.label(item.getName());
-        builder.valuePrefix(item.getValue() + "-");
+        if (!"any".equals(item.getValue())) {
+            builder.valuePrefix(item.getValue() + "-");
+        }
         builder.itemType("single");
         builder.term("xref");
         builder.dataType("string");

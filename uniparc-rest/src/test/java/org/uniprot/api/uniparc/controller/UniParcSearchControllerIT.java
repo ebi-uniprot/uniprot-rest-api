@@ -331,7 +331,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("database_facet,organism_name"))
+                    .queryParam("facets", Collections.singletonList("organism_name,database_facet"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results[*].uniParcId",

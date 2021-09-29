@@ -251,7 +251,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.results.*.primaryAccession",
                                 contains("P00011", "P00013", "P00015", "P00017")))
-                .andExpect(jsonPath("$.facets.*.label", contains("Protein Existence", "Status")))
+                .andExpect(jsonPath("$.facets.*.label", contains("Protein existence", "Status")))
                 .andExpect(jsonPath("$.facets.*.name", contains("existence", "reviewed")))
                 .andExpect(
                         jsonPath(
@@ -284,7 +284,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(9)))
-                .andExpect(jsonPath("$.facets.*.label", contains("Annotation Score")))
+                .andExpect(jsonPath("$.facets.*.label", contains("Annotation score")))
                 .andExpect(jsonPath("$.facets.*.name", contains(facets)))
                 .andExpect(jsonPath("$.facets[0].values.*.value", contains("4", "3", "2")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 1, 5)));
@@ -318,7 +318,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
                 .andExpect(jsonPath("$.results.size()", is(pageSize)))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00011", "P00013")))
-                .andExpect(jsonPath("$.facets.*.label", contains("Protein Existence", "Status")))
+                .andExpect(jsonPath("$.facets.*.label", contains("Protein existence", "Status")))
                 .andExpect(jsonPath("$.facets.*.name", contains("existence", "reviewed")))
                 .andExpect(
                         jsonPath(

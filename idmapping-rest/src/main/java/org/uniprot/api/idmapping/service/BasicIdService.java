@@ -162,7 +162,8 @@ public abstract class BasicIdService<T, U> {
             List<String> ids, SearchRequest searchRequest) {
         SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest, facetConfig);
-        return this.facetTupleStreamConverter.convert(facetTupleStream);
+        return this.facetTupleStreamConverter.convert(
+                facetTupleStream, searchRequest.getFacetList());
     }
 
     private Integer getPageSize(SearchRequest searchRequest) {

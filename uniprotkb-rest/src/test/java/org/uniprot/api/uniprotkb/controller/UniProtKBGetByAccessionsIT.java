@@ -159,10 +159,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 "3D Structure",
                                 "Proteins with",
                                 "Fragment",
-                                "Protein Existence",
+                                "Protein existence",
                                 "Sequence length",
                                 "Status",
-                                "Annotation Score",
+                                "Annotation score",
                                 "Model organisms",
                                 "Proteomes"));
         return List.of(rm1, rm2);
@@ -227,10 +227,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 "3D Structure",
                                 "Proteins with",
                                 "Fragment",
-                                "Protein Existence",
+                                "Protein existence",
                                 "Sequence length",
                                 "Status",
-                                "Annotation Score",
+                                "Annotation score",
                                 "Model organisms",
                                 "Proteomes"));
         ResultMatcher rm4 =

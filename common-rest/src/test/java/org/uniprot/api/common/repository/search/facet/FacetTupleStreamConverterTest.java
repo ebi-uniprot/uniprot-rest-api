@@ -26,7 +26,7 @@ class FacetTupleStreamConverterTest {
         when(tupleStream.read()).thenReturn(tuple);
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
-        SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream, null);
         assertNotNull(response);
         assertNotNull(response.getFacets());
         assertEquals(0, response.getFacets().size());
@@ -53,7 +53,7 @@ class FacetTupleStreamConverterTest {
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
-        SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream, null);
         assertNotNull(response);
         List<Facet> facets = response.getFacets();
         assertNotNull(response.getIds());
@@ -114,7 +114,7 @@ class FacetTupleStreamConverterTest {
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
-        SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream, null);
 
         List<Facet> facets = response.getFacets();
         assertNotNull(response.getIds());
@@ -163,7 +163,7 @@ class FacetTupleStreamConverterTest {
 
         FacetTupleStreamConverter facetConverter =
                 new FacetTupleStreamConverter(idFieldName, new FakeFacetConfig());
-        SolrStreamFacetResponse response = facetConverter.convert(tupleStream);
+        SolrStreamFacetResponse response = facetConverter.convert(tupleStream, null);
         assertNotNull(response);
         List<Facet> facets = response.getFacets();
         assertNotNull(response.getIds());
