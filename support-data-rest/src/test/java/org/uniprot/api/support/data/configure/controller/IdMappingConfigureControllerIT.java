@@ -56,7 +56,7 @@ class IdMappingConfigureControllerIT {
                                         "Chemistry",
                                         "Protein family/group databases",
                                         "PTM databases",
-                                        "Polymorphism and mutation databases",
+                                        "Genetic variation databases",
                                         "2D gel databases",
                                         "Proteomic databases",
                                         "Protocols and materials databases",
@@ -64,7 +64,7 @@ class IdMappingConfigureControllerIT {
                                         "Organism-specific databases",
                                         "Phylogenomic databases",
                                         "Enzyme and pathway databases",
-                                        "Other",
+                                        "Miscellaneous",
                                         "Gene expression databases",
                                         "Family and domain databases")))
                 .andExpect(
@@ -90,14 +90,14 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Protein family/group databases')].items.*",
-                                iterableWithSize(8)))
+                                iterableWithSize(7)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='PTM databases')].items.*",
                                 iterableWithSize(1)))
                 .andExpect(
                         jsonPath(
-                                "$.groups.[?(@.groupName=='Polymorphism and mutation databases')].items.*",
+                                "$.groups.[?(@.groupName=='Genetic variation databases')].items.*",
                                 iterableWithSize(2)))
                 .andExpect(
                         jsonPath(
@@ -118,7 +118,7 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Organism-specific databases')].items.*",
-                                iterableWithSize(32)))
+                                iterableWithSize(31)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Phylogenomic databases')].items.*",
@@ -128,7 +128,9 @@ class IdMappingConfigureControllerIT {
                                 "$.groups.[?(@.groupName=='Enzyme and pathway databases')].items.*",
                                 iterableWithSize(4)))
                 .andExpect(
-                        jsonPath("$.groups.[?(@.groupName=='Other')].items.*", iterableWithSize(3)))
+                        jsonPath(
+                                "$.groups.[?(@.groupName=='Miscellaneous')].items.*",
+                                iterableWithSize(4)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Gene expression databases')].items.*",
@@ -136,7 +138,7 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Family and domain databases')].items.*",
-                                iterableWithSize(1)))
+                                iterableWithSize(2)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==1)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==2)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==3)]", iterableWithSize(1)))

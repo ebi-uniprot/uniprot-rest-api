@@ -1754,8 +1754,8 @@
         ]
       },
       {
-        "id": "id_group_polymorphism_and_mutation_databases",
-        "label": "Polymorphism and mutation databases",
+        "id": "id_group_genetic_variation_databases",
+        "label": "Genetic variation databases",
         "itemType": "group",
         "dataType": "",
         "items": [
