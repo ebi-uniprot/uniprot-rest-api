@@ -224,7 +224,9 @@ public class UniProtEntryService
 
     private boolean needToFilterActiveEntries(UniProtKBSearchRequest uniProtRequest) {
         return "*".equals(uniProtRequest.getQuery().trim())
+                || "(*)".equals(uniProtRequest.getQuery().trim())
                 || "*:*".equals(uniProtRequest.getQuery().trim())
+                || "(*:*)".equals(uniProtRequest.getQuery().trim())
                 || SolrQueryUtil.hasNegativeTerm(uniProtRequest.getQuery());
     }
 

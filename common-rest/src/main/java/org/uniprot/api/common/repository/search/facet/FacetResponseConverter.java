@@ -2,7 +2,6 @@ package org.uniprot.api.common.repository.search.facet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.json.BucketBasedJsonFacet;
@@ -38,19 +37,20 @@ public class FacetResponseConverter extends FacetConverter<QueryResponse, List<F
      * @return List of Facet converted and configured.
      */
     @Override
-    public List<Facet> convert(QueryResponse queryResponse) {
+    public List<Facet> convert(QueryResponse queryResponse, List<String> facetList) {
         List<Facet> facetResult = new ArrayList<>();
 
         if (Utils.notNull(queryResponse.getJsonFacetingResponse())) {
             NestableJsonFacet facetResponse = queryResponse.getJsonFacetingResponse();
-            Set<String> facetNames = facetResponse.getBucketBasedFacetNames();
-            for (String facetName : facetNames) {
-                // Iterating over all Query response Facets
+            for (String facetName : facetList) {
+                // Iterating over all requested Facets
                 BucketBasedJsonFacet facetField = facetResponse.getBucketBasedFacets(facetName);
-                if (isIntervalFacet(facetName)) {
-                    facetResult.add(convertIntervalFacets(facetField, facetName));
-                } else {
-                    facetResult.add(convertFieldFacets(facetField, facetName));
+                if (facetField != null) {
+                    if (isIntervalFacet(facetName)) {
+                        facetResult.add(convertIntervalFacets(facetField, facetName));
+                    } else {
+                        facetResult.add(convertFieldFacets(facetField, facetName));
+                    }
                 }
             }
         }

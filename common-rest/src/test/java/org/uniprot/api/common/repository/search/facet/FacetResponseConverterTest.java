@@ -23,7 +23,7 @@ class FacetResponseConverterTest {
         when(queryResponse.getFacetFields()).thenReturn(null);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
-        List<Facet> facets = facetConverter.convert(queryResponse);
+        List<Facet> facets = facetConverter.convert(queryResponse, new ArrayList<>());
         assertNotNull(facets);
         assertEquals(0, facets.size());
     }
@@ -35,11 +35,11 @@ class FacetResponseConverterTest {
         when(queryResponse.getJsonFacetingResponse()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
-        List<Facet> facets = facetConverter.convert(queryResponse);
+        List<Facet> facets = facetConverter.convert(queryResponse, List.of("reviewed", "fragment"));
         assertNotNull(facets);
         assertEquals(2, facets.size());
 
-        Facet reviewed = facets.get(1);
+        Facet reviewed = facets.get(0);
         assertEquals("Status", reviewed.getLabel());
         assertEquals("reviewed", reviewed.getName());
         assertFalse(reviewed.isAllowMultipleSelection());
@@ -60,7 +60,7 @@ class FacetResponseConverterTest {
         when(queryResponse.getJsonFacetingResponse()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
-        List<Facet> facets = facetConverter.convert(queryResponse);
+        List<Facet> facets = facetConverter.convert(queryResponse, List.of("model_organism"));
         assertNotNull(facets);
 
         Facet modelOrganism = facets.get(0);
@@ -84,7 +84,7 @@ class FacetResponseConverterTest {
         when(queryResponse.getJsonFacetingResponse()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
-        List<Facet> facets = facetConverter.convert(queryResponse);
+        List<Facet> facets = facetConverter.convert(queryResponse, List.of("annotation"));
         assertNotNull(facets);
 
         Facet annotation = facets.get(0);
@@ -114,7 +114,7 @@ class FacetResponseConverterTest {
         when(queryResponse.getJsonFacetingResponse()).thenReturn(fieldList);
 
         FacetResponseConverter facetConverter = new FacetResponseConverter(new FakeFacetConfig());
-        List<Facet> facets = facetConverter.convert(queryResponse);
+        List<Facet> facets = facetConverter.convert(queryResponse, List.of("length"));
         assertNotNull(facets);
 
         Facet lengthFacet = facets.get(0);

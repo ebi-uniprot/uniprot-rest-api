@@ -1,12 +1,14 @@
 package org.uniprot.api.common.repository.search.facet;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.core.convert.converter.Converter;
 import org.uniprot.core.util.Utils;
 
-public abstract class FacetConverter<F, T> implements Converter<F, T> {
+public abstract class FacetConverter<F, T> {
+
+    public abstract T convert(F queryResponse, List<String> facetList);
 
     protected abstract FacetConfig getFacetConfig();
 

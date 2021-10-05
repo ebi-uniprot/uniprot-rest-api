@@ -69,7 +69,7 @@ public abstract class SolrQueryRepository<T extends Document> {
             page.setNextCursor(solrResponse.getNextCursorMark());
             page.setTotalElements(solrResponse.getResults().getNumFound());
 
-            List<Facet> facets = facetConverter.convert(solrResponse);
+            List<Facet> facets = facetConverter.convert(solrResponse, request.getFacets());
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
             List<Suggestion> suggestions = suggestionConverter.convert(solrResponse);
 
