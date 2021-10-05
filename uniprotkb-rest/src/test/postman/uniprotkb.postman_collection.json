@@ -492,7 +492,7 @@
 											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, 200, \"application/vnd.ms-excel\", undefined, ",
+											"verifyHeaders(undefined, 200, \"application/vnd.openxmlformats-officedocument.spreadsheetml.sheetl\", undefined, ",
 											"            undefined, undefined, xRelease, controlAllow);"
 										],
 										"type": "text/javascript"
@@ -505,7 +505,7 @@
 									{
 										"key": "Accept",
 										"type": "text",
-										"value": "application/vnd.ms-excel"
+										"value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 									}
 								],
 								"url": {
@@ -1165,7 +1165,7 @@
 											"let xRelease = pm.globals.get('x_releaseNumber');",
 											"let controlAllow = pm.globals.get('control_origin');",
 											"let verifyHeaders = eval(pm.globals.get(\"verifyHeaders\"));",
-											"verifyHeaders(undefined, 200, \"application/vnd.ms-excel\", undefined, ",
+											"verifyHeaders(undefined, 200, \"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\", undefined, ",
 											"            undefined, undefined, xRelease, controlAllow);"
 										],
 										"type": "text/javascript"
@@ -1178,7 +1178,7 @@
 									{
 										"key": "Accept",
 										"type": "text",
-										"value": "application/vnd.ms-excel"
+										"value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 									}
 								],
 								"url": {

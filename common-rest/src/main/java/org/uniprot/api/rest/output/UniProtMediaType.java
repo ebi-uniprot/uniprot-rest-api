@@ -20,7 +20,8 @@ public class UniProtMediaType {
     public static final MediaType LIST_MEDIA_TYPE = valueOf(LIST_MEDIA_TYPE_VALUE);
     public static final String TSV_MEDIA_TYPE_VALUE = "text/tsv";
     public static final MediaType TSV_MEDIA_TYPE = valueOf(TSV_MEDIA_TYPE_VALUE);
-    public static final String XLS_MEDIA_TYPE_VALUE = "application/vnd.ms-excel";
+    public static final String XLS_MEDIA_TYPE_VALUE =
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public static final MediaType XLS_MEDIA_TYPE = valueOf(XLS_MEDIA_TYPE_VALUE);
     public static final String FASTA_MEDIA_TYPE_VALUE = "text/fasta";
     public static final MediaType FASTA_MEDIA_TYPE = valueOf(FASTA_MEDIA_TYPE_VALUE);
