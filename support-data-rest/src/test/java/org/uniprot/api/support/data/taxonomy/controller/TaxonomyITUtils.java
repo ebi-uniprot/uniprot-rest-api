@@ -53,7 +53,7 @@ public class TaxonomyITUtils {
                 TaxonomyDocument.builder()
                         .id(String.valueOf(taxId))
                         .taxId(taxId)
-                        .ancestor(taxId - 1)
+                        .parent(taxId - 1)
                         .synonym("synonym" + taxId)
                         .scientific("scientific" + taxId)
                         .common("common " + taxId)
@@ -61,6 +61,7 @@ public class TaxonomyITUtils {
                         .rank("rank")
                         .strain(Collections.singletonList("strain"))
                         .host(Collections.singletonList(10L))
+                        .ancestor(Collections.singletonList(10L + 1L))
                         .linked(facet)
                         .active(facet)
                         .taxonomyObj(getTaxonomyBinary(taxonomyEntry));
