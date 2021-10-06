@@ -38,10 +38,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.exception.NoContentException;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.exception.*;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
@@ -124,6 +121,25 @@ public class ResponseExceptionHandler {
         logger.error("handleInternalServerError -- {}:", urlAndParams, ex);
         List<String> messages = new ArrayList<>();
         messages.add(messageSource.getMessage(INTERNAL_ERROR_MESSAGE, null, Locale.getDefault()));
+        addDebugError(request, ex, messages);
+
+        ErrorInfo error = new ErrorInfo(url, messages);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(getContentTypeFromRequest(request))
+                .body(error);
+    }
+
+    @ExceptionHandler({ImportantMessageServiceException.class})
+    public ResponseEntity<ErrorInfo> handleImportantMessageInternalServerError(
+            Throwable ex, HttpServletRequest request) {
+        String url = Encode.forHtml(request.getRequestURL().toString());
+        String queryString = Encode.forHtml(request.getQueryString());
+        String urlAndParams = queryString == null ? url : url + '?' + queryString;
+        // NOSONAR
+        logger.error("handleImportantMessageInternalServerError -- {}:", urlAndParams, ex);
+        List<String> messages = new ArrayList<>();
+        messages.add(ex.getMessage());
         addDebugError(request, ex, messages);
 
         ErrorInfo error = new ErrorInfo(url, messages);
