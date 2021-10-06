@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.NoContentException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -166,6 +167,37 @@ class ResponseExceptionHandlerTest {
         assertNotNull(responseEntity);
         assertNotNull(responseEntity.getStatusCode());
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+
+        assertNotNull(responseEntity.getHeaders());
+        assertEquals(1, responseEntity.getHeaders().size());
+        assertEquals(MediaType.APPLICATION_JSON, responseEntity.getHeaders().getContentType());
+
+        assertNotNull(responseEntity.getBody());
+        ErrorInfo errorMessage = responseEntity.getBody();
+
+        assertEquals(REQUEST_URL, errorMessage.getUrl());
+
+        assertNotNull(errorMessage.getMessages());
+        assertEquals(1, errorMessage.getMessages().size());
+        assertThat(errorMessage.getMessages().get(0), containsString(message));
+    }
+
+    @Test
+    void handleImportantMessageServiceExceptionInternalServerError() {
+        // when
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
+
+        String message = "message describing error";
+        ImportantMessageServiceException error = new ImportantMessageServiceException(message, null);
+
+        ResponseEntity<ErrorInfo> responseEntity =
+                errorHandler.handleImportantMessageInternalServerError(error, request);
+
+        // then
+        assertNotNull(responseEntity);
+        assertNotNull(responseEntity.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
 
         assertNotNull(responseEntity.getHeaders());
         assertEquals(1, responseEntity.getHeaders().size());
