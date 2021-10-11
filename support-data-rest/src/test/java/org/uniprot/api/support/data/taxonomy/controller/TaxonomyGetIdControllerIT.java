@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 
 import org.junit.jupiter.api.Test;
@@ -221,12 +220,9 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControll
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.TAXONOMY, document);
     }
 
-    private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
+    private byte[] getTaxonomyBinary(TaxonomyEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    TaxonomyJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return TaxonomyJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
