@@ -1,11 +1,14 @@
 package org.uniprot.api.uniref.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 
 import org.junit.jupiter.api.*;
@@ -23,6 +26,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
@@ -60,6 +65,8 @@ class UniRefLightGetIdControllerIT {
 
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
+    @Autowired private RestTemplate restTemplate;
+
     private static final String ID_LIGHT_PREFIX_PATH = "/uniref/";
 
     private static final String ID_LIGHT_SUFIX_PATH = "/light";
@@ -81,6 +88,8 @@ class UniRefLightGetIdControllerIT {
                 "solrClient",
                 storeManager.getSolrClient(DataStoreManager.StoreType.UNIREF_LIGHT));
         saveEntry();
+        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
+        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     @AfterAll
@@ -311,5 +320,36 @@ class UniRefLightGetIdControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.XLS_MEDIA_TYPE_VALUE));
+    }
+
+    @Test
+    void contentTypeRDFSuccessRequest() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(ID_LIGHT_PREFIX_PATH + ID + ID_LIGHT_SUFIX_PATH)
+                        .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE_VALUE);
+
+        ResultActions response = mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "<?xml version='1.0' encoding='UTF-8'?>\n"
+                                                        + "<rdf:RDF xmlns=\"http://purl.uniprot.org/core/\" xmlns:isoform=\"http://purl.uniprot.org/isoforms/\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:taxon=\"http://purl.uniprot.org/taxonomy/\" xmlns:uniparc=\"http://purl.uniprot.org/uniparc/\" xmlns:uniprot=\"http://purl.uniprot.org/uniprot/\" xmlns:uniref=\"http://purl.uniprot.org/uniref/\">\n"
+                                                        + "<owl:Ontology rdf:about=\"\">\n"
+                                                        + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                                                        + "</owl:Ontology>\n"
+                                                        + "    <sample>text</sample>\n"
+                                                        + "    <anotherSample>text2</anotherSample>\n"
+                                                        + "    <someMore>text3</someMore>\n"
+                                                        + "</rdf:RDF>")));
     }
 }

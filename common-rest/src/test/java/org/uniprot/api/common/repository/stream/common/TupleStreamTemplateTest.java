@@ -26,7 +26,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
-import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
@@ -175,6 +174,8 @@ class TupleStreamTemplateTest {
                         .build();
 
         // then
-        assertThrows(ImportantMessageServiceException.class, () -> streamTemplate.validateResponse(request));
+        assertThrows(
+                ImportantMessageServiceException.class,
+                () -> streamTemplate.validateResponse(request));
     }
 }

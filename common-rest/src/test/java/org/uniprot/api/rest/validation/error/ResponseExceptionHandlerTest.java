@@ -189,7 +189,8 @@ class ResponseExceptionHandlerTest {
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
 
         String message = "message describing error";
-        ImportantMessageServiceException error = new ImportantMessageServiceException(message, null);
+        ImportantMessageServiceException error =
+                new ImportantMessageServiceException(message, null);
 
         ResponseEntity<ErrorInfo> responseEntity =
                 errorHandler.handleImportantMessageInternalServerError(error, request);
