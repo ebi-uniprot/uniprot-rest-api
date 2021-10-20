@@ -95,7 +95,6 @@ public class UniProtKBConfigureService {
 
     public List<UniProtDatabaseDetailResponse> getAllDatabases() {
         return DBX_TYPES.getAllDbTypes().stream()
-                .filter(db -> Utils.notNullNotEmpty(db.getUriLink()))
                 .map(UniProtDatabaseDetailResponse::getUniProtDatabaseDetailResponse)
                 .collect(Collectors.toList());
     }

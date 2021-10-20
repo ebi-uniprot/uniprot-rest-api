@@ -11,7 +11,7 @@ import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Getter
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UniProtDatabaseDetailResponse {
     private String name;
     private String displayName;
