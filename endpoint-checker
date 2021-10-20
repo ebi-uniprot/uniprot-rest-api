@@ -1,0 +1,21 @@
+#! /bin/bash
+#set -x
+
+while read -r line; do
+  if echo $line | grep -v '^#.*' >/dev/null; then
+    if echo $line | grep -e '^[a-z]' >/dev/null; then
+      header=""
+      IFS=',' read -ra lineParts <<< "$line"
+      url="${lineParts[0]}"
+      if [ ${#lineParts[@]} == 2 ]; then
+        header="-H \"${lineParts[1]}\""
+      fi
+#      curl $header $url
+      status="FAILED"
+      if curl -s -v $header $url 2>&1 | grep 'HTTP.* 200' > /dev/null; then
+        status="OKAY"
+      fi
+      echo "$status: curl -s $header $url"
+    fi
+  fi
+done <checklist.csv

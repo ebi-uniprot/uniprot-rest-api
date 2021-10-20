@@ -1,0 +1,22 @@
+# uniprotkb
+https://rest.uniprot.org/beta/uniprotkb/P12345.json,
+https://rest.uniprot.org/beta/uniprotkb/P12345.txt,
+https://rest.uniprot.org/beta/uniprotkb/P12345.fasta,
+https://rest.uniprot.org/beta/uniprotkb/P12345.gff,
+https://rest.uniprot.org/beta/uniprotkb/P12345.tsv,
+https://rest.uniprot.org/beta/uniprotkb/P12345.xml,
+https://rest.uniprot.org/beta/uniprotkb/P12345.rdf,
+# Retired according to Jerven: https://rest.uniprot.org/beta/uniprot/P12345.rdf?include=yes
+https://rest.uniprot.org/beta/uniprotkb/search?query=P12345,application/json
+
+# uniref
+https://rest.uniprot.org/beta/uniref/UniRef90_P99999.xml,
+https://rest.uniprot.org/beta/uniref/UniRef90_P99999.rdf,
+https://rest.uniprot.org/beta/uniref/UniRef90_P99999.fasta,
+https://rest.uniprot.org/beta/uniref/UniRef90_P99999.tsv,
+
+# uniparc
+https://rest.uniprot.org/beta/uniparc/UPI000000001F.xml,
+https://rest.uniprot.org/beta/uniparc/UPI000000001F.rdf,
+https://rest.uniprot.org/beta/uniparc/UPI000000001F.fasta,
+https://rest.uniprot.org/beta/uniparc/UPI000000001F.tsv,
