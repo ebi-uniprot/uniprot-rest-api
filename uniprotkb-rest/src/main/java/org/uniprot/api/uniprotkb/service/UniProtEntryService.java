@@ -191,6 +191,11 @@ public class UniProtEntryService
         return solrRequest;
     }
 
+    @Override
+    protected RDFStreamer getRDFStreamer() {
+        return this.uniProtRDFStreamer;
+    }
+
     private void addIsoformFilter(SolrRequest solrRequest) {
         List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
         queries.add(getQueryFieldName("is_isoform") + ":" + false);

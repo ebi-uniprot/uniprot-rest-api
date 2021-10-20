@@ -1,22 +1,31 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -26,14 +35,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
+import org.uniprot.api.rest.controller.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
@@ -66,7 +77,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
             UniProtKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
             UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
         })
-class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
+class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
     @Autowired private ObjectMapper objectMapper;
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/{accession}";
@@ -76,6 +87,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
     @Autowired private UniprotQueryRepository repository;
 
     private UniProtKBStoreClient storeClient;
+
+    @Autowired
+    @Qualifier("rdfRestTemplate")
+    private RestTemplate restTemplate;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -94,6 +109,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected void saveEntry() {
+        initUniprotKbDataStore();
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
     }
@@ -103,7 +119,6 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         return ACCESSION_RESOURCE;
     }
 
-    @BeforeAll
     void initUniprotKbDataStore() {
         UniProtEntryConverter uniProtEntryConverter =
                 new UniProtEntryConverter(
@@ -124,11 +139,6 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 new UniProtKBStoreClient(
                         VoldemortInMemoryUniprotEntryStore.getInstance("avro-uniprot"));
         dsm.addStore(DataStoreManager.StoreType.UNIPROT, storeClient);
-    }
-
-    @AfterEach
-    void cleanStore() {
-        storeClient.truncate();
     }
 
     @Test
@@ -301,7 +311,29 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DELETED")));
     }
 
+    @Override
+    protected RestTemplate getRestTemple() {
+        return restTemplate;
+    }
+
+    @Override
+    protected String getSearchAccession() {
+        return ACCESSION_ID;
+    }
+
+    @Override
+    protected String getRDFProlog() {
+        return RDFPrologs.UNIPROT_RDF_PROLOG;
+    }
+
+    @Override
+    protected String getIdRequestPathWithoutPathVariable() {
+        return "/uniprotkb/";
+    }
+
     static class UniprotKBGetIdParameterResolver extends AbstractGetIdParameterResolver {
+
+        private static final String NON_EXISTENT_ACCESSION_ID = "Q12345";
 
         @Override
         public GetIdParameter validIdParameter() {
@@ -327,8 +359,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
         @Override
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
-                    .id(ACCESSION_ID)
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .id(NON_EXISTENT_ACCESSION_ID)
+                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                     .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
                     .build();
         }
@@ -448,6 +480,23 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<?xml version='1.0' encoding='UTF-8'?>\n"
+                                                                            + "<rdf:RDF xml:base=\"http://purl.uniprot.org/uniprot/\" xmlns=\"http://purl.uniprot.org/core/\" xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" xmlns:owl=\"http://www.w3.org/2002/07/owl#\" xmlns:skos=\"http://www.w3.org/2004/02/skos/core#\" xmlns:bibo=\"http://purl.org/ontology/bibo/\" xmlns:foaf=\"http://xmlns.com/foaf/0.1/\" xmlns:void=\"http://rdfs.org/ns/void#\" xmlns:sd=\"http://www.w3.org/ns/sparql-service-description#\" xmlns:faldo=\"http://biohackathon.org/resource/faldo#\">\n"
+                                                                            + "    <owl:Ontology rdf:about=\"http://purl.uniprot.org/uniprot/\">\n"
+                                                                            + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                                                                            + "    </owl:Ontology>\n"
+                                                                            + "    <sample>text</sample>\n"
+                                                                            + "    <anotherSample>text2</anotherSample>\n"
+                                                                            + "    <someMore>text3</someMore>\n"
+                                                                            + "</rdf:RDF>")))
+                                    .build())
                     .build();
         }
 
@@ -458,7 +507,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -477,32 +526,37 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FF_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(content().string(is(emptyString())))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(is(emptyOrNullString()))))
                                     .build())
                     .build();
         }

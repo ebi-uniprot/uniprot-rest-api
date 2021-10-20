@@ -1,10 +1,10 @@
 package org.uniprot.api.common.exception;
 
 /**
- * Represents a problem in the service layer, whose associated message is important and should
- * be shown to the client.
+ * Represents a problem in the service layer, whose associated message is important and should be
+ * shown to the client.
  *
- * Created 06/10/2021
+ * <p>Created 06/10/2021
  *
  * @author Edd
  */

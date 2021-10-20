@@ -158,7 +158,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                GFF_MEDIA_TYPE_VALUE
+                GFF_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get UniProtKB entry by an accession.",
@@ -176,7 +177,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccession(
@@ -197,8 +199,13 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        UniProtKBEntry entry = entryService.findByUniqueId(accession, fields);
-        return super.getEntityResponse(entry, fields, request);
+        if (isRDFAccept(request)) {
+            String rdf = entryService.getRDFXml(accession);
+            return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
+        } else {
+            UniProtKBEntry entry = entryService.findByUniqueId(accession, fields);
+            return super.getEntityResponse(entry, fields, request);
+        }
     }
 
     /*

@@ -150,6 +150,11 @@ public class UniRefEntryLightService
         return queryProcessor;
     }
 
+    @Override
+    protected RDFStreamer getRDFStreamer() {
+        return this.uniRefRDFStreamer;
+    }
+
     private UniRefEntryLight cleanMemberId(UniRefEntryLight entry) {
         UniRefEntryLightBuilder builder = UniRefEntryLightBuilder.from(entry);
 

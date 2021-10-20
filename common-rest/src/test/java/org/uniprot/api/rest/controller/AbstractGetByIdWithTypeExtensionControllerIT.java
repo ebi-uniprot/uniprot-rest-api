@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data;
+package org.uniprot.api.rest.controller;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -25,14 +26,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
-import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
 /**
  * @author sahmad
  * @created 02/02/2021
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractGetByIdWithTypeExtensionControllerIT
         extends AbstractGetByIdControllerIT {
 
