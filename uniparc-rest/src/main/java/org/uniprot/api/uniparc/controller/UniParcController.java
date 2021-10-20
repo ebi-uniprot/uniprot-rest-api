@@ -1,57 +1,5 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.DeferredResult;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.request.IdsSearchRequest;
-import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByDBRefIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByProteomeIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
-import org.uniprot.api.uniparc.request.UniParcIdsPostRequest;
-import org.uniprot.api.uniparc.request.UniParcIdsSearchRequest;
-import org.uniprot.api.uniparc.request.UniParcSearchRequest;
-import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
-import org.uniprot.api.uniparc.request.UniParcStreamRequest;
-import org.uniprot.api.uniparc.service.UniParcQueryService;
-import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -59,6 +7,35 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.IdsSearchRequest;
+import org.uniprot.api.uniparc.request.*;
+import org.uniprot.api.uniparc.service.UniParcQueryService;
+import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.xml.jaxb.uniparc.Entry;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 /**
  * @author jluo
@@ -138,6 +115,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     @GetMapping(
             value = "/{upi}",
             produces = {
+                TSV_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 APPLICATION_XML_VALUE,
@@ -157,6 +135,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                                     schema = @Schema(implementation = Entry.class)),
                             @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
                         })
             })

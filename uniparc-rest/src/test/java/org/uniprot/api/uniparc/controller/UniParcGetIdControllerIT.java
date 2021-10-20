@@ -148,6 +148,11 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(containsString(UNIPARC_ID)))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(content().string(containsString(UNIPARC_ID)))
                                     .build())
@@ -217,6 +222,11 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(emptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(content().string(emptyString()))
                                     .build())
                     .contentTypeParam(
