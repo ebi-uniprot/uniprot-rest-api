@@ -34,13 +34,13 @@ All requests allow the `format` parameter, which can be used to indicate the des
 ### File Extensions
 Entries for any data-set can be displayed in different formats by specifying a suffix/file-extension. For example:        
 
-# XML
 ```bash
+# e.g., XML
 "https://rest.uniprot.org/beta/uniprotkb/P12345.xml"
 ```
                                  
 ### Accept Header
-As is typical with REST requests, the desired format can be specified via the Accept header. For example:
+As is typical with REST requests, the desired format can be specified as an Accept header. For example:
 
 ```bash
 # TAB SEPARATED VALUES
@@ -71,7 +71,7 @@ Please refer to [our comprehensive guide](https://rest.uniprot.org/beta/docs/) t
 |Resource Description Framework (RDF)|application/rdf+xml|rdf|.rdf|
 |Excel|application/vnd.ms-excel|xlsx|.xlsx|
 
-Below we show some examples of how to use the table above:
+Some examples are given in the following:               
 
 ```bash
 ## Accept header
@@ -86,97 +86,28 @@ curl "https://rest.uniprot.org/beta/uniprotkb/search?query=human&format=gff"
 
 ## Tips
 
-*   Get familiar with the [query builder](http://beta.uniprot.org/help/advanced%5Fsearch) (advanced search form) by clicking on **Advanced**.
-*   Click [**Customize data**](http://beta.uniprot.org/help/customize) on the search results page to select the columns for retrieving result tables in tab-separated or Excel format.
+*   Familiarise oneself with the [advanced search builder](http://beta.uniprot.org/help/advanced%5Fsearch) by clicking on **Advanced**.
+*   Click [Customize data](http://beta.uniprot.org/help/customize) on the search results page to select the columns to show in the results table.
 *   You can also look up your relevant column names in the full list of [UniProtKB column names for programmatic access](http://beta.uniprot.org/help/uniprotkb%5Fcolumn%5Fnames).
 
 The URL for a query result consists of a data set name (e.g. `uniprot`, `uniref`, `uniparc`, `taxonomy`, ...) and the actual query. The following query parameters are supported:
+          
+|Parameter|Values|Description|
+|---------|------|-----------|
+|`query`|_string_| See [query syntax](http://www.uniprot.org/help/text-search) <br> and [query fields for UniProtKB](http://beta.uniprot.org/help/query-fields). <br>An empty query string will retrieve all entries in a data set. **Tip:** Refine your search by clicking **Advanced** in the search bar.|
+|`format`|See section, "What formats are available?"|See section, "What formats are available?"|
+|`fields`|comma-separated list of column names|Columns to retrieve in the results. Applies to `tsv`, `xslx` and `json` formats only. Please refer to [our API documentation](https://rest.uniprot.org/beta/docs/) for all fields available, for all data-sets. <br>(For UniProtKB you can also read the [full list of UniProtKB column names](http://www.uniprot.org/help/uniprotkb_column_names)).|
+|`includeIsoform`|`true` or `false`|Whether or not to include isoforms in the search results. *Note:* Only applies to UniProtKB searches.|
+|`compressed`|`true` or `false`| Return results gzipped. Note that if the client supports HTTP compression, results may be compressed transparently even if this parameter is not set to `true`.|
+|`size`|_integer_|Maximum number of results to retrieve. *Note:* Only takes effect on searches.|
+|`cursor`|_string_|Specifies the cursor position in the entire result set, from which returned results will begin. Cursors are used to allow paging through results. Typically used together with the `size` parameter.|
 
-Parameter
-
-Values
-
-Description
-
-`query`
-
-_string_
-
-See [query syntax](http://www.uniprot.org/help/text-search)
-
-and [query fields for UniProtKB](http://www.uniprot.org/help/query-fields).
-
-An empty query string will retrieve all entries in a data set. **Tip:** Click **Advanced**
-
-in the search bar.
-
-`format`
-
-`html | tab | xls | fasta | gff | txt | xml | rdf | list | rss`
-
-Format in which to return results:
-
-*   `tab` returns data for the selected `columns` in tab-separated format.
-*   `xls` returns data for the selected `columns` for import into Excel.
-*   `fasta` returns sequence data only, where applicable.
-*   `gff` returns sequence annotation, where applicable.
-*   `txt`, `xml` and `rdf` return full entries.
-*   `list` returns a list of identifiers.
-*   `rss` returns an [OpenSearch](http://opensearch.a9.com/) RSS feed.
-
-**Tip:** Click `Download` above the list of results.
-
-`columns`
-
-comma-separated list of column names
-
-Columns to select for retrieving results in `tab` or `xls` format.
-
-Click **Columns** on the search results page to see the available columns
-
-(for UniProtKB you can also read the [full list of UniProtKB column names](http://www.uniprot.org/help/uniprotkb_column_names)).
-
-**Tip:** Some columns can be parameterized, e.g. `database(PDB)` (see the example at the end of this section).
-
-`include`
-
-`yes | no`
-
-Include isoform sequences when the `format` parameter is set to `fasta`.
-
-Include description of referenced data when the `format` parameter is set to `rdf`.
-
-This parameter is ignored for all other values of the `format` parameter.
-
-`compress`
-
-`yes | no`
-
-Return results gzipped. Note that if the client supports HTTP compression,
-
-results may be compressed transparently even if this parameter is
-
-not set to `yes`.
-
-`limit`
-
-_integer_
-
-Maximum number of results to retrieve.
-
-`offset`
-
-_integer_
-
-Offset of the first result, typically used together with
-
-the `limit` parameter.
-
-The following example retrieves all human entries matching the term '`antigen`' in RDF/XML and tab-separated format, respectively.
-
-https://www.uniprot.org/uniprot/?query=organism:9606+AND+antigen&format=rdf&compress=yes
-
-https://www.uniprot.org/uniprot/?query=organism:9606+AND+antigen&format=tab&compress=yes&columns=id,reviewed,protein names
+The following example retrieves all human entries matching the term '`antigen`' in compressed JSON and tab-separated-values formats, respectively.
+                                                                                         
+```bash
+https://rest.uniprot.org/beta/uniprotkb/search?query=organism_id:9606+AND+antigen&format=json&compressed=true
+https://rest.uniprot.org/beta/uniprotkb/search?query=organism_id:9606+AND+antigen&format=tsv&compressed=true
+```
 
 The next example retrieves all human entries with cross-references to PDB in tab-separated format, showing only the UniProtKB and PDB identifiers.
 
@@ -184,7 +115,4 @@ https://www.uniprot.org/uniprot/?query=organism:9606+AND+database:pdb&format=tab
 
 See also:
 
-[REST API - Access the UniProt website programmatically](http://www.uniprot.org/help/api) - batch retrieval, ID mapping, queries, downloads, etc
-
-Related terms: programmatic access, program, script, wget, curl, web services, API
-        
+[REST API - Access the UniProt website programmatically](http://beta.uniprot.org/help/api) - batch retrieval, ID mapping, queries, downloads, etc
