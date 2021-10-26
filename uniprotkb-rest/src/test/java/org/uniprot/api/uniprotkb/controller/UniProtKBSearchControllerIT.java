@@ -976,6 +976,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.bpcpRedoxPotentialEv.add("Search All");
             doc.bpcpTempDependence.add("Search All");
             doc.bpcpTempDependenceEv.add("Search All");
+            doc.inchikey.add("Search All");
+            doc.rheaIds.add("Search All");
+            doc.chebi.add("Search All");
             doc.cofactorChebi.add("Search All");
             doc.cofactorChebiEv.add("Search All");
             doc.cofactorNote.add("Search All");

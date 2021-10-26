@@ -6,7 +6,6 @@
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
 		<version>1.0.8-SNAPSHOT</version>
-		<relativePath>../</relativePath>
 	</parent>
 	<artifactId>proteome-rest</artifactId>
 	<name>proteome-rest</name>
@@ -55,6 +54,10 @@
 				<exclusion>
 					<groupId>org.junit.vintage</groupId>
 					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

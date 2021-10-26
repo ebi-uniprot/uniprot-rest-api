@@ -828,6 +828,18 @@
     "type": "String"
   },
   {
+    "name":"rhea",
+    "type": "String"
+  },
+  {
+    "name":"chebi",
+    "type": "String"
+  },
+  {
+    "name":"inchikey",
+    "type": "String"
+  },
+  {
     "name": "cc_cofactor_chebi",
     "type": "String"
   },

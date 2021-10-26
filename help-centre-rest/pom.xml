@@ -6,7 +6,6 @@
 		<artifactId>uniprot-rest-api</artifactId>
 		<groupId>org.uniprot</groupId>
 		<version>1.0.8-SNAPSHOT</version>
-		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -136,6 +135,10 @@
 				<exclusion>
 					<groupId>org.junit.vintage</groupId>
 					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
