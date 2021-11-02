@@ -64,7 +64,8 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve an UniRef cluster by id.",
@@ -80,15 +81,21 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntry>> getById(
             @Valid @ModelAttribute UniRefIdRequest idRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        UniRefEntry entryResult = entryService.getEntity(idRequest.getId());
-        return super.getEntityResponse(entryResult, idRequest.getFields(), request);
+        if (isRDFAccept(request)) {
+            String rdf = entryService.getRDFXml(idRequest.getId());
+            return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
+        } else {
+            UniRefEntry entryResult = entryService.getEntity(idRequest.getId());
+            return super.getEntityResponse(entryResult, idRequest.getFields(), request);
+        }
     }
 
     @Override

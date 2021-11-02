@@ -164,7 +164,8 @@ public class UniRefMessageConverterConfig {
                         uniRefContext(APPLICATION_JSON),
                         uniRefContext(FASTA_MEDIA_TYPE),
                         uniRefContext(TSV_MEDIA_TYPE),
-                        uniRefContext(XLS_MEDIA_TYPE))
+                        uniRefContext(XLS_MEDIA_TYPE),
+                        uniRefContext(RDF_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
