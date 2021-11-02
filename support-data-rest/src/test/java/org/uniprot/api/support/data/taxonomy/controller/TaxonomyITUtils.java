@@ -1,6 +1,5 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
-import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 
@@ -78,12 +77,9 @@ public class TaxonomyITUtils {
         return docBuilder.build();
     }
 
-    public static ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
+    public static byte[] getTaxonomyBinary(TaxonomyEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    TaxonomyJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return TaxonomyJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }

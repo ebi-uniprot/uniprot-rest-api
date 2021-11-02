@@ -24,8 +24,7 @@ public class TaxonomyEntryConverter implements Function<TaxonomyDocument, Taxono
     @Override
     public TaxonomyEntry apply(TaxonomyDocument taxonomyDocument) {
         try {
-            return objectMapper.readValue(
-                    taxonomyDocument.getTaxonomyObj().array(), TaxonomyEntry.class);
+            return objectMapper.readValue(taxonomyDocument.getTaxonomyObj(), TaxonomyEntry.class);
         } catch (Exception e) {
             log.info("Error converting solr binary to TaxonomyEntry: ", e);
         }

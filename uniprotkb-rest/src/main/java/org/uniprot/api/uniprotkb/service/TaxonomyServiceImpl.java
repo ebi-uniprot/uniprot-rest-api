@@ -71,7 +71,7 @@ public class TaxonomyServiceImpl extends BasicSearchService<TaxonomyDocument, Ta
             log.info("fetch taxonomy=" + taxonomyDocument.getTaxId());
             try {
                 return objectMapper.readValue(
-                        taxonomyDocument.getTaxonomyObj().array(), TaxonomyEntry.class);
+                        taxonomyDocument.getTaxonomyObj(), TaxonomyEntry.class);
             } catch (Exception e) {
                 log.info("Error converting solr binary to TaxonomyEntry: ", e);
             }

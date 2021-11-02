@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
-import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1075,12 +1074,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         }
     }
 
-    private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
+    private byte[] getTaxonomyBinary(TaxonomyEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    TaxonomyJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return TaxonomyJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }

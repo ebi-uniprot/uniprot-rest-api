@@ -23,7 +23,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
-import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -380,12 +379,9 @@ class TaxonomyGetIdsControllerIT {
                                         "Invalid facet name 'INVALID'. Expected value can be [superkingdom, taxonomies_with].")));
     }
 
-    private ByteBuffer getTaxonomyBinary(TaxonomyEntry entry) {
+    private byte[] getTaxonomyBinary(TaxonomyEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    TaxonomyJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return TaxonomyJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
