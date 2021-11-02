@@ -12,26 +12,26 @@ https://beta.uniprot.org/uniprot/P12345
 By default, a web page is returned. To retrieve only the entry data, it is possible
 to use the REST API and specify a file extension after the entry id indicating the format. 
 Here are some examples:
-
-https://rest.uniprot.org/beta/uniprotkb/P12345.json
-https://rest.uniprot.org/beta/uniprotkb/P12345.txt
-https://rest.uniprot.org/beta/uniprotkb/P12345.fasta
-https://rest.uniprot.org/beta/uniprotkb/P12345.gff
-https://rest.uniprot.org/beta/uniprotkb/P12345.tsv
-https://rest.uniprot.org/beta/uniprotkb/P12345.xml
-https://rest.uniprot.org/beta/uniprotkb/P12345.rdf
-
-https://rest.uniprot.org/beta/uniref/UniRef90_P99999.json
-https://rest.uniprot.org/beta/uniref/UniRef90_P99999.xml
-https://rest.uniprot.org/beta/uniref/UniRef90_P99999.rdf
-https://rest.uniprot.org/beta/uniref/UniRef90_P99999.fasta
-https://rest.uniprot.org/beta/uniref/UniRef90_P99999.tsv
-                                                                     
-https://rest.uniprot.org/beta/uniparc/UPI000000001F.json
-https://rest.uniprot.org/beta/uniparc/UPI000000001F.xml
-https://rest.uniprot.org/beta/uniparc/UPI000000001F.rdf
-https://rest.uniprot.org/beta/uniparc/UPI000000001F.fasta
-https://rest.uniprot.org/beta/uniparc/UPI000000001F.tsv
+                          
+* https://rest.uniprot.org/beta/uniprotkb/P12345.json
+* https://rest.uniprot.org/beta/uniprotkb/P12345.txt
+* https://rest.uniprot.org/beta/uniprotkb/P12345.fasta
+* https://rest.uniprot.org/beta/uniprotkb/P12345.gff
+* https://rest.uniprot.org/beta/uniprotkb/P12345.tsv
+* https://rest.uniprot.org/beta/uniprotkb/P12345.xml
+* https://rest.uniprot.org/beta/uniprotkb/P12345.rdf
+ <br><br> 
+* https://rest.uniprot.org/beta/uniref/UniRef90_P99999.json
+* https://rest.uniprot.org/beta/uniref/UniRef90_P99999.xml
+* https://rest.uniprot.org/beta/uniref/UniRef90_P99999.rdf
+* https://rest.uniprot.org/beta/uniref/UniRef90_P99999.fasta
+* https://rest.uniprot.org/beta/uniref/UniRef90_P99999.tsv
+  <br><br>                                                                     
+* https://rest.uniprot.org/beta/uniparc/UPI000000001F.json
+* https://rest.uniprot.org/beta/uniparc/UPI000000001F.xml
+* https://rest.uniprot.org/beta/uniparc/UPI000000001F.rdf
+* https://rest.uniprot.org/beta/uniparc/UPI000000001F.fasta
+* https://rest.uniprot.org/beta/uniparc/UPI000000001F.tsv
                                                         
 #### Notes
 * UniRef identifiers cannot be guaranteed to be stable, since the sequence clusters are recomputed at every 
