@@ -53,7 +53,7 @@ public class RDFService<T> implements StoreService<T> {
 
     @Override
     public Optional<T> getEntry(String id) {
-        return Optional.of(getEntriesByAccessions(Arrays.asList(id)));
+        return Optional.ofNullable(getEntriesByAccessions(Arrays.asList(id)));
     }
 
     private T getEntriesByAccessions(List<String> accessions) {

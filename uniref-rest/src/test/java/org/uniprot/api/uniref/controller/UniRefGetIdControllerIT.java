@@ -1,7 +1,10 @@
 package org.uniprot.api.uniref.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
 
 import java.util.List;
@@ -16,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -64,6 +69,8 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
+    @Autowired private RestTemplate restTemplate;
+
     @Override
     protected DataStoreManager.StoreType getStoreType() {
         return DataStoreManager.StoreType.UNIREF_LIGHT;
@@ -92,6 +99,8 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .addDocConverter(
                         DataStoreManager.StoreType.UNIREF_LIGHT,
                         new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
+        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     @AfterEach
@@ -267,6 +276,15 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<sample>text</sample>")))
+                                    .build())
                     .build();
         }
 
@@ -312,6 +330,15 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(content().string(emptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
                                     .build())
                     .build();
         }
