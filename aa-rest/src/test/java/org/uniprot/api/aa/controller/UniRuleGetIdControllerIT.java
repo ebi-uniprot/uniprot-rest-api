@@ -36,6 +36,7 @@ import org.uniprot.core.unirule.impl.UniRuleEntryBuilder;
 import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.core.unirule.impl.UniRuleIdBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
@@ -77,7 +78,8 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
         UniRuleEntry entry = create();
-        UniRuleDocumentConverter converter = new UniRuleDocumentConverter();
+        UniRuleDocumentConverter converter =
+                new UniRuleDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         UniRuleDocument document = converter.convertToDocument(entry);
         getStoreManager().saveDocs(getStoreType(), document);
     }

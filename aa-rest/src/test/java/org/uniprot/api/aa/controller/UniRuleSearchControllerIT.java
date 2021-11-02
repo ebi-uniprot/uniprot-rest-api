@@ -42,6 +42,7 @@ import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
@@ -102,7 +103,8 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
     void initDataStore() {
         getStoreManager()
                 .addDocConverter(
-                        DataStoreManager.StoreType.UNIRULE, new UniRuleDocumentConverter());
+                        DataStoreManager.StoreType.UNIRULE,
+                        new UniRuleDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
     }
 
     @Override
@@ -138,7 +140,8 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         UniRuleEntry uniRuleEntry =
                 UniRuleControllerITUtils.updateValidValues(
                         updatedCommentEntry, suffix, UniRuleControllerITUtils.RuleType.UR);
-        UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
+        UniRuleDocumentConverter docConverter =
+                new UniRuleDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         UniRuleDocument document = docConverter.convertToDocument(uniRuleEntry);
         getStoreManager().saveDocs(DataStoreManager.StoreType.UNIRULE, document);
     }
@@ -240,7 +243,7 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("taxonomy"))
+                    .queryParam("facets", Collections.singletonList("superkingdom"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.uniRuleId",
@@ -248,18 +251,20 @@ public class UniRuleSearchControllerIT extends AbstractSearchWithFacetController
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(jsonPath("$.facets[0].label", is("Superkingdom")))
-                    .resultMatcher(jsonPath("$.facets[0].name", is("taxonomy")))
+                    .resultMatcher(jsonPath("$.facets[0].name", is("superkingdom")))
                     .resultMatcher(jsonPath("$.facets[0].allowMultipleSelection", is(true)))
                     .resultMatcher(
                             jsonPath(
                                     "$.facets[0].values.*.label",
-                                    containsInAnyOrder("Archaea", "Bacteria", "Eukaryota")))
+                                    containsInAnyOrder(
+                                            "Archaea", "Bacteria", "Eukaryota", "Viruses")))
                     .resultMatcher(
                             jsonPath(
                                     "$.facets[0].values.*.value",
-                                    containsInAnyOrder("archaea", "bacteria", "eukaryota")))
+                                    containsInAnyOrder(
+                                            "Archaea", "Bacteria", "Eukaryota", "Viruses")))
                     .resultMatcher(
-                            jsonPath("$.facets[0].values.*.count", containsInAnyOrder(2, 2, 2)))
+                            jsonPath("$.facets[0].values.*.count", containsInAnyOrder(2, 2, 2, 2)))
                     .build();
         }
     }

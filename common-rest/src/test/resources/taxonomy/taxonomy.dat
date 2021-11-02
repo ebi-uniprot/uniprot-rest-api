@@ -61,3 +61,6 @@
 984236	192955	1	0	no rank	11	0	Salmonella enterica subsp. enterica serovar Kentucky str. ATCC 9263	\N	Salmonella enterica subsp. enterica serovar Kentucky str. ATCC 9263\N	\N	\N	492704	492705
 9606	2759	1	0	species	1	2	Homo sapiens	human	Homo sapiens	Human	\N	HUMAN	4013962	4013967
 1197221	2759	1	0	species	1	5	Ancylis habeleri	\N	Ancylis habeleri	\N	\N	\N	3506776	3506777
+2157	1	0	0	superkingdom	11	0	Archaea	\N	Archaea	\N	\N	9ARCH	1	2
+10239	1	0	0	superkingdom	1	0	Viruses	\N	Viruses	\N	\N	9VIRU	2	421295
+1076255	10239	1	0	species	1	0	Yokapox virus	\N	Yokapox virus	\N	\N	\N	418965	418966
