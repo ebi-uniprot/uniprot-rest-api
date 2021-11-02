@@ -91,6 +91,8 @@ public class UniRuleControllerITUtils {
                 new ConditionValueBuilder("Eukaryota").cvId("2759").build());
         conditionBuilder.conditionValuesAdd(
                 new ConditionValueBuilder("Bacteria").cvId("2").build());
+        conditionBuilder.conditionValuesAdd(
+                new ConditionValueBuilder("Yokapox virus").cvId("1076255").build());
         ConditionSet conditionSet = new ConditionSetBuilder(conditionBuilder.build()).build();
 
         ConditionBuilder conditionBuilder1 = new ConditionBuilder("scientific organism");

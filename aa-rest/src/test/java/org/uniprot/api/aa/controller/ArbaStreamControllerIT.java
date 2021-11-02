@@ -37,6 +37,7 @@ import org.uniprot.core.unirule.impl.UniRuleEntryBuilder;
 import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.arba.ArbaDocumentConverter;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 
 /**
@@ -94,7 +95,7 @@ class ArbaStreamControllerIT extends AbstractSolrStreamControllerIT {
         UniRuleEntry arbaEntry =
                 UniRuleControllerITUtils.updateValidValues(
                         thinUniRuleEntry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
-        var docConverter = new ArbaDocumentConverter();
+        var docConverter = new ArbaDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         var arbaDocument = docConverter.convertToDocument(arbaEntry);
         storeManager.saveDocs(DataStoreManager.StoreType.ARBA, arbaDocument);
     }

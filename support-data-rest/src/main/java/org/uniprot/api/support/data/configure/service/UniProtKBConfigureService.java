@@ -14,7 +14,6 @@ import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.uniprotkb.evidence.EvidenceDatabaseDetail;
 import org.uniprot.core.uniprotkb.evidence.EvidenceDatabaseTypes;
-import org.uniprot.core.util.Utils;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.domain.DatabaseGroup;
