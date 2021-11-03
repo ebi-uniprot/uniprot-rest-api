@@ -63,7 +63,7 @@ class QuerySyntaxValidatorTest {
 
     @Test
     void isValidMissingRangeEndValueReturnFalse() {
-        ValidSolrQuerySyntax.QuerySyntaxValidator validator =
+        ValidSolrQuerySyntax.QuerySyntaxValidator validator =                         
                 new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         boolean result = validator.isValid("((length:[1 TO ]) AND (gene:\"CDC7))", null);
@@ -75,7 +75,7 @@ class QuerySyntaxValidatorTest {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator =
                 new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
-        boolean result = validator.isValid("gene:MT1558\\/MT1560", null);
+        boolean result = validator.isValid("gene:MT1558/MT1560", null);
         assertTrue(result);
     }
 

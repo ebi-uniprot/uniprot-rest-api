@@ -1,22 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,6 +42,9 @@ import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.comment.CommentType;
+import org.uniprot.core.uniprotkb.description.impl.NameBuilder;
+import org.uniprot.core.uniprotkb.description.impl.ProteinDescriptionBuilder;
+import org.uniprot.core.uniprotkb.description.impl.ProteinNameBuilder;
 import org.uniprot.core.uniprotkb.feature.FeatureCategory;
 import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
@@ -81,7 +69,20 @@ import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
@@ -205,6 +206,88 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                 "$.messages.*",
                                 contains(
                                         "Invalid includeIsoform parameter value. Expected true or false")));
+    }
+
+    @Test
+    void searchWithForwardSlash() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(entry);
+        entryBuilder.proteinDescription(
+                new ProteinDescriptionBuilder()
+                        .recommendedName(
+                                new ProteinNameBuilder()
+                                        .fullName(
+                                                new NameBuilder()
+                                                        .value(
+                                                                "Serine/arginine repetitive matrix protein 2")
+                                                        .build())
+                                        .build())
+                        .build());
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entryBuilder.build());
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE
+                                            + "?query=(Serine/arginine repetitive matrix protein 2)")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)));
+    }
+
+    @Test
+    void phraseSearchWithForwardSlash() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        String acc = entry.getPrimaryAccession().getValue();
+        UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(entry);
+        entryBuilder.proteinDescription(
+                new ProteinDescriptionBuilder()
+                        .recommendedName(
+                                new ProteinNameBuilder()
+                                        .fullName(
+                                                new NameBuilder()
+                                                        .value(
+                                                                "Serine/arginine repetitive matrix protein 2")
+                                                        .build())
+                                        .build())
+                        .build());
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entryBuilder.build());
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE
+                                            + "?query=(\"Serine/arginine repetitive matrix protein 2\")")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)));
     }
 
     @Test
