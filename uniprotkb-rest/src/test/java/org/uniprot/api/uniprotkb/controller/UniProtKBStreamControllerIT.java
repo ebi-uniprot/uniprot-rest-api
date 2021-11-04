@@ -332,7 +332,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                 get(streamRequestPath)
                         .header(ACCEPT, mediaType)
                         .param("query", "content:*")
-                        .param("fields", "accession,rhea_id");
+                        .param("fields", "accession,rhea");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -351,7 +351,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                 get(streamRequestPath)
                         .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE)
                         .param("query", "content:*")
-                        .param("fields", "accession,rhea_id");
+                        .param("fields", "accession,rhea");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
