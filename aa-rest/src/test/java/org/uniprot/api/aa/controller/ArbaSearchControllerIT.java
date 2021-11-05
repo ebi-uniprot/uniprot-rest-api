@@ -45,6 +45,7 @@ import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.arba.ArbaDocumentConverter;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 
@@ -103,7 +104,9 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @BeforeAll
     void initDataStore() {
         getStoreManager()
-                .addDocConverter(DataStoreManager.StoreType.ARBA, new UniRuleDocumentConverter());
+                .addDocConverter(
+                        DataStoreManager.StoreType.ARBA,
+                        new UniRuleDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
     }
 
     @Override
@@ -148,7 +151,7 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         UniRuleEntry arbaEntry =
                 UniRuleControllerITUtils.updateValidValues(
                         updatedCommentEntry, suffix, UniRuleControllerITUtils.RuleType.ARBA);
-        var docConverter = new ArbaDocumentConverter();
+        var docConverter = new ArbaDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         var arbaDocument = docConverter.convertToDocument(arbaEntry);
         getStoreManager().saveDocs(getStoreType(), arbaDocument);
     }
@@ -245,7 +248,7 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("*:*"))
-                    .queryParam("facets", Collections.singletonList("taxonomy"))
+                    .queryParam("facets", Collections.singletonList("superkingdom"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.uniRuleId",
@@ -253,18 +256,20 @@ public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                     .resultMatcher(jsonPath("$.facets", notNullValue()))
                     .resultMatcher(jsonPath("$.facets", not(empty())))
                     .resultMatcher(jsonPath("$.facets[0].label", is("Superkingdom")))
-                    .resultMatcher(jsonPath("$.facets[0].name", is("taxonomy")))
+                    .resultMatcher(jsonPath("$.facets[0].name", is("superkingdom")))
                     .resultMatcher(jsonPath("$.facets[0].allowMultipleSelection", is(true)))
                     .resultMatcher(
                             jsonPath(
                                     "$.facets[0].values.*.label",
-                                    containsInAnyOrder("Archaea", "Bacteria", "Eukaryota")))
+                                    containsInAnyOrder(
+                                            "Archaea", "Bacteria", "Eukaryota", "Viruses")))
                     .resultMatcher(
                             jsonPath(
                                     "$.facets[0].values.*.value",
-                                    containsInAnyOrder("archaea", "bacteria", "eukaryota")))
+                                    containsInAnyOrder(
+                                            "Archaea", "Bacteria", "Eukaryota", "Viruses")))
                     .resultMatcher(
-                            jsonPath("$.facets[0].values.*.count", containsInAnyOrder(2, 2, 2)))
+                            jsonPath("$.facets[0].values.*.count", containsInAnyOrder(2, 2, 2, 2)))
                     .build();
         }
     }

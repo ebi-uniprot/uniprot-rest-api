@@ -34,6 +34,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
@@ -83,7 +84,8 @@ class UniRuleStreamControllerIT extends AbstractSolrStreamControllerIT {
         UniRuleEntry uniRuleEntry =
                 UniRuleControllerITUtils.updateValidValues(
                         entry, suffix, UniRuleControllerITUtils.RuleType.UR);
-        UniRuleDocumentConverter docConverter = new UniRuleDocumentConverter();
+        UniRuleDocumentConverter docConverter =
+                new UniRuleDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         UniRuleDocument document = docConverter.convertToDocument(uniRuleEntry);
         storeManager.saveDocs(DataStoreManager.StoreType.UNIRULE, document);
     }

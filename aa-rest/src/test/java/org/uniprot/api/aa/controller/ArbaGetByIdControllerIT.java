@@ -36,6 +36,7 @@ import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.core.unirule.impl.UniRuleIdBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.arba.ArbaDocumentConverter;
+import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 
 /**
@@ -76,7 +77,7 @@ public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
     @Override
     protected void saveEntry() {
         UniRuleEntry uniRuleEntry = create();
-        var converter = new ArbaDocumentConverter();
+        var converter = new ArbaDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         var arbaDocument = converter.convertToDocument(uniRuleEntry);
         getStoreManager().saveDocs(getStoreType(), arbaDocument);
     }

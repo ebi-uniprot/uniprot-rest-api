@@ -7,7 +7,6 @@
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
 		<version>1.0.8-SNAPSHOT</version>
-		<relativePath>../</relativePath>
 	</parent>
 	<artifactId>support-data-rest</artifactId>
 	<description>UniProt Rest API for support data</description>
@@ -86,6 +85,10 @@
 				<exclusion>
 					<groupId>org.junit.vintage</groupId>
 					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

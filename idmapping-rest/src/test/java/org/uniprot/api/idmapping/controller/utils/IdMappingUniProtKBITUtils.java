@@ -159,6 +159,8 @@ public class IdMappingUniProtKBITUtils {
         doc.rcPlasmid.add("Search All");
         doc.rcTransposon.add("Search All");
         doc.rcStrain.add("Search All");
+        doc.chebi.add("Search All");
+        doc.inchikey.add("Search All");
         List<String> goAssertionCodes =
                 GoEvidences.INSTANCE.getEvidences().stream()
                         .filter(IdMappingUniProtKBITUtils::getManualEvidenceGroup)
