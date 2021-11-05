@@ -131,7 +131,7 @@ class ProteomeControllerITUtils {
                         .averageCdss(100)
                         .confidence(110)
                         .proteomeCount(120)
-                        .status(CPDStatus.CLOSE_TO_STANDARD)
+                        .status(CPDStatus.CLOSE_TO_STANDARD_HIGH)
                         .stdCdss(12.3d)
                         .build();
 
