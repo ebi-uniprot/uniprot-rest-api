@@ -54,7 +54,7 @@ public @interface ValidSolrQuerySyntax {
         }
 
         /**
-         * Although '/' is a special lucene character, the old uniprot website allows // users to
+         * Although '/' is a special lucene character, the old uniprot website allows users to
          * *not* escape it. That is, they allow queries like, "hello/world", to pass unescaped through to lucene.
          * Therefore, in order to allow it, we should escape it here, allowing validation to "ignore"
          * the forward slash.
