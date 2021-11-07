@@ -238,7 +238,6 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     protected String[] getErrorMessages() {
         return new String[] {
             "UPI 'INVALID2' has invalid format. It should be a valid UniParc id.",
-            "Only '10' upis are allowed in each request.",
             "The 'download' parameter has invalid format. It should be a boolean true or false.",
             "Invalid fields parameter value 'invalid'",
             "UPI 'INVALID' has invalid format. It should be a valid UniParc id.",
@@ -266,6 +265,11 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String getUnmatchedFacetFilter() {
         return "organism_name:missing";
+    }
+
+    @Override
+    protected String[] getIdLengthErrorMessage() {
+        return new String[] {"Only '1000' upis are allowed in each request."};
     }
 
     private void saveEntries() throws Exception {

@@ -272,7 +272,6 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
             "UniRef id 'INVALID2' has invalid format. It should be a valid UniRef id.",
             "Invalid fields parameter value 'invalid'",
             "UniRef id 'INVALID' has invalid format. It should be a valid UniRef id.",
-            "Only '10' UniRef ids are allowed in each request.",
             "The 'download' parameter has invalid format. It should be a boolean true or false."
         };
     }
@@ -297,5 +296,10 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String getUnmatchedFacetFilter() {
         return "identity:2";
+    }
+
+    @Override
+    protected String[] getIdLengthErrorMessage() {
+        return new String[] {"Only '1000' UniRef ids are allowed in each request."};
     }
 }
