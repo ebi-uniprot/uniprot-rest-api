@@ -272,7 +272,6 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String[] getErrorMessages() {
         return new String[] {
-            "Only '10' accessions are allowed in each request.",
             "Invalid fields parameter value 'invalid'",
             "Invalid fields parameter value 'invalid1'",
             "The 'download' parameter has invalid format. It should be a boolean true or false.",
@@ -317,5 +316,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected String[] getIdLengthErrorMessage() {
+        return new String[] {"Only '1000' accessions are allowed in each request."};
     }
 }

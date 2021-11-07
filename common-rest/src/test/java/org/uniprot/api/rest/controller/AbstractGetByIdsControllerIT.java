@@ -458,6 +458,43 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
         }
     }
 
+    @Test
+    void getByTooManyIdsSuccess() throws Exception {
+        // when
+        String tooManyIds = (getCommaSeparatedIds() + ",").repeat(100);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), tooManyIds));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1000)));
+    }
+
+    @Test
+    void getByMoreThanAllowedIdsFailure() throws Exception {
+        // when
+        String tooManyIds = (getCommaSeparatedIds() + ",").repeat(101);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), tooManyIds));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*", containsInAnyOrder(getIdLengthErrorMessage())));
+    }
+
     protected abstract String getCommaSeparatedIds();
 
     protected abstract String getCommaSeparatedNIds(int n);
@@ -499,6 +536,8 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     protected abstract ResultMatcher getSortedIdResultMatcher();
 
     protected abstract String getUnmatchedFacetFilter();
+
+    protected abstract String[] getIdLengthErrorMessage();
 
     private void verifyResults(ResultActions response) throws Exception {
         for (ResultMatcher matcher : getResultsResultMatchers()) {
