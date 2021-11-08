@@ -6,7 +6,7 @@ import org.uniprot.api.aa.repository.UniRuleFacetConfig;
 import org.uniprot.api.aa.repository.UniRuleQueryRepository;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -20,8 +20,8 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
 public class UniRuleService extends BasicSearchService<UniRuleDocument, UniRuleEntry> {
 
     public static final String UNIRULE_ID_FIELD = "unirule_id";
+    private final UniProtQueryProcessorConfig uniRuleQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor queryProcessor;
 
     @Autowired
     public UniRuleService(
@@ -30,11 +30,11 @@ public class UniRuleService extends BasicSearchService<UniRuleDocument, UniRuleE
             UniRuleEntryConverter uniRuleEntryConverter,
             UniRuleSortClause solrSortClause,
             SolrQueryConfig uniRuleSolrQueryConf,
-            QueryProcessor uniRuleQueryProcessor,
+            UniProtQueryProcessorConfig uniRuleQueryProcessorConfig,
             SearchFieldConfig uniRuleSearchFieldConfig) {
         super(repository, uniRuleEntryConverter, solrSortClause, uniRuleSolrQueryConf, facetConfig);
+        this.uniRuleQueryProcessorConfig = uniRuleQueryProcessorConfig;
         this.searchFieldConfig = uniRuleSearchFieldConfig;
-        this.queryProcessor = uniRuleQueryProcessor;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class UniRuleService extends BasicSearchService<UniRuleDocument, UniRuleE
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return this.queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return uniRuleQueryProcessorConfig;
     }
 }

@@ -9,7 +9,7 @@ import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.api.support.data.taxonomy.request.GetByTaxonIdsRequest;
 import org.uniprot.api.support.data.taxonomy.request.TaxonomyFacetConfig;
@@ -26,8 +26,8 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 public class TaxonomyService extends BasicSearchService<TaxonomyDocument, TaxonomyEntry> {
     public static final String TAXONOMY_ID_FIELD = "id";
     private static final String ACTIVE_FIELD = "active";
+    private final UniProtQueryProcessorConfig taxonomyQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor queryProcessor;
     private final RDFStreamer rdfStreamer;
 
     public TaxonomyService(
@@ -36,13 +36,13 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
             TaxonomyEntryConverter converter,
             TaxonomySortClause taxonomySortClause,
             SolrQueryConfig taxonomySolrQueryConf,
-            QueryProcessor taxonomyQueryProcessor,
+            UniProtQueryProcessorConfig taxonomyQueryProcessorConfig,
             SearchFieldConfig taxonomySearchFieldConfig,
             @Qualifier("taxonomyRDFStreamer") RDFStreamer rdfStreamer) {
 
         super(repository, converter, taxonomySortClause, taxonomySolrQueryConf, facetConfig);
+        this.taxonomyQueryProcessorConfig = taxonomyQueryProcessorConfig;
         this.searchFieldConfig = taxonomySearchFieldConfig;
-        this.queryProcessor = taxonomyQueryProcessor;
         this.rdfStreamer = rdfStreamer;
     }
 
@@ -76,8 +76,8 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return taxonomyQueryProcessorConfig;
     }
 
     @Override

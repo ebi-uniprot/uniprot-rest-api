@@ -1,16 +1,9 @@
 package org.uniprot.api.support.data.subcellular.request;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
-import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.api.support.data.subcellular.service.SubcellularLocationService;
@@ -18,6 +11,11 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class SubcellularLocationSolrQueryConfig {
@@ -34,7 +32,7 @@ public class SubcellularLocationSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor subcellQueryProcessor(
+    public UniProtQueryProcessorConfig subcellQueryProcessorConfig(
             WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig subcellSearchFieldConfig) {
         Map<String, String> subcellWhiteListFields =
                 whiteListFieldConfig
@@ -42,12 +40,10 @@ public class SubcellularLocationSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.SUBCELLLOCATION.toString().toLowerCase(),
                                 new HashMap<>());
-        return UniProtQueryProcessor.newInstance(
-                UniProtQueryProcessorConfig.builder()
-                        .optimisableFields(
-                                getDefaultSearchOptimisedFieldItems(subcellSearchFieldConfig))
-                        .whiteListFields(subcellWhiteListFields)
-                        .build());
+        return UniProtQueryProcessorConfig.builder()
+                .optimisableFields(getDefaultSearchOptimisedFieldItems(subcellSearchFieldConfig))
+                .whiteListFields(subcellWhiteListFields)
+                .build();
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

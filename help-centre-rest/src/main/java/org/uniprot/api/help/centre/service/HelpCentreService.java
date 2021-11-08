@@ -11,6 +11,7 @@ import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -30,7 +31,7 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
                     .getSearchFieldItemByName("id")
                     .getFieldName();
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor helpCentreQueryProcessor;
+    private final UniProtQueryProcessorConfig helpCentreQueryProcessorConfig;
 
     public HelpCentreService(
             SolrQueryRepository<HelpDocument> repository,
@@ -39,10 +40,10 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
             SolrQueryConfig helpCentreSolrQueryConf,
             HelpCentreFacetConfig facetConfig,
             SearchFieldConfig helpCentreSearchFieldConfig,
-            QueryProcessor helpCentreQueryProcessor) {
+            UniProtQueryProcessorConfig helpCentreQueryProcessorConfig) {
         super(repository, entryConverter, solrSortClause, helpCentreSolrQueryConf, facetConfig);
         this.searchFieldConfig = helpCentreSearchFieldConfig;
-        this.helpCentreQueryProcessor = helpCentreQueryProcessor;
+        this.helpCentreQueryProcessorConfig = helpCentreQueryProcessorConfig;
     }
 
     @Override
@@ -51,7 +52,8 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return helpCentreQueryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return helpCentreQueryProcessorConfig;
     }
+
 }

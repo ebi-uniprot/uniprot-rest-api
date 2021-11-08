@@ -23,6 +23,7 @@ import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.UniProtSolrQueryConfig;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
@@ -46,11 +47,11 @@ public class UniProtEntryService
     public static final String ACCESSION = "accession_id";
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final SolrQueryConfig solrQueryConfig;
+    private final UniProtQueryProcessorConfig uniProtQueryProcessorConfig;
     private final UniProtTermsConfig uniProtTermsConfig;
     private final UniprotQueryRepository repository;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
-    private final QueryProcessor queryProcessor;
     private final RDFStreamer uniProtRDFStreamer;
 
     public UniProtEntryService(
@@ -63,7 +64,7 @@ public class UniProtEntryService
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyService taxService,
             FacetTupleStreamTemplate facetTupleStreamTemplate,
-            QueryProcessor uniProtKBQueryProcessor,
+            UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
             RDFStreamer uniProtRDFStreamer) {
         super(
@@ -76,11 +77,11 @@ public class UniProtEntryService
         this.repository = repository;
         this.uniProtTermsConfig = uniProtTermsConfig;
         this.solrQueryConfig = uniProtKBSolrQueryConf;
+        this.uniProtQueryProcessorConfig = uniProtKBQueryProcessorConfig;
         this.resultsConverter = new UniProtEntryQueryResultsConverter(entryStore, taxService);
         this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.queryProcessor = uniProtKBQueryProcessor;
         this.uniProtRDFStreamer = uniProtRDFStreamer;
     }
 
@@ -103,6 +104,11 @@ public class UniProtEntryService
     @Override
     protected SearchFieldItem getIdField() {
         return searchFieldConfig.getSearchFieldItemByName(ACCESSION);
+    }
+
+    @Override
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return uniProtQueryProcessorConfig;
     }
 
     @Override
@@ -134,11 +140,6 @@ public class UniProtEntryService
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
         return this.uniProtRDFStreamer.idsToRDFStoreStream(solrRequest);
-    }
-
-    @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
     }
 
     @Override

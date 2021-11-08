@@ -7,6 +7,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
 import org.uniprot.api.support.data.disease.request.DiseaseSolrQueryConfig;
 import org.uniprot.api.support.data.disease.request.DiseaseSolrSortClause;
@@ -20,8 +21,8 @@ import org.uniprot.store.search.document.disease.DiseaseDocument;
 @Import(DiseaseSolrQueryConfig.class)
 public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseEntry> {
     public static final String DISEASE_ID_FIELD = "id";
+    private final UniProtQueryProcessorConfig diseaseQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor queryProcessor;
     private final RDFStreamer rdfStreamer;
 
     public DiseaseService(
@@ -29,7 +30,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
             DiseaseDocumentToDiseaseConverter toDiseaseConverter,
             DiseaseSolrSortClause diseaseSolrSortClause,
             SolrQueryConfig diseaseSolrQueryConf,
-            QueryProcessor diseaseQueryProcessor,
+            UniProtQueryProcessorConfig diseaseQueryProcessorConfig,
             SearchFieldConfig diseaseSearchFieldConfig,
             @Qualifier("diseaseRDFStreamer") RDFStreamer rdfStreamer) {
 
@@ -39,8 +40,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 diseaseSolrSortClause,
                 diseaseSolrQueryConf,
                 null);
+        this.diseaseQueryProcessorConfig = diseaseQueryProcessorConfig;
         this.searchFieldConfig = diseaseSearchFieldConfig;
-        this.queryProcessor = diseaseQueryProcessor;
         this.rdfStreamer = rdfStreamer;
     }
 
@@ -50,8 +51,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return diseaseQueryProcessorConfig;
     }
 
     @Override

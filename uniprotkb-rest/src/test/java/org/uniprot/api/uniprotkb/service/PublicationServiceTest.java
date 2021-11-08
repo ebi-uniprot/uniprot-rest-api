@@ -100,7 +100,7 @@ class PublicationServiceTest {
                         new LiteratureEntryConverter(),
                         publicationSolrQueryConfig.publicationSolrQueryConf(),
                         publicationFacetConfig,
-                        publicationSolrQueryConfig.publicationQueryProcessor(),
+                        publicationSolrQueryConfig.publicationQueryProcessorConfig(),
                         literatureSolrQueryConfig.literatureSolrQueryConf());
         PublicationRequest request = new PublicationRequest();
         request.setSize(25);

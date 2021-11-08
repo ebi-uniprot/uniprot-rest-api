@@ -8,6 +8,7 @@ import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.api.support.data.literature.request.LiteratureSortClause;
@@ -25,8 +26,8 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @Import(LiteratureSolrQueryConfig.class)
 public class LiteratureService extends BasicSearchService<LiteratureDocument, LiteratureEntry> {
     public static final String LITERATURE_ID_FIELD = "id";
+    private final UniProtQueryProcessorConfig literatureQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor queryProcessor;
     private final RDFStreamer rdfStreamer;
 
     public LiteratureService(
@@ -35,7 +36,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             LiteratureFacetConfig facetConfig,
             LiteratureSortClause literatureSortClause,
             SolrQueryConfig literatureSolrQueryConf,
-            QueryProcessor literatureQueryProcessor,
+            UniProtQueryProcessorConfig literatureQueryProcessorConfig,
             SearchFieldConfig literatureSearchFieldConfig,
             @Qualifier("literatureRDFStreamer") RDFStreamer rdfStreamer) {
         super(
@@ -44,8 +45,8 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
                 literatureSortClause,
                 literatureSolrQueryConf,
                 facetConfig);
+        this.literatureQueryProcessorConfig = literatureQueryProcessorConfig;
         this.searchFieldConfig = literatureSearchFieldConfig;
-        this.queryProcessor = literatureQueryProcessor;
         this.rdfStreamer = rdfStreamer;
     }
 
@@ -55,8 +56,8 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return literatureQueryProcessorConfig;
     }
 
     @Override

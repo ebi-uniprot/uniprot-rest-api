@@ -7,7 +7,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
 import org.uniprot.api.proteome.repository.GeneCentricQueryRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.core.genecentric.GeneCentricEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -21,8 +21,8 @@ import org.uniprot.store.search.document.genecentric.GeneCentricDocument;
 @Import(GeneCentricSolrQueryConfig.class)
 public class GeneCentricService extends BasicSearchService<GeneCentricDocument, GeneCentricEntry> {
     public static final String GENECENTRIC_ID_FIELD = "accession_id";
+    private final UniProtQueryProcessorConfig geneCentricQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor queryProcessor;
 
     @Autowired
     public GeneCentricService(
@@ -30,7 +30,7 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
             GeneCentricFacetConfig facetConfig,
             GeneCentricSortClause solrSortClause,
             SolrQueryConfig geneCentricSolrQueryConf,
-            QueryProcessor geneCentricQueryProcessor,
+            UniProtQueryProcessorConfig geneCentricQueryProcessorConfig,
             SearchFieldConfig geneCentricSearchFieldConfig) {
         super(
                 repository,
@@ -38,8 +38,8 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
                 solrSortClause,
                 geneCentricSolrQueryConf,
                 facetConfig);
+        this.geneCentricQueryProcessorConfig = geneCentricQueryProcessorConfig;
         searchFieldConfig = geneCentricSearchFieldConfig;
-        this.queryProcessor = geneCentricQueryProcessor;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class GeneCentricService extends BasicSearchService<GeneCentricDocument, 
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return geneCentricQueryProcessorConfig;
     }
 }

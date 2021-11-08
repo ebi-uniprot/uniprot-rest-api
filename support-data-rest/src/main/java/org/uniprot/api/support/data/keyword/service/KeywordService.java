@@ -7,6 +7,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.keyword.repository.KeywordFacetConfig;
 import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
@@ -18,8 +19,8 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 @Import(KeywordSolrQueryConfig.class)
 public class KeywordService extends BasicSearchService<KeywordDocument, KeywordEntry> {
     public static final String KEYWORD_ID_FIELD = "keyword_id";
+    private final UniProtQueryProcessorConfig keywordQueryProcessorConfig;
     private final SearchFieldConfig fieldConfig;
-    private final QueryProcessor queryProcessor;
     private final RDFStreamer rdfStreamer;
 
     public KeywordService(
@@ -27,7 +28,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             KeywordEntryConverter keywordEntryConverter,
             KeywordSortClause keywordSortClause,
             SolrQueryConfig keywordSolrQueryConf,
-            QueryProcessor keywordQueryProcessor,
+            UniProtQueryProcessorConfig keywordQueryProcessorConfig,
             KeywordFacetConfig facetConfig,
             SearchFieldConfig keywordSearchFieldConfig,
             @Qualifier("keywordRDFStreamer") RDFStreamer rdfStreamer) {
@@ -37,8 +38,8 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
                 keywordSortClause,
                 keywordSolrQueryConf,
                 facetConfig);
+        this.keywordQueryProcessorConfig = keywordQueryProcessorConfig;
         this.fieldConfig = keywordSearchFieldConfig;
-        this.queryProcessor = keywordQueryProcessor;
         this.rdfStreamer = rdfStreamer;
     }
 
@@ -48,8 +49,8 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return keywordQueryProcessorConfig;
     }
 
     @Override

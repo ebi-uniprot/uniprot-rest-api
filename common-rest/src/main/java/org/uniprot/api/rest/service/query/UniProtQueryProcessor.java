@@ -2,14 +2,18 @@ package org.uniprot.api.rest.service.query;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.queryparser.flexible.core.nodes.AndQueryNode;
+import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.core.util.Utils;
+
+import java.util.List;
 
 /**
  * This class does the following:
@@ -22,6 +26,8 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
  *   <li>{@link QueryNode#toQueryString(EscapeQuerySyntax)} is then called on the resulting query
  *       tree to give a {@link String} version of the processed client query.
  * </ul>
+ *
+ * <b>Note:</b> A new instance of this class should be used for every query that is to be processed.
  *
  * <p>Created 24/08/2020
  *
@@ -50,7 +56,7 @@ public class UniProtQueryProcessor implements QueryProcessor {
             QueryNode queryTree = syntaxParser.parse(query, IMPOSSIBLE_FIELD);
             QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
             return processedQueryTree.toQueryString(ESCAPER).toString();
-        } catch (QueryNodeException e) {
+        } catch (Exception e) {
             log.warn("Problem processing user query: " + query, e);
             return query;
         }

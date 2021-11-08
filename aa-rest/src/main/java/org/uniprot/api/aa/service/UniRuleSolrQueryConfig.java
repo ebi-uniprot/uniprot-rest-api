@@ -1,22 +1,20 @@
 package org.uniprot.api.aa.service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
-import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author sahmad
@@ -37,19 +35,17 @@ public class UniRuleSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor uniRuleQueryProcessor(
+    public UniProtQueryProcessorConfig uniRuleQueryProcessorConfig(
             WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig uniRuleSearchFieldConfig) {
         Map<String, String> uniRuleWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.UNIRULE.toString().toLowerCase(), new HashMap<>());
-        return UniProtQueryProcessor.newInstance(
-                UniProtQueryProcessorConfig.builder()
-                        .optimisableFields(
-                                getDefaultSearchOptimisedFieldItems(uniRuleSearchFieldConfig))
-                        .whiteListFields(uniRuleWhiteListFields)
-                        .build());
+        return UniProtQueryProcessorConfig.builder()
+                .optimisableFields(getDefaultSearchOptimisedFieldItems(uniRuleSearchFieldConfig))
+                .whiteListFields(uniRuleWhiteListFields)
+                .build();
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
