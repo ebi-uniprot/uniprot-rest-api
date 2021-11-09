@@ -24,6 +24,7 @@ import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
@@ -49,7 +50,7 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
     private final PublicationRepository publicationRepository;
     private final LiteratureRepository literatureRepository;
     private final PublicationConverter publicationConverter;
-    private final QueryProcessor publicationQueryProcessor;
+    private final UniProtQueryProcessorConfig literatureQueryProcessorConfig;
     private final LiteratureEntryConverter literatureEntryConverter;
     private final SolrQueryConfig literatureSolrQueryConf;
     private final String idFieldName;
@@ -63,13 +64,13 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
             LiteratureEntryConverter literatureEntryConverter,
             @Qualifier("publicationQueryConfig") SolrQueryConfig publicationSolrQueryConf,
             PublicationFacetConfig facetConfig,
-            QueryProcessor publicationQueryProcessor,
+            UniProtQueryProcessorConfig literatureQueryProcessorConfig,
             SolrQueryConfig literatureSolrQueryConf) {
         super(publicationRepository, null, solrSortClause, publicationSolrQueryConf, facetConfig);
         this.publicationRepository = publicationRepository;
         this.literatureRepository = literatureRepository;
         this.publicationConverter = publicationConverter;
-        this.publicationQueryProcessor = publicationQueryProcessor;
+        this.literatureQueryProcessorConfig = literatureQueryProcessorConfig;
         this.literatureEntryConverter = literatureEntryConverter;
         this.literatureSolrQueryConf = literatureSolrQueryConf;
         this.idFieldName =
@@ -126,8 +127,8 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return publicationQueryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return literatureQueryProcessorConfig;
     }
 
     private Map<String, LiteratureEntry> getPubMedLiteratureEntryMap(

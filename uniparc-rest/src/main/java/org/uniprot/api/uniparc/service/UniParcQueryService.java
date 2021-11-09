@@ -22,6 +22,7 @@ import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.UniParcSolrQueryConfig;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.request.UniParcDatabasesRequest;
@@ -55,10 +56,10 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private static final String ACCESSION_FIELD = "uniprotkb";
     public static final String MD5_STR = "md5";
     private static final String COMMA_STR = ",";
+    private final UniProtQueryProcessorConfig uniParcQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final UniParcQueryRepository repository;
     private final UniParcQueryResultConverter entryConverter;
-    private final QueryProcessor queryProcessor;
     private final SolrQueryConfig solrQueryConfig;
     private final RDFStreamer uniParcRDFStreamer;
 
@@ -70,7 +71,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             UniParcQueryResultConverter uniParcQueryResultConverter,
             StoreStreamer<UniParcEntry> storeStreamer,
             SolrQueryConfig uniParcSolrQueryConf,
-            QueryProcessor uniParcQueryProcessor,
+            UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
             RDFStreamer uniParcRDFStreamer,
             FacetTupleStreamTemplate facetTupleStreamTemplate) {
@@ -83,8 +84,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 storeStreamer,
                 uniParcSolrQueryConf,
                 facetTupleStreamTemplate);
+        this.uniParcQueryProcessorConfig = uniParcQueryProcessorConfig;
         this.searchFieldConfig = uniParcSearchFieldConfig;
-        this.queryProcessor = uniParcQueryProcessor;
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
         this.solrQueryConfig = uniParcSolrQueryConf;
@@ -147,6 +148,11 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     @Override
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return uniParcQueryProcessorConfig;
+    }
+
+    @Override
     public UniParcEntry findByUniqueId(String uniqueId, String filters) {
         return findByUniqueId(uniqueId);
     }
@@ -161,11 +167,6 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPARC)
                 .getSearchFieldItemByName(UNIPARC_ID_FIELD)
                 .getFieldName();
-    }
-
-    @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
     }
 
     public UniParcEntry getUniParcBestGuess(UniParcBestGuessRequest request) {

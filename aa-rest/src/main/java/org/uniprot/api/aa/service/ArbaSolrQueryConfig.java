@@ -37,19 +37,18 @@ public class ArbaSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor arbaQueryProcessor(
+    public UniProtQueryProcessorConfig arbaQueryProcessorConfig(
             WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig arbaSearchFieldConfig) {
         Map<String, String> uniRuleWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.ARBA.toString().toLowerCase(), new HashMap<>());
-        return UniProtQueryProcessor.newInstance(
-                UniProtQueryProcessorConfig.builder()
+        return UniProtQueryProcessorConfig.builder()
                         .optimisableFields(
                                 getDefaultSearchOptimisedFieldItems(arbaSearchFieldConfig))
                         .whiteListFields(uniRuleWhiteListFields)
-                        .build());
+                        .build();
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

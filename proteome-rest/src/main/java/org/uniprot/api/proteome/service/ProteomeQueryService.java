@@ -10,6 +10,7 @@ import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -24,15 +25,15 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
     public static final String PROTEOME_ID_FIELD = "upid";
     public static final String EXCLUDED_FIELD = "excluded";
+    private final UniProtQueryProcessorConfig proteomeQueryProcessorConfig;
     private final SearchFieldConfig fieldConfig;
-    private final QueryProcessor queryProcessor;
 
     public ProteomeQueryService(
             ProteomeQueryRepository repository,
             ProteomeFacetConfig facetConfig,
             ProteomeSortClause solrSortClause,
             SolrQueryConfig proteomeSolrQueryConf,
-            QueryProcessor proteomeQueryProcessor,
+            UniProtQueryProcessorConfig proteomeQueryProcessorConfig,
             SearchFieldConfig proteomeSearchFieldConfig) {
         super(
                 repository,
@@ -40,8 +41,8 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
                 solrSortClause,
                 proteomeSolrQueryConf,
                 facetConfig);
+        this.proteomeQueryProcessorConfig = proteomeQueryProcessorConfig;
         fieldConfig = proteomeSearchFieldConfig;
-        this.queryProcessor = proteomeQueryProcessor;
     }
 
     @Override
@@ -61,8 +62,8 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return proteomeQueryProcessorConfig;
     }
 
     private String getActiveProteomeFilterQuery() {

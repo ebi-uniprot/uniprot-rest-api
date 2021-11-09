@@ -20,6 +20,7 @@ import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.config.UniRefSolrQueryConfig;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.request.UniRefStreamRequest;
@@ -43,8 +44,8 @@ public class UniRefEntryLightService
     private final SolrQueryConfig solrQueryConfig;
     private static final int ID_LIMIT = 10;
     public static final String UNIREF_ID = "id";
+    private final UniProtQueryProcessorConfig uniRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor queryProcessor;
     private final RDFStreamer uniRefRDFStreamer;
 
     @Autowired
@@ -55,7 +56,7 @@ public class UniRefEntryLightService
             UniRefLightQueryResultConverter uniRefQueryResultConverter,
             StoreStreamer<UniRefEntryLight> storeStreamer,
             SolrQueryConfig uniRefSolrQueryConf,
-            QueryProcessor uniRefQueryProcessor,
+            UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
             RDFStreamer uniRefRDFStreamer,
             FacetTupleStreamTemplate facetTupleStreamTemplate) {
@@ -67,8 +68,8 @@ public class UniRefEntryLightService
                 storeStreamer,
                 uniRefSolrQueryConf,
                 facetTupleStreamTemplate);
+        this.uniRefQueryProcessorConfig = uniRefQueryProcessorConfig;
         this.searchFieldConfig = uniRefSearchFieldConfig;
-        this.queryProcessor = uniRefQueryProcessor;
         this.solrQueryConfig = uniRefSolrQueryConf;
         this.uniRefRDFStreamer = uniRefRDFStreamer;
     }
@@ -146,8 +147,8 @@ public class UniRefEntryLightService
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return uniRefQueryProcessorConfig;
     }
 
     @Override

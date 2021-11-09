@@ -7,6 +7,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
 import org.uniprot.api.support.data.crossref.request.CrossRefEntryConverter;
 import org.uniprot.api.support.data.crossref.request.CrossRefFacetConfig;
@@ -21,8 +22,8 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 @Import(CrossRefSolrQueryConfig.class)
 public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossRefEntry> {
     public static final String CROSS_REF_ID_FIELD = "id";
+    private final UniProtQueryProcessorConfig crossRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor queryProcessor;
     private final RDFStreamer rdfStreamer;
 
     public CrossRefService(
@@ -31,7 +32,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
             CrossRefSolrSortClause crossRefSolrSortClause,
             CrossRefFacetConfig crossRefFacetConfig,
             SolrQueryConfig crossRefSolrQueryConf,
-            QueryProcessor crossRefQueryProcessor,
+            UniProtQueryProcessorConfig crossRefQueryProcessorConfig,
             SearchFieldConfig crossRefSearchFieldConfig,
             @Qualifier("xrefRDFStreamer") RDFStreamer xrefRDFStreamer) {
         super(
@@ -40,8 +41,8 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
                 crossRefSolrSortClause,
                 crossRefSolrQueryConf,
                 crossRefFacetConfig);
+        this.crossRefQueryProcessorConfig = crossRefQueryProcessorConfig;
         this.searchFieldConfig = crossRefSearchFieldConfig;
-        this.queryProcessor = crossRefQueryProcessor;
         this.rdfStreamer = xrefRDFStreamer;
     }
 
@@ -51,8 +52,8 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return crossRefQueryProcessorConfig;
     }
 
     @Override

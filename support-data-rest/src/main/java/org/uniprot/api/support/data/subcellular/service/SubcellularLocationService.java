@@ -7,6 +7,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.QueryProcessor;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.subcellular.repository.SubcellularLocationRepository;
 import org.uniprot.api.support.data.subcellular.request.SubcellularLocationSolrQueryConfig;
 import org.uniprot.api.support.data.subcellular.request.SubcellularLocationSortClause;
@@ -25,8 +26,8 @@ import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 public class SubcellularLocationService
         extends BasicSearchService<SubcellularLocationDocument, SubcellularLocationEntry> {
     public static final String SUBCELL_ID_FIELD = "id";
+    private final UniProtQueryProcessorConfig subcellQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final QueryProcessor queryProcessor;
     private final RDFStreamer rdfStreamer;
 
     public SubcellularLocationService(
@@ -34,7 +35,7 @@ public class SubcellularLocationService
             SubcellularLocationEntryConverter subcellularLocationEntryConverter,
             SubcellularLocationSortClause subcellularLocationSortClause,
             SolrQueryConfig subcellSolrQueryConf,
-            QueryProcessor subcellQueryProcessor,
+            UniProtQueryProcessorConfig subcellQueryProcessorConfig,
             SearchFieldConfig subcellSearchFieldConfig,
             @Qualifier("locationRDFStreamer") RDFStreamer rdfStreamer) {
         super(
@@ -43,8 +44,8 @@ public class SubcellularLocationService
                 subcellularLocationSortClause,
                 subcellSolrQueryConf,
                 null);
+        this.subcellQueryProcessorConfig = subcellQueryProcessorConfig;
         this.searchFieldConfig = subcellSearchFieldConfig;
-        this.queryProcessor = subcellQueryProcessor;
         this.rdfStreamer = rdfStreamer;
     }
 
@@ -54,8 +55,8 @@ public class SubcellularLocationService
     }
 
     @Override
-    protected QueryProcessor getQueryProcessor() {
-        return queryProcessor;
+    protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
+        return subcellQueryProcessorConfig;
     }
 
     @Override

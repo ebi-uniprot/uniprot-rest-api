@@ -1,20 +1,18 @@
 package org.uniprot.api.help.centre.service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
-import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author lgonzales
@@ -36,16 +34,16 @@ public class HelpCentreSolrQueryConfig {
     }
 
     @Bean
-    public QueryProcessor helpCentreQueryProcessor(WhitelistFieldConfig whiteListFieldConfig) {
+    public UniProtQueryProcessorConfig helpCentreQueryProcessorConfig(
+            WhitelistFieldConfig whiteListFieldConfig) {
         Map<String, String> helpCentreWhiteListFields =
                 whiteListFieldConfig
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.HELP.toString().toLowerCase(), new HashMap<>());
-        return UniProtQueryProcessor.newInstance(
-                UniProtQueryProcessorConfig.builder()
-                        .optimisableFields(Collections.emptyList())
-                        .whiteListFields(helpCentreWhiteListFields)
-                        .build());
+        return UniProtQueryProcessorConfig.builder()
+                .optimisableFields(Collections.emptyList())
+                .whiteListFields(helpCentreWhiteListFields)
+                .build();
     }
 }
