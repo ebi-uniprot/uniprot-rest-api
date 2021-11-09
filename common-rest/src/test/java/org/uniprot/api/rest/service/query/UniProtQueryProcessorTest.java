@@ -1,12 +1,15 @@
 package org.uniprot.api.rest.service.query;
 
+import nl.altindag.log.LogCaptor;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -18,9 +21,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -43,19 +49,18 @@ class UniProtQueryProcessorTest {
     void setUp() {
         Map<String, String> whitelistFields = new HashMap<>();
         whitelistFields.put("go", "^[0-9]+$");
-        config = UniProtQueryProcessorConfig.builder()
-                .optimisableFields(
-                        singletonList(
-                                searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")))
-                .whiteListFields(whitelistFields)
-                .build();
-        processor =
-                UniProtQueryProcessor.newInstance(
-                        config);
+        config =
+                UniProtQueryProcessorConfig.builder()
+                        .optimisableFields(
+                                singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")))
+                        .whiteListFields(whitelistFields)
+                        .build();
+        processor = UniProtQueryProcessor.newInstance(config);
     }
 
     @Test
-    void manyQueriesToProcess() {
+    void concurrentQueriesWithNewProcessorHasNoProblems() {
+        LogCaptor logCaptor = LogCaptor.forClass(UniProtQueryProcessor.class);
         List<String> queries =
                 List.of(
                         "(*)",
@@ -71,10 +76,12 @@ class UniProtQueryProcessorTest {
         for (int i = 0; i < 10000; i++) {
             executorService.submit(
                     () ->
-                            UniProtQueryProcessor.newInstance(config).processQuery(
-                                    queries.get((int) (Math.random() * queries.size()))));
+                            UniProtQueryProcessor.newInstance(config)
+                                    .processQuery(
+                                            queries.get((int) (Math.random() * queries.size()))));
         }
 
+        assertThat(logCaptor.getWarnLogs(), is(emptyList()));
 
         executorService.shutdown();
         try {
@@ -84,6 +91,41 @@ class UniProtQueryProcessorTest {
         } catch (InterruptedException e) {
             executorService.shutdownNow();
         }
+    }
+
+    @Test
+    void concurrentQueriesWithSameProcessorHasProblems() {
+        LogCaptor logCaptor = LogCaptor.forClass(UniProtQueryProcessor.class);
+        List<String> queries =
+                List.of(
+                        "(*)",
+                        "this is a default query",
+                        "(Methanococcoides burtonii Hel308)",
+                        "(ethylsterigmatocystin oxidoreductase)",
+                        "(L2EFL_DROME)",
+                        "(L8I5P5)",
+                        "(another type) AND (length:[10 TO 20])",
+                        "Serine\\/alpha is okay");
+
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        for (int i = 0; i < 10000; i++) {
+            executorService.submit(
+                    () ->
+                            processor.processQuery(
+                                    queries.get((int) (Math.random() * queries.size()))));
+        }
+
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executorService.shutdownNow();
+        }
+
+        assertThat(logCaptor.getWarnLogs(), hasSize(greaterThan(0)));
+        assertThat(logCaptor.getWarnLogs(), everyItem(Matchers.startsWith("Problem processing user query: ")));
     }
 
     @Test
