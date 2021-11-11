@@ -3,9 +3,12 @@ package org.uniprot.api.unisave.service.impl;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +24,9 @@ import org.uniprot.api.unisave.repository.domain.Entry;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 import org.uniprot.core.util.Utils;
+
+import static org.uniprot.api.unisave.request.UniSaveRequest.VERSION_FULL_PATTERN_REGEX;
+import static org.uniprot.api.unisave.request.UniSaveRequest.VERSION_PART_PATTERN_REGEX;
 
 @Service
 @Slf4j
@@ -97,17 +103,33 @@ public class UniSaveServiceImpl implements UniSaveService {
     }
 
     List<Integer> extractVersionsFromRequest(UniSaveRequest.Entries entryRequest) {
-        List<Integer> versions = new ArrayList<>();
-        for (String versionString : entryRequest.getVersions().split(",")) {
-            try {
-                versions.add(Integer.parseInt(versionString));
-            } catch (NumberFormatException nfe) {
+        String spec = entryRequest.getVersions();
+            if (VERSION_FULL_PATTERN_REGEX.matcher(spec).matches()) {
+                List<Integer> versions = new ArrayList<>();
+                Matcher matcher = VERSION_PART_PATTERN_REGEX.matcher(spec);
+                while (matcher.find()) {
+                    String lowerBoundaryVersion = matcher.group(2);
+                    String upperBoundaryVersion = "";
+                    if (matcher.groupCount() >= 4) {
+                        upperBoundaryVersion = matcher.group(4);
+                    }
+
+                    if (Utils.notNullNotEmpty(lowerBoundaryVersion)
+                            && Utils.notNullNotEmpty(upperBoundaryVersion)) {
+                        IntStream.range(
+                                        Integer.parseInt(lowerBoundaryVersion),
+                                        Integer.parseInt(upperBoundaryVersion) + 1)
+                                .forEach(versions::add);
+                    } else {
+                        versions.add(Integer.parseInt(lowerBoundaryVersion));
+                    }
+                }
+                return versions;
+            } else {
                 throw new InvalidRequestException(
-                        "Comma separated version list must only contain non-zero integers, found: "
-                                + versionString);
+                        "Version list must contain non-zero integers. For example, 1-5,8,20-30. Instead, found: "
+                                + spec);
             }
-        }
-        return versions;
     }
 
     UniSaveEntry.UniSaveEntryBuilder addCopyright(UniSaveEntry.UniSaveEntryBuilder entry) {
