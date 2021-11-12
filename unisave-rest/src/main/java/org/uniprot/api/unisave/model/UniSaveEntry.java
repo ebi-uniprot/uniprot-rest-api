@@ -41,6 +41,9 @@ public class UniSaveEntry {
         return isCurrentRelease;
     }
 
+    @JsonIgnore
+    private Integer entryVersionUpper; // used only when constructing
+
     public static class UniSaveEntryBuilder {
         public String getLastRelease() {
             return lastRelease;

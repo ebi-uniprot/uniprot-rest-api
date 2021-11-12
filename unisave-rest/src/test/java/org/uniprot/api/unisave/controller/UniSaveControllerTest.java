@@ -154,6 +154,37 @@ class UniSaveControllerTest {
     }
 
     @Test
+    void canRetrieveAllAggregatedEntries() throws Exception {
+        // given
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1));
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + ACCESSION)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("includeContent", "true")
+                                .param(VERSIONS, "1"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath(ENTRY_VERSION, contains(1)))
+                .andExpect(jsonPath(RESULTS_CONTENT).exists());
+    }
+
+    @Test
+    void canRetrieveAggregatedEntriesInVersionRange() {
+
+    }
+
+    @Test
+    void retrievingAggregatedEntriesWithContentFalseStillWorks() {
+
+    }
+
+    @Test
     void canDownloadEntries() throws Exception {
         // given
         List<EntryInfoImpl> repositoryEntries =
@@ -222,7 +253,7 @@ class UniSaveControllerTest {
                         jsonPath(
                                 MESSAGES,
                                 contains(
-                                        "Invalid request received. Comma separated version list must only contain non-zero integers, found: XXXX")));
+                                        "Invalid request received. Version list must contain non-zero integers. For example, 1-5,8,20-30. Instead, found: XXXX")));
     }
 
     // resource /{accession}/diff

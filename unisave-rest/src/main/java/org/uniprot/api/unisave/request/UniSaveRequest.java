@@ -33,6 +33,9 @@ public class UniSaveRequest {
 
         @Parameter(description = "Non-zero entry version numbers, e.g., 1,3-8,15-20,6.")
         private String versions;
+
+        @Parameter(description = "Whether or not to aggregate sequences that are unique (true|false)")
+        private boolean uniqueSequences;
     }
 
     @Data

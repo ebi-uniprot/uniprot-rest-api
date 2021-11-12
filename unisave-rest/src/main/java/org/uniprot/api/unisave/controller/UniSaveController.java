@@ -1,19 +1,12 @@
 package org.uniprot.api.unisave.controller;
 
-import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
-
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,12 +20,16 @@ import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+import java.util.stream.Stream;
+
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
 
 /**
  * Created 20/03/20
@@ -85,13 +82,14 @@ public class UniSaveController {
         uniSaveRequest.setAccession(accession);
         String acceptHeader = getAcceptHeader(servletRequest);
         setContentIfRequired(uniSaveRequest, acceptHeader);
+        MediaType contentType = UniProtMediaType.valueOf(acceptHeader);
         HttpHeaders httpHeaders =
-                addDownloadHeaderIfRequired(
-                        uniSaveRequest, UniProtMediaType.valueOf(acceptHeader), servletRequest);
+                addDownloadHeaderIfRequired(uniSaveRequest, contentType, servletRequest);
         MessageConverterContext<UniSaveEntry> context =
                 converterContextFactory.get(
-                        MessageConverterContextFactory.Resource.UNISAVE,
-                        UniProtMediaType.valueOf(acceptHeader));
+                        MessageConverterContextFactory.Resource.UNISAVE, contentType);
+
+        optimiseEntriesRequest(uniSaveRequest, contentType);
         context.setEntities(service.getEntries(uniSaveRequest).stream());
 
         return ResponseEntity.ok().headers(httpHeaders).body(context);
@@ -163,6 +161,16 @@ public class UniSaveController {
         context.setEntities(Stream.of(service.getAccessionStatus(accession)));
 
         return ResponseEntity.ok(context);
+    }
+
+    private void optimiseEntriesRequest(
+            UniSaveRequest.Entries uniSaveRequest, MediaType contentType) {
+        // user asks for unique sequences
+        if (uniSaveRequest.isUniqueSequences()
+                && !contentType.equals(UniProtMediaType.FASTA_MEDIA_TYPE)) {
+            // only allow sequence aggregation for fasta format
+            uniSaveRequest.setUniqueSequences(false);
+        }
     }
 
     // responses in fasta/flatfile format will require fetching

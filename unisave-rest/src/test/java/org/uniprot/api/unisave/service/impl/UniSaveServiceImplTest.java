@@ -27,6 +27,7 @@ import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
+import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED_SEQUENCE_MEMBER;
 import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
 
 /**
@@ -161,6 +162,58 @@ class UniSaveServiceImplTest {
         }
 
         @Test
+        void canGetAggregatedEntriesWithContent() {
+            // given
+            String accession = ACCESSION;
+            when(uniSaveRepository.getCurrentRelease()).thenReturn(mockRelease("1"));
+            List<EntryImpl> repositoryEntries =
+                    asList(
+                            mockEntry(accession, 8, 4),
+                            mockEntry(accession, 7, 3),
+                            mockEntry(accession, 6, 3),
+                            mockEntry(accession, 5, 2),
+                            mockEntry(accession, 4, 2),
+                            mockEntry(accession, 3, 2),
+                            mockEntry(accession, 2, 1),
+                            mockEntry(accession, 1, 1));
+            doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntries(accession);
+
+            // when
+            UniSaveRequest.Entries request = entriesRequest(accession, null, false, true);
+            request.setUniqueSequences(true);
+            List<UniSaveEntry> entries = uniSaveService.getEntries(request);
+
+            // then
+            assertThat(entries, hasSize(4));
+
+            // EV=8, SV=4
+            assertThat(entries.get(0).getEntryVersion(), is(8));
+            assertThat(entries.get(0).getEntryVersionUpper(), is(8));
+            assertThat(entries.get(0).getSequenceVersion(), is(4));
+
+            // EV=6-7, SV=3
+            assertThat(entries.get(1).getEntryVersion(), is(6));
+            assertThat(entries.get(1).getEntryVersionUpper(), is(7));
+            assertThat(entries.get(1).getSequenceVersion(), is(3));
+
+            // EV=3-5, SV=2
+            assertThat(entries.get(2).getEntryVersion(), is(3));
+            assertThat(entries.get(2).getEntryVersionUpper(), is(5));
+            assertThat(entries.get(2).getSequenceVersion(), is(2));
+
+            // EV=1-2, SV=1
+            assertThat(entries.get(3).getEntryVersion(), is(1));
+            assertThat(entries.get(3).getEntryVersionUpper(), is(2));
+            assertThat(entries.get(3).getSequenceVersion(), is(1));
+
+            entries.forEach(
+                    entry ->
+                            assertThat(
+                                    entry.getContent(),
+                                    Matchers.startsWith(AGGREGATED_SEQUENCE_MEMBER)));
+        }
+
+        @Test
         void canGetEntryVersionsWithContent() {
             // given
             String accession = ACCESSION;
@@ -179,18 +232,6 @@ class UniSaveServiceImplTest {
                             .map(UniSaveEntry::getEntryVersion)
                             .collect(Collectors.toList()),
                     contains(3, 1));
-        }
-
-        private UniSaveRequest.Entries entriesRequest(
-                String accession, String versions, boolean download, boolean includeContent) {
-
-            UniSaveRequest.Entries request = new UniSaveRequest.Entries();
-            request.setAccession(accession);
-            request.setDownload(download);
-            request.setIncludeContent(includeContent);
-            request.setVersions(versions);
-
-            return request;
         }
 
         @Test
@@ -360,6 +401,18 @@ class UniSaveServiceImplTest {
             assertThat(entryBuilder.build().getLastRelease(), is(firstRelease));
             assertThat(entryBuilder.build().getLastReleaseDate(), is(firstReleaseDate));
         }
+
+        private UniSaveRequest.Entries entriesRequest(
+                String accession, String versions, boolean download, boolean includeContent) {
+
+            UniSaveRequest.Entries request = new UniSaveRequest.Entries();
+            request.setAccession(accession);
+            request.setDownload(download);
+            request.setIncludeContent(includeContent);
+            request.setVersions(versions);
+
+            return request;
+        }
     }
 
     @Nested
@@ -369,13 +422,6 @@ class UniSaveServiceImplTest {
         @BeforeEach
         void setUp() {
             uniSaveService = new UniSaveServiceImpl(mock(UniSaveRepository.class));
-        }
-
-        private List<Integer> parseVersionSpec(String spec) {
-            UniSaveRequest.Entries entriesRequest = new UniSaveRequest.Entries();
-            entriesRequest.setVersions(spec);
-
-            return uniSaveService.extractVersionsFromRequest(entriesRequest);
         }
 
         @Test
@@ -419,8 +465,15 @@ class UniSaveServiceImplTest {
             MatcherAssert.assertThat(
                     parseVersionSpec("2,4,6,8-10,1,100-110,16"),
                     Matchers.contains(
-                            2, 4, 6, 8, 9, 10, 1, 100, 101, 102, 103, 104, 105, 106, 107, 108,
-                            109, 110, 16));
+                            2, 4, 6, 8, 9, 10, 1, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109,
+                            110, 16));
+        }
+
+        private List<Integer> parseVersionSpec(String spec) {
+            UniSaveRequest.Entries entriesRequest = new UniSaveRequest.Entries();
+            entriesRequest.setVersions(spec);
+
+            return uniSaveService.extractVersionsFromRequest(entriesRequest);
         }
     }
 }
