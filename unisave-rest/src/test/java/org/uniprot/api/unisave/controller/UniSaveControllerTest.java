@@ -21,6 +21,7 @@ import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.unisave.UniSaveRESTApplication;
 import org.uniprot.api.unisave.repository.UniSaveRepository;
+import org.uniprot.api.unisave.repository.domain.EntryInfo;
 import org.uniprot.api.unisave.repository.domain.impl.AccessionStatusInfoImpl;
 import org.uniprot.api.unisave.repository.domain.impl.DiffImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
@@ -341,6 +342,41 @@ class UniSaveControllerTest {
                                                         + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
                                                         + "FQIIGETVSSTNRG")));
 
+    }
+
+    @Test
+    void retrievingAllAggregatedEntriesInTSV() throws Exception {
+        // given
+        List<EntryInfo> repositoryEntries =
+                asList(
+                        mockEntryInfo(ACCESSION, 4),
+                        mockEntryInfo(ACCESSION, 3),
+                        mockEntryInfo(ACCESSION, 2),
+                        mockEntryInfo(ACCESSION, 1));
+        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntryInfos(ACCESSION);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + ACCESSION)
+                                .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Entry version\tSequence version\tEntry name\tDatabase\tNumber\tDate\tReplaces\tReplaced by\n"
+                                                        + "4\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t\n"
+                                                        + "3\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t\n"
+                                                        + "2\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t\n"
+                                                        + "1\t0\tname\tSwiss-Prot\t2\t15-Nov-2021\t\t\n")));
     }
 
     @Test

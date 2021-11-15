@@ -27,8 +27,7 @@ import java.util.stream.Stream;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
 
 /**
@@ -64,12 +63,13 @@ public class UniSaveController {
                                     mediaType = APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UniSaveEntry.class)),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FF_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE)
                         })
             })
     @GetMapping(
             value = "/{accession}",
-            produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
+            produces = {APPLICATION_JSON_VALUE, FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE, TSV_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
             @Parameter(description = "The accession of a UniProtKB entry.")
                     @PathVariable("accession")

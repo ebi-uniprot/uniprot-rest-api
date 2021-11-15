@@ -32,6 +32,7 @@ public class UniSaveEntityMocker {
 
     public static EntryInfoImpl mockEntryInfo(String accession, int entryVersion) {
         EntryInfoImpl entryInfo = new EntryInfoImpl();
+        entryInfo.setName("name");
         entryInfo.setEntryVersion(entryVersion);
         ReleaseImpl lastRelease = new ReleaseImpl();
         lastRelease.setDatabase(DatabaseEnum.SWISSPROT);
