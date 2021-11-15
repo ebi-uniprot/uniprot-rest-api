@@ -168,8 +168,11 @@ public class UniProtEntryService
 
         UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
 
-        if (needToFilterActiveEntries(uniProtRequest)) {
+        if (isSearchAll(uniProtRequest)) {
             uniProtRequest.setQuery(getQueryFieldName("active") + ":" + true);
+        } else if (needToAddActiveFilter(uniProtRequest)) {
+            uniProtRequest.setQuery(
+                    uniProtRequest.getQuery() + " AND " + getQueryFieldName("active") + ":" + true);
         }
 
         // fill the common params from the basic service class
@@ -227,12 +230,15 @@ public class UniProtEntryService
         }
     }
 
-    private boolean needToFilterActiveEntries(UniProtKBSearchRequest uniProtRequest) {
+    private boolean isSearchAll(UniProtKBSearchRequest uniProtRequest) {
         return "*".equals(uniProtRequest.getQuery().trim())
                 || "(*)".equals(uniProtRequest.getQuery().trim())
                 || "*:*".equals(uniProtRequest.getQuery().trim())
-                || "(*:*)".equals(uniProtRequest.getQuery().trim())
-                || SolrQueryUtil.hasNegativeTerm(uniProtRequest.getQuery());
+                || "(*:*)".equals(uniProtRequest.getQuery().trim());
+    }
+
+    private boolean needToAddActiveFilter(UniProtKBSearchRequest uniProtRequest) {
+        return SolrQueryUtil.hasNegativeTerm(uniProtRequest.getQuery());
     }
 
     private String getQueryFieldName(String active) {

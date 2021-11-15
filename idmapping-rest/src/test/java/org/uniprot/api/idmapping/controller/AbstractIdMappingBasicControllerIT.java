@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -236,12 +235,11 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
     @Test
     void testSearchWithoutFieldNameWithEmptyResult() throws Exception {
         // when
-        String searchQuery = UUID.randomUUID().toString();
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
 
         MockHttpServletRequestBuilder requestBuilder =
                 get(getIdMappingResultPath(), job.getJobId())
-                        .param("query", searchQuery)
+                        .param("query", "INVALIDVALUE")
                         .header(ACCEPT, APPLICATION_JSON_VALUE);
         ResultActions response = performRequest(requestBuilder);
 

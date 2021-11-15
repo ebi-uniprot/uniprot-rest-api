@@ -949,6 +949,84 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
     }
 
+    @Test
+    void searchWithNotOperatorWorks() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "Reactome NOT(organism_id:9606)")
+                                        .param("fields", "accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("F1Q0X3")));
+    }
+
+    @Test
+    void searchWithNotWithDashOperatorWorks() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "Reactome -organism_id:9606")
+                                        .param("fields", "accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("F1Q0X3")));
+    }
+
+    @Test
+    void searchWithNotWithExclamationOperatorWorks() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "Reactome !organism_id:9606")
+                                        .param("fields", "accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("F1Q0X3")));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
