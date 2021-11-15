@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
-import org.uniprot.api.rest.service.query.QueryProcessor;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
 import org.uniprot.store.config.UniProtDataType;
@@ -45,10 +43,9 @@ public class ArbaSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.ARBA.toString().toLowerCase(), new HashMap<>());
         return UniProtQueryProcessorConfig.builder()
-                        .optimisableFields(
-                                getDefaultSearchOptimisedFieldItems(arbaSearchFieldConfig))
-                        .whiteListFields(uniRuleWhiteListFields)
-                        .build();
+                .optimisableFields(getDefaultSearchOptimisedFieldItems(arbaSearchFieldConfig))
+                .whiteListFields(uniRuleWhiteListFields)
+                .build();
     }
 
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(

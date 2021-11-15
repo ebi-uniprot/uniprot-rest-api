@@ -2,18 +2,13 @@ package org.uniprot.api.rest.service.query;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.queryparser.flexible.core.nodes.AndQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
+
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
-import org.uniprot.core.util.Utils;
-
-import java.util.List;
 
 /**
  * This class does the following:

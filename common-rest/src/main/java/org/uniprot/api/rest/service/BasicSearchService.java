@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorPipeline;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -21,7 +20,6 @@ import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -190,7 +188,9 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         String requestedQuery = request.getQuery();
 
-        requestBuilder.query(UniProtQueryProcessor.newInstance(getQueryProcessorConfig()).processQuery(requestedQuery));
+        requestBuilder.query(
+                UniProtQueryProcessor.newInstance(getQueryProcessorConfig())
+                        .processQuery(requestedQuery));
 
         if (solrSortClause != null) {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));

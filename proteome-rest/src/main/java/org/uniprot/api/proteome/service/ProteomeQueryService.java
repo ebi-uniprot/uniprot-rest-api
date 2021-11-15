@@ -9,7 +9,6 @@ import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;

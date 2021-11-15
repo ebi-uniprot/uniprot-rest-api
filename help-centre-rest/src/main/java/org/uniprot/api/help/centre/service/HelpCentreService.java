@@ -10,7 +10,6 @@ import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -55,5 +54,4 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
     protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return helpCentreQueryProcessorConfig;
     }
-
 }

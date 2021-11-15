@@ -6,7 +6,6 @@ import org.uniprot.api.aa.repository.ArbaFacetConfig;
 import org.uniprot.api.aa.repository.ArbaQueryRepository;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.rest.service.BasicSearchService;
-import org.uniprot.api.rest.service.query.QueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -47,5 +46,4 @@ public class ArbaService extends BasicSearchService<ArbaDocument, UniRuleEntry> 
     protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return arbaQueryProcessorConfig;
     }
-
 }

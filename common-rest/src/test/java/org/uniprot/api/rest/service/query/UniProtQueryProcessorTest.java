@@ -1,26 +1,5 @@
 package org.uniprot.api.rest.service.query;
 
-import nl.altindag.log.LogCaptor;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
-import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.*;
@@ -30,6 +9,27 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import nl.altindag.log.LogCaptor;
+
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
+import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * This class tests the full flow of functionality offered by {@link UniProtQueryProcessor},
@@ -125,7 +125,9 @@ class UniProtQueryProcessorTest {
         }
 
         assertThat(logCaptor.getWarnLogs(), hasSize(greaterThan(0)));
-        assertThat(logCaptor.getWarnLogs(), everyItem(Matchers.startsWith("Problem processing user query: ")));
+        assertThat(
+                logCaptor.getWarnLogs(),
+                everyItem(Matchers.startsWith("Problem processing user query: ")));
     }
 
     @Test

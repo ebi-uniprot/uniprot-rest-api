@@ -13,7 +13,6 @@ import javax.validation.Payload;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -54,10 +53,10 @@ public @interface ValidSolrQuerySyntax {
         }
 
         /**
-         * Although '/' is a special lucene character, the old uniprot website allows users to
-         * *not* escape it. That is, they allow queries like, "hello/world", to pass unescaped through to lucene.
-         * Therefore, in order to allow it, we should escape it here, allowing validation to "ignore"
-         * the forward slash.
+         * Although '/' is a special lucene character, the old uniprot website allows users to *not*
+         * escape it. That is, they allow queries like, "hello/world", to pass unescaped through to
+         * lucene. Therefore, in order to allow it, we should escape it here, allowing validation to
+         * "ignore" the forward slash.
          *
          * @param queryString the query string from the client
          * @return the query string with forward slashes appropriately escaped

@@ -1,10 +1,10 @@
 package org.uniprot.api.rest.validation;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 
 class QuerySyntaxValidatorTest {
     @ParameterizedTest
