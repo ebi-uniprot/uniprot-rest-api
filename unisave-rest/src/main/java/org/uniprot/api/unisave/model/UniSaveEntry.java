@@ -42,7 +42,7 @@ public class UniSaveEntry {
     }
 
     @JsonIgnore
-    private Integer entryVersionUpper; // used only when constructing
+    private Integer entryVersionUpper; // used only when constructing unique sequence aggregates in fasta format
 
     public static class UniSaveEntryBuilder {
         public String getLastRelease() {
