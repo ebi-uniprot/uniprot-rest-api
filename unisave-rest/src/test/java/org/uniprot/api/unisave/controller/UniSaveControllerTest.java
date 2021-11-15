@@ -1,19 +1,5 @@
 package org.uniprot.api.unisave.controller;
 
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.Mockito.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
-
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +18,29 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.unisave.UniSaveRESTApplication;
 import org.uniprot.api.unisave.repository.UniSaveRepository;
 import org.uniprot.api.unisave.repository.domain.impl.AccessionStatusInfoImpl;
 import org.uniprot.api.unisave.repository.domain.impl.DiffImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryInfoImpl;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
 
 /**
  * Created 06/04/20
@@ -156,31 +159,187 @@ class UniSaveControllerTest {
     @Test
     void canRetrieveAllAggregatedEntries() throws Exception {
         // given
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1));
+        List<EntryImpl> repositoryEntries =
+                asList(
+                        mockEntry(ACCESSION, 4, 2, true),
+                        mockEntry(ACCESSION, 3, 2, true),
+                        mockEntry(ACCESSION, 2, 1, true),
+                        mockEntry(ACCESSION, 1, 1, true));
+        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntries(ACCESSION);
 
         // when
         ResultActions response =
                 mockMvc.perform(
                         get(RESOURCE_BASE + ACCESSION)
-                                .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("includeContent", "true")
-                                .param(VERSIONS, "1"));
+                                .header(ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE_VALUE)
+                                .param("uniqueSequences", "true"));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath(ENTRY_VERSION, contains(1)))
-                .andExpect(jsonPath(RESULTS_CONTENT).exists());
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">P12345: EV=3-4 SV=2\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG\n"
+                                                        + ">P12345: EV=1-2 SV=1\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG")));
     }
 
     @Test
-    void canRetrieveAggregatedEntriesInVersionRange() {
+    void canRetrieveAggregatedEntriesInVersionRange() throws Exception {
+        // given
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 4)).thenReturn(mockEntry(ACCESSION, 4, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 3)).thenReturn(mockEntry(ACCESSION, 3, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 2)).thenReturn(mockEntry(ACCESSION, 2, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1, 1, true));
 
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + ACCESSION)
+                                .header(ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE_VALUE)
+                                .param("uniqueSequences", "true")
+                                .param("versions", "2-4"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                HttpHeaders.CONTENT_TYPE,
+                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">P12345: EV=3-4 SV=2\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG\n"
+                                                        + ">P12345: EV=2 SV=1\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG")));
     }
 
     @Test
-    void retrievingAggregatedEntriesWithContentFalseStillWorks() {
+    void canRetrieveAggregatedEntriesForCSV() throws Exception {
+        // given
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 4)).thenReturn(mockEntry(ACCESSION, 4, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 3)).thenReturn(mockEntry(ACCESSION, 3, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 2)).thenReturn(mockEntry(ACCESSION, 2, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1, 1, true));
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + ACCESSION)
+                                .header(ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE_VALUE)
+                                .param("uniqueSequences", "true")
+                                .param("versions", "2,3"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                HttpHeaders.CONTENT_TYPE,
+                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">P12345: EV=3 SV=2\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG\n"
+                                                        + ">P12345: EV=2 SV=1\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG")));
+    }
+
+    @Test
+    void canRetrieveAggregatedEntriesCSVRangeMix() throws Exception {
+        // given
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 7)).thenReturn(mockEntry(ACCESSION, 7, 4, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 6)).thenReturn(mockEntry(ACCESSION, 6, 3, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 5)).thenReturn(mockEntry(ACCESSION, 5, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 4)).thenReturn(mockEntry(ACCESSION, 4, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 3)).thenReturn(mockEntry(ACCESSION, 3, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 2)).thenReturn(mockEntry(ACCESSION, 2, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1, 1, true));
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + ACCESSION)
+                                .header(ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE_VALUE)
+                                .param("uniqueSequences", "true")
+                                .param("versions", "1,3-5,7"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                HttpHeaders.CONTENT_TYPE,
+                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">P12345: EV=7 SV=4\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG\n"
+                                                        + ">P12345: EV=3-5 SV=2\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG\n"
+                                                        + ">P12345: EV=1 SV=1\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG")));
+    }
+
+    @Test
+    void retrievingAggregatedEntriesWithContentFalseStillWorks() throws Exception {
+        // given
+        List<EntryImpl> repositoryEntries =
+                asList(
+                        mockEntry(ACCESSION, 4, 2, true),
+                        mockEntry(ACCESSION, 3, 2, true),
+                        mockEntry(ACCESSION, 2, 1, true),
+                        mockEntry(ACCESSION, 1, 1, true));
+        doReturn(repositoryEntries).when(uniSaveRepository).retrieveEntries(ACCESSION);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(RESOURCE_BASE + ACCESSION)
+                                .header(ACCEPT, UniProtMediaType.FASTA_MEDIA_TYPE_VALUE)
+                                .param("uniqueSequences", "true")
+                                .param("includeContent", "true"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        header().string(
+                                HttpHeaders.CONTENT_TYPE,
+                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                ">P12345: EV=3-4 SV=2\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG\n"
+                                                        + ">P12345: EV=1-2 SV=1\n"
+                                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                                        + "FQIIGETVSSTNRG")));
 
     }
 
@@ -220,7 +379,7 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
+                .andExpect(jsonPath(MESSAGES).value(contains(NOT_FOUND)));
     }
 
     @Test
@@ -234,7 +393,7 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
+                .andExpect(jsonPath(MESSAGES).value(contains(INVALID_ACCESSION_ERROR_MESSAGE)));
     }
 
     @Test
@@ -250,10 +409,10 @@ class UniSaveControllerTest {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
-                                MESSAGES,
-                                contains(
-                                        "Invalid request received. Version list must contain non-zero integers. For example, 1-5,8,20-30. Instead, found: XXXX")));
+                        jsonPath(MESSAGES)
+                                .value(
+                                        contains(
+                                                "Invalid request received. Version list must contain non-zero integers. For example, 1-5,8,20-30. Instead, found: XXXX")));
     }
 
     // resource /{accession}/diff
@@ -300,7 +459,7 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
+                .andExpect(jsonPath(MESSAGES).value(contains(INVALID_ACCESSION_ERROR_MESSAGE)));
     }
 
     @Test
@@ -319,7 +478,7 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
+                .andExpect(jsonPath(MESSAGES).value(contains(NOT_FOUND)));
     }
 
     @Test
@@ -334,7 +493,8 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath(MESSAGES, contains("'version2' is a required parameter")));
+                .andExpect(
+                        jsonPath(MESSAGES).value(contains("'version2' is a required parameter")));
     }
 
     @Test
@@ -349,7 +509,8 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath(MESSAGES, contains("'version1' is a required parameter")));
+                .andExpect(
+                        jsonPath(MESSAGES).value(contains("'version1' is a required parameter")));
     }
 
     // resource /{accession}/status
@@ -388,7 +549,7 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                .andExpect(jsonPath(MESSAGES, contains("Internal server error")));
+                .andExpect(jsonPath(MESSAGES).value(contains("Internal server error")));
     }
 
     @Test
@@ -408,7 +569,7 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(jsonPath(MESSAGES, contains(NOT_FOUND)));
+                .andExpect(jsonPath(MESSAGES).value(contains(NOT_FOUND)));
     }
 
     @Test
@@ -422,7 +583,7 @@ class UniSaveControllerTest {
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath(MESSAGES, contains(INVALID_ACCESSION_ERROR_MESSAGE)));
+                .andExpect(jsonPath(MESSAGES).value(contains(INVALID_ACCESSION_ERROR_MESSAGE)));
     }
 
     @Profile("unisave-controller-test")

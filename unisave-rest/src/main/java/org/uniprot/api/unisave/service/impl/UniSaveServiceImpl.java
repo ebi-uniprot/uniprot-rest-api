@@ -127,6 +127,7 @@ public class UniSaveServiceImpl implements UniSaveService {
                 String content = AGGREGATED_SEQUENCE_MEMBER + uniSaveEntry.getContent();
                 currEntryBuilder =
                         UniSaveEntry.builder()
+                                .accession(uniSaveEntry.getAccession())
                                 .sequenceVersion(currSeqVer)
                                 .entryVersionUpper(uniSaveEntry.getEntryVersion())
                                 .content(content);
