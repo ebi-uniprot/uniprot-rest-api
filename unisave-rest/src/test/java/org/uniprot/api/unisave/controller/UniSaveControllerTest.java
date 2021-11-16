@@ -448,7 +448,7 @@ class UniSaveControllerTest {
                         jsonPath(MESSAGES)
                                 .value(
                                         contains(
-                                                "Invalid request received. Version list must contain non-zero integers. For example, 1-5,8,20-30. Instead, found: XXXX")));
+                                                "Invalid request received. Version list must contain integers greater than zero. For example, 1-5,8,20-30. Instead, found: XXXX")));
     }
 
     // resource /{accession}/diff

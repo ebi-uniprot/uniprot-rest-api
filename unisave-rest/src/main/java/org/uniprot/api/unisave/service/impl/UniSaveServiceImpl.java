@@ -170,7 +170,7 @@ public class UniSaveServiceImpl implements UniSaveService {
             return versions;
         } else {
             throw new InvalidRequestException(
-                    "Version list must contain non-zero integers. For example, 1-5,8,20-30. Instead, found: "
+                    "Version list must contain integers greater than zero. For example, 1-5,8,20-30. Instead, found: "
                             + spec);
         }
     }

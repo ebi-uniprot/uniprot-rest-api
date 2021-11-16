@@ -31,7 +31,7 @@ public class UniSaveRequest {
         @Parameter(description = "Whether or not to include the entry content (true|false).")
         private boolean includeContent;
 
-        @Parameter(description = "Non-zero entry version numbers, e.g., 1,3-8,15-20,6.")
+        @Parameter(description = "Greater than zero entry version numbers, e.g., 1,3-8,15-20,6.")
         private String versions;
 
         @Parameter(description = "Whether or not to aggregate sequences that are unique (true|false)")
