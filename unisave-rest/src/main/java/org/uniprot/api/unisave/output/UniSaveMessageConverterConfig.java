@@ -2,8 +2,7 @@ package org.uniprot.api.unisave.output;
 
 import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 
@@ -23,6 +22,7 @@ import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.output.converter.UniSaveFastaMessageConverter;
 import org.uniprot.api.unisave.output.converter.UniSaveFlatFileMessageConverter;
 import org.uniprot.api.unisave.output.converter.UniSaveJsonMessageConverter;
+import org.uniprot.api.unisave.output.converter.UniSaveTSVMessageConverter;
 
 /** @author Edd */
 @Configuration
@@ -42,6 +42,7 @@ public class UniSaveMessageConverterConfig {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new UniSaveFastaMessageConverter());
                 converters.add(new UniSaveFlatFileMessageConverter());
+                converters.add(new UniSaveTSVMessageConverter());
                 converters.add(0, new UniSaveJsonMessageConverter());
             }
         };
@@ -55,7 +56,8 @@ public class UniSaveMessageConverterConfig {
         asList(
                         unisaveContext(APPLICATION_JSON),
                         unisaveContext(FASTA_MEDIA_TYPE),
-                        unisaveContext(FF_MEDIA_TYPE))
+                        unisaveContext(FF_MEDIA_TYPE),
+                        unisaveContext(TSV_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

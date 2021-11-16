@@ -41,6 +41,9 @@ public class UniSaveEntry {
         return isCurrentRelease;
     }
 
+    @JsonIgnore
+    private Integer entryVersionUpper; // used only when constructing unique sequence aggregates in fasta format
+
     public static class UniSaveEntryBuilder {
         public String getLastRelease() {
             return lastRelease;

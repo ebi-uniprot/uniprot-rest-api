@@ -1,13 +1,16 @@
 package org.uniprot.api.unisave;
 
+import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
+import org.uniprot.api.unisave.repository.domain.impl.*;
+
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
-import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
-import org.uniprot.api.unisave.repository.domain.impl.*;
+import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED_SEQUENCE_MEMBER;
 
 /**
  * Created 08/04/20
@@ -30,11 +33,12 @@ public class UniSaveEntityMocker {
 
     public static EntryInfoImpl mockEntryInfo(String accession, int entryVersion) {
         EntryInfoImpl entryInfo = new EntryInfoImpl();
+        entryInfo.setName("name");
         entryInfo.setEntryVersion(entryVersion);
         ReleaseImpl lastRelease = new ReleaseImpl();
         lastRelease.setDatabase(DatabaseEnum.SWISSPROT);
         lastRelease.setReleaseNumber("2");
-        lastRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
+        lastRelease.setReleaseDate(java.sql.Date.valueOf(LocalDate.of(2021, 11, 15)));
 
         entryInfo.setLastRelease(lastRelease);
         entryInfo.setAccession(accession);
@@ -43,7 +47,7 @@ public class UniSaveEntityMocker {
         ReleaseImpl firstRelease = new ReleaseImpl();
         firstRelease.setDatabase(DatabaseEnum.SWISSPROT);
         firstRelease.setReleaseNumber("1");
-        firstRelease.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
+        firstRelease.setReleaseDate(java.sql.Date.valueOf(LocalDate.of(2021, 11, 15)));
         entryInfo.setFirstRelease(firstRelease);
 
         return entryInfo;
@@ -53,15 +57,17 @@ public class UniSaveEntityMocker {
         ReleaseImpl release = new ReleaseImpl();
         release.setDatabase(DatabaseEnum.SWISSPROT);
         release.setReleaseNumber(releaseNumber);
-        release.setReleaseDate(new Date(Calendar.getInstance().getTime().getTime()));
+        release.setReleaseDate(java.sql.Date.valueOf(LocalDate.of(2021, 11, 15)));
 
         return release;
     }
 
-    public static EntryImpl mockEntry(String accession, int entryVersion, String entryContent) {
+    public static EntryImpl mockEntry(
+            String accession, int entryVersion, int sequenceVersion, String entryContent) {
         EntryImpl entry = new EntryImpl();
         EntryContentImpl content = new EntryContentImpl();
         content.setFullContent(entryContent);
+        entry.setSequenceVersion(sequenceVersion);
         entry.setEntryContent(content);
         entry.setEntryVersion(entryVersion);
         entry.setAccession(accession);
@@ -87,9 +93,11 @@ public class UniSaveEntityMocker {
         return release;
     }
 
-    public static EntryImpl mockEntry(String accession, int entryVersion) {
+    public static EntryImpl mockEntry(
+            String accession, int entryVersion, int sequenceVersion, boolean isAggregatedSequence) {
         String fullContent =
-                "ID   "
+                (isAggregatedSequence ? AGGREGATED_SEQUENCE_MEMBER : "")
+                        + "ID   "
                         + accession
                         + "_ID        Unreviewed;        60 AA.\n"
                         + "AC   "
@@ -123,6 +131,14 @@ public class UniSaveEntityMocker {
                         + "     MASGAYSKYL FQIIGETVSS TNRGNKYNSF DHSRVDTRAG SFREAYNSKK KGSGRFGRKC\n"
                         + "     FQIIGETVSS TNRG\n"
                         + "//\n";
-        return mockEntry(accession, entryVersion, fullContent);
+        return mockEntry(accession, entryVersion, sequenceVersion, fullContent);
+    }
+
+    public static EntryImpl mockEntry(String accession, int entryVersion, int sequenceVersion) {
+        return mockEntry(accession, entryVersion, sequenceVersion, false);
+    }
+
+    public static EntryImpl mockEntry(String accession, int entryVersion) {
+        return mockEntry(accession, entryVersion, 0);
     }
 }
