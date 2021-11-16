@@ -231,10 +231,10 @@ public class UniProtEntryService
     }
 
     private boolean isSearchAll(UniProtKBSearchRequest uniProtRequest) {
-        return "*".equals(uniProtRequest.getQuery().trim())
-                || "(*)".equals(uniProtRequest.getQuery().trim())
-                || "*:*".equals(uniProtRequest.getQuery().trim())
-                || "(*:*)".equals(uniProtRequest.getQuery().trim());
+        return "*".equals(uniProtRequest.getQuery().strip())
+                || "(*)".equals(uniProtRequest.getQuery().strip())
+                || "*:*".equals(uniProtRequest.getQuery().strip())
+                || "(*:*)".equals(uniProtRequest.getQuery().strip());
     }
 
     private boolean needToAddActiveFilter(UniProtKBSearchRequest uniProtRequest) {
