@@ -230,7 +230,7 @@ class UniSaveControllerTest {
     }
 
     @Test
-    void canRetrieveAggregatedEntriesForCSV() throws Exception {
+    void canRetrieveAggregatedEntriesForCommaSeparatedValues() throws Exception {
         // given
         when(uniSaveRepository.retrieveEntry(ACCESSION, 4)).thenReturn(mockEntry(ACCESSION, 4, 2, true));
         when(uniSaveRepository.retrieveEntry(ACCESSION, 3)).thenReturn(mockEntry(ACCESSION, 3, 2, true));
@@ -265,7 +265,7 @@ class UniSaveControllerTest {
     }
 
     @Test
-    void canRetrieveAggregatedEntriesCSVRangeMix() throws Exception {
+    void canRetrieveAggregatedEntriesCommaSeparatedValuesRangeMix() throws Exception {
         // given
         when(uniSaveRepository.retrieveEntry(ACCESSION, 7)).thenReturn(mockEntry(ACCESSION, 7, 4, true));
         when(uniSaveRepository.retrieveEntry(ACCESSION, 6)).thenReturn(mockEntry(ACCESSION, 6, 3, true));
