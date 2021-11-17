@@ -1341,6 +1341,7 @@ DR   ProteomicsDB; 53925; -. [P21802-7]
 DR   ProteomicsDB; 53926; -. [P21802-8]
 DR   ProteomicsDB; 53927; -. [P21802-9]
 DR   TopDownProteomics; P21802-8; -. [P21802-8]
+DR   TCDB; 8.A.94.1.2; the adiponectin (adiponectin) family.
 DR   ABCD; P21802; -.
 DR   Ensembl; ENST00000346997; ENSP00000263451; ENSG00000066468. [P21802-5]
 DR   Ensembl; ENST00000356226; ENSP00000348559; ENSG00000066468. [P21802-20]
