@@ -8,6 +8,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,7 +75,7 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Sequence databases')].items.*",
-                                iterableWithSize(5)))
+                                iterableWithSize(6)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='3D structure databases')].items.*",
@@ -145,12 +146,12 @@ class IdMappingConfigureControllerIT {
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==4)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==5)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==6)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(89)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(90)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId>=8)]", iterableWithSize(0)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId<=0)]", iterableWithSize(0)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(95)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(96)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.from==false)]", iterableWithSize(2)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(96)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(97)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.to==false)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.rules.length()", is(7)))
                 .andExpect(jsonPath("$.rules.[?(@.taxonId==false)]", iterableWithSize(6)))
