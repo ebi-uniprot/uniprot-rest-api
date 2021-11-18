@@ -15,8 +15,8 @@ import java.util.regex.Pattern;
 public class UniSaveRequest {
     public static final String ACCESSION_PATTERN =
             "([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])(-[0-9]+)?";
-    public static final String VERSION_PART_PATTERN = ",?(([1-9][0-9]*)(-([1-9][0-9]*))?)";
-    public static final String VERSION_FULL_PATTERN = "(" + VERSION_PART_PATTERN + ")*";
+    public static final String VERSION_PART_PATTERN = ",?(([1-9][0-9]{0,2})(-([1-9][0-9]{0,2}))?)";
+    public static final String VERSION_FULL_PATTERN = "(" + VERSION_PART_PATTERN + "){0,100}";
     public static final Pattern VERSION_FULL_PATTERN_REGEX = Pattern.compile(VERSION_FULL_PATTERN);
     public static final Pattern VERSION_PART_PATTERN_REGEX = Pattern.compile(VERSION_PART_PATTERN);
 
