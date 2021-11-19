@@ -62,7 +62,7 @@ import org.uniprot.store.search.SolrCollection;
             ArbaSearchControllerIT.ArbaSearchContentTypeParamResolver.class,
             ArbaSearchControllerIT.ArbaSearchParameterResolver.class
         })
-public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+public class ArbaSearchControllerIT extends AbstractRuleSearchWithFacetControllerIT {
 
     @Autowired private ArbaFacetConfig facetConfig;
 
