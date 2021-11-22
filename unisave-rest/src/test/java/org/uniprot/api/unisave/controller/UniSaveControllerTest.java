@@ -1,5 +1,21 @@
 package org.uniprot.api.unisave.controller;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,22 +42,6 @@ import org.uniprot.api.unisave.repository.domain.impl.AccessionStatusInfoImpl;
 import org.uniprot.api.unisave.repository.domain.impl.DiffImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryInfoImpl;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.Mockito.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
 
 /**
  * Created 06/04/20
@@ -197,10 +197,14 @@ class UniSaveControllerTest {
     @Test
     void canRetrieveAggregatedEntriesInVersionRange() throws Exception {
         // given
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 4)).thenReturn(mockEntry(ACCESSION, 4, 2, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 3)).thenReturn(mockEntry(ACCESSION, 3, 2, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 2)).thenReturn(mockEntry(ACCESSION, 2, 1, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 4))
+                .thenReturn(mockEntry(ACCESSION, 4, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 3))
+                .thenReturn(mockEntry(ACCESSION, 3, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 2))
+                .thenReturn(mockEntry(ACCESSION, 2, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 1))
+                .thenReturn(mockEntry(ACCESSION, 1, 1, true));
 
         // when
         ResultActions response =
@@ -215,8 +219,8 @@ class UniSaveControllerTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(
                         content()
                                 .string(
@@ -232,10 +236,14 @@ class UniSaveControllerTest {
     @Test
     void canRetrieveAggregatedEntriesForCommaSeparatedValues() throws Exception {
         // given
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 4)).thenReturn(mockEntry(ACCESSION, 4, 2, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 3)).thenReturn(mockEntry(ACCESSION, 3, 2, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 2)).thenReturn(mockEntry(ACCESSION, 2, 1, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 4))
+                .thenReturn(mockEntry(ACCESSION, 4, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 3))
+                .thenReturn(mockEntry(ACCESSION, 3, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 2))
+                .thenReturn(mockEntry(ACCESSION, 2, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 1))
+                .thenReturn(mockEntry(ACCESSION, 1, 1, true));
 
         // when
         ResultActions response =
@@ -250,8 +258,8 @@ class UniSaveControllerTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(
                         content()
                                 .string(
@@ -267,13 +275,20 @@ class UniSaveControllerTest {
     @Test
     void canRetrieveAggregatedEntriesCommaSeparatedValuesRangeMix() throws Exception {
         // given
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 7)).thenReturn(mockEntry(ACCESSION, 7, 4, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 6)).thenReturn(mockEntry(ACCESSION, 6, 3, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 5)).thenReturn(mockEntry(ACCESSION, 5, 2, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 4)).thenReturn(mockEntry(ACCESSION, 4, 2, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 3)).thenReturn(mockEntry(ACCESSION, 3, 2, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 2)).thenReturn(mockEntry(ACCESSION, 2, 1, true));
-        when(uniSaveRepository.retrieveEntry(ACCESSION, 1)).thenReturn(mockEntry(ACCESSION, 1, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 7))
+                .thenReturn(mockEntry(ACCESSION, 7, 4, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 6))
+                .thenReturn(mockEntry(ACCESSION, 6, 3, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 5))
+                .thenReturn(mockEntry(ACCESSION, 5, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 4))
+                .thenReturn(mockEntry(ACCESSION, 4, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 3))
+                .thenReturn(mockEntry(ACCESSION, 3, 2, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 2))
+                .thenReturn(mockEntry(ACCESSION, 2, 1, true));
+        when(uniSaveRepository.retrieveEntry(ACCESSION, 1))
+                .thenReturn(mockEntry(ACCESSION, 1, 1, true));
 
         // when
         ResultActions response =
@@ -288,8 +303,8 @@ class UniSaveControllerTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(
                         content()
                                 .string(
@@ -329,8 +344,8 @@ class UniSaveControllerTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(
                         content()
                                 .string(
@@ -341,7 +356,6 @@ class UniSaveControllerTest {
                                                         + ">P12345: EV=1-2 SV=1\n"
                                                         + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
                                                         + "FQIIGETVSSTNRG")));
-
     }
 
     @Test

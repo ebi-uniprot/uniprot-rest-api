@@ -1,5 +1,21 @@
 package org.uniprot.api.unisave.service.impl;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
+import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED_SEQUENCE_MEMBER;
+import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,22 +29,6 @@ import org.uniprot.api.unisave.repository.UniSaveRepository;
 import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.request.UniSaveRequest;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
-import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED_SEQUENCE_MEMBER;
-import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
 
 /**
  * Created 08/04/20

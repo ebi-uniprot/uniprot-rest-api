@@ -30,7 +30,6 @@ import org.uniprot.api.aa.AARestApplication;
 import org.uniprot.api.aa.repository.UniRuleFacetConfig;
 import org.uniprot.api.aa.repository.UniRuleQueryRepository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -60,7 +59,7 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
             UniRuleSearchControllerIT.UniRuleSearchContentTypeParamResolver.class,
             UniRuleSearchControllerIT.UniRuleSearchParameterResolver.class
         })
-public class UniRuleSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+public class UniRuleSearchControllerIT extends AbstractRuleSearchWithFacetControllerIT {
 
     @Autowired private UniRuleFacetConfig facetConfig;
 

@@ -30,7 +30,6 @@ import org.uniprot.api.aa.AARestApplication;
 import org.uniprot.api.aa.repository.ArbaFacetConfig;
 import org.uniprot.api.aa.repository.ArbaQueryRepository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -62,7 +61,7 @@ import org.uniprot.store.search.SolrCollection;
             ArbaSearchControllerIT.ArbaSearchContentTypeParamResolver.class,
             ArbaSearchControllerIT.ArbaSearchParameterResolver.class
         })
-public class ArbaSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+public class ArbaSearchControllerIT extends AbstractRuleSearchWithFacetControllerIT {
 
     @Autowired private ArbaFacetConfig facetConfig;
 

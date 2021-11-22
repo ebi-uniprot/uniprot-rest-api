@@ -3,7 +3,6 @@ package org.uniprot.api.unisave.output.converter;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.SWISSPROT;
-import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED_SEQUENCE_MEMBER;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.unisave.UniSaveEntityMocker;
 import org.uniprot.api.unisave.model.UniSaveEntry;
-import org.uniprot.api.unisave.repository.domain.impl.EntryContentImpl;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
 
 /**
@@ -93,8 +91,8 @@ class UniSaveFastaMessageConverterTest {
         verify(outputStream)
                 .write(
                         (">P12345: EV=4-10 SV=20\n"
-                                + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                + "FQIIGETVSSTNRG\n")
+                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                        + "FQIIGETVSSTNRG\n")
                                 .getBytes());
     }
 
@@ -119,8 +117,8 @@ class UniSaveFastaMessageConverterTest {
         verify(outputStream)
                 .write(
                         (">P12345: EV=10 SV=20\n"
-                                + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
-                                + "FQIIGETVSSTNRG\n")
+                                        + "MASGAYSKYLFQIIGETVSSTNRGNKYNSFDHSRVDTRAGSFREAYNSKKKGSGRFGRKC\n"
+                                        + "FQIIGETVSSTNRG\n")
                                 .getBytes());
     }
 }

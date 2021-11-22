@@ -1,6 +1,17 @@
 package org.uniprot.api.unisave.service.impl;
 
+import static org.uniprot.api.unisave.request.UniSaveRequest.VERSION_FULL_PATTERN_REGEX;
+import static org.uniprot.api.unisave.request.UniSaveRequest.VERSION_PART_PATTERN_REGEX;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -13,16 +24,6 @@ import org.uniprot.api.unisave.repository.domain.Entry;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
 import org.uniprot.core.util.Utils;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.uniprot.api.unisave.request.UniSaveRequest.VERSION_FULL_PATTERN_REGEX;
-import static org.uniprot.api.unisave.request.UniSaveRequest.VERSION_PART_PATTERN_REGEX;
 
 @Service
 @Slf4j
