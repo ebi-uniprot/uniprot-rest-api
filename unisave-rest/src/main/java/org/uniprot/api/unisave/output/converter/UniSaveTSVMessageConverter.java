@@ -1,15 +1,16 @@
 package org.uniprot.api.unisave.output.converter;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.core.util.Utils;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
 
 /** @author Edd */
 @Slf4j

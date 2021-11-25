@@ -1,16 +1,14 @@
 package org.uniprot.api.unisave;
 
-import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
-import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
-import org.uniprot.api.unisave.repository.domain.impl.*;
+import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED_SEQUENCE_MEMBER;
 
-import java.sql.Date;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED_SEQUENCE_MEMBER;
+import org.uniprot.api.unisave.repository.domain.DatabaseEnum;
+import org.uniprot.api.unisave.repository.domain.EventTypeEnum;
+import org.uniprot.api.unisave.repository.domain.impl.*;
 
 /**
  * Created 08/04/20

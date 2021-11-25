@@ -1,8 +1,10 @@
 package org.uniprot.api.uniprotkb.output.converter;
 
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CONTEXT;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_FOOTER;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_HEADER;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 
 import javax.xml.bind.Marshaller;
 
@@ -32,11 +34,11 @@ public class UniProtKBXmlMessageConverter
 
     @Override
     protected String getFooter() {
-        return UNIPROTKB_XML_FOOTER;
+        return COPYRIGHT_TAG + UNIPROTKB_XML_CLOSE_TAG;
     }
 
     @Override
     protected String getHeader() {
-        return UNIPROTKB_XML_HEADER;
+        return XML_DECLARATION + UNIPROTKB_XML_SCHEMA;
     }
 }

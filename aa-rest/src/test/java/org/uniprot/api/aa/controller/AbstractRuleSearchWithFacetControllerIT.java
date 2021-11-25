@@ -1,12 +1,5 @@
 package org.uniprot.api.aa.controller;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.web.servlet.ResultActions;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
-import org.uniprot.api.rest.controller.SaveScenario;
-
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -16,11 +9,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
+import org.uniprot.api.rest.controller.SaveScenario;
+
 /**
  * @author sahmad
  * @created 19/11/2021
  */
-public abstract class AbstractRuleSearchWithFacetControllerIT extends AbstractSearchWithFacetControllerIT {
+public abstract class AbstractRuleSearchWithFacetControllerIT
+        extends AbstractSearchWithFacetControllerIT {
     @Test
     void searchWithFacetAsSearchField() throws Exception {
         // given

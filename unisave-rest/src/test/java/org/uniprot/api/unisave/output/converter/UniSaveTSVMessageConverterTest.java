@@ -1,19 +1,19 @@
 package org.uniprot.api.unisave.output.converter;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.uniprot.api.unisave.model.UniSaveEntry;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.SWISSPROT;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.uniprot.api.unisave.model.UniSaveEntry;
 
 class UniSaveTSVMessageConverterTest {
     private static UniSaveTSVMessageConverter converter;
