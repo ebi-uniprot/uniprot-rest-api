@@ -1,11 +1,12 @@
 package org.uniprot.api.unisave.request;
 
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.Data;
+import java.util.regex.Pattern;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.util.regex.Pattern;
+
+import lombok.Data;
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * Created 27/03/20
@@ -34,7 +35,8 @@ public class UniSaveRequest {
         @Parameter(description = "Greater than zero entry version numbers, e.g., 1,3-8,15-20,6.")
         private String versions;
 
-        @Parameter(description = "Whether or not to aggregate sequences that are unique (true|false)")
+        @Parameter(
+                description = "Whether or not to aggregate sequences that are unique (true|false)")
         private boolean uniqueSequences;
     }
 

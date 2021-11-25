@@ -528,7 +528,6 @@ public abstract class AbstractSearchControllerIT {
                                     header().string(
                                                     HttpHeaders.CONTENT_TYPE,
                                                     contentType.getContentType().toString()));
-
             for (ResultMatcher resultMatcher : contentType.getResultMatchers()) {
                 resultActions.andExpect(resultMatcher);
             }

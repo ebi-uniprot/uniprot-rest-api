@@ -1,8 +1,10 @@
 package org.uniprot.api.idmapping.output.converter.uniparc;
 
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CONTEXT;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_FOOTER;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_HEADER;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 
 import java.util.List;
 
@@ -53,13 +55,15 @@ public class UniParcMessageConverterConfig {
                         UniParcEntryPair.class,
                         returnFieldConfig,
                         new EntryPairValueMapper<>(new UniParcEntryValueMapper())));
+        String header = XML_DECLARATION + UNIPARC_XML_SCHEMA;
+        String footer = COPYRIGHT_TAG + UNIPARC_XML_CLOSE_TAG;
         EntryPairXmlMessageConverter<UniParcEntryPair, UniParcEntry, Entry> xmlConverter =
                 new EntryPairXmlMessageConverter<>(
                         UniParcEntryPair.class,
                         UNIPARC_XML_CONTEXT,
                         new UniParcEntryConverter(),
-                        UNIPARC_XML_HEADER,
-                        UNIPARC_XML_FOOTER);
+                        header,
+                        footer);
         converters.add(currentIndex++, xmlConverter);
 
         return currentIndex;

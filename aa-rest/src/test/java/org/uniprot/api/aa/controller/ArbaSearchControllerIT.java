@@ -30,7 +30,6 @@ import org.uniprot.api.aa.AARestApplication;
 import org.uniprot.api.aa.repository.ArbaFacetConfig;
 import org.uniprot.api.aa.repository.ArbaQueryRepository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;

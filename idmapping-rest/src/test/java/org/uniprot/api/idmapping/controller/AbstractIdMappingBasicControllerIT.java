@@ -8,6 +8,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH;
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH;
+import static org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIREF_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -23,6 +33,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -106,10 +117,15 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         ResultActions response = performRequest(requestBuilder);
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
-                .andExpect(content().contentTypeCompatibleWith(mediaType));
+        ResultActions resultActions =
+                response.andDo(log())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                        .andExpect(content().contentTypeCompatibleWith(mediaType));
+        if (MediaType.APPLICATION_XML.equals(mediaType)) {
+            resultActions.andExpect(getXMLHeaderMatcher());
+            resultActions.andExpect(getXMLFooterMatcher());
+        }
     }
 
     // ---------------------------------------------------------------------------------
@@ -331,5 +347,35 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
+    }
+
+    private ResultMatcher getXMLHeaderMatcher() {
+        ResultMatcher xmlHeaderMatcher;
+        String resultPath = getIdMappingResultPath();
+        if (resultPath.contains(UNIPROTKB_ID_MAPPING_PATH)) {
+            xmlHeaderMatcher = content().string(startsWith(XML_DECLARATION + UNIPROTKB_XML_SCHEMA));
+        } else if (resultPath.contains(UNIREF_ID_MAPPING_PATH)) {
+            xmlHeaderMatcher = content().string(startsWith(XML_DECLARATION + UNIREF_XML_SCHEMA));
+        } else if (resultPath.contains(UNIPARC_ID_MAPPING_PATH)) {
+            xmlHeaderMatcher = content().string(startsWith(XML_DECLARATION + UNIPARC_XML_SCHEMA));
+        } else {
+            xmlHeaderMatcher = content().string(startsWith("INVALID"));
+        }
+        return xmlHeaderMatcher;
+    }
+
+    private ResultMatcher getXMLFooterMatcher() {
+        ResultMatcher xmlHeaderMatcher;
+        String resultPath = getIdMappingResultPath();
+        if (resultPath.contains(UNIPROTKB_ID_MAPPING_PATH)) {
+            xmlHeaderMatcher = content().string(endsWith(COPYRIGHT_TAG + UNIPROTKB_XML_CLOSE_TAG));
+        } else if (resultPath.contains(UNIREF_ID_MAPPING_PATH)) {
+            xmlHeaderMatcher = content().string(not(containsStringIgnoringCase("<copyright>")));
+        } else if (resultPath.contains(UNIPARC_ID_MAPPING_PATH)) {
+            xmlHeaderMatcher = content().string(endsWith(COPYRIGHT_TAG + UNIPARC_XML_CLOSE_TAG));
+        } else {
+            xmlHeaderMatcher = content().string(startsWith("INVALID"));
+        }
+        return xmlHeaderMatcher;
     }
 }
