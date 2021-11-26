@@ -1,8 +1,10 @@
 package org.uniprot.api.uniparc.output.converter;
 
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CONTEXT;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_FOOTER;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_HEADER;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 
 import javax.xml.bind.Marshaller;
 
@@ -24,11 +26,13 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
     public UniParcXmlMessageConverter(String version) {
         super(UniParcEntry.class, UNIPARC_XML_CONTEXT);
         converter = new UniParcEntryConverter();
-        header = UNIPARC_XML_HEADER;
+        header = UNIPARC_XML_SCHEMA;
         if (Utils.notNullNotEmpty(version)) {
             String versionAttrib = " version=\"" + version + "\"" + ">\n";
             header = header.replace(">\n", versionAttrib);
         }
+
+        header = XML_DECLARATION + header;
     }
 
     @Override
@@ -49,6 +53,6 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
 
     @Override
     protected String getFooter() {
-        return UNIPARC_XML_FOOTER;
+        return COPYRIGHT_TAG + UNIPARC_XML_CLOSE_TAG;
     }
 }

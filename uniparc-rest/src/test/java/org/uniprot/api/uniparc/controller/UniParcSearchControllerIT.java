@@ -1,17 +1,38 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntry;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getXref;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -372,9 +393,21 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            startsWith(
+                                                                    XML_DECLARATION
+                                                                            + UNIPARC_XML_SCHEMA)))
+                                    .resultMatcher(
                                             content().string(containsString("UPI0000083A11")))
                                     .resultMatcher(
                                             content().string(containsString("UPI0000083A20")))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            endsWith(
+                                                                    COPYRIGHT_TAG
+                                                                            + UNIPARC_XML_CLOSE_TAG)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

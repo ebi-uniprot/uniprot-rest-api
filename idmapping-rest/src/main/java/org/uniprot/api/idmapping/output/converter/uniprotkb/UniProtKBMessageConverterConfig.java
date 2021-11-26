@@ -1,8 +1,10 @@
 package org.uniprot.api.idmapping.output.converter.uniprotkb;
 
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CONTEXT;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_FOOTER;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_HEADER;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 
 import java.util.List;
 
@@ -56,13 +58,15 @@ public class UniProtKBMessageConverterConfig {
                         returnFieldConfig,
                         new EntryPairValueMapper<>(new UniProtKBEntryValueMapper())));
 
+        String header = XML_DECLARATION + UNIPROTKB_XML_SCHEMA;
+        String footer = COPYRIGHT_TAG + UNIPROTKB_XML_CLOSE_TAG;
         EntryPairXmlMessageConverter<UniProtKBEntryPair, UniProtKBEntry, Entry> xmlConverter =
                 new EntryPairXmlMessageConverter<>(
                         UniProtKBEntryPair.class,
                         UNIPROTKB_XML_CONTEXT,
                         new UniProtEntryConverter(),
-                        UNIPROTKB_XML_HEADER,
-                        UNIPROTKB_XML_FOOTER);
+                        header,
+                        footer);
         converters.add(currentIdx++, xmlConverter);
         return currentIdx;
     }

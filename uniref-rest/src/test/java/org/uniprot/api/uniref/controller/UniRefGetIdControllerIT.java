@@ -1,11 +1,24 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIREF_XML_CLOSE_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIREF_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntryMembers;
 
 import java.util.List;
 
@@ -35,7 +48,10 @@ import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
-import org.uniprot.core.uniref.*;
+import org.uniprot.core.uniref.RepresentativeMember;
+import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
+import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
@@ -244,7 +260,26 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            startsWith(
+                                                                    XML_DECLARATION
+                                                                            + UNIREF_XML_SCHEMA)))
                                     .resultMatcher(content().string(containsString(ID)))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            not(
+                                                                    containsStringIgnoringCase(
+                                                                            "<copyright>"))))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            not(
+                                                                    containsStringIgnoringCase(
+                                                                            "</copyright>"))))
+                                    .resultMatcher(content().string(endsWith(UNIREF_XML_CLOSE_TAG)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
