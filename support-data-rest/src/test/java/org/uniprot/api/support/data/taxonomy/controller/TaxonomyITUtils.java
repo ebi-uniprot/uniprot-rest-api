@@ -58,6 +58,7 @@ public class TaxonomyITUtils {
                         .common("common " + taxId)
                         .mnemonic("mnemonic" + taxId)
                         .rank("rank")
+                        .otherNames(Collections.singletonList("otherName"))
                         .strain(Collections.singletonList("strain"))
                         .host(Collections.singletonList(10L))
                         .ancestor(Collections.singletonList(10L + 1L))
