@@ -26,11 +26,12 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
     public UniParcXmlMessageConverter(String version) {
         super(UniParcEntry.class, UNIPARC_XML_CONTEXT);
         converter = new UniParcEntryConverter();
-        header = XML_DECLARATION + UNIPARC_XML_SCHEMA;
+        header = UNIPARC_XML_SCHEMA;
         if (Utils.notNullNotEmpty(version)) {
             String versionAttrib = " version=\"" + version + "\"" + ">\n";
             header = header.replace(">\n", versionAttrib);
         }
+        header = XML_DECLARATION + header;
     }
 
     @Override

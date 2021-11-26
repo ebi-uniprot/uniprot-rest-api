@@ -19,7 +19,7 @@ public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRe
     public UniRefXmlMessageConverter(String version, String releaseDate) {
         super(UniRefEntry.class, ConverterConstants.UNIREF_XML_CONTEXT);
         converter = new UniRefEntryConverter();
-        header = ConverterConstants.XML_DECLARATION + ConverterConstants.UNIREF_XML_SCHEMA;
+        header = ConverterConstants.UNIREF_XML_SCHEMA;
         if ((version != null) && (!version.isEmpty())) {
             header += " version=\"" + version + "\"";
         }
@@ -28,6 +28,8 @@ public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRe
             header += " releaseDate=\"" + releaseDate + "\"";
         }
         header += ">\n";
+
+        header = ConverterConstants.XML_DECLARATION + header;
     }
 
     @Override
