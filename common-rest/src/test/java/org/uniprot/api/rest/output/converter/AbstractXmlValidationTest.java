@@ -41,17 +41,23 @@ import static org.mockito.Mockito.when;
 public abstract class AbstractXmlValidationTest<T> {
     @TempDir File tempDir;
 
-    public abstract String getXSDLocation();
+    public abstract String getXSDUrlLocation();
 
     public abstract MessageConverterContext<T> getMessageConverterConfig();
 
     public abstract AbstractEntityHttpMessageConverter<T> getXmlConverter();
 
+    /**
+     * This should be a comprehensive entry with all features possible, to ensure the validation
+     * captures any potential problems.
+     *
+     * @return the entry to validate
+     */
     protected abstract T getEntry();
 
     @BeforeEach
     void fetchXSD() throws IOException {
-        FileUtils.copyURLToFile(new URL(getXSDLocation()), getXSDFile());
+        FileUtils.copyURLToFile(new URL(getXSDUrlLocation()), getXSDFile());
     }
 
     @Test
@@ -73,7 +79,7 @@ public abstract class AbstractXmlValidationTest<T> {
                 "Schema validation failure", validateXMLSchema(outputStream), Matchers.is(true));
     }
 
-    protected boolean validateXMLSchema(ByteArrayOutputStream outputStream) {
+    private boolean validateXMLSchema(ByteArrayOutputStream outputStream) {
         final List<SAXParseException> exceptions = new ArrayList<>();
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
