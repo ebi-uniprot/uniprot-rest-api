@@ -17,11 +17,12 @@ class UniProtKBXmlMessageConverterTest extends AbstractXmlValidationTest<UniProt
 
     @Override
     public UniProtKBEntry getEntry() {
+        // add some more features to this entry that are causing problems!
         return UniProtEntryMocker.create(SP_COMPLEX);
     }
 
     @Override
-    public String getXSDLocation() {
+    public String getXSDUrlLocation() {
         return "https://www.uniprot.org/docs/uniprot.xsd";
     }
 
