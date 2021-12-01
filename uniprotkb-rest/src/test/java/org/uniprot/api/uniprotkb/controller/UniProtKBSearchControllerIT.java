@@ -1,49 +1,14 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.startsWith;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -108,35 +73,19 @@ import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 @ContextConfiguration(
@@ -655,6 +604,145 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q14301")));
+    }
+
+    @Nested
+    class TRM_1234 {
+        @ParameterizedTest
+        @ValueSource(strings = {"reviewed", "unreviewed"})
+        void canSearchForFullIDs(String type) throws Exception {
+            // given
+            String id = "GENE1_SPECIES";
+            UniProtKBEntry templateEntry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+            if ("reviewed".equals(type)) {
+                templateEntry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_COMPLEX);
+            }
+
+            UniProtKBEntry entry =
+                    UniProtKBEntryBuilder.from(templateEntry)
+                            .uniProtId(id)
+                            .primaryAccession("ACCESSION")
+                            .build();
+
+            getStoreManager()
+                    .save(
+                            DataStoreManager.StoreType.UNIPROT,
+                            UniProtEntryMocker.create(UniProtEntryMocker.Type.TR),
+                            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP),
+                            entry,
+                            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_COMPLEX));
+
+            // find exact entry for ID
+            ResultActions response =
+                    getMockMvc()
+                            .perform(
+                                    get(String.format("%s?query=%s", SEARCH_RESOURCE, id))
+                                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+            response.andDo(log())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.results.size()", is(1)))
+                    .andExpect(jsonPath("$.results[0].uniProtkbId", is(id)));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"XXXX1", "XXXX"})
+        void canSearchForSwissProtEntryByFirstPartOfID(String idPart) throws Exception {
+            // given
+            String id = "XXXX1_SPECIES";
+            UniProtKBEntry spEntry =
+                    UniProtKBEntryBuilder.from(
+                                    UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_COMPLEX))
+                            .uniProtId(id)
+                            .primaryAccession("ACCESSION")
+                            .build();
+
+            getStoreManager()
+                    .save(
+                            DataStoreManager.StoreType.UNIPROT,
+                            UniProtEntryMocker.create(UniProtEntryMocker.Type.TR),
+                            spEntry,
+                            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP));
+
+            // find Swiss-Prot entry by *part of first part of ID*, or all of first part of ID,
+            // e.g. BRCA / BRCA2 in BRCA2_MOUSE
+            ResultActions response =
+                    getMockMvc()
+                            .perform(
+                                    get(String.format("%s?query=%s", SEARCH_RESOURCE, idPart))
+                                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+            response.andDo(log())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.results.size()", is(1)))
+                    .andExpect(jsonPath("$.results[0].uniProtkbId", is(id)));
+        }
+
+        @Test
+        void cannotSearchForTrEMBLEntryByFirstPartOfID() throws Exception {
+            // given
+            String idPart = "XXXX";
+            String id = idPart + "1_SPECIES";
+            UniProtKBEntry trEntry =
+                    UniProtKBEntryBuilder.from(
+                                    UniProtEntryMocker.create(UniProtEntryMocker.Type.TR))
+                            .uniProtId(id)
+                            .primaryAccession("ACCESSION")
+                            .build();
+
+            getStoreManager()
+                    .save(
+                            DataStoreManager.StoreType.UNIPROT,
+                            trEntry,
+                            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP));
+
+            // find Swiss-Prot entry by *part of* first part of ID, e.g. BRCA in BRCA2_MOUSE
+            ResultActions response =
+                    getMockMvc()
+                            .perform(
+                                    get(String.format("%s?query=%s", SEARCH_RESOURCE, idPart))
+                                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+            response.andDo(log())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.results.size()", is(0)));
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"reviewed", "unreviewed"})
+        void canSearchForEntryBySecondPartOfID(String type) throws Exception {
+            // given
+            UniProtKBEntry templateEntry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+            if ("reviewed".equals(type)) {
+                templateEntry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+            }
+
+            String idPart = "SPECIES";
+            String id = "GENE1_" + idPart;
+            UniProtKBEntry entry =
+                    UniProtKBEntryBuilder.from(templateEntry)
+                            .uniProtId(id)
+                            .primaryAccession("ACCESSION")
+                            .build();
+
+            getStoreManager()
+                    .save(
+                            DataStoreManager.StoreType.UNIPROT,
+                            entry,
+                            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP));
+
+            // find Swiss-Prot entry by *part of* first part of ID, e.g. BRCA in BRCA2_MOUSE
+            ResultActions response =
+                    getMockMvc()
+                            .perform(
+                                    get(String.format("%s?query=%s", SEARCH_RESOURCE, idPart))
+                                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+            response.andDo(log())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.results.size()", is(1)))
+                    .andExpect(jsonPath("$.results[0].uniProtkbId", is(id)));
+        }
     }
 
     @Test
