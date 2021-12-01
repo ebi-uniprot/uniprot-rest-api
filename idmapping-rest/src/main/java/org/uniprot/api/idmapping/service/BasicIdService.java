@@ -50,6 +50,23 @@ public abstract class BasicIdService<T, U> {
     @Value("${search.default.page.size:#{null}}")
     private Integer defaultPageSize;
 
+    // the maximum number of ids allowed in from field
+    @Value("${id.mapping.max.from.ids.count:#{null}}")// value to 100k
+    private Integer maxIdMappingFromIdsCount;
+
+    // the maximum number of ids allowed in `to` field after mapped by `from` fields
+    @Value("${id.mapping.max.to.ids.count:#{null}}")// value to 500k
+    private Integer maxIdMappingToIdsCount;
+
+    // Maximum number of `to` ids supported to enrich result with uniprot data
+    // Greater than maxIdMappingToIdsCountEnriched and less than maxIdMappingToIdsCount, the API should return only `to` ids
+    @Value("${id.mapping.max.to.ids.enrich.count:#{null}}")// value to 100k
+    private Integer maxIdMappingToIdsCountEnriched;
+
+    // Maximum number of `to` ids supported with faceting query
+    @Value("${id.mapping.max.to.ids.with.facets.count:#{null}}")// value to 10k
+    private Integer maxIdMappingToIdsCountWithFacets;
+
     protected BasicIdService(
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
@@ -69,6 +86,10 @@ public abstract class BasicIdService<T, U> {
             SearchRequest searchRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
+
+        if(isValidRequest(searchRequest, mappedIds)){
+            // stub fill it
+        }
         if (needSearchInSolr(searchRequest)) {
             List<String> toIds = getMappedToIds(mappedIds);
 
@@ -297,6 +318,16 @@ public abstract class BasicIdService<T, U> {
         return Utils.notNullNotEmpty(searchRequest.getQuery())
                 || Utils.notNullNotEmpty(searchRequest.getFacets())
                 || Utils.notNullNotEmpty(searchRequest.getSort());
+    }
+
+    private boolean isValidRequest(SearchRequest searchRequest, List<IdMappingStringPair> mappedIds) {
+        return !(
+                    (
+                        Utils.notNullNotEmpty(searchRequest.getFacets())
+                        && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets
+                    )
+                    || mappedIds.size() > this.maxIdMappingToIdsCount
+                );
     }
 
     @Builder
