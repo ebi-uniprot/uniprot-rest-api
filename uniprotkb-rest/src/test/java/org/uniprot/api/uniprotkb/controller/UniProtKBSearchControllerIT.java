@@ -606,6 +606,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q14301")));
     }
 
+    // Use-cases related to searching by ID
     @Nested
     class TRM_27083 {
         @ParameterizedTest
