@@ -607,7 +607,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     }
 
     @Nested
-    class TRM_1234 {
+    class TRM_27083 {
         @ParameterizedTest
         @ValueSource(strings = {"reviewed", "unreviewed"})
         void canSearchForFullIDs(String type) throws Exception {
@@ -679,7 +679,38 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         }
 
         @Test
-        void cannotSearchForTrEMBLEntryByFirstPartOfID() throws Exception {
+        void canSearchForTrEMBLEntryByFirstPartOfID() throws Exception {
+            // given
+            String idPart = "XXXX1";
+            String id = idPart + "_SPECIES";
+            UniProtKBEntry trEntry =
+                    UniProtKBEntryBuilder.from(
+                                    UniProtEntryMocker.create(UniProtEntryMocker.Type.TR))
+                            .uniProtId(id)
+                            .primaryAccession("ACCESSION")
+                            .build();
+
+            getStoreManager()
+                    .save(
+                            DataStoreManager.StoreType.UNIPROT,
+                            trEntry,
+                            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP));
+
+            // find Swiss-Prot entry by *part of* first part of ID, e.g. BRCA in BRCA2_MOUSE
+            ResultActions response =
+                    getMockMvc()
+                            .perform(
+                                    get(String.format("%s?query=%s", SEARCH_RESOURCE, idPart))
+                                            .header(ACCEPT, APPLICATION_JSON_VALUE));
+            response.andDo(log())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                    .andExpect(jsonPath("$.results.size()", is(1)))
+                    .andExpect(jsonPath("$.results[0].uniProtkbId", is(id)));
+        }
+
+        @Test
+        void cannotSearchForTrEMBLEntryByPartOfFirstPartOfID() throws Exception {
             // given
             String idPart = "XXXX";
             String id = idPart + "1_SPECIES";
