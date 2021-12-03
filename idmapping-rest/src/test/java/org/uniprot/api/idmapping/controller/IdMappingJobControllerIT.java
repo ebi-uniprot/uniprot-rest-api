@@ -61,7 +61,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobControllerIT {
-    @Value("${csv.max.length}")
+    @Value("${id.mapping.max.from.ids.count}")
     private Integer maxCountCSV;
 
     private static final String JOB_SUBMIT_ENDPOINT =

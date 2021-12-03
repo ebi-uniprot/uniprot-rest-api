@@ -50,10 +50,6 @@ public abstract class BasicIdService<T, U> {
     @Value("${search.default.page.size:#{null}}")
     private Integer defaultPageSize;
 
-    // the maximum number of ids allowed in from field
-    @Value("${id.mapping.max.from.ids.count:#{null}}")// value to 100k
-    private Integer maxIdMappingFromIdsCount;
-
     // the maximum number of ids allowed in `to` field after mapped by `from` fields
     @Value("${id.mapping.max.to.ids.count:#{null}}")// value to 500k
     private Integer maxIdMappingToIdsCount;
@@ -87,9 +83,9 @@ public abstract class BasicIdService<T, U> {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
 
-        if(isValidRequest(searchRequest, mappedIds)){
-            // stub fill it
-        }
+        // validate the limits
+        validateRequest(searchRequest, mappedIds);
+
         if (needSearchInSolr(searchRequest)) {
             List<String> toIds = getMappedToIds(mappedIds);
 
@@ -320,14 +316,17 @@ public abstract class BasicIdService<T, U> {
                 || Utils.notNullNotEmpty(searchRequest.getSort());
     }
 
-    private boolean isValidRequest(SearchRequest searchRequest, List<IdMappingStringPair> mappedIds) {
-        return !(
-                    (
-                        Utils.notNullNotEmpty(searchRequest.getFacets())
-                        && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets
-                    )
-                    || mappedIds.size() > this.maxIdMappingToIdsCount
-                );
+    private void validateRequest(SearchRequest searchRequest, List<IdMappingStringPair> mappedIds) {
+        if(mappedIds.size() > this.maxIdMappingToIdsCount){
+            throw new IllegalArgumentException("Maximum number of mapped ids supported "
+                    + this.maxIdMappingToIdsCount);
+        }
+
+        if(Utils.notNullNotEmpty(searchRequest.getFacets())
+                        && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets){
+            throw new IllegalArgumentException("facets are supported for less than "
+                    + this.maxIdMappingToIdsCountWithFacets + " mapped ids.");
+        }
     }
 
     @Builder
