@@ -51,16 +51,17 @@ public abstract class BasicIdService<T, U> {
     private Integer defaultPageSize;
 
     // the maximum number of ids allowed in `to` field after mapped by `from` fields
-    @Value("${id.mapping.max.to.ids.count:#{null}}")// value to 500k
+    @Value("${id.mapping.max.to.ids.count:#{null}}") // value to 500k
     private Integer maxIdMappingToIdsCount;
 
     // Maximum number of `to` ids supported to enrich result with uniprot data
-    // Greater than maxIdMappingToIdsCountEnriched and less than maxIdMappingToIdsCount, the API should return only `to` ids
-    @Value("${id.mapping.max.to.ids.enrich.count:#{null}}")// value to 100k
+    // Greater than maxIdMappingToIdsCountEnriched and less than maxIdMappingToIdsCount, the API
+    // should return only `to` ids
+    @Value("${id.mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
     private Integer maxIdMappingToIdsCountEnriched;
 
     // Maximum number of `to` ids supported with faceting query
-    @Value("${id.mapping.max.to.ids.with.facets.count:#{null}}")// value to 10k
+    @Value("${id.mapping.max.to.ids.with.facets.count:#{null}}") // value to 10k
     private Integer maxIdMappingToIdsCountWithFacets;
 
     protected BasicIdService(
@@ -317,15 +318,17 @@ public abstract class BasicIdService<T, U> {
     }
 
     private void validateRequest(SearchRequest searchRequest, List<IdMappingStringPair> mappedIds) {
-        if(mappedIds.size() > this.maxIdMappingToIdsCount){
-            throw new IllegalArgumentException("Maximum number of mapped ids supported "
-                    + this.maxIdMappingToIdsCount);
+        if (mappedIds.size() > this.maxIdMappingToIdsCount) {
+            throw new IllegalArgumentException(
+                    "Maximum number of mapped ids supported " + this.maxIdMappingToIdsCount);
         }
 
-        if(Utils.notNullNotEmpty(searchRequest.getFacets())
-                        && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets){
-            throw new IllegalArgumentException("facets are supported for less than "
-                    + this.maxIdMappingToIdsCountWithFacets + " mapped ids.");
+        if (Utils.notNullNotEmpty(searchRequest.getFacets())
+                && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets) {
+            throw new IllegalArgumentException(
+                    "facets are supported for less than "
+                            + this.maxIdMappingToIdsCountWithFacets
+                            + " mapped ids.");
         }
     }
 

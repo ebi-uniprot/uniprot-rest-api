@@ -52,7 +52,7 @@ public class IdMappingUniParcITUtils {
     public static void saveEntries(
             CloudSolrClient cloudSolrClient, UniProtStoreClient<UniParcEntry> storeClient)
             throws Exception {
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 1; i <= AbstractJobOperation.DEFAULT_IDS_COUNT; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
         cloudSolrClient.commit(SolrCollection.uniparc.name());

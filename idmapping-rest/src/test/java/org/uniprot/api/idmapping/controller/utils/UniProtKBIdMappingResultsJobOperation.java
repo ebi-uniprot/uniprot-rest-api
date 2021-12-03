@@ -20,14 +20,14 @@ public class UniProtKBIdMappingResultsJobOperation extends AbstractJobOperation 
     }
 
     @Override
-    public IdMappingJob createAndPutJobInCache() throws Exception {
-        return createAndPutJobInCache(JobStatus.FINISHED);
+    public IdMappingJob createAndPutJobInCache(int idsCount) throws Exception {
+        return createAndPutJobInCache(idsCount, JobStatus.FINISHED);
     }
 
     @Override
-    public IdMappingJob createAndPutJobInCache(JobStatus jobStatus) throws Exception {
+    public IdMappingJob createAndPutJobInCache(int idsCount, JobStatus jobStatus) throws Exception {
         Map<String, String> ids = new LinkedHashMap<>();
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 1; i <= idsCount; i++) {
             String id = String.format("Q%05d", i);
             ids.put(id, id);
         }

@@ -11,6 +11,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -143,7 +144,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .thenReturn(new DefaultUriBuilderFactory());
         when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
 
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 1; i <= this.maxFromIdsAllowed; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
     }
@@ -172,7 +173,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Test
     void testIdMappingWithSuccess() throws Exception {
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxIdsWithFacets);
         ResultActions response =
                 mockMvc.perform(
                         get(getIdMappingResultPath(), job.getJobId())
@@ -181,9 +182,9 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                 .param("query", "reviewed:true")
                                 .param("fields", "accession,sequence")
                                 .param("sort", "accession desc")
-                                .param("size", "6"));
+                                .param("size", "3"));
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets.size()", is(2)))
@@ -192,20 +193,18 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andExpect(jsonPath("$.facets[0].values.*.value", contains("true")))
                 .andExpect(
                         jsonPath("$.facets[0].values.*.label", contains("Reviewed (Swiss-Prot)")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(10)))
-                .andExpect(jsonPath("$.results.size()", is(6)))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(5)))
+                .andExpect(jsonPath("$.results.size()", is(3)))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.from",
                                 contains(
-                                        "Q00020", "Q00018", "Q00016", "Q00014", "Q00012",
-                                        "Q00010")))
+                                        "Q00010", "Q00008", "Q00006")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.to.primaryAccession",
                                 contains(
-                                        "Q00020", "Q00018", "Q00016", "Q00014", "Q00012",
-                                        "Q00010")))
+                                        "Q00010", "Q00008", "Q00006")))
                 .andExpect(jsonPath("$.results.*.to.sequence").exists())
                 .andExpect(jsonPath("$.results.*.to.organism").doesNotExist());
     }

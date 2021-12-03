@@ -13,7 +13,11 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 public interface JobOperation {
     IdMappingJob createAndPutJobInCache() throws Exception;
 
+    IdMappingJob createAndPutJobInCache(int idsCount) throws Exception;
+
     IdMappingJob createAndPutJobInCache(JobStatus jobStatus) throws Exception;
+
+    IdMappingJob createAndPutJobInCache(int idsCount, JobStatus jobStatus) throws Exception;
 
     IdMappingJob createAndPutJobInCache(String from, String to, String fromIds)
             throws InvalidKeySpecException, NoSuchAlgorithmException;

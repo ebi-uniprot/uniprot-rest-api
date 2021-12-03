@@ -18,6 +18,7 @@ import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
  * @created 03/03/2021
  */
 public abstract class AbstractJobOperation implements JobOperation {
+    public static final int DEFAULT_IDS_COUNT = 20;// same as id.mapping.max.from.ids.count
     private IdMappingJobCacheService cacheService;
 
     public AbstractJobOperation(IdMappingJobCacheService cacheService) {
@@ -35,6 +36,14 @@ public abstract class AbstractJobOperation implements JobOperation {
                                         (a, b) -> a,
                                         LinkedHashMap::new));
         return createAndPutJobInCache(from, to, mappedIds);
+    }
+
+    public IdMappingJob createAndPutJobInCache() throws Exception {
+        return createAndPutJobInCache(DEFAULT_IDS_COUNT);
+    }
+
+    public IdMappingJob createAndPutJobInCache(JobStatus jobStatus) throws Exception {
+        return createAndPutJobInCache(DEFAULT_IDS_COUNT, jobStatus);
     }
 
     protected IdMappingJob createAndPutJobInCache(

@@ -22,6 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,6 +46,12 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBasicControllerIT {
 
+    @Value("${id.mapping.max.to.ids.with.facets.count}")
+    protected Integer maxIdsWithFacets;
+
+    @Value("${id.mapping.max.from.ids.count}")
+    protected Integer maxFromIdsAllowed;
+
     @Autowired protected IdMappingJobCacheService idMappingJobCacheService;
 
     protected abstract FacetConfig getFacetConfig();
@@ -67,7 +74,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(defaultPageSize)))
@@ -92,7 +99,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
@@ -120,7 +127,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -146,7 +153,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -169,7 +176,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(0)));
@@ -292,7 +299,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
     @MethodSource("getAllFacets")
     void testUniProtKBToUniProtKBMappingWithFacet(String facetName) throws Exception {
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxIdsWithFacets);
         ResultActions response =
                 getMockMvc()
                         .perform(

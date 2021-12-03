@@ -161,7 +161,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
     @Test
     void testIdMappingWithSuccess() throws Exception {
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxIdsWithFacets);
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -181,24 +181,24 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                 .andExpect(jsonPath("$.facets.*.name", contains("identity")))
                 .andExpect(jsonPath("$.facets[0].values.size()", is(1)))
                 .andExpect(jsonPath("$.facets[0].values.*.value", contains("0.5")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(20)))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(10)))
                 .andExpect(jsonPath("$.results.size()", is(6)))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.from",
                                 contains(
-                                        "Q00020", "Q00019", "Q00018", "Q00017", "Q00016",
-                                        "Q00015")))
+                                        "Q00010", "Q00009", "Q00008", "Q00007", "Q00006",
+                                        "Q00005")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.to.id",
                                 contains(
-                                        "UniRef50_P03920",
-                                        "UniRef50_P03919",
-                                        "UniRef50_P03918",
-                                        "UniRef50_P03917",
-                                        "UniRef50_P03916",
-                                        "UniRef50_P03915")))
+                                        "UniRef50_P03910",
+                                        "UniRef50_P03909",
+                                        "UniRef50_P03908",
+                                        "UniRef50_P03907",
+                                        "UniRef50_P03906",
+                                        "UniRef50_P03905")))
                 .andExpect(jsonPath("$.results.*.to.commonTaxon").exists())
                 .andExpect(jsonPath("$.results.*.to.members").doesNotExist());
     }

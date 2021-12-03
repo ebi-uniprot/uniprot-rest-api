@@ -57,7 +57,7 @@ public class IdMappingUniRefITUtils {
     public static void saveEntries(
             CloudSolrClient cloudSolrClient, UniProtStoreClient<UniRefEntryLight> storeClient)
             throws Exception {
-        for (int i = 1; i <= 20; i++) {
+        for (int i = 1; i <= AbstractJobOperation.DEFAULT_IDS_COUNT; i++) {
             saveEntry(i, UniRefType.UniRef50, cloudSolrClient, storeClient);
             saveEntry(i, UniRefType.UniRef90, cloudSolrClient, storeClient);
             saveEntry(i, UniRefType.UniRef100, cloudSolrClient, storeClient);
