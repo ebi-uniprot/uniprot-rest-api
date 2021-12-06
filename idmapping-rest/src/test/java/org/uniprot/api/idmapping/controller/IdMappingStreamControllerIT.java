@@ -27,9 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.controller.ControllerITUtils;
 
@@ -43,12 +41,9 @@ import org.uniprot.api.rest.controller.ControllerITUtils;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IdMappingStreamControllerIT {
+class IdMappingStreamControllerIT extends AbstractIdMappingPIRResultsControllerIT {
     private static final String ID_MAPPING_STREAM = "/idmapping/stream/{jobId}";
     @Autowired private MockMvc mockMvc;
-    @Autowired protected JobOperation idMappingResultJobOp;
-
-    @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
     @MethodSource("getContentTypes")
@@ -77,8 +72,13 @@ class IdMappingStreamControllerIT {
                 .andExpect(content().string(not(containsString("facets"))));
     }
 
-    private MockMvc getMockMvc() {
+    protected MockMvc getMockMvc() {
         return this.mockMvc;
+    }
+
+    @Override
+    protected String getIdMappingResultPath() {
+        return ID_MAPPING_STREAM;
     }
 
     private String getIdMappingStreamPath() {

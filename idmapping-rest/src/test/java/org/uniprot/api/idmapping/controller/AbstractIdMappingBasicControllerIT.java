@@ -1,32 +1,11 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH;
-import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH;
-import static org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIREF_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
-
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,6 +26,39 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH;
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH;
+import static org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIREF_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
+
 /**
  * @author lgonzales
  * @since 08/03/2021
@@ -54,6 +66,15 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 @ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControllerIT {
+
+    @Value("${id.mapping.max.to.ids.with.facets.count}")
+    protected Integer maxIdsWithFacets;
+
+    @Value("${id.mapping.max.from.ids.count}")
+    protected Integer maxFromIdsAllowed;
+
+    @Value("${id.mapping.max.to.ids.count}")
+    protected Integer maxToIdsAllowed;
 
     protected abstract String getIdMappingResultPath();
 
@@ -102,6 +123,30 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                 .andExpect(jsonPath("$.messages.size()", is(1)))
                 .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
     }
+
+    @Test
+    void testWithMoreThanAllowedMappedId() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCacheWithOneToManyMapping(this.maxFromIdsAllowed, JobStatus.FINISHED);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, APPLICATION_JSON_VALUE);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        ResultActions resultActions =
+                response.andDo(print())
+                        .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                        .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                        .andExpect(
+                                jsonPath(
+                                        "$.messages.*",
+                                        containsInAnyOrder(
+                                                "Invalid request received. Maximum number of mapped ids supported is " + this.maxToIdsAllowed)));;
+    }
+
+
     // ---------------------------------------------------------------------------------
     // -------------------------------- CONTENT TYPES ----------------------------------
     // ---------------------------------------------------------------------------------
@@ -148,7 +193,7 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(

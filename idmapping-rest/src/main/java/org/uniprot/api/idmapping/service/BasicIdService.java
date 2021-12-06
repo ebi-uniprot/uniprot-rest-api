@@ -1,20 +1,9 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import lombok.Builder;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.facet.Facet;
@@ -33,6 +22,18 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad
@@ -85,7 +86,7 @@ public abstract class BasicIdService<T, U> {
         List<Facet> facets = null;
 
         // validate the limits
-        validateRequest(searchRequest, mappedIds);
+        validateSearchRequest(searchRequest, mappedIds);
 
         if (needSearchInSolr(searchRequest)) {
             List<String> toIds = getMappedToIds(mappedIds);
@@ -122,6 +123,8 @@ public abstract class BasicIdService<T, U> {
     public Stream<U> streamEntries(StreamRequest streamRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds());
+        // validate the limit
+        validatedMappedIdsLimit(mappedIds);
         return streamEntries(mappedIds);
     }
 
@@ -317,18 +320,23 @@ public abstract class BasicIdService<T, U> {
                 || Utils.notNullNotEmpty(searchRequest.getSort());
     }
 
-    private void validateRequest(SearchRequest searchRequest, List<IdMappingStringPair> mappedIds) {
-        if (mappedIds.size() > this.maxIdMappingToIdsCount) {
-            throw new IllegalArgumentException(
-                    "Maximum number of mapped ids supported " + this.maxIdMappingToIdsCount);
-        }
+    private void validateSearchRequest(SearchRequest searchRequest, List<IdMappingStringPair> mappedIds) {
+
+        validatedMappedIdsLimit(mappedIds);
 
         if (Utils.notNullNotEmpty(searchRequest.getFacets())
                 && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets) {
-            throw new IllegalArgumentException(
+            throw new InvalidRequestException(
                     "facets are supported for less than "
                             + this.maxIdMappingToIdsCountWithFacets
                             + " mapped ids.");
+        }
+    }
+
+    private void validatedMappedIdsLimit(List<IdMappingStringPair> mappedIds){
+        if (mappedIds.size() > this.maxIdMappingToIdsCount) {
+            throw new InvalidRequestException(
+                    "Maximum number of mapped ids supported is " + this.maxIdMappingToIdsCount);
         }
     }
 

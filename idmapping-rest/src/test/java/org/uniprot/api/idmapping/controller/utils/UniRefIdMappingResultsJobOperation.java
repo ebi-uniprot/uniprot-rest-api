@@ -34,4 +34,15 @@ public class UniRefIdMappingResultsJobOperation extends AbstractJobOperation {
         }
         return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, "UniRef50", ids, jobStatus);
     }
+
+    @Override
+    public IdMappingJob createAndPutJobInCacheWithOneToManyMapping(int idsCount, JobStatus jobStatus) throws Exception {
+        Map<String, String> ids = new LinkedHashMap<>();
+        for (int i = 1; i <= idsCount; i++) {
+            String fromId = String.format("Q%05d", i);
+            String toId = (";" + String.format(UniRefEntryMocker.ID_PREF_50 + "%02d", i)).repeat(6).replaceFirst(";", "");
+            ids.put(fromId, toId);
+        }
+        return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, "UniRef50", ids, jobStatus);
+    }
 }

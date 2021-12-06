@@ -7,6 +7,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
@@ -33,10 +34,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
-import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.controller.ControllerITUtils;
 
@@ -50,13 +49,9 @@ import org.uniprot.api.rest.controller.ControllerITUtils;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IdMappingResultsControllerIT {
+class IdMappingResultsControllerIT extends AbstractIdMappingPIRResultsControllerIT {
     private static final String ID_MAPPING_RESULT = "/idmapping/results/{jobId}";
     @Autowired private MockMvc mockMvc;
-    @Autowired protected JobOperation idMappingResultJobOp;
-
-    @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
-
     // ---------------------------------------------------------------------------------
     // -------------------------------- PAGINATION TEST --------------------------------
     // ---------------------------------------------------------------------------------
@@ -329,11 +324,11 @@ class IdMappingResultsControllerIT {
                 .andExpect(content().contentTypeCompatibleWith(mediaType));
     }
 
-    private MockMvc getMockMvc() {
+    protected MockMvc getMockMvc() {
         return this.mockMvc;
     }
 
-    private String getIdMappingResultPath() {
+    protected String getIdMappingResultPath() {
         return ID_MAPPING_RESULT;
     }
 

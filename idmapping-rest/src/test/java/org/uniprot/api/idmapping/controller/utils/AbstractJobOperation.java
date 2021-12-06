@@ -82,7 +82,7 @@ public abstract class AbstractJobOperation implements JobOperation {
             IdMappingJobRequest request, Map<String, String> mappedIds) {
         List<IdMappingStringPair> ids =
                 mappedIds.entrySet().stream()
-                        .map(entry -> new IdMappingStringPair(entry.getKey(), entry.getValue()))
+                        .flatMap(entry -> Arrays.stream(entry.getValue().split(";")).map(to -> new IdMappingStringPair(entry.getKey(), to)))
                         .collect(Collectors.toList());
         return IdMappingResult.builder().mappedIds(ids).build();
     }

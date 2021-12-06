@@ -21,4 +21,6 @@ public interface JobOperation {
 
     IdMappingJob createAndPutJobInCache(String from, String to, String fromIds)
             throws InvalidKeySpecException, NoSuchAlgorithmException;
+
+    IdMappingJob createAndPutJobInCacheWithOneToManyMapping(int idsCount, JobStatus jobStatus) throws Exception;
 }

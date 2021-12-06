@@ -35,4 +35,16 @@ public class UniParcIdMappingResultsJobOperation extends AbstractJobOperation {
         }
         return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, "UniParc", ids, jobStatus);
     }
+
+    @Override
+    public IdMappingJob createAndPutJobInCacheWithOneToManyMapping(int idsCount, JobStatus jobStatus) throws Exception {
+        Map<String, String> ids = new LinkedHashMap<>();
+        for (int i = 1; i <= idsCount; i++) {
+            String fromId = String.format("Q%05d", i);
+            // one id to 6 ids
+            String toId = (";" + String.format(UPI_PREF + "%02d", i)).repeat(6).replaceFirst(";", "");;
+            ids.put(fromId, toId);
+        }
+        return createAndPutJobInCache(UNIPROTKB_AC_ID_STR, "UniParc", ids, jobStatus);
+    }
 }
