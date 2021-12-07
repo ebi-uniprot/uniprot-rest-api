@@ -5,6 +5,7 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.IdMappingJobController;
@@ -15,11 +16,13 @@ import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.HashGenerator;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
@@ -55,6 +58,9 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
+
+    @Value("${id.mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
+    private Integer maxIdMappingToIdsCountEnriched;
 
     public IdMappingJobServiceImpl(
             IdMappingJobCacheService cacheService,
@@ -96,7 +102,9 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     public String getRedirectPathToResults(IdMappingJob job, String requestUrl) {
         String toDB = job.getIdMappingRequest().getTo();
         String dbType = "";
-        if (UNIREF_SET.contains(toDB)) {
+        if(isMoreThanAllowedMappedIdsToEnrich(job.getIdMappingResult())){ // just return mapped ids without enrichment
+            dbType = "";
+        } else if (UNIREF_SET.contains(toDB)) {
             dbType = UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH + "/";
         } else if (UNIPARC.equals(toDB)) {
             dbType = UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH + "/";
@@ -142,5 +150,11 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         builder.jobId(jobId).jobStatus(JobStatus.NEW);
         builder.idMappingRequest(request);
         return builder.build();
+    }
+
+    private boolean isMoreThanAllowedMappedIdsToEnrich(IdMappingResult idMappingResult) {
+        return Utils.notNull(idMappingResult) &&
+                Utils.notNullNotEmpty(idMappingResult.getMappedIds()) &&
+                idMappingResult.getMappedIds().size() > this.maxIdMappingToIdsCountEnriched;
     }
 }

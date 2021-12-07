@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -14,22 +15,26 @@ import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.core.util.Utils;
 
 import com.google.common.base.Stopwatch;
 
@@ -53,6 +58,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class IdMappingResultsController extends BasicSearchController<IdMappingStringPair> {
     private final IdMappingPIRService idMappingService;
     private final IdMappingJobCacheService cacheService;
+
+    @Value("${id.mapping.max.to.ids.count:#{null}}") // value to 500k
+    private Integer maxIdMappingToIdsCount;
 
     @Autowired
     public IdMappingResultsController(
@@ -94,6 +102,8 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             HttpServletRequest request,
             HttpServletResponse response) {
         IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
+        // validate the mapped ids size
+        validatedMappedIdsLimit(completedJob.getIdMappingResult());
 
         Stopwatch stopwatch = Stopwatch.createStarted();
         QueryResult<IdMappingStringPair> queryResult =
@@ -143,7 +153,8 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                     HttpServletResponse response) {
 
         IdMappingJob completedJob = cacheService.getCompletedJobAsResource(jobId);
-
+        // validate the mapped ids size
+        validatedMappedIdsLimit(completedJob.getIdMappingResult());
         return super.stream(
                 completedJob.getIdMappingResult().getMappedIds().stream(),
                 streamRequest,
@@ -160,5 +171,12 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
     @Override
     protected Optional<String> getEntityRedirectId(IdMappingStringPair entity) {
         return Optional.empty();
+    }
+
+    private void validatedMappedIdsLimit(IdMappingResult result){
+        if (Utils.notNullNotEmpty(result.getMappedIds()) && result.getMappedIds().size() > this.maxIdMappingToIdsCount) {
+            throw new InvalidRequestException(
+                    "Maximum number of mapped ids supported is " + this.maxIdMappingToIdsCount);
+        }
     }
 }
