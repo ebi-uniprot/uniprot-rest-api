@@ -81,7 +81,7 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
         Assertions.assertEquals(JobStatus.FINISHED, submittedJob.getJobStatus());
-        Assertions.assertNull(submittedJob.getErrorMessage());
+        Assertions.assertNull(submittedJob.getErrors());
         Assertions.assertEquals(request, submittedJob.getIdMappingRequest());
         Assertions.assertNotNull(submittedJob.getIdMappingResult());
         Assertions.assertNotNull(submittedJob.getCreated());
@@ -113,7 +113,7 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
         Assertions.assertEquals(JobStatus.RUNNING, submittedJob.getJobStatus());
-        Assertions.assertNull(submittedJob.getErrorMessage());
+        Assertions.assertNull(submittedJob.getErrors());
         Assertions.assertEquals(request, submittedJob.getIdMappingRequest());
         Assertions.assertNull(submittedJob.getIdMappingResult());
         Assertions.assertNotNull(submittedJob.getCreated());
@@ -147,8 +147,10 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
         Assertions.assertEquals(JobStatus.ERROR, submittedJob.getJobStatus());
-        Assertions.assertNotNull(submittedJob.getErrorMessage());
-        Assertions.assertEquals(errorMsg, submittedJob.getErrorMessage());
+        Assertions.assertNotNull(submittedJob.getErrors());
+        Assertions.assertEquals(1, submittedJob.getErrors().size());
+        Assertions.assertEquals(errorMsg, submittedJob.getErrors().get(0).getMessage());
+        Assertions.assertEquals(50, submittedJob.getErrors().get(0).getCode());
         Assertions.assertEquals(request, submittedJob.getIdMappingRequest());
         Assertions.assertNull(submittedJob.getIdMappingResult());
         Assertions.assertNotNull(submittedJob.getCreated());

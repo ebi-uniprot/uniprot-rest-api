@@ -1,27 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -48,12 +28,38 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.model.IdMappingWarning;
+import org.uniprot.api.idmapping.model.IdMappingWarningError;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.matchesPattern;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
 
 /**
  * @author sahmad
@@ -71,6 +77,9 @@ class IdMappingJobControllerIT {
 
     @Value("${id.mapping.max.to.ids.enrich.count}")
     private Integer maxAllowedIdsToEnrich;
+
+    @Value("${id.mapping.max.to.ids.count}")
+    private Integer maxAllowedToIds;
 
     private static final String JOB_SUBMIT_ENDPOINT =
             IdMappingJobController.IDMAPPING_PATH + "/run";
@@ -500,7 +509,8 @@ class IdMappingJobControllerIT {
         // map more than allowed enrich ids
         IdMappingResult idMappingResult = IdMappingResult.builder()
                 .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
-                .warning(IdMappingWarning.ENRICHMENT)
+                .warning(new IdMappingWarningError(ENRICHMENT_WARNING.getCode(),
+                        ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich))
                 .build();
 
         IdMappingJob job =
@@ -523,8 +533,8 @@ class IdMappingJobControllerIT {
                 .andExpect(redirectedUrlPattern("**/idmapping/results/" + jobId))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.warnings.length()", is(1)))
-                .andExpect(jsonPath("$.warnings[0].message", is(IdMappingWarning.ENRICHMENT.getMessage())))
-                .andExpect(jsonPath("$.warnings[0].code", is(IdMappingWarning.ENRICHMENT.getCode())));
+                .andExpect(jsonPath("$.warnings[0].message", is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
+                .andExpect(jsonPath("$.warnings[0].code", is(ENRICHMENT_WARNING.getCode())));
     }
 
     /**
@@ -547,7 +557,7 @@ class IdMappingJobControllerIT {
         request.setTaxId(taxId);
         IdMappingResult idMappingResult = IdMappingResult.builder()
                 .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
-                .warning(IdMappingWarning.ENRICHMENT)
+                .warning(new IdMappingWarningError(ENRICHMENT_WARNING.getCode(), ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich))
                 .build();
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -577,8 +587,44 @@ class IdMappingJobControllerIT {
                                 matchesPattern(
                                         "https://localhost/idmapping/results/" + jobId)))
                 .andExpect(jsonPath("$.warnings.length()", is(1)))
-                .andExpect(jsonPath("$.warnings[0].message", is(IdMappingWarning.ENRICHMENT.getMessage())))
-                .andExpect(jsonPath("$.warnings[0].code", is(IdMappingWarning.ENRICHMENT.getCode())));
+                .andExpect(jsonPath("$.warnings[0].message", is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
+                .andExpect(jsonPath("$.warnings[0].code", is(ENRICHMENT_WARNING.getCode())));
+    }
+
+    @Test
+    void testGetJobDetailsWithLimitExceedError() throws Exception {
+        String jobId = "ID";
+        String ids = "Q1,Q2";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(IdMappingFieldConfig.ACC_ID_STR);
+        request.setTo(IdMappingFieldConfig.UNIPARC_STR);
+        request.setIds(ids);
+        IdMappingResult idMappingResult = IdMappingResult.builder()
+                .error(new IdMappingWarningError(LIMIT_EXCEED_ERROR.getCode(), LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)).build();
+        IdMappingJob job =
+                IdMappingJob.builder()
+                        .idMappingRequest(request)
+                        .jobStatus(JobStatus.ERROR)
+                        .jobId(jobId)
+                        .errors(idMappingResult.getErrors())
+                        .idMappingResult(idMappingResult)
+                        .build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_DETAILS_ENDPOINT, jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.warnings").doesNotExist())
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.length()", is(1)))
+                .andExpect(jsonPath("$.errors[0].code", is(LIMIT_EXCEED_ERROR.getCode())))
+                .andExpect(jsonPath("$.errors[0].message", is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
     }
 
     private Collection<IdMappingStringPair> getMappedIds(Integer idPairCountPlusOne) {

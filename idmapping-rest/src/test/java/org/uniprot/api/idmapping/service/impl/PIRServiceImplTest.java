@@ -25,7 +25,7 @@ class PIRServiceImplTest {
     @BeforeEach
     void setUp() {
         restTemplate = mock(RestTemplate.class);
-        pirService = new PIRServiceImpl(restTemplate, 5, "http://localhost");
+        pirService = new PIRServiceImpl(restTemplate, 5, "http://localhost", 20, 10);
     }
 
     @Test

@@ -1,6 +1,8 @@
 package org.uniprot.api.idmapping.service;
 
 import static java.util.Arrays.asList;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -10,9 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpServerErrorException;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+import org.uniprot.api.idmapping.model.IdMappingWarningError;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.model.IdMappingWarning;
+import org.uniprot.api.idmapping.model.PredefinedIdMappingStatus;
 import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
@@ -54,8 +57,10 @@ public class PIRResponseConverter {
         }
     }
 
+
     public IdMappingResult convertToIDMappings(
-            IdMappingJobRequest request, Integer maxToUniProtIdsAllowed, ResponseEntity<String> response) {
+            IdMappingJobRequest request, Integer maxToUniProtIdsAllowed, Integer maxToIdsAllowed,
+            ResponseEntity<String> response) {
         IdMappingResult.IdMappingResultBuilder builder = IdMappingResult.builder();
         HttpStatus statusCode = response.getStatusCode();
         if (statusCode.equals(HttpStatus.OK)) {
@@ -66,11 +71,18 @@ public class PIRResponseConverter {
                         .filter(Utils::notNullNotEmpty)
                         //                        .filter(line -> !line.startsWith("MSG:"))
                         .forEach(line -> convertLine(line, request, builder));
-                // populate warning if needed
-                Optional<IdMappingWarning> optWarning = getOptionalEnrichmentWarning(request,
-                        maxToUniProtIdsAllowed, builder.build());
-                if(optWarning.isPresent()){
-                    builder.warning(optWarning.get());
+                // populate  error  if needed
+                Optional<IdMappingWarningError> optError = getOptionalLimitError(maxToIdsAllowed, builder.build());
+                if(optError.isEmpty()) { // populate warning if needed
+                    Optional<IdMappingWarningError> optWarning = getOptionalEnrichmentWarning(request,
+                            maxToUniProtIdsAllowed, builder.build());
+                    if (optWarning.isPresent()) {
+                        builder.warning(optWarning.get());
+                    }
+                } else  {
+                    builder.clearMappedIds();
+                    builder.clearUnmappedIds();
+                    builder.error(optError.get());
                 }
             }
         } else {
@@ -108,12 +120,21 @@ public class PIRResponseConverter {
         }
     }
 
-    private Optional<IdMappingWarning> getOptionalEnrichmentWarning(IdMappingJobRequest request, Integer  maxToUniProtIdsAllowed,
-                                                          IdMappingResult result) {
+    private Optional<IdMappingWarningError> getOptionalLimitError(Integer maxToIdsAllowed, IdMappingResult result) {
+        if(Utils.notNullNotEmpty(result.getMappedIds()) && result.getMappedIds().size() > maxToIdsAllowed){
+            return Optional.of(new IdMappingWarningError(LIMIT_EXCEED_ERROR.getCode(),
+                    LIMIT_EXCEED_ERROR.getMessage() + maxToIdsAllowed));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<IdMappingWarningError> getOptionalEnrichmentWarning(IdMappingJobRequest request, Integer  maxToUniProtIdsAllowed,
+                                                                             IdMappingResult result) {
         if (isMappedToUniProtDBId(request.getTo()) &&
                 Utils.notNullNotEmpty(result.getMappedIds()) &&
                 result.getMappedIds().size() > maxToUniProtIdsAllowed) {
-            return Optional.of(IdMappingWarning.ENRICHMENT);
+            return Optional.of(new IdMappingWarningError(ENRICHMENT_WARNING.getCode(),
+                    ENRICHMENT_WARNING.getMessage() + maxToUniProtIdsAllowed));
         }
         return Optional.empty();
     }

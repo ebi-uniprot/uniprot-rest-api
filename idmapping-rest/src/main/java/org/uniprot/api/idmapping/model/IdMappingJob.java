@@ -20,7 +20,7 @@ public class IdMappingJob {
     private JobStatus jobStatus;
     private IdMappingJobRequest idMappingRequest;
     private IdMappingResult idMappingResult;
-    private String errorMessage;
+    private List<IdMappingWarningError> errors;
     @Builder.Default private Date created = new Date();
     @Builder.Default private Date updated = new Date();
 }
