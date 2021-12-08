@@ -4,7 +4,11 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
 
 import java.util.List;
@@ -21,6 +25,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.IdMappingWarning;
 
 class PIRResponseConverterTest {
     private PIRResponseConverter converter;
@@ -40,17 +45,18 @@ class PIRResponseConverterTest {
 
         assertThrows(
                 HttpServerErrorException.class,
-                () -> converter.convertToIDMappings(request, responseEntity));
+                () -> converter.convertToIDMappings(request, 20, responseEntity));
     }
 
     @Test
     void emptyResponseGivesEmptyResult() {
         ResponseEntity<String> responseEntity = ResponseEntity.status(HttpStatus.OK).build();
 
-        IdMappingResult result = converter.convertToIDMappings(request, responseEntity);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, responseEntity);
 
         assertThat(result.getMappedIds(), is(emptyList()));
         assertThat(result.getUnmappedIds(), is(emptyList()));
+        assertThat(result.getWarnings(), is(emptyList()));
     }
 
     @Test
@@ -58,7 +64,7 @@ class PIRResponseConverterTest {
         ResponseEntity<String> responseEntity =
                 ResponseEntity.status(HttpStatus.OK).body("From1\tTo1\n" + "From2\tTo1;To2\n");
 
-        IdMappingResult result = converter.convertToIDMappings(request, responseEntity);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, responseEntity);
 
         assertThat(
                 result.getMappedIds(),
@@ -67,6 +73,7 @@ class PIRResponseConverterTest {
                         new IdMappingStringPair("From2", "To1"),
                         new IdMappingStringPair("From2", "To2")));
         assertThat(result.getUnmappedIds(), is(emptyList()));
+        assertThat(result.getWarnings(), is(emptyList()));
     }
 
     @Test
@@ -81,7 +88,7 @@ class PIRResponseConverterTest {
                                         + "From2\tP12345;UPI0000000001;P21802\n"
                                         + "From3\tUPI0000000001;P12346\n");
 
-        IdMappingResult result = converter.convertToIDMappings(request, responseEntity);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, responseEntity);
 
         assertThat(
                 result.getMappedIds(),
@@ -91,6 +98,7 @@ class PIRResponseConverterTest {
                         new IdMappingStringPair("From2", "P21802"),
                         new IdMappingStringPair("From3", "P12346")));
         assertThat(result.getUnmappedIds(), is(emptyList()));
+        assertThat(result.getWarnings(), is(emptyList()));
     }
 
     @Test
@@ -99,7 +107,7 @@ class PIRResponseConverterTest {
                 ResponseEntity.status(HttpStatus.OK)
                         .body("Taxonomy ID: 9606\n" + "\n" + "From1\tTo1\n" + "From2\tTo1;To2\n");
 
-        IdMappingResult result = converter.convertToIDMappings(request, responseEntity);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, responseEntity);
 
         assertThat(
                 result.getMappedIds(),
@@ -108,6 +116,7 @@ class PIRResponseConverterTest {
                         new IdMappingStringPair("From2", "To1"),
                         new IdMappingStringPair("From2", "To2")));
         assertThat(result.getUnmappedIds(), is(emptyList()));
+        assertThat(result.getWarnings(), is(emptyList()));
     }
 
     @Test
@@ -128,7 +137,7 @@ class PIRResponseConverterTest {
                                         + "\n"
                                         + "MSG: 200 -- 2 IDs have no matches: \"gene 12,gene 36,\".\n");
 
-        IdMappingResult result = converter.convertToIDMappings(request, responseEntity);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, responseEntity);
 
         assertThat(
                 result.getMappedIds(),
@@ -137,6 +146,7 @@ class PIRResponseConverterTest {
                         new IdMappingStringPair("From2", "To1"),
                         new IdMappingStringPair("From2", "To2")));
         assertThat(result.getUnmappedIds(), contains("gene 12", "gene 36"));
+        assertThat(result.getWarnings(), is(emptyList()));
     }
 
     @Test
@@ -148,10 +158,11 @@ class PIRResponseConverterTest {
         List<String> ids = List.of("id1", "id2", "id3", "id4");
         String idsStr = String.join(",", ids);
         request.setIds(idsStr);
-        IdMappingResult result = converter.convertToIDMappings(request, responseEntity);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, responseEntity);
 
         assertThat(result.getMappedIds(), is(emptyList()));
         assertThat(result.getUnmappedIds(), is(ids));
+        assertThat(result.getWarnings(), is(emptyList()));
     }
 
     @ParameterizedTest
@@ -177,6 +188,47 @@ class PIRResponseConverterTest {
     @MethodSource("invalidToAndIdPairs")
     void checkInvalidPairs(String to, String id) {
         assertThat(isValidIdPattern(to, id), is(false));
+    }
+
+    @Test
+    void checkIdMappingResultWithWarning() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo("UniProtKB");
+        // when  more than allowed ids (20 for tests) for enrichment
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "From1\tP00001;P00002;P00003;P00004;P00005\n"
+                                        + "From2\tP00006;P00007;P00008;P00009;P00010\n"
+                                        + "From3\tP00011;P00012;P00014;P00015;P00016\n"
+                                        + "From4\tP00016;P00017;P00018;P00019;P00020\n"
+                                        + "From5\tP00021\n");
+
+        IdMappingResult result = converter.convertToIDMappings(request, 20, responseEntity);
+
+        assertFalse(result.getMappedIds().isEmpty());
+        assertEquals(21, result.getMappedIds().size());
+        assertFalse(result.getWarnings().isEmpty());
+        assertEquals(1, result.getWarnings().size());
+        assertEquals(IdMappingWarning.ENRICHMENT, result.getWarnings().get(0));
+        assertThat(result.getUnmappedIds(), is(emptyList()));
+    }
+
+    @Test
+    void checkIdMappingResultWithoutWarningForNonUniProtId() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo("EMBL");
+        // when  more than allowed ids (20 for tests) for enrichment
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body("From1\t00001;00002;00003;00004;00005\n");
+
+        IdMappingResult result = converter.convertToIDMappings(request, 4, responseEntity);
+
+        assertFalse(result.getMappedIds().isEmpty());
+        assertEquals(5, result.getMappedIds().size());
+        assertTrue(result.getWarnings().isEmpty());
+        assertThat(result.getUnmappedIds(), is(emptyList()));
     }
 
     private static Stream<Arguments> invalidToAndIdPairs() {

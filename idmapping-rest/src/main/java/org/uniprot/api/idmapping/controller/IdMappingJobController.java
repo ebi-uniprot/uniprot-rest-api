@@ -17,8 +17,13 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobStatusResponse;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingWarning;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -110,6 +115,7 @@ public class IdMappingJobController {
             detailResponse.setRedirectURL(
                     idMappingJobService.getRedirectPathToResults(
                             job, servletRequest.getRequestURL().toString()));
+            detailResponse.setWarnings(getWarnings(job));
         }
 
         return ResponseEntity.ok(detailResponse);
@@ -124,11 +130,10 @@ public class IdMappingJobController {
                 break;
             case FINISHED:
                 String redirectUrl = idMappingJobService.getRedirectPathToResults(job, url);
-
                 response =
                         ResponseEntity.status(HttpStatus.SEE_OTHER)
                                 .header(HttpHeaders.LOCATION, redirectUrl)
-                                .body(new JobStatusResponse(JobStatus.FINISHED));
+                                .body(new JobStatusResponse(JobStatus.FINISHED, getWarnings(job)));
                 break;
             default:
                 response =
@@ -138,5 +143,13 @@ public class IdMappingJobController {
         }
 
         return response;
+    }
+
+    private List<IdMappingWarning> getWarnings(IdMappingJob job){
+        List<IdMappingWarning> warnings =  new ArrayList<>();
+        if(Objects.nonNull(job.getIdMappingResult())) {
+            warnings = job.getIdMappingResult().getWarnings();
+        }
+        return warnings;
     }
 }

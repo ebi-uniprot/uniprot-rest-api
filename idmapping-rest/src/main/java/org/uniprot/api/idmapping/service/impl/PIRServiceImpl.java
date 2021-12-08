@@ -36,6 +36,9 @@ public class PIRServiceImpl extends IdMappingPIRService {
     private final RestTemplate restTemplate;
     private final PIRResponseConverter pirResponseConverter;
 
+    @Value("${id.mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
+    private Integer maxIdMappingToIdsCountEnriched;
+
     @Autowired
     public PIRServiceImpl(
             RestTemplate idMappingRestTemplate,
@@ -60,7 +63,8 @@ public class PIRServiceImpl extends IdMappingPIRService {
                 new HttpEntity<>(createPostBody(request), HTTP_HEADERS);
 
         return pirResponseConverter.convertToIDMappings(
-                request, restTemplate.postForEntity(pirIdMappingUrl, requestBody, String.class));
+                request, this.maxIdMappingToIdsCountEnriched,
+                restTemplate.postForEntity(pirIdMappingUrl, requestBody, String.class));
     }
 
     private MultiValueMap<String, String> createPostBody(IdMappingJobRequest request) {

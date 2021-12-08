@@ -34,9 +34,9 @@ import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 @Slf4j
 public class IdMappingJobServiceImpl implements IdMappingJobService {
     private static final String RESULTS_SUBPATH = "results/";
-    private static final Set<String> UNIREF_SET;
-    private static final String UNIPARC;
-    private static final Set<String> UNIPROTKB_SET;
+    public static final Set<String> UNIREF_SET;
+    public static final String UNIPARC;
+    public static final Set<String> UNIPROTKB_SET;
 
     static {
         UNIPARC = IdMappingFieldConfig.UPARC_STR;

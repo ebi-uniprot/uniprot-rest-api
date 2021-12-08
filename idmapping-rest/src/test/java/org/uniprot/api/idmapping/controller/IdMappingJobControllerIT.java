@@ -48,6 +48,7 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.IdMappingWarning;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
@@ -131,7 +132,8 @@ class IdMappingJobControllerIT {
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(redirectedUrlPattern("**/idmapping/results/" + jobId))
-                .andExpect(jsonPath("$.jobStatus", is(JobStatus.FINISHED.toString())));
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.FINISHED.toString())))
+                .andExpect(jsonPath("$.warnings").doesNotExist());
     }
 
     @Test
@@ -172,7 +174,8 @@ class IdMappingJobControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobStatus", is(JobStatus.NEW.toString())));
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.NEW.toString())))
+                .andExpect(jsonPath("$.warnings").doesNotExist());
     }
 
     @Test
@@ -197,7 +200,8 @@ class IdMappingJobControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobStatus", is(JobStatus.RUNNING.toString())));
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.RUNNING.toString())))
+                .andExpect(jsonPath("$.warnings").doesNotExist());
     }
 
     @Test
@@ -222,7 +226,8 @@ class IdMappingJobControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobStatus", is(JobStatus.ERROR.toString())));
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.ERROR.toString())))
+                .andExpect(jsonPath("$.warnings").doesNotExist());
     }
 
     private String extractJobId(ResultActions response)
@@ -414,7 +419,8 @@ class IdMappingJobControllerIT {
                 .andExpect(jsonPath("$.to", is(IdMappingFieldConfig.GENE_NAME_STR)))
                 .andExpect(jsonPath("$.ids", is(ids)))
                 .andExpect(jsonPath("$.taxId", is(taxId)))
-                .andExpect(jsonPath("$.redirectURL").doesNotExist());
+                .andExpect(jsonPath("$.redirectURL").doesNotExist())
+                .andExpect(jsonPath("$.warnings").doesNotExist());
     }
 
     @Test
@@ -453,7 +459,8 @@ class IdMappingJobControllerIT {
                         jsonPath(
                                 "$.redirectURL",
                                 matchesPattern(
-                                        "https://localhost/idmapping/uniparc/results/" + jobId)));
+                                        "https://localhost/idmapping/uniparc/results/" + jobId)))
+                .andExpect(jsonPath("$.warnings").doesNotExist());
     }
 
     @Test
@@ -475,6 +482,53 @@ class IdMappingJobControllerIT {
 
     /**
      * If the mapped ids are more than id.mapping.max.to.ids.enrich.count
+     * we return the plain from and to result without any uniprot data in the status/{jobId} response.
+     * So to do that we just return the plain results url redirect without any db in the path even though the mapped to id
+     * is uniprotkb, uniparc or uniref ids
+     * plain result url : https://localhost/idmapping/results/{jobId}
+     *
+     */
+
+    @Test
+    void testGetJobStatusWithCorrectRedirect() throws Exception {
+        String jobId = "ID";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom("UniProtKB_AC-ID");
+        request.setTo("UniProtKB");
+        request.setIds("Q00001,Q00002");
+
+        // map more than allowed enrich ids
+        IdMappingResult idMappingResult = IdMappingResult.builder()
+                .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
+                .warning(IdMappingWarning.ENRICHMENT)
+                .build();
+
+        IdMappingJob job =
+                IdMappingJob.builder()
+                        .idMappingRequest(request)
+                        .jobStatus(JobStatus.FINISHED)
+                        .jobId(jobId)
+                        .idMappingResult(idMappingResult)
+                        .build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(redirectedUrlPattern("**/idmapping/results/" + jobId))
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.FINISHED.toString())))
+                .andExpect(jsonPath("$.warnings.length()", is(1)))
+                .andExpect(jsonPath("$.warnings[0].message", is(IdMappingWarning.ENRICHMENT.getMessage())))
+                .andExpect(jsonPath("$.warnings[0].code", is(IdMappingWarning.ENRICHMENT.getCode())));
+    }
+
+    /**
+     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count
      * we return the plain from and to result without any uniprot data.
      * So to do that we just return the plain results url redirect without any db in the path even though the mapped to id
      * is uniprotkb, uniparc or uniref ids
@@ -482,7 +536,7 @@ class IdMappingJobControllerIT {
      *
      */
     @Test
-    void testFinishedJobWithUniParcMappingRedirectUrlWithPlainUrl() throws Exception {
+    void testGetJobDetailsWithCorrectRedirectUrl() throws Exception {
         String jobId = "ID";
         String ids = "Q1,Q2";
         String taxId = "9606";
@@ -491,7 +545,10 @@ class IdMappingJobControllerIT {
         request.setTo(IdMappingFieldConfig.UNIPARC_STR);
         request.setIds(ids);
         request.setTaxId(taxId);
-        IdMappingResult idMappingResult = IdMappingResult.builder().mappedIds(getMappedIds(this.maxAllowedIdsToEnrich)).build();
+        IdMappingResult idMappingResult = IdMappingResult.builder()
+                .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
+                .warning(IdMappingWarning.ENRICHMENT)
+                .build();
         IdMappingJob job =
                 IdMappingJob.builder()
                         .idMappingRequest(request)
@@ -507,7 +564,7 @@ class IdMappingJobControllerIT {
                         get(JOB_DETAILS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.from", is(IdMappingFieldConfig.ACC_ID_STR)))
@@ -518,13 +575,15 @@ class IdMappingJobControllerIT {
                         jsonPath(
                                 "$.redirectURL",
                                 matchesPattern(
-                                        "https://localhost/idmapping/results/" + jobId)));
+                                        "https://localhost/idmapping/results/" + jobId)))
+                .andExpect(jsonPath("$.warnings.length()", is(1)))
+                .andExpect(jsonPath("$.warnings[0].message", is(IdMappingWarning.ENRICHMENT.getMessage())))
+                .andExpect(jsonPath("$.warnings[0].code", is(IdMappingWarning.ENRICHMENT.getCode())));
     }
 
-    private Collection<IdMappingStringPair> getMappedIds(Integer maxAllowedIdsToEnrich) {
-        return IntStream.rangeClosed(0, maxAllowedIdsToEnrich)
+    private Collection<IdMappingStringPair> getMappedIds(Integer idPairCountPlusOne) {
+        return IntStream.rangeClosed(0, idPairCountPlusOne)
                 .mapToObj(i -> new IdMappingStringPair("from", "to"))
                 .collect(Collectors.toList());
-
     }
 }

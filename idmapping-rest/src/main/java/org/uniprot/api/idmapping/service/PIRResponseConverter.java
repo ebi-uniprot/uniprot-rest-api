@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.service;
 import static java.util.Arrays.asList;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.IdMappingWarning;
+import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
@@ -52,7 +55,7 @@ public class PIRResponseConverter {
     }
 
     public IdMappingResult convertToIDMappings(
-            IdMappingJobRequest request, ResponseEntity<String> response) {
+            IdMappingJobRequest request, Integer maxToUniProtIdsAllowed, ResponseEntity<String> response) {
         IdMappingResult.IdMappingResultBuilder builder = IdMappingResult.builder();
         HttpStatus statusCode = response.getStatusCode();
         if (statusCode.equals(HttpStatus.OK)) {
@@ -63,6 +66,12 @@ public class PIRResponseConverter {
                         .filter(Utils::notNullNotEmpty)
                         //                        .filter(line -> !line.startsWith("MSG:"))
                         .forEach(line -> convertLine(line, request, builder));
+                // populate warning if needed
+                Optional<IdMappingWarning> optWarning = getOptionalEnrichmentWarning(request,
+                        maxToUniProtIdsAllowed, builder.build());
+                if(optWarning.isPresent()){
+                    builder.warning(optWarning.get());
+                }
             }
         } else {
             throw new HttpServerErrorException(statusCode, "PIR id-mapping service error");
@@ -97,5 +106,21 @@ public class PIRResponseConverter {
                         .forEach(builder::mappedId);
             }
         }
+    }
+
+    private Optional<IdMappingWarning> getOptionalEnrichmentWarning(IdMappingJobRequest request, Integer  maxToUniProtIdsAllowed,
+                                                          IdMappingResult result) {
+        if (isMappedToUniProtDBId(request.getTo()) &&
+                Utils.notNullNotEmpty(result.getMappedIds()) &&
+                result.getMappedIds().size() > maxToUniProtIdsAllowed) {
+            return Optional.of(IdMappingWarning.ENRICHMENT);
+        }
+        return Optional.empty();
+    }
+
+    private boolean isMappedToUniProtDBId(String toDB) {
+        return IdMappingJobServiceImpl.UNIREF_SET.contains(toDB) ||
+                IdMappingJobServiceImpl.UNIPARC.contains(toDB) ||
+                IdMappingJobServiceImpl.UNIPROTKB_SET.contains(toDB);
     }
 }
