@@ -22,8 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
@@ -214,11 +213,11 @@ public abstract class BasicSearchController<T> {
             String redirectId, String fromId, MediaType contentType) {
         String path = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
         if (path != null) {
-            path =
-                    path.substring(0, path.lastIndexOf('/') + 1)
-                            + redirectId
-                            + "."
-                            + UniProtMediaType.getFileExtension(contentType);
+            String suffix = "";
+            if (!contentType.equals(DEFAULT_MEDIA_TYPE)) {
+                suffix = "." + UniProtMediaType.getFileExtension(contentType);
+            }
+            path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId + suffix;
         }
         return path + "?from=" + fromId;
     }
