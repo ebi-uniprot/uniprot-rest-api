@@ -1,34 +1,12 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-
-import java.util.HashMap;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,6 +34,7 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.go.GORepo;
@@ -70,7 +49,20 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
 
 /** @author lgonzales */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -97,6 +89,27 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     @Autowired
     @Qualifier("rdfRestTemplate")
     private RestTemplate restTemplate;
+
+    public Stream<Arguments> fetchingInactiveEntriesWithFileExtension() {
+        return Stream.of(
+                Arguments.of(
+                        getFileExtension(APPLICATION_JSON), "P00000", "P99999", "MY_ID", "MY_ID"),
+                Arguments.of(getFileExtension(FF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "MY_ID"),
+                Arguments.of(
+                        getFileExtension(GFF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
+                Arguments.of(
+                        getFileExtension(LIST_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
+                Arguments.of(
+                        getFileExtension(TSV_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
+                Arguments.of(
+                        getFileExtension(APPLICATION_XML), "P00000", "P99999", "MY_ID", "P99999"),
+                Arguments.of(
+                        getFileExtension(XLS_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "BINARY"),
+                Arguments.of(
+                        getFileExtension(FASTA_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
+                Arguments.of(
+                        getFileExtension(RDF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"));
+    }
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -257,6 +270,69 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(jsonPath("$.entryType", is("Inactive")))
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("MERGED")))
                 .andExpect(jsonPath("$.inactiveReason.mergeDemergeTo", contains("P21802")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("fetchingInactiveEntriesWithFileExtension")
+    void inactiveEntryWithExtensionReturnsActiveOneWithExtension(
+            String fileExtension,
+            String inactiveAcc,
+            String activeAcc,
+            String activeId,
+            String expectResponseMatch)
+            throws Exception {
+        // GIVEN
+        MediaType mediaType = UniProtMediaType.getMediaTypeForFileExtension(fileExtension);
+        UniProtKBEntry template = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtKBEntry activeEntry =
+                UniProtKBEntryBuilder.from(template)
+                        .primaryAccession(activeAcc)
+                        .uniProtId(activeId)
+                        .build();
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, activeEntry);
+
+        // ... inactive entry that was merged into 'activeAcc' entry
+        InactiveUniProtEntry inactiveEntry =
+                InactiveUniProtEntry.from(inactiveAcc, "I8FBX0_MYCAB", MERGED, activeAcc);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveEntry);
+
+        // REQUEST 1 ---------------------------
+        // WHEN we fetch the inactive accession
+        ResultActions response =
+                getMockMvc().perform(get(ACCESSION_RESOURCE, inactiveAcc + "." + fileExtension));
+
+        // THEN we expect a redirect 303 (200 for RDF)
+        ResultActions resultActions = response.andDo(log());
+        String redirectedURL =
+                "/uniprotkb/" + activeAcc + "." + fileExtension + "?from=" + inactiveAcc;
+
+        if (mediaType.equals(RDF_MEDIA_TYPE)) {
+            resultActions
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()));
+        } else {
+            // response REDIRECTS client
+            resultActions
+                    .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                    .andExpect(header().string(HttpHeaders.LOCATION, redirectedURL));
+
+            // REQUEST 2 ---------------------------
+            // ... let's simulate a client (e.g., browser) redirect and go to the address directly
+            response = getMockMvc().perform(get(redirectedURL));
+
+            // then we expect the active entry to contain the appropriate contents
+            Matcher<String> matcher = containsString(expectResponseMatch);
+            if (expectResponseMatch.equals("BINARY")) {
+                matcher = is(not(emptyString()));
+            }
+
+            response.andDo(log())
+                    .andExpect(status().is(HttpStatus.OK.value()))
+                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                    .andExpect(content().string(matcher));
+        }
     }
 
     @Test

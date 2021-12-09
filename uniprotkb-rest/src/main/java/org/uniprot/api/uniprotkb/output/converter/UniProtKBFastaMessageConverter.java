@@ -17,6 +17,8 @@ public class UniProtKBFastaMessageConverter
     @Override
     protected void writeEntity(UniProtKBEntry entity, OutputStream outputStream)
             throws IOException {
-        outputStream.write((UniProtKBFastaParser.toFasta(entity) + "\n").getBytes());
+        if (entity.isActive()) {
+            outputStream.write((UniProtKBFastaParser.toFasta(entity) + "\n").getBytes());
+        }
     }
 }
