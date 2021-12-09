@@ -18,7 +18,6 @@ import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.model.PredefinedIdMappingStatus;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.SortUtils;
@@ -37,6 +36,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.FACET_WARNING;
 
 /**
@@ -89,8 +89,7 @@ public abstract class BasicIdService<T, U> {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
 
-        // validate the limits
-        validateRequest(mappedIds);
+        validateMappedIdsEnrichmentLimit(mappedIds);
 
         List<WarningPair> warnings = new ArrayList<>();
         if (needSearchInSolr(searchRequest)) {
@@ -135,8 +134,7 @@ public abstract class BasicIdService<T, U> {
     public Stream<U> streamEntries(StreamRequest streamRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds());
-        // validate the limits
-        validateRequest(mappedIds);
+        validateMappedIdsEnrichmentLimit(mappedIds);
         return streamEntries(mappedIds);
     }
 
@@ -332,22 +330,9 @@ public abstract class BasicIdService<T, U> {
                 || Utils.notNullNotEmpty(searchRequest.getSort());
     }
 
-    private void validateRequest(List<IdMappingStringPair> mappedIds) {
-        validateMappedIdsEnrichmentLimit(mappedIds);
-        validateMappedIdsLimit(mappedIds);
-    }
-
-    private void validateMappedIdsLimit(List<IdMappingStringPair> mappedIds){
-        if (mappedIds.size() > this.maxIdMappingToIdsCount) {
-            throw new InvalidRequestException(
-                    "Maximum number of mapped ids supported is " + this.maxIdMappingToIdsCount);
-        }
-    }
-
     private void validateMappedIdsEnrichmentLimit(List<IdMappingStringPair> mappedIds){
         if (mappedIds.size() > this.maxIdMappingToIdsCountEnriched) {
-            throw new InvalidRequestException(
-                    "Maximum number of mapped ids which can be enriched with UniProt data is " + this.maxIdMappingToIdsCountEnriched);
+            throw new InvalidRequestException(ENRICHMENT_WARNING.getMessage() + this.maxIdMappingToIdsCountEnriched);
         }
     }
     private boolean facetingDisallowed(SearchRequest searchRequest, List<IdMappingStringPair> mappedIds){
