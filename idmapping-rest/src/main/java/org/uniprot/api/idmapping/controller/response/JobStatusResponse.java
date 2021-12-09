@@ -2,7 +2,7 @@ package org.uniprot.api.idmapping.controller.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import org.uniprot.api.idmapping.model.IdMappingWarningError;
+import org.uniprot.api.common.repository.search.WarningPair;
 
 import java.util.List;
 
@@ -18,20 +18,20 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class JobStatusResponse {
     private final JobStatus jobStatus;
-    private final List<IdMappingWarningError> warnings;
-    private List<IdMappingWarningError> errors;
+    private final List<WarningPair> warnings;
+    private List<WarningPair> errors;
 
     public JobStatusResponse(JobStatus jobStatus){
         this(jobStatus, List.of());
     }
 
-    public JobStatusResponse(List<IdMappingWarningError> errors){
+    public JobStatusResponse(List<WarningPair> errors){
         this(JobStatus.ERROR, List.of(), errors);
     }
-    public JobStatusResponse(JobStatus jobStatus, List<IdMappingWarningError> warnings){
+    public JobStatusResponse(JobStatus jobStatus, List<WarningPair> warnings){
         this(jobStatus, warnings, List.of());
     }
-    public JobStatusResponse(JobStatus jobStatus, List<IdMappingWarningError> warnings, List<IdMappingWarningError> errors){
+    public JobStatusResponse(JobStatus jobStatus, List<WarningPair> warnings, List<WarningPair> errors){
         this.jobStatus = jobStatus;
         this.warnings = warnings;
         this.errors = errors;

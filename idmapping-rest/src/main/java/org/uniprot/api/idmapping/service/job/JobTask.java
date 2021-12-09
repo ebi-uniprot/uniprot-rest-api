@@ -1,21 +1,20 @@
 package org.uniprot.api.idmapping.service.job;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
-import lombok.extern.slf4j.Slf4j;
+import com.google.common.base.Stopwatch;
 
 import org.springframework.web.client.RestClientException;
+import org.uniprot.api.common.repository.search.WarningPair;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.IdMappingWarningError;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.core.util.Utils;
 
-import com.google.common.base.Stopwatch;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sahmad
@@ -55,10 +54,10 @@ public class JobTask implements Runnable {
                 this.job.setUpdated(new Date());
             }
         } catch (RestClientException restException) {
-            populateError(List.of(new IdMappingWarningError(REST_EXCEPTION_CODE, restException.getMessage())));
+            populateError(List.of(new WarningPair(REST_EXCEPTION_CODE, restException.getMessage())));
         }
     }
-    private void populateError(List<IdMappingWarningError> errors){
+    private void populateError(List<WarningPair> errors){
         this.job.setErrors(errors);
         this.job.setJobStatus(JobStatus.ERROR);
         this.job.setUpdated(new Date());

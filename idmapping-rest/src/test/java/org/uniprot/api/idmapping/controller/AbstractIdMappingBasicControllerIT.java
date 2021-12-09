@@ -217,7 +217,7 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("sort", sortField + " desc"));
         // then
-        response.andDo(log())
+        response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", greaterThan(0)));

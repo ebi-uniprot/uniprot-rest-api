@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.uniprot.api.common.repository.search.WarningPair;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobDetailResponse;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobStatusResponse;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.IdMappingWarningError;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 
@@ -158,16 +158,16 @@ public class IdMappingJobController {
         return response;
     }
 
-    private List<IdMappingWarningError> getWarnings(IdMappingJob job){
-        List<IdMappingWarningError> warnings =  new ArrayList<>();
+    private List<WarningPair> getWarnings(IdMappingJob job){
+        List<WarningPair> warnings =  new ArrayList<>();
         if(Objects.nonNull(job.getIdMappingResult())) {
             warnings = job.getIdMappingResult().getWarnings();
         }
         return warnings;
     }
 
-    private List<IdMappingWarningError> getErrors(IdMappingJob job){
-        List<IdMappingWarningError> errors = new ArrayList<>();
+    private List<WarningPair> getErrors(IdMappingJob job){
+        List<WarningPair> errors = new ArrayList<>();
         if(Objects.nonNull(job.getIdMappingResult())){
             errors = job.getIdMappingResult().getErrors();
         }

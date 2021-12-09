@@ -39,12 +39,11 @@ public abstract class IdMappingPIRService {
                         .stream(),
                 cursorPage,
                 null,
-                null,
-                result.getUnmappedIds());
+                result.getUnmappedIds(), result.getWarnings());
     }
 
     public QueryResult<IdMappingStringPair> queryResultAll(IdMappingResult result) {
         return QueryResult.of(
-                result.getMappedIds().stream(), null, null, null, result.getUnmappedIds());
+                result.getMappedIds().stream(), null, null, result.getUnmappedIds(), result.getWarnings());
     }
 }

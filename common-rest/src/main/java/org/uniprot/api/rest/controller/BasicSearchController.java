@@ -115,6 +115,7 @@ public abstract class BasicSearchController<T> {
         } else {
             context.setEntities(result.getContent());
             context.setFailedIds(result.getFailedIds());
+            context.setWarnings(result.getWarnings());
         }
 
         HttpHeaders headers = createHttpSearchHeader(contentType);

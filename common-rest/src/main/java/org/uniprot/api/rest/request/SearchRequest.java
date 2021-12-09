@@ -37,4 +37,6 @@ public interface SearchRequest extends BasicRequest {
             return Collections.emptyList();
         }
     }
+
+    void setFacets(String facets);
 }

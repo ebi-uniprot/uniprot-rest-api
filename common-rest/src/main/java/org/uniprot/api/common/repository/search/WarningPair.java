@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.model;
+package org.uniprot.api.common.repository.search;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class IdMappingWarningError {
+public class WarningPair {
     private int code;
     private String message;
 }

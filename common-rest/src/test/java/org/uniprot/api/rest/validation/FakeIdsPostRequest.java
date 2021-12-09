@@ -51,4 +51,9 @@ public class FakeIdsPostRequest implements IdsSearchRequest {
 
     @Override
     public void setSize(Integer size) {}
+
+    @Override
+    public void setFacets(String facets) {
+        // do nothing
+    }
 }

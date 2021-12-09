@@ -22,13 +22,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.WarningPair;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.model.IdMappingWarningError;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
@@ -226,7 +226,7 @@ class IdMappingJobControllerIT {
                         .idMappingRequest(request)
                         .jobStatus(JobStatus.ERROR)
                         .jobId(jobId)
-                        .errors(List.of(new IdMappingWarningError(-1, "Ignored error")))
+                        .errors(List.of(new WarningPair(-1, "Ignored error")))
                         .build();
         when(cacheService.getJobAsResource(jobId)).thenReturn(job);
 
@@ -515,7 +515,7 @@ class IdMappingJobControllerIT {
         // map more than allowed enrich ids
         IdMappingResult idMappingResult = IdMappingResult.builder()
                 .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
-                .warning(new IdMappingWarningError(ENRICHMENT_WARNING.getCode(),
+                .warning(new WarningPair(ENRICHMENT_WARNING.getCode(),
                         ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich))
                 .build();
 
@@ -563,7 +563,7 @@ class IdMappingJobControllerIT {
         request.setTaxId(taxId);
         IdMappingResult idMappingResult = IdMappingResult.builder()
                 .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
-                .warning(new IdMappingWarningError(ENRICHMENT_WARNING.getCode(), ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich))
+                .warning(new WarningPair(ENRICHMENT_WARNING.getCode(), ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich))
                 .build();
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -607,7 +607,7 @@ class IdMappingJobControllerIT {
         request.setTo(IdMappingFieldConfig.UNIPARC_STR);
         request.setIds(ids);
         IdMappingResult idMappingResult = IdMappingResult.builder()
-                .error(new IdMappingWarningError(LIMIT_EXCEED_ERROR.getCode(), LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)).build();
+                .error(new WarningPair(LIMIT_EXCEED_ERROR.getCode(), LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)).build();
         IdMappingJob job =
                 IdMappingJob.builder()
                         .idMappingRequest(request)
@@ -652,7 +652,7 @@ class IdMappingJobControllerIT {
                         .idMappingRequest(request)
                         .jobStatus(JobStatus.ERROR)
                         .jobId(jobId)
-                        .errors(List.of(new IdMappingWarningError(-1, "Ignored error")))
+                        .errors(List.of(new WarningPair(-1, "Ignored error")))
                         .idMappingResult(idMappingResult)
                         .build();
         when(cacheService.getJobAsResource(jobId)).thenReturn(job);
@@ -680,7 +680,7 @@ class IdMappingJobControllerIT {
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setTo("EMBL-GenBank-DDBJ");
         IdMappingResult idMappingResult = IdMappingResult.builder()
-                .error(new IdMappingWarningError(LIMIT_EXCEED_ERROR.getCode(), LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds))
+                .error(new WarningPair(LIMIT_EXCEED_ERROR.getCode(), LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds))
                 .build();
         IdMappingJob job =
                 IdMappingJob.builder()
