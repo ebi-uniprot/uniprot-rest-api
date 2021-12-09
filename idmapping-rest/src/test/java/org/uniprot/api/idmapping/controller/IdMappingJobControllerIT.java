@@ -34,6 +34,7 @@ import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -53,7 +54,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
@@ -184,7 +184,8 @@ class IdMappingJobControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.NEW.toString())))
-                .andExpect(jsonPath("$.warnings").doesNotExist());
+                .andExpect(jsonPath("$.warnings").doesNotExist())
+                .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
     @Test
@@ -210,7 +211,8 @@ class IdMappingJobControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.RUNNING.toString())))
-                .andExpect(jsonPath("$.warnings").doesNotExist());
+                .andExpect(jsonPath("$.warnings").doesNotExist())
+                .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
     @Test
@@ -224,6 +226,7 @@ class IdMappingJobControllerIT {
                         .idMappingRequest(request)
                         .jobStatus(JobStatus.ERROR)
                         .jobId(jobId)
+                        .errors(List.of(new IdMappingWarningError(-1, "Ignored error")))
                         .build();
         when(cacheService.getJobAsResource(jobId)).thenReturn(job);
 
@@ -236,7 +239,8 @@ class IdMappingJobControllerIT {
                 .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.ERROR.toString())))
-                .andExpect(jsonPath("$.warnings").doesNotExist());
+                .andExpect(jsonPath("$.warnings").doesNotExist())
+                .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
     private String extractJobId(ResultActions response)
@@ -429,7 +433,8 @@ class IdMappingJobControllerIT {
                 .andExpect(jsonPath("$.ids", is(ids)))
                 .andExpect(jsonPath("$.taxId", is(taxId)))
                 .andExpect(jsonPath("$.redirectURL").doesNotExist())
-                .andExpect(jsonPath("$.warnings").doesNotExist());
+                .andExpect(jsonPath("$.warnings").doesNotExist())
+                .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
     @Test
@@ -469,6 +474,7 @@ class IdMappingJobControllerIT {
                                 "$.redirectURL",
                                 matchesPattern(
                                         "https://localhost/idmapping/uniparc/results/" + jobId)))
+                .andExpect(jsonPath("$.warnings").doesNotExist())
                 .andExpect(jsonPath("$.warnings").doesNotExist());
     }
 
@@ -527,7 +533,7 @@ class IdMappingJobControllerIT {
                 mockMvc.perform(
                         get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(redirectedUrlPattern("**/idmapping/results/" + jobId))
@@ -574,7 +580,7 @@ class IdMappingJobControllerIT {
                         get(JOB_DETAILS_ENDPOINT, jobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.from", is(IdMappingFieldConfig.ACC_ID_STR)))
@@ -588,7 +594,8 @@ class IdMappingJobControllerIT {
                                         "https://localhost/idmapping/results/" + jobId)))
                 .andExpect(jsonPath("$.warnings.length()", is(1)))
                 .andExpect(jsonPath("$.warnings[0].message", is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
-                .andExpect(jsonPath("$.warnings[0].code", is(ENRICHMENT_WARNING.getCode())));
+                .andExpect(jsonPath("$.warnings[0].code", is(ENRICHMENT_WARNING.getCode())))
+                .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
     @Test
@@ -620,9 +627,81 @@ class IdMappingJobControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.from", is(IdMappingFieldConfig.ACC_ID_STR)))
+                .andExpect(jsonPath("$.to", is(IdMappingFieldConfig.UNIPARC_STR)))
+                .andExpect(jsonPath("$.ids", is(ids)))
+                .andExpect(jsonPath("$.redirectURL").doesNotExist())
                 .andExpect(jsonPath("$.warnings").doesNotExist())
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.length()", is(1)))
+                .andExpect(jsonPath("$.errors[0].code", is(LIMIT_EXCEED_ERROR.getCode())))
+                .andExpect(jsonPath("$.errors[0].message", is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
+    }
+
+    @Test
+    void testGetJobDetailsWithJobErrorsIgnored() throws Exception {
+        String jobId = "ID";
+        String ids = "Q1,Q2";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(IdMappingFieldConfig.ACC_ID_STR);
+        request.setTo(IdMappingFieldConfig.UNIPARC_STR);
+        request.setIds(ids);
+        IdMappingResult idMappingResult = IdMappingResult.builder().build();
+        IdMappingJob job =
+                IdMappingJob.builder()
+                        .idMappingRequest(request)
+                        .jobStatus(JobStatus.ERROR)
+                        .jobId(jobId)
+                        .errors(List.of(new IdMappingWarningError(-1, "Ignored error")))
+                        .idMappingResult(idMappingResult)
+                        .build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_DETAILS_ENDPOINT, jobId)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.from", is(IdMappingFieldConfig.ACC_ID_STR)))
+                .andExpect(jsonPath("$.to", is(IdMappingFieldConfig.UNIPARC_STR)))
+                .andExpect(jsonPath("$.ids", is(ids)))
+                .andExpect(jsonPath("$.warnings").doesNotExist())
+                .andExpect(jsonPath("$.errors").doesNotExist())
+                .andExpect(jsonPath("$.redirectURL").doesNotExist());
+    }
+
+    @Test
+    void testGetJobStatusWithLimitExceedError() throws Exception {
+        String jobId = "ID";
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo("EMBL-GenBank-DDBJ");
+        IdMappingResult idMappingResult = IdMappingResult.builder()
+                .error(new IdMappingWarningError(LIMIT_EXCEED_ERROR.getCode(), LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds))
+                .build();
+        IdMappingJob job =
+                IdMappingJob.builder()
+                        .idMappingRequest(request)
+                        .jobStatus(JobStatus.ERROR)
+                        .jobId(jobId)
+                        .idMappingResult(idMappingResult)
+                        .build();
+        when(cacheService.getJobAsResource(jobId)).thenReturn(job);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.ERROR.toString())))
+                .andExpect(jsonPath("$.warnings").doesNotExist())
+                .andExpect(jsonPath("$.errors.length()",  is(1)))
                 .andExpect(jsonPath("$.errors[0].code", is(LIMIT_EXCEED_ERROR.getCode())))
                 .andExpect(jsonPath("$.errors[0].message", is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
     }
