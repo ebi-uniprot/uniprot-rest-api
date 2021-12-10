@@ -13,6 +13,9 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.core.xml.uniprot.UniProtEntryConverter;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 public class UniProtKBXmlMessageConverter
         extends AbstractXmlMessageConverter<UniProtKBEntry, Entry> {
     private final UniProtEntryConverter converter;
@@ -25,6 +28,13 @@ public class UniProtKBXmlMessageConverter
     @Override
     protected Entry toXml(UniProtKBEntry entity) {
         return converter.toXml(entity);
+    }
+
+    @Override
+    protected void writeEntity(UniProtKBEntry entity, OutputStream outputStream) throws IOException {
+        if (entity.isActive()) {
+            super.writeEntity(entity, outputStream);
+        }
     }
 
     @Override

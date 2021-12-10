@@ -1,18 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,6 +16,15 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.StreamRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
 /**
  * @param <T>
@@ -72,7 +69,9 @@ public abstract class BasicSearchController<T> {
                                                 .header(
                                                         HttpHeaders.LOCATION,
                                                         getLocationURLForId(
-                                                                id, getEntityId(entity))))
+                                                                id,
+                                                                getEntityId(entity),
+                                                                contentType)))
                         .orElse(ResponseEntity.ok());
 
         return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
@@ -210,10 +209,15 @@ public abstract class BasicSearchController<T> {
         return getDeferredResultResponseEntity(request, context);
     }
 
-    public static String getLocationURLForId(String redirectId, String fromId) {
+    public static String getLocationURLForId(
+            String redirectId, String fromId, MediaType contentType) {
         String path = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
         if (path != null) {
-            path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId;
+            String suffix = "";
+            if (!contentType.equals(DEFAULT_MEDIA_TYPE)) {
+                suffix = "." + UniProtMediaType.getFileExtension(contentType);
+            }
+            path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId + suffix;
         }
         return path + "?from=" + fromId;
     }
