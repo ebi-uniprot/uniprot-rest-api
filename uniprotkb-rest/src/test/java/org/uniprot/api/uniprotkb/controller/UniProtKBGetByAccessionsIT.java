@@ -603,7 +603,7 @@ class UniProtKBGetByAccessionsIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
-                                        "Invalid facet name 'reviewed123'. Expected value can be [structure_3d, fragment, proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome].")));
+                                        "Invalid facet name 'reviewed123'. Expected value can be [structure_3d, proteins_with, fragment, existence, length, reviewed, annotation_score, model_organism, other_organism, proteome].")));
     }
 
     @Test
