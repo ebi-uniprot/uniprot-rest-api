@@ -1,19 +1,18 @@
 package org.uniprot.api.uniref.output.converter;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.AbstractXmlValidationTest;
 import org.uniprot.api.uniref.output.UniRefMessageConverterConfig;
-import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class UniRefXmlMessageConverterTest extends AbstractXmlValidationTest<UniRefEntry>  {
+class UniRefXmlMessageConverterTest extends AbstractXmlValidationTest<UniRefEntry> {
 
     @Override
     public String getXSDUrlLocation() {

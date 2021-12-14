@@ -1,13 +1,29 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
+
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -68,22 +84,7 @@ import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
-import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
@@ -513,13 +514,17 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 // given
                 UniProtKBEntry templateActiveEntry =
                         UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-                UniProtKBEntry activeDrome = UniProtKBEntryBuilder.from(templateActiveEntry)
-                        .uniProtId("ACTIVE_DROME").build();
+                UniProtKBEntry activeDrome =
+                        UniProtKBEntryBuilder.from(templateActiveEntry)
+                                .uniProtId("ACTIVE_DROME")
+                                .build();
                 getStoreManager().save(DataStoreManager.StoreType.UNIPROT, activeDrome);
 
-                InactiveUniProtEntry inactiveDrome = InactiveUniProtEntry.from("I8FBX0", "INACTIVE_DROME", DELETED, null);
+                InactiveUniProtEntry inactiveDrome =
+                        InactiveUniProtEntry.from("I8FBX0", "INACTIVE_DROME", DELETED, null);
                 getStoreManager()
-                        .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
+                        .saveEntriesInSolr(
+                                DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
 
                 // when
                 ResultActions response =
