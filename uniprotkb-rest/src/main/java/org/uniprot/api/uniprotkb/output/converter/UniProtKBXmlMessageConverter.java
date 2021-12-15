@@ -6,15 +6,15 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import javax.xml.bind.Marshaller;
 
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.core.xml.uniprot.UniProtEntryConverter;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
 public class UniProtKBXmlMessageConverter
         extends AbstractXmlMessageConverter<UniProtKBEntry, Entry> {
@@ -31,7 +31,8 @@ public class UniProtKBXmlMessageConverter
     }
 
     @Override
-    protected void writeEntity(UniProtKBEntry entity, OutputStream outputStream) throws IOException {
+    protected void writeEntity(UniProtKBEntry entity, OutputStream outputStream)
+            throws IOException {
         if (entity.isActive()) {
             super.writeEntity(entity, outputStream);
         }
