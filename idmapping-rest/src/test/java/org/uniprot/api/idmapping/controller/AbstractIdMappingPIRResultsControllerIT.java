@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
 
 /**
  * @author sahmad
@@ -61,7 +62,7 @@ public abstract class AbstractIdMappingPIRResultsControllerIT {
                                 jsonPath(
                                         "$.messages.*",
                                         containsInAnyOrder(
-                                                "Invalid request received. Maximum number of mapped ids supported is " + this.maxToIdsAllowed)));;
+                                                "Invalid request received. " + LIMIT_EXCEED_ERROR.getMessage() + this.maxToIdsAllowed)));;
     }
 
     protected abstract MockMvc getMockMvc();

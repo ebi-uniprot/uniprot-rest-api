@@ -335,6 +335,7 @@ public abstract class BasicIdService<T, U> {
             throw new InvalidRequestException(ENRICHMENT_WARNING.getMessage() + this.maxIdMappingToIdsCountEnriched);
         }
     }
+
     private boolean facetingDisallowed(SearchRequest searchRequest, List<IdMappingStringPair> mappedIds){
        return Utils.notNullNotEmpty(searchRequest.getFacets())
                 && mappedIds.size() > this.maxIdMappingToIdsCountWithFacets;

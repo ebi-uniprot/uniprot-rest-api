@@ -51,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH;
 import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH;
 import static org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
@@ -75,6 +76,9 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
 
     @Value("${id.mapping.max.to.ids.count}")
     protected Integer maxToIdsAllowed;
+
+    @Value("${id.mapping.max.to.ids.enrich.count}")
+    protected Integer maxToIdsEnrichAllowed;
 
     protected abstract String getIdMappingResultPath();
 
@@ -124,6 +128,8 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                 .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
     }
 
+    // if someone constructs the url to get uniprotkb/uniparc/uniref using the job id to get more than allowed enriched data,
+    // this test case will catch that
     @Test
     void testWithMoreThanAllowedMappedId() throws Exception {
         // when
@@ -135,7 +141,7 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
 
         // then
         ResultActions resultActions =
-                response.andDo(print())
+                response.andDo(log())
                         .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                         .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                         .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
@@ -143,7 +149,7 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                                 jsonPath(
                                         "$.messages.*",
                                         containsInAnyOrder(
-                                                "Invalid request received. Maximum number of mapped ids supported is " + this.maxToIdsAllowed)));;
+                                                "Invalid request received. " + ENRICHMENT_WARNING.getMessage() + this.maxToIdsEnrichAllowed)));;
     }
 
 
