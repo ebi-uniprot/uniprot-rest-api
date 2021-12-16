@@ -1,20 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,7 +49,20 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
 
 /** @author lgonzales */
 @ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
@@ -305,8 +304,11 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
         // THEN we expect a redirect 303 (200 for RDF)
         ResultActions resultActions = response.andDo(log());
-        String redirectedURL =
-                "/uniprotkb/" + activeAcc + "." + fileExtension + "?from=" + inactiveAcc;
+        String redirectedURL = "/uniprotkb/" + activeAcc;
+        if (!mediaType.equals(DEFAULT_MEDIA_TYPE)) {
+            redirectedURL += "." + fileExtension;
+        }
+        redirectedURL += "?from=" + inactiveAcc;
 
         if (mediaType.equals(RDF_MEDIA_TYPE)) {
             resultActions
