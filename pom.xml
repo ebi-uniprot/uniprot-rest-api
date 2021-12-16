@@ -254,7 +254,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<argLine>-Xmx2304m -XX:MaxPermSize=2304m
+					<argLine>-Xmx2304m -XX:MaxPermSize=4096m
 						-Dlogback.configurationFile=${project.basedir}/../logback-test.xml
 						${argLine}</argLine>
 					<includes>
@@ -347,11 +347,11 @@
 			</snapshots>
 			<url>${http-uniprot-private-url}/snapshot</url>
 		</repository>
-        <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>https://maven.restlet.talend.com</url>
-        </repository>
+		<repository>
+			<id>maven-restlet</id>
+			<name>Public online Restlet repository</name>
+			<url>https://maven.restlet.talend.com</url>
+		</repository>
 	</repositories>
 
 	<distributionManagement>
