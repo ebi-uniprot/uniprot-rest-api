@@ -121,7 +121,7 @@ public class IdMappingJobController {
                     idMappingJobService.getRedirectPathToResults(
                             job, servletRequest.getRequestURL().toString()));
             detailResponse.setWarnings(getWarnings(job));
-        } else  if(JobStatus.ERROR == job.getJobStatus()){
+        } else if(JobStatus.ERROR == job.getJobStatus()){
             detailResponse.setErrors(getErrors(job));
         }
 

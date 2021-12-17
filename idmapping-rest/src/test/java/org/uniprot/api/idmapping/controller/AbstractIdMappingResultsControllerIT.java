@@ -38,7 +38,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -309,7 +308,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
                                         .param("size", "0"));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
@@ -318,6 +317,31 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
                 .andExpect(jsonPath("$.facets[0].values.size()", greaterThan(0)))
                 .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
     }
+
+    @Test
+    void testEnrichedResultsWithFacetNotSupportedWarning() throws Exception {
+        // when
+        Integer defaultPageSize = 5;
+        String facetName = getFacetConfig().getFacetNames().stream().findFirst().get();
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxToIdsEnrichAllowed);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getIdMappingResultPath(), job.getJobId())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("facets", facetName));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(defaultPageSize)))
+                .andExpect(jsonPath("$.facets").doesNotExist())
+                .andExpect(jsonPath("$.warnings").exists())
+                .andExpect(jsonPath("$.warnings.size()", is(1)))
+                .andExpect(jsonPath("$.warnings[0].code", is(20)))
+                .andExpect(jsonPath("$.warnings[0].message", is("Filters are not supported for mapping results with IDs more than 10")));
+    }
+
 
     private Stream<Arguments> getAllSearchFields() {
         return SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType())

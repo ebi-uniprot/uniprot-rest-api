@@ -100,7 +100,8 @@ public abstract class BasicIdService<T, U> {
             // unset facets if mapped to ids exceeds the allowed limit and set the warning
             if(facetingDisallowed(searchRequest, mappedIds)){
                 searchRequest.setFacets("");
-                warnings.add(new WarningPair(FACET_WARNING.getCode(), FACET_WARNING.getMessage() + this.maxIdMappingToIdsCountWithFacets));
+                warnings.add(new WarningPair(FACET_WARNING.getCode(),
+                        FACET_WARNING.getMessage() + this.maxIdMappingToIdsCountWithFacets));
             }
 
             SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);

@@ -184,7 +184,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                 .param("sort", "accession desc")
                                 .param("size", "3"));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.facets.size()", is(2)))
