@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class WarningPair {
+public class ProblemPair {
     private int code;
     private String message;
 }

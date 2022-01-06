@@ -1,5 +1,27 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RECORDS;
+
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -15,33 +37,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RECORDS;
 
 /**
  * @author lgonzales
@@ -242,6 +244,25 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
                 .andExpect(jsonPath("$.failedIds", contains("UnMappedId1", "UnMappedId2")));
     }
 
+    @Test
+    void testOneLessThanAllowedFromIdsSuccess() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(this.maxFromIdsAllowed - 1, JobStatus.FINISHED);
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId())
+                        .header(ACCEPT, APPLICATION_JSON_VALUE);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE));
+    }
+
     // ---------------------------------------------------------------------------------
     // -------------------------------- SEARCH FIELDS ----------------------------------
     // ---------------------------------------------------------------------------------
@@ -339,9 +360,12 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
                 .andExpect(jsonPath("$.warnings").exists())
                 .andExpect(jsonPath("$.warnings.size()", is(1)))
                 .andExpect(jsonPath("$.warnings[0].code", is(20)))
-                .andExpect(jsonPath("$.warnings[0].message", is("Filters are not supported for mapping results with IDs more than 10")));
+                .andExpect(
+                        jsonPath(
+                                "$.warnings[0].message",
+                                is(
+                                        "Filters are not supported for mapping results with IDs more than 10")));
     }
-
 
     private Stream<Arguments> getAllSearchFields() {
         return SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType())

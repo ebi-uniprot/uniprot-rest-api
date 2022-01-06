@@ -1,12 +1,12 @@
 package org.uniprot.api.idmapping.model;
 
-import org.uniprot.api.common.repository.search.WarningPair;
-
 import java.util.List;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+
+import org.uniprot.api.common.repository.search.ProblemPair;
 
 /**
  * Created 17/02/2021
@@ -18,6 +18,6 @@ import lombok.Singular;
 public class IdMappingResult {
     @Singular private List<String> unmappedIds;
     @Singular private List<IdMappingStringPair> mappedIds;
-    @Singular private List<WarningPair> warnings;
-    @Singular private List<WarningPair> errors;
+    @Singular private List<ProblemPair> warnings;
+    @Singular private List<ProblemPair> errors;
 }

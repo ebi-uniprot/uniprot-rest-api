@@ -102,7 +102,8 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     public String getRedirectPathToResults(IdMappingJob job, String requestUrl) {
         String toDB = job.getIdMappingRequest().getTo();
         String dbType = "";
-        if(isMoreThanAllowedMappedIdsToEnrich(job.getIdMappingResult())){ // just return mapped ids without enrichment
+        if (isMoreThanAllowedMappedIdsToEnrich(
+                job.getIdMappingResult())) { // just return mapped ids without enrichment
             dbType = "";
         } else if (UNIREF_SET.contains(toDB)) {
             dbType = UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH + "/";
@@ -153,8 +154,8 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     }
 
     private boolean isMoreThanAllowedMappedIdsToEnrich(IdMappingResult idMappingResult) {
-        return Utils.notNull(idMappingResult) &&
-                Utils.notNullNotEmpty(idMappingResult.getMappedIds()) &&
-                idMappingResult.getMappedIds().size() > this.maxIdMappingToIdsCountEnriched;
+        return Utils.notNull(idMappingResult)
+                && Utils.notNullNotEmpty(idMappingResult.getMappedIds())
+                && idMappingResult.getMappedIds().size() > this.maxIdMappingToIdsCountEnriched;
     }
 }

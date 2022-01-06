@@ -5,7 +5,6 @@ import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EX
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +29,6 @@ import org.uniprot.api.idmapping.controller.request.IdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.model.PredefinedIdMappingStatus;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -175,9 +173,11 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
         return Optional.empty();
     }
 
-    private void validatedMappedIdsLimit(IdMappingResult result){
-        if (Utils.notNullNotEmpty(result.getMappedIds()) && result.getMappedIds().size() > this.maxIdMappingToIdsCount) {
-            throw new InvalidRequestException(LIMIT_EXCEED_ERROR.getMessage() + this.maxIdMappingToIdsCount);
+    private void validatedMappedIdsLimit(IdMappingResult result) {
+        if (Utils.notNullNotEmpty(result.getMappedIds())
+                && result.getMappedIds().size() > this.maxIdMappingToIdsCount) {
+            throw new InvalidRequestException(
+                    LIMIT_EXCEED_ERROR.getMessage() + this.maxIdMappingToIdsCount);
         }
     }
 }

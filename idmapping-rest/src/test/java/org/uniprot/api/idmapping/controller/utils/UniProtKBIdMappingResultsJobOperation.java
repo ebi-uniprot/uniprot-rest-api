@@ -35,7 +35,8 @@ public class UniProtKBIdMappingResultsJobOperation extends AbstractJobOperation 
     }
 
     @Override
-    public IdMappingJob createAndPutJobInCacheWithOneToManyMapping(int idsCount, JobStatus jobStatus) throws Exception {
+    public IdMappingJob createAndPutJobInCacheWithOneToManyMapping(
+            int idsCount, JobStatus jobStatus) throws Exception {
         Map<String, String> ids = new LinkedHashMap<>();
         for (int i = 1; i <= idsCount; i++) {
             String fromId = String.format("Q%05d", i);

@@ -1,13 +1,13 @@
 package org.uniprot.api.idmapping.controller.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-import org.uniprot.api.common.repository.search.WarningPair;
-
 import java.util.List;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
+import org.uniprot.api.common.repository.search.ProblemPair;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author sahmad
@@ -18,20 +18,23 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class JobStatusResponse {
     private final JobStatus jobStatus;
-    private final List<WarningPair> warnings;
-    private List<WarningPair> errors;
+    private final List<ProblemPair> warnings;
+    private List<ProblemPair> errors;
 
-    public JobStatusResponse(JobStatus jobStatus){
+    public JobStatusResponse(JobStatus jobStatus) {
         this(jobStatus, List.of());
     }
 
-    public JobStatusResponse(List<WarningPair> errors){
+    public JobStatusResponse(List<ProblemPair> errors) {
         this(JobStatus.ERROR, List.of(), errors);
     }
-    public JobStatusResponse(JobStatus jobStatus, List<WarningPair> warnings){
+
+    public JobStatusResponse(JobStatus jobStatus, List<ProblemPair> warnings) {
         this(jobStatus, warnings, List.of());
     }
-    public JobStatusResponse(JobStatus jobStatus, List<WarningPair> warnings, List<WarningPair> errors){
+
+    public JobStatusResponse(
+            JobStatus jobStatus, List<ProblemPair> warnings, List<ProblemPair> errors) {
         this.jobStatus = jobStatus;
         this.warnings = warnings;
         this.errors = errors;

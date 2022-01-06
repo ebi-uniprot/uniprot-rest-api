@@ -8,5 +8,4 @@ public interface EntryPair<T> {
     String getFrom();
 
     T getTo();
-
 }

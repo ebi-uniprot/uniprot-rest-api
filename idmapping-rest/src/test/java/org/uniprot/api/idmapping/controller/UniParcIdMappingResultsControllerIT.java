@@ -167,16 +167,11 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                                 contains("Homo sapiens", "Torpedo californica")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 3)))
                 .andExpect(jsonPath("$.results.size()", is(3)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.from",
-                                contains("Q00009", "Q00006", "Q00003")))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00009", "Q00006", "Q00003")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.to.uniParcId",
-                                contains("UPI0000283A09",
-                                        "UPI0000283A06",
-                                        "UPI0000283A03")))
+                                contains("UPI0000283A09", "UPI0000283A06", "UPI0000283A03")))
                 .andExpect(jsonPath("$.results.*.to.uniParcCrossReferences.*.database").exists())
                 .andExpect(
                         jsonPath("$.results.*.to.uniParcCrossReferences.*.organism")

@@ -23,7 +23,7 @@ public class QueryResult<T> {
     private final Stream<T> content;
     private final Collection<Facet> facets;
     private final Collection<String> failedIds;
-    private final Collection<WarningPair> warnings;
+    private final Collection<ProblemPair> warnings;
 
     private QueryResult(
             Stream<T> content,
@@ -32,7 +32,7 @@ public class QueryResult<T> {
             Collection<TermInfo> matchedFields,
             Collection<Suggestion> suggestions,
             Collection<String> failedIds,
-            Collection<WarningPair> warnings) {
+            Collection<ProblemPair> warnings) {
         this.content = content;
         this.page = page;
         this.facets = facets;
@@ -65,8 +65,8 @@ public class QueryResult<T> {
             Page page,
             Collection<Facet> facets,
             Collection<String> failedIds,
-            Collection<WarningPair> warnings) {
-        return new QueryResult<>(content, page, facets, null,null, failedIds, warnings);
+            Collection<ProblemPair> warnings) {
+        return new QueryResult<>(content, page, facets, null, null, failedIds, warnings);
     }
 
     public Page getPageAndClean() {

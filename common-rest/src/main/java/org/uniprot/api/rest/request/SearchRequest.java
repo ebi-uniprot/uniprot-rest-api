@@ -38,5 +38,7 @@ public interface SearchRequest extends BasicRequest {
         }
     }
 
-    void setFacets(String facets);
+    default void removeFacets(){
+        // empty method to avoid overriding in other subclasses
+    }
 }

@@ -11,7 +11,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -195,16 +194,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         jsonPath("$.facets[0].values.*.label", contains("Reviewed (Swiss-Prot)")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(5)))
                 .andExpect(jsonPath("$.results.size()", is(3)))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.from",
-                                contains(
-                                        "Q00010", "Q00008", "Q00006")))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00010", "Q00008", "Q00006")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.to.primaryAccession",
-                                contains(
-                                        "Q00010", "Q00008", "Q00006")))
+                                contains("Q00010", "Q00008", "Q00006")))
                 .andExpect(jsonPath("$.results.*.to.sequence").exists())
                 .andExpect(jsonPath("$.results.*.to.organism").doesNotExist());
     }

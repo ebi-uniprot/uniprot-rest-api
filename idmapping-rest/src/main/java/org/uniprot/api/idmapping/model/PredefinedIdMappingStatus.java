@@ -9,14 +9,17 @@ import lombok.Getter;
 @Getter
 public enum PredefinedIdMappingStatus {
     FACET_WARNING(20, "Filters are not supported for mapping results with IDs more than "),
-    ENRICHMENT_WARNING(21,  "UniProt data enrichment is not supported for mapping results with \"mapped to\" IDs more than "),
-    LIMIT_EXCEED_ERROR(40, "Id Mapping API is not supported for mapping results with \"mapped to\" IDs more than ")
-    ;
+    ENRICHMENT_WARNING(
+            21,
+            "UniProt data enrichment is not supported for mapping results with \"mapped to\" IDs more than "),
+    LIMIT_EXCEED_ERROR(
+            40,
+            "Id Mapping API is not supported for mapping results with \"mapped to\" IDs more than ");
     private String message;
     private int code;
 
     PredefinedIdMappingStatus(int code, String message) {
         this.code = code;
-        this.message =  message;
+        this.message = message;
     }
 }

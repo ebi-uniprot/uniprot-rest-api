@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -70,6 +71,10 @@ class IdMappingStreamControllerIT extends AbstractIdMappingPIRResultsControllerI
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, containsString("max-age")))
                 .andExpect(content().contentTypeCompatibleWith(mediaType))
                 .andExpect(content().string(not(containsString("facets"))));
+    }
+
+    @Test
+    void testOneLessThanAllowedFromIdsSuccess() { // do nothing
     }
 
     protected MockMvc getMockMvc() {

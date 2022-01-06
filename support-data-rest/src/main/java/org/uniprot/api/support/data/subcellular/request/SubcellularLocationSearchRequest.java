@@ -25,4 +25,9 @@ public class SubcellularLocationSearchRequest extends SubcellularLocationBasicRe
     public String getFacets() {
         return "";
     }
+
+    @Override
+    public void setFacets(String facets) {
+        // do nothing
+    }
 }

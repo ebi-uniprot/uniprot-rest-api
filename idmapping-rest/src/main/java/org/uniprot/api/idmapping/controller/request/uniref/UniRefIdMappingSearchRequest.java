@@ -24,4 +24,9 @@ public class UniRefIdMappingSearchRequest extends UniRefIdMappingBasicRequest
     @Parameter(description = "Name of the facet search")
     @ValidFacets(facetConfig = UniRefFacetConfig.class)
     private String facets;
+
+    @Override
+    public void removeFacets() {
+        this.facets = null;
+    }
 }

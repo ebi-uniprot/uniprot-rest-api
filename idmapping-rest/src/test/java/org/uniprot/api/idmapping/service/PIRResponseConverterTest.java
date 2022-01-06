@@ -1,5 +1,19 @@
 package org.uniprot.api.idmapping.service;
 
+import static java.util.Collections.emptyList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
+
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,20 +25,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
-import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
 
 class PIRResponseConverterTest {
     private PIRResponseConverter converter;
@@ -203,13 +203,16 @@ class PIRResponseConverterTest {
                                         + "From4\tP00016;P00017;P00018;P00019;P00020\n"
                                         + "From5\tP00021\n");
         int maxCountForDataEnrich = 20;
-        IdMappingResult result = converter.convertToIDMappings(request, maxCountForDataEnrich, 40, responseEntity);
+        IdMappingResult result =
+                converter.convertToIDMappings(request, maxCountForDataEnrich, 40, responseEntity);
 
         assertFalse(result.getMappedIds().isEmpty());
         assertEquals(21, result.getMappedIds().size());
         assertFalse(result.getWarnings().isEmpty());
         assertEquals(1, result.getWarnings().size());
-        assertEquals(ENRICHMENT_WARNING.getMessage() + maxCountForDataEnrich, result.getWarnings().get(0).getMessage());
+        assertEquals(
+                ENRICHMENT_WARNING.getMessage() + maxCountForDataEnrich,
+                result.getWarnings().get(0).getMessage());
         assertThat(result.getUnmappedIds(), is(emptyList()));
     }
 
@@ -219,8 +222,7 @@ class PIRResponseConverterTest {
         request.setTo("EMBL");
         // when  more than allowed ids (20 for tests) for enrichment
         ResponseEntity<String> responseEntity =
-                ResponseEntity.status(HttpStatus.OK)
-                        .body("From1\t00001;00002;00003;00004;00005\n");
+                ResponseEntity.status(HttpStatus.OK).body("From1\t00001;00002;00003;00004;00005\n");
 
         IdMappingResult result = converter.convertToIDMappings(request, 4, 40, responseEntity);
 
@@ -236,8 +238,7 @@ class PIRResponseConverterTest {
         request.setTo("EMBL");
         // when  more than allowed ids (20 for tests) for enrichment
         ResponseEntity<String> responseEntity =
-                ResponseEntity.status(HttpStatus.OK)
-                        .body("From1\t00001;00002;00003;00004;00005\n");
+                ResponseEntity.status(HttpStatus.OK).body("From1\t00001;00002;00003;00004;00005\n");
 
         IdMappingResult result = converter.convertToIDMappings(request, 4, 4, responseEntity);
 
@@ -245,7 +246,9 @@ class PIRResponseConverterTest {
         assertTrue(result.getWarnings().isEmpty());
         assertThat(result.getUnmappedIds(), is(emptyList()));
         assertEquals(1, result.getErrors().size());
-        assertEquals("Id Mapping API is not supported for mapping results with \"mapped to\" IDs more than 4", result.getErrors().get(0).getMessage());
+        assertEquals(
+                "Id Mapping API is not supported for mapping results with \"mapped to\" IDs more than 4",
+                result.getErrors().get(0).getMessage());
         assertEquals(40, result.getErrors().get(0).getCode());
     }
 

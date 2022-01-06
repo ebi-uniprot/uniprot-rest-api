@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.service.impl;
 
+import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -15,8 +17,6 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.PIRResponseConverter;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
-
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
 /**
  * Created 17/02/2021
@@ -48,7 +48,8 @@ public class PIRServiceImpl extends IdMappingPIRService {
                             "${id.mapping.pir.url:https://idmapping.uniprot.org/cgi-bin/idmapping_http_client_async}")
                     String pirMappingUrl,
             @Value("${id.mapping.max.to.ids.count:#{null}}") Integer maxIdMappingToIdsCount,
-            @Value("${id.mapping.max.to.ids.enrich.count:#{null}}") Integer maxIdMappingToIdsCountEnriched) {
+            @Value("${id.mapping.max.to.ids.enrich.count:#{null}}")
+                    Integer maxIdMappingToIdsCountEnriched) {
 
         super(defaultPageSize);
         this.restTemplate = idMappingRestTemplate;
@@ -64,7 +65,9 @@ public class PIRServiceImpl extends IdMappingPIRService {
                 new HttpEntity<>(createPostBody(request), HTTP_HEADERS);
 
         return pirResponseConverter.convertToIDMappings(
-                request, this.maxIdMappingToIdsCountEnriched, this.maxIdMappingToIdsCount,
+                request,
+                this.maxIdMappingToIdsCountEnriched,
+                this.maxIdMappingToIdsCount,
                 restTemplate.postForEntity(pirIdMappingUrl, requestBody, String.class));
     }
 

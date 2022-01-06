@@ -24,4 +24,9 @@ public class UniProtKBIdMappingSearchRequest extends UniProtKBIdMappingBasicRequ
     @Parameter(description = "Name of the facet search")
     @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     private String facets;
+
+    @Override
+    public void removeFacets() {
+        this.facets = null;
+    }
 }

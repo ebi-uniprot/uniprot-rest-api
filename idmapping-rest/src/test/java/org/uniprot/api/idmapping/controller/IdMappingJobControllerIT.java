@@ -1,43 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.common.repository.search.WarningPair;
-import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
-import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -60,6 +22,44 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.ProblemPair;
+import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+import org.uniprot.api.idmapping.controller.response.JobStatus;
+import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author sahmad
@@ -226,7 +226,7 @@ class IdMappingJobControllerIT {
                         .idMappingRequest(request)
                         .jobStatus(JobStatus.ERROR)
                         .jobId(jobId)
-                        .errors(List.of(new WarningPair(-1, "Ignored error")))
+                        .errors(List.of(new ProblemPair(-1, "Ignored error")))
                         .build();
         when(cacheService.getJobAsResource(jobId)).thenReturn(job);
 
@@ -475,7 +475,7 @@ class IdMappingJobControllerIT {
                                 matchesPattern(
                                         "https://localhost/idmapping/uniparc/results/" + jobId)))
                 .andExpect(jsonPath("$.warnings").doesNotExist())
-                .andExpect(jsonPath("$.warnings").doesNotExist());
+                .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
     @Test
@@ -496,14 +496,12 @@ class IdMappingJobControllerIT {
     }
 
     /**
-     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count
-     * we return the plain from and to result without any uniprot data in the status/{jobId} response.
-     * So to do that we just return the plain results url redirect without any db in the path even though the mapped to id
-     * is uniprotkb, uniparc or uniref ids
-     * plain result url : https://localhost/idmapping/results/{jobId}
-     *
+     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count we return the plain from
+     * and to result without any uniprot data in the status/{jobId} response. So to do that we just
+     * return the plain results url redirect without any db in the path even though the mapped to id
+     * is uniprotkb, uniparc or uniref ids plain result url :
+     * https://localhost/idmapping/results/{jobId}
      */
-
     @Test
     void testGetJobStatusWithCorrectRedirect() throws Exception {
         String jobId = "ID";
@@ -513,11 +511,15 @@ class IdMappingJobControllerIT {
         request.setIds("Q00001,Q00002");
 
         // map more than allowed enrich ids
-        IdMappingResult idMappingResult = IdMappingResult.builder()
-                .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
-                .warning(new WarningPair(ENRICHMENT_WARNING.getCode(),
-                        ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich))
-                .build();
+        IdMappingResult idMappingResult =
+                IdMappingResult.builder()
+                        .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
+                        .warning(
+                                new ProblemPair(
+                                        ENRICHMENT_WARNING.getCode(),
+                                        ENRICHMENT_WARNING.getMessage()
+                                                + this.maxAllowedIdsToEnrich))
+                        .build();
 
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -538,21 +540,23 @@ class IdMappingJobControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(redirectedUrlPattern("**/idmapping/results/" + jobId))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.FINISHED.toString())))
+                .andExpect(jsonPath("$.errors").doesNotExist())
                 .andExpect(jsonPath("$.warnings.length()", is(1)))
-                .andExpect(jsonPath("$.warnings[0].message", is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
+                .andExpect(
+                        jsonPath(
+                                "$.warnings[0].message",
+                                is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
                 .andExpect(jsonPath("$.warnings[0].code", is(ENRICHMENT_WARNING.getCode())));
     }
 
     /**
-     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count
-     * we return the plain from and to result without any uniprot data.
-     * So to do that we just return the plain results url redirect without any db in the path even though the mapped to id
-     * is uniprotkb, uniparc or uniref ids
-     * plain result url : https://localhost/idmapping/results/{jobId}
-     *
+     * If the mapped ids are more than id.mapping.max.to.ids.enrich.count we return the plain from
+     * and to result without any uniprot data. So to do that we just return the plain results url
+     * redirect without any db in the path even though the mapped to id is uniprotkb, uniparc or
+     * uniref ids plain result url : https://localhost/idmapping/results/{jobId}
      */
     @Test
-    void testGetJobDetailsWithCorrectRedirectUrl() throws Exception {
+    void getDetails_tooManyUniProtToIdsProducesWarningInResponse() throws Exception {
         String jobId = "ID";
         String ids = "Q1,Q2";
         String taxId = "9606";
@@ -561,10 +565,15 @@ class IdMappingJobControllerIT {
         request.setTo(IdMappingFieldConfig.UNIPARC_STR);
         request.setIds(ids);
         request.setTaxId(taxId);
-        IdMappingResult idMappingResult = IdMappingResult.builder()
-                .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
-                .warning(new WarningPair(ENRICHMENT_WARNING.getCode(), ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich))
-                .build();
+        IdMappingResult idMappingResult =
+                IdMappingResult.builder()
+                        .mappedIds(getMappedIds(this.maxAllowedIdsToEnrich))
+                        .warning(
+                                new ProblemPair(
+                                        ENRICHMENT_WARNING.getCode(),
+                                        ENRICHMENT_WARNING.getMessage()
+                                                + this.maxAllowedIdsToEnrich))
+                        .build();
         IdMappingJob job =
                 IdMappingJob.builder()
                         .idMappingRequest(request)
@@ -590,24 +599,31 @@ class IdMappingJobControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.redirectURL",
-                                matchesPattern(
-                                        "https://localhost/idmapping/results/" + jobId)))
+                                matchesPattern("https://localhost/idmapping/results/" + jobId)))
                 .andExpect(jsonPath("$.warnings.length()", is(1)))
-                .andExpect(jsonPath("$.warnings[0].message", is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
+                .andExpect(
+                        jsonPath(
+                                "$.warnings[0].message",
+                                is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
                 .andExpect(jsonPath("$.warnings[0].code", is(ENRICHMENT_WARNING.getCode())))
                 .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
     @Test
-    void testGetJobDetailsWithLimitExceedError() throws Exception {
+    void getDetails_tooManyUniProtToIdsProducesErrorInResponse() throws Exception {
         String jobId = "ID";
         String ids = "Q1,Q2";
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom(IdMappingFieldConfig.ACC_ID_STR);
         request.setTo(IdMappingFieldConfig.UNIPARC_STR);
         request.setIds(ids);
-        IdMappingResult idMappingResult = IdMappingResult.builder()
-                .error(new WarningPair(LIMIT_EXCEED_ERROR.getCode(), LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)).build();
+        IdMappingResult idMappingResult =
+                IdMappingResult.builder()
+                        .error(
+                                new ProblemPair(
+                                        LIMIT_EXCEED_ERROR.getCode(),
+                                        LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds))
+                        .build();
         IdMappingJob job =
                 IdMappingJob.builder()
                         .idMappingRequest(request)
@@ -635,11 +651,14 @@ class IdMappingJobControllerIT {
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.length()", is(1)))
                 .andExpect(jsonPath("$.errors[0].code", is(LIMIT_EXCEED_ERROR.getCode())))
-                .andExpect(jsonPath("$.errors[0].message", is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
+                .andExpect(
+                        jsonPath(
+                                "$.errors[0].message",
+                                is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
     }
 
     @Test
-    void testGetJobDetailsWithJobErrorsIgnored() throws Exception {
+    void ignoreJobErrorsInResponse() throws Exception {
         String jobId = "ID";
         String ids = "Q1,Q2";
         IdMappingJobRequest request = new IdMappingJobRequest();
@@ -652,7 +671,7 @@ class IdMappingJobControllerIT {
                         .idMappingRequest(request)
                         .jobStatus(JobStatus.ERROR)
                         .jobId(jobId)
-                        .errors(List.of(new WarningPair(-1, "Ignored error")))
+                        .errors(List.of(new ProblemPair(-1, "Ignored error")))
                         .idMappingResult(idMappingResult)
                         .build();
         when(cacheService.getJobAsResource(jobId)).thenReturn(job);
@@ -675,13 +694,17 @@ class IdMappingJobControllerIT {
     }
 
     @Test
-    void testGetJobStatusWithLimitExceedError() throws Exception {
+    void getDetails_tooManyEMBLToIdsProducesErrorInResponse() throws Exception {
         String jobId = "ID";
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setTo("EMBL-GenBank-DDBJ");
-        IdMappingResult idMappingResult = IdMappingResult.builder()
-                .error(new WarningPair(LIMIT_EXCEED_ERROR.getCode(), LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds))
-                .build();
+        IdMappingResult idMappingResult =
+                IdMappingResult.builder()
+                        .error(
+                                new ProblemPair(
+                                        LIMIT_EXCEED_ERROR.getCode(),
+                                        LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds))
+                        .build();
         IdMappingJob job =
                 IdMappingJob.builder()
                         .idMappingRequest(request)
@@ -701,9 +724,12 @@ class IdMappingJobControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.ERROR.toString())))
                 .andExpect(jsonPath("$.warnings").doesNotExist())
-                .andExpect(jsonPath("$.errors.length()",  is(1)))
+                .andExpect(jsonPath("$.errors.length()", is(1)))
                 .andExpect(jsonPath("$.errors[0].code", is(LIMIT_EXCEED_ERROR.getCode())))
-                .andExpect(jsonPath("$.errors[0].message", is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
+                .andExpect(
+                        jsonPath(
+                                "$.errors[0].message",
+                                is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
     }
 
     private Collection<IdMappingStringPair> getMappedIds(Integer idPairCountPlusOne) {

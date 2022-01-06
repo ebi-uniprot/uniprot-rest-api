@@ -1,9 +1,17 @@
 package org.uniprot.api.idmapping.service;
 
+import static java.util.Arrays.asList;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
+
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.regex.Pattern;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpServerErrorException;
-import org.uniprot.api.common.repository.search.WarningPair;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -11,14 +19,6 @@ import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
-import static java.util.Arrays.asList;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
 
 /**
  * Created 17/02/2021
@@ -56,9 +56,10 @@ public class PIRResponseConverter {
         }
     }
 
-
     public IdMappingResult convertToIDMappings(
-            IdMappingJobRequest request, Integer maxToUniProtIdsAllowed, Integer maxToIdsAllowed,
+            IdMappingJobRequest request,
+            Integer maxToUniProtIdsAllowed,
+            Integer maxToIdsAllowed,
             ResponseEntity<String> response) {
         IdMappingResult.IdMappingResultBuilder builder = IdMappingResult.builder();
         HttpStatus statusCode = response.getStatusCode();
@@ -71,17 +72,20 @@ public class PIRResponseConverter {
                         //                        .filter(line -> !line.startsWith("MSG:"))
                         .forEach(line -> convertLine(line, request, builder));
                 // populate  error  if needed
-                Optional<WarningPair> optError = getOptionalLimitError(maxToIdsAllowed, builder.build());
-                if(optError.isEmpty()) { // populate warning if needed
-                    Optional<WarningPair> optWarning = getOptionalEnrichmentWarning(request,
-                            maxToUniProtIdsAllowed, builder.build());
-                    if (optWarning.isPresent()) {
-                        builder.warning(optWarning.get());
-                    }
-                } else  {
+                Optional<ProblemPair> optError =
+                        getOptionalLimitError(maxToIdsAllowed, builder.build());
+                if (optError.isPresent()) {
                     builder.clearMappedIds();
                     builder.clearUnmappedIds();
                     builder.error(optError.get());
+                } else {
+                    // populate warning if needed
+                    Optional<ProblemPair> optWarning =
+                            getOptionalEnrichmentWarning(
+                                    request, maxToUniProtIdsAllowed, builder.build());
+                    if (optWarning.isPresent()) {
+                        builder.warning(optWarning.get());
+                    }
                 }
             }
         } else {
@@ -119,28 +123,34 @@ public class PIRResponseConverter {
         }
     }
 
-    private Optional<WarningPair> getOptionalLimitError(Integer maxToIdsAllowed, IdMappingResult result) {
-        if(Utils.notNullNotEmpty(result.getMappedIds()) && result.getMappedIds().size() > maxToIdsAllowed){
-            return Optional.of(new WarningPair(LIMIT_EXCEED_ERROR.getCode(),
-                    LIMIT_EXCEED_ERROR.getMessage() + maxToIdsAllowed));
+    private Optional<ProblemPair> getOptionalLimitError(
+            Integer maxToIdsAllowed, IdMappingResult result) {
+        if (Utils.notNullNotEmpty(result.getMappedIds())
+                && result.getMappedIds().size() > maxToIdsAllowed) {
+            return Optional.of(
+                    new ProblemPair(
+                            LIMIT_EXCEED_ERROR.getCode(),
+                            LIMIT_EXCEED_ERROR.getMessage() + maxToIdsAllowed));
         }
         return Optional.empty();
     }
 
-    private Optional<WarningPair> getOptionalEnrichmentWarning(IdMappingJobRequest request, Integer  maxToUniProtIdsAllowed,
-                                                                             IdMappingResult result) {
-        if (isMappedToUniProtDBId(request.getTo()) &&
-                Utils.notNullNotEmpty(result.getMappedIds()) &&
-                result.getMappedIds().size() > maxToUniProtIdsAllowed) {
-            return Optional.of(new WarningPair(ENRICHMENT_WARNING.getCode(),
-                    ENRICHMENT_WARNING.getMessage() + maxToUniProtIdsAllowed));
+    private Optional<ProblemPair> getOptionalEnrichmentWarning(
+            IdMappingJobRequest request, Integer maxToUniProtIdsAllowed, IdMappingResult result) {
+        if (isMappedToUniProtDBId(request.getTo())
+                && Utils.notNullNotEmpty(result.getMappedIds())
+                && result.getMappedIds().size() > maxToUniProtIdsAllowed) {
+            return Optional.of(
+                    new ProblemPair(
+                            ENRICHMENT_WARNING.getCode(),
+                            ENRICHMENT_WARNING.getMessage() + maxToUniProtIdsAllowed));
         }
         return Optional.empty();
     }
 
     private boolean isMappedToUniProtDBId(String toDB) {
-        return IdMappingJobServiceImpl.UNIREF_SET.contains(toDB) ||
-                IdMappingJobServiceImpl.UNIPARC.contains(toDB) ||
-                IdMappingJobServiceImpl.UNIPROTKB_SET.contains(toDB);
+        return IdMappingJobServiceImpl.UNIREF_SET.contains(toDB)
+                || IdMappingJobServiceImpl.UNIPARC.contains(toDB)
+                || IdMappingJobServiceImpl.UNIPROTKB_SET.contains(toDB);
     }
 }

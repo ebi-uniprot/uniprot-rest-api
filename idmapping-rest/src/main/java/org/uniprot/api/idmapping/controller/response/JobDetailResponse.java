@@ -1,14 +1,14 @@
 package org.uniprot.api.idmapping.controller.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-import org.uniprot.api.common.repository.search.WarningPair;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-
 import java.util.List;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import org.uniprot.api.common.repository.search.ProblemPair;
+import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author lgonzales
@@ -19,6 +19,6 @@ import lombok.EqualsAndHashCode;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class JobDetailResponse extends IdMappingJobRequest {
     private String redirectURL;
-    private List<WarningPair> warnings;
-    private List<WarningPair> errors;
+    private List<ProblemPair> warnings;
+    private List<ProblemPair> errors;
 }

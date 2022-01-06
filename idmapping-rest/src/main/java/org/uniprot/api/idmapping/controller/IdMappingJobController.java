@@ -1,5 +1,15 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,7 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.common.repository.search.WarningPair;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobDetailResponse;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -20,21 +30,11 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
 
 /**
  * @author sahmad
@@ -121,8 +121,8 @@ public class IdMappingJobController {
                     idMappingJobService.getRedirectPathToResults(
                             job, servletRequest.getRequestURL().toString()));
             detailResponse.setWarnings(getWarnings(job));
-        } else if(JobStatus.ERROR == job.getJobStatus()){
-            detailResponse.setErrors(getErrors(job));
+        } else if (JobStatus.ERROR == job.getJobStatus()) {
+            detailResponse.setErrors(getLimitExceedError(job));
         }
 
         return ResponseEntity.ok(detailResponse);
@@ -143,14 +143,16 @@ public class IdMappingJobController {
                                 .body(new JobStatusResponse(JobStatus.FINISHED, getWarnings(job)));
                 break;
             default:
-                if(getErrors(job).isEmpty()) {
+                if (!getLimitExceedError(job).isEmpty()) {
+                    // limit exceed error
+                    response =
+                            ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                    .body(new JobStatusResponse(getLimitExceedError(job)));
+
+                } else {
                     response =
                             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                     .body(new JobStatusResponse(JobStatus.ERROR));
-                } else { // limit exceed error
-                    response =
-                            ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                    .body(new JobStatusResponse(getErrors(job)));
                 }
                 break;
         }
@@ -158,17 +160,17 @@ public class IdMappingJobController {
         return response;
     }
 
-    private List<WarningPair> getWarnings(IdMappingJob job){
-        List<WarningPair> warnings =  new ArrayList<>();
-        if(Objects.nonNull(job.getIdMappingResult())) {
+    private List<ProblemPair> getWarnings(IdMappingJob job) {
+        List<ProblemPair> warnings = new ArrayList<>();
+        if (Objects.nonNull(job.getIdMappingResult())) {
             warnings = job.getIdMappingResult().getWarnings();
         }
         return warnings;
     }
 
-    private List<WarningPair> getErrors(IdMappingJob job){
-        List<WarningPair> errors = new ArrayList<>();
-        if(Objects.nonNull(job.getIdMappingResult())){
+    private List<ProblemPair> getLimitExceedError(IdMappingJob job) {
+        List<ProblemPair> errors = new ArrayList<>();
+        if (Objects.nonNull(job.getIdMappingResult())) {
             errors = job.getIdMappingResult().getErrors();
         }
         return errors;

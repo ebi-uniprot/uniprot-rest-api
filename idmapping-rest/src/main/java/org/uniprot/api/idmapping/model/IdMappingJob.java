@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
-import org.uniprot.api.common.repository.search.WarningPair;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 
@@ -21,7 +21,7 @@ public class IdMappingJob {
     private JobStatus jobStatus;
     private IdMappingJobRequest idMappingRequest;
     private IdMappingResult idMappingResult;
-    private List<WarningPair> errors;
+    private List<ProblemPair> errors;
     @Builder.Default private Date created = new Date();
     @Builder.Default private Date updated = new Date();
 }
