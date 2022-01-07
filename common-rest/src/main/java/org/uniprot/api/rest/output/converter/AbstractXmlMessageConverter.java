@@ -45,7 +45,17 @@ public abstract class AbstractXmlMessageConverter<T, X>
 
     @Override
     protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
-        outputStream.write(getXmlString(entity).getBytes());
+        try {
+            X entry = toXml(entity);
+            Writer out = new OutputStreamWriter(outputStream);
+            DataWriter writer = new DataWriter(out, "UTF-8");
+            writer.setIndentStep("  ");
+            getMarshaller().marshal(entry, writer);
+            writer.characters("\n");
+            writer.flush();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -62,22 +72,6 @@ public abstract class AbstractXmlMessageConverter<T, X>
             return contextMarshaller;
         } catch (Exception e) {
             throw new RuntimeException("JAXB marshaller creation failed", e);
-        }
-    }
-
-    private String getXmlString(T uniProtEntry) {
-        try {
-            X entry = toXml(uniProtEntry);
-            StringWriter xmlString = new StringWriter();
-            Writer out = new BufferedWriter(xmlString);
-            DataWriter writer = new DataWriter(out, "UTF-8");
-            writer.setIndentStep("  ");
-            getMarshaller().marshal(entry, writer);
-            writer.characters("\n");
-            writer.flush();
-            return xmlString.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }

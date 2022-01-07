@@ -23,7 +23,6 @@ public class UniProtDatabaseDetailResponse {
     private boolean implicit;
 
     private String linkedReason;
-    private String idMappingName;
 
     private UniProtDatabaseDetailResponse(
             String name,
@@ -32,8 +31,7 @@ public class UniProtDatabaseDetailResponse {
             String uriLink,
             List<UniProtDatabaseAttributeResponse> attributes,
             boolean implicit,
-            String linkedReason,
-            String idMappingName) {
+            String linkedReason) {
         this.name = name;
         this.displayName = displayName;
         this.category = category;
@@ -41,7 +39,6 @@ public class UniProtDatabaseDetailResponse {
         this.attributes = attributes;
         this.implicit = implicit;
         this.linkedReason = linkedReason;
-        this.idMappingName = idMappingName;
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -81,7 +78,6 @@ public class UniProtDatabaseDetailResponse {
                 UniProtDatabaseAttributeResponse.getUniProtDatabaseAttributeResponses(
                         dbDetail.getAttributes()),
                 dbDetail.isImplicit(),
-                dbDetail.getLinkedReason(),
-                dbDetail.getIdMappingName());
+                dbDetail.getLinkedReason());
     }
 }
