@@ -26,9 +26,4 @@ public class UniParcGetByDBRefIdRequest extends UniParcGetByIdPageSearchRequest 
     public String getQuery() {
         return DB_ID_STR + ":" + this.dbId;
     }
-
-    @Override
-    public void setFacets(String facets) {
-        // do nothing
-    }
 }

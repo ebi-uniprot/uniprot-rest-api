@@ -48,9 +48,4 @@ public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements Se
     public String getFacets() {
         return null;
     }
-
-    @Override
-    public void setFacets(String facets) {
-        // do nothing
-    }
 }

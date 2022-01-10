@@ -19,9 +19,4 @@ public class UniParcIdsPostRequest extends IdsDownloadRequest {
     public String getCommaSeparatedIds() {
         return this.upis;
     }
-
-    @Override
-    public void setFacets(String facets) {
-        // do nothing
-    }
 }

@@ -28,9 +28,4 @@ public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchReque
     public String getQuery() {
         return PROTEOME_ID_STR + ":" + this.upId;
     }
-
-    @Override
-    public void setFacets(String facets) {
-        // do nothing
-    }
 }

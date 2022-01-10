@@ -6,6 +6,9 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import javax.xml.bind.Marshaller;
 
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
@@ -25,6 +28,14 @@ public class UniProtKBXmlMessageConverter
     @Override
     protected Entry toXml(UniProtKBEntry entity) {
         return converter.toXml(entity);
+    }
+
+    @Override
+    protected void writeEntity(UniProtKBEntry entity, OutputStream outputStream)
+            throws IOException {
+        if (entity.isActive()) {
+            super.writeEntity(entity, outputStream);
+        }
     }
 
     @Override

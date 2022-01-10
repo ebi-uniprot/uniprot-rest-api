@@ -15,9 +15,4 @@ public class UniProtKBIdsPostRequest extends IdsDownloadRequest {
     public String getCommaSeparatedIds() {
         return this.accessions;
     }
-
-    @Override
-    public void setFacets(String facets) {
-        // do nothing
-    }
 }

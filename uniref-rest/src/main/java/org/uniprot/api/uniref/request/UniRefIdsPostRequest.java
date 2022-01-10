@@ -29,9 +29,4 @@ public class UniRefIdsPostRequest extends IdsDownloadRequest {
                 .map(String::strip)
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public void setFacets(String facets) {
-        // do nothing
-    }
 }
