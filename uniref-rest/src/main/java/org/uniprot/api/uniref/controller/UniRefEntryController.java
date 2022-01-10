@@ -104,7 +104,7 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRefEntry entity) {
+    protected Optional<String> getEntityRedirectId(UniRefEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

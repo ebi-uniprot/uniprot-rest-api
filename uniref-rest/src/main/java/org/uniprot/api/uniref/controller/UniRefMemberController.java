@@ -92,7 +92,7 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRefMember entity) {
+    protected Optional<String> getEntityRedirectId(UniRefMember entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

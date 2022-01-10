@@ -176,7 +176,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRefEntryPair entity) {
+    protected Optional<String> getEntityRedirectId(UniRefEntryPair entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

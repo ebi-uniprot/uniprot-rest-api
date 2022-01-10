@@ -100,7 +100,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniParcCrossReference entity) {
+    protected Optional<String> getEntityRedirectId(UniParcCrossReference entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

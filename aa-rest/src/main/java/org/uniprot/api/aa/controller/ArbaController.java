@@ -167,7 +167,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRuleEntry entity) {
+    protected Optional<String> getEntityRedirectId(UniRuleEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 

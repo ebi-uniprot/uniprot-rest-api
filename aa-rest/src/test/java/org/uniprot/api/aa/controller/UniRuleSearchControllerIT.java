@@ -37,7 +37,10 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.core.unirule.Information;
 import org.uniprot.core.unirule.UniRuleEntry;
+import org.uniprot.core.unirule.impl.InformationBuilder;
+import org.uniprot.core.unirule.impl.UniRuleEntryBuilder;
 import org.uniprot.core.unirule.impl.UniRuleEntryBuilderTest;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -60,6 +63,7 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
             UniRuleSearchControllerIT.UniRuleSearchParameterResolver.class
         })
 public class UniRuleSearchControllerIT extends AbstractRuleSearchWithFacetControllerIT {
+    private static final String OLD_RULE_ID = "PIRSR628829-1";
 
     @Autowired private UniRuleFacetConfig facetConfig;
 
@@ -113,6 +117,9 @@ public class UniRuleSearchControllerIT extends AbstractRuleSearchWithFacetContro
             case "unirule_id":
                 value = "UR000000200";
                 break;
+            case "all_rule_id":
+                value = OLD_RULE_ID;
+                break;
         }
         return value;
     }
@@ -139,6 +146,8 @@ public class UniRuleSearchControllerIT extends AbstractRuleSearchWithFacetContro
         UniRuleEntry uniRuleEntry =
                 UniRuleControllerITUtils.updateValidValues(
                         updatedCommentEntry, suffix, UniRuleControllerITUtils.RuleType.UR);
+        Information info = InformationBuilder.from(entry.getInformation()).oldRuleNum(OLD_RULE_ID).build();
+        uniRuleEntry = UniRuleEntryBuilder.from(uniRuleEntry).information(info).build();
         UniRuleDocumentConverter docConverter =
                 new UniRuleDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         UniRuleDocument document = docConverter.convertToDocument(uniRuleEntry);

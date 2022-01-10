@@ -58,7 +58,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(InteractionEntry entity) {
+    protected Optional<String> getEntityRedirectId(InteractionEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 

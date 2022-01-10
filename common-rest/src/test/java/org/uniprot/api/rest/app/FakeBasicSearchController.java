@@ -47,7 +47,7 @@ public class FakeBasicSearchController extends BasicSearchController<String> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(String entity) {
+    protected Optional<String> getEntityRedirectId(String entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

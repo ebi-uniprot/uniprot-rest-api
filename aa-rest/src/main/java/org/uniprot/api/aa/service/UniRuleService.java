@@ -19,7 +19,7 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
 @Service
 public class UniRuleService extends BasicSearchService<UniRuleDocument, UniRuleEntry> {
 
-    public static final String UNIRULE_ID_FIELD = "unirule_id";
+    public static final String ALL_RULE_ID_FIELD = "all_rule_id";
     private final UniProtQueryProcessorConfig uniRuleQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
 
@@ -39,7 +39,7 @@ public class UniRuleService extends BasicSearchService<UniRuleDocument, UniRuleE
 
     @Override
     protected SearchFieldItem getIdField() {
-        return this.searchFieldConfig.getSearchFieldItemByName(UNIRULE_ID_FIELD);
+        return this.searchFieldConfig.getSearchFieldItemByName(ALL_RULE_ID_FIELD);
     }
 
     @Override

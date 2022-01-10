@@ -220,7 +220,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(ProteomeEntry entity) {
+    protected Optional<String> getEntityRedirectId(ProteomeEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

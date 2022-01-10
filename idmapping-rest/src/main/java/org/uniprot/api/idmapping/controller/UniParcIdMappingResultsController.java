@@ -195,7 +195,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniParcEntryPair entity) {
+    protected Optional<String> getEntityRedirectId(UniParcEntryPair entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

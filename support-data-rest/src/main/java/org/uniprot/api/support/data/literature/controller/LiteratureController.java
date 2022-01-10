@@ -212,7 +212,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(LiteratureEntry entity) {
+    protected Optional<String> getEntityRedirectId(LiteratureEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

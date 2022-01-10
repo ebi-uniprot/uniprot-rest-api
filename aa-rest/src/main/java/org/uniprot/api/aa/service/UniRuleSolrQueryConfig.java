@@ -51,6 +51,7 @@ public class UniRuleSolrQueryConfig {
     private List<SearchFieldItem> getDefaultSearchOptimisedFieldItems(
             SearchFieldConfig uniRuleSearchFieldConfig) {
         return Collections.singletonList(
-                uniRuleSearchFieldConfig.getSearchFieldItemByName(UniRuleService.UNIRULE_ID_FIELD));
+                uniRuleSearchFieldConfig.getSearchFieldItemByName(
+                        UniRuleService.ALL_RULE_ID_FIELD));
     }
 }
