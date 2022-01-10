@@ -7,6 +7,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIRULE;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +61,9 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
 
     private static final int PREVIEW_SIZE = 10;
     private final UniRuleService uniRuleService;
-    public static final String UNIRULE_ID_REGEX = "UR(\\d{9})";
+    public static final String UNIRULE_ALL_ID_REGEX = "UR(\\d{9})|MF_[0-9]{5}|PIRSR[0-9]+(\\-[0-9]+)?|PIRNR[0-9]+|RU[0-9]{6}|PRU[0-9]{5}";
+    private static final String UNIRULE_ID_REGEX = "UR(\\d{9})";
+    private static final java.util.regex.Pattern UNIRULE_ID_PATTERN = java.util.regex.Pattern.compile(UNIRULE_ID_REGEX);
 
     @Autowired
     public UniRuleController(
@@ -96,7 +99,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByUniRuleId(
             @PathVariable("uniruleid")
                     @Pattern(
-                            regexp = UNIRULE_ID_REGEX,
+                            regexp = UNIRULE_ALL_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.unirule.invalid.id}")
                     String uniRuleId,
@@ -186,7 +189,17 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRuleEntry entity) {
+    protected String getFromId(UniRuleEntry entity, HttpServletRequest request){
+        return extractRuleId(request);
+    }
+
+    @Override
+    protected Optional<String> getEntityRedirectId(UniRuleEntry entity, HttpServletRequest request) {
+        String ruleId = extractRuleId(request);
+        Matcher matcher = UNIRULE_ID_PATTERN.matcher(ruleId);
+        if(!matcher.find()){
+            return Optional.of(entity.getUniRuleId().getValue());
+        }
         return Optional.empty();
     }
 
@@ -194,5 +207,11 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
         if (preview) {
             searchRequest.setSize(PREVIEW_SIZE);
         }
+    }
+
+    private String extractRuleId(HttpServletRequest request){
+        String uri = request.getRequestURI();
+        String ruleId = uri.substring(uri.lastIndexOf("/") + 1);
+        return ruleId;
     }
 }

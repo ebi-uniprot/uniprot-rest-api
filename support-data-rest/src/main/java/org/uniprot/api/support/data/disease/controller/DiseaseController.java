@@ -208,7 +208,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(DiseaseEntry entity) {
+    protected Optional<String> getEntityRedirectId(DiseaseEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

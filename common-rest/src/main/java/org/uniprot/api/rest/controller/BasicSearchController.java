@@ -64,7 +64,7 @@ public abstract class BasicSearchController<T> {
         }
 
         ResponseEntity.BodyBuilder responseBuilder =
-                getEntityRedirectId(entity)
+                getEntityRedirectId(entity, request)
                         .map(
                                 id ->
                                         ResponseEntity.status(HttpStatus.SEE_OTHER)
@@ -72,7 +72,7 @@ public abstract class BasicSearchController<T> {
                                                         HttpHeaders.LOCATION,
                                                         getLocationURLForId(
                                                                 id,
-                                                                getEntityId(entity),
+                                                                getFromId(entity, request),
                                                                 contentType)))
                         .orElse(ResponseEntity.ok());
 
@@ -189,7 +189,11 @@ public abstract class BasicSearchController<T> {
 
     protected abstract String getEntityId(T entity);
 
-    protected abstract Optional<String> getEntityRedirectId(T entity);
+    protected String getFromId(T entity, HttpServletRequest request){
+        return getEntityId(entity);
+    }
+
+    protected abstract Optional<String> getEntityRedirectId(T entity, HttpServletRequest request);
 
     protected MediaType getAcceptHeader(HttpServletRequest request) {
         return UniProtMediaType.valueOf(request.getHeader(HttpHeaders.ACCEPT));

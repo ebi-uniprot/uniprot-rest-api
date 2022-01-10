@@ -393,7 +393,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniProtKBEntry entity) {
+    protected Optional<String> getEntityRedirectId(UniProtKBEntry entity, HttpServletRequest request) {
         if (isInactiveAndMergedEntry(entity)) {
             return Optional.of(
                     String.valueOf(entity.getInactiveReason().getMergeDemergeTos().get(0)));

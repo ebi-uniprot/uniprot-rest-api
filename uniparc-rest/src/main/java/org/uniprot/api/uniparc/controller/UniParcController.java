@@ -513,7 +513,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniParcEntry entity) {
+    protected Optional<String> getEntityRedirectId(UniParcEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 

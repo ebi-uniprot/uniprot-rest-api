@@ -252,7 +252,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(GeneCentricEntry entity) {
+    protected Optional<String> getEntityRedirectId(GeneCentricEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 

@@ -223,7 +223,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(SubcellularLocationEntry entity) {
+    protected Optional<String> getEntityRedirectId(SubcellularLocationEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }
