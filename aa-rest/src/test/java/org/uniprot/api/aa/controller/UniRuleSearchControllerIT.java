@@ -146,7 +146,8 @@ public class UniRuleSearchControllerIT extends AbstractRuleSearchWithFacetContro
         UniRuleEntry uniRuleEntry =
                 UniRuleControllerITUtils.updateValidValues(
                         updatedCommentEntry, suffix, UniRuleControllerITUtils.RuleType.UR);
-        Information info = InformationBuilder.from(entry.getInformation()).oldRuleNum(OLD_RULE_ID).build();
+        Information info =
+                InformationBuilder.from(entry.getInformation()).oldRuleNum(OLD_RULE_ID).build();
         uniRuleEntry = UniRuleEntryBuilder.from(uniRuleEntry).information(info).build();
         UniRuleDocumentConverter docConverter =
                 new UniRuleDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());

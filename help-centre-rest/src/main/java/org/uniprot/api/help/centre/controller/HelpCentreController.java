@@ -121,7 +121,8 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(HelpCentreEntry entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            HelpCentreEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

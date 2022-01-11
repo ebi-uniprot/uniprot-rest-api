@@ -337,7 +337,8 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRefEntryLight entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            UniRefEntryLight entity, HttpServletRequest request) {
         return Optional.empty();
     }
 

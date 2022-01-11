@@ -169,7 +169,8 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(IdMappingStringPair entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            IdMappingStringPair entity, HttpServletRequest request) {
         return Optional.empty();
     }
 

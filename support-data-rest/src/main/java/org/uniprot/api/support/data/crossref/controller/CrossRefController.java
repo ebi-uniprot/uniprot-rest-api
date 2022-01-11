@@ -178,7 +178,8 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(CrossRefEntry entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            CrossRefEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

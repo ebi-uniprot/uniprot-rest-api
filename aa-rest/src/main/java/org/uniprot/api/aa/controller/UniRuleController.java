@@ -61,9 +61,11 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
 
     private static final int PREVIEW_SIZE = 10;
     private final UniRuleService uniRuleService;
-    public static final String UNIRULE_ALL_ID_REGEX = "UR(\\d{9})|MF_[0-9]{5}|PIRSR[0-9]+(\\-[0-9]+)?|PIRNR[0-9]+|RU[0-9]{6}|PRU[0-9]{5}";
-    private static final String UNIRULE_ID_REGEX = "UR(\\d{9})";
-    private static final java.util.regex.Pattern UNIRULE_ID_PATTERN = java.util.regex.Pattern.compile(UNIRULE_ID_REGEX);
+    public static final String UNIRULE_ALL_ID_REGEX =
+            "UR[0-9]{9}|MF_[0-9]{5}|PIRSR[0-9]+(\\-[0-9]+)?|PIRNR[0-9]+|RU[0-9]{6}|PRU[0-9]{5}";
+    private static final String UNIRULE_ID_REGEX = "UR[0-9]{9}";
+    private static final java.util.regex.Pattern UNIRULE_ID_PATTERN =
+            java.util.regex.Pattern.compile(UNIRULE_ID_REGEX);
 
     @Autowired
     public UniRuleController(
@@ -189,15 +191,16 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
     }
 
     @Override
-    protected String getFromId(UniRuleEntry entity, HttpServletRequest request){
+    protected String getFromId(UniRuleEntry entity, HttpServletRequest request) {
         return extractRuleId(request);
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniRuleEntry entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            UniRuleEntry entity, HttpServletRequest request) {
         String ruleId = extractRuleId(request);
         Matcher matcher = UNIRULE_ID_PATTERN.matcher(ruleId);
-        if(!matcher.find()){
+        if (!matcher.find()) {
             return Optional.of(entity.getUniRuleId().getValue());
         }
         return Optional.empty();
@@ -209,7 +212,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
         }
     }
 
-    private String extractRuleId(HttpServletRequest request){
+    private String extractRuleId(HttpServletRequest request) {
         String uri = request.getRequestURI();
         String ruleId = uri.substring(uri.lastIndexOf("/") + 1);
         return ruleId;

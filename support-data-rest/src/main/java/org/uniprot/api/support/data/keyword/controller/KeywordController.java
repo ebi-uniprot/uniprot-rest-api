@@ -200,7 +200,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(KeywordEntry entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            KeywordEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }
