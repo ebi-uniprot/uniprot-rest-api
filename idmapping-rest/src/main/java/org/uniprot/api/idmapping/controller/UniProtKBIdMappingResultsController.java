@@ -206,7 +206,8 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniProtKBEntryPair entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            UniProtKBEntryPair entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

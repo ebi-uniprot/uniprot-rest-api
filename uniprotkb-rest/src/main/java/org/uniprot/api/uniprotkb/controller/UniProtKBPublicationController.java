@@ -58,7 +58,8 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(PublicationEntry entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            PublicationEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 

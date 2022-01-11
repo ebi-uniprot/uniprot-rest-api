@@ -244,7 +244,8 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(TaxonomyEntry entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            TaxonomyEntry entity, HttpServletRequest request) {
         if (isInactiveAndMergedEntity(entity)) {
             return Optional.of(String.valueOf(entity.getInactiveReason().getMergedTo()));
         } else {

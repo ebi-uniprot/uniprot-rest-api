@@ -189,7 +189,7 @@ public abstract class BasicSearchController<T> {
 
     protected abstract String getEntityId(T entity);
 
-    protected String getFromId(T entity, HttpServletRequest request){
+    protected String getFromId(T entity, HttpServletRequest request) {
         return getEntityId(entity);
     }
 

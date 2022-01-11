@@ -1,8 +1,28 @@
 package org.uniprot.api.aa.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -38,21 +58,8 @@ import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -71,7 +78,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String UNIRULE_ID = "UR000100241";
     private static final String OLD_RULE_ID = "MF_00807";
-
 
     @Autowired private UniRuleQueryRepository repository;
 
@@ -103,8 +109,12 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
         UniRuleId uniRuleId = new UniRuleIdBuilder(UNIRULE_ID).build();
         UniRuleEntry uniRule = UniRuleEntryBuilderTest.createObject();
         // inject old rule id to search
-        Information information = InformationBuilder.from(uniRule.getInformation()).oldRuleNum(OLD_RULE_ID).build();
-        return UniRuleEntryBuilder.from(uniRule).uniRuleId(uniRuleId).information(information).build();
+        Information information =
+                InformationBuilder.from(uniRule.getInformation()).oldRuleNum(OLD_RULE_ID).build();
+        return UniRuleEntryBuilder.from(uniRule)
+                .uniRuleId(uniRuleId)
+                .information(information)
+                .build();
     }
 
     @Override
@@ -113,29 +123,59 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
     }
 
     @Test
-    void testGetByOldRuleId() throws Exception {
+    void testGetByOldRuleIdWithRedirect() throws Exception {
         // given
         saveEntry();
 
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(getIdRequestPath(), OLD_RULE_ID)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON);
+                get(getIdRequestPath(), OLD_RULE_ID).header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = getMockMvc().perform(requestBuilder);
 
         // then
+        String redirectUri = "/unirule/" + UNIRULE_ID + "?from=" + OLD_RULE_ID;
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(
+                        header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LOCATION, redirectUri));
+
+        // let's simulate a client (e.g., browser) redirect and go to the address directly
+        response = getMockMvc().perform(get(redirectUri));
         ResultActions resultActions =
                 response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
                                 header().string(
-                                        HttpHeaders.CONTENT_TYPE,
-                                        MediaType.APPLICATION_JSON_VALUE));
+                                                HttpHeaders.CONTENT_TYPE,
+                                                MediaType.APPLICATION_JSON_VALUE));
         GetIdParameter idParameter = new UniRuleGetIdParameterResolver().validIdParameter();
         for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideOldRuleNumber")
+    void testOldRuleNumberValidation(String ruleId) throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdRequestPath(), ruleId).header(ACCEPT, MediaType.APPLICATION_JSON);
+
+        ResultActions response = getMockMvc().perform(requestBuilder);
+
+        // then no validation error
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
+    }
+
+    private static Stream<Arguments> provideOldRuleNumber() {
+        return List.of("MF_00855", "PIRSR620777-50", "PIRNR029950", "RU366062", "PRU01042")
+                .stream()
+                .map(Arguments::of);
     }
 
     static class UniRuleGetIdParameterResolver extends AbstractGetIdParameterResolver {
@@ -167,7 +207,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                             jsonPath(
                                     "$.messages.*",
                                     contains(
-                                            "The UniRule id value has invalid format. It should match the regular expression 'UR[0-9]{9}'")))
+                                            "The UniRule id value has invalid format. It should match the regular expression 'UR[0-9]{9}|MF_[0-9]{5}|PIRSR[0-9]+(-[0-9]+)?|PIRNR[0-9]+|RU[0-9]{6}|PRU[0-9]{5}'")))
                     .build();
         }
 
@@ -288,7 +328,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             jsonPath(
                                                     "$.messages.*",
                                                     contains(
-                                                            "The UniRule id value has invalid format. It should match the regular expression 'UR[0-9]{9}'")))
+                                                            "The UniRule id value has invalid format. It should match the regular expression 'UR[0-9]{9}|MF_[0-9]{5}|PIRSR[0-9]+(-[0-9]+)?|PIRNR[0-9]+|RU[0-9]{6}|PRU[0-9]{5}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
