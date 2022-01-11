@@ -978,7 +978,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")));
     }
-    //    }
 
     @Test
     void defaultSingleTermShowSingleTermMatchedFieldsReturnMatchedFields() throws Exception {
