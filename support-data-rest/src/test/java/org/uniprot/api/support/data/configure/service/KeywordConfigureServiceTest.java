@@ -23,7 +23,7 @@ class KeywordConfigureServiceTest {
         assertNotNull(resultGroups);
         assertEquals(1, resultGroups.size());
 
-        assertEquals(11, resultGroups.get(0).getFields().size());
+        assertEquals(10, resultGroups.get(0).getFields().size());
     }
 
     @Test

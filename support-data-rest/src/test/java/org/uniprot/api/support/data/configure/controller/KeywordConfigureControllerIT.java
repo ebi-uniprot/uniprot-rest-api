@@ -31,7 +31,7 @@ import org.uniprot.api.support.data.SupportDataRestApplication;
 @WebMvcTest(KeywordConfigureController.class)
 class KeywordConfigureControllerIT {
 
-    private static final String CONFIGURE_RESOURCE = "/configure/keyword/";
+    private static final String CONFIGURE_RESOURCE = "/configure/keywords/";
 
     @Autowired private MockMvc mockMvc;
 
