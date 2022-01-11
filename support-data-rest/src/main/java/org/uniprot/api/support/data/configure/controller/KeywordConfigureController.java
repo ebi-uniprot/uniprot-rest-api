@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         name = "Configuration",
         description = "These services provide configuration data used in the UniProt website")
 @RestController
-@RequestMapping("/configure/keyword")
+@RequestMapping("/configure/keywords")
 public class KeywordConfigureController {
     private final KeywordConfigureService service;
 
