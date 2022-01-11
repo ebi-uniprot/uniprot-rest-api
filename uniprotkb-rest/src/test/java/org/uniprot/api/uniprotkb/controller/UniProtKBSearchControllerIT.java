@@ -509,7 +509,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Test
     @Tag("TRM_27084")
-    void inactiveEntry_searchAllReturnsActiveOne() throws Exception {
+    void searchAllReturnsActiveOneEvenThoughMatchOnInactiveExists() throws Exception {
         // given
         UniProtKBEntry templateActiveEntry =
                 UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
@@ -542,7 +542,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @ParameterizedTest
     @Tag("TRM_27083")
     @ValueSource(strings = {"reviewed", "unreviewed"})
-    void inactiveEntry_canSearchForFullIDs(String type) throws Exception {
+    void canSearchForFullIDs(String type) throws Exception {
         // given
         String id = "GENE1_SPECIES";
         UniProtKBEntry templateEntry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
