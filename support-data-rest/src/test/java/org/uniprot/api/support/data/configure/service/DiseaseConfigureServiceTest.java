@@ -23,7 +23,7 @@ class DiseaseConfigureServiceTest {
         assertNotNull(resultGroups);
         assertEquals(1, resultGroups.size());
 
-        assertEquals(9, resultGroups.get(0).getFields().size());
+        assertEquals(8, resultGroups.get(0).getFields().size());
     }
 
     @Test

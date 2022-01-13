@@ -29,7 +29,7 @@ class ReturnFieldMetaReaderImplTest {
                 returnFieldMetaReaderImpl.read("crossref-return-fields.json");
         assertNotNull(result);
 
-        assertEquals(11, result.size());
+        assertEquals(10, result.size());
         assertTrue(validateFieldMap(result, "name", "abbrev"));
         assertTrue(validateFieldMap(result, "label", "Database Abbreviation"));
     }
