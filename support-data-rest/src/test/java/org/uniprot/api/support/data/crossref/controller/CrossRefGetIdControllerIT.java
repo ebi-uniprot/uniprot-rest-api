@@ -185,12 +185,13 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .fields("id,category,unreviewed_protein_count")
+                    .fields("id,category,statistics")
                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
+                    .resultMatcher(jsonPath("$.statistics").exists())
                     .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", is(5)))
                     .resultMatcher(jsonPath("$.name").doesNotExist())
-                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount").doesNotExist())
+                    .resultMatcher(jsonPath("$.statistics.reviewedProteinCount").exists())
                     .build();
         }
 

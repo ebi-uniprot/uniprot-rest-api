@@ -243,12 +243,12 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
         public GetIdParameter withFilterFieldsParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION)
-                    .fields("name,id,reviewed_protein_count")
+                    .fields("name,id,statistics")
                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
                     .resultMatcher(jsonPath("$.name", is("ZTTK syndrome")))
                     .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", is(1)))
                     .resultMatcher(jsonPath("$.alternativeNames").doesNotExist())
-                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount").doesNotExist())
+                    .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount").exists())
                     .resultMatcher(jsonPath("$.acronym").doesNotExist())
                     .build();
         }
