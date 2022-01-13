@@ -1,0 +1,83 @@
+package org.uniprot.api.help.centre.service;
+
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Properties;
+
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
+import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ImportantMessageServiceException;
+import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.help.centre.model.ContactForm;
+import org.uniprot.api.help.centre.model.Token;
+
+@Service
+public class ContactService {
+
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    private static final String DELIMITER = "-;;-";
+    private static final String TOKEN_PREFIX = "contactToken";
+    private static final int TOKEN_RADIX = 36;
+
+    public Token generateToken(String subjectKey) {
+        String date = LocalDateTime.now().format(formatter);
+        String concatenatedToken = TOKEN_PREFIX + DELIMITER + subjectKey + DELIMITER + date;
+        String encryptedToken = new BigInteger(concatenatedToken.getBytes()).toString(TOKEN_RADIX);
+        return new Token(encryptedToken);
+    }
+
+    public boolean validToken(String token, String subjectKey) {
+        byte[] bytes = new BigInteger(token, TOKEN_RADIX).toByteArray();
+        String extractedToken = new String(bytes);
+        String[] parsedToken = extractedToken.split(DELIMITER);
+        if (parsedToken.length == 3) {
+            String tokenKey = parsedToken[1];
+            if (!subjectKey.contains(tokenKey)) {
+                throw new ImportantMessageServiceException("Invalid token key format");
+            }
+            LocalDateTime tokenDate = LocalDateTime.parse(parsedToken[2], formatter);
+            if (tokenDate.plusSeconds(30L).isBefore(LocalDateTime.now())) {
+                throw new ImportantMessageServiceException("The provided token is expired");
+            }
+        } else {
+            throw new ImportantMessageServiceException("Invalid token format");
+        }
+        return true;
+    }
+
+    public boolean sendEmail(ContactForm contactForm) {
+        Properties prop = new Properties();
+        prop.put("mail.smtp.host", "outgoing.ebi.ac.uk");
+        prop.put("mail.smtp.port", "587");
+        try {
+            Session session = Session.getInstance(prop);
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(contactForm.getEmail()));
+            message.setRecipients(
+                    Message.RecipientType.TO,
+                    InternetAddress.parse(
+                            "lgonzales@ebi.ac.uk"));//,xwatkins@ebi.ac.uk,luciani@ebi.ac.uk
+            message.setSubject(contactForm.getSubject());
+
+            MimeBodyPart mimeBodyPart = new MimeBodyPart();
+            mimeBodyPart.setContent(contactForm.getMessage(), "text/html; charset=utf-8");
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(mimeBodyPart);
+
+            message.setContent(multipart);
+
+            Transport.send(message);
+        } catch (MessagingException messagingException) {
+            throw new ServiceException("Unable to send Email", messagingException);
+        }
+        return true;
+    }
+}
