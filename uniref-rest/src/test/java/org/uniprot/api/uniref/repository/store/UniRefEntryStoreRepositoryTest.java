@@ -311,8 +311,9 @@ class UniRefEntryStoreRepositoryTest {
         assertEquals("name value", entry.getName());
         assertEquals(UniRefType.UniRef50, entry.getEntryType());
         assertNotNull(entry.getUpdated());
-        assertEquals("common taxon value", entry.getCommonTaxon());
-        assertEquals(10L, entry.getCommonTaxonId().longValue());
+        assertNotNull(entry.getCommonTaxon());
+        assertEquals("common taxon value", entry.getCommonTaxon().getScientificName());
+        assertEquals(10L, entry.getCommonTaxon().getTaxonId());
         assertEquals(1, entry.getGoTerms().size());
 
         assertEquals(28, entry.getMemberCount().intValue()); // 27+representative

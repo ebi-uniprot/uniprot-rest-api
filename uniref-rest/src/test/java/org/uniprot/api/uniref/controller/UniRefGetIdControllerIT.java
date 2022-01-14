@@ -156,8 +156,8 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(jsonPath("$.memberCount", is(28)))
                     .resultMatcher(jsonPath("$.updated", is("2019-08-27")))
                     .resultMatcher(jsonPath("$.entryType", is("UniRef50")))
-                    .resultMatcher(jsonPath("$.commonTaxonId", is(9606)))
-                    .resultMatcher(jsonPath("$.commonTaxon", is("Homo sapiens")))
+                    .resultMatcher(jsonPath("$.commonTaxon.taxonId", is(9606)))
+                    .resultMatcher(jsonPath("$.commonTaxon.scientificName", is("Homo sapiens")))
                     .resultMatcher(jsonPath("$.seedId", is("P12301")))
                     .resultMatcher(jsonPath("$.goTerms.size()", is(3)))
                     .resultMatcher(

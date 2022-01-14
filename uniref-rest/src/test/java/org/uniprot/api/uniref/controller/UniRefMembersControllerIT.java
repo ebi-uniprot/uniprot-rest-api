@@ -55,6 +55,7 @@ import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefEntryFacetConfig;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 import org.uniprot.core.uniref.RepresentativeMember;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
@@ -477,7 +478,8 @@ class UniRefMembersControllerIT {
         UniRefEntryBuilder builder = new UniRefEntryBuilder();
         builder.id(ID_FILTER);
         builder.name("Cluster Name");
-        builder.commonTaxonId(9606L);
+        builder.commonTaxon(
+                new OrganismBuilder().taxonId(9606L).scientificName("Homo Sapiens").build());
         builder.entryType(UniRefType.UniRef50);
 
         RepresentativeMemberBuilder repBuilder =
