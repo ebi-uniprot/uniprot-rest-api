@@ -34,7 +34,9 @@ public class ContactController {
         return ResponseEntity.ok().body(token);
     }
 
-    @PostMapping(value = "/send", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+    @PostMapping(
+            value = "/send",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<ContactForm> postContact(
             HttpServletRequest request, @Valid ContactForm contactForm) {

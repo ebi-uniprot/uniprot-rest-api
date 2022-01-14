@@ -11,6 +11,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.ServiceException;
@@ -18,12 +19,24 @@ import org.uniprot.api.help.centre.model.ContactForm;
 import org.uniprot.api.help.centre.model.Token;
 
 @Service
+@Profile("live")
 public class ContactService {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
     private static final String DELIMITER = "-;;-";
     private static final String TOKEN_PREFIX = "contactToken";
     private static final int TOKEN_RADIX = 36;
+    private final ContactConfig contactConfig;
+    private final Properties emailProperties;
+
+    public ContactService(ContactConfig contactConfig) {
+        this.contactConfig = contactConfig;
+
+        Properties emailProp = new Properties();
+        emailProp.put("mail.smtp.host", contactConfig.getHost());
+        emailProp.put("mail.smtp.port", contactConfig.getPort());
+        this.emailProperties = emailProp;
+    }
 
     public Token generateToken(String subjectKey) {
         String date = LocalDateTime.now().format(formatter);
@@ -42,7 +55,9 @@ public class ContactService {
                 throw new ImportantMessageServiceException("Invalid token key format");
             }
             LocalDateTime tokenDate = LocalDateTime.parse(parsedToken[2], formatter);
-            if (tokenDate.plusSeconds(30L).isBefore(LocalDateTime.now())) {
+            if (tokenDate
+                    .plusSeconds(contactConfig.getTokenExpireInSecs())
+                    .isBefore(LocalDateTime.now())) {
                 throw new ImportantMessageServiceException("The provided token is expired");
             }
         } else {
@@ -51,33 +66,31 @@ public class ContactService {
         return true;
     }
 
-    public boolean sendEmail(ContactForm contactForm) {
-        Properties prop = new Properties();
-        prop.put("mail.smtp.host", "outgoing.ebi.ac.uk");
-        prop.put("mail.smtp.port", "587");
+    public void sendEmail(ContactForm contactForm) {
         try {
-            Session session = Session.getInstance(prop);
+            Session session = Session.getInstance(emailProperties);
 
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(contactForm.getEmail()));
             message.setRecipients(
-                    Message.RecipientType.TO,
-                    InternetAddress.parse(
-                            "lgonzales@ebi.ac.uk"));//,xwatkins@ebi.ac.uk,luciani@ebi.ac.uk
+                    Message.RecipientType.TO, InternetAddress.parse(contactConfig.getTo()));
             message.setSubject(contactForm.getSubject());
 
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            mimeBodyPart.setContent(contactForm.getMessage(), "text/html; charset=utf-8");
+            mimeBodyPart.setContent(contactForm.getMessage(), contactConfig.getMessageFormat());
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(mimeBodyPart);
 
             message.setContent(multipart);
 
-            Transport.send(message);
+            sendMail(message);
         } catch (MessagingException messagingException) {
             throw new ServiceException("Unable to send Email", messagingException);
         }
-        return true;
+    }
+
+    protected void sendMail(Message message) throws MessagingException {
+        Transport.send(message);
     }
 }
