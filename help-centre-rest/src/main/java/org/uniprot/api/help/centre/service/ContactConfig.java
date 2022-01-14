@@ -16,8 +16,6 @@ public class ContactConfig {
 
     private String host;
 
-    private String port;
-
     private String to;
 
     private String messageFormat;

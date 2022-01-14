@@ -101,7 +101,7 @@ class ContactControllerIT {
                         .param("message", message)
                         .param("token", token)
                         .param("requiredForRobots", "")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                         .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         response = mockMvc.perform(requestBuilder);
@@ -123,7 +123,7 @@ class ContactControllerIT {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 post(SEND_CONTECT_PATH)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                         .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);
@@ -158,7 +158,7 @@ class ContactControllerIT {
                         .param("message", "Message")
                         .param("token", "Token")
                         .param("requiredForRobots", "BotValue")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                         .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);
@@ -185,7 +185,7 @@ class ContactControllerIT {
                         .param("message", "Message")
                         .param("token", "Token")
                         .param("requiredForRobots", "")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                         .header(ACCEPT, MediaType.APPLICATION_JSON);
 
         ResultActions response = mockMvc.perform(requestBuilder);

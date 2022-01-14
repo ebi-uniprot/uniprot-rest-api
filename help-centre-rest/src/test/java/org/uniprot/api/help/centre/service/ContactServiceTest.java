@@ -17,7 +17,6 @@ class ContactServiceTest {
     void canGenerateToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setPort("90");
         ContactService service = new ContactService(config);
         Token token = service.generateToken("tokenkey");
         assertNotNull(token);
@@ -27,7 +26,6 @@ class ContactServiceTest {
     void canValidateToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setPort("90");
         config.setTokenExpireInSecs(2L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
@@ -40,7 +38,6 @@ class ContactServiceTest {
     void throwErrorWhenInvalidFormatValidToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setPort("90");
         config.setTokenExpireInSecs(2L);
         ContactService service = new ContactService(config);
         ImportantMessageServiceException exception =
@@ -54,7 +51,6 @@ class ContactServiceTest {
     void throwErrorWhenInvalidKeyValidToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setPort("90");
         config.setTokenExpireInSecs(2L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
@@ -73,7 +69,6 @@ class ContactServiceTest {
     void throwErrorWhenExpiredTokenValidToken() throws InterruptedException {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setPort("90");
         config.setTokenExpireInSecs(1L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
@@ -93,7 +88,6 @@ class ContactServiceTest {
     void sendEmailFillTheEmailMessageCorrectly() throws Exception {
         String subject = "subjectValue";
         String host = "hostValue";
-        String port = "portValue";
         String toEmail = "to@email.com";
         String fromEmail = "from@email.com";
         String messageFormat = "messageFormatValue";
@@ -101,7 +95,6 @@ class ContactServiceTest {
 
         ContactConfig config = new ContactConfig();
         config.setHost(host);
-        config.setPort(port);
         config.setTo(toEmail);
         config.setMessageFormat(messageFormat);
 
@@ -127,7 +120,6 @@ class ContactServiceTest {
     void sendEmailWithInvalidData() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setPort("90");
         config.setTo("to@email.com");
         config.setMessageFormat("messageFormatValue");
         ContactService service = new ContactService(config);
