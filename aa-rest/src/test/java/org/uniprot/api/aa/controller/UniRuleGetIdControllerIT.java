@@ -17,6 +17,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,9 +60,6 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.unirule.UniRuleDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.unirule.UniRuleDocument;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -173,8 +173,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
     }
 
     private static Stream<Arguments> provideOldRuleNumber() {
-        return List.of("MF_00855", "PIRSR620777-50", "PIRNR029950", "RU366062", "PRU01042")
-                .stream()
+        return List.of("MF_00855", "PIRSR620777-50", "PIRNR029950", "RU366062", "PRU01042").stream()
                 .map(Arguments::of);
     }
 
