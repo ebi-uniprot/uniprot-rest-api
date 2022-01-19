@@ -1,5 +1,16 @@
 package org.uniprot.api.rest.output.converter;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
+import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.lang.Nullable;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.util.Utils;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
@@ -11,18 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.lang.Nullable;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.core.util.Utils;
 
 /**
  * Abstract HTTP message converter extending {@link AbstractHttpMessageConverter} that implements a
@@ -54,7 +53,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
         boolean result = false;
         if (Objects.nonNull(type)
-                && this.canWrite(mediaType)
+                && validMediaType(mediaType)
                 && MessageConverterContext.class.isAssignableFrom(clazz)
                 && Utils.notNull(type)) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
@@ -71,14 +70,33 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     }
 
     @Override
-    protected MessageConverterContext<C> readInternal(
-            Class<? extends MessageConverterContext<C>> aClass, HttpInputMessage httpInputMessage) {
+    public MessageConverterContext<C> read(
+            Type type, Class<?> aClass, HttpInputMessage httpInputMessage) {
         return null;
     }
 
+    protected boolean validMediaType(MediaType mediaType) {
+        if (Utils.notNull(mediaType)) {
+            for (MediaType supportedMediaType : getSupportedMediaTypes()) {
+                if (mediaType.equals(supportedMediaType)) {
+                    return true;
+                }
+            }
+        }
+
+        // the following (taken from
+        // org.springframework.http.converter.AbstractHttpMessageConverter)
+        // can be simplified but this way is more readable.
+        if (mediaType == null || MediaType.ALL.equalsTypeAndSubtype(mediaType)) {
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
-    public MessageConverterContext<C> read(
-            Type type, Class<?> aClass, HttpInputMessage httpInputMessage) {
+    protected MessageConverterContext<C> readInternal(
+            Class<? extends MessageConverterContext<C>> aClass, HttpInputMessage httpInputMessage) {
         return null;
     }
 
@@ -118,6 +136,9 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         try {
             before(context, outputStream);
 
+            if (entities == null) {
+                System.out.println();
+            }
             writeEntities(entities, outputStream, start, counter);
 
             after(context, outputStream);
@@ -199,7 +220,8 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         int secDuration = (int) millisDuration / 1000;
         String rate = String.format("%.2f", ((double) counter) / secDuration);
         log.info(
-                "Entities written: {} with duration: {} ({} entries/sec)",
+                "Entities written by {}: {} with duration: {} ({} entries/sec)",
+                getClass(),
                 counter,
                 secDuration,
                 rate);

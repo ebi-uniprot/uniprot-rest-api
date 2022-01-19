@@ -25,7 +25,7 @@ public abstract class AbstractEntityIdHttpMessageConverter<C>
 
     @Override
     public boolean canWrite(@Nullable Type type, Class<?> clazz, @Nullable MediaType mediaType) {
-        return this.canWrite(mediaType) && MessageConverterContext.class.isAssignableFrom(clazz);
+        return validMediaType(mediaType) && MessageConverterContext.class.isAssignableFrom(clazz);
     }
 
     @Override

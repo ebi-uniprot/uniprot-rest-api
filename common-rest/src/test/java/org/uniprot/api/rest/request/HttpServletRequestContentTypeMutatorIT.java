@@ -98,7 +98,7 @@ class HttpServletRequestContentTypeMutatorIT {
                         content()
                                 .string(
                                         containsString(
-                                                "Invalid request received. Requested media type/format not accepted: 'text/obo'.")))
+                                                "Invalid request received. Requested media type/format not accepted: 'text/plain;format=obo'.")))
                 .andExpect(
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
@@ -115,7 +115,7 @@ class HttpServletRequestContentTypeMutatorIT {
                         content()
                                 .string(
                                         containsString(
-                                                "Invalid request received. Requested media type/format not accepted, 'obo'. Valid media types/formats for this end-point include: text/tsv, text/flatfile.")))
+                                                "Invalid request received. Requested media type/format not accepted, 'obo'. Valid media types/formats for this end-point include: text/plain;format=tsv, text/plain;format=flatfile.")))
                 .andExpect(
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
@@ -133,7 +133,7 @@ class HttpServletRequestContentTypeMutatorIT {
                         content()
                                 .string(
                                         containsString(
-                                                "Invalid request received. Requested media type/format not accepted, 'obo'. Valid media types/formats for this end-point include: text/tsv, text/flatfile.")))
+                                                "Invalid request received. Requested media type/format not accepted, 'obo'. Valid media types/formats for this end-point include: text/plain;format=tsv, text/plain;format=flatfile.")))
                 .andExpect(
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
@@ -304,7 +304,7 @@ class HttpServletRequestContentTypeMutatorIT {
                         content()
                                 .string(
                                         containsString(
-                                                "Invalid request received. Requested media type/format not accepted, 'obo'. Valid media types/formats for this end-point include: application/json, text/flatfile.")))
+                                                "Invalid request received. Requested media type/format not accepted, 'obo'. Valid media types/formats for this end-point include: application/json, text/plain;format=flatfile.")))
                 .andExpect(
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
