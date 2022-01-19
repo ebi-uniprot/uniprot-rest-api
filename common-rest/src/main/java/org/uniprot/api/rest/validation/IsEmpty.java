@@ -16,7 +16,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IsEmpty {
-    String message() default "this field must have empty value";
+    String message() default "This field must have an empty value";
 
     Class<?>[] groups() default {};
 

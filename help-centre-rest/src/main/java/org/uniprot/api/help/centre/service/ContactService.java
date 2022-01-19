@@ -55,7 +55,7 @@ public class ContactService {
             }
             LocalDateTime tokenDate = LocalDateTime.parse(parsedToken[2], formatter);
             if (tokenDate
-                    .plusSeconds(contactConfig.getTokenExpireInSecs())
+                    .plusSeconds(contactConfig.getTokenExpiresInSecs())
                     .isBefore(LocalDateTime.now())) {
                 throw new ImportantMessageServiceException("The provided token is expired");
             }

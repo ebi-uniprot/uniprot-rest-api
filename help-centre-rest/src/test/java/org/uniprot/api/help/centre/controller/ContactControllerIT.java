@@ -141,8 +141,8 @@ class ContactControllerIT {
                                         "The 'email' is a required field",
                                         "The 'subject' is a required field",
                                         "The 'message' is a required field",
-                                        "Missing data, Please use our contact page from uniprot.org",
-                                        "Please use our contact page from uniprot.org")));
+                                        "Missing data. Please use the contact page on www.uniprot.org",
+                                        "Please use the contact page on www.uniprot.org")));
         // IMPORTANT: token and requiredForRobots validation has generic error messages because
         // they are security validations. We do not want to explain how to bypass our security
         // checks
@@ -172,7 +172,7 @@ class ContactControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.messages.*",
-                                contains("Please use our contact page from uniprot.org")));
+                                contains("Please use the contact page on www.uniprot.org")));
     }
 
     @Test

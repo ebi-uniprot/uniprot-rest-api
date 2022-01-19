@@ -25,7 +25,7 @@ public class ContactForm {
     @NotNull(message = "{search.helpcentre.contact.required.token}")
     private String token;
 
-    // HoneyPot functionally to block robots
+    // HoneyPot functionality to block robots
     @IsEmpty(message = "{search.helpcentre.contact.robot}")
     private String requiredForRobots;
 

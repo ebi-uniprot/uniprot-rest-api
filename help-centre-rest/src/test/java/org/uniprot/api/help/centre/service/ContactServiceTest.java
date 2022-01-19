@@ -26,7 +26,7 @@ class ContactServiceTest {
     void canValidateToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setTokenExpireInSecs(2L);
+        config.setTokenExpiresInSecs(2L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
         Token token = service.generateToken(tokenKey);
@@ -38,7 +38,7 @@ class ContactServiceTest {
     void throwErrorWhenInvalidFormatValidToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setTokenExpireInSecs(2L);
+        config.setTokenExpiresInSecs(2L);
         ContactService service = new ContactService(config);
         ImportantMessageServiceException exception =
                 assertThrows(
@@ -51,7 +51,7 @@ class ContactServiceTest {
     void throwErrorWhenInvalidKeyValidToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setTokenExpireInSecs(2L);
+        config.setTokenExpiresInSecs(2L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
         Token token = service.generateToken(tokenKey);
@@ -69,7 +69,7 @@ class ContactServiceTest {
     void throwErrorWhenExpiredTokenValidToken() throws InterruptedException {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
-        config.setTokenExpireInSecs(1L);
+        config.setTokenExpiresInSecs(1L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
         Token token = service.generateToken(tokenKey);

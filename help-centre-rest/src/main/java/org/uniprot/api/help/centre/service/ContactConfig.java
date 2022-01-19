@@ -20,5 +20,5 @@ public class ContactConfig {
 
     private String messageFormat;
 
-    private Long tokenExpireInSecs;
+    private Long tokenExpiresInSecs;
 }
