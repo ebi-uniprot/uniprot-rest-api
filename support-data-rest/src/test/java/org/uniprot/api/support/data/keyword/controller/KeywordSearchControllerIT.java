@@ -315,6 +315,26 @@ class KeywordSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
+                                    .resultMatcher(content().string(containsString("format-version: 1.2")))
+                                    .resultMatcher(content().string(containsString("default-namespace: uniprot:keywords")))
+                                    .resultMatcher(content().string(containsString("[Typedef]\n" +
+                                            "id: category\n" +
+                                            "name: category\n" +
+                                            "is_cyclic: false")))
+                                    .resultMatcher(content().string(containsString("id: KW-0001\n" +
+                                            "name: my keyword KW-0001\n" +
+                                            "def: \"Definition value\" []\n" +
+                                            "synonym: \"synonyms\" [UniProt]\n" +
+                                            "xref: idValue \"nameValue\"\n" +
+                                            "xref: linkValue\n" +
+                                            "is_a: KW-0001\n" +
+                                            "relationship: category KW-9993")))
+                                    .build())
                     .build();
         }
 
@@ -346,6 +366,11 @@ class KeywordSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(content().string(isEmptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
+                                    .resultMatcher(content().string(is(emptyString())))
                                     .build())
                     .build();
         }
