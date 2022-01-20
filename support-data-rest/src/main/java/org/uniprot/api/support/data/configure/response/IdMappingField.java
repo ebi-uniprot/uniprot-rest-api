@@ -37,6 +37,7 @@ public class IdMappingField implements Serializable {
         private boolean from;
         private boolean to;
         private Integer ruleId;
+        private String uriLink;
     }
 
     @Data
