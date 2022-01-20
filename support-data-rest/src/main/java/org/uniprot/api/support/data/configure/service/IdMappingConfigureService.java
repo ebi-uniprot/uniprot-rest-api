@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.support.data.configure.response.IdMappingField;
 import org.uniprot.core.cv.xdb.UniProtDatabaseCategory;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 /**
@@ -165,6 +166,10 @@ public class IdMappingConfigureService {
         } else if (UNIPROTKB_SWISS_STR.equals(detail.getDisplayName())
                 || UNIPROTKB_STR.equals(detail.getDisplayName())) {
             fieldBuilder.from(false);
+        }
+
+        if(Utils.notNullNotEmpty(detail.getUriLink())){
+            fieldBuilder.uriLink(detail.getUriLink());
         }
 
         return fieldBuilder.build();
