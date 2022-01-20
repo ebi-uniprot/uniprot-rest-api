@@ -1,7 +1,5 @@
 package org.uniprot.api.support.data.common;
 
-import java.util.List;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +32,8 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
+import java.util.List;
+
 @Configuration
 @ConfigurationProperties(prefix = "download")
 public class MessageConverterConfig {
@@ -62,17 +62,21 @@ public class MessageConverterConfig {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-                converters.add(new ErrorMessageConverter());
-                converters.add(new ListMessageConverter());
+                int index = 0;
+
+                converters.add(index++, new ErrorMessageConverter());
+                converters.add(index++, new ListMessageConverter());
 
                 ReturnFieldConfig litReturnConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.LITERATURE);
                 converters.add(
+                        index++,
                         new XlsMessageConverter<>(
                                 LiteratureEntry.class,
                                 litReturnConfig,
                                 new LiteratureEntryValueMapper()));
                 converters.add(
+                        index++,
                         new TsvMessageConverter<>(
                                 LiteratureEntry.class,
                                 litReturnConfig,
@@ -81,11 +85,13 @@ public class MessageConverterConfig {
                 ReturnFieldConfig taxReturnConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.TAXONOMY);
                 converters.add(
+                        index++,
                         new XlsMessageConverter<>(
                                 TaxonomyEntry.class,
                                 taxReturnConfig,
                                 new TaxonomyEntryValueMapper()));
                 converters.add(
+                        index++,
                         new TsvMessageConverter<>(
                                 TaxonomyEntry.class,
                                 taxReturnConfig,
@@ -94,41 +100,47 @@ public class MessageConverterConfig {
                 ReturnFieldConfig kwReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
                 converters.add(
+                        index++,
                         new XlsMessageConverter<>(
                                 KeywordEntry.class, kwReturnFields, new KeywordEntryValueMapper()));
                 converters.add(
+                        index++,
                         new TsvMessageConverter<>(
                                 KeywordEntry.class, kwReturnFields, new KeywordEntryValueMapper()));
-                converters.add(new KeywordOBOMessageConverter());
+                converters.add(index++, new KeywordOBOMessageConverter());
 
                 ReturnFieldConfig subcellReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(
                                 UniProtDataType.SUBCELLLOCATION);
                 converters.add(
+                        index++,
                         new XlsMessageConverter<>(
                                 SubcellularLocationEntry.class,
                                 subcellReturnFields,
                                 new SubcellularLocationEntryValueMapper()));
                 converters.add(
+                        index++,
                         new TsvMessageConverter<>(
                                 SubcellularLocationEntry.class,
                                 subcellReturnFields,
                                 new SubcellularLocationEntryValueMapper()));
-                converters.add(new SubcellularLocationOBOMessageConverter());
+                converters.add(index++, new SubcellularLocationOBOMessageConverter());
 
                 ReturnFieldConfig diseaseReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.DISEASE);
                 converters.add(
+                        index++,
                         new XlsMessageConverter<>(
                                 DiseaseEntry.class,
                                 diseaseReturnFields,
                                 new DiseaseEntryValueMapper()));
                 converters.add(
+                        index++,
                         new TsvMessageConverter<>(
                                 DiseaseEntry.class,
                                 diseaseReturnFields,
                                 new DiseaseEntryValueMapper()));
-                converters.add(new DiseaseOBOMessageConverter());
+                converters.add(index++, new DiseaseOBOMessageConverter());
 
                 // add Json message converter first in the list because it is the most used
                 JsonMessageConverter<LiteratureEntry> litJsonConverter =
@@ -136,35 +148,35 @@ public class MessageConverterConfig {
                                 LiteratureJsonConfig.getInstance().getSimpleObjectMapper(),
                                 LiteratureEntry.class,
                                 litReturnConfig);
-                converters.add(0, litJsonConverter);
+                converters.add(index++, litJsonConverter);
 
                 JsonMessageConverter<KeywordEntry> keywordJsonConverter =
                         new JsonMessageConverter<>(
                                 KeywordJsonConfig.getInstance().getSimpleObjectMapper(),
                                 KeywordEntry.class,
                                 kwReturnFields);
-                converters.add(0, keywordJsonConverter);
+                converters.add(index++, keywordJsonConverter);
 
                 JsonMessageConverter<TaxonomyEntry> taxonomyJsonConverter =
                         new JsonMessageConverter<>(
                                 TaxonomyJsonConfig.getInstance().getSimpleObjectMapper(),
                                 TaxonomyEntry.class,
                                 taxReturnConfig);
-                converters.add(0, taxonomyJsonConverter);
+                converters.add(index++, taxonomyJsonConverter);
 
                 JsonMessageConverter<SubcellularLocationEntry> subcellJsonConverter =
                         new JsonMessageConverter<>(
                                 SubcellularLocationJsonConfig.getInstance().getSimpleObjectMapper(),
                                 SubcellularLocationEntry.class,
                                 subcellReturnFields);
-                converters.add(0, subcellJsonConverter);
+                converters.add(index++, subcellJsonConverter);
 
                 JsonMessageConverter<DiseaseEntry> diseaseJsonConverter =
                         new JsonMessageConverter<>(
                                 DiseaseJsonConfig.getInstance().getSimpleObjectMapper(),
                                 DiseaseEntry.class,
                                 diseaseReturnFields);
-                converters.add(0, diseaseJsonConverter);
+                converters.add(index++, diseaseJsonConverter);
 
                 JsonMessageConverter<CrossRefEntry> xrefJsonConverter =
                         new JsonMessageConverter<>(
@@ -172,8 +184,8 @@ public class MessageConverterConfig {
                                 CrossRefEntry.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(
                                         UniProtDataType.CROSSREF));
-                converters.add(0, xrefJsonConverter);
-                converters.add(new RDFMessageConverter());
+                converters.add(index++, xrefJsonConverter);
+                converters.add(index, new RDFMessageConverter());
             }
         };
     }
