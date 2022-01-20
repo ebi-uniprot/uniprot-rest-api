@@ -135,12 +135,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
 
         try {
             before(context, outputStream);
-
-            if (entities == null) {
-                System.out.println();
-            }
             writeEntities(entities, outputStream, start, counter);
-
             after(context, outputStream);
             logStats(counter.get(), start);
         } catch (StopStreamException | IOException e) {
