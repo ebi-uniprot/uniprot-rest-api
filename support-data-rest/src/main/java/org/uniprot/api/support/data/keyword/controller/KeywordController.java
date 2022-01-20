@@ -124,7 +124,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 TSV_MEDIA_TYPE_VALUE,
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                OBO_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Search Keywords by given Lucene search query.",
@@ -141,7 +142,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                                                                             KeywordEntry.class))),
                             @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = OBO_MEDIA_TYPE_VALUE),
                         })
             })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> search(
