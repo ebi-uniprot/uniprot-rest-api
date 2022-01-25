@@ -1,5 +1,18 @@
 package org.uniprot.api.proteome.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,19 +42,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.*;
 
 /**
  * @author jluo
@@ -198,7 +198,9 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("upid:*"))
                     .resultMatcher(
-                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
                     .build();
         }
 
@@ -252,7 +254,9 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("organism"))
                     .resultMatcher(
-                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
                     .resultMatcher(jsonPath("$.results.*.taxonomy.taxonId", contains(9606, 9606)))
                     .build();
         }
@@ -263,7 +267,9 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("superkingdom,proteome_type"))
                     .resultMatcher(
-                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
                     .resultMatcher(jsonPath("$.facets", iterableWithSize(2)))
                     .resultMatcher(jsonPath("$.facets[0].values", iterableWithSize(1)))
                     .resultMatcher(jsonPath("$.facets[0].label", is("Superkingdom")))

@@ -161,8 +161,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                                         "UP000005004",
                                         "UP000005003",
                                         "UP000005002",
-                                        "UP000005001"
-                                )));
+                                        "UP000005001")));
     }
 
     @Test

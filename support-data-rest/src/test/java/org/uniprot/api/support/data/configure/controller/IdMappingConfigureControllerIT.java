@@ -74,10 +74,16 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='UniProt')].items.*.uriLink",
-                                contains("https://www.uniprot.org/uniprot/%id", "https://www.uniprot.org/uniprot/%id",
-                                        "https://www.uniprot.org/uniprot/%id", null, "https://www.uniprot.org/uniref/%id",
-                                        "https://www.uniprot.org/uniref/%id", "https://www.uniprot.org/uniref/%id",
-                                        "https://proteininformationresource.org/cgi-bin/nbrfget?uid=%id", null)))
+                                contains(
+                                        "https://www.uniprot.org/uniprot/%id",
+                                        "https://www.uniprot.org/uniprot/%id",
+                                        "https://www.uniprot.org/uniprot/%id",
+                                        null,
+                                        "https://www.uniprot.org/uniref/%id",
+                                        "https://www.uniprot.org/uniref/%id",
+                                        "https://www.uniprot.org/uniref/%id",
+                                        "https://proteininformationresource.org/cgi-bin/nbrfget?uid=%id",
+                                        null)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Sequence databases')].items.*",
@@ -85,8 +91,10 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Sequence databases')].items.*.uriLink",
-                                contains("https://www.ncbi.nlm.nih.gov/CCDS/CcdsBrowse.cgi?REQUEST=CCDS&GO=MainBrowse&DATA=%id",
-                                        "https://www.ebi.ac.uk/ena/data/view/%id", "https://www.ebi.ac.uk/ena/data/view/%id",
+                                contains(
+                                        "https://www.ncbi.nlm.nih.gov/CCDS/CcdsBrowse.cgi?REQUEST=CCDS&GO=MainBrowse&DATA=%id",
+                                        "https://www.ebi.ac.uk/ena/data/view/%id",
+                                        "https://www.ebi.ac.uk/ena/data/view/%id",
                                         "https://proteininformationresource.org/cgi-bin/nbrfget?uid=%id",
                                         "https://www.ncbi.nlm.nih.gov/nuccore/%id",
                                         "https://www.ncbi.nlm.nih.gov/protein/%id")))
@@ -105,8 +113,11 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Protein-protein interaction databases')].items.*.uriLink",
-                                contains("https://thebiogrid.org/%id", "https://www.ebi.ac.uk/complexportal/complex/%id",
-                                        "https://dip.doe-mbi.ucla.edu/dip/Browse.cgi?ID=%id", "https://string-db.org/network/%id")))
+                                contains(
+                                        "https://thebiogrid.org/%id",
+                                        "https://www.ebi.ac.uk/complexportal/complex/%id",
+                                        "https://dip.doe-mbi.ucla.edu/dip/Browse.cgi?ID=%id",
+                                        "https://string-db.org/network/%id")))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Chemistry')].items.*",
@@ -114,8 +125,11 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Chemistry')].items.*.uriLink",
-                                contains("https://www.ebi.ac.uk/chembldb/target/inspect/%id", "https://www.drugbank.ca/drugs/%id",
-                                        "http://www.guidetopharmacology.org/GRAC/ObjectDisplayForward?objectId=%id", "https://www.swisslipids.org/#/entity/%id/")))
+                                contains(
+                                        "https://www.ebi.ac.uk/chembldb/target/inspect/%id",
+                                        "https://www.drugbank.ca/drugs/%id",
+                                        "http://www.guidetopharmacology.org/GRAC/ObjectDisplayForward?objectId=%id",
+                                        "https://www.swisslipids.org/#/entity/%id/")))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Protein family/group databases')].items.*",

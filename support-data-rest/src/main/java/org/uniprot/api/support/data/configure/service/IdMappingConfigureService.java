@@ -168,7 +168,7 @@ public class IdMappingConfigureService {
             fieldBuilder.from(false);
         }
 
-        if(Utils.notNullNotEmpty(detail.getUriLink())){
+        if (Utils.notNullNotEmpty(detail.getUriLink())) {
             fieldBuilder.uriLink(detail.getUriLink());
         }
 

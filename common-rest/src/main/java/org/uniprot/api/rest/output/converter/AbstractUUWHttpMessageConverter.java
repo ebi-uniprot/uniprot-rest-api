@@ -1,16 +1,5 @@
 package org.uniprot.api.rest.output.converter;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.lang.Nullable;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.core.util.Utils;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
@@ -22,6 +11,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
+import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.lang.Nullable;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.util.Utils;
 
 /**
  * Abstract HTTP message converter extending {@link AbstractHttpMessageConverter} that implements a
