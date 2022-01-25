@@ -54,6 +54,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
     private static final String EXCLUDED_PROTEOME = "UP999999999";
 
     @Autowired private ProteomeQueryRepository repository;
+    private int totalEntriesSaved;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -80,7 +81,8 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
         int numberOfEntries = 12;
         IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
         saveExcluded();
-        return numberOfEntries;
+        totalEntriesSaved = numberOfEntries + 1;
+        return totalEntriesSaved;
     }
 
     @Test
@@ -142,11 +144,12 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(12)))
+                .andExpect(jsonPath("$.results.size()", is(totalEntriesSaved)))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.id",
                                 contains(
+                                        "UP999999999",
                                         "UP000005012",
                                         "UP000005011",
                                         "UP000005010",
@@ -158,7 +161,8 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                                         "UP000005004",
                                         "UP000005003",
                                         "UP000005002",
-                                        "UP000005001")));
+                                        "UP000005001"
+                                )));
     }
 
     @Test
@@ -178,7 +182,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(12)))
+                .andExpect(jsonPath("$.results.size()", is(totalEntriesSaved)))
                 .andExpect(jsonPath("$.results.*.taxonomy").doesNotExist())
                 .andExpect(jsonPath("$.results.*.description").doesNotExist())
                 .andExpect(jsonPath("$.results.*.components").exists())
@@ -356,7 +360,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
     }
 
     @Test
-    void excludedIdReturnEmptyResult() throws Exception {
+    void canFindExcludedIdInStandardIdSearch() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getStreamPath())
@@ -371,7 +375,8 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)));
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].id", is(EXCLUDED_PROTEOME)));
     }
 
     private void saveExcluded() {
