@@ -6,7 +6,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.*;
 
 import java.util.ArrayList;
@@ -39,8 +38,6 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeP
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.core.proteome.*;
-import org.uniprot.core.proteome.impl.*;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -146,7 +143,7 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected void saveEntries(int numberOfEntries) {
-        IntStream.rangeClosed(1, numberOfEntries).forEach(this::saveEntry);
+        IntStream.rangeClosed(1, numberOfEntries - 1).forEach(this::saveEntry);
         saveExcluded();
     }
 
@@ -201,7 +198,9 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("upid:*"))
                     .resultMatcher(
-                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
                     .build();
         }
 
@@ -243,7 +242,9 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("organism_name desc"))
                     .resultMatcher(
-                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
                     .build();
         }
 
@@ -253,7 +254,9 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("organism"))
                     .resultMatcher(
-                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
                     .resultMatcher(jsonPath("$.results.*.taxonomy.taxonId", contains(9606, 9606)))
                     .build();
         }
@@ -264,7 +267,9 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("superkingdom,proteome_type"))
                     .resultMatcher(
-                            jsonPath("$.results.*.id", contains("UP000005231", "UP000005520")))
+                            jsonPath(
+                                    "$.results.*.id",
+                                    contains("UP000005231", "UP000005520", EXCLUDED_PROTEOME)))
                     .resultMatcher(jsonPath("$.facets", iterableWithSize(2)))
                     .resultMatcher(jsonPath("$.facets[0].values", iterableWithSize(1)))
                     .resultMatcher(jsonPath("$.facets[0].label", is("Superkingdom")))

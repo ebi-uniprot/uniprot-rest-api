@@ -23,7 +23,6 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 @Import(ProteomeSolrQueryConfig.class)
 public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, ProteomeEntry> {
     public static final String PROTEOME_ID_FIELD = "upid";
-    public static final String EXCLUDED_FIELD = "excluded";
     private final UniProtQueryProcessorConfig proteomeQueryProcessorConfig;
     private final SearchFieldConfig fieldConfig;
 
@@ -49,10 +48,7 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
             BasicRequest request,
             AbstractSolrSortClause solrSortClause,
             SolrQueryConfig queryBoosts) {
-        SolrRequest.SolrRequestBuilder builder =
-                super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
-        builder.filterQuery(getActiveProteomeFilterQuery());
-        return builder;
+        return super.createSolrRequestBuilder(request, solrSortClause, queryBoosts);
     }
 
     @Override
@@ -63,9 +59,5 @@ public class ProteomeQueryService extends BasicSearchService<ProteomeDocument, P
     @Override
     protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return proteomeQueryProcessorConfig;
-    }
-
-    private String getActiveProteomeFilterQuery() {
-        return EXCLUDED_FIELD + ":false";
     }
 }

@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.common;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,8 +33,6 @@ import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-
-import java.util.List;
 
 @Configuration
 @ConfigurationProperties(prefix = "download")
