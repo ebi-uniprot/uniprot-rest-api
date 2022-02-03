@@ -1,5 +1,17 @@
 package org.uniprot.api.rest.output.converter;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
+import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.lang.Nullable;
+import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.util.Utils;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
@@ -11,18 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.HttpOutputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.lang.Nullable;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.core.util.Utils;
 
 /**
  * Abstract HTTP message converter extending {@link AbstractHttpMessageConverter} that implements a
@@ -44,10 +44,15 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     private static final int LOG_INTERVAL = 10000;
     private static final ThreadLocal<String> ENTITY_SEPARATOR = new ThreadLocal<>();
     private final Class<C> messageConverterEntryClass;
+    private final Gatekeeper downloadGatekeeper;
 
-    AbstractUUWHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
+    AbstractUUWHttpMessageConverter(
+            MediaType mediaType,
+            Class<C> messageConverterEntryClass,
+            Gatekeeper downloadGatekeeper) {
         super(mediaType);
         this.messageConverterEntryClass = messageConverterEntryClass;
+        this.downloadGatekeeper = downloadGatekeeper;
     }
 
     @Override
@@ -144,9 +149,15 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             outputStream.write(("\n\n" + errorMsg + " Please try again later.\n").getBytes());
             throw new StopStreamException(errorMsg, e);
         } finally {
+            if (downloadGatekeeper != null && context.isLargeDownload()) {
+                downloadGatekeeper.exit();
+                log.info("Gatekeeper let me out (space inside={})", downloadGatekeeper.getSpaceInside());
+            }
+
             outputStream.close();
             entities.close();
             cleanUp();
+
         }
     }
 

@@ -245,7 +245,7 @@ class AbstractUUWHttpMessageConverterTest {
                 charStream(ORIGINAL).onClose(() -> characterStreamIsClosed = true);
 
         FakeMessageConverter(MediaType mediaType) {
-            super(mediaType, Character.class);
+            super(mediaType, Character.class, null);
         }
 
         int getCounter() {

@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
@@ -50,6 +51,16 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             Class<T> messageConverterEntryClass,
             ReturnFieldConfig returnFieldConfig) {
         super(MediaType.APPLICATION_JSON, messageConverterEntryClass);
+        this.objectMapper = objectMapper;
+        this.returnFieldConfig = returnFieldConfig;
+    }
+
+    public JsonMessageConverter(
+            ObjectMapper objectMapper,
+            Class<T> messageConverterEntryClass,
+            ReturnFieldConfig returnFieldConfig,
+            Gatekeeper downloadGatekeeper) {
+        super(MediaType.APPLICATION_JSON, messageConverterEntryClass, downloadGatekeeper);
         this.objectMapper = objectMapper;
         this.returnFieldConfig = returnFieldConfig;
     }

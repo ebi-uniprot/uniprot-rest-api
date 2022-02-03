@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -85,8 +86,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             ApplicationEventPublisher eventPublisher,
             UniProtEntryService entryService,
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB, downloadGatekeeper);
         this.entryService = entryService;
     }
 

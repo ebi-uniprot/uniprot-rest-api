@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.concurrency.TaskExecutorProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -57,6 +58,13 @@ public class MessageConverterConfig {
     }
 
     @Bean
+    public Gatekeeper downloadGatekeeper() {
+        return new Gatekeeper(
+                taskExecutor.getConcurrentLargeDownloadsCount(),
+                taskExecutor.getTimeoutInSecondsForLargeDownloads());
+    }
+
+    @Bean
     public ThreadPoolTaskExecutor configurableTaskExecutor() {
         return new ThreadPoolTaskExecutor();
     }
@@ -66,19 +74,21 @@ public class MessageConverterConfig {
      * Add more message converters for additional response types.
      */
     @Bean
-    public WebMvcConfigurer extendedMessageConverters() {
+    public WebMvcConfigurer extendedMessageConverters(Gatekeeper downloadGatekeeper) {
         ReturnFieldConfig returnConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         JsonMessageConverter<UniProtKBEntry> uniProtKBJsonMessageConverter =
                 new JsonMessageConverter<>(
                         UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                         UniProtKBEntry.class,
-                        returnConfig);
+                        returnConfig,
+                        downloadGatekeeper);
         JsonMessageConverter<InteractionEntry> interactionJsonMessageConverter =
                 new JsonMessageConverter<>(
                         UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                         InteractionEntry.class,
-                        returnConfig);
+                        returnConfig,
+                        downloadGatekeeper);
 
         return new WebMvcConfigurer() {
             @Override
@@ -86,31 +96,32 @@ public class MessageConverterConfig {
                 int index = 0;
                 converters.add(index++, uniProtKBJsonMessageConverter);
                 converters.add(index++, new PublicationJsonMessageConverter());
-                converters.add(index++, new PublicationJsonMessageConverter());
                 converters.add(index++, interactionJsonMessageConverter);
-                converters.add(index++, new UniProtKBFlatFileMessageConverter());
-                converters.add(index++, new UniProtKBFastaMessageConverter());
-                converters.add(index++, new ListMessageConverter());
-                converters.add(index++, new RDFMessageConverter());
-                converters.add(index++, new UniProtKBGffMessageConverter());
+                converters.add(index++, new UniProtKBFlatFileMessageConverter(downloadGatekeeper));
+                converters.add(index++, new UniProtKBFastaMessageConverter(downloadGatekeeper));
+                converters.add(index++, new ListMessageConverter(downloadGatekeeper));
+                converters.add(index++, new RDFMessageConverter(downloadGatekeeper));
+                converters.add(index++, new UniProtKBGffMessageConverter(downloadGatekeeper));
                 converters.add(
                         index++,
                         new TsvMessageConverter<>(
                                 UniProtKBEntry.class,
                                 returnConfig,
-                                new UniProtKBEntryValueMapper()));
+                                new UniProtKBEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         index++,
                         new XlsMessageConverter<>(
                                 UniProtKBEntry.class,
                                 returnConfig,
-                                new UniProtKBEntryValueMapper()));
+                                new UniProtKBEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(index++, new ErrorMessageConverter());
-                converters.add(index++, new UniProtKBXmlMessageConverter());
+                converters.add(index++, new UniProtKBXmlMessageConverter(downloadGatekeeper));
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages
 
-                converters.add(index, new InteractionXmlMessageConverter());
+                converters.add(index, new InteractionXmlMessageConverter(downloadGatekeeper));
             }
         };
     }

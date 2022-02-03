@@ -1,17 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
-
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -27,6 +17,16 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.core.util.Utils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
 /**
  * @param <T>
@@ -38,16 +38,27 @@ public abstract class BasicSearchController<T> {
     private final MessageConverterContextFactory<T> converterContextFactory;
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final MessageConverterContextFactory.Resource resource;
+    private final Gatekeeper downloadGatekeeper;
 
     protected BasicSearchController(
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<T> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             MessageConverterContextFactory.Resource resource) {
+        this(eventPublisher, converterContextFactory, downloadTaskExecutor, resource, null);
+    }
+
+    protected BasicSearchController(
+            ApplicationEventPublisher eventPublisher,
+            MessageConverterContextFactory<T> converterContextFactory,
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            MessageConverterContextFactory.Resource resource,
+            Gatekeeper downloadGatekeeper) {
         this.eventPublisher = eventPublisher;
         this.converterContextFactory = converterContextFactory;
         this.downloadTaskExecutor = downloadTaskExecutor;
         this.resource = resource;
+        this.downloadGatekeeper = downloadGatekeeper;
     }
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
@@ -174,12 +185,29 @@ public abstract class BasicSearchController<T> {
         downloadTaskExecutor.execute(
                 () -> {
                     try {
-                        deferredResult.setResult(
+                        ResponseEntity<MessageConverterContext<T>> okayResponse =
                                 ResponseEntity.ok()
                                         .headers(createHttpDownloadHeader(context, request))
-                                        .body(context));
+                                        .body(context);
+                        if (Utils.notNull(downloadGatekeeper)) {
+                            context.setLargeDownload(true);
+                            if (downloadGatekeeper.enter()) {
+                                log.info(
+                                        "Gatekeeper let me in (space inside={})",
+                                        downloadGatekeeper.getSpaceInside());
+                                deferredResult.setResult(okayResponse);
+                            } else {
+                                log.info("Gatekeeper threw me out");
+                                deferredResult.setResult(
+                                        ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                                                .build());
+                            }
+                        } else {
+                            deferredResult.setResult(okayResponse);
+                        }
                     } catch (Exception e) {
                         log.error("Error occurred during processing.");
+                        downloadGatekeeper.exit();
                         deferredResult.setErrorResult(e);
                     }
                 });
