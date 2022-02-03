@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import org.apache.catalina.connector.ClientAbortException;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.uniprot.api.common.exception.*;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
+import org.uniprot.api.rest.output.converter.StopStreamException;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
 
@@ -102,6 +104,16 @@ public class ResponseExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .contentType(getContentTypeFromRequest(request))
                 .body(error);
+    }
+
+    @ExceptionHandler({ClientAbortException.class})
+    public void handleClientAbortException(Throwable e) {
+        logger.warn("Client Aborted", e);
+    }
+
+    @ExceptionHandler({StopStreamException.class})
+    public void handleStopStreamException(Throwable e) {
+        logger.warn("Stopping stream", e);
     }
 
     /**
