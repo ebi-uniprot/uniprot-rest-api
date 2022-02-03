@@ -61,6 +61,19 @@ public abstract class BasicSearchController<T> {
         this.downloadGatekeeper = downloadGatekeeper;
     }
 
+    public static String getLocationURLForId(
+            String redirectId, String fromId, MediaType contentType) {
+        String path = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
+        if (path != null) {
+            String suffix = "";
+            if (!contentType.equals(DEFAULT_MEDIA_TYPE)) {
+                suffix = "." + UniProtMediaType.getFileExtension(contentType);
+            }
+            path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId + suffix;
+        }
+        return path + "?from=" + fromId;
+    }
+
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
             T entity, String fields, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
@@ -174,14 +187,13 @@ public abstract class BasicSearchController<T> {
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>>
             getDeferredResultResponseEntity(
                     HttpServletRequest request, MessageConverterContext<T> context) {
-        // timeout in millis
-        Long timeoutInMillis = (long) downloadTaskExecutor.getKeepAliveSeconds() * 1000;
 
         DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult =
-                new DeferredResult<>(timeoutInMillis);
+                new DeferredResult<>();
 
-        deferredResult.onTimeout(() -> log.error("Request timeout occurred."));
+        deferredResult.onTimeout(() -> setTooManyRequestsResponse(deferredResult));
 
+        // create the deferred result on a thread pool to prevent blocking client
         downloadTaskExecutor.execute(
                 () -> {
                     try {
@@ -190,18 +202,7 @@ public abstract class BasicSearchController<T> {
                                         .headers(createHttpDownloadHeader(context, request))
                                         .body(context);
                         if (Utils.notNull(downloadGatekeeper)) {
-                            context.setLargeDownload(true);
-                            if (downloadGatekeeper.enter()) {
-                                log.info(
-                                        "Gatekeeper let me in (space inside={})",
-                                        downloadGatekeeper.getSpaceInside());
-                                deferredResult.setResult(okayResponse);
-                            } else {
-                                log.info("Gatekeeper threw me out");
-                                deferredResult.setResult(
-                                        ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                                                .build());
-                            }
+                            runRequestIfNotBusy(context, deferredResult, okayResponse);
                         } else {
                             deferredResult.setResult(okayResponse);
                         }
@@ -244,21 +245,26 @@ public abstract class BasicSearchController<T> {
         return getDeferredResultResponseEntity(request, context);
     }
 
-    public static String getLocationURLForId(
-            String redirectId, String fromId, MediaType contentType) {
-        String path = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
-        if (path != null) {
-            String suffix = "";
-            if (!contentType.equals(DEFAULT_MEDIA_TYPE)) {
-                suffix = "." + UniProtMediaType.getFileExtension(contentType);
-            }
-            path = path.substring(0, path.lastIndexOf('/') + 1) + redirectId + suffix;
-        }
-        return path + "?from=" + fromId;
-    }
-
     protected boolean isRDFAccept(HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
         return contentType.equals(RDF_MEDIA_TYPE);
+    }
+
+    private void setTooManyRequestsResponse(
+            DeferredResult<ResponseEntity<MessageConverterContext<T>>> result) {
+        result.setResult(ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build());
+    }
+
+    private void runRequestIfNotBusy(MessageConverterContext<T> context, DeferredResult<ResponseEntity<MessageConverterContext<T>>> deferredResult, ResponseEntity<MessageConverterContext<T>> okayResponse) {
+        context.setLargeDownload(true);
+        if (downloadGatekeeper.enter()) {
+            log.debug(
+                    "Gatekeeper let me in (space inside={})",
+                    downloadGatekeeper.getSpaceInside());
+            deferredResult.setResult(okayResponse);
+        } else {
+            log.debug("Gatekeeper threw me out");
+            setTooManyRequestsResponse(deferredResult);
+        }
     }
 }

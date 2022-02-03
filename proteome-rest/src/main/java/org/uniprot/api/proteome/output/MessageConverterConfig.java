@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.uniprot.api.common.concurrency.TaskExecutorProperties;
+import org.uniprot.api.common.concurrency.StreamConcurrencyProperties;
 import org.uniprot.api.proteome.output.converter.*;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -40,7 +40,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 @Getter
 @Setter
 public class MessageConverterConfig {
-    private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
+    private StreamConcurrencyProperties taskExecutor = new StreamConcurrencyProperties();
 
     @Bean
     public ThreadPoolTaskExecutor downloadTaskExecutor(

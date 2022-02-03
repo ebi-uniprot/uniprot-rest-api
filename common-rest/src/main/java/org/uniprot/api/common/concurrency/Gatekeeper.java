@@ -14,21 +14,29 @@ import java.util.concurrent.TimeUnit;
 public class Gatekeeper {
     protected static final int DEFAULT_TIMEOUT = 5;
     private final Semaphore semaphore;
+    private final int capacity;
     private final int timeout;
 
     public Gatekeeper(int capacity) {
-        semaphore = new Semaphore(capacity);
-        timeout = DEFAULT_TIMEOUT;
+        this.semaphore = new Semaphore(capacity);
+        this.timeout = DEFAULT_TIMEOUT;
+        this.capacity = capacity;
     }
 
-    public Gatekeeper(int capacity, int acceptableWaitTimeForEntry) {
-        semaphore = new Semaphore(capacity);
+    public Gatekeeper(int capacity, int entryTimeoutSeconds) {
 
-        if (acceptableWaitTimeForEntry > 0) {
-            timeout = acceptableWaitTimeForEntry;
+        this.semaphore = new Semaphore(capacity);
+        this.capacity = capacity;
+
+        if (entryTimeoutSeconds > 0) {
+            timeout = entryTimeoutSeconds;
         } else {
             timeout = DEFAULT_TIMEOUT;
         }
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     public boolean enter() {
@@ -47,5 +55,9 @@ public class Gatekeeper {
 
     public int getSpaceInside() {
         return semaphore.availablePermits();
+    }
+
+    int getTimeout() {
+        return timeout;
     }
 }

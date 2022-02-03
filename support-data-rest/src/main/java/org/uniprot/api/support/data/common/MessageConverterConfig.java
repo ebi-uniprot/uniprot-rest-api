@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.uniprot.api.common.concurrency.TaskExecutorProperties;
+import org.uniprot.api.common.concurrency.StreamConcurrencyProperties;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.support.data.disease.response.DiseaseOBOMessageConverter;
 import org.uniprot.api.support.data.keyword.response.KeywordOBOMessageConverter;
@@ -37,7 +37,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 @Configuration
 @ConfigurationProperties(prefix = "download")
 public class MessageConverterConfig {
-    private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
+    private StreamConcurrencyProperties taskExecutor = new StreamConcurrencyProperties();
 
     @Bean
     public ThreadPoolTaskExecutor downloadTaskExecutor(

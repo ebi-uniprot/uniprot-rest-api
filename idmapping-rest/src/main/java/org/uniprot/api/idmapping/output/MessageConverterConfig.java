@@ -29,7 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.uniprot.api.common.concurrency.TaskExecutorProperties;
+import org.uniprot.api.common.concurrency.StreamConcurrencyProperties;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
@@ -59,7 +59,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Getter
 @Setter
 public class MessageConverterConfig {
-    private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
+    private StreamConcurrencyProperties taskExecutor = new StreamConcurrencyProperties();
 
     @Bean
     public ThreadPoolTaskExecutor downloadTaskExecutor(
