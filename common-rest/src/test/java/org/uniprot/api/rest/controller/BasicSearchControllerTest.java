@@ -1,8 +1,12 @@
 package org.uniprot.api.rest.controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.support.GenericWebApplicationContext;
@@ -10,11 +14,6 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.app.FakeBasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-
-import javax.servlet.http.HttpServletRequest;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 
 /**
  * The purpose of this test class is to ensure the {@link BasicSearchController} interacts correctly
@@ -38,7 +37,7 @@ class BasicSearchControllerTest {
         ThreadPoolTaskExecutor downloadTaskExecutor = new ThreadPoolTaskExecutor();
         downloadTaskExecutor.initialize();
         controller =
-                new FakeBasicSearchController(
+                FakeBasicSearchController.createInstance(
                         new GenericWebApplicationContext(),
                         contextFactory,
                         downloadTaskExecutor,

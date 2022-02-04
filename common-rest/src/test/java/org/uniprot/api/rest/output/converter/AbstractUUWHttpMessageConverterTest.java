@@ -3,8 +3,7 @@ package org.uniprot.api.rest.output.converter;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 
@@ -165,6 +165,35 @@ class AbstractUUWHttpMessageConverterTest {
     }
 
     @Test
+    void errorDuringWriteStreamedEntitiesCausesCleanUpAndInvokesExitInGatekeeper()
+            throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        FakeMessageConverter converter =
+                new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper) {
+                    @Override
+                    protected void writeEntity(Character entity, OutputStream outputStream)
+                            throws IOException {
+                        throw new IOException();
+                    }
+                };
+        assertThat(converter.hasCleanedUp(), is(false));
+        assertThat(converter.isCharacterStreamIsClosed(), is(false));
+        ByteArrayOutputStream mockOS = mock(ByteArrayOutputStream.class);
+        MessageConverterContext<Character> context =
+                createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        assertThrows(
+                StopStreamException.class,
+                () -> converter.writeInternal(context, null, httpOutputMessage(mockOS)));
+
+        verify(mockOS).close();
+        verify(gatekeeper).exit();
+        assertThat(converter.hasCleanedUp(), is(true));
+        assertThat(converter.isCharacterStreamIsClosed(), is(true));
+    }
+
+    @Test
     void writesCorrectNumberOfEntities() throws IOException {
         FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE);
         assertThat(converter.getCounter(), is(0));
@@ -195,6 +224,36 @@ class AbstractUUWHttpMessageConverterTest {
                 createFakeMessageConverterContext(FileType.FILE);
         converter.writeInternal(context, null, httpOutputMessage(os));
 
+        assertThat(os.toString(), is(ORIGINAL));
+    }
+
+    @Test
+    void normalRequestDoesNotInvokeExitFromGatekeeper() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        MessageConverterContext<Character> context =
+                createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(false);
+
+        converter.writeInternal(context, null, httpOutputMessage(os));
+
+        verify(gatekeeper, times(0)).exit();
+        assertThat(os.toString(), is(ORIGINAL));
+    }
+
+    @Test
+    void streamedRequestInvokesExitFromGatekeeper() throws IOException {
+        Gatekeeper gatekeeper = mock(Gatekeeper.class);
+        FakeMessageConverter converter = new FakeMessageConverter(ANY_MEDIA_TYPE, gatekeeper);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        MessageConverterContext<Character> context =
+                createFakeMessageConverterContext(FileType.FILE);
+        context.setLargeDownload(true);
+
+        converter.writeInternal(context, null, httpOutputMessage(os));
+
+        verify(gatekeeper).exit();
         assertThat(os.toString(), is(ORIGINAL));
     }
 
@@ -246,6 +305,10 @@ class AbstractUUWHttpMessageConverterTest {
 
         FakeMessageConverter(MediaType mediaType) {
             super(mediaType, Character.class, null);
+        }
+
+        FakeMessageConverter(MediaType mediaType, Gatekeeper gatekeeper) {
+            super(mediaType, Character.class, gatekeeper);
         }
 
         int getCounter() {

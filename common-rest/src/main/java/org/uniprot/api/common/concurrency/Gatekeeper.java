@@ -1,9 +1,9 @@
 package org.uniprot.api.common.concurrency;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 02/02/2022

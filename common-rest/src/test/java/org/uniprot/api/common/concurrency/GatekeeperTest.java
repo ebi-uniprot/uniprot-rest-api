@@ -1,14 +1,14 @@
 package org.uniprot.api.common.concurrency;
 
-import org.junit.jupiter.api.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.jupiter.api.Test;
 
 class GatekeeperTest {
     @Test
@@ -65,7 +65,7 @@ class GatekeeperTest {
     @Test
     void cannotEnterWhenFull() {
         Gatekeeper gatekeeper = new Gatekeeper(2, 1);
-        
+
         gatekeeper.enter();
         gatekeeper.enter();
 
