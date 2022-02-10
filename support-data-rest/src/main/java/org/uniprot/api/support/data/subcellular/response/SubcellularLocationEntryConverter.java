@@ -30,7 +30,7 @@ public class SubcellularLocationEntryConverter
     public SubcellularLocationEntry apply(SubcellularLocationDocument subcellularLocationDocument) {
         try {
             return objectMapper.readValue(
-                    subcellularLocationDocument.getSubcellularlocationObj().array(),
+                    subcellularLocationDocument.getSubcellularlocationObj(),
                     SubcellularLocationEntry.class);
         } catch (Exception e) {
             log.warn("Error converting solr binary to SubcellularLocationEntry: ", e);
