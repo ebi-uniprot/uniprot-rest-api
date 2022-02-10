@@ -1,6 +1,5 @@
 package org.uniprot.api.support.data.subcellular.controller;
 
-import java.nio.ByteBuffer;
 import java.util.Collections;
 
 import org.uniprot.core.cv.go.impl.GoTermBuilder;
@@ -60,12 +59,11 @@ public class SubcellularLocationITUtils {
         return document;
     }
 
-    private static ByteBuffer getSubcellularLocationBinary(SubcellularLocationEntry entry) {
+    private static byte[] getSubcellularLocationBinary(SubcellularLocationEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    SubcellularLocationJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return SubcellularLocationJsonConfig.getInstance()
+                    .getFullObjectMapper()
+                    .writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(
                     "Unable to parse SubcellularLocationEntry to binary json: ", e);
