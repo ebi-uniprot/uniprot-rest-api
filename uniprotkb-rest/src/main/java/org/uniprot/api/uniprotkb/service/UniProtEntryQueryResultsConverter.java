@@ -66,7 +66,7 @@ class UniProtEntryQueryResultsConverter {
                 results.getFacets(),
                 results.getMatchedFields(),
                 null,
-                null);
+                results.getSuggestions());
     }
 
     Optional<UniProtKBEntry> convertDoc(UniProtDocument doc, List<ReturnField> filters) {
