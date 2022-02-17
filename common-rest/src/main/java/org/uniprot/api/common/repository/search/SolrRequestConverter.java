@@ -67,9 +67,6 @@ public class SolrRequestConverter {
         }
 
         solrQuery.add("spellcheck", "true");
-        // TODO remove this after testing.. changes are already in solrconfig.xml
-        solrQuery.add("spellcheck.extendedResults", "true");
-        solrQuery.add("spellcheck.count", "5");
 
         JsonQueryRequest result = new JsonQueryRequest(solrQuery);
         setSort(result, request.getSorts());
