@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +91,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.isEmptyString;
@@ -100,6 +103,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -1280,8 +1284,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
     }
 
-    @Test
-    void testGetSuggestionForSearchWithTypo() throws Exception {
+    @ParameterizedTest(name = "{0} misspelt `{1}`")
+    @MethodSource(value = "provideMisspeltSearchString")
+    void testGetSuggestionForSearchWithTypo(String field, String searchString, List<String> suggestions) throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -1296,7 +1301,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=homan")
+                                get(SEARCH_RESOURCE + "?query=" + searchString)
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -1305,10 +1310,38 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                         .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                         .andExpect(jsonPath("$.results", is(empty())))
                         .andExpect(jsonPath("$.suggestions.size()", is(1)))
-                        .andExpect(jsonPath("$.suggestions[0].original", is("homan")))
-                        .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains("human", "homo")))
-                        .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(2, 2)));
+                        .andExpect(jsonPath("$.suggestions[0].original", is(searchString)))
+                        .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains(suggestions.toArray())))
+                        .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", notNullValue()));
     }
+
+    @Test
+    void testGetNoSuggestionForSearch() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=cambridge")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", is(empty())))
+                .andExpect(jsonPath("$.suggestions").doesNotExist());
+    }
+
 
     @Override
     protected String getSearchRequestPath() {
@@ -1561,6 +1594,16 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                     .saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
                         });
     }
+
+    public Stream<Arguments> provideMisspeltSearchString() {
+        return Stream.of(
+                Arguments.of("organism_name", "homan", List.of("human", "homo")),
+                Arguments.of("protein_name", "fibroblost", List.of("fibroblast")),
+                Arguments.of("taxonomy_name", "homa", List.of("homo", "human")),
+                Arguments.of("gene_exact", "fgfr9", List.of("fgfr", "fgfr2", "kgfr"))
+        );
+    }
+
 
     static class UniprotKBSearchParameterResolver extends AbstractSearchParameterResolver {
 
