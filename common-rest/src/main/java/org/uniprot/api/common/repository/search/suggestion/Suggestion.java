@@ -18,5 +18,6 @@ import lombok.Data;
 @Data
 @Builder
 public class Suggestion {
-    private Alternative alternative;
+    private String query;
+    private long hits;
 }

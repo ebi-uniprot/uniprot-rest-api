@@ -33,11 +33,9 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
     }
 
     private Suggestion getSuggestion(SpellCheckResponse.Collation collation) {
-        Alternative alternate =
-                Alternative.builder()
-                        .term(collation.getCollationQueryString())
-                        .count(collation.getNumberOfHits())
-                        .build();
-        return Suggestion.builder().alternative(alternate).build();
+        return Suggestion.builder()
+                .query(collation.getCollationQueryString())
+                .hits(collation.getNumberOfHits())
+                .build();
     }
 }

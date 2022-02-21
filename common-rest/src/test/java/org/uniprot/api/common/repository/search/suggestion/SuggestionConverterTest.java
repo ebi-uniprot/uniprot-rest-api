@@ -47,29 +47,29 @@ class SuggestionConverterTest {
     @Test
     void convertsSingleSolrSuggestionToSingletonListOfUniProtSuggestions() {
         // given --------------------------------------------------------------
-        String alternative = "bill";
-        long hit = 1L;
-        simulateSuggestionsReturnedAre(List.of(new PairImpl<>(alternative, hit)));
+        String correctQuery = "bill";
+        long hits = 1L;
+        simulateSuggestionsReturnedAre(List.of(new PairImpl<>(correctQuery, hits)));
 
         // when --------------------------------------------------------------
         List<Suggestion> suggestions = converter.convert(mockQueryResponse);
 
         // then --------------------------------------------------------------
         assertThat(suggestions, hasSize(1));
-        assertThat(suggestions.get(0).getAlternative().getTerm(), is(alternative));
-        assertThat(suggestions.get(0).getAlternative().getCount(), is(hit));
+        assertThat(suggestions.get(0).getQuery(), is(correctQuery));
+        assertThat(suggestions.get(0).getHits(), is(hits));
     }
 
     @Test
     void convertsMultipleSolrSuggestionsToMultipleUniProtSuggestions() {
         // given --------------------------------------------------------------
-        String alternative0 = "bill";
+        String correctQuery0 = "bill";
         long hit0 = 8L;
 
-        String alternative1 = "ship";
+        String correctQuery1 = "ship";
         long hit1 = 2L;
         List<Pair<String, Long>> termHitPairs =
-                List.of(new PairImpl<>(alternative0, hit0), new PairImpl<>(alternative1, hit1));
+                List.of(new PairImpl<>(correctQuery0, hit0), new PairImpl<>(correctQuery1, hit1));
         simulateSuggestionsReturnedAre(termHitPairs);
 
         // when --------------------------------------------------------------
@@ -77,26 +77,26 @@ class SuggestionConverterTest {
 
         // then --------------------------------------------------------------
         assertThat(suggestions, hasSize(2));
-        assertThat(suggestions.get(0).getAlternative().getTerm(), is(alternative0));
-        assertThat(suggestions.get(0).getAlternative().getCount(), is(hit0));
+        assertThat(suggestions.get(0).getQuery(), is(correctQuery0));
+        assertThat(suggestions.get(0).getHits(), is(hit0));
 
-        assertThat(suggestions.get(1).getAlternative().getTerm(), is(alternative1));
-        assertThat(suggestions.get(1).getAlternative().getCount(), is(hit1));
+        assertThat(suggestions.get(1).getQuery(), is(correctQuery1));
+        assertThat(suggestions.get(1).getHits(), is(hit1));
     }
 
     @SuppressWarnings("unchecked")
-    private void simulateSuggestionsReturnedAre(List<Pair<String, Long>> termHitPairs) {
-        if (Utils.notNullNotEmpty(termHitPairs)) {
+    private void simulateSuggestionsReturnedAre(List<Pair<String, Long>> queryHitsPairs) {
+        if (Utils.notNullNotEmpty(queryHitsPairs)) {
             List<SpellCheckResponse.Collation> mockCollations = new ArrayList<>();
 
-            for (Pair<String, Long> termHit : termHitPairs) {
+            for (Pair<String, Long> termHit : queryHitsPairs) {
 
-                String alternative = termHit.getKey();
-                Long hit = termHit.getValue();
+                String query = termHit.getKey();
+                Long hits = termHit.getValue();
                 SpellCheckResponse.Collation mockCollation =
                         mock(SpellCheckResponse.Collation.class);
-                when(mockCollation.getCollationQueryString()).thenReturn(alternative);
-                when(mockCollation.getNumberOfHits()).thenReturn(hit);
+                when(mockCollation.getCollationQueryString()).thenReturn(query);
+                when(mockCollation.getNumberOfHits()).thenReturn(hits);
                 mockCollations.add(mockCollation);
             }
             when(mockSpellCheckResponse.getCollatedResults()).thenReturn(mockCollations);
