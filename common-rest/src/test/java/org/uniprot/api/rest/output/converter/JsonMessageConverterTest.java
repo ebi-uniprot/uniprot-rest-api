@@ -331,7 +331,6 @@ class JsonMessageConverterTest {
                         .suggestions(
                                 List.of(
                                         Suggestion.builder()
-                                                .original("orig 1")
                                                 .alternative(
                                                         Alternative.builder()
                                                                 .term("one")
@@ -339,7 +338,6 @@ class JsonMessageConverterTest {
                                                                 .build())
                                                 .build(),
                                         Suggestion.builder()
-                                                .original("orig 2")
                                                 .alternative(
                                                         Alternative.builder()
                                                                 .term("two")

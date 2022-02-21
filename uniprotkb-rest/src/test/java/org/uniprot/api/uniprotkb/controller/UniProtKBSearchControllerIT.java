@@ -1285,7 +1285,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @ParameterizedTest(name = "{0} misspelt `{1}`")
     @MethodSource(value = "provideMisspeltSearchString")
     void testGetSuggestionForSearchWithTypo(
-            String field, String searchString, List<String> suggestions) throws Exception {
+            String field, String searchString, List<String> alternatives) throws Exception {
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
@@ -1308,13 +1308,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results", is(empty())))
-                .andExpect(jsonPath("$.suggestions.size()", is(1)))
-                .andExpect(jsonPath("$.suggestions[0].original", is(searchString)))
-                .andExpect(
-                        jsonPath(
-                                "$.suggestions[0].alternatives[*].term",
-                                containsInAnyOrder(suggestions.toArray())))
-                .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", notNullValue()));
+                .andExpect(jsonPath("$.suggestions.size()", is(alternatives.size())))
+                .andExpect(jsonPath("$.suggestions[0].alternative.term", is(alternatives.get(0))))
+                .andExpect(jsonPath("$.suggestions[0].alternative.count", notNullValue()));
     }
 
     @Test
@@ -1599,9 +1595,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     public Stream<Arguments> provideMisspeltSearchString() {
         return Stream.of(
                 Arguments.of("protein_name", "fibroblost", List.of("fibroblast")),
-                Arguments.of("taxonomy_name", "homa", List.of("homo", "human")),
+                Arguments.of("taxonomy_name", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
                 Arguments.of("cc_disease", "pfeifer", List.of("pfeiffer")),
-                Arguments.of("gene_exact", "fgfr9", List.of("fgfr", "fgfr2")));
+                Arguments.of("gene_exact", "fgfr9", List.of("fgfr2", "fgfr")));
     }
 
     static class UniprotKBSearchParameterResolver extends AbstractSearchParameterResolver {
