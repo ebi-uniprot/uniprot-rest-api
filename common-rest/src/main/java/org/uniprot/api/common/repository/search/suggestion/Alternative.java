@@ -19,5 +19,5 @@ import lombok.Data;
 @Builder
 public class Alternative {
     private String term;
-    private int count;
+    private long count;
 }
