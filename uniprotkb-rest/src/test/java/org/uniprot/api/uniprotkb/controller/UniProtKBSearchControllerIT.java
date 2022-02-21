@@ -16,7 +16,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -1310,8 +1309,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results", is(empty())))
                 .andExpect(jsonPath("$.suggestions.size()", is(alternatives.size())))
-                .andExpect(jsonPath("$.suggestions[0].alternative.term", is(alternatives.get(0))))
-                .andExpect(jsonPath("$.suggestions[0].alternative.count", notNullValue()));
+                .andExpect(jsonPath("$.suggestions[0].query", is(alternatives.get(0))))
+                .andExpect(jsonPath("$.suggestions[0].hits", notNullValue()));
     }
 
     @Test
@@ -1339,10 +1338,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results", is(empty())))
                 .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].alternative.term", is("taxonomy_name:human")))
-                .andExpect(jsonPath("$.suggestions[0].alternative.count", is(1)))
-                .andExpect(jsonPath("$.suggestions[1].alternative.term", is("taxonomy_name:homo")))
-                .andExpect(jsonPath("$.suggestions[1].alternative.count", is(1)));
+                .andExpect(jsonPath("$.suggestions[0].query", is("taxonomy_name:human")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(1)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("taxonomy_name:homo")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
 
     @Test

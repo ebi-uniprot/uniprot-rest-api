@@ -10,6 +10,7 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -234,10 +235,10 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].alternative.term", is("ball")))
-                .andExpect(jsonPath("$.suggestions[0].alternative.count", is(2)))
-                .andExpect(jsonPath("$.suggestions[1].alternative.term", is("bill")))
-                .andExpect(jsonPath("$.suggestions[1].alternative.count", is(1)));
+                .andExpect(jsonPath("$.suggestions[0].query", is("ball")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(2)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("bill")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
 
     @Test
@@ -260,10 +261,10 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].alternative.term", is("\"protein ball\"")))
-                .andExpect(jsonPath("$.suggestions[0].alternative.count", is(2)))
-                .andExpect(jsonPath("$.suggestions[1].alternative.term", is("\"protein bill\"")))
-                .andExpect(jsonPath("$.suggestions[1].alternative.count", is(1)));
+                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein ball\"")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(2)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein bill\"")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
 
     @Test
@@ -288,10 +289,10 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].alternative.term", is("\"protein bill\"")))
-                .andExpect(jsonPath("$.suggestions[0].alternative.count", is(3)))
-                .andExpect(jsonPath("$.suggestions[1].alternative.term", is("\"protein ball\"")))
-                .andExpect(jsonPath("$.suggestions[1].alternative.count", is(2)));
+                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein bill\"")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(3)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein ball\"")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(2)));
     }
 
     @Test
