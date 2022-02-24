@@ -5,7 +5,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -157,8 +156,11 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRuleEntry>>> stream(
             @Valid @ModelAttribute ArbaStreamRequest streamRequest, HttpServletRequest request) {
 
-        Stream<UniRuleEntry> result = arbaService.stream(streamRequest);
-        return super.stream(result, streamRequest, getAcceptHeader(request), request);
+        return super.stream(
+                () -> arbaService.stream(streamRequest),
+                streamRequest,
+                getAcceptHeader(request),
+                request);
     }
 
     @Override

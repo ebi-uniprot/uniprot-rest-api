@@ -54,6 +54,7 @@ public class MessageConverterConfig {
         configurableTaskExecutor.setAllowCoreThreadTimeOut(taskExecutor.isAllowCoreThreadTimeout());
         configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(
                 taskExecutor.isWaitForTasksToCompleteOnShutdown());
+        configurableTaskExecutor.initialize();
         return configurableTaskExecutor;
     }
 

@@ -51,14 +51,14 @@ class BasicSearchControllerTest {
         setUp(true);
 
         // FIRST STREAM REQUEST
-        controller.getDeferredResultResponseEntity(mock(HttpServletRequest.class), context);
+        controller.getDeferredResultResponseEntity(() -> context, mock(HttpServletRequest.class));
         Thread.sleep(100); // give some time to allow the Gatekeeper to allow an "enter"
 
         MatcherAssert.assertThat(
                 gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity() - 1));
 
         // SECOND STREAM REQUEST
-        controller.getDeferredResultResponseEntity(mock(HttpServletRequest.class), context);
+        controller.getDeferredResultResponseEntity(() -> context, mock(HttpServletRequest.class));
         Thread.sleep(100); // give some time to allow the Gatekeeper to allow an "enter"
 
         MatcherAssert.assertThat(
@@ -69,7 +69,7 @@ class BasicSearchControllerTest {
     void noErrorWhenCreatingDeferredResultIfGatekeeperNull() throws InterruptedException {
         setUp(false);
 
-        controller.getDeferredResultResponseEntity(mock(HttpServletRequest.class), context);
+        controller.getDeferredResultResponseEntity(() -> context, mock(HttpServletRequest.class));
 
         assertTrue(true);
     }

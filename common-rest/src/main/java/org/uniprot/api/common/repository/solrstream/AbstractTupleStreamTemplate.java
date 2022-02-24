@@ -28,7 +28,7 @@ public abstract class AbstractTupleStreamTemplate {
         if (Objects.isNull(this.streamFactory)) {
             initTupleStreamFactory(zkHost, collection);
         } else {
-            log.info("DefaultStreamFactory already created for collection {}", collection);
+            log.debug("DefaultStreamFactory already created for collection {}", collection);
         }
         return this.streamFactory;
     }
@@ -37,7 +37,7 @@ public abstract class AbstractTupleStreamTemplate {
         if (Objects.isNull(this.streamContext)) {
             initStreamContext(collection, httpClient);
         } else {
-            log.info("StreamContext already created for collection {}", collection);
+            log.debug("StreamContext already created for collection {}", collection);
         }
         return this.streamContext;
     }

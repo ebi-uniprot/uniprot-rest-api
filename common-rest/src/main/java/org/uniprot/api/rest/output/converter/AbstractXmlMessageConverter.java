@@ -1,17 +1,19 @@
 package org.uniprot.api.rest.output.converter;
 
-import com.sun.xml.bind.marshaller.DataWriter;
-import org.springframework.http.MediaType;
-import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import org.springframework.http.MediaType;
+import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+
+import com.sun.xml.bind.marshaller.DataWriter;
 
 /**
  * @author jluo

@@ -6,7 +6,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -162,13 +161,18 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            Stream<String> result = crossRefService.streamRDF(streamRequest);
-            return super.streamRDF(result, streamRequest, contentType, request);
+            return super.streamRDF(
+                    () -> crossRefService.streamRDF(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         } else {
-            Stream<CrossRefEntry> result = crossRefService.stream(streamRequest);
-            return super.stream(result, streamRequest, contentType, request);
+            return super.stream(
+                    () -> crossRefService.stream(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         }
     }
 

@@ -9,7 +9,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.TAXONOMY;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -230,11 +229,17 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                     MediaType contentType,
             HttpServletRequest request) {
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            Stream<String> result = taxonomyService.streamRDF(streamRequest);
-            return super.streamRDF(result, streamRequest, contentType, request);
+            return super.streamRDF(
+                    () -> taxonomyService.streamRDF(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         } else {
-            Stream<TaxonomyEntry> result = taxonomyService.stream(streamRequest);
-            return super.stream(result, streamRequest, contentType, request);
+            return super.stream(
+                    () -> taxonomyService.stream(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         }
     }
 

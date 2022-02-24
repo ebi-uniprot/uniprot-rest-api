@@ -24,7 +24,9 @@ public abstract class AbstractEntityHttpMessageConverter<C>
     }
 
     public AbstractEntityHttpMessageConverter(
-            MediaType mediaType, Class<C> messageConverterEntryClass, Gatekeeper downloadGatekeeper) {
+            MediaType mediaType,
+            Class<C> messageConverterEntryClass,
+            Gatekeeper downloadGatekeeper) {
         super(mediaType, messageConverterEntryClass, downloadGatekeeper);
     }
 

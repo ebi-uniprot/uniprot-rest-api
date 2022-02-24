@@ -10,7 +10,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.SUBCELLULAR_LOCATION;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -208,12 +207,17 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                     MediaType contentType,
             HttpServletRequest request) {
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            Stream<String> result = subcellularLocationService.streamRDF(streamRequest);
-            return super.streamRDF(result, streamRequest, contentType, request);
+            return super.streamRDF(
+                    () -> subcellularLocationService.streamRDF(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         } else {
-            Stream<SubcellularLocationEntry> result =
-                    subcellularLocationService.stream(streamRequest);
-            return super.stream(result, streamRequest, contentType, request);
+            return super.stream(
+                    () -> subcellularLocationService.stream(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         }
     }
 

@@ -156,7 +156,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
         // validate the mapped ids size
         validatedMappedIdsLimit(completedJob.getIdMappingResult());
         return super.stream(
-                completedJob.getIdMappingResult().getMappedIds().stream(),
+                () -> completedJob.getIdMappingResult().getMappedIds().stream(),
                 streamRequest,
                 getAcceptHeader(request),
                 request);

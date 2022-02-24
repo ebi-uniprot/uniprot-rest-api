@@ -8,7 +8,6 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 
 import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -181,8 +180,11 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRuleEntry>>> stream(
             @Valid @ModelAttribute UniRuleStreamRequest streamRequest, HttpServletRequest request) {
 
-        Stream<UniRuleEntry> result = uniRuleService.stream(streamRequest);
-        return super.stream(result, streamRequest, getAcceptHeader(request), request);
+        return super.stream(
+                () -> uniRuleService.stream(streamRequest),
+                streamRequest,
+                getAcceptHeader(request),
+                request);
     }
 
     @Override

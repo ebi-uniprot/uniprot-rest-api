@@ -24,7 +24,10 @@ public abstract class AbstractEntityIdHttpMessageConverter<C>
         super(mediaType, messageConverterEntryClass, null);
     }
 
-    AbstractEntityIdHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass, Gatekeeper downloadGatekeeper) {
+    AbstractEntityIdHttpMessageConverter(
+            MediaType mediaType,
+            Class<C> messageConverterEntryClass,
+            Gatekeeper downloadGatekeeper) {
         super(mediaType, messageConverterEntryClass, downloadGatekeeper);
     }
 
