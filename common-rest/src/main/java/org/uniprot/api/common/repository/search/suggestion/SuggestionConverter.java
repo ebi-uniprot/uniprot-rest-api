@@ -34,7 +34,7 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
 
     private Suggestion getSuggestion(SpellCheckResponse.Collation collation) {
         return Suggestion.builder()
-                .query(collation.getCollationQueryString())
+                .query(collation.getCollationQueryString().replace(" AND ", " "))
                 .hits(collation.getNumberOfHits())
                 .build();
     }
