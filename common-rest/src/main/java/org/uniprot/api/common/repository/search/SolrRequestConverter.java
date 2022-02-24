@@ -66,13 +66,6 @@ public class SolrRequestConverter {
             setQueryFields(solrQuery, request.getQueryConfig());
         }
 
-        //        solrQuery.add("spellcheck", "true");
-        //        solrQuery.add("spellcheck.count", "5");
-        //        solrQuery.add("spellcheck.maxResultsForSuggest", "0");
-        //        solrQuery.add("spellcheck.collate", "true");
-        //        solrQuery.add("spellcheck.collateExtendedResults", "true");
-        //        solrQuery.add("spellcheck.maxCollations", "5");
-        //        solrQuery.add("spellcheck.maxCollationTries", "5");
         JsonQueryRequest result = new JsonQueryRequest(solrQuery);
         setSort(result, request.getSorts());
         if (!request.getFacets().isEmpty()) {
