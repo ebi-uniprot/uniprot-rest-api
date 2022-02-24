@@ -279,7 +279,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(getSearchRequestPath())
-                                .param("query", "\"protin bell\"")
+                                .param("query", "protin bell")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -288,9 +288,9 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein bill\"")))
+                .andExpect(jsonPath("$.suggestions[0].query", is("protein bill")))
                 .andExpect(jsonPath("$.suggestions[0].hits", is(3)))
-                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein ball\"")))
+                .andExpect(jsonPath("$.suggestions[1].query", is("protein ball")))
                 .andExpect(jsonPath("$.suggestions[1].hits", is(2)));
     }
 
@@ -314,6 +314,34 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.id", contains("3")))
                 .andExpect(jsonPath("$.suggestions").doesNotExist());
+    }
+
+    @Test
+    void multipleSuggestionsGivenForPhraseQuery() throws Exception {
+        saveEntry("id0", "another fluffy protein bill", "content 0", "category");
+        saveEntry("id00", "another one fluffy protein bill", "content 00", "category");
+        saveEntry("id1", "title", "content 1", "category");
+        saveEntry("id2", "goat cabbage protein ball", "content 2", "category");
+        saveEntry("id3", "rigorous protein ball", "content 3", "category");
+        saveEntry("id4", "pink fluffy protein bill", "content 4", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "\"protin bell\"")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.suggestions.size()", is(2)))
+                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein bill\"")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(3)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein ball\"")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(2)));
     }
 
     @Override
