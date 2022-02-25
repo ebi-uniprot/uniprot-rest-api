@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -71,12 +72,14 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             @Qualifier("literatureMessageConverterContextFactory")
                     MessageConverterContextFactory<LiteratureEntry>
                             literatureMessageConverterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
         super(
                 eventPublisher,
                 literatureMessageConverterContextFactory,
                 downloadTaskExecutor,
-                LITERATURE);
+                LITERATURE,
+                downloadGatekeeper);
         this.literatureService = literatureService;
     }
 

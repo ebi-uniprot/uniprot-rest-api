@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -65,8 +66,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             @Qualifier("keywordMessageConverterContextFactory")
                     MessageConverterContextFactory<KeywordEntry>
                             keywordMessageConverterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, keywordMessageConverterContextFactory, downloadTaskExecutor, KEYWORD);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(eventPublisher, keywordMessageConverterContextFactory, downloadTaskExecutor, KEYWORD, downloadGatekeeper);
         this.keywordService = keywordService;
     }
 

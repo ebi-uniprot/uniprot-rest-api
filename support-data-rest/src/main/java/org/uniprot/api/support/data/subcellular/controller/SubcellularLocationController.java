@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -71,12 +72,14 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             @Qualifier("subcellularLocationMessageConverterContextFactory")
                     MessageConverterContextFactory<SubcellularLocationEntry>
                             subcellularLocationMessageConverterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
         super(
                 eventPublisher,
                 subcellularLocationMessageConverterContextFactory,
                 downloadTaskExecutor,
-                SUBCELLULAR_LOCATION);
+                SUBCELLULAR_LOCATION,
+                downloadGatekeeper);
         this.subcellularLocationService = subcellularLocationService;
     }
 
