@@ -22,6 +22,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
@@ -68,8 +69,9 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             IdMappingPIRService idMappingService,
             IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<IdMappingStringPair> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, IDMAPPING_PIR);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, IDMAPPING_PIR, downloadGatekeeper);
         this.idMappingService = idMappingService;
         this.cacheService = cacheService;
     }

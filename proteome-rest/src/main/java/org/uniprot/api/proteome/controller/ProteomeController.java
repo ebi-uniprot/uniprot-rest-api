@@ -21,6 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.proteome.request.ProteomeSearchRequest;
 import org.uniprot.api.proteome.request.ProteomeStreamRequest;
@@ -61,8 +62,9 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             ProteomeQueryService queryService,
             @Qualifier("PROTEOME")
                     MessageConverterContextFactory<ProteomeEntry> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, PROTEOME);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, PROTEOME, downloadGatekeeper);
         this.queryService = queryService;
     }
 

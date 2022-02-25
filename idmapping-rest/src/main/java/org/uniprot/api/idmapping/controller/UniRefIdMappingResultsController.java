@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingStreamRequest;
@@ -59,8 +60,9 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
             UniRefIdService idService,
             IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<UniRefEntryPair> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF, downloadGatekeeper);
         this.idService = idService;
         this.cacheService = cacheService;
     }

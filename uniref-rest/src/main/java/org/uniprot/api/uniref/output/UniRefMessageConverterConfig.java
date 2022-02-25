@@ -1,15 +1,7 @@
 package org.uniprot.api.uniref.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.concurrency.StreamConcurrencyProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -36,35 +29,21 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
 /**
  * @author jluo
  * @date: 22 Aug 2019
  */
 @Configuration
-@ConfigurationProperties(prefix = "download")
 @Getter
 @Setter
 public class UniRefMessageConverterConfig {
-    private StreamConcurrencyProperties taskExecutor = new StreamConcurrencyProperties();
-
-    @Bean
-    public ThreadPoolTaskExecutor downloadTaskExecutor(
-            ThreadPoolTaskExecutor configurableTaskExecutor) {
-        configurableTaskExecutor.setCorePoolSize(taskExecutor.getCorePoolSize());
-        configurableTaskExecutor.setMaxPoolSize(taskExecutor.getMaxPoolSize());
-        configurableTaskExecutor.setQueueCapacity(taskExecutor.getQueueCapacity());
-        configurableTaskExecutor.setKeepAliveSeconds(taskExecutor.getKeepAliveSeconds());
-        configurableTaskExecutor.setAllowCoreThreadTimeOut(taskExecutor.isAllowCoreThreadTimeout());
-        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(
-                taskExecutor.isWaitForTasksToCompleteOnShutdown());
-        return configurableTaskExecutor;
-    }
-
-    @Bean
-    public ThreadPoolTaskExecutor configurableTaskExecutor() {
-        return new ThreadPoolTaskExecutor();
-    }
-
     @Bean
     public WebMvcConfigurer extendedMessageConverters() {
         return new WebMvcConfigurer() {

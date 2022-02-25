@@ -21,6 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -65,8 +66,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             ApplicationEventPublisher eventPublisher,
             UniRefEntryLightService queryService,
             MessageConverterContextFactory<UniRefEntryLight> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF, downloadGatekeeper);
         this.service = queryService;
     }
 

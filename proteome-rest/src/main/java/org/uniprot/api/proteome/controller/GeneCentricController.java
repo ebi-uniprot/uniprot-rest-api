@@ -21,6 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.proteome.request.GeneCentricSearchRequest;
 import org.uniprot.api.proteome.request.GeneCentricStreamRequest;
@@ -64,8 +65,9 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
             @Qualifier("GENECENTRIC")
                     MessageConverterContextFactory<GeneCentricEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper,
             SearchFieldConfig geneCentricSearchFieldConfig) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, GENECENTRIC);
+        super(eventPublisher, converterContextFactory, downloadTaskExecutor, GENECENTRIC, downloadGatekeeper);
         this.service = service;
         this.upIdFieldName =
                 geneCentricSearchFieldConfig.getSearchFieldItemByName("upid").getFieldName();

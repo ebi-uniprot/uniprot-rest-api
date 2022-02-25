@@ -31,7 +31,6 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
  */
 @Configuration
 public class MessageConverterConfig {
-
     @Bean(name = "uniRuleMessageConverterContextFactory")
     public MessageConverterContextFactory<UniRuleEntry> uniRuleMessageConverterContextFactory() {
         MessageConverterContextFactory<UniRuleEntry> contextFactory =

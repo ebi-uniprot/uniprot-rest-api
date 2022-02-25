@@ -1,15 +1,7 @@
 package org.uniprot.api.uniprotkb.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,44 +24,22 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
 /**
  * Created 21/08/18
  *
  * @author Edd
  */
 @Configuration
-@ConfigurationProperties(prefix = "download")
 @Getter
 @Setter
 public class MessageConverterConfig {
-    private StreamConcurrencyProperties taskExecutor = new StreamConcurrencyProperties();
-
-    @Bean
-    public ThreadPoolTaskExecutor downloadTaskExecutor(
-            ThreadPoolTaskExecutor configurableTaskExecutor) {
-        configurableTaskExecutor.setCorePoolSize(taskExecutor.getCorePoolSize());
-        configurableTaskExecutor.setMaxPoolSize(taskExecutor.getMaxPoolSize());
-        configurableTaskExecutor.setQueueCapacity(taskExecutor.getQueueCapacity());
-        configurableTaskExecutor.setKeepAliveSeconds(taskExecutor.getKeepAliveSeconds());
-        configurableTaskExecutor.setAllowCoreThreadTimeOut(taskExecutor.isAllowCoreThreadTimeout());
-        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(
-                taskExecutor.isWaitForTasksToCompleteOnShutdown());
-        configurableTaskExecutor.initialize();
-        return configurableTaskExecutor;
-    }
-
-    @Bean
-    public Gatekeeper downloadGatekeeper() {
-        return new Gatekeeper(
-                taskExecutor.getConcurrentLargeDownloadsCount(),
-                taskExecutor.getTimeoutInSecondsForLargeDownloads());
-    }
-
-    @Bean
-    public ThreadPoolTaskExecutor configurableTaskExecutor() {
-        return new ThreadPoolTaskExecutor();
-    }
-
     /*
      * Add to the supported message converters.
      * Add more message converters for additional response types.

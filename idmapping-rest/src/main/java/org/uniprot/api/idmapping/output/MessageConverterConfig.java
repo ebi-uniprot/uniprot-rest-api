@@ -55,30 +55,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Edd
  */
 @Configuration
-@ConfigurationProperties(prefix = "download")
 @Getter
 @Setter
 public class MessageConverterConfig {
-    private StreamConcurrencyProperties taskExecutor = new StreamConcurrencyProperties();
-
-    @Bean
-    public ThreadPoolTaskExecutor downloadTaskExecutor(
-            ThreadPoolTaskExecutor configurableTaskExecutor) {
-        configurableTaskExecutor.setCorePoolSize(taskExecutor.getCorePoolSize());
-        configurableTaskExecutor.setMaxPoolSize(taskExecutor.getMaxPoolSize());
-        configurableTaskExecutor.setQueueCapacity(taskExecutor.getQueueCapacity());
-        configurableTaskExecutor.setKeepAliveSeconds(taskExecutor.getKeepAliveSeconds());
-        configurableTaskExecutor.setAllowCoreThreadTimeOut(taskExecutor.isAllowCoreThreadTimeout());
-        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(
-                taskExecutor.isWaitForTasksToCompleteOnShutdown());
-        return configurableTaskExecutor;
-    }
-
-    @Bean
-    public ThreadPoolTaskExecutor configurableTaskExecutor() {
-        return new ThreadPoolTaskExecutor();
-    }
-
     @Bean
     public WebMvcConfigurer extendedMessageConverters() {
         return new WebMvcConfigurer() {
