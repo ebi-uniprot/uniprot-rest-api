@@ -1,6 +1,18 @@
 package org.uniprot.api.rest.controller;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
+
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.HttpHeaders;
@@ -19,16 +31,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Utils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
 /**
  * @param <T>
@@ -277,8 +279,9 @@ public abstract class BasicSearchController<T> {
 
     /**
      * Runs a request only if a {@link Gatekeeper} indicates it is okay to do so. Note that the
-     * entities are provided via a {@link Supplier}, so that they can be computed ONLY after
-     * the gatekeeper says it is okay to do so.
+     * entities are provided via a {@link Supplier}, so that they can be computed ONLY after the
+     * gatekeeper says it is okay to do so.
+     *
      * @param contextSupplier provides the {@link MessageConverterContext} for response
      * @param request the request
      * @param deferredResult the deferred result whose contents should be set
@@ -296,10 +299,10 @@ public abstract class BasicSearchController<T> {
                             .body(context);
             context.setLargeDownload(true);
 
-            log.info("Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
+            log.debug("Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
             deferredResult.setResult(okayResponse);
         } else {
-            log.info(
+            log.debug(
                     "Gatekeeper did NOT let me in (space inside={})",
                     downloadGatekeeper.getSpaceInside());
             setTooManyRequestsResponse(deferredResult);
