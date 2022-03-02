@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -63,6 +64,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithSuggestionsControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -125,7 +127,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             UniProtKBSearchControllerIT.UniprotKBSearchContentTypeParamResolver.class
         })
 @Slf4j
-class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControllerIT {
 
     private static final String SEARCH_RESOURCE = UNIPROTKB_RESOURCE + "/search";
 
@@ -1282,95 +1284,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
     }
 
-    @ParameterizedTest(name = "{0} misspelt `{1}`")
-    @MethodSource(value = "provideMisspeltSearchString")
-    void testGetSuggestionForSearchWithTypo(
-            String field, String searchString, List<String> alternatives) throws Exception {
-        // given
-        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(SEARCH_RESOURCE + "?query=" + searchString)
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", is(empty())))
-                .andExpect(jsonPath("$.suggestions.size()", is(alternatives.size())))
-                .andExpect(jsonPath("$.suggestions[0].query", is(alternatives.get(0))))
-                .andExpect(jsonPath("$.suggestions[0].hits", notNullValue()));
-    }
-
-    @Test
-    void testGetSuggestionWithFieldAndValueSearchWithTypo() throws Exception {
-        // given
-        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(SEARCH_RESOURCE + "?query=taxonomy_name:homan")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", is(empty())))
-                .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].query", is("taxonomy_name:human")))
-                .andExpect(jsonPath("$.suggestions[0].hits", is(1)))
-                .andExpect(jsonPath("$.suggestions[1].query", is("taxonomy_name:homo")))
-                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
-    }
-
-    @Test
-    void testGetNoSuggestionForSearch() throws Exception {
-        // given
-        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(SEARCH_RESOURCE + "?query=cambridge")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", is(empty())))
-                .andExpect(jsonPath("$.suggestions").doesNotExist());
-    }
-
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
@@ -1635,12 +1548,14 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                         });
     }
 
-    public Stream<Arguments> provideMisspeltSearchString() {
-        return Stream.of(
-                Arguments.of("protein_name", "fibroblost", List.of("fibroblast")),
-                Arguments.of("taxonomy_name", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
-                Arguments.of("cc_disease", "pfeifer", List.of("pfeiffer")),
-                Arguments.of("gene_exact", "fgfr9", List.of("fgfr2", "fgfr")));
+    @Override
+    protected List<Triple<String, String, List<String>>> getTriplets() {
+        return List.of(
+                Triple.of("protein_name", "fibroblost", List.of("fibroblast")),
+                Triple.of("taxonomy_name", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
+                Triple.of("cc_disease", "pfeifer", List.of("pfeiffer")),
+                Triple.of("gene_exact", "fgfr9", List.of("fgfr2", "fgfr", "fgar"))
+        );
     }
 
     static class UniprotKBSearchParameterResolver extends AbstractSearchParameterResolver {

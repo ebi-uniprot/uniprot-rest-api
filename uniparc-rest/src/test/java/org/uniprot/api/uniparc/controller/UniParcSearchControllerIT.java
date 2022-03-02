@@ -1,40 +1,6 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.startsWith;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntry;
-import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getXref;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.IntStream;
-
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithSuggestionsControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -74,6 +40,42 @@ import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.SolrCollection;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.emptyString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.createEntry;
+import static org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker.getXref;
+
 /**
  * @author jluo
  * @date: 25 Jun 2019
@@ -93,7 +95,7 @@ import org.uniprot.store.search.SolrCollection;
             UniParcSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
             UniParcSearchControllerIT.UniParcSearchParameterResolver.class
         })
-class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerIT {
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;
@@ -197,6 +199,35 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.facets[0].values.*.label", hasItem("EnsemblBacteria")))
                 .andExpect(jsonPath("$.facets[0].values.*.label", hasItem("EMBL CDS")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
+    }
+
+    @Test
+    void testGetNoSuggestionForSearch() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_NOT_FOUND);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=cambridge")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", is(empty())))
+                .andExpect(jsonPath("$.suggestions").doesNotExist());
+    }
+
+    @Override
+    protected List<Triple<String, String, List<String>>> getTriplets() {
+        return List.of(
+                Triple.of("protein", "proteenname11", List.of("proteinname11")),
+                Triple.of("taxonomy_name phrase", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
+                Triple.of("taxonomy_name", "homo sapeans", List.of("homo sapiens")),
+                Triple.of("gene", "genename21", List.of("genename11", "genename20")));
     }
 
     @Override
