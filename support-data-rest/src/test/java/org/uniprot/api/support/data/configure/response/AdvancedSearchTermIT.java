@@ -48,12 +48,15 @@ class AdvancedSearchTermIT {
                         "Web Resources",
                         "Date Of",
                         "Gene Ontology [GO]",
+                        "Small molecule",
                         "Keyword [KW]",
                         "Literature Citation",
                         "Proteomes",
                         "Cited for",
                         "Reviewed",
-                        "Active"
+                        "Active",
+                        "UniRef ID",
+                        "UniParc ID"
                     });
     private static final List<String> FUNCTION_CHILDREN =
             Arrays.asList(

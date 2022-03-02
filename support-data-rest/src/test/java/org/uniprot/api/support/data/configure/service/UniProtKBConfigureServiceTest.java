@@ -22,7 +22,7 @@ class UniProtKBConfigureServiceTest {
     @Test
     void testGetUniProtSearchItems() {
         List<AdvancedSearchTerm> items = service.getUniProtSearchItems(CONTEXT_PATH);
-        assertEquals(27, items.size());
+        assertEquals(30, items.size());
     }
 
     @Test
