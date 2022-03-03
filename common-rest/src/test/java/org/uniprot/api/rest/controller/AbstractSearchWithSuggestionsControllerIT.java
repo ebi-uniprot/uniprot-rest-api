@@ -1,17 +1,5 @@
 package org.uniprot.api.rest.controller;
 
-import org.apache.commons.lang3.tuple.Triple;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.test.web.servlet.ResultActions;
-
-import java.util.List;
-import java.util.stream.Stream;
-
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -25,11 +13,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.tuple.Triple;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.web.servlet.ResultActions;
+
 /**
  * @author sahmad
  * @created 02/03/2022
  */
-public abstract class AbstractSearchWithSuggestionsControllerIT extends AbstractSearchWithFacetControllerIT {
+public abstract class AbstractSearchWithSuggestionsControllerIT
+        extends AbstractSearchWithFacetControllerIT {
 
     @ParameterizedTest(name = "{0} misspelt `{1}`")
     @MethodSource(value = "provideMisspeltSearchString")

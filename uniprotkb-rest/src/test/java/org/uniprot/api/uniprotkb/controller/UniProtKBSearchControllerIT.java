@@ -46,8 +46,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +61,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
 import org.uniprot.api.rest.controller.AbstractSearchWithSuggestionsControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -1542,8 +1539,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 Triple.of("protein_name", "fibroblost", List.of("fibroblast")),
                 Triple.of("taxonomy_name", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
                 Triple.of("cc_disease", "pfeifer", List.of("pfeiffer")),
-                Triple.of("gene_exact", "fgfr9", List.of("fgfr2", "fgfr", "fgar"))
-        );
+                Triple.of("gene_exact", "fgfr9", List.of("fgfr2", "fgfr", "fgar")));
     }
 
     static class UniprotKBSearchParameterResolver extends AbstractSearchParameterResolver {
