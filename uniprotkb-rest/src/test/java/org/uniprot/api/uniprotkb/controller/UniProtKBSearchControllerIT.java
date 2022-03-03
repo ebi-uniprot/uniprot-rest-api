@@ -1413,13 +1413,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     value = "5";
                     break;
                 case "uniref_cluster_50":
-                    value = "UniRef50_P0001";
+                    value = "UniRef50_P00001";
                     break;
                 case "uniref_cluster_90":
-                    value = "UniRef90_P0001";
+                    value = "UniRef90_P00001";
                     break;
                 case "uniref_cluster_100":
-                    value = "UniRef100_P0001";
+                    value = "UniRef100_P00001";
                     break;
                 case "uniparc":
                     value = "UPI0000000001";
@@ -1512,9 +1512,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
             doc.uniparc = "UPI0000000001";
-            doc.unirefCluster50 = "UniRef50_P0001";
-            doc.unirefCluster90 = "UniRef90_P0001";
-            doc.unirefCluster100 = "UniRef100_P0001";
+            doc.unirefCluster50 = "UniRef50_P00001";
+            doc.unirefCluster90 = "UniRef90_P00001";
+            doc.unirefCluster100 = "UniRef100_P00001";
             doc.computationalPubmedIds.add("890123456");
             doc.communityPubmedIds.add("1234567");
             UniProtDatabaseTypes.INSTANCE
@@ -1699,7 +1699,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                             + "OR reviewed:INVALID OR organism_id:invalid OR virus_host_id:invalid OR taxonomy_id:invalid "
                                             + "OR is_isoform:invalid OR structure_3d:invalid OR active:invalid OR proteome:INVALID"
                                             + "OR uniparc:invalid OR uniref_cluster_50:invalid OR uniref_cluster_90:invalid "
-                                            + "OR uniref_cluster_100:invalid" ))
+                                            + "OR uniref_cluster_100:invalid"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -1715,10 +1715,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                             "The 'taxonomy_id' filter value should be a number",
                                             "The 'accession_id' filter value 'INVALID' has invalid format. It should be a valid UniProtKB accession",
                                             "The 'virus_host_id' filter value should be a number",
-                                            "The 'uniparc' filter value has invalid format. It should be a valid UniParc upi.",
-                                            "The 'uniref_cluster_50' filter value has invalid format. It should be a valid UniRef50 cluster id.",
-                                            "The 'uniref_cluster_90' filter value has invalid format. It should be a valid UniRef90 cluster id.",
-                                            "The 'uniref_cluster_100' filter value has invalid format. It should be a valid UniRef100 cluster id.")))
+                                            "The 'uniparc' filter value has invalid format. It should be a valid UniParc UPI.",
+                                            "The 'uniref_cluster_50' filter value has invalid format. It should be a valid UniRef50 cluster ID.",
+                                            "The 'uniref_cluster_90' filter value has invalid format. It should be a valid UniRef90 cluster ID.",
+                                            "The 'uniref_cluster_100' filter value has invalid format. It should be a valid UniRef100 cluster ID.")))
                     .build();
         }
 
