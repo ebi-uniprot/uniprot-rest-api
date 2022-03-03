@@ -101,7 +101,14 @@ public class UniRefEntryLightService
             Stream<UniRefEntryLight> content =
                     result.getContent().map(this::removeOverLimitAndCleanMemberId);
 
-            result = QueryResult.of(content, result.getPage(), result.getFacets(), null, null, result.getSuggestions());
+            result =
+                    QueryResult.of(
+                            content,
+                            result.getPage(),
+                            result.getFacets(),
+                            null,
+                            null,
+                            result.getSuggestions());
         } else {
             Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
 

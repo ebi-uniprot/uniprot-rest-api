@@ -168,7 +168,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .resultMatcher(
                             jsonPath(
                                     "$.representativeMember.organismName",
-                                    is("Homo sapiens (Representative)")))
+                                    is("Homo sapiens (human)")))
                     .resultMatcher(jsonPath("$.representativeMember.organismTaxId", is(9600)))
                     .resultMatcher(jsonPath("$.representativeMember.sequenceLength", is(312)))
                     .resultMatcher(
