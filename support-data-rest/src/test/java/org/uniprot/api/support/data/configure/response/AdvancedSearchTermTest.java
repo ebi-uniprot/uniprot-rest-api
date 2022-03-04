@@ -1,8 +1,9 @@
 package org.uniprot.api.support.data.configure.response;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.store.config.UniProtDataType;
@@ -22,31 +23,44 @@ class AdvancedSearchTermTest {
     @Test
     void testGetTopLevelFields() {
         List<SearchFieldItem> roots = AdvancedSearchTerm.getTopLevelFieldItems(fieldConfig);
-        Assertions.assertNotNull(roots);
-        Assertions.assertFalse(roots.isEmpty());
+        assertNotNull(roots);
+        assertFalse(roots.isEmpty());
     }
 
     @Test
     void testGetChildFields() {
         String parentId = "structure";
         List<SearchFieldItem> fields = AdvancedSearchTerm.getChildFieldItems(fieldConfig, parentId);
-        Assertions.assertNotNull(fields);
-        Assertions.assertFalse(fields.isEmpty());
+        assertNotNull(fields);
+        assertFalse(fields.isEmpty());
     }
 
     @Test
     void testGetNoChildFields() {
         String parentId = "length_sort";
         List<SearchFieldItem> fields = AdvancedSearchTerm.getChildFieldItems(fieldConfig, parentId);
-        Assertions.assertNotNull(fields);
-        Assertions.assertTrue(fields.isEmpty());
+        assertNotNull(fields);
+        assertTrue(fields.isEmpty());
     }
 
     @Test
     void testGetChildFieldsWithWrongParent() {
         String parentId = "random";
         List<SearchFieldItem> fields = AdvancedSearchTerm.getChildFieldItems(fieldConfig, parentId);
-        Assertions.assertNotNull(fields);
-        Assertions.assertTrue(fields.isEmpty());
+        assertNotNull(fields);
+        assertTrue(fields.isEmpty());
+    }
+
+    @Test
+    void testGetChildFieldsWithTags() {
+        String parentId = "catalytic_activity";
+        List<SearchFieldItem> fields = AdvancedSearchTerm.getChildFieldItems(fieldConfig, parentId);
+        assertNotNull(fields);
+        assertFalse(fields.isEmpty());
+        SearchFieldItem catalyticItem = fields.get(0);
+        assertNotNull(catalyticItem);
+        assertNotNull(catalyticItem.getTags());
+        assertFalse(catalyticItem.getTags().isEmpty());
+        assertTrue(catalyticItem.getTags().contains("CHEBI"));
     }
 }

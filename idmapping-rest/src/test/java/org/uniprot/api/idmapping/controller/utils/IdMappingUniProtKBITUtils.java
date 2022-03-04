@@ -98,6 +98,18 @@ public class IdMappingUniProtKBITUtils {
                 case "annotation_score":
                     value = "5";
                     break;
+                case "uniref_cluster_50":
+                    value = "UniRef50_P00001";
+                    break;
+                case "uniref_cluster_90":
+                    value = "UniRef90_P00001";
+                    break;
+                case "uniref_cluster_100":
+                    value = "UniRef100_P00001";
+                    break;
+                case "uniparc":
+                    value = "UPI0000000001";
+                    break;
             }
         }
         return value;
@@ -138,10 +150,10 @@ public class IdMappingUniProtKBITUtils {
 
         UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
         doc.otherOrganism = "otherValue";
-        doc.unirefCluster50 = "UniRef50_P0001";
-        doc.unirefCluster90 = "UniRef90_P0001";
-        doc.unirefCluster100 = "UniRef100_P0001";
-        doc.uniparc = "UPI000000000";
+        doc.unirefCluster50 = "UniRef50_P00001";
+        doc.unirefCluster90 = "UniRef90_P00001";
+        doc.unirefCluster100 = "UniRef100_P00001";
+        doc.uniparc = "UPI0000000001";
         doc.computationalPubmedIds.add("890123456");
         doc.communityPubmedIds.add("1234567");
         doc.isIsoform = i % 10 == 0;
