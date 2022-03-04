@@ -22,14 +22,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.commons.lang3.SerializationUtils;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.uniprot.api.common.concurrency.StreamConcurrencyProperties;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
@@ -59,7 +57,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Setter
 public class MessageConverterConfig {
     @Bean
-    public WebMvcConfigurer extendedMessageConverters() {
+    public WebMvcConfigurer extendedMessageConverters(Gatekeeper downloadGatekeeper) {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -73,42 +71,51 @@ public class MessageConverterConfig {
                 ReturnFieldConfig uniProtKBReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIPROTKB);
 
-                index = appendUniProtKBConverters(index, converters, uniProtKBReturnFieldCfg);
+                index =
+                        appendUniProtKBConverters(
+                                index, converters, uniProtKBReturnFieldCfg, downloadGatekeeper);
 
                 // ------------------------- UniParcEntryPair -------------------------
 
                 ReturnFieldConfig uniParcReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIPARC);
 
-                index = appendUniParcConverters(index, converters, uniParcReturnFieldCfg);
+                index =
+                        appendUniParcConverters(
+                                index, converters, uniParcReturnFieldCfg, downloadGatekeeper);
 
                 // ------------------------- UniRefEntryPair -------------------------
 
                 ReturnFieldConfig uniRefReturnFieldCfg =
                         getIdMappingReturnFieldConfig(UniProtDataType.UNIREF);
 
-                index = appendUniRefConverters(index, converters, uniRefReturnFieldCfg);
+                index =
+                        appendUniRefConverters(
+                                index, converters, uniRefReturnFieldCfg, downloadGatekeeper);
 
                 // ------------------------- IdMappingStringPair -------------------------
                 JsonMessageConverter<IdMappingStringPair> idMappingPairJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 new ObjectMapper(),
                                 IdMappingStringPair.class,
-                                ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING));
+                                ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING),
+                                downloadGatekeeper);
                 converters.add(index++, idMappingPairJsonMessageConverter);
-                converters.add(index++, new ListMessageConverter());
+                converters.add(index++, new ListMessageConverter(downloadGatekeeper));
                 converters.add(
                         index++,
                         new TsvMessageConverter<>(
                                 IdMappingStringPair.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING),
-                                new IdMappingStringPairTSVMapper()));
+                                new IdMappingStringPairTSVMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         index,
                         new XlsMessageConverter<>(
                                 IdMappingStringPair.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(PIR_ID_MAPPING),
-                                new IdMappingStringPairTSVMapper()));
+                                new IdMappingStringPairTSVMapper(),
+                                downloadGatekeeper));
             }
         };
     }

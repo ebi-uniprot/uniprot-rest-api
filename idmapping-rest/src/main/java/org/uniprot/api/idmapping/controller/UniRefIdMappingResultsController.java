@@ -62,7 +62,12 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
             MessageConverterContextFactory<UniRefEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF, downloadGatekeeper);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                UNIREF,
+                downloadGatekeeper);
         this.idService = idService;
         this.cacheService = cacheService;
     }

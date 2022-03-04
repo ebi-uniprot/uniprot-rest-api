@@ -71,7 +71,12 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             MessageConverterContextFactory<IdMappingStringPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, IDMAPPING_PIR, downloadGatekeeper);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                IDMAPPING_PIR,
+                downloadGatekeeper);
         this.idMappingService = idMappingService;
         this.cacheService = cacheService;
     }

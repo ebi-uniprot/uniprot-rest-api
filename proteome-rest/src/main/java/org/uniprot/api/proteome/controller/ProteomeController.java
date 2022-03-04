@@ -64,7 +64,12 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                     MessageConverterContextFactory<ProteomeEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, PROTEOME, downloadGatekeeper);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                PROTEOME,
+                downloadGatekeeper);
         this.queryService = queryService;
     }
 

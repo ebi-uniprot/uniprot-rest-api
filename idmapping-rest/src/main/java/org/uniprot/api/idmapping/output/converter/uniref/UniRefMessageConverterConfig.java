@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.output.converter.uniref;
 import java.util.List;
 
 import org.springframework.http.converter.HttpMessageConverter;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
@@ -24,28 +25,32 @@ public class UniRefMessageConverterConfig {
     public static int appendUniRefConverters(
             int currentIndex,
             List<HttpMessageConverter<?>> converters,
-            ReturnFieldConfig returnFieldConfig) {
+            ReturnFieldConfig returnFieldConfig,
+            Gatekeeper downloadGatekeeper) {
         JsonMessageConverter<UniRefEntryPair> jsonMessageConverter =
                 new JsonMessageConverter<>(
                         UniRefEntryLightJsonConfig.getInstance().getSimpleObjectMapper(),
                         UniRefEntryPair.class,
-                        returnFieldConfig);
+                        returnFieldConfig,
+                        downloadGatekeeper);
         converters.add(currentIndex++, jsonMessageConverter);
-        converters.add(currentIndex++, new UniRefEntryFastaMessageConverter());
-        converters.add(currentIndex++, new ListMessageConverter());
-        converters.add(currentIndex++, new RDFMessageConverter());
+        converters.add(currentIndex++, new UniRefEntryFastaMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new ListMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new RDFMessageConverter(downloadGatekeeper));
         converters.add(
                 currentIndex++,
                 new TsvMessageConverter<>(
                         UniRefEntryPair.class,
                         returnFieldConfig,
-                        new EntryPairValueMapper<>(new UniRefEntryLightValueMapper())));
+                        new EntryPairValueMapper<>(new UniRefEntryLightValueMapper()),
+                        downloadGatekeeper));
         converters.add(
                 currentIndex++,
                 new XlsMessageConverter<>(
                         UniRefEntryPair.class,
                         returnFieldConfig,
-                        new EntryPairValueMapper<>(new UniRefEntryLightValueMapper())));
+                        new EntryPairValueMapper<>(new UniRefEntryLightValueMapper()),
+                        downloadGatekeeper));
         return currentIndex;
     }
 

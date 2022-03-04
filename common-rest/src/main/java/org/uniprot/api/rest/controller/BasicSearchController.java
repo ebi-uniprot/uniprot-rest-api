@@ -23,6 +23,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -221,6 +222,7 @@ public abstract class BasicSearchController<T> {
                             log.error("Error occurred during processing.");
                             downloadGatekeeper.exit();
                             deferredResult.setErrorResult(e);
+                            // TODO: 04/03/2022 throw e;
                         }
                     });
         } catch (TaskRejectedException ex) {
@@ -299,7 +301,8 @@ public abstract class BasicSearchController<T> {
                             .body(context);
             context.setLargeDownload(true);
 
-            log.debug("Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
+            log.debug(
+                    "Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
             deferredResult.setResult(okayResponse);
         } else {
             log.debug(

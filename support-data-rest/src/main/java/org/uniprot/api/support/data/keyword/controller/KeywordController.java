@@ -68,7 +68,12 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                             keywordMessageConverterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
-        super(eventPublisher, keywordMessageConverterContextFactory, downloadTaskExecutor, KEYWORD, downloadGatekeeper);
+        super(
+                eventPublisher,
+                keywordMessageConverterContextFactory,
+                downloadTaskExecutor,
+                KEYWORD,
+                downloadGatekeeper);
         this.keywordService = keywordService;
     }
 

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.genecentric.GeneCentricEntry;
@@ -25,7 +26,11 @@ public class GeneCentricXmlMessageConverter
     private final XmlMapper mapper;
 
     public GeneCentricXmlMessageConverter() {
-        super(MediaType.APPLICATION_XML, GeneCentricEntry.class);
+        this(null);
+    }
+
+    public GeneCentricXmlMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(MediaType.APPLICATION_XML, GeneCentricEntry.class, downloadGatekeeper);
         JacksonXmlModule xmlModule = new JacksonXmlModule();
         xmlModule.setDefaultUseWrapper(false);
 

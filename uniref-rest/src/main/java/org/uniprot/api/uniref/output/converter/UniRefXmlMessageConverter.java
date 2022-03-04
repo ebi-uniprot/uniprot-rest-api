@@ -2,6 +2,7 @@ package org.uniprot.api.uniref.output.converter;
 
 import javax.xml.bind.Marshaller;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.core.uniref.UniRefEntry;
@@ -17,7 +18,12 @@ public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRe
     private String header;
 
     public UniRefXmlMessageConverter(String version, String releaseDate) {
-        super(UniRefEntry.class, ConverterConstants.UNIREF_XML_CONTEXT);
+        this(version, releaseDate, null);
+    }
+
+    public UniRefXmlMessageConverter(
+            String version, String releaseDate, Gatekeeper downloadGatekeeper) {
+        super(UniRefEntry.class, ConverterConstants.UNIREF_XML_CONTEXT, downloadGatekeeper);
         converter = new UniRefEntryConverter();
         header = ConverterConstants.UNIREF_XML_SCHEMA;
         if ((version != null) && (!version.isEmpty())) {

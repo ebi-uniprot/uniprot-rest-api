@@ -9,6 +9,7 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLA
 import java.util.List;
 
 import org.springframework.http.converter.HttpMessageConverter;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
 import org.uniprot.api.idmapping.output.converter.EntryPairXmlMessageConverter;
@@ -33,30 +34,36 @@ public class UniProtKBMessageConverterConfig {
     public static int appendUniProtKBConverters(
             int currentIdx,
             List<HttpMessageConverter<?>> converters,
-            ReturnFieldConfig returnFieldConfig) {
+            ReturnFieldConfig returnFieldConfig,
+            Gatekeeper downloadGatekeeper) {
         JsonMessageConverter<UniProtKBEntryPair> jsonMessageConverter =
                 new JsonMessageConverter<>(
                         UniprotKBJsonConfig.getInstance().getSimpleObjectMapper(),
                         UniProtKBEntryPair.class,
-                        returnFieldConfig);
+                        returnFieldConfig,
+                        downloadGatekeeper);
         converters.add(currentIdx++, jsonMessageConverter);
-        converters.add(currentIdx++, new UniProtKBEntryPairFlatFileMessageConverter());
-        converters.add(currentIdx++, new UniProtKBEntryPairFastaMessageConverter());
-        converters.add(currentIdx++, new ListMessageConverter());
-        converters.add(currentIdx++, new RDFMessageConverter());
-        converters.add(currentIdx++, new UniProtKBEntryPairGFFMessageConverter());
+        converters.add(
+                currentIdx++, new UniProtKBEntryPairFlatFileMessageConverter(downloadGatekeeper));
+        converters.add(
+                currentIdx++, new UniProtKBEntryPairFastaMessageConverter(downloadGatekeeper));
+        converters.add(currentIdx++, new ListMessageConverter(downloadGatekeeper));
+        converters.add(currentIdx++, new RDFMessageConverter(downloadGatekeeper));
+        converters.add(currentIdx++, new UniProtKBEntryPairGFFMessageConverter(downloadGatekeeper));
         converters.add(
                 currentIdx++,
                 new TsvMessageConverter<>(
                         UniProtKBEntryPair.class,
                         returnFieldConfig,
-                        new EntryPairValueMapper<>(new UniProtKBEntryValueMapper())));
+                        new EntryPairValueMapper<>(new UniProtKBEntryValueMapper()),
+                        downloadGatekeeper));
         converters.add(
                 currentIdx++,
                 new XlsMessageConverter<>(
                         UniProtKBEntryPair.class,
                         returnFieldConfig,
-                        new EntryPairValueMapper<>(new UniProtKBEntryValueMapper())));
+                        new EntryPairValueMapper<>(new UniProtKBEntryValueMapper()),
+                        downloadGatekeeper));
 
         String header = XML_DECLARATION + UNIPROTKB_XML_SCHEMA;
         String footer = COPYRIGHT_TAG + UNIPROTKB_XML_CLOSE_TAG;
@@ -66,7 +73,8 @@ public class UniProtKBMessageConverterConfig {
                         UNIPROTKB_XML_CONTEXT,
                         new UniProtEntryConverter(),
                         header,
-                        footer);
+                        footer,
+                        downloadGatekeeper);
         converters.add(currentIdx++, xmlConverter);
         return currentIdx;
     }

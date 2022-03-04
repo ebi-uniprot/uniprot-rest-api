@@ -3,6 +3,7 @@ package org.uniprot.api.uniparc.output.converter;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.parser.fasta.UniParcFastaParser;
@@ -15,6 +16,10 @@ import org.uniprot.core.uniparc.UniParcEntry;
 public class UniParcFastaMessageConverter extends AbstractEntityHttpMessageConverter<UniParcEntry> {
     public UniParcFastaMessageConverter() {
         super(UniProtMediaType.FASTA_MEDIA_TYPE, UniParcEntry.class);
+    }
+
+    public UniParcFastaMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(UniProtMediaType.FASTA_MEDIA_TYPE, UniParcEntry.class, downloadGatekeeper);
     }
 
     @Override

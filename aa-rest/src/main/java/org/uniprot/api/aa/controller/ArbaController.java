@@ -26,6 +26,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.aa.request.ArbaSearchRequest;
 import org.uniprot.api.aa.request.ArbaStreamRequest;
 import org.uniprot.api.aa.service.ArbaService;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -63,12 +64,14 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<UniRuleEntry> arbaMessageConverterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
-            ArbaService arbaService) {
+            ArbaService arbaService,
+            Gatekeeper downloadGatekeeper) {
         super(
                 eventPublisher,
                 arbaMessageConverterContextFactory,
                 downloadTaskExecutor,
-                MessageConverterContextFactory.Resource.ARBA);
+                MessageConverterContextFactory.Resource.ARBA,
+                downloadGatekeeper);
         this.arbaService = arbaService;
     }
 

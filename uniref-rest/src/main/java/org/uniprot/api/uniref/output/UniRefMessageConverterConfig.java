@@ -1,16 +1,21 @@
 package org.uniprot.api.uniref.output;
 
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.common.concurrency.StreamConcurrencyProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
@@ -29,13 +34,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
 /**
  * @author jluo
  * @date: 22 Aug 2019
@@ -45,7 +43,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 @Setter
 public class UniRefMessageConverterConfig {
     @Bean
-    public WebMvcConfigurer extendedMessageConverters() {
+    public WebMvcConfigurer extendedMessageConverters(Gatekeeper downloadGatekeeper) {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -54,49 +52,60 @@ public class UniRefMessageConverterConfig {
 
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
-                converters.add(new ListMessageConverter());
-                converters.add(new UniRefLightFastaMessageConverter());
-                converters.add(new UniRefFastaMessageConverter());
-                converters.add(new RDFMessageConverter());
+                converters.add(new ListMessageConverter(downloadGatekeeper));
+                converters.add(new UniRefLightFastaMessageConverter(downloadGatekeeper));
+                converters.add(new UniRefFastaMessageConverter(downloadGatekeeper));
+                converters.add(new RDFMessageConverter(downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniRefEntryLight.class,
                                 returnConfig,
-                                new UniRefEntryLightValueMapper()));
+                                new UniRefEntryLightValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
-                                UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
+                                UniRefEntry.class,
+                                returnConfig,
+                                new UniRefEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         new XlsMessageConverter<>(
                                 UniRefEntryLight.class,
                                 returnConfig,
-                                new UniRefEntryLightValueMapper()));
+                                new UniRefEntryLightValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         new XlsMessageConverter<>(
-                                UniRefEntry.class, returnConfig, new UniRefEntryValueMapper()));
+                                UniRefEntry.class,
+                                returnConfig,
+                                new UniRefEntryValueMapper(),
+                                downloadGatekeeper));
 
                 JsonMessageConverter<UniRefEntryLight> unirefLightJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniRefEntryLightJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniRefEntryLight.class,
-                                returnConfig);
+                                returnConfig,
+                                downloadGatekeeper);
                 converters.add(0, unirefLightJsonMessageConverter);
 
                 JsonMessageConverter<UniRefEntry> unirefJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniRefEntryJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniRefEntry.class,
-                                returnConfig);
+                                returnConfig,
+                                downloadGatekeeper);
                 converters.add(1, unirefJsonMessageConverter);
 
                 JsonMessageConverter<UniRefMember> unirefMemberJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniRefMemberJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniRefMember.class,
-                                returnConfig);
+                                returnConfig,
+                                downloadGatekeeper);
                 converters.add(2, unirefMemberJsonMessageConverter);
 
-                converters.add(3, new UniRefXmlMessageConverter("", ""));
+                converters.add(3, new UniRefXmlMessageConverter("", "", downloadGatekeeper));
             }
         };
     }

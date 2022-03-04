@@ -2,6 +2,7 @@ package org.uniprot.api.proteome.output.converter;
 
 import javax.xml.bind.Marshaller;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.core.xml.jaxb.proteome.Proteome;
@@ -21,7 +22,11 @@ public class ProteomeXmlMessageConverter
     private static final String FOOTER = "\n</proteomes>";
 
     public ProteomeXmlMessageConverter() {
-        super(ProteomeEntry.class, XML_CONTEXT);
+        this(null);
+    }
+
+    public ProteomeXmlMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(ProteomeEntry.class, XML_CONTEXT, downloadGatekeeper);
         converter = new ProteomeConverter();
     }
 

@@ -67,7 +67,12 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper,
             SearchFieldConfig geneCentricSearchFieldConfig) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, GENECENTRIC, downloadGatekeeper);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                GENECENTRIC,
+                downloadGatekeeper);
         this.service = service;
         this.upIdFieldName =
                 geneCentricSearchFieldConfig.getSearchFieldItemByName("upid").getFieldName();

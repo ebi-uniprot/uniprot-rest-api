@@ -67,7 +67,12 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB, downloadGatekeeper);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                UNIPROTKB,
+                downloadGatekeeper);
         this.idService = idService;
         this.cacheService = cacheService;
     }

@@ -68,7 +68,12 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             MessageConverterContextFactory<UniRefEntryLight> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIREF, downloadGatekeeper);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                UNIREF,
+                downloadGatekeeper);
         this.service = queryService;
     }
 

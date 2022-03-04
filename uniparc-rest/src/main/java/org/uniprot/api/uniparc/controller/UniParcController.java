@@ -62,7 +62,12 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             MessageConverterContextFactory<UniParcEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC, downloadGatekeeper);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                UNIPARC,
+                downloadGatekeeper);
         this.queryService = queryService;
     }
 

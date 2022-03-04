@@ -9,6 +9,7 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLA
 import java.util.List;
 
 import org.springframework.http.converter.HttpMessageConverter;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
 import org.uniprot.api.idmapping.output.converter.EntryPairXmlMessageConverter;
@@ -33,28 +34,33 @@ public class UniParcMessageConverterConfig {
     public static int appendUniParcConverters(
             int currentIndex,
             List<HttpMessageConverter<?>> converters,
-            ReturnFieldConfig returnFieldConfig) {
+            ReturnFieldConfig returnFieldConfig,
+            Gatekeeper downloadGatekeeper) {
         JsonMessageConverter<UniParcEntryPair> jsonMessageConverter =
                 new JsonMessageConverter<>(
                         UniParcJsonConfig.getInstance().getSimpleObjectMapper(),
                         UniParcEntryPair.class,
-                        returnFieldConfig);
+                        returnFieldConfig,
+                        downloadGatekeeper);
         converters.add(currentIndex++, jsonMessageConverter);
-        converters.add(currentIndex++, new UniParcEntryPairFastaMessageConverter());
-        converters.add(currentIndex++, new ListMessageConverter());
-        converters.add(currentIndex++, new RDFMessageConverter());
+        converters.add(
+                currentIndex++, new UniParcEntryPairFastaMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new ListMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new RDFMessageConverter(downloadGatekeeper));
         converters.add(
                 currentIndex++,
                 new TsvMessageConverter<>(
                         UniParcEntryPair.class,
                         returnFieldConfig,
-                        new EntryPairValueMapper<>(new UniParcEntryValueMapper())));
+                        new EntryPairValueMapper<>(new UniParcEntryValueMapper()),
+                        downloadGatekeeper));
         converters.add(
                 currentIndex++,
                 new XlsMessageConverter<>(
                         UniParcEntryPair.class,
                         returnFieldConfig,
-                        new EntryPairValueMapper<>(new UniParcEntryValueMapper())));
+                        new EntryPairValueMapper<>(new UniParcEntryValueMapper()),
+                        downloadGatekeeper));
         String header = XML_DECLARATION + UNIPARC_XML_SCHEMA;
         String footer = COPYRIGHT_TAG + UNIPARC_XML_CLOSE_TAG;
         EntryPairXmlMessageConverter<UniParcEntryPair, UniParcEntry, Entry> xmlConverter =
@@ -63,7 +69,8 @@ public class UniParcMessageConverterConfig {
                         UNIPARC_XML_CONTEXT,
                         new UniParcEntryConverter(),
                         header,
-                        footer);
+                        footer,
+                        downloadGatekeeper);
         converters.add(currentIndex++, xmlConverter);
 
         return currentIndex;

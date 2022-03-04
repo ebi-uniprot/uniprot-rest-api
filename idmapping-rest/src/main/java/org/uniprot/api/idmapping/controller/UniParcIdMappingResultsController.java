@@ -64,7 +64,12 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             MessageConverterContextFactory<UniParcEntryPair> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             Gatekeeper downloadGatekeeper) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC, downloadGatekeeper);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                UNIPARC,
+                downloadGatekeeper);
         this.idService = idService;
         this.cacheService = cacheService;
     }
