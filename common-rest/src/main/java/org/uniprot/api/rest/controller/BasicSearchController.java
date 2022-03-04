@@ -219,10 +219,9 @@ public abstract class BasicSearchController<T> {
                                 runRequestNow(contextSupplier, request, deferredResult);
                             }
                         } catch (Exception e) {
-                            log.error("Error occurred during processing.");
+                            log.error("Error occurred during processing.", e);
                             downloadGatekeeper.exit();
                             deferredResult.setErrorResult(e);
-                            // TODO: 04/03/2022 throw e;
                         }
                     });
         } catch (TaskRejectedException ex) {
