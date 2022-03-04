@@ -138,7 +138,6 @@ public abstract class BasicIdService<T, U> {
     public Stream<U> streamEntries(StreamRequest streamRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds());
-        validateMappedIdsEnrichmentLimit(mappedIds);
         return streamEntries(mappedIds);
     }
 
@@ -334,7 +333,7 @@ public abstract class BasicIdService<T, U> {
                 || Utils.notNullNotEmpty(searchRequest.getSort());
     }
 
-    private void validateMappedIdsEnrichmentLimit(List<IdMappingStringPair> mappedIds) {
+    public void validateMappedIdsEnrichmentLimit(List<IdMappingStringPair> mappedIds) {
         if (mappedIds.size() > this.maxIdMappingToIdsCountEnriched) {
             throw new InvalidRequestException(
                     ENRICHMENT_WARNING.getMessage() + this.maxIdMappingToIdsCountEnriched);

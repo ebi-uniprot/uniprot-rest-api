@@ -24,6 +24,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.UniRefIdService;
@@ -157,17 +158,20 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
         MediaType contentType = getAcceptHeader(request);
 
+        IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
+        this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
+
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             Supplier<Stream<String>> result =
                     () ->
                             this.idService.streamRDF(
-                                    streamRequest, cachedJobResult.getIdMappingResult());
+                                    streamRequest, idMappingResult);
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniRefEntryPair>> result =
                     () ->
                             this.idService.streamEntries(
-                                    streamRequest, cachedJobResult.getIdMappingResult());
+                                    streamRequest, idMappingResult);
             return super.stream(result, streamRequest, contentType, request);
         }
     }

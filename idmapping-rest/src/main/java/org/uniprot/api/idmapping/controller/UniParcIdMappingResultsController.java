@@ -25,6 +25,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniparc.UniParcIdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.uniparc.UniParcIdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.UniParcIdService;
@@ -176,17 +177,20 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
         MediaType contentType = getAcceptHeader(request);
 
+        IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
+        this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
+
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             Supplier<Stream<String>> result =
                     () ->
                             this.idService.streamRDF(
-                                    streamRequest, cachedJobResult.getIdMappingResult());
+                                    streamRequest, idMappingResult);
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniParcEntryPair>> result =
                     () ->
                             this.idService.streamEntries(
-                                    streamRequest, cachedJobResult.getIdMappingResult());
+                                    streamRequest, idMappingResult);
             return super.stream(result, streamRequest, contentType, request);
         }
     }
