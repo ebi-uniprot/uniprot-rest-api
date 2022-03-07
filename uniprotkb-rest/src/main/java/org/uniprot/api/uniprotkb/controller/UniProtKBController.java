@@ -13,9 +13,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -60,7 +57,6 @@ import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import scala.Byte;
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -151,17 +147,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
 
-    @GetMapping(value = "/oom")
-    public ResponseEntity<String> oom() {
-        List<byte[]> massiveList = new ArrayList<>();
-        for (int i = 0; i < 1000000; i++) {
-            byte[] bytes = new byte[1024*1024];
-            massiveList.add(bytes);
-            System.out.println("Free memory: "+ Runtime.getRuntime().freeMemory());
-        }
-        return ResponseEntity.ok().build();
-    }
-
     @Tag(name = "uniprotkb")
     @GetMapping(
             value = "/{accession}",
@@ -214,7 +199,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-
         if (isRDFAccept(request)) {
             String rdf = entryService.getRDFXml(accession);
             return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
