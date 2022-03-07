@@ -66,7 +66,7 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 int index = 0;
                 converters.add(index++, uniProtKBJsonMessageConverter);
-                converters.add(index++, new PublicationJsonMessageConverter());
+                converters.add(index++, new PublicationJsonMessageConverter(downloadGatekeeper));
                 converters.add(index++, interactionJsonMessageConverter);
                 converters.add(index++, new UniProtKBFlatFileMessageConverter(downloadGatekeeper));
                 converters.add(index++, new UniProtKBFastaMessageConverter(downloadGatekeeper));
