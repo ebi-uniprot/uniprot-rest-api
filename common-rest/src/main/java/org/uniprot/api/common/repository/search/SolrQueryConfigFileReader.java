@@ -1,14 +1,17 @@
 package org.uniprot.api.common.repository.search;
 
-import static org.uniprot.core.util.Utils.notNull;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Stream;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Created 04/09/19
@@ -18,8 +21,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SolrQueryConfigFileReader {
     private static final String COMMENT_PREFIX = "#";
+    private static final String SPRING_CONFIG_LOCATION = "spring.config.location";
     private final SolrQueryConfig.SolrQueryConfigBuilder builder;
     private final String resourceLocation;
+    private DefaultResourceLoader loader;
+    private static String externalConfigDir;
+
+    static {
+        // set the location of the config dir if present
+        String configLoc = System.getProperty(SPRING_CONFIG_LOCATION);
+        if (configLoc != null) {
+            File configLocFile = Paths.get(configLoc).toFile();
+            if (configLocFile.exists()) {
+                if (configLocFile.isFile()) {
+                    externalConfigDir = configLocFile.getParentFile().getAbsolutePath();
+                } else {
+                    externalConfigDir = configLocFile.getAbsolutePath();
+                }
+            }
+        } else {
+            externalConfigDir = null;
+        }
+    }
 
     public SolrQueryConfigFileReader(String resourceLocation) {
         this.resourceLocation = resourceLocation;
@@ -32,32 +55,62 @@ public class SolrQueryConfigFileReader {
     }
 
     private void initialiseSolrQueryConfig() {
-        log.info("Loading Solr query config [" + this.resourceLocation + "]...");
-        InputStream resourceAsStream = getClass().getResourceAsStream(resourceLocation);
-        if (notNull(resourceAsStream)) {
+        loader = new DefaultResourceLoader();
 
-            Stream<String> lines =
-                    new BufferedReader(new InputStreamReader(resourceAsStream)).lines();
-            QueryConfigType queryConfigType = QueryConfigType.DEFAULT_SEARCH;
-            for (String line : lines.toArray(String[]::new)) {
-                String trimmedLine = line.trim();
-                QueryConfigType parsedType = QueryConfigType.typeOf(trimmedLine);
-                if (parsedType == null) {
-                    if ((line.startsWith(COMMENT_PREFIX) || trimmedLine.isEmpty())) {
-                        // => commented out or empty line, skip it
-                        log.debug("ignoring boost line: <{}>", line);
-                    } else {
-                        addQueryConfig(queryConfigType, trimmedLine);
-                    }
+        String location = getConfigLocation();
+        log.info("Loading Solr query config [" + location + "]...");
+        // try to query config from file first, then try from classpath
+        Stream<String> lines =
+                getConfigAsStringStream("file:" + location)
+                        .or(() -> getConfigAsStringStream("classpath:" + location))
+                        .orElseThrow(
+                                () -> {
+                                    log.error("Error loading Solr query config.");
+                                    return new SolrQueryConfigCreationException(
+                                            "Could not load config resources: " + location);
+                                });
+
+        QueryConfigType queryConfigType = QueryConfigType.DEFAULT_SEARCH;
+        for (String line : lines.toArray(String[]::new)) {
+            String trimmedLine = line.trim();
+            QueryConfigType parsedType = QueryConfigType.typeOf(trimmedLine);
+            if (parsedType == null) {
+                if ((line.startsWith(COMMENT_PREFIX) || trimmedLine.isEmpty())) {
+                    // => commented out or empty line, skip it
+                    log.debug("ignoring boost line: <{}>", line);
                 } else {
-                    queryConfigType = parsedType;
+                    addQueryConfig(queryConfigType, trimmedLine);
                 }
+            } else {
+                queryConfigType = parsedType;
             }
-            log.info("Loaded Solr query config.");
-        } else {
-            log.error("Error loading Solr query config.");
-            throw new SolrQueryConfigCreationException("Could not create Solr query configuration");
         }
+        log.info("Loaded Solr query config.");
+    }
+
+    private String getConfigLocation() {
+        String location;
+        if (externalConfigDir != null) {
+            location = externalConfigDir + this.resourceLocation;
+        } else {
+            location = this.resourceLocation;
+        }
+        return location;
+    }
+
+    private Optional<Stream<String>> getConfigAsStringStream(String resourceLocation) {
+        Resource resource = loader.getResource(resourceLocation);
+        if (resource.exists()) {
+            try {
+                log.info("Reading query config from: " + resource.getURI());
+                return Optional.of(
+                        new BufferedReader(new InputStreamReader(resource.getInputStream()))
+                                .lines());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return Optional.empty();
     }
 
     private void addQueryConfig(QueryConfigType queryConfigType, String line) {
