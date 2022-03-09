@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.Test;
@@ -56,10 +55,8 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
         })
 class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
-    private static final String SEARCH_ACCESSION1 =
-            "DB-" + ThreadLocalRandom.current().nextLong(1000, 9999);
-    private static final String SEARCH_ACCESSION2 =
-            "DB-" + ThreadLocalRandom.current().nextLong(1000, 9999);
+    private static final String SEARCH_ACCESSION1 = "DB-1000";
+    private static final String SEARCH_ACCESSION2 = "DB-2000";
     private static final List<String> SORTED_ACCESSIONS =
             new ArrayList<>(Arrays.asList(SEARCH_ACCESSION1, SEARCH_ACCESSION2));
 
@@ -121,19 +118,17 @@ class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
-        saveEntry(SEARCH_ACCESSION1, 10);
-        saveEntry(SEARCH_ACCESSION2, 20);
+        saveEntry(1000); // SEARCH_ACCESSION1
+        saveEntry(2000); // SEARCH_ACCESSION2
     }
 
     private void saveEntry(long suffix) {
-        String accPrefix = "DB-";
-        long num = ThreadLocalRandom.current().nextLong(1000, 9999);
-        String accession = accPrefix + num;
-        saveEntry(accession, suffix);
+        String accession = String.format("DB-%04d", suffix);
+        saveEntry(accession);
     }
 
-    private void saveEntry(String accession, long suffix) {
-        CrossRefDocument document = CrossRefITUtils.createSolrDocument(accession, suffix);
+    private void saveEntry(String accession) {
+        CrossRefDocument document = CrossRefITUtils.createSolrDocument(accession);
         this.getStoreManager().saveDocs(DataStoreManager.StoreType.CROSSREF, document);
     }
 
@@ -251,8 +246,8 @@ class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                             jsonPath(
                                     "$.results.*.category",
                                     containsInAnyOrder(
-                                            "Family and domain databases20",
-                                            "Family and domain databases10")))
+                                            "Family and domain databases2000",
+                                            "Family and domain databases1000")))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",

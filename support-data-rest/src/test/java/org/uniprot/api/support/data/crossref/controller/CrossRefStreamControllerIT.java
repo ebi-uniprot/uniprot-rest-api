@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
@@ -223,17 +222,15 @@ class CrossRefStreamControllerIT extends AbstractRDFStreamControllerIT {
     }
 
     private void saveEntry(long suffix) {
-        String accPrefix = "DB-";
-        long num = ThreadLocalRandom.current().nextLong(1000, 9999);
-        String accession = accPrefix + num;
+        String accession = String.format("DB-%04d", suffix);
         searchAccession = accession;
         allAccessions.add(searchAccession);
         Collections.sort(allAccessions, Collections.reverseOrder());
-        saveEntry(accession, suffix);
+        saveEntry(accession);
     }
 
-    private void saveEntry(String accession, long suffix) {
-        CrossRefDocument document = CrossRefITUtils.createSolrDocument(accession, suffix);
+    private void saveEntry(String accession) {
+        CrossRefDocument document = CrossRefITUtils.createSolrDocument(accession);
         storeManager.saveDocs(DataStoreManager.StoreType.CROSSREF, document);
     }
 }

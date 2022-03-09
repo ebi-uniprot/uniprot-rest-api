@@ -138,7 +138,7 @@ class IdMappingJobServiceTest {
         IdMappingJob submittedJob = null;
         int attemptsRemaining = 5;
         while (attemptsRemaining-- > 0) {
-            Thread.sleep(1000); // delay to make sure that thread is picked to run
+            Thread.sleep(3000); // delay to make sure that thread is picked to run
             submittedJob = this.cacheService.getJobAsResource(jobId);
             if (submittedJob != null) {
                 break;
