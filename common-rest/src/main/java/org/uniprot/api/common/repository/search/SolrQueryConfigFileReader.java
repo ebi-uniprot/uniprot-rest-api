@@ -70,8 +70,11 @@ public class SolrQueryConfigFileReader {
                                             "Could not load config resources: " + location);
                                 });
 
+        String[] linesArr = lines.toArray(String[]::new);
+        logSizeOfConfigFile(linesArr);
+
         QueryConfigType queryConfigType = QueryConfigType.DEFAULT_SEARCH;
-        for (String line : lines.toArray(String[]::new)) {
+        for (String line : linesArr) {
             String trimmedLine = line.trim();
             QueryConfigType parsedType = QueryConfigType.typeOf(trimmedLine);
             if (parsedType == null) {
@@ -88,6 +91,14 @@ public class SolrQueryConfigFileReader {
         log.info("Loaded Solr query config.");
     }
 
+    private void logSizeOfConfigFile(String[] linesArr) {
+        if (linesArr.length == 0) {
+            log.warn("Solr query config is EMPTY");
+        } else {
+            log.info("Solr query config contains {} lines", linesArr.length);
+        }
+    }
+
     private String getConfigLocation() {
         String location;
         if (externalConfigDir != null) {
@@ -102,16 +113,19 @@ public class SolrQueryConfigFileReader {
         Resource resource = loader.getResource(resourceLocation);
         if (resource.exists()) {
             try {
-                log.info("Reading query config from: " + resource.getURI());
+                log.info("Reading query config from [{}]", resource.getURI());
                 return Optional.of(
                         new BufferedReader(new InputStreamReader(resource.getInputStream()))
                                 .lines());
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Could not read query config [{}]", resourceLocation, e);
             }
+        } else {
+            log.warn("Could not read query config [{}]", resourceLocation);
         }
         return Optional.empty();
     }
+
 
     private void addQueryConfig(QueryConfigType queryConfigType, String line) {
         switch (queryConfigType) {
