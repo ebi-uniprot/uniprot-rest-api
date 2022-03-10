@@ -27,13 +27,17 @@ public class ContactService {
     private static final String TOKEN_PREFIX = "contactToken";
     private static final int TOKEN_RADIX = 36;
     private final ContactConfig contactConfig;
-    private final Properties emailProperties;
+    final Properties emailProperties;
 
     public ContactService(ContactConfig contactConfig) {
         this.contactConfig = contactConfig;
 
         Properties emailProp = new Properties();
         emailProp.put("mail.smtp.host", contactConfig.getHost());
+        emailProp.put("mail.smtp.port", contactConfig.getPort());
+        emailProp.put("mail.smtp.auth", contactConfig.isAuth());
+        emailProp.put("mail.smtp.starttls.enable", contactConfig.isStarttls());
+
         this.emailProperties = emailProp;
     }
 
