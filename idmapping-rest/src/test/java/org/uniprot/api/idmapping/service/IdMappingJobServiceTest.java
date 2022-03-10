@@ -138,7 +138,7 @@ class IdMappingJobServiceTest {
         IdMappingJob submittedJob = null;
         int attemptsRemaining = 5;
         while (attemptsRemaining-- > 0) {
-            Thread.sleep(5000); // delay to make sure that thread is picked to run
+            Thread.sleep(3000); // delay to make sure that thread is picked to run
             submittedJob = this.cacheService.getJobAsResource(jobId);
             if (submittedJob != null) {
                 break;
@@ -158,6 +158,7 @@ class IdMappingJobServiceTest {
         Mockito.verify(pirService, times(1)).mapIds(request);
 
         this.jobService.submitJob(request);
+        Thread.sleep(3000);
         IdMappingJob newJobAsResource = this.cacheService.getJobAsResource(jobId);
         MatcherAssert.assertThat(
                 newJobAsResource.getJobStatus(), IsIn.oneOf(JobStatus.NEW, JobStatus.RUNNING));
