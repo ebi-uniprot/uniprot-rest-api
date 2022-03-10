@@ -278,11 +278,34 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         content()
                                 .string(
                                         containsString(
-                                                "Q00001\tQ00001\tFGFR2_HUMAN\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00002\tQ00002\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 2 gene 2 gene 2\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00003\tQ00003\tFGFR2_HUMAN\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00004\tQ00004\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 4 gene 4 gene 4\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00005\tQ00005\tFGFR2_HUMAN\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
+                                                "Q00001\tQ00001\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00002\tQ00002\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 2 gene 2 gene 2\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00003\tQ00003\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00004\tQ00004\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 4 gene 4 gene 4\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00005\tQ00005\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
+    }
+
+    @Test
+    void testIdMappingWithSplitQuerySuccess() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxIdsWithFacets);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("facets", "reviewed")
+                                .param("query", "id_default:FGFR12345")
+                                .param("size", "10"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(jsonPath("$.facets.size()", is(1)))
+                .andExpect(jsonPath("$.facets[0].values.*.value", contains("true")))
+                .andExpect(
+                        jsonPath("$.facets[0].values.*.label", contains("Reviewed (Swiss-Prot)")))
+                .andExpect(jsonPath("$.facets[0].values.*.count", contains(5)));
     }
 
     @Override

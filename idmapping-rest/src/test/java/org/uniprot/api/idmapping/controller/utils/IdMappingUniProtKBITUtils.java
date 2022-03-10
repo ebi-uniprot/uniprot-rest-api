@@ -123,7 +123,9 @@ public class IdMappingUniProtKBITUtils {
         entryBuilder.primaryAccession(acc);
         if (i % 2 == 0) {
             entryBuilder.entryType(UniProtKBEntryType.SWISSPROT);
+            entryBuilder.uniProtId("FGFR12345_HUMAN");
         } else {
+            entryBuilder.uniProtId("ATPG_12345");
             entryBuilder.entryType(UniProtKBEntryType.TREMBL);
         }
 
