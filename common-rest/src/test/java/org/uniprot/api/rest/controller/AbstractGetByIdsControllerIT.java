@@ -1,14 +1,7 @@
 package org.uniprot.api.rest.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyIterable;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -372,8 +365,8 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     }
 
     @Test
-    void getByIdsWithFacetFilterSuccess() throws Exception {
-        String facetFilter = getFacetFilter();
+    void getByIdsQueryFilterSuccess() throws Exception {
+        String queryFilter = getQueryFilter();
         // when
         ResultActions response =
                 getMockMvc()
@@ -383,7 +376,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
                                         .param(getRequestParamName(), getCommaSeparatedIds())
-                                        .param("facetFilter", facetFilter)
+                                        .param("query", queryFilter)
                                         .param("size", "10"));
 
         // then
@@ -396,8 +389,8 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     }
 
     @Test
-    void getByIdsWithFacetFilterEmptyResponse() throws Exception {
-        String facetFilter = getUnmatchedFacetFilter();
+    void getByIdsWithQueryFilterEmptyResponse() throws Exception {
+        String queryFilter = getUnmatchedQueryFilter();
         // when
         ResultActions response =
                 getMockMvc()
@@ -407,7 +400,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
                                         .param(getRequestParamName(), getCommaSeparatedIds())
-                                        .param("facetFilter", facetFilter)
+                                        .param("query", queryFilter)
                                         .param("size", "10"));
 
         // then
@@ -419,8 +412,8 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     }
 
     @Test
-    void getByIdsWithFacetsAndFacetFilterSuccess() throws Exception {
-        String facetFilter = getFacetFilter();
+    void getByIdsWithFacetsAndQueryFilterSuccess() throws Exception {
+        String queryFilter = getQueryFilter();
         int facetCount = getCommaSeparatedFacets().split(",").length;
         int idCount = 5;
         // when
@@ -435,7 +428,7 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                                                 getRequestParamName(),
                                                 getCommaSeparatedNIds(idCount))
                                         .param("facets", getCommaSeparatedFacets())
-                                        .param("facetFilter", facetFilter));
+                                        .param("query", queryFilter));
 
         // then
         response.andDo(log())
@@ -456,6 +449,30 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                         jsonPath("$.facets[" + i + "].values[?(@.count <= " + idCount + ")]")
                                 .isArray());
         }
+    }
+
+    @Test
+    void getByIdsQueryFilterQuerySyntaxBadRequest() throws Exception {
+        String queryFilter = "invalidfield(:invalidValue AND :invalid:10)";
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(
+                                                org.apache.http.HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), getCommaSeparatedIds())
+                                        .param("query", queryFilter)
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*", contains("query parameter has an invalid syntax")));
     }
 
     @Test
@@ -531,11 +548,11 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
 
     protected abstract String[] getInvalidFacetErrorMessage();
 
-    protected abstract String getFacetFilter();
+    protected abstract String getQueryFilter();
 
     protected abstract ResultMatcher getSortedIdResultMatcher();
 
-    protected abstract String getUnmatchedFacetFilter();
+    protected abstract String getUnmatchedQueryFilter();
 
     protected abstract String[] getIdLengthErrorMessage();
 

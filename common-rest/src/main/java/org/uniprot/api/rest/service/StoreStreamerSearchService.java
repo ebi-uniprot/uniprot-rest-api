@@ -85,10 +85,10 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
                         ? searchBySolrStream(idsRequest)
                         : new SolrStreamFacetResponse();
 
-        // use the ids returned by solr stream if facetFilter is passed
+        // use the ids returned by solr stream if query filter is passed
         // otherwise use the passed ids
         List<String> ids =
-                Utils.notNullNotEmpty(idsRequest.getFacetFilter())
+                Utils.notNullNotEmpty(idsRequest.getQuery())
                         ? solrStreamResponse.getIds()
                         : idsRequest.getIdList();
         // default page size to number of ids passed
@@ -142,8 +142,8 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         String termQuery = qb.toString();
 
         // append the facet filter query in the accession query
-        if (Utils.notNullNotEmpty(idsRequest.getFacetFilter())) {
-            solrRequestBuilder.query(idsRequest.getFacetFilter());
+        if (Utils.notNullNotEmpty(idsRequest.getQuery())) {
+            solrRequestBuilder.query(idsRequest.getQuery());
             solrRequestBuilder.filteredQuery(termQuery);
             solrRequestBuilder.searchAccession(Boolean.TRUE);
             solrRequestBuilder.searchSort(getSolrIdField() + " asc");
@@ -161,6 +161,6 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         return (Utils.nullOrEmpty(idsRequest.getCursor())
                         && Utils.notNullNotEmpty(idsRequest.getFacetList())
                         && !idsRequest.isDownload())
-                || Utils.notNullNotEmpty(idsRequest.getFacetFilter());
+                || Utils.notNullNotEmpty(idsRequest.getQuery());
     }
 }

@@ -6,8 +6,12 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,13 +19,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
@@ -89,6 +98,58 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
         saveEntries();
+    }
+
+    @Test
+    void getByUIdsWithQueryFilterSuccess() throws Exception {
+        String queryFilter = "uniprotkb:P10001 OR uniprotkb:P10002";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_UPIS_PATH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("upis", getCommaSeparatedIds())
+                                .param("query", queryFilter)
+                                .param("fields", "upi,organism")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.uniParcId",
+                                contains("UPI0000000001", "UPI0000000002")))
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
+    void getByUIdsQueryBadRequest() throws Exception {
+        String queryFilter = "invalid:P12301 AND upi:INVALID";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_UPIS_PATH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("upis", getCommaSeparatedIds())
+                                .param("query", queryFilter)
+                                .param("fields", "upi,organism")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                containsInAnyOrder(
+                                        "The 'upi' value has invalid format. It should be a valid UniParc UPI",
+                                        "'invalid' is not a valid search field")))
+                .andExpect(jsonPath("$.facets").doesNotExist());
     }
 
     @Override
@@ -253,7 +314,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
-    protected String getFacetFilter() {
+    protected String getQueryFilter() {
         return "database_facet:1";
     }
 
@@ -263,7 +324,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
-    protected String getUnmatchedFacetFilter() {
+    protected String getUnmatchedQueryFilter() {
         return "organism_name:missing";
     }
 

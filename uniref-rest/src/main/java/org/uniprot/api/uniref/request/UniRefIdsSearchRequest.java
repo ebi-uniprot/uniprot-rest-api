@@ -12,14 +12,10 @@ import lombok.Data;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
+import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
-import org.uniprot.api.rest.validation.ValidContentTypes;
-import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
-import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import org.uniprot.api.rest.validation.ValidUniqueIdList;
+import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -46,12 +42,12 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
+    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniref-search-fields.json")
     @Parameter(
-            description =
-                    "Criteria to filter by facet value. It can support any valid lucene query.")
+            description = "Criteria to search UniRef clusters. It can take any valid solr query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
-    @ValidSolrQueryFacetFields(facetConfig = UniRefFacetConfig.class)
-    private String facetFilter;
+    @ValidSolrQueryFields(uniProtDataType = UniProtDataType.UNIREF, messagePrefix = "search.uniref")
+    private String query;
 
     @Parameter(
             description =

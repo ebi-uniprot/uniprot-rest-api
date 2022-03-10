@@ -1,24 +1,30 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
@@ -109,6 +115,58 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
         UniRefDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
         storeClient.saveEntry(entryLight);
+    }
+
+    @Test
+    void getByIdsWithQueryFilterSuccess() throws Exception {
+        String queryFilter = "uniprot_id:P12301";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_IDS_PATH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("ids", getCommaSeparatedIds())
+                                .param("query", queryFilter)
+                                .param("fields", "id,name,types")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.id",
+                                contains("UniRef100_P03901", "UniRef50_P03901", "UniRef90_P03901")))
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
+    void getByIdsQueryBadRequest() throws Exception {
+        String queryFilter = "invalid:P12301 AND id:INVALID";
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_IDS_PATH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("ids", getCommaSeparatedIds())
+                                .param("query", queryFilter)
+                                .param("fields", "id,name,types")
+                                .param("size", "10"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                containsInAnyOrder(
+                                        "The 'id' value has invalid format. It should be a valid UniRef Cluster id",
+                                        "'invalid' is not a valid search field")))
+                .andExpect(jsonPath("$.facets").doesNotExist());
     }
 
     @Override
@@ -284,7 +342,7 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
-    protected String getFacetFilter() {
+    protected String getQueryFilter() {
         return "identity:0.5 OR identity:0.9 OR identity:1.0";
     }
 
@@ -294,7 +352,7 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
-    protected String getUnmatchedFacetFilter() {
+    protected String getUnmatchedQueryFilter() {
         return "identity:2";
     }
 
