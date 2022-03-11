@@ -25,7 +25,7 @@ public class FakeIdsPostRequest implements IdsSearchRequest {
     }
 
     @Override
-    public String getFacetFilter() {
+    public String getQuery() {
         return null;
     }
 

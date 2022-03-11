@@ -11,7 +11,7 @@ public abstract class IdsDownloadRequest implements IdsSearchRequest {
     }
 
     @Override
-    public String getFacetFilter() {
+    public String getQuery() {
         return null;
     }
 

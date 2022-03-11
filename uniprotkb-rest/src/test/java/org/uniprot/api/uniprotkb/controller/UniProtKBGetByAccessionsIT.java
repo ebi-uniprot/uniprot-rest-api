@@ -289,7 +289,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
-    protected String getFacetFilter() {
+    protected String getQueryFilter() {
         return "reviewed:true OR reviewed:false";
     }
 
@@ -299,7 +299,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
-    protected String getUnmatchedFacetFilter() {
+    protected String getUnmatchedQueryFilter() {
         return "existence:randomvalue";
     }
 

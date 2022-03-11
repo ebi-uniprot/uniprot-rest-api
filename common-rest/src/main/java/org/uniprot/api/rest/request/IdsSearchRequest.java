@@ -12,13 +12,7 @@ public interface IdsSearchRequest extends SearchRequest {
 
     String getDownload();
 
-    String getFacetFilter();
-
     void setCursor(String cursor);
-
-    default String getQuery() {
-        return null;
-    }
 
     default String getSort() {
         return null;
