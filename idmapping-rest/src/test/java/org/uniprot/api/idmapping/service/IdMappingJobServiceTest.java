@@ -158,11 +158,14 @@ class IdMappingJobServiceTest {
         Mockito.verify(pirService, times(1)).mapIds(request);
 
         this.jobService.submitJob(request);
-        Thread.sleep(3000);
         IdMappingJob newJobAsResource = this.cacheService.getJobAsResource(jobId);
-        MatcherAssert.assertThat(
-                newJobAsResource.getJobStatus(), IsIn.oneOf(JobStatus.NEW, JobStatus.RUNNING));
-        Mockito.verify(pirService, times(2)).mapIds(request);
+        JobStatus currentStatus = newJobAsResource.getJobStatus();
+        MatcherAssert.assertThat(currentStatus, IsIn.oneOf(JobStatus.NEW, JobStatus.RUNNING));
+        if(currentStatus == JobStatus.NEW) {
+            Mockito.verify(pirService, times(1)).mapIds(request);
+        } else if(currentStatus == JobStatus.RUNNING){
+            Mockito.verify(pirService, times(2)).mapIds(request);
+        }
     }
 
     @Nested
