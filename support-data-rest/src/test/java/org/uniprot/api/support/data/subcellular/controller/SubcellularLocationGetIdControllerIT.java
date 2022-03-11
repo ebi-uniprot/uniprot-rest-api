@@ -4,8 +4,6 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.nio.ByteBuffer;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -98,12 +96,11 @@ public class SubcellularLocationGetIdControllerIT
         return "/locations/{id}";
     }
 
-    private ByteBuffer getSubcellularLocationBinary(SubcellularLocationEntry entry) {
+    private byte[] getSubcellularLocationBinary(SubcellularLocationEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    SubcellularLocationJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return SubcellularLocationJsonConfig.getInstance()
+                    .getFullObjectMapper()
+                    .writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(
                     "Unable to parse SubcellularLocationEntry to binary json: ", e);

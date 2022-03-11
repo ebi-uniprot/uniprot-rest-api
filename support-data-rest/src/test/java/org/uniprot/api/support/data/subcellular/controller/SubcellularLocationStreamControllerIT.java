@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.Assertions;
@@ -421,16 +420,14 @@ class SubcellularLocationStreamControllerIT extends AbstractRDFStreamControllerI
     }
 
     private void saveEntry(long suffix) {
-        String accPrefix = "SL-";
-        long num = ThreadLocalRandom.current().nextLong(1000, 9999);
-        String accession = accPrefix + num;
+        String accession = String.format("SL-%04d", suffix);
         searchAccession = accession;
         allAccessions.add(searchAccession);
         Collections.sort(allAccessions, Collections.reverseOrder());
-        saveEntry(accession, suffix);
+        saveEntry(accession);
     }
 
-    private void saveEntry(String accession, long suffix) {
+    private void saveEntry(String accession) {
         SubcellularLocationDocument document = SubcellularLocationITUtils.createSolrDoc(accession);
         storeManager.saveDocs(DataStoreManager.StoreType.SUBCELLULAR_LOCATION, document);
     }

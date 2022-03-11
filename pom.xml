@@ -12,7 +12,7 @@
 
 	<artifactId>uniprot-rest-api</artifactId>
 	<groupId>org.uniprot</groupId>
-	<version>1.0.10-throttle-SNAPSHOT</version>
+	<version>1.0.13-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>UniProt REST API Aggregator</name>
 	<description>
@@ -22,8 +22,8 @@
 	</description>
 
 	<properties>
-		<uniprot-store.version>1.0.10-SNAPSHOT</uniprot-store.version>
-		<uniprot-core.version>1.0.10-SNAPSHOT</uniprot-core.version>
+		<uniprot-store.version>${project.version}</uniprot-store.version>
+		<uniprot-core.version>${project.version}</uniprot-core.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.version>3.8.0</maven.compiler.version>
@@ -96,6 +96,10 @@
 					<exclusion>
 						<groupId>org.apache.logging.log4j</groupId>
 						<artifactId>log4j-slf4j-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.logging.log4j</groupId>
+						<artifactId>log4j-api</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -218,6 +222,14 @@
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
 					<artifactId>log4j-slf4j-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-1.2-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

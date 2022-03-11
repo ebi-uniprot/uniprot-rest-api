@@ -1,6 +1,10 @@
 package org.uniprot.api.rest.output.converter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,7 +22,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
-import org.uniprot.api.common.repository.search.suggestion.Alternative;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -330,22 +333,8 @@ class JsonMessageConverterTest {
                 MessageConverterContext.<UniProtKBEntry>builder()
                         .suggestions(
                                 List.of(
-                                        Suggestion.builder()
-                                                .original("orig 1")
-                                                .alternative(
-                                                        Alternative.builder()
-                                                                .term("one")
-                                                                .count(1)
-                                                                .build())
-                                                .build(),
-                                        Suggestion.builder()
-                                                .original("orig 2")
-                                                .alternative(
-                                                        Alternative.builder()
-                                                                .term("two")
-                                                                .count(2)
-                                                                .build())
-                                                .build()))
+                                        Suggestion.builder().query("one").hits(1).build(),
+                                        Suggestion.builder().query("one").hits(1).build()))
                         .build();
         log.debug("------- BEGIN: writeCanWriteOnlySuggestions");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -356,7 +345,7 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals(
-                "{\"results\":[],\"suggestions\":[{\"original\":\"orig 1\",\"alternatives\":[{\"term\":\"one\",\"count\":1}]},{\"original\":\"orig 2\",\"alternatives\":[{\"term\":\"two\",\"count\":2}]}]}",
+                "{\"results\":[],\"suggestions\":[{\"query\":\"one\",\"hits\":1},{\"query\":\"one\",\"hits\":1}]}",
                 result);
     }
 

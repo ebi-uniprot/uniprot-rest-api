@@ -11,7 +11,8 @@ import org.uniprot.store.search.document.dbxref.CrossRefDocument;
  * @created 01/02/2021
  */
 public class CrossRefITUtils {
-    public static CrossRefDocument createSolrDocument(String accession, long suffix) {
+    public static CrossRefDocument createSolrDocument(String accession) {
+        long suffix = Long.parseLong(accession.substring(3));
         CrossRefEntryBuilder entryBuilder = new CrossRefEntryBuilder();
         Statistics statistics =
                 new StatisticsBuilder()

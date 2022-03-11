@@ -46,6 +46,7 @@ public class AdvancedSearchTerm implements Serializable {
     @JsonIgnore private String autoCompleteQueryFieldValidRegex;
     private String regex;
     private String valuePrefix;
+    private List<String> tags;
     private List<Value> values;
     private List<AdvancedSearchTerm> items;
     private List<AdvancedSearchTerm> siblings;
@@ -130,7 +131,9 @@ public class AdvancedSearchTerm implements Serializable {
                 }
             }
         }
-
+        if (fi.getTags() != null) {
+            b.tags(fi.getTags());
+        }
         List<SearchFieldItem.Value> values = fi.getValues();
         if (values != null) {
             List<AdvancedSearchTerm.Value> stcValues =

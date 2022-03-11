@@ -3,6 +3,7 @@ package org.uniprot.api.uniparc.controller;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.endsWith;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +50,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithSuggestionsControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -93,7 +95,7 @@ import org.uniprot.store.search.SolrCollection;
             UniParcSearchControllerIT.UniParcSearchContentTypeParamResolver.class,
             UniParcSearchControllerIT.UniParcSearchParameterResolver.class
         })
-class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerIT {
     private static final String UPI_PREF = "UPI0000083A";
 
     @Autowired private UniParcQueryRepository repository;
@@ -197,6 +199,35 @@ class UniParcSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.facets[0].values.*.label", hasItem("EnsemblBacteria")))
                 .andExpect(jsonPath("$.facets[0].values.*.label", hasItem("EMBL CDS")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", hasItem(greaterThan(0))));
+    }
+
+    @Test
+    void testGetNoSuggestionForSearch() throws Exception {
+        // given
+        saveEntry(SaveScenario.SEARCH_NOT_FOUND);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=cambridge")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results", is(empty())))
+                .andExpect(jsonPath("$.suggestions").doesNotExist());
+    }
+
+    @Override
+    protected List<Triple<String, String, List<String>>> getTriplets() {
+        return List.of(
+                Triple.of("protein", "proteenname11", List.of("proteinname11")),
+                Triple.of("taxonomy_name phrase", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
+                Triple.of("taxonomy_name", "homo sapeans", List.of("homo sapiens")),
+                Triple.of("gene", "genename21", List.of("genename11", "genename20")));
     }
 
     @Override

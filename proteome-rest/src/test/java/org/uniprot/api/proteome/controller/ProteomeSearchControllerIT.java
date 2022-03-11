@@ -1,18 +1,32 @@
 package org.uniprot.api.proteome.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.UPID_PREF;
+import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getExcludedProteomeDocument;
+import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getProteomeDocument;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +43,7 @@ import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.proteome.ProteomeRestApplication;
 import org.uniprot.api.proteome.repository.ProteomeFacetConfig;
 import org.uniprot.api.proteome.repository.ProteomeQueryRepository;
-import org.uniprot.api.rest.controller.AbstractSearchWithFacetControllerIT;
+import org.uniprot.api.rest.controller.AbstractSearchWithSuggestionsControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
@@ -61,7 +75,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
             ProteomeSearchControllerIT.ProteomeSearchContentTypeParamResolver.class,
             ProteomeSearchControllerIT.ProteomeSearchParameterResolver.class
         })
-class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+class ProteomeSearchControllerIT extends AbstractSearchWithSuggestionsControllerIT {
 
     private static final String EXCLUDED_PROTEOME = "UP999999999";
     @Autowired private ProteomeQueryRepository repository;
@@ -173,6 +187,13 @@ class ProteomeSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
+    @Override
+    protected List<Triple<String, String, List<String>>> getTriplets() {
+        return List.of(
+                Triple.of("taxonomy_name phrase", "\"homo sapeans\"", List.of("\"homo sapiens\"")),
+                Triple.of("taxonomy_name", "homo sapeans", List.of("homo sapiens")));
     }
 
     static class ProteomeSearchParameterResolver extends AbstractSearchParameterResolver {

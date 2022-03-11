@@ -22,8 +22,9 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
     @Override
     public List<Suggestion> convert(QueryResponse queryResponse) {
         SpellCheckResponse spellCheckResponse = queryResponse.getSpellCheckResponse();
-        if (Utils.notNull(spellCheckResponse)) {
-            return spellCheckResponse.getSuggestions().stream()
+        if (Utils.notNull(spellCheckResponse)
+                && Utils.notNullNotEmpty(spellCheckResponse.getCollatedResults())) {
+            return spellCheckResponse.getCollatedResults().stream()
                     .map(this::getSuggestion)
                     .collect(Collectors.toList());
         } else {
@@ -31,16 +32,10 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
         }
     }
 
-    private Suggestion getSuggestion(SpellCheckResponse.Suggestion s) {
-        Suggestion.SuggestionBuilder suggestionBuilder =
-                Suggestion.builder().original(s.getToken());
-        for (int i = 0; i < s.getAlternatives().size(); i++) {
-            suggestionBuilder.alternative(
-                    Alternative.builder()
-                            .term(s.getAlternatives().get(i))
-                            .count(s.getAlternativeFrequencies().get(i))
-                            .build());
-        }
-        return suggestionBuilder.build();
+    private Suggestion getSuggestion(SpellCheckResponse.Collation collation) {
+        return Suggestion.builder()
+                .query(collation.getCollationQueryString().replace(" AND ", " "))
+                .hits(collation.getNumberOfHits())
+                .build();
     }
 }

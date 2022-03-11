@@ -1,13 +1,24 @@
 package org.uniprot.api.help.centre.controller;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
@@ -222,11 +233,11 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.suggestions.size()", is(1)))
-                .andExpect(jsonPath("$.suggestions[0].original", is("bell")))
-                .andExpect(
-                        jsonPath("$.suggestions[0].alternatives[*].term", contains("ball", "bill")))
-                .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(2, 1)));
+                .andExpect(jsonPath("$.suggestions.size()", is(2)))
+                .andExpect(jsonPath("$.suggestions[0].query", is("ball")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(2)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("bill")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
 
     @Test
@@ -240,7 +251,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(getSearchRequestPath())
-                                .param("query", "protein bell")
+                                .param("query", "\"protein bell\"")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -248,15 +259,17 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.suggestions.size()", is(1)))
-                .andExpect(jsonPath("$.suggestions[0].original", is("bell")))
-                .andExpect(
-                        jsonPath("$.suggestions[0].alternatives[*].term", contains("ball", "bill")))
-                .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(2, 1)));
+                .andExpect(jsonPath("$.suggestions.size()", is(2)))
+                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein ball\"")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(2)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein bill\"")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
 
     @Test
     void multipleSuggestionsGivenForMultiWordQuery() throws Exception {
+        saveEntry("id0", "another fluffy protein bill", "content 0", "category");
+        saveEntry("id00", "another one fluffy protein bill", "content 00", "category");
         saveEntry("id1", "title", "content 1", "category");
         saveEntry("id2", "goat cabbage protein ball", "content 2", "category");
         saveEntry("id3", "rigorous protein ball", "content 3", "category");
@@ -275,13 +288,10 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].original", is("protin")))
-                .andExpect(jsonPath("$.suggestions[0].alternatives[*].term", contains("protein")))
-                .andExpect(jsonPath("$.suggestions[0].alternatives[*].count", contains(3)))
-                .andExpect(jsonPath("$.suggestions[1].original", is("bell")))
-                .andExpect(
-                        jsonPath("$.suggestions[1].alternatives[*].term", contains("ball", "bill")))
-                .andExpect(jsonPath("$.suggestions[1].alternatives[*].count", contains(2, 1)));
+                .andExpect(jsonPath("$.suggestions[0].query", is("protein bill")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(3)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("protein ball")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(2)));
     }
 
     @Test
@@ -302,7 +312,36 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.id", contains("3")));
+                .andExpect(jsonPath("$.results.*.id", contains("3")))
+                .andExpect(jsonPath("$.suggestions").doesNotExist());
+    }
+
+    @Test
+    void multipleSuggestionsGivenForPhraseQuery() throws Exception {
+        saveEntry("id0", "another fluffy protein bill", "content 0", "category");
+        saveEntry("id00", "another one fluffy protein bill", "content 00", "category");
+        saveEntry("id1", "title", "content 1", "category");
+        saveEntry("id2", "goat cabbage protein ball", "content 2", "category");
+        saveEntry("id3", "rigorous protein ball", "content 3", "category");
+        saveEntry("id4", "pink fluffy protein bill", "content 4", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "\"protin bell\"")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.suggestions.size()", is(2)))
+                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein bill\"")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(3)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein ball\"")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(2)));
     }
 
     @Override

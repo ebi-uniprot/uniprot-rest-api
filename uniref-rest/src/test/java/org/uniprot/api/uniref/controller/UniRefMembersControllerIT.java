@@ -175,8 +175,7 @@ class UniRefMembersControllerIT {
                 .andExpect(
                         jsonPath("$.results[0].memberIdType", is("UniProtKB Unreviewed (TrEMBL)")))
                 .andExpect(jsonPath("$.results[0].memberId", is("P12301_HUMAN")))
-                .andExpect(
-                        jsonPath("$.results[0].organismName", is("Homo sapiens (Representative)")))
+                .andExpect(jsonPath("$.results[0].organismName", is("Homo sapiens (human)")))
                 .andExpect(jsonPath("$.results[0].organismTaxId", is(9600)))
                 .andExpect(jsonPath("$.results[0].sequenceLength", is(312)))
                 .andExpect(jsonPath("$.results[0].proteinName", is("some protein name")))
