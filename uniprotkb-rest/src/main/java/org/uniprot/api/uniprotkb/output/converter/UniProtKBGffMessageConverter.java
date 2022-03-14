@@ -3,6 +3,7 @@ package org.uniprot.api.uniprotkb.output.converter;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.parser.gff.uniprot.UniProtGffParser;
@@ -13,6 +14,10 @@ public class UniProtKBGffMessageConverter
 
     public UniProtKBGffMessageConverter() {
         super(UniProtMediaType.GFF_MEDIA_TYPE, UniProtKBEntry.class);
+    }
+
+    public UniProtKBGffMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(UniProtMediaType.GFF_MEDIA_TYPE, UniProtKBEntry.class, downloadGatekeeper);
     }
 
     @Override

@@ -74,7 +74,7 @@ public class StoreStreamer<T> {
     private void closeTupleStream(TupleStream tupleStream) {
         try {
             tupleStream.close();
-            log.info("TupleStream closed: {}", tupleStream.getStreamNodeId());
+            log.debug("TupleStream closed: {}", tupleStream.getStreamNodeId());
         } catch (IOException e) {
             String message = "Error when closing TupleStream";
             log.error(message, e);

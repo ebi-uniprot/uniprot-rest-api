@@ -11,6 +11,7 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
 import org.obolibrary.oboformat.writer.OBOFormatWriter;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 
@@ -19,7 +20,12 @@ public abstract class AbstractOBOMessageConverter<T> extends AbstractEntityHttpM
     private final OBOFormatWriter oboFormatWriter;
 
     public AbstractOBOMessageConverter(Class<T> messageConverterEntryClass) {
-        super(UniProtMediaType.OBO_MEDIA_TYPE, messageConverterEntryClass);
+        this(messageConverterEntryClass, null);
+    }
+
+    public AbstractOBOMessageConverter(
+            Class<T> messageConverterEntryClass, Gatekeeper downloadGatekeeper) {
+        super(UniProtMediaType.OBO_MEDIA_TYPE, messageConverterEntryClass, downloadGatekeeper);
         this.oboFormatWriter = new OBOFormatWriter();
     }
 

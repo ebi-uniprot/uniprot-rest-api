@@ -6,6 +6,7 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.AbstractOBOMessageConverter;
 import org.uniprot.core.cv.disease.DiseaseCrossReference;
 import org.uniprot.core.cv.disease.DiseaseEntry;
@@ -16,6 +17,10 @@ public class DiseaseOBOMessageConverter extends AbstractOBOMessageConverter<Dise
 
     public DiseaseOBOMessageConverter() {
         super(DiseaseEntry.class);
+    }
+
+    public DiseaseOBOMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(DiseaseEntry.class, downloadGatekeeper);
     }
 
     @Override

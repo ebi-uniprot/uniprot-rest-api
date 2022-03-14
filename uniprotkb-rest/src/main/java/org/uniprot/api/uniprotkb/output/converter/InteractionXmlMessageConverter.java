@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
@@ -23,7 +24,11 @@ public class InteractionXmlMessageConverter
     private final ObjectWriter objectWriter;
 
     public InteractionXmlMessageConverter() {
-        super(MediaType.APPLICATION_XML, InteractionEntry.class);
+        this(null);
+    }
+
+    public InteractionXmlMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(MediaType.APPLICATION_XML, InteractionEntry.class, downloadGatekeeper);
         JacksonXmlModule xmlModule = new JacksonXmlModule();
         xmlModule.setDefaultUseWrapper(false);
 

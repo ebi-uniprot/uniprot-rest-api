@@ -2,13 +2,11 @@ package org.uniprot.api.support.data.common;
 
 import java.util.List;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.uniprot.api.common.concurrency.TaskExecutorProperties;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.support.data.disease.response.DiseaseOBOMessageConverter;
 import org.uniprot.api.support.data.keyword.response.KeywordOBOMessageConverter;
@@ -35,37 +33,16 @@ import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 @Configuration
-@ConfigurationProperties(prefix = "download")
 public class MessageConverterConfig {
-    private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
-
     @Bean
-    public ThreadPoolTaskExecutor downloadTaskExecutor(
-            ThreadPoolTaskExecutor configurableTaskExecutor) {
-        configurableTaskExecutor.setCorePoolSize(taskExecutor.getCorePoolSize());
-        configurableTaskExecutor.setMaxPoolSize(taskExecutor.getMaxPoolSize());
-        configurableTaskExecutor.setQueueCapacity(taskExecutor.getQueueCapacity());
-        configurableTaskExecutor.setKeepAliveSeconds(taskExecutor.getKeepAliveSeconds());
-        configurableTaskExecutor.setAllowCoreThreadTimeOut(taskExecutor.isAllowCoreThreadTimeout());
-        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(
-                taskExecutor.isWaitForTasksToCompleteOnShutdown());
-        return configurableTaskExecutor;
-    }
-
-    @Bean
-    public ThreadPoolTaskExecutor configurableTaskExecutor() {
-        return new ThreadPoolTaskExecutor();
-    }
-
-    @Bean
-    public WebMvcConfigurer extendedMessageConverters() {
+    public WebMvcConfigurer extendedMessageConverters(Gatekeeper downloadGatekeeper) {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 int index = 0;
 
                 converters.add(index++, new ErrorMessageConverter());
-                converters.add(index++, new ListMessageConverter());
+                converters.add(index++, new ListMessageConverter(downloadGatekeeper));
 
                 ReturnFieldConfig litReturnConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.LITERATURE);
@@ -74,13 +51,15 @@ public class MessageConverterConfig {
                         new XlsMessageConverter<>(
                                 LiteratureEntry.class,
                                 litReturnConfig,
-                                new LiteratureEntryValueMapper()));
+                                new LiteratureEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         index++,
                         new TsvMessageConverter<>(
                                 LiteratureEntry.class,
                                 litReturnConfig,
-                                new LiteratureEntryValueMapper()));
+                                new LiteratureEntryValueMapper(),
+                                downloadGatekeeper));
 
                 ReturnFieldConfig taxReturnConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.TAXONOMY);
@@ -89,25 +68,33 @@ public class MessageConverterConfig {
                         new XlsMessageConverter<>(
                                 TaxonomyEntry.class,
                                 taxReturnConfig,
-                                new TaxonomyEntryValueMapper()));
+                                new TaxonomyEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         index++,
                         new TsvMessageConverter<>(
                                 TaxonomyEntry.class,
                                 taxReturnConfig,
-                                new TaxonomyEntryValueMapper()));
+                                new TaxonomyEntryValueMapper(),
+                                downloadGatekeeper));
 
                 ReturnFieldConfig kwReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.KEYWORD);
                 converters.add(
                         index++,
                         new XlsMessageConverter<>(
-                                KeywordEntry.class, kwReturnFields, new KeywordEntryValueMapper()));
+                                KeywordEntry.class,
+                                kwReturnFields,
+                                new KeywordEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         index++,
                         new TsvMessageConverter<>(
-                                KeywordEntry.class, kwReturnFields, new KeywordEntryValueMapper()));
-                converters.add(index++, new KeywordOBOMessageConverter());
+                                KeywordEntry.class,
+                                kwReturnFields,
+                                new KeywordEntryValueMapper(),
+                                downloadGatekeeper));
+                converters.add(index++, new KeywordOBOMessageConverter(downloadGatekeeper));
 
                 ReturnFieldConfig subcellReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(
@@ -117,14 +104,17 @@ public class MessageConverterConfig {
                         new XlsMessageConverter<>(
                                 SubcellularLocationEntry.class,
                                 subcellReturnFields,
-                                new SubcellularLocationEntryValueMapper()));
+                                new SubcellularLocationEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         index++,
                         new TsvMessageConverter<>(
                                 SubcellularLocationEntry.class,
                                 subcellReturnFields,
-                                new SubcellularLocationEntryValueMapper()));
-                converters.add(index++, new SubcellularLocationOBOMessageConverter());
+                                new SubcellularLocationEntryValueMapper(),
+                                downloadGatekeeper));
+                converters.add(
+                        index++, new SubcellularLocationOBOMessageConverter(downloadGatekeeper));
 
                 ReturnFieldConfig diseaseReturnFields =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.DISEASE);
@@ -133,49 +123,56 @@ public class MessageConverterConfig {
                         new XlsMessageConverter<>(
                                 DiseaseEntry.class,
                                 diseaseReturnFields,
-                                new DiseaseEntryValueMapper()));
+                                new DiseaseEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         index++,
                         new TsvMessageConverter<>(
                                 DiseaseEntry.class,
                                 diseaseReturnFields,
-                                new DiseaseEntryValueMapper()));
-                converters.add(index++, new DiseaseOBOMessageConverter());
+                                new DiseaseEntryValueMapper(),
+                                downloadGatekeeper));
+                converters.add(index++, new DiseaseOBOMessageConverter(downloadGatekeeper));
 
                 // add Json message converter first in the list because it is the most used
                 JsonMessageConverter<LiteratureEntry> litJsonConverter =
                         new JsonMessageConverter<>(
                                 LiteratureJsonConfig.getInstance().getSimpleObjectMapper(),
                                 LiteratureEntry.class,
-                                litReturnConfig);
+                                litReturnConfig,
+                                downloadGatekeeper);
                 converters.add(index++, litJsonConverter);
 
                 JsonMessageConverter<KeywordEntry> keywordJsonConverter =
                         new JsonMessageConverter<>(
                                 KeywordJsonConfig.getInstance().getSimpleObjectMapper(),
                                 KeywordEntry.class,
-                                kwReturnFields);
+                                kwReturnFields,
+                                downloadGatekeeper);
                 converters.add(index++, keywordJsonConverter);
 
                 JsonMessageConverter<TaxonomyEntry> taxonomyJsonConverter =
                         new JsonMessageConverter<>(
                                 TaxonomyJsonConfig.getInstance().getSimpleObjectMapper(),
                                 TaxonomyEntry.class,
-                                taxReturnConfig);
+                                taxReturnConfig,
+                                downloadGatekeeper);
                 converters.add(index++, taxonomyJsonConverter);
 
                 JsonMessageConverter<SubcellularLocationEntry> subcellJsonConverter =
                         new JsonMessageConverter<>(
                                 SubcellularLocationJsonConfig.getInstance().getSimpleObjectMapper(),
                                 SubcellularLocationEntry.class,
-                                subcellReturnFields);
+                                subcellReturnFields,
+                                downloadGatekeeper);
                 converters.add(index++, subcellJsonConverter);
 
                 JsonMessageConverter<DiseaseEntry> diseaseJsonConverter =
                         new JsonMessageConverter<>(
                                 DiseaseJsonConfig.getInstance().getSimpleObjectMapper(),
                                 DiseaseEntry.class,
-                                diseaseReturnFields);
+                                diseaseReturnFields,
+                                downloadGatekeeper);
                 converters.add(index++, diseaseJsonConverter);
 
                 JsonMessageConverter<CrossRefEntry> xrefJsonConverter =
@@ -183,9 +180,10 @@ public class MessageConverterConfig {
                                 CrossRefJsonConfig.getInstance().getSimpleObjectMapper(),
                                 CrossRefEntry.class,
                                 ReturnFieldConfigFactory.getReturnFieldConfig(
-                                        UniProtDataType.CROSSREF));
+                                        UniProtDataType.CROSSREF),
+                                downloadGatekeeper);
                 converters.add(index++, xrefJsonConverter);
-                converters.add(index, new RDFMessageConverter());
+                converters.add(index, new RDFMessageConverter(downloadGatekeeper));
             }
         };
     }

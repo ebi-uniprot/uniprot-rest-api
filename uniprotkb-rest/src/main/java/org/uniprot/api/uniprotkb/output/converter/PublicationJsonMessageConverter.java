@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.output.converter;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.core.json.parser.publication.MappedPublicationsJsonConfig;
@@ -14,5 +15,13 @@ public class PublicationJsonMessageConverter extends JsonMessageConverter<Public
                 MappedPublicationsJsonConfig.getInstance().getSimpleObjectMapper(),
                 PublicationEntry.class,
                 null);
+    }
+
+    public PublicationJsonMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(
+                MappedPublicationsJsonConfig.getInstance().getSimpleObjectMapper(),
+                PublicationEntry.class,
+                null,
+                downloadGatekeeper);
     }
 }

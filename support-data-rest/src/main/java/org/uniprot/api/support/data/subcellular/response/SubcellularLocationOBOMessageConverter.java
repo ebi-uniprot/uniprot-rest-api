@@ -6,6 +6,7 @@ import org.obolibrary.oboformat.model.Clause;
 import org.obolibrary.oboformat.model.Frame;
 import org.obolibrary.oboformat.model.Xref;
 import org.obolibrary.oboformat.parser.OBOFormatConstants;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.AbstractOBOMessageConverter;
 import org.uniprot.core.cv.go.GoTerm;
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
@@ -22,6 +23,10 @@ public class SubcellularLocationOBOMessageConverter
 
     public SubcellularLocationOBOMessageConverter() {
         super(SubcellularLocationEntry.class);
+    }
+
+    public SubcellularLocationOBOMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(SubcellularLocationEntry.class, downloadGatekeeper);
     }
 
     @Override

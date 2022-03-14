@@ -1,12 +1,16 @@
 package org.uniprot.api.rest.output.converter;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 
 import com.sun.xml.bind.marshaller.DataWriter;
@@ -21,7 +25,12 @@ public abstract class AbstractXmlMessageConverter<T, X>
     private final JAXBContext jaxbContext;
 
     public AbstractXmlMessageConverter(Class<T> messageConverterEntryClass, String context) {
-        super(MediaType.APPLICATION_XML, messageConverterEntryClass);
+        this(messageConverterEntryClass, context, null);
+    }
+
+    public AbstractXmlMessageConverter(
+            Class<T> messageConverterEntryClass, String context, Gatekeeper downloadGatekeeper) {
+        super(MediaType.APPLICATION_XML, messageConverterEntryClass, downloadGatekeeper);
         try {
             jaxbContext = JAXBContext.newInstance(context);
         } catch (JAXBException e) {

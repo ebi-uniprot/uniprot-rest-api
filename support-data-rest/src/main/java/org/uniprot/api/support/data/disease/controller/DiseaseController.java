@@ -9,7 +9,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -64,13 +64,15 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     protected DiseaseController(
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<DiseaseEntry> diseaseMessageConverterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
 
         super(
                 eventPublisher,
                 diseaseMessageConverterContextFactory,
                 downloadTaskExecutor,
-                MessageConverterContextFactory.Resource.DISEASE);
+                MessageConverterContextFactory.Resource.DISEASE,
+                downloadGatekeeper);
     }
 
     @Operation(
@@ -192,13 +194,18 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            Stream<String> result = diseaseService.streamRDF(streamRequest);
-            return super.streamRDF(result, streamRequest, contentType, request);
+            return super.streamRDF(
+                    () -> diseaseService.streamRDF(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         } else {
-            Stream<DiseaseEntry> result = diseaseService.stream(streamRequest);
-            return super.stream(result, streamRequest, contentType, request);
+            return super.stream(
+                    () -> diseaseService.stream(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         }
     }
 

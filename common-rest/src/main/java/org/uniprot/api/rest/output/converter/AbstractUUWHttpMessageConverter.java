@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.lang.Nullable;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
@@ -44,10 +45,15 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
     private static final int LOG_INTERVAL = 10000;
     private static final ThreadLocal<String> ENTITY_SEPARATOR = new ThreadLocal<>();
     private final Class<C> messageConverterEntryClass;
+    private final Gatekeeper downloadGatekeeper;
 
-    AbstractUUWHttpMessageConverter(MediaType mediaType, Class<C> messageConverterEntryClass) {
+    AbstractUUWHttpMessageConverter(
+            MediaType mediaType,
+            Class<C> messageConverterEntryClass,
+            Gatekeeper downloadGatekeeper) {
         super(mediaType);
         this.messageConverterEntryClass = messageConverterEntryClass;
+        this.downloadGatekeeper = downloadGatekeeper;
     }
 
     @Override
@@ -144,6 +150,13 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             outputStream.write(("\n\n" + errorMsg + " Please try again later.\n").getBytes());
             throw new StopStreamException(errorMsg, e);
         } finally {
+            if (downloadGatekeeper != null && context.isLargeDownload()) {
+                downloadGatekeeper.exit();
+                log.debug(
+                        "Gatekeeper let me out (space inside={})",
+                        downloadGatekeeper.getSpaceInside());
+            }
+
             outputStream.close();
             entities.close();
             cleanUp();

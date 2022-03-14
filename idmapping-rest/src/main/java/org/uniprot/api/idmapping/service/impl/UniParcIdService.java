@@ -80,7 +80,7 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryP
     }
 
     @Override
-    protected Stream<UniParcEntryPair> streamEntries(List<IdMappingStringPair> mappedIds) {
+    public Stream<UniParcEntryPair> streamEntries(List<IdMappingStringPair> mappedIds) {
         UniParcBatchStoreEntryPairIterable batchIterable =
                 new UniParcBatchStoreEntryPairIterable(
                         mappedIds,

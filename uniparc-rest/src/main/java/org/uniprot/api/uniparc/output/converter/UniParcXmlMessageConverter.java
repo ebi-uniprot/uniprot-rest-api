@@ -8,6 +8,7 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLA
 
 import javax.xml.bind.Marshaller;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.Utils;
@@ -24,7 +25,11 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
     private String header;
 
     public UniParcXmlMessageConverter(String version) {
-        super(UniParcEntry.class, UNIPARC_XML_CONTEXT);
+        this(version, null);
+    }
+
+    public UniParcXmlMessageConverter(String version, Gatekeeper downloadGatekeeper) {
+        super(UniParcEntry.class, UNIPARC_XML_CONTEXT, downloadGatekeeper);
         converter = new UniParcEntryConverter();
         header = UNIPARC_XML_SCHEMA;
         if (Utils.notNullNotEmpty(version)) {

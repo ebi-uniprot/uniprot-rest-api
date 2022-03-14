@@ -3,6 +3,7 @@ package org.uniprot.api.proteome.output.converter;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.fasta.UniProtKBFasta;
@@ -20,6 +21,10 @@ public class GeneCentricFastaMessageConverter
         extends AbstractEntityHttpMessageConverter<GeneCentricEntry> {
     public GeneCentricFastaMessageConverter() {
         super(UniProtMediaType.FASTA_MEDIA_TYPE, GeneCentricEntry.class);
+    }
+
+    public GeneCentricFastaMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(UniProtMediaType.FASTA_MEDIA_TYPE, GeneCentricEntry.class, downloadGatekeeper);
     }
 
     @Override

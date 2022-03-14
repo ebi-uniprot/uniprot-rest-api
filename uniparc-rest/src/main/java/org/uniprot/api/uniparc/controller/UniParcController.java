@@ -6,7 +6,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +20,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -60,8 +60,14 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             ApplicationEventPublisher eventPublisher,
             UniParcQueryService queryService,
             MessageConverterContextFactory<UniParcEntry> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPARC);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                UNIPARC,
+                downloadGatekeeper);
         this.queryService = queryService;
     }
 
@@ -201,11 +207,14 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             HttpServletRequest request) {
 
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            Stream<String> result = queryService.streamRDF(streamRequest);
-            return super.streamRDF(result, streamRequest, contentType, request);
+            return super.streamRDF(
+                    () -> queryService.streamRDF(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         } else {
-            Stream<UniParcEntry> result = queryService.stream(streamRequest);
-            return super.stream(result, streamRequest, contentType, request);
+            return super.stream(
+                    () -> queryService.stream(streamRequest), streamRequest, contentType, request);
         }
     }
 

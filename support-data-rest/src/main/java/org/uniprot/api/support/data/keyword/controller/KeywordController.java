@@ -10,7 +10,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -66,8 +66,14 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             @Qualifier("keywordMessageConverterContextFactory")
                     MessageConverterContextFactory<KeywordEntry>
                             keywordMessageConverterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, keywordMessageConverterContextFactory, downloadTaskExecutor, KEYWORD);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(
+                eventPublisher,
+                keywordMessageConverterContextFactory,
+                downloadTaskExecutor,
+                KEYWORD,
+                downloadGatekeeper);
         this.keywordService = keywordService;
     }
 
@@ -188,11 +194,17 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
             @Valid @ModelAttribute KeywordStreamRequest streamRequest, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            Stream<String> result = keywordService.streamRDF(streamRequest);
-            return super.streamRDF(result, streamRequest, contentType, request);
+            return super.streamRDF(
+                    () -> keywordService.streamRDF(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         } else {
-            Stream<KeywordEntry> result = keywordService.stream(streamRequest);
-            return super.stream(result, streamRequest, contentType, request);
+            return super.stream(
+                    () -> keywordService.stream(streamRequest),
+                    streamRequest,
+                    contentType,
+                    request);
         }
     }
 

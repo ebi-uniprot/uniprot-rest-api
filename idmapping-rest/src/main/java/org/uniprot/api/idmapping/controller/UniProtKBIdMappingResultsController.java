@@ -2,17 +2,11 @@ package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.GFF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,16 +20,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
@@ -74,8 +66,14 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             UniProtKBIdService idService,
             IdMappingJobCacheService cacheService,
             MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB);
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                UNIPROTKB,
+                downloadGatekeeper);
         this.idService = idService;
         this.cacheService = cacheService;
     }
@@ -188,14 +186,21 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                     HttpServletResponse response) {
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
         MediaType contentType = getAcceptHeader(request);
+
+        IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
+        this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
+
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            Stream<String> result =
-                    this.idService.streamRDF(streamRequest, cachedJobResult.getIdMappingResult());
+            Supplier<Stream<String>> result =
+                    () ->
+                            this.idService.streamRDF(
+                                    streamRequest, idMappingResult);
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
-            Stream<UniProtKBEntryPair> result =
-                    this.idService.streamEntries(
-                            streamRequest, cachedJobResult.getIdMappingResult());
+            Supplier<Stream<UniProtKBEntryPair>> result =
+                    () ->
+                            this.idService.streamEntries(
+                                    streamRequest, idMappingResult);
             return super.stream(result, streamRequest, contentType, request);
         }
     }

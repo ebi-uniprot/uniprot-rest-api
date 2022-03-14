@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.output.converter.uniref;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.output.converter.AbstractEntryPairFastaConverter;
 import org.uniprot.core.parser.fasta.UniRefFastaParser;
@@ -9,6 +10,10 @@ public class UniRefEntryFastaMessageConverter
         extends AbstractEntryPairFastaConverter<UniRefEntryPair, UniRefEntryLight> {
 
     public UniRefEntryFastaMessageConverter() {
+        super(UniRefEntryPair.class);
+    }
+
+    public UniRefEntryFastaMessageConverter(Gatekeeper downloadGatekeeper) {
         super(UniRefEntryPair.class);
     }
 

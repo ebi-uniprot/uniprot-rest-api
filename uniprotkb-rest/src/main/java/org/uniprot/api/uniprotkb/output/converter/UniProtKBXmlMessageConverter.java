@@ -11,6 +11,7 @@ import java.io.OutputStream;
 
 import javax.xml.bind.Marshaller;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
@@ -21,7 +22,11 @@ public class UniProtKBXmlMessageConverter
     private final UniProtEntryConverter converter;
 
     public UniProtKBXmlMessageConverter() {
-        super(UniProtKBEntry.class, UNIPROTKB_XML_CONTEXT);
+        this(null);
+    }
+
+    public UniProtKBXmlMessageConverter(Gatekeeper downloadGatekeeper) {
+        super(UniProtKBEntry.class, UNIPROTKB_XML_CONTEXT, downloadGatekeeper);
         converter = new UniProtEntryConverter();
     }
 

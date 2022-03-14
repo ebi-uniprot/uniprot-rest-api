@@ -2,11 +2,11 @@ package org.uniprot.api.proteome.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.proteome.request.GeneCentricSearchRequest;
 import org.uniprot.api.proteome.request.GeneCentricStreamRequest;
@@ -64,8 +65,14 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
             @Qualifier("GENECENTRIC")
                     MessageConverterContextFactory<GeneCentricEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper,
             SearchFieldConfig geneCentricSearchFieldConfig) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, GENECENTRIC);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                GENECENTRIC,
+                downloadGatekeeper);
         this.service = service;
         this.upIdFieldName =
                 geneCentricSearchFieldConfig.getSearchFieldItemByName("upid").getFieldName();
@@ -199,8 +206,11 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
     public DeferredResult<ResponseEntity<MessageConverterContext<GeneCentricEntry>>> stream(
             @Valid @ModelAttribute GeneCentricStreamRequest streamRequest,
             HttpServletRequest request) {
-        Stream<GeneCentricEntry> result = service.stream(streamRequest);
-        return super.stream(result, streamRequest, getAcceptHeader(request), request);
+        return super.stream(
+                () -> service.stream(streamRequest),
+                streamRequest,
+                getAcceptHeader(request),
+                request);
     }
 
     @Tag(name = "genecentric")

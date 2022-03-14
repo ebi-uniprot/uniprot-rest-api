@@ -5,7 +5,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,6 +26,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.aa.request.ArbaSearchRequest;
 import org.uniprot.api.aa.request.ArbaStreamRequest;
 import org.uniprot.api.aa.service.ArbaService;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -64,12 +64,14 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<UniRuleEntry> arbaMessageConverterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
-            ArbaService arbaService) {
+            ArbaService arbaService,
+            Gatekeeper downloadGatekeeper) {
         super(
                 eventPublisher,
                 arbaMessageConverterContextFactory,
                 downloadTaskExecutor,
-                MessageConverterContextFactory.Resource.ARBA);
+                MessageConverterContextFactory.Resource.ARBA,
+                downloadGatekeeper);
         this.arbaService = arbaService;
     }
 
@@ -157,8 +159,11 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRuleEntry>>> stream(
             @Valid @ModelAttribute ArbaStreamRequest streamRequest, HttpServletRequest request) {
 
-        Stream<UniRuleEntry> result = arbaService.stream(streamRequest);
-        return super.stream(result, streamRequest, getAcceptHeader(request), request);
+        return super.stream(
+                () -> arbaService.stream(streamRequest),
+                streamRequest,
+                getAcceptHeader(request),
+                request);
     }
 
     @Override

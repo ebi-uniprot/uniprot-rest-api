@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.parser.tsv.EntityValueMapper;
@@ -37,7 +38,15 @@ public class XlsMessageConverter<T> extends AbstractEntityHttpMessageConverter<T
             Class<T> messageConverterEntryClass,
             ReturnFieldConfig fieldConfig,
             EntityValueMapper<T> entityMapper) {
-        super(UniProtMediaType.XLS_MEDIA_TYPE, messageConverterEntryClass);
+        this(messageConverterEntryClass, fieldConfig, entityMapper, null);
+    }
+
+    public XlsMessageConverter(
+            Class<T> messageConverterEntryClass,
+            ReturnFieldConfig fieldConfig,
+            EntityValueMapper<T> entityMapper,
+            Gatekeeper downloadGatekeeper) {
+        super(UniProtMediaType.XLS_MEDIA_TYPE, messageConverterEntryClass, downloadGatekeeper);
         this.fieldConfig = fieldConfig;
         this.entityMapper = entityMapper;
     }

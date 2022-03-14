@@ -2,9 +2,11 @@ package org.uniprot.api.rest.output.converter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.parser.tsv.EntityValueMapper;
@@ -25,7 +27,15 @@ public class TsvMessageConverter<T> extends AbstractEntityHttpMessageConverter<T
             Class<T> messageConverterEntryClass,
             ReturnFieldConfig fieldConfig,
             EntityValueMapper<T> entityMapper) {
-        super(UniProtMediaType.TSV_MEDIA_TYPE, messageConverterEntryClass);
+        this(messageConverterEntryClass, fieldConfig, entityMapper, null);
+    }
+
+    public TsvMessageConverter(
+            Class<T> messageConverterEntryClass,
+            ReturnFieldConfig fieldConfig,
+            EntityValueMapper<T> entityMapper,
+            Gatekeeper downloadGatekeeper) {
+        super(UniProtMediaType.TSV_MEDIA_TYPE, messageConverterEntryClass, downloadGatekeeper);
         this.fieldConfig = fieldConfig;
         this.entityMapper = entityMapper;
     }

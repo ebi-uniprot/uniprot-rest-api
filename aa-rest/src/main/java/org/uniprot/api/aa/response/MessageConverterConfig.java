@@ -10,15 +10,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
-import org.uniprot.api.rest.output.converter.TsvMessageConverter;
-import org.uniprot.api.rest.output.converter.XlsMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.core.json.parser.unirule.UniRuleJsonConfig;
 import org.uniprot.core.parser.tsv.unirule.UniRuleEntryValueMapper;
 import org.uniprot.core.unirule.UniRuleEntry;
@@ -31,7 +27,6 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
  */
 @Configuration
 public class MessageConverterConfig {
-
     @Bean(name = "uniRuleMessageConverterContextFactory")
     public MessageConverterContextFactory<UniRuleEntry> uniRuleMessageConverterContextFactory() {
         MessageConverterContextFactory<UniRuleEntry> contextFactory =
@@ -58,7 +53,7 @@ public class MessageConverterConfig {
     }
 
     @Bean
-    public WebMvcConfigurer extendedMessageConverters() {
+    public WebMvcConfigurer extendedMessageConverters(Gatekeeper downloadGatekeeper) {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -67,19 +62,26 @@ public class MessageConverterConfig {
 
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
-                converters.add(new ListMessageConverter());
+                converters.add(new ListMessageConverter(downloadGatekeeper));
                 converters.add(
                         new XlsMessageConverter<>(
-                                UniRuleEntry.class, returnConfig, new UniRuleEntryValueMapper()));
+                                UniRuleEntry.class,
+                                returnConfig,
+                                new UniRuleEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
-                                UniRuleEntry.class, returnConfig, new UniRuleEntryValueMapper()));
+                                UniRuleEntry.class,
+                                returnConfig,
+                                new UniRuleEntryValueMapper(),
+                                downloadGatekeeper));
 
                 JsonMessageConverter<UniRuleEntry> uniRuleJsonMessageConverter =
                         new JsonMessageConverter<>(
                                 UniRuleJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniRuleEntry.class,
-                                returnConfig);
+                                returnConfig,
+                                downloadGatekeeper);
                 converters.add(0, uniRuleJsonMessageConverter);
             }
         };

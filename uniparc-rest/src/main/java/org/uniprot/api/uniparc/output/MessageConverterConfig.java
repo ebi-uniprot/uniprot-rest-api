@@ -14,14 +14,12 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.uniprot.api.common.concurrency.TaskExecutorProperties;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
@@ -48,62 +46,44 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
  * @date: 25 Jun 2019
  */
 @Configuration
-@ConfigurationProperties(prefix = "download")
 @Getter
 @Setter
 public class MessageConverterConfig {
-    private TaskExecutorProperties taskExecutor = new TaskExecutorProperties();
-
     @Bean
-    public ThreadPoolTaskExecutor downloadTaskExecutor(
-            ThreadPoolTaskExecutor configurableTaskExecutor) {
-        configurableTaskExecutor.setCorePoolSize(taskExecutor.getCorePoolSize());
-        configurableTaskExecutor.setMaxPoolSize(taskExecutor.getMaxPoolSize());
-        configurableTaskExecutor.setQueueCapacity(taskExecutor.getQueueCapacity());
-        configurableTaskExecutor.setKeepAliveSeconds(taskExecutor.getKeepAliveSeconds());
-        configurableTaskExecutor.setAllowCoreThreadTimeOut(taskExecutor.isAllowCoreThreadTimeout());
-        configurableTaskExecutor.setWaitForTasksToCompleteOnShutdown(
-                taskExecutor.isWaitForTasksToCompleteOnShutdown());
-        return configurableTaskExecutor;
-    }
-
-    @Bean
-    public ThreadPoolTaskExecutor configurableTaskExecutor() {
-        return new ThreadPoolTaskExecutor();
-    }
-
-    @Bean
-    public WebMvcConfigurer extendedMessageConverters() {
+    public WebMvcConfigurer extendedMessageConverters(Gatekeeper downloadGatekeeper) {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
-                converters.add(new ListMessageConverter());
+                converters.add(new ListMessageConverter(downloadGatekeeper));
 
                 ReturnFieldConfig returnFieldConfig =
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC);
 
-                converters.add(new UniParcFastaMessageConverter());
+                converters.add(new UniParcFastaMessageConverter(downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniParcEntry.class,
                                 returnFieldConfig,
-                                new UniParcEntryValueMapper()));
+                                new UniParcEntryValueMapper(),
+                                downloadGatekeeper));
                 converters.add(
                         new XlsMessageConverter<>(
                                 UniParcEntry.class,
                                 returnFieldConfig,
-                                new UniParcEntryValueMapper()));
+                                new UniParcEntryValueMapper(),
+                                downloadGatekeeper));
 
                 JsonMessageConverter<UniParcEntry> uniparcJsonConverter =
                         new JsonMessageConverter<>(
                                 UniParcJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniParcEntry.class,
-                                returnFieldConfig);
+                                returnFieldConfig,
+                                downloadGatekeeper);
                 converters.add(0, uniparcJsonConverter);
-                converters.add(1, new UniParcXmlMessageConverter(""));
-                converters.add(new RDFMessageConverter());
+                converters.add(1, new UniParcXmlMessageConverter("", downloadGatekeeper));
+                converters.add(new RDFMessageConverter(downloadGatekeeper));
                 // ####################### UniParcCrossReference ###################
                 ReturnFieldConfig uniParcCrossRefReturnField =
                         ReturnFieldConfigFactory.getReturnFieldConfig(
@@ -112,13 +92,15 @@ public class MessageConverterConfig {
                         new JsonMessageConverter<>(
                                 UniParcCrossRefJsonConfig.getInstance().getSimpleObjectMapper(),
                                 UniParcCrossReference.class,
-                                uniParcCrossRefReturnField);
+                                uniParcCrossRefReturnField,
+                                downloadGatekeeper);
                 converters.add(2, uniParcCrossRefJsonConverter);
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniParcCrossReference.class,
                                 uniParcCrossRefReturnField,
-                                new UniParcEntryCrossRefValueMapper()));
+                                new UniParcEntryCrossRefValueMapper(),
+                                downloadGatekeeper));
             }
         };
     }
