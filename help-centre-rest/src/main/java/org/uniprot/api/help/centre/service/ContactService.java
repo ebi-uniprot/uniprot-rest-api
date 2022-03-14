@@ -34,9 +34,6 @@ public class ContactService {
 
         Properties emailProp = new Properties();
         emailProp.put("mail.smtp.host", contactConfig.getHost());
-        emailProp.put("mail.smtp.port", contactConfig.getPort());
-        emailProp.put("mail.smtp.auth", contactConfig.isAuth());
-        emailProp.put("mail.smtp.starttls.enable", contactConfig.isStarttls());
 
         this.emailProperties = emailProp;
     }

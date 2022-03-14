@@ -16,12 +16,6 @@ public class ContactConfig {
 
     private String host;
 
-    private Long port;
-
-    private boolean auth;
-
-    private boolean starttls;
-
     private String to;
 
     private String messageFormat;
