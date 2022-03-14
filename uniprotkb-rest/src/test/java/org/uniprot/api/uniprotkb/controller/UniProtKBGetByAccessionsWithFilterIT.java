@@ -71,7 +71,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamControllerIT {
+class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
 
     private static final String accessionsByIdPath = "/uniprotkb/accessions";
 
@@ -136,7 +136,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithSingleValueFacetFilterSuccess() throws Exception {
-        String facetFilter = "reviewed:true";
+        String query = "reviewed:true";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -145,7 +145,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("size", "10"));
 
         // then
@@ -171,7 +171,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithMultiValueFacetFilterSuccess() throws Exception {
-        String facetFilter = "existence:3 OR existence:2";
+        String query = "existence:3 OR existence:2";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -180,7 +180,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("size", "10"));
 
         // then
@@ -206,7 +206,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithSingleAndMultiValueFacetFilterSuccess() throws Exception {
-        String facetFilter = "reviewed:true AND (existence:3 OR existence:2)";
+        String query = "reviewed:true AND (existence:3 OR existence:2)";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -215,7 +215,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("size", "10"));
 
         // then
@@ -227,7 +227,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithFacetsAndFacetFilterSuccess() throws Exception {
-        String facetFilter = "reviewed:false";
+        String query = "reviewed:false";
         String facets = "existence,reviewed";
         // when
         ResultActions response =
@@ -237,7 +237,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00014,P00018,P00020,P00015")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("facets", facets)
                                 .param("fields", "accession")
                                 .param("size", "10"));
@@ -293,7 +293,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
     @Test
     void getByAccessionsWithFacetsAndFacetFilterWithPaginationSuccess() throws Exception {
         int pageSize = 2;
-        String facetFilter = "reviewed:false";
+        String query = "reviewed:false";
         String facets = "existence,reviewed";
         // when
         ResultActions response =
@@ -303,7 +303,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("facets", facets)
                                 .param("fields", "accession")
                                 .param("size", String.valueOf(pageSize)));
@@ -342,7 +342,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("facets", facets)
                                 .param("fields", "accession")
                                 .param("cursor", cursor)
@@ -372,7 +372,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("facets", facets)
                                 .param("fields", "accession")
                                 .param("cursor", cursor)
@@ -391,8 +391,8 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
 
     @Test
     void getByAccessionsWithInvalidFacetNamesInFilterSuccess() throws Exception {
-        String facetFilter =
-                "reviewed:true AND invalidFacet1:val AND length:[1 TO 200] AND invalidFacet2:12";
+        String query =
+                "reviewed:true AND invalidField1:val AND length:[1 TO 200] AND invalidField2:12";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -401,7 +401,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("size", "10"));
 
         // then
@@ -412,13 +412,13 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                         jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
-                                        "Invalid facet name 'invalidFacet1'. Expected value can be [structure_3d, fragment, proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome].",
-                                        "Invalid facet name 'invalidFacet2'. Expected value can be [structure_3d, fragment, proteins_with, length, existence, reviewed, annotation_score, model_organism, other_organism, proteome].")));
+                                        "'invalidField1' is not a valid search field",
+                                        "'invalidField2' is not a valid search field")));
     }
 
     @Test
     void getByAccessionsWithInvalidFacetFilterQuerySuccess() throws Exception {
-        String facetFilter = "reviewed:true AND length:[1 TO 200";
+        String query = "reviewed:true AND length:[1 TO 200";
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -427,7 +427,7 @@ class UniProtKBGetByAccessionsWithFacetFilterIT extends AbstractStreamController
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
-                                .param("facetFilter", facetFilter)
+                                .param("query", query)
                                 .param("size", "10"));
 
         // then

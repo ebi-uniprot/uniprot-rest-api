@@ -1,19 +1,12 @@
 package org.uniprot.api.idmapping.service;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.*;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.Date;
-import java.util.UUID;
-
-import javax.servlet.ServletContext;
-
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsIn;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -35,6 +28,19 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.servlet.ServletContext;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 /**
  * @author sahmad
@@ -158,11 +164,9 @@ class IdMappingJobServiceTest {
         Mockito.verify(pirService, times(1)).mapIds(request);
 
         this.jobService.submitJob(request);
-        Thread.sleep(3000);
         IdMappingJob newJobAsResource = this.cacheService.getJobAsResource(jobId);
-        MatcherAssert.assertThat(
-                newJobAsResource.getJobStatus(), IsIn.oneOf(JobStatus.NEW, JobStatus.RUNNING));
-        Mockito.verify(pirService, times(2)).mapIds(request);
+        JobStatus currentStatus = newJobAsResource.getJobStatus();
+        MatcherAssert.assertThat(currentStatus, IsIn.oneOf(JobStatus.NEW, JobStatus.RUNNING));
     }
 
     @Nested

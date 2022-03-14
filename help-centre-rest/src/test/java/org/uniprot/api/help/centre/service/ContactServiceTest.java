@@ -11,12 +11,17 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.help.centre.model.ContactForm;
 import org.uniprot.api.help.centre.model.Token;
 
+import java.util.Properties;
+
 class ContactServiceTest {
 
     @Test
     void canGenerateToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
+        config.setPort(111L);
+        config.setAuth(false);
+        config.setStarttls(false);
         ContactService service = new ContactService(config);
         Token token = service.generateToken("tokenkey");
         assertNotNull(token);
@@ -26,6 +31,9 @@ class ContactServiceTest {
     void canValidateToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
+        config.setPort(111L);
+        config.setAuth(false);
+        config.setStarttls(false);
         config.setTokenExpiresInSecs(2L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
@@ -38,6 +46,9 @@ class ContactServiceTest {
     void throwErrorWhenInvalidFormatValidToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
+        config.setPort(111L);
+        config.setAuth(false);
+        config.setStarttls(false);
         config.setTokenExpiresInSecs(2L);
         ContactService service = new ContactService(config);
         ImportantMessageServiceException exception =
@@ -51,6 +62,9 @@ class ContactServiceTest {
     void throwErrorWhenInvalidKeyValidToken() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
+        config.setPort(111L);
+        config.setAuth(false);
+        config.setStarttls(false);
         config.setTokenExpiresInSecs(2L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
@@ -69,6 +83,9 @@ class ContactServiceTest {
     void throwErrorWhenExpiredTokenValidToken() throws InterruptedException {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
+        config.setPort(111L);
+        config.setAuth(false);
+        config.setStarttls(false);
         config.setTokenExpiresInSecs(1L);
         ContactService service = new ContactService(config);
         String tokenKey = "tokenkey";
@@ -95,6 +112,9 @@ class ContactServiceTest {
 
         ContactConfig config = new ContactConfig();
         config.setHost(host);
+        config.setPort(111L);
+        config.setAuth(false);
+        config.setStarttls(false);
         config.setTo(toEmail);
         config.setMessageFormat(messageFormat);
 
@@ -120,6 +140,9 @@ class ContactServiceTest {
     void sendEmailWithInvalidData() {
         ContactConfig config = new ContactConfig();
         config.setHost("test");
+        config.setPort(111L);
+        config.setAuth(false);
+        config.setStarttls(false);
         config.setTo("to@email.com");
         config.setMessageFormat("messageFormatValue");
         ContactService service = new ContactService(config);
@@ -133,5 +156,28 @@ class ContactServiceTest {
         assertNotNull(serviceException);
         assertEquals("Unable to send Email", serviceException.getMessage());
         assertNotNull(serviceException.getCause());
+    }
+
+    @Test
+    void canSetEmailProperties() throws Exception {
+        String host = "host.ebi.ac.uk";
+        Long port = 587L;
+        boolean auth = false;
+        boolean startTls = true;
+
+        ContactConfig config = new ContactConfig();
+        config.setHost(host);
+        config.setPort(port);
+        config.setAuth(auth);
+        config.setStarttls(startTls);
+
+        ContactService service = new ContactService(config);
+        Properties emailProperties = service.emailProperties;
+        assertNotNull(emailProperties);
+        assertEquals(4, emailProperties.size());
+        assertEquals(host, emailProperties.getProperty("mail.smtp.host"));
+        assertEquals(port, emailProperties.get("mail.smtp.port"));
+        assertEquals(auth, emailProperties.get("mail.smtp.auth"));
+        assertEquals(startTls, emailProperties.get("mail.smtp.starttls.enable"));
     }
 }
