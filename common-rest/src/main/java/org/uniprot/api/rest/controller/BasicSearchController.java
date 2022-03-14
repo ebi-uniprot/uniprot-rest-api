@@ -1,18 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
-
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +11,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -32,6 +19,16 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Utils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
+import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
 /**
  * @param <T>
@@ -220,12 +217,14 @@ public abstract class BasicSearchController<T> {
                             }
                         } catch (Exception e) {
                             log.error("Error occurred during processing.", e);
-                            downloadGatekeeper.exit();
+                            if (Utils.notNull(downloadGatekeeper)) {
+                                downloadGatekeeper.exit();
+                            }
                             deferredResult.setErrorResult(e);
                         }
                     });
         } catch (TaskRejectedException ex) {
-            log.info(
+            log.debug(
                     "Task executor rejected stream request (space inside={})",
                     downloadGatekeeper.getSpaceInside());
             setTooManyRequestsResponse(deferredResult);
