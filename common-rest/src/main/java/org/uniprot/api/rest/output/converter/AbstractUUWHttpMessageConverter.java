@@ -180,8 +180,10 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             AtomicInteger counter) {
         AtomicBoolean firstIteration = new AtomicBoolean(true);
         try {
+
             entityCollection.forEach(
                     entity -> {
+                        // TODO: 16/03/2022 if StoreResult entity is not null, do the following:
                         try {
                             int currentCount = counter.getAndIncrement();
                             flushWhenNecessary(outputStream, currentCount);
@@ -199,12 +201,19 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
                         } catch (Exception e) {
                             throw new StopStreamException("Could not write entry: " + entity, e);
                         }
+                        // TODO: 16/03/2022 else, add StoreResult.id to failed Ids
                     });
         } catch (Exception e) {
+            // TODO: 16/03/2022 call new abstract method, onWritingStreamError(e, outputStream);
             throw new StopStreamException("Stream must be closed", e);
         }
     }
 
+    // TODO: 16/03/2022
+    // protected void onWritingStreamError(e, outputStream) { throw e;}
+    // TODO: 16/03/2022
+    // override this method for JsonMessageConverter, to close the results array, and write
+    // an error object with message, "Error encountered when streaming data. Please try again later."
     protected void writeEntitySeparator(OutputStream outputStream, String separator)
             throws IOException {
         outputStream.write(separator.getBytes());

@@ -85,6 +85,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         if (!context.isEntityOnly()) {
             generator.writeStartObject();
 
+            // TODO: 16/03/2022 move to after() method, and also add warnings from caught exceptions
             if (notNullNotEmpty(context.getWarnings())) {
                 generator.writeFieldName("warnings");
                 generator.writeStartArray();
