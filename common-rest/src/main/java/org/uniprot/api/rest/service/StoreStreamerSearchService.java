@@ -88,7 +88,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         // use the ids returned by solr stream if query filter is passed
         // otherwise use the passed ids
         List<String> ids =
-                Utils.notNullNotEmpty(idsRequest.getQuery())
+                solrStreamNeeded(idsRequest)
                         ? solrStreamResponse.getIds()
                         : idsRequest.getIdList();
         // default page size to number of ids passed
