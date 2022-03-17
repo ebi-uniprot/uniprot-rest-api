@@ -11,8 +11,6 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.help.centre.model.ContactForm;
 import org.uniprot.api.help.centre.model.Token;
 
-import java.util.Properties;
-
 class ContactServiceTest {
 
     @Test

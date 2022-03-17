@@ -192,15 +192,11 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
 
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             Supplier<Stream<String>> result =
-                    () ->
-                            this.idService.streamRDF(
-                                    streamRequest, idMappingResult);
+                    () -> this.idService.streamRDF(streamRequest, idMappingResult);
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniProtKBEntryPair>> result =
-                    () ->
-                            this.idService.streamEntries(
-                                    streamRequest, idMappingResult);
+                    () -> this.idService.streamEntries(streamRequest, idMappingResult);
             return super.stream(result, streamRequest, contentType, request);
         }
     }

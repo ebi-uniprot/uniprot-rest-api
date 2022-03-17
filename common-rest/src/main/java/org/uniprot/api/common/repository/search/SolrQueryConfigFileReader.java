@@ -1,9 +1,5 @@
 package org.uniprot.api.common.repository.search;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +8,11 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 
 /**
  * Created 04/09/19
@@ -125,7 +126,6 @@ public class SolrQueryConfigFileReader {
         }
         return Optional.empty();
     }
-
 
     private void addQueryConfig(QueryConfigType queryConfigType, String line) {
         switch (queryConfigType) {
