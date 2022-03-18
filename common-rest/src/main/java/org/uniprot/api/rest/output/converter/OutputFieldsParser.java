@@ -1,8 +1,10 @@
 package org.uniprot.api.rest.output.converter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.uniprot.core.util.Utils;
@@ -19,10 +21,14 @@ public class OutputFieldsParser {
     public static List<ReturnField> parse(String fields, final ReturnFieldConfig fieldConfig) {
         List<ReturnField> returnFields;
         if (Utils.notNullNotEmpty(fields)) {
-            returnFields =
+            returnFields = new ArrayList<>();
+            // add from field as the first field if present for idmapping
+            addFromFieldIfPresent(returnFields, fieldConfig);
+            returnFields.addAll(
                     Arrays.stream(fields.split(COMMA))
                             .map(fieldConfig::getReturnFieldByName)
-                            .collect(Collectors.toList());
+                            .collect(Collectors.toList()));
+
         } else {
             returnFields = fieldConfig.getDefaultReturnFields();
         }
@@ -34,5 +40,16 @@ public class OutputFieldsParser {
                 .map(ReturnField::getName)
                 .map(field -> mappedField.getOrDefault(field, ""))
                 .collect(Collectors.toList());
+    }
+
+    private static void addFromFieldIfPresent(
+            List<ReturnField> returnFields, ReturnFieldConfig fieldConfig) {
+        Optional<ReturnField> optFrom =
+                fieldConfig.getReturnFields().stream()
+                        .filter(rf -> "from".equalsIgnoreCase(rf.getName()))
+                        .findFirst();
+        if (optFrom.isPresent()) {
+            returnFields.add(optFrom.get());
+        }
     }
 }
