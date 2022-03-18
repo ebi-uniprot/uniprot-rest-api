@@ -219,14 +219,6 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
         return resultMatchers;
     }
 
-    protected Sheet getExcelSheet(MvcResult result) throws IOException {
-        byte[] xlsBin = result.getResponse().getContentAsByteArray();
-        InputStream excelFile = new ByteArrayInputStream(xlsBin);
-        Workbook workbook = new XSSFWorkbook(excelFile);
-        Sheet sheet = workbook.getSheetAt(0);
-        return sheet;
-    }
-
     protected Integer getExcelRowCountAndVerifyContent(MvcResult result) throws IOException {
         byte[] xlsBin = result.getResponse().getContentAsByteArray();
         InputStream excelFile = new ByteArrayInputStream(xlsBin);
