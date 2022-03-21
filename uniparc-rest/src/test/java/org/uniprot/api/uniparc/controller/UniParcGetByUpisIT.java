@@ -181,7 +181,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     protected String getCommaSeparatedMixedIds() {
         // 6 present and 2 missing ids
         String csvs = String.join(",", Arrays.asList(TEST_IDS_ARRAY).subList(0, 6));
-        return csvs + "," + MISSING_ID1 + "," + MISSING_ID2;
+        return MISSING_ID1 + "," + csvs + "," + MISSING_ID2;
     }
 
     @Override

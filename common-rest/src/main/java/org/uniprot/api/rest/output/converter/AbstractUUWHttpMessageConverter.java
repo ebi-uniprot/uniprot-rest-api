@@ -145,9 +145,13 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             writeEntities(entities, outputStream, start, counter);
             after(context, outputStream);
             logStats(counter.get(), start);
-        } catch (StopStreamException | IOException e) {
-            String errorMsg = "Error encountered when streaming data.";
+        } catch (IOException e) {
+            String errorMsg = "Error encountered when returning data.";
             outputStream.write(("\n\n" + errorMsg + " Please try again later.\n").getBytes());
+            throw new StopStreamException(errorMsg, e);
+        } catch (StopStreamException e) {
+            String errorMsg = "Error encountered when streaming data.";
+            writeStopStreamErrorMessage(outputStream, errorMsg);
             throw new StopStreamException(errorMsg, e);
         } finally {
             if (downloadGatekeeper != null && context.isLargeDownload()) {
@@ -161,6 +165,11 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
             entities.close();
             cleanUp();
         }
+    }
+
+    protected void writeStopStreamErrorMessage(OutputStream outputStream, String errorMsg)
+            throws IOException {
+        outputStream.write(("\n\n" + errorMsg + " Please try again later.\n").getBytes());
     }
 
     protected void cleanUp() {

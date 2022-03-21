@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
@@ -382,6 +383,37 @@ class JsonMessageConverterTest {
         assertEquals(resultJson.read(JsonPath.compile("$.results.size()")), new Integer(10));
     }
 
+    @Test
+    void writeStopStreamErrorMessage() throws IOException {
+        List<UniProtKBEntry> entities = new ArrayList<>();
+        entities.add(getEntity());
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .entities(entities.stream())
+                        .build();
+
+        log.debug("------- BEGIN: writeStopStreamErrorMessage");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+
+        ReturnFieldConfig returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
+        ObjectMapper objectMapper = UniprotKBJsonConfig.getInstance().getSimpleObjectMapper();
+        ErrorJsonMessageConverter<UniProtKBEntry> errorJsonMessageConverter =
+                new ErrorJsonMessageConverter<>(
+                        objectMapper, UniProtKBEntry.class, returnFieldConfig);
+
+        assertThrows(
+                StopStreamException.class,
+                () ->
+                        errorJsonMessageConverter.writeContents(
+                                messageContext, outputStream, Instant.now(), new AtomicInteger(0)));
+        String result = outputStream.toString("UTF-8");
+        log.debug(result);
+        assertEquals(
+                "{\"results\":[],\"error\":\"Error encountered when streaming data.\"}", result);
+    }
+
     private void writeBefore(
             MessageConverterContext<UniProtKBEntry> messageContext,
             ByteArrayOutputStream outputStream)
@@ -428,5 +460,28 @@ class JsonMessageConverterTest {
 
     private TermInfo getMatchedField() {
         return TermInfo.builder().hits(10).name("fieldName").build();
+    }
+
+    private static class ErrorJsonMessageConverter<T> extends JsonMessageConverter<T> {
+
+        ErrorJsonMessageConverter(
+                ObjectMapper objectMapper,
+                Class<T> messageConverterEntryClass,
+                ReturnFieldConfig returnFieldConfig) {
+            super(objectMapper, messageConverterEntryClass, returnFieldConfig);
+        }
+
+        ErrorJsonMessageConverter(
+                ObjectMapper objectMapper,
+                Class<T> messageConverterEntryClass,
+                ReturnFieldConfig returnFieldConfig,
+                Gatekeeper downloadGatekeeper) {
+            super(objectMapper, messageConverterEntryClass, returnFieldConfig, downloadGatekeeper);
+        }
+
+        @Override
+        protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
+            throw new StopStreamException("Fake error to reproduce", new NullPointerException());
+        }
     }
 }
