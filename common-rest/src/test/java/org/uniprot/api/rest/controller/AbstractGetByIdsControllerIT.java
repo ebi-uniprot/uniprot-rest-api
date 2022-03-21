@@ -258,6 +258,55 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     }
 
     @Test
+    void getByIdsWithMixMissingIdsPagination() throws Exception {
+        int pageSize = 4;
+        String ids = getCommaSeparatedMixedIds();
+        String[] idsArray = ids.split(",");
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                        .param("fields", getCommaSeparatedReturnFields())
+                                        .param(getRequestParamName(), ids)
+                                        .param("size", String.valueOf(pageSize)));
+
+        // then first page
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(X_TOTAL_RECORDS, "8"))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("size=4")))
+                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
+                .andExpect(jsonPath("$.results.size()", is(3)));
+
+        String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
+        assertThat(linkHeader, notNullValue());
+        String cursor = linkHeader.split("\\?")[1].split("&")[2].split("=")[1];
+        // when last page
+        response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                        .param(getRequestParamName(), ids)
+                                        .param("fields", getCommaSeparatedReturnFields())
+                                        .param("cursor", cursor)
+                                        .param("size", String.valueOf(pageSize)));
+
+        // then last page
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(X_TOTAL_RECORDS, "8"))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
     void getByIdsWithFewIdsMissingFromStoreWithFacetsSuccess() throws Exception {
         // when
         ResultActions response =

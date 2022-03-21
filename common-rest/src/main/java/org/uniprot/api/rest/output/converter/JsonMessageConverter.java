@@ -183,6 +183,16 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     }
 
     @Override
+    protected void writeStopStreamErrorMessage(OutputStream outputStream, String errorMsg)
+            throws IOException {
+        JsonGenerator generator = TL_JSON_GENERATOR.get();
+        generator.writeEndArray();
+        generator.writeFieldName("error");
+        generator.writeObject(errorMsg);
+        generator.writeEndObject();
+    }
+
+    @Override
     protected void cleanUp() {
         super.cleanUp();
         try {
