@@ -40,9 +40,4 @@ public class IdMappingConfig {
         Cache mappingCache = cacheManager.getCache(PIR_ID_MAPPING_CACHE);
         return new EhCacheMappingJobService(mappingCache);
     }
-
-    @Bean
-    public ThreadPoolTaskExecutor configurableJobTaskExecutor() {
-        return new ThreadPoolTaskExecutor();
-    }
 }
