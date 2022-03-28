@@ -1,42 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
-import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
-import org.uniprot.api.idmapping.controller.utils.JobOperation;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
-import org.uniprot.store.config.UniProtDataType;
-import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
-import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -71,6 +34,43 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIREF_XML_SCHEMA;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.controller.response.JobStatus;
+import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
+import org.uniprot.api.idmapping.controller.utils.JobOperation;
+import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * @author lgonzales
@@ -198,10 +198,12 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
 
     @ParameterizedTest(name = "[{index}] fields={1} and contentType {0}")
     @MethodSource("streamTabularContentTypeAndFields")
-    void testGetTabularFormatShouldAlwaysReturnFromField(MediaType mediaType, String fields) throws Exception {
+    void testGetTabularFormatShouldAlwaysReturnFromField(MediaType mediaType, String fields)
+            throws Exception {
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
-        MockHttpServletRequestBuilder requestBuilder = get(getIdMappingResultPath(), job.getJobId())
+        MockHttpServletRequestBuilder requestBuilder =
+                get(getIdMappingResultPath(), job.getJobId())
                         .param("fields", fields)
                         .header(ACCEPT, mediaType);
 
@@ -213,15 +215,15 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                         .andExpect(content().contentTypeCompatibleWith(mediaType));
-       if(TSV_MEDIA_TYPE.equals(mediaType)){
-           resultActions.andExpect(content().string(containsString("From")));
-       }
-       if(XLS_MEDIA_TYPE.equals(mediaType)){
-           Sheet sheet = getExcelSheet(resultActions.andReturn());
-           assertTrue(sheet.getPhysicalNumberOfRows() > 1);
-           assertTrue(sheet.getRow(0).getPhysicalNumberOfCells() > 1);
-           assertThat(sheet.getRow(0).getCell(0).toString(), equalTo("From"));
-       }
+        if (TSV_MEDIA_TYPE.equals(mediaType)) {
+            resultActions.andExpect(content().string(containsString("From")));
+        }
+        if (XLS_MEDIA_TYPE.equals(mediaType)) {
+            Sheet sheet = getExcelSheet(resultActions.andReturn());
+            assertTrue(sheet.getPhysicalNumberOfRows() > 1);
+            assertTrue(sheet.getRow(0).getPhysicalNumberOfCells() > 1);
+            assertThat(sheet.getRow(0).getCell(0).toString(), equalTo("From"));
+        }
     }
 
     // ---------------------------------------------------------------------------------
@@ -445,17 +447,22 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
 
-    private Stream<Arguments> streamTabularContentTypeAndFields(){
-        String fields = getAllReturnedFields().map(arg -> arg.get()[0].toString())
-                .limit(2)
-                .collect(Collectors.joining(","));
+    private Stream<Arguments> streamTabularContentTypeAndFields() {
+        String fields =
+                getAllReturnedFields()
+                        .map(arg -> arg.get()[0].toString())
+                        .limit(2)
+                        .collect(Collectors.joining(","));
         // tabular content types
-        List<MediaType> tabularTypes = getContentTypes()
-                .map(arg -> (MediaType) arg.get()[0])
-                .filter(mt -> mt.equals(XLS_MEDIA_TYPE) || mt.equals(TSV_MEDIA_TYPE))
-                .collect(Collectors.toList());
+        List<MediaType> tabularTypes =
+                getContentTypes()
+                        .map(arg -> (MediaType) arg.get()[0])
+                        .filter(mt -> mt.equals(XLS_MEDIA_TYPE) || mt.equals(TSV_MEDIA_TYPE))
+                        .collect(Collectors.toList());
         assertThat(tabularTypes.size(), is(2));
-        return Stream.of(Arguments.of(tabularTypes.get(0), fields), Arguments.of(tabularTypes.get(1), fields));
+        return Stream.of(
+                Arguments.of(tabularTypes.get(0), fields),
+                Arguments.of(tabularTypes.get(1), fields));
     }
 
     private ResultMatcher getXMLHeaderMatcher() {

@@ -2,9 +2,12 @@ package org.uniprot.api.rest.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -21,6 +24,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
+import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.Document;
@@ -152,9 +156,30 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             solrRequestBuilder.query(termQuery);
         }
 
+        if (Utils.notNullNotEmpty(idsRequest.getSort())) {
+            List<SolrQuery.SortClause> sort =
+                    SortUtils.parseSortClause(getUniProtDataType(), idsRequest.getSort());
+            solrRequestBuilder.searchSort(getSearchSort(sort));
+            solrRequestBuilder.searchFieldList(getFieldList(sort));
+            solrRequestBuilder.searchAccession(Boolean.TRUE);
+        }
+
         List<String> facets = idsRequest.getFacetList();
 
         return solrRequestBuilder.queryConfig(this.solrQueryConfig).facets(facets).build();
+    }
+
+    private String getSearchSort(List<SolrQuery.SortClause> sort) {
+        return sort.stream()
+                .map(clause -> clause.getItem() + " " + clause.getOrder().name())
+                .collect(Collectors.joining(","));
+    }
+
+    private String getFieldList(List<SolrQuery.SortClause> sort) {
+        Set<String> fieldList =
+                sort.stream().map(SolrQuery.SortClause::getItem).collect(Collectors.toSet());
+        fieldList.add(getSolrIdField());
+        return String.join(",", fieldList);
     }
 
     private boolean solrStreamNeeded(IdsSearchRequest idsRequest) {
