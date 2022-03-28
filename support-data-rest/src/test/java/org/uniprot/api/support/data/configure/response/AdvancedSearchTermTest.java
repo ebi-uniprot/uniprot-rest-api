@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
+import junit.framework.AssertionFailedError;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.store.config.UniProtDataType;
@@ -53,11 +55,15 @@ class AdvancedSearchTermTest {
 
     @Test
     void testGetChildFieldsWithTags() {
-        String parentId = "catalytic_activity";
+        String parentId = "function";
         List<SearchFieldItem> fields = AdvancedSearchTerm.getChildFieldItems(fieldConfig, parentId);
         assertNotNull(fields);
         assertFalse(fields.isEmpty());
-        SearchFieldItem catalyticItem = fields.get(0);
+        SearchFieldItem catalyticItem =
+                fields.stream()
+                        .filter(field -> field.getId().equals("catalytic_activity"))
+                        .findFirst()
+                        .orElseThrow(AssertionFailedError::new);
         assertNotNull(catalyticItem);
         assertNotNull(catalyticItem.getTags());
         assertFalse(catalyticItem.getTags().isEmpty());
