@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
+import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
@@ -60,6 +61,11 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
+
+    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
+    @Parameter(description = "Name of the field to be sorted on")
+    @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
+    private String sort;
 
     public String getCommaSeparatedIds() {
         return this.accessions;
