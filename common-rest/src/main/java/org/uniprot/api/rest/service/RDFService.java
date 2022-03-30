@@ -1,5 +1,11 @@
 package org.uniprot.api.rest.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.uniprot.store.datastore.common.StoreService;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,20 +14,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.springframework.web.util.UriBuilder;
-import org.uniprot.store.datastore.common.StoreService;
-
 public class RDFService<T> implements StoreService<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDFService.class);
-    private static final String QUERY_STR = "query";
-    private static final String FORMAT_STR = "format";
-    private static final String RDF_STR = "rdf";
-    private static final String ID_COLON_STR = "id:";
-    private static final String OR_DELIMITER_STR = " or ";
     public static final String RDF_CLOSE_TAG = "</rdf:RDF>";
     private static final String OWL_CLOSE_TAG = "</owl:Ontology>";
     private Class<T> clazz;
@@ -57,18 +51,12 @@ public class RDFService<T> implements StoreService<T> {
     }
 
     private T getEntriesByAccessions(List<String> accessions) {
-        // create query like id:P12345 or id:P54321 or ....
-        String idQuery =
-                accessions.stream()
-                        .map(acc -> new StringBuilder(ID_COLON_STR).append(acc))
-                        .collect(Collectors.joining(OR_DELIMITER_STR));
+        String commaSeparatedIds = accessions.stream().collect(Collectors.joining(","));
 
         DefaultUriBuilderFactory handler =
                 (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
 
-        UriBuilder uriBuilder =
-                handler.builder().queryParam(QUERY_STR, idQuery).queryParam(FORMAT_STR, RDF_STR);
-        URI requestUri = uriBuilder.build();
+        URI requestUri = handler.builder().build(commaSeparatedIds);
 
         T rdfXML = restTemplate.getForObject(requestUri, this.clazz);
 
