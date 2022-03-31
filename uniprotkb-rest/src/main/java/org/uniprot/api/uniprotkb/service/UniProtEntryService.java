@@ -138,6 +138,9 @@ public class UniProtEntryService
     public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        if (needsToFilterIsoform(streamRequest.getQuery(), streamRequest.isIncludeIsoform())) {
+            addIsoformFilter(solrRequest);
+        }
         return this.uniProtRDFStreamer.idsToRDFStoreStream(solrRequest);
     }
 

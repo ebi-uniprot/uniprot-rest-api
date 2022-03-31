@@ -1,11 +1,5 @@
 package org.uniprot.api.rest.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.store.datastore.common.StoreService;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +7,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.uniprot.store.datastore.common.StoreService;
 
 public class RDFService<T> implements StoreService<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDFService.class);
