@@ -344,6 +344,28 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.suggestions[1].hits", is(2)));
     }
 
+    @Test
+    void canFindPartialWorldExactResultFirst() throws Exception {
+        saveEntry("id0", "another fluffy protein", "content 0", "category");
+        saveEntry("id00", "another one fluffy protein", "content 00", "category");
+        saveEntry("id1", "goat cabbage protein ball", "content 1", "category");
+        saveEntry("id2", "goat cabbage protein with ball", "content 2", "category");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "protein b")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results.*.id", contains("id1", "id2")));
+    }
+
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
