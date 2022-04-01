@@ -66,20 +66,22 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
     public QueryResult<HelpCentreEntry> search(SearchRequest request) {
         HelpCentreSearchRequest searchRequest = (HelpCentreSearchRequest) request;
         String query = searchRequest.getQuery();
-        if(simpleSearch(query)) {
-            //default simple search (query OR "query") will boost exact search
+        if (simpleSearch(query)) {
+            // default simple search (query OR "query") will boost exact search
             searchRequest.setQuery(query + " OR \"" + query + "\"");
         }
         QueryResult<HelpCentreEntry> result = super.search(searchRequest);
-        if(simpleSearch(query) && Utils.notNullNotEmpty(result.getSuggestions())){
+        if (simpleSearch(query) && Utils.notNullNotEmpty(result.getSuggestions())) {
             searchRequest.setQuery(query);
             QueryResult<HelpCentreEntry> suggester = super.search(request);
-            result = QueryResult.of(result.getContent(),
-                    result.getPage(),
-                    result.getFacets(),
-                    null,
-                    null,
-                    suggester.getSuggestions());
+            result =
+                    QueryResult.of(
+                            result.getContent(),
+                            result.getPage(),
+                            result.getFacets(),
+                            null,
+                            null,
+                            suggester.getSuggestions());
         }
         return result;
     }
@@ -95,9 +97,9 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
     }
 
     private boolean simpleSearch(String query) {
-        return !query.contains("\"") &&
-                !SolrQueryUtil.hasFieldTerms(query, HELP_CENTRE_TITLE_FIELD) &&
-                !SolrQueryUtil.hasFieldTerms(query, HELP_CENTRE_CATEGORY_FIELD) &&
-                !SolrQueryUtil.hasFieldTerms(query, HELP_CENTRE_CONTENT_FIELD);
+        return !query.contains("\"")
+                && !SolrQueryUtil.hasFieldTerms(query, HELP_CENTRE_TITLE_FIELD)
+                && !SolrQueryUtil.hasFieldTerms(query, HELP_CENTRE_CATEGORY_FIELD)
+                && !SolrQueryUtil.hasFieldTerms(query, HELP_CENTRE_CONTENT_FIELD);
     }
 }
