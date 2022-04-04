@@ -2,12 +2,9 @@ package org.uniprot.api.rest.service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -24,7 +21,6 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
-import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.Document;
@@ -89,10 +85,10 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
                         ? searchBySolrStream(idsRequest)
                         : new SolrStreamFacetResponse();
 
-        // use the ids returned by solr stream if query filter is passed
+        // use the ids returned by solr stream if query filter is passed or sort field is passed
         // otherwise use the passed ids
         List<String> ids =
-                Utils.notNullNotEmpty(idsRequest.getQuery())
+                needSolrReturnedAccessions(idsRequest)
                         ? solrStreamResponse.getIds()
                         : idsRequest.getIdList();
         // default page size to number of ids passed
@@ -126,66 +122,27 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     protected abstract String getSolrIdField();
 
     private SolrStreamFacetResponse searchBySolrStream(IdsSearchRequest idsRequest) {
-        SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(idsRequest);
+        SolrStreamFacetRequest solrStreamRequest =
+                SolrStreamFacetRequest.createSolrStreamFacetRequest(
+                        this.solrQueryConfig,
+                        getUniProtDataType(),
+                        getSolrIdField(),
+                        idsRequest.getIdList(),
+                        idsRequest);
         TupleStream tupleStream = this.tupleStreamTemplate.create(solrStreamRequest, facetConfig);
         return this.tupleStreamConverter.convert(tupleStream, idsRequest.getFacetList());
-    }
-
-    private SolrStreamFacetRequest createSolrStreamRequest(IdsSearchRequest idsRequest) {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
-                SolrStreamFacetRequest.builder();
-
-        // construct the query for tuple stream
-        List<String> ids = idsRequest.getIdList();
-        StringBuilder qb = new StringBuilder();
-        qb.append("({!terms f=")
-                .append(getSolrIdField())
-                .append("}")
-                .append(String.join(",", ids))
-                .append(")");
-        String termQuery = qb.toString();
-
-        // append the facet filter query in the accession query
-        if (Utils.notNullNotEmpty(idsRequest.getQuery())) {
-            solrRequestBuilder.query(idsRequest.getQuery());
-            solrRequestBuilder.filteredQuery(termQuery);
-            solrRequestBuilder.searchAccession(Boolean.TRUE);
-            solrRequestBuilder.searchSort(getSolrIdField() + " asc");
-            solrRequestBuilder.searchFieldList(getSolrIdField());
-        } else {
-            solrRequestBuilder.query(termQuery);
-        }
-
-        if (Utils.notNullNotEmpty(idsRequest.getSort())) {
-            List<SolrQuery.SortClause> sort =
-                    SortUtils.parseSortClause(getUniProtDataType(), idsRequest.getSort());
-            solrRequestBuilder.searchSort(getSearchSort(sort));
-            solrRequestBuilder.searchFieldList(getFieldList(sort));
-            solrRequestBuilder.searchAccession(Boolean.TRUE);
-        }
-
-        List<String> facets = idsRequest.getFacetList();
-
-        return solrRequestBuilder.queryConfig(this.solrQueryConfig).facets(facets).build();
-    }
-
-    private String getSearchSort(List<SolrQuery.SortClause> sort) {
-        return sort.stream()
-                .map(clause -> clause.getItem() + " " + clause.getOrder().name())
-                .collect(Collectors.joining(","));
-    }
-
-    private String getFieldList(List<SolrQuery.SortClause> sort) {
-        Set<String> fieldList =
-                sort.stream().map(SolrQuery.SortClause::getItem).collect(Collectors.toSet());
-        fieldList.add(getSolrIdField());
-        return String.join(",", fieldList);
     }
 
     private boolean solrStreamNeeded(IdsSearchRequest idsRequest) {
         return (Utils.nullOrEmpty(idsRequest.getCursor())
                         && Utils.notNullNotEmpty(idsRequest.getFacetList())
                         && !idsRequest.isDownload())
-                || Utils.notNullNotEmpty(idsRequest.getQuery());
+                || Utils.notNullNotEmpty(idsRequest.getQuery())
+                || Utils.notNullNotEmpty(idsRequest.getSort());
+    }
+
+    private boolean needSolrReturnedAccessions(IdsSearchRequest idsRequest) {
+        return Utils.notNullNotEmpty(idsRequest.getQuery())
+                || Utils.notNullNotEmpty(idsRequest.getSort());
     }
 }

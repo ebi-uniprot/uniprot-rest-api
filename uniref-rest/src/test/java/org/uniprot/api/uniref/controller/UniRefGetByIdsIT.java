@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
@@ -182,6 +184,11 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return this.facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected String getIdSortField() {
+        return "id";
     }
 
     @Override
@@ -352,6 +359,17 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
+    protected ResultMatcher getReverseSortedIdResultMatcher() {
+        return jsonPath(
+                "$.results.*.id",
+                contains(
+                        Arrays.stream(TEST_IDS_ARRAY_SORTED)
+                                .sorted(Comparator.reverseOrder())
+                                .collect(Collectors.toList())
+                                .toArray()));
+    }
+
+    @Override
     protected String getUnmatchedQueryFilter() {
         return "identity:2";
     }
@@ -359,5 +377,10 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String[] getIdLengthErrorMessage() {
         return new String[] {"Only '1000' UniRef ids are allowed in each request."};
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIREF;
     }
 }

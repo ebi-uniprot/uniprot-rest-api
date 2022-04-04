@@ -14,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.UniParcDocumentConverter;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
@@ -165,6 +167,11 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return this.facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected String getIdSortField() {
+        return "upi";
     }
 
     @Override
@@ -324,6 +331,17 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
+    protected ResultMatcher getReverseSortedIdResultMatcher() {
+        return jsonPath(
+                "$.results.*.uniParcId",
+                contains(
+                        Arrays.stream(TEST_IDS_ARRAY_SORTED)
+                                .sorted(Comparator.reverseOrder())
+                                .collect(Collectors.toList())
+                                .toArray()));
+    }
+
+    @Override
     protected String getUnmatchedQueryFilter() {
         return "organism_name:missing";
     }
@@ -331,6 +349,11 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String[] getIdLengthErrorMessage() {
         return new String[] {"Only '1000' upis are allowed in each request."};
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPARC;
     }
 
     private void saveEntries() throws Exception {

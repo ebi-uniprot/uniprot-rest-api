@@ -15,7 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -35,7 +34,6 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.rest.search.SortUtils;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -194,7 +192,9 @@ public abstract class BasicIdService<T, U> {
 
     private SolrStreamFacetResponse searchBySolrStream(
             List<String> ids, SearchRequest searchRequest) {
-        SolrStreamFacetRequest solrStreamRequest = createSolrStreamRequest(ids, searchRequest);
+        SolrStreamFacetRequest solrStreamRequest =
+                SolrStreamFacetRequest.createSolrStreamFacetRequest(
+                        queryConfig, getUniProtDataType(), getSolrIdField(), ids, searchRequest);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest, facetConfig);
         return this.facetTupleStreamConverter.convert(
                 facetTupleStream, searchRequest.getFacetList());
@@ -269,58 +269,6 @@ public abstract class BasicIdService<T, U> {
 
     private List<String> getMappedToIds(List<IdMappingStringPair> mappedIdPairs) {
         return mappedIdPairs.stream().map(IdMappingStringPair::getTo).collect(Collectors.toList());
-    }
-
-    private SolrStreamFacetRequest createSolrStreamRequest(
-            List<String> ids, SearchRequest searchRequest) {
-        SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
-                SolrStreamFacetRequest.builder();
-
-        // construct the query for tuple stream
-        StringBuilder qb = new StringBuilder();
-        qb.append("({!terms f=")
-                .append(getSolrIdField())
-                .append("}")
-                .append(String.join(",", ids))
-                .append(")");
-        String termQuery = qb.toString();
-
-        // append the facet filter query in the accession query
-        if (Utils.notNullNotEmpty(searchRequest.getQuery())) {
-            solrRequestBuilder.query(searchRequest.getQuery());
-            solrRequestBuilder.filteredQuery(termQuery);
-            solrRequestBuilder.searchAccession(Boolean.TRUE);
-            solrRequestBuilder.searchSort(getSolrIdField() + " asc");
-            solrRequestBuilder.searchFieldList(getSolrIdField());
-        } else {
-            solrRequestBuilder.query(termQuery);
-        }
-
-        if (Utils.notNullNotEmpty(searchRequest.getSort())) {
-            List<SolrQuery.SortClause> sort =
-                    SortUtils.parseSortClause(getUniProtDataType(), searchRequest.getSort());
-            solrRequestBuilder.searchSort(getSearchSort(sort));
-            solrRequestBuilder.searchFieldList(getFieldList(sort));
-            solrRequestBuilder.searchAccession(Boolean.TRUE);
-        }
-
-        return solrRequestBuilder
-                .queryConfig(this.queryConfig)
-                .facets(searchRequest.getFacetList())
-                .build();
-    }
-
-    private String getSearchSort(List<SolrQuery.SortClause> sort) {
-        return sort.stream()
-                .map(clause -> clause.getItem() + " " + clause.getOrder().name())
-                .collect(Collectors.joining(","));
-    }
-
-    private String getFieldList(List<SolrQuery.SortClause> sort) {
-        Set<String> fieldList =
-                sort.stream().map(SolrQuery.SortClause::getItem).collect(Collectors.toSet());
-        fieldList.add(getSolrIdField());
-        return String.join(",", fieldList);
     }
 
     private Map<String, T> constructIdEntryMap(Stream<T> entries) {
