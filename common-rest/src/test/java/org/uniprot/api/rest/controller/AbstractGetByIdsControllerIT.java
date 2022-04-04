@@ -26,6 +26,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * @author sahmad
@@ -561,6 +565,65 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                 .andExpect(jsonPath("$.messages.*", containsInAnyOrder(getIdLengthErrorMessage())));
     }
 
+    @ParameterizedTest(name = "[{index}] sort {0}")
+    @MethodSource("getAllSortFields")
+    void getByIdsWithAllAvailableSortFields(String sortField) throws Exception {
+        // given
+        assertThat(sortField, notNullValue());
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .param(getRequestParamName(), getCommaSeparatedIds())
+                                        .param("sort", sortField + " asc")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)));
+    }
+
+    @Test
+    void getByIdsSortWithCorrectValuesSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(
+                                                org.apache.http.HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), getCommaSeparatedIds())
+                                        .param("sort", getIdSortField() + " desc")
+                                        .param("size", "10"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(getReverseSortedIdResultMatcher())
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    private Stream<Arguments> getAllSortFields() {
+        SearchFieldConfig fieldConfig = getSearchFieldConfig();
+        return fieldConfig.getSearchFieldItems().stream()
+                .map(SearchFieldItem::getFieldName)
+                .filter(fieldConfig::correspondingSortFieldExists)
+                .map(Arguments::of);
+    }
+
+    private SearchFieldConfig getSearchFieldConfig() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(getUniProtDataType());
+    }
+
+    protected abstract String getIdSortField();
+
     protected abstract String getCommaSeparatedIds();
 
     protected abstract String getCommaSeparatedNIds(int n);
@@ -601,9 +664,13 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
 
     protected abstract ResultMatcher getSortedIdResultMatcher();
 
+    protected abstract ResultMatcher getReverseSortedIdResultMatcher();
+
     protected abstract String getUnmatchedQueryFilter();
 
     protected abstract String[] getIdLengthErrorMessage();
+
+    protected abstract UniProtDataType getUniProtDataType();
 
     private void verifyResults(ResultActions response) throws Exception {
         for (ResultMatcher matcher : getResultsResultMatchers()) {

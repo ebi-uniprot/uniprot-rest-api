@@ -2,26 +2,38 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
@@ -29,12 +41,17 @@ import org.uniprot.api.rest.controller.AbstractGetByIdsControllerIT;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.core.gene.Gene;
+import org.uniprot.core.gene.GeneName;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.impl.GeneBuilder;
+import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.go.GORepo;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
@@ -71,7 +88,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     private static final String TEST_IDS =
             "p00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009";
-    private static final String[] TEST_IDS_ARRAY = {
+    public static final String[] TEST_IDS_ARRAY = {
         "P00003", "P00002", "P00001", "P00007", "P00006", "P00005", "P00004", "P00008", "P00010",
         "P00009"
     };
@@ -93,6 +110,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
+        char prefix = 'z';
         for (int i = 1; i <= 10; i++) {
             UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
             String acc = String.format("P%05d", i);
@@ -103,14 +121,54 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                 entryBuilder.entryType(UniProtKBEntryType.TREMBL);
             }
 
+            // update gene name
+            List<Gene> genes = new ArrayList<>(TEMPLATE_ENTRY.getGenes());
+            Gene gene = genes.get(0);
+            GeneBuilder geneBuilder = GeneBuilder.from(gene);
+            GeneNameBuilder gnBuilder = GeneNameBuilder.from(gene.getGeneName());
+            GeneName gn = gnBuilder.value(prefix + gene.getGeneName().getValue()).build();
+            geneBuilder.geneName(gn);
+            genes.remove(0);
+            genes.add(0, geneBuilder.build());
+            entryBuilder.genesSet(genes);
+
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
 
             UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
 
             cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
             storeClient.saveEntry(uniProtKBEntry);
+            prefix--;
         }
         cloudSolrClient.commit(SolrCollection.uniprot.name());
+    }
+
+    @Test
+    void getByIdsSortByProteinNameWithCorrectValuesSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(
+                                                org.apache.http.HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), getCommaSeparatedIds())
+                                        .param("sort", "gene asc")
+                                        .param("size", "10"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(getReverseSortedIdResultMatcher())
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Override
+    protected String getIdSortField() {
+        return "accession";
     }
 
     @Override
@@ -299,6 +357,17 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     }
 
     @Override
+    protected ResultMatcher getReverseSortedIdResultMatcher() {
+        return jsonPath(
+                "$.results.*.primaryAccession",
+                contains(
+                        Arrays.stream(TEST_IDS_ARRAY_SORTED)
+                                .sorted(Comparator.reverseOrder())
+                                .collect(Collectors.toList())
+                                .toArray()));
+    }
+
+    @Override
     protected String getUnmatchedQueryFilter() {
         return "existence:randomvalue";
     }
@@ -321,5 +390,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected String[] getIdLengthErrorMessage() {
         return new String[] {"Only '1000' accessions are allowed in each request."};
+    }
+
+    @Override
+    protected UniProtDataType getUniProtDataType() {
+        return UniProtDataType.UNIPROTKB;
     }
 }
