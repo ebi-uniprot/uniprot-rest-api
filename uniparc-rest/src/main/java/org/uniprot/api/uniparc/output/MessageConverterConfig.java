@@ -101,6 +101,11 @@ public class MessageConverterConfig {
                                 uniParcCrossRefReturnField,
                                 new UniParcEntryCrossRefValueMapper(),
                                 downloadGatekeeper));
+                converters.add(new XlsMessageConverter<>(
+                        UniParcCrossReference.class,
+                        uniParcCrossRefReturnField,
+                        new UniParcEntryCrossRefValueMapper(),
+                        downloadGatekeeper));
             }
         };
     }
@@ -130,6 +135,7 @@ public class MessageConverterConfig {
                 new MessageConverterContextFactory<>();
         contextFactory.addMessageConverterContext(uniParcCrossRefContext(APPLICATION_JSON));
         contextFactory.addMessageConverterContext(uniParcCrossRefContext(TSV_MEDIA_TYPE));
+        contextFactory.addMessageConverterContext(uniParcCrossRefContext(XLS_MEDIA_TYPE));
         return contextFactory;
     }
 

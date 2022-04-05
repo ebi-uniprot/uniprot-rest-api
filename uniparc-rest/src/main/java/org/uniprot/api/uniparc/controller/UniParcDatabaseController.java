@@ -2,6 +2,7 @@ package org.uniprot.api.uniparc.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
 import java.util.Optional;
@@ -65,7 +66,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
 
     @GetMapping(
             value = "/{upi}/databases",
-            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
+            produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     @Operation(
             summary = "Retrieve UniParc databases by a upi.",
             responses = {
@@ -74,7 +75,8 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
                             @Content(
                                     mediaType = APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UniParcCrossReference.class)),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcCrossReference>> getDatabasesByUpi(

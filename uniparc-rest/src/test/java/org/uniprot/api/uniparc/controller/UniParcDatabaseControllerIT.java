@@ -338,6 +338,11 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                                                             + "UNIMES\tunimes1\t7\t\t2017-02-12\t2017-04-23\tNo\n"
                                                                             + "VectorBase\tcommon-vector\t7\t\t2017-02-12\t2017-04-23\tYes")))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(emptyString())))
+                                    .build())
                     .build();
         }
 
@@ -358,6 +363,11 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .resultMatcher(content().string(emptyString()))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(content().string(emptyString()))
                                     .build())
                     .build();
