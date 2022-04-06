@@ -39,6 +39,7 @@ import org.uniprot.core.util.Utils;
 
 import com.google.common.base.Stopwatch;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,6 +52,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  *
  * @author Edd
  */
+@Hidden
 @Tag(name = "results", description = "APIs to get result of the submitted job.")
 @RestController
 @Validated

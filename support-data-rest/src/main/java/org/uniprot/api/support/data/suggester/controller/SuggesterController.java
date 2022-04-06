@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.support.data.suggester.response.Suggestions;
 import org.uniprot.api.support.data.suggester.service.SuggesterService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  *
  * @author Edd
  */
+@Hidden
 @Tag(
         name = "Suggester",
         description =

@@ -35,6 +35,7 @@ import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -47,6 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 19/07/2021
  */
+@Hidden
 @Tag(
         name = "arba",
         description =

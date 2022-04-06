@@ -42,6 +42,7 @@ import org.uniprot.api.support.data.subcellular.service.SubcellularLocationServi
 import org.uniprot.core.cv.subcell.SubcellularLocationEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -54,6 +55,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 2019-07-19
  */
+@Hidden
 @Tag(
         name = "Subcellular location",
         description =

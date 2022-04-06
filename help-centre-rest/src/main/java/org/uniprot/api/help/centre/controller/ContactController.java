@@ -13,6 +13,9 @@ import org.uniprot.api.help.centre.model.ContactForm;
 import org.uniprot.api.help.centre.model.Token;
 import org.uniprot.api.help.centre.service.ContactService;
 
+import io.swagger.v3.oas.annotations.Hidden;
+
+@Hidden
 @RestController
 @Validated
 @RequestMapping("/contact")

@@ -12,6 +12,7 @@ import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.api.support.data.configure.service.SubcellularLocationConfigureService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 18/03/2021
  */
+@Hidden
 @Tag(
         name = "Configuration",
         description = "These services provide configuration data used in the the UniProt website")

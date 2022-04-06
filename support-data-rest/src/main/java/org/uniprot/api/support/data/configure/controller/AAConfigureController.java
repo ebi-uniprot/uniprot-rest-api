@@ -12,6 +12,7 @@ import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.api.support.data.configure.service.AAConfigureService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +24,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 29/07/2021
  */
+
+@Hidden
 @Tag(
         name = "Configuration",
         description = "These services provide configuration data used in the UniProt website")
