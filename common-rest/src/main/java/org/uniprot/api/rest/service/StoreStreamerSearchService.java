@@ -1,10 +1,5 @@
 package org.uniprot.api.rest.service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -24,6 +19,11 @@ import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.Document;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public abstract class StoreStreamerSearchService<D extends Document, R>
         extends BasicSearchService<D, R> {
