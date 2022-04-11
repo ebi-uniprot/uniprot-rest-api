@@ -14,6 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
@@ -92,7 +93,7 @@ public class ResultsConfig {
         int maxRdfRetryDelay = rdfRetryDelay * 8;
         RetryPolicy<Object> rdfRetryPolicy =
                 new RetryPolicy<>()
-                        .handle(IOException.class)
+                        .handle(ResourceAccessException.class)
                         .withBackoff(rdfRetryDelay, maxRdfRetryDelay, ChronoUnit.MILLIS)
                         .withMaxRetries(rdfConfigProperties().getMaxRetries())
                         .onRetry(
