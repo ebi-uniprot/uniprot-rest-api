@@ -42,6 +42,7 @@ public class SuggesterController {
     }
 
     @Operation(
+            hidden = true,
             summary =
                     "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).",
             responses = {

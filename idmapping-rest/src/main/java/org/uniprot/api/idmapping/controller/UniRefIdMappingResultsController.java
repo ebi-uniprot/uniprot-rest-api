@@ -85,6 +85,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Search result of UniRef cluster (or clusters) by a submitted job id.",
             responses = {
                 @ApiResponse(
@@ -130,6 +131,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Stream an UniRef cluster (or clusters) retrieved by a submitted job id.",
             responses = {
                 @ApiResponse(

@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 20 Aug 2019
  */
-
 @Hidden
 @Tag(
         name = "Configuration",

@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @EqualsAndHashCode(callSuper = true)
 public class ProteomeSearchRequest extends ProteomeBasicRequest implements SearchRequest {
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidFacets(facetConfig = ProteomeFacetConfig.class)
     private String facets;
 

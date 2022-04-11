@@ -93,6 +93,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary =
                     "Search result for a UniProtKB protein entry (or entries) mapped by a submitted job id.",
             responses = {
@@ -150,6 +151,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.",
             responses = {
                 @ApiResponse(

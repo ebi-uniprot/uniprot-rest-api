@@ -90,6 +90,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Get Keyword by keywordId.",
             responses = {
                 @ApiResponse(
@@ -136,6 +137,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Search Keywords by given Lucene search query.",
             responses = {
                 @ApiResponse(
@@ -173,6 +175,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Download Keywords by given Lucene search query.",
             responses = {
                 @ApiResponse(

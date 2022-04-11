@@ -104,8 +104,8 @@ public class UniRefEntryStoreRepository {
         return builder.build();
     }
 
-    public QueryResult<UniRefMember> getEntryMembers(UniRefMemberRequest memberRequest) {
-        UniRefEntryLight entryLight = getUniRefEntryLightFromStore(memberRequest.getId());
+    public QueryResult<UniRefMember> getEntryMembers(UniRefMemberRequest memberRequest, String id) {
+        UniRefEntryLight entryLight = getUniRefEntryLightFromStore(id);
         List<String> members = entryLight.getMembers();
         log.info("entryLight size {}", members.size());
         // Handle Facets

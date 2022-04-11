@@ -86,6 +86,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Operation(
+            hidden = true,
             summary = "Get subcellular locations by id.",
             responses = {
                 @ApiResponse(
@@ -138,6 +139,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Operation(
+            hidden = true,
             summary = "Search subcellular locations by given Lucene search query.",
             responses = {
                 @ApiResponse(
@@ -176,6 +178,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Operation(
+            hidden = true,
             summary = "Download subcellular locations by given Lucene search query.",
             responses = {
                 @ApiResponse(

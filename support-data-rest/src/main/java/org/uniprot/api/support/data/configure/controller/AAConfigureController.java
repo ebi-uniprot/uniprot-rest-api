@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 29/07/2021
  */
-
 @Hidden
 @Tag(
         name = "Configuration",
@@ -39,6 +38,7 @@ public class AAConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = "List of return fields available in the UniRule services.",
             responses = {
                 @ApiResponse(
@@ -60,6 +60,7 @@ public class AAConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = "List of search fields available in the UniRule services.",
             responses = {
                 @ApiResponse(
@@ -81,6 +82,7 @@ public class AAConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = "List of return fields available in the Arba services.",
             responses = {
                 @ApiResponse(
@@ -102,6 +104,7 @@ public class AAConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = "List of search fields available in the Arba services.",
             responses = {
                 @ApiResponse(

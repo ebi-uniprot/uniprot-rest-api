@@ -32,7 +32,7 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
@@ -46,6 +46,7 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     private String query;
 
     @Parameter(
+            hidden = true,
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
@@ -57,13 +58,15 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
+    @Parameter(
+            hidden = true,
+            description = "Size of the result. Defaults to number of accessions passed.")
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 

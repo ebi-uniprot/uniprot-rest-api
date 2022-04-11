@@ -60,6 +60,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
     }
 
     @Operation(
+            hidden = true,
             summary = "Get Help Centre Page by Id.",
             responses = {
                 @ApiResponse(
@@ -92,6 +93,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
     }
 
     @Operation(
+            hidden = true,
             summary = "Search Help pages by given Lucene search query.",
             responses = {
                 @ApiResponse(

@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @EqualsAndHashCode(callSuper = true)
 public class TaxonomyStreamRequest extends TaxonomyBasicRequest implements StreamRequest {
     @Parameter(
+            hidden = true,
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(

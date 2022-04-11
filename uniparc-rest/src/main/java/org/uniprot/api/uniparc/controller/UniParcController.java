@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -30,7 +31,9 @@ import org.uniprot.api.uniparc.request.*;
 import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -148,17 +151,25 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByUpId(
-            @Valid @ModelAttribute UniParcGetByUniParcIdRequest getByUniParcIdRequest,
+            @PathVariable("upi")
+                    @Pattern(
+                            regexp = FieldRegexConstants.UNIPARC_UPI_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.invalid.upi.value}")
+                    @NotNull(message = "{search.required}")
+                    @Parameter(description = "UniParc ID (UPI)")
+                    String upi,
+            @Valid @ModelAttribute UniParcGetByIdRequest getByIdRequest,
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
         if (contentType.equals(RDF_MEDIA_TYPE)) {
-            String result = queryService.getRDFXml(getByUniParcIdRequest.getUpi());
+            String result = queryService.getRDFXml(upi);
             return super.getEntityResponseRDF(result, contentType, request);
         }
 
-        UniParcEntry entry = queryService.getByUniParcId(getByUniParcIdRequest);
-        return super.getEntityResponse(entry, getByUniParcIdRequest.getFields(), request);
+        UniParcEntry entry = queryService.getByUniParcId(getByIdRequest, upi);
+        return super.getEntityResponse(entry, getByIdRequest.getFields(), request);
     }
 
     @GetMapping(
@@ -246,13 +257,21 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByAccession(
-            @Valid @ModelAttribute UniParcGetByAccessionRequest getByAccessionRequest,
+            @PathVariable("accession")
+                    @Pattern(
+                            regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.invalid.accession.value}")
+                    @NotNull(message = "{search.required}")
+                    @Parameter(description = "Unique identifier for the UniProt entry")
+                    String accession,
+            @Valid @ModelAttribute UniParcGetByIdRequest getByIdRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        UniParcEntry entry = queryService.getByUniProtAccession(getByAccessionRequest);
+        UniParcEntry entry = queryService.getByUniProtAccession(getByIdRequest, accession);
 
-        return super.getEntityResponse(entry, getByAccessionRequest.getFields(), request);
+        return super.getEntityResponse(entry, getByIdRequest.getFields(), request);
     }
 
     @GetMapping(
@@ -293,10 +312,16 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> searchByDBRefId(
+            @PathVariable("dbId")
+                    @Parameter(
+                            description =
+                                    "UniParc cross reference id, eg. AAC02967 (EMBL) or XP_006524055 (RefSeq)")
+                    @NotNull(message = "{search.required}")
+                    String dbId,
             @Valid @ModelAttribute UniParcGetByDBRefIdRequest getByDbIdRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-
+        getByDbIdRequest.setDbId(dbId);
         QueryResult<UniParcEntry> results = queryService.searchByFieldId(getByDbIdRequest);
 
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
@@ -340,10 +365,14 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> searchByProteomeId(
+            @PathVariable("upId")
+                    @Parameter(description = "UniProt Proteome UPID")
+                    @NotNull(message = "{search.required}")
+                    String upId,
             @Valid @ModelAttribute UniParcGetByProteomeIdRequest getByUpIdRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-
+        getByUpIdRequest.setUpId(upId);
         QueryResult<UniParcEntry> results = queryService.searchByFieldId(getByUpIdRequest);
 
         return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
@@ -466,6 +495,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return getByUpis(idsSearchRequest, request, response);
     }
 
+    @Hidden
     @SuppressWarnings("squid:S3752")
     @RequestMapping(
             value = "/upis",

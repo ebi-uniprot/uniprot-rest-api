@@ -38,7 +38,7 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidFacets(facetConfig = UniRefFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
@@ -51,6 +51,7 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     private String query;
 
     @Parameter(
+            hidden = true,
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(

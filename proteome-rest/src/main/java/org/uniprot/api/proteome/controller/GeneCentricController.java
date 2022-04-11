@@ -159,10 +159,18 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                         })
             })
     public ResponseEntity<MessageConverterContext<GeneCentricEntry>> getByUpId(
+            @PathVariable("upid")
+                    @Parameter(description = "Unique identifier for the Proteome entry")
+                    @Pattern(
+                            regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.invalid.upid.value}")
+                    String upid,
             @Valid @ModelAttribute GeneCentricUPIdRequest upIdRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        GeneCentricSearchRequest searchRequest = convertUPIdRequestToSearchRequest(upIdRequest);
+        GeneCentricSearchRequest searchRequest =
+                convertUPIdRequestToSearchRequest(upid, upIdRequest);
         QueryResult<GeneCentricEntry> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
@@ -268,9 +276,9 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
     }
 
     private GeneCentricSearchRequest convertUPIdRequestToSearchRequest(
-            @ModelAttribute @Valid GeneCentricUPIdRequest upIdRequest) {
+            String upid, @ModelAttribute @Valid GeneCentricUPIdRequest upIdRequest) {
         GeneCentricSearchRequest searchRequest = new GeneCentricSearchRequest();
-        searchRequest.setQuery(upIdFieldName + ":" + upIdRequest.getUpid());
+        searchRequest.setQuery(upIdFieldName + ":" + upid);
         searchRequest.setFields(upIdRequest.getFields());
         searchRequest.setCursor(upIdRequest.getCursor());
         searchRequest.setSize(upIdRequest.getSize());

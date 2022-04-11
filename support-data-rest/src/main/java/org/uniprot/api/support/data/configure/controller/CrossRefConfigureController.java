@@ -38,6 +38,7 @@ public class CrossRefConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = "List of return fields available in the database services.",
             responses = {
                 @ApiResponse(
@@ -59,6 +60,7 @@ public class CrossRefConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = "List of search fields available in the database services.",
             responses = {
                 @ApiResponse(

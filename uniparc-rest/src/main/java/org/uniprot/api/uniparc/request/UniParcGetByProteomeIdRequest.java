@@ -1,7 +1,5 @@
 package org.uniprot.api.uniparc.request;
 
-import javax.validation.constraints.NotNull;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -20,8 +18,7 @@ public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchReque
     @Parameter(hidden = true)
     private static final String PROTEOME_ID_STR = "upid";
 
-    @Parameter(description = "UniProt Proteome UPID")
-    @NotNull(message = "{search.required}")
+    @Parameter(hidden = true)
     private String upId;
 
     @Override

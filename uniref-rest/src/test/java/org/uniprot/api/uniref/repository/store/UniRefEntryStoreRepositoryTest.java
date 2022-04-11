@@ -78,9 +78,9 @@ class UniRefEntryStoreRepositoryTest {
     void getFirstPageEntryMembersDefault25AndRepresentativeWithFacets() {
         UniRefMemberRequest request = new UniRefMemberRequest();
 
-        request.setId(UNIREF_ID_OK);
+        //      request.setId(UNIREF_ID_OK);
         request.setFacets(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName());
-        QueryResult<UniRefMember> result = repository.getEntryMembers(request);
+        QueryResult<UniRefMember> result = repository.getEntryMembers(request, UNIREF_ID_OK);
         assertNotNull(result);
 
         assertNotNull(result.getPage());
@@ -131,10 +131,10 @@ class UniRefEntryStoreRepositoryTest {
     void getMembersEntryMembersFilteringFacet() {
         UniRefMemberRequest request = new UniRefMemberRequest();
 
-        request.setId(UNIREF_ID_OK);
+        // request.setId(UNIREF_ID_OK);
         request.setFacets(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName());
         request.setFacetFilter(UniRefEntryFacet.MEMBER_ID_TYPE.getFacetName() + ":uniparc");
-        QueryResult<UniRefMember> result = repository.getEntryMembers(request);
+        QueryResult<UniRefMember> result = repository.getEntryMembers(request, UNIREF_ID_OK);
         assertNotNull(result);
 
         assertNotNull(result.getPage());
@@ -176,8 +176,8 @@ class UniRefEntryStoreRepositoryTest {
     void getFirstPageEntryMembersByIdWithSize10() {
         UniRefMemberRequest request = new UniRefMemberRequest();
         request.setSize(10);
-        request.setId(UNIREF_ID_OK);
-        QueryResult<UniRefMember> result = repository.getEntryMembers(request);
+        //     request.setId(UNIREF_ID_OK);
+        QueryResult<UniRefMember> result = repository.getEntryMembers(request, UNIREF_ID_OK);
         assertNotNull(result);
 
         assertNotNull(result.getPage());
@@ -232,8 +232,9 @@ class UniRefEntryStoreRepositoryTest {
         UniRefMemberRequest request = new UniRefMemberRequest();
         request.setSize(10);
         request.setCursor("3sbq7rwffis");
-        request.setId(UNIREF_ID_OK);
-        QueryResult<UniRefMember> result = repository.getEntryMembers(request);
+        //  request.setId(UNIREF_ID_OK);
+        QueryResult<UniRefMember> result = repository.getEntryMembers(request, UNIREF_ID_OK),
+                UNIREF_ID_OK;
         assertNotNull(result);
 
         assertNotNull(result.getPage());
@@ -272,8 +273,8 @@ class UniRefEntryStoreRepositoryTest {
         UniRefMemberRequest request = new UniRefMemberRequest();
         request.setSize(10);
         request.setCursor("3v3i3le3dck");
-        request.setId(UNIREF_ID_OK);
-        QueryResult<UniRefMember> result = repository.getEntryMembers(request);
+        //   request.setId(UNIREF_ID_OK);
+        QueryResult<UniRefMember> result = repository.getEntryMembers(request, UNIREF_ID_OK);
         assertNotNull(result);
 
         assertNotNull(result.getPage());

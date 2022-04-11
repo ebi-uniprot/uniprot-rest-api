@@ -88,6 +88,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Search result of UniParc sequence entry (or entries) by a submitted job id.",
             responses = {
                 @ApiResponse(
@@ -141,6 +142,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Stream a UniParc sequence entry (or entries) by a submitted job id.",
             responses = {
                 @ApiResponse(

@@ -87,6 +87,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             value = "/results/{jobId}",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     @Operation(
+            hidden = true,
             summary = "Search result by a submitted job id.",
             responses = {
                 @ApiResponse(
@@ -136,6 +137,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Stream result by a submitted job id.",
             responses = {
                 @ApiResponse(

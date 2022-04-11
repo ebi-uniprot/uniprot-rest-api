@@ -34,7 +34,7 @@ public class LiteratureBasicRequest {
     private String query;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "literature-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.LITERATURE)
     private String sort;
 

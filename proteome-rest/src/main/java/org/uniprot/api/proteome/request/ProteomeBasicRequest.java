@@ -33,7 +33,7 @@ public class ProteomeBasicRequest {
     private String query;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "proteome-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String sort;
 

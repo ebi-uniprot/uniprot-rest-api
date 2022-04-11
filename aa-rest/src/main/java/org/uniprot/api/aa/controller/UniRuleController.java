@@ -78,6 +78,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
         this.uniRuleService = uniRuleService;
     }
 
+    @Hidden
     @GetMapping(
             value = "/{uniruleid}",
             produces = {
@@ -115,6 +116,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
         return super.getEntityResponse(entryResult, fields, request);
     }
 
+    @Hidden
     @GetMapping(
             value = "/search",
             produces = {
@@ -153,6 +155,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
+    @Hidden
     @GetMapping(
             value = "/stream",
             produces = {

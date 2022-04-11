@@ -39,7 +39,7 @@ public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements Sea
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
@@ -49,7 +49,7 @@ public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements Sea
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(description = "Used to return matched fields ")
+    @Parameter(hidden = true, description = "Used to return matched fields ")
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

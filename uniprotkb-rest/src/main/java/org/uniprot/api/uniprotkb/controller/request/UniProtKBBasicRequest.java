@@ -43,7 +43,7 @@ public class UniProtKBBasicRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 
-    @Parameter(description = "Flag to include Isoform or not")
+    @Parameter(hidden = true, description = "Flag to include Isoform or not")
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

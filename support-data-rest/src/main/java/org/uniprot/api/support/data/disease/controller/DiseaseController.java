@@ -77,6 +77,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 downloadGatekeeper);
     }
 
+    @Hidden
     @Operation(
             summary = "Get diseases by id.",
             responses = {
@@ -125,6 +126,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
         return super.getEntityResponse(disease, fields, request);
     }
 
+    @Hidden
     @Operation(
             summary = "Search disease by given Lucene search query.",
             responses = {
@@ -161,6 +163,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
+    @Hidden
     @Operation(
             summary = "Download disease by given Lucene search query.",
             responses = {

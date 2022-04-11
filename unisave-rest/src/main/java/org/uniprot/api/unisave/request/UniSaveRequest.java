@@ -26,7 +26,7 @@ public class UniSaveRequest {
         @Parameter(hidden = true)
         private String accession;
 
-        @Parameter(description = "Add download headers to response (true|false).")
+        @Parameter(hidden =true, description = "Add download headers to response (true|false).")
         private boolean download;
 
         @Parameter(description = "Whether or not to include the entry content (true|false).")

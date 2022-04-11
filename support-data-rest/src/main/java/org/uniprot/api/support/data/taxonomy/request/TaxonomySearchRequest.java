@@ -16,7 +16,7 @@ public class TaxonomySearchRequest extends TaxonomyBasicRequest implements Searc
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Comma separated list of facets to search")
+    @Parameter(hidden = true, description = "Comma separated list of facets to search")
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)
     private String facets;
 

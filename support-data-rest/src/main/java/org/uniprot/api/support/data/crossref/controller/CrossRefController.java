@@ -38,6 +38,7 @@ import org.uniprot.api.support.data.crossref.service.CrossRefService;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -75,6 +76,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                 downloadGatekeeper);
     }
 
+    @Hidden
     @Operation(
             summary = "Get cross-references by database id.",
             responses = {
@@ -113,6 +115,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
         return super.getEntityResponse(crossRefEntry, fields, request);
     }
 
+    @Hidden
     @Operation(
             summary = "Search cross-references by given Lucene search query.",
             responses = {
@@ -141,6 +144,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     }
 
     @Operation(
+            hidden = true,
             summary = "Download cross-references by given Lucene search query.",
             responses = {
                 @ApiResponse(

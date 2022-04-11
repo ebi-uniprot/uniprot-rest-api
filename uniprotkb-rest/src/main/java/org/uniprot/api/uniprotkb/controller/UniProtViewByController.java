@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.service.*;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Hidden
 @RestController
 @RequestMapping("/uniprotkb/view")
 public class UniProtViewByController {
@@ -46,6 +48,7 @@ public class UniProtViewByController {
         this.viewByTaxonomyService = viewByTaxonomyService;
     }
 
+    @Hidden
     @Tag(
             name = "uniprotkbview",
             description =
@@ -72,6 +75,7 @@ public class UniProtViewByController {
         return new ResponseEntity<>(viewBys, HttpStatus.OK);
     }
 
+    @Hidden
     @Tag(name = "uniprotkbview")
     @GetMapping(
             value = "/keyword",
@@ -94,6 +98,7 @@ public class UniProtViewByController {
         return new ResponseEntity<>(viewByKeywordService.get(query, parent), HttpStatus.OK);
     }
 
+    @Hidden
     @Tag(name = "uniprotkbview")
     @GetMapping(
             value = "/pathway",
@@ -116,6 +121,7 @@ public class UniProtViewByController {
         return new ResponseEntity<>(viewByPathwayService.get(query, parent), HttpStatus.OK);
     }
 
+    @Hidden
     @Tag(name = "uniprotkbview")
     @GetMapping(
             value = "/go",
@@ -138,6 +144,7 @@ public class UniProtViewByController {
         return new ResponseEntity<>(viewByGoService.get(query, parent), HttpStatus.OK);
     }
 
+    @Hidden
     @Tag(name = "uniprotkbview")
     @GetMapping(
             value = "/taxonomy",

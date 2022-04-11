@@ -61,6 +61,7 @@ public class IdMappingJobController {
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
+            hidden = true,
             summary = "Submit a job.",
             responses = {
                 @ApiResponse(
@@ -80,6 +81,7 @@ public class IdMappingJobController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
+            hidden = true,
             summary = "Get the status of a job.",
             responses = {
                 @ApiResponse(
@@ -99,6 +101,7 @@ public class IdMappingJobController {
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
+            hidden = true,
             summary = "Get the details of a job.",
             responses = {
                 @ApiResponse(

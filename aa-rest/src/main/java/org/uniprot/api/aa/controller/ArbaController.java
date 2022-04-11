@@ -77,6 +77,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
         this.arbaService = arbaService;
     }
 
+    @Hidden
     @GetMapping(
             value = "/{arbaId}",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
@@ -107,6 +108,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
         return super.getEntityResponse(entryResult, fields, request);
     }
 
+    @Hidden
     @GetMapping(
             value = "/search",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
@@ -138,6 +140,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
+    @Hidden
     @GetMapping(
             value = "/stream",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})

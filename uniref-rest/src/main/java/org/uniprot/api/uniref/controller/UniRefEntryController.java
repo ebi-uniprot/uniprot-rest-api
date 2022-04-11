@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,12 +20,17 @@ import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniref.request.UniRefIdRequest;
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
+import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniref.service.UniRefEntryService;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -86,15 +91,29 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntry>> getById(
-            @Valid @ModelAttribute UniRefIdRequest idRequest,
+            @PathVariable("id")
+                    @Parameter(description = "Unique identifier for the UniRef cluster")
+                    @Pattern(
+                            regexp = FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.invalid.id.value}")
+                    String id,
+            @ModelFieldMeta(
+                            reader = ReturnFieldMetaReaderImpl.class,
+                            path = "uniref-return-fields.json")
+                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
+                    @Parameter(
+                            description =
+                                    "Comma separated list of fields to be returned in response")
+                    String fields,
             HttpServletRequest request,
             HttpServletResponse response) {
         if (isRDFAccept(request)) {
-            String rdf = entryService.getRDFXml(idRequest.getId());
+            String rdf = entryService.getRDFXml(id);
             return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
         } else {
-            UniRefEntry entryResult = entryService.getEntity(idRequest.getId());
-            return super.getEntityResponse(entryResult, idRequest.getFields(), request);
+            UniRefEntry entryResult = entryService.getEntity(id);
+            return super.getEntityResponse(entryResult, fields, request);
         }
     }
 

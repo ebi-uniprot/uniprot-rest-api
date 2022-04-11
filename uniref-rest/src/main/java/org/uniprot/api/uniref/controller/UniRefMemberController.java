@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,8 +24,10 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniref.request.UniRefMemberRequest;
 import org.uniprot.api.uniref.service.UniRefMemberService;
 import org.uniprot.core.uniref.UniRefMember;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -79,10 +82,17 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefMember>> search(
+            @PathVariable("id")
+                    @Parameter(description = "Unique identifier for the UniRef cluster")
+                    @Pattern(
+                            regexp = FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.invalid.id.value}")
+                    String id,
             @Valid @ModelAttribute UniRefMemberRequest memberRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<UniRefMember> results = service.retrieveMembers(memberRequest);
+        QueryResult<UniRefMember> results = service.retrieveMembers(memberRequest, id);
         return super.getSearchResponse(results, "", request, response);
     }
 

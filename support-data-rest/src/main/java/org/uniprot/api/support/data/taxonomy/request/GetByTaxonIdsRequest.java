@@ -39,12 +39,13 @@ public class GetByTaxonIdsRequest implements SearchRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
     @Parameter(
+            hidden = true,
             description =
                     "Criteria to filter by facet value. It can any supported valid Lucene query.")
     @ValidSolrQuerySyntax(message = "{search.taxonomy.ids.invalid.facet.filter}")
@@ -52,6 +53,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
     private String facetFilter;
 
     @Parameter(
+            hidden = true,
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(

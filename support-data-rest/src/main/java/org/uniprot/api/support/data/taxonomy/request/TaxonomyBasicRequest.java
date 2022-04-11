@@ -32,7 +32,7 @@ public class TaxonomyBasicRequest {
     private String query;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "taxonomy-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String sort;
 

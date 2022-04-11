@@ -2,10 +2,14 @@ package org.uniprot.api.uniparc.request;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidEnumDisplayValue;
+import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.uniparc.UniParcDatabase;
+import org.uniprot.store.config.UniProtDataType;
 
+import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -14,6 +18,12 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class UniParcGetByIdRequest {
+
+    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
+    @Parameter(description = "Comma separated list of fields to be returned in the response")
+    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
+    private String fields;
+
     @Parameter(description = "Comma separated list of UniParc cross reference database names")
     @ValidCommaSeparatedItemsLength(maxLength = 50)
     @ValidEnumDisplayValue(enumDisplay = UniParcDatabase.class)

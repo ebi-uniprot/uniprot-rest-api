@@ -25,10 +25,8 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.repository.UniParcQueryRepository;
 import org.uniprot.api.uniparc.request.UniParcBestGuessRequest;
 import org.uniprot.api.uniparc.request.UniParcDatabasesRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByAccessionRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByIdPageSearchRequest;
 import org.uniprot.api.uniparc.request.UniParcGetByIdRequest;
-import org.uniprot.api.uniparc.request.UniParcGetByUniParcIdRequest;
 import org.uniprot.api.uniparc.request.UniParcSequenceRequest;
 import org.uniprot.api.uniparc.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.service.filter.UniParcCrossReferenceTaxonomyFilter;
@@ -91,21 +89,21 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.uniParcRDFStreamer = uniParcRDFStreamer;
     }
 
-    public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {
+    public UniParcEntry getByUniParcId(UniParcGetByIdRequest getByIdRequest, String upi) {
 
-        UniParcEntry uniParcEntry = getEntity(UNIPARC_ID_FIELD, getByUniParcIdRequest.getUpi());
+        UniParcEntry uniParcEntry = getEntity(UNIPARC_ID_FIELD, upi);
 
-        return filterUniParcStream(Stream.of(uniParcEntry), getByUniParcIdRequest)
+        return filterUniParcStream(Stream.of(uniParcEntry), getByIdRequest)
                 .findFirst()
                 .orElse(null);
     }
 
-    public UniParcEntry getByUniProtAccession(UniParcGetByAccessionRequest getByAccessionRequest) {
+    public UniParcEntry getByUniProtAccession(
+            UniParcGetByIdRequest getByIdRequest, String accession) {
 
-        UniParcEntry uniParcEntry =
-                getEntity(ACCESSION_FIELD, getByAccessionRequest.getAccession());
+        UniParcEntry uniParcEntry = getEntity(ACCESSION_FIELD, accession);
 
-        return filterUniParcStream(Stream.of(uniParcEntry), getByAccessionRequest)
+        return filterUniParcStream(Stream.of(uniParcEntry), getByIdRequest)
                 .findFirst()
                 .orElse(null);
     }
