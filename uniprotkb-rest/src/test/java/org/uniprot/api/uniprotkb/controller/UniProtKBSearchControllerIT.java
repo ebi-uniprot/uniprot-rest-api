@@ -82,6 +82,7 @@ import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.UniProtKBId;
 import org.uniprot.core.uniprotkb.comment.CommentType;
 import org.uniprot.core.uniprotkb.description.impl.NameBuilder;
 import org.uniprot.core.uniprotkb.description.impl.ProteinDescriptionBuilder;
@@ -1279,6 +1280,63 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+    }
+
+    @Test
+    void searchByIdShouldNotIncludeIsoform() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        UniProtKBId entryId = entry.getUniProtkbId();
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        // set the same uniprot id as canonical
+        UniProtKBEntryBuilder eb = UniProtKBEntryBuilder.from(entry);
+        eb.uniProtId(entryId);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, eb.build());
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=id:FGFR2_HUMAN&fields=accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802")))
+                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-2")));
+    }
+
+    @Test
+    void searchByIdAndIncludeIsoform() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        UniProtKBId entryId = entry.getUniProtkbId();
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        // set the same uniprot id as canonical
+        UniProtKBEntryBuilder eb = UniProtKBEntryBuilder.from(entry);
+        eb.uniProtId(entryId);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, eb.build());
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE
+                                                + "?query=id:FGFR2_HUMAN AND is_isoform:true&fields=accession")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
     }
 
     @Override

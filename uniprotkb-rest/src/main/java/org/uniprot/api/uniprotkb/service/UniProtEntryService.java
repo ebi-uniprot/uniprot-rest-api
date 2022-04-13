@@ -208,20 +208,17 @@ public class UniProtEntryService
     /**
      * This method verify if we need to add isoform filter query to remove isoform entries
      *
-     * <p>if does not have id fields (we can not filter isoforms when querying for IDS) AND has
-     * includeIsoform params in the request URL Then we analyze the includeIsoform request
-     * parameter. IMPORTANT: Implementing this way, query search has precedence over isoform request
-     * parameter
+     * <p>if the query does not have accession_id field (we should not filter isoforms when querying
+     * for accession_id) AND has includeIsoform params in the request URL Then we analyze the
+     * includeIsoform request parameter. IMPORTANT: Implementing this way, query search has
+     * precedence over isoform request parameter
      *
      * @return true if we need to add isoform filter query
      */
     private boolean needsToFilterIsoform(String query, boolean isIncludeIsoform) {
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(
-                        query,
-                        getQueryFieldName(ACCESSION),
-                        getQueryFieldName("id"),
-                        getQueryFieldName("is_isoform"));
+                        query, getQueryFieldName(ACCESSION), getQueryFieldName("is_isoform"));
 
         if (!hasIdFieldTerms) {
             return !isIncludeIsoform;
