@@ -1,6 +1,5 @@
 package org.uniprot.api.idmapping.service.config;
 
-import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
@@ -15,6 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
@@ -41,7 +41,7 @@ public class UniProtKBRDFStreamerConfig {
         int maxRdfRetryDelay = rdfRetryDelay * 8;
         RetryPolicy<Object> rdfRetryPolicy =
                 new RetryPolicy<>()
-                        .handle(IOException.class)
+                        .handle(ResourceAccessException.class)
                         .withBackoff(rdfRetryDelay, maxRdfRetryDelay, ChronoUnit.MILLIS)
                         .withMaxRetries(uniProtKBRDFConfigProperties.getMaxRetries())
                         .onRetry(

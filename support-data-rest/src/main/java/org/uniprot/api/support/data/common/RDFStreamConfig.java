@@ -1,11 +1,11 @@
 package org.uniprot.api.support.data.common;
 
-import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
+import org.springframework.web.client.ResourceAccessException;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 
 /**
@@ -20,7 +20,7 @@ public class RDFStreamConfig {
         int rdfRetryDelay = rdfConfigProps.getRetryDelayMillis();
         int maxRdfRetryDelay = rdfRetryDelay * 8;
         return new RetryPolicy<>()
-                .handle(IOException.class)
+                .handle(ResourceAccessException.class)
                 .withBackoff(rdfRetryDelay, maxRdfRetryDelay, ChronoUnit.MILLIS)
                 .withMaxRetries(rdfConfigProps.getMaxRetries())
                 .onRetry(
