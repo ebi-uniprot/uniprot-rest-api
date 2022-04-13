@@ -113,7 +113,7 @@ public class ResponseExceptionHandler {
 
     @ExceptionHandler({StopStreamException.class})
     public void handleStopStreamException(Throwable e) {
-        logger.warn("Stopping stream", e);
+        logger.error("Stopping stream", e);
     }
 
     /**
