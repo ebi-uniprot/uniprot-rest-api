@@ -101,11 +101,12 @@ public class MessageConverterConfig {
                                 uniParcCrossRefReturnField,
                                 new UniParcEntryCrossRefValueMapper(),
                                 downloadGatekeeper));
-                converters.add(new XlsMessageConverter<>(
-                        UniParcCrossReference.class,
-                        uniParcCrossRefReturnField,
-                        new UniParcEntryCrossRefValueMapper(),
-                        downloadGatekeeper));
+                converters.add(
+                        new XlsMessageConverter<>(
+                                UniParcCrossReference.class,
+                                uniParcCrossRefReturnField,
+                                new UniParcEntryCrossRefValueMapper(),
+                                downloadGatekeeper));
             }
         };
     }
