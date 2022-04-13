@@ -372,7 +372,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             IdsSearchRequest accessionsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        QueryResult<UniProtKBEntry> result = entryService.getByIds(accessionsRequest);
+        QueryResult<UniProtKBEntry> result = entryService.getBy]Ids(accessionsRequest);
         return super.getSearchResponse(
                 result,
                 accessionsRequest.getFields(),
