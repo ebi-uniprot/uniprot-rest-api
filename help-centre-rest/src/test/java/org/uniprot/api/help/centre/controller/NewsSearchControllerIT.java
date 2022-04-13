@@ -52,9 +52,11 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.help.HelpDocument;
 
 /**
- * @author lgonzales
- * @since 09/07/2021
- */
+ *
+ * @author jluo
+ * @date: 13 Apr 2022
+ *
+*/
 @ContextConfiguration(
         classes = {
             HelpCentreStoreTestConfig.class,
@@ -66,10 +68,10 @@ import org.uniprot.store.search.document.help.HelpDocument;
 @ExtendWith(
         value = {
             SpringExtension.class,
-            HelpCentreSearchControllerIT.HelpCentreSearchContentTypeParamResolver.class,
-            HelpCentreSearchControllerIT.HelpCentreSearchParameterResolver.class
+            NewsSearchControllerIT.NewsSearchContentTypeParamResolver.class,
+            NewsSearchControllerIT.NewsSearchParameterResolver.class
         })
-class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private HelpCentreQueryRepository repository;
     @Autowired private HelpCentreFacetConfig facetConfig;
@@ -92,7 +94,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected String getSearchRequestPath() {
-        return "/help/search";
+        return "/news/search";
     }
 
     @Override
@@ -157,8 +159,8 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Test
     void searchReturnsTitleFirst() throws Exception {
-        saveEntry("1", "something else", "title is lovely", "category", "help");
-        saveEntry("2", "title is lovely", "content", "category", "help");
+        saveEntry("1", "something else", "title is lovely", "category", "news");
+        saveEntry("2", "title is lovely", "content", "category", "news");
 
         // when
         ResultActions response =
@@ -177,8 +179,8 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Test
     void canFindPartialMatchInTitle() throws Exception {
-        saveEntry("1", "something else", "content contains a word in title", "category", "help");
-        saveEntry("2", "title is lovely", "content", "category", "help");
+        saveEntry("1", "something else", "content contains a word in title", "category", "news");
+        saveEntry("2", "title is lovely", "content", "category", "news");
 
         // when
         ResultActions response =
@@ -197,8 +199,8 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Test
     void canFindPartialMatchesInContent() throws Exception {
-        saveEntry("1", "something else", "content has a word in title", "category", "help");
-        saveEntry("2", "title is lovely", "content", "category",  "help");
+        saveEntry("1", "something else", "content has a word in title", "category", "news");
+        saveEntry("2", "title is lovely", "content", "category",  "news");
 
         // when
         ResultActions response =
@@ -214,92 +216,12 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results.*.id", contains("2", "1")));
     }
-    @Disabled
-    @Test
-    void suggestionGivenForSingleWordQuery() throws Exception {
-        saveEntry("id1", "title", "content 1",  "help");
-        saveEntry("id2", "ball", "content 2", "help");
-        saveEntry("id3", "ball", "content 3",  "help");
-        saveEntry("id4", "bill", "content 4",  "help");
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getSearchRequestPath())
-                                .param("query", "bell")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].query", is("ball")))
-                .andExpect(jsonPath("$.suggestions[0].hits", is(2)))
-                .andExpect(jsonPath("$.suggestions[1].query", is("bill")))
-                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
-    }
-    @Disabled
-    @Test
-    void singleSuggestionGivenForMultiWordQuery() throws Exception {
-        saveEntry("id1", "title", "content 1", "category","help");
-        saveEntry("id2", "protein ball", "content 2", "category", "help");
-        saveEntry("id3", "protein ball", "content 3", "category", "help");
-        saveEntry("id4", "protein bill", "content 4", "category", "help");
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getSearchRequestPath())
-                                .param("query", "\"protein bell\"")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein ball\"")))
-                .andExpect(jsonPath("$.suggestions[0].hits", is(2)))
-                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein bill\"")))
-                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
-    }
-    @Disabled
-    @Test
-    void multipleSuggestionsGivenForMultiWordQuery() throws Exception {
-        saveEntry("id0", "another fluffy protein bill", "content 0", "category", "help");
-        saveEntry("id00", "another one fluffy protein bill", "content 00", "category", "help");
-        saveEntry("id1", "title", "content 1", "category", "help");
-        saveEntry("id2", "goat cabbage protein ball", "content 2", "category", "help");
-        saveEntry("id3", "rigorous protein ball", "content 3", "category", "help");
-        saveEntry("id4", "pink fluffy protein bill", "content 4", "category", "help");
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getSearchRequestPath())
-                                .param("query", "protin bell")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].query", is("protein bill")))
-                .andExpect(jsonPath("$.suggestions[0].hits", is(3)))
-                .andExpect(jsonPath("$.suggestions[1].query", is("protein ball")))
-                .andExpect(jsonPath("$.suggestions[1].hits", is(2)));
-    }
-
+   
     @Test
     void suggestionNotGivenIfNotRequired() throws Exception {
-        saveEntry("1", "title", "content", "category", "help");
-        saveEntry("2", "ball", "content", "category", "help");
-        saveEntry("3", "bell", "content", "category", "help");
+        saveEntry("1", "title", "content", "category", "news");
+        saveEntry("2", "ball", "content", "category", "news");
+        saveEntry("3", "bell", "content", "category", "news");
 
         // when
         ResultActions response =
@@ -316,41 +238,13 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.id", contains("3")))
                 .andExpect(jsonPath("$.suggestions").doesNotExist());
     }
-    @Disabled
-    @Test
-    void multipleSuggestionsGivenForPhraseQuery() throws Exception {
-        saveEntry("id0", "another fluffy protein bill", "content 0", "category", "help");
-        saveEntry("id00", "another one fluffy protein bill", "content 00", "category", "help");
-        saveEntry("id1", "title", "content 1", "category", "help");
-        saveEntry("id2", "goat cabbage protein ball", "content 2", "category", "help");
-        saveEntry("id3", "rigorous protein ball", "content 3", "category", "help");
-        saveEntry("id4", "pink fluffy protein bill", "content 4", "category", "help");
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(getSearchRequestPath())
-                                .param("query", "\"protin bell\"")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.suggestions.size()", is(2)))
-                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein bill\"")))
-                .andExpect(jsonPath("$.suggestions[0].hits", is(3)))
-                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein ball\"")))
-                .andExpect(jsonPath("$.suggestions[1].hits", is(2)));
-    }
-
+  
     @Test
     void canFindPartialWorldExactResultFirst() throws Exception {
-        saveEntry("id0", "another fluffy protein", "content 0", "category", "help");
-        saveEntry("id00", "another one fluffy protein", "content 00", "category", "help");
-        saveEntry("id1", "goat cabbage protein ball", "content 1", "category", "help");
-        saveEntry("id2", "goat cabbage protein with ball", "content 2", "category", "help");
+        saveEntry("id0", "another fluffy protein", "content 0", "category", "news");
+        saveEntry("id00", "another one fluffy protein", "content 00", "category", "news");
+        saveEntry("id1", "goat cabbage protein ball", "content 1", "category", "news");
+        saveEntry("id2", "goat cabbage protein with ball", "content 2", "category", "news");
 
         // when
         ResultActions response =
@@ -372,7 +266,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         return new ArrayList<>(facetConfig.getFacetNames());
     }
 
-    static class HelpCentreSearchParameterResolver extends AbstractSearchParameterResolver {
+    static class NewsSearchParameterResolver extends AbstractSearchParameterResolver {
 
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
@@ -473,7 +367,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         }
     }
 
-    static class HelpCentreSearchContentTypeParamResolver
+    static class NewsSearchContentTypeParamResolver
             extends AbstractSearchContentTypeParamResolver {
 
         @Override
@@ -520,7 +414,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                         .content("content-value-clean " + i)
                         .contentOriginal("content-value-original " + i)
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
-                        .categories(List.of("category-value", "category-value-" + i, "help"))
+                        .categories(List.of("category-value", "category-value-" + i, "news"))
                         .build();
         getStoreManager().saveDocs(getStoreType(), doc);
     }
@@ -539,3 +433,4 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         getStoreManager().saveDocs(getStoreType(), doc);
     }
 }
+

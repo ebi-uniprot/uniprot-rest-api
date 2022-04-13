@@ -37,29 +37,32 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- *
  * @author jluo
  * @date: 13 Apr 2022
- *
  */
-
 @Tag(name = "news", description = "UniProt Help centre API")
 @RestController
 @Validated
 @RequestMapping("/news")
 public class NewsController extends BasicSearchController<HelpCentreEntry> {
-	// private static final String NEW_ID_REGEX = "(?!^[0-9]+$)^.+$";
-	private final HelpCentreService service;
-	
-    private static final String QUERY_FILTER="category:news";
+    // private static final String NEW_ID_REGEX = "(?!^[0-9]+$)^.+$";
+    private final HelpCentreService service;
 
-	protected NewsController(ApplicationEventPublisher eventPublisher,
-			MessageConverterContextFactory<HelpCentreEntry> converterContextFactory, HelpCentreService service) {
-		super(eventPublisher, converterContextFactory, null, MessageConverterContextFactory.Resource.HELP);
-		this.service = service;
-	}
+    private static final String QUERY_FILTER = "category:news";
 
-	@Operation(
+    protected NewsController(
+            ApplicationEventPublisher eventPublisher,
+            MessageConverterContextFactory<HelpCentreEntry> converterContextFactory,
+            HelpCentreService service) {
+        super(
+                eventPublisher,
+                converterContextFactory,
+                null,
+                MessageConverterContextFactory.Resource.HELP);
+        this.service = service;
+    }
+
+    @Operation(
             summary = "Get Help Centre Page by Id.",
             responses = {
                 @ApiResponse(
@@ -75,10 +78,10 @@ public class NewsController extends BasicSearchController<HelpCentreEntry> {
             produces = {APPLICATION_JSON_VALUE, MARKDOWN_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<HelpCentreEntry>> getByHelpCentrePageId(
             @Parameter(description = "New page id to find")
-//                    @Pattern(
-//                            regexp = NEW_ID_REGEX,
-//                            flags = {Pattern.Flag.CASE_INSENSITIVE},
-//                            message = "{search.helpcentre.invalid.id}")
+                    //                    @Pattern(
+                    //                            regexp = NEW_ID_REGEX,
+                    //                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                    //                            message = "{search.helpcentre.invalid.id}")
                     @PathVariable("id")
                     String id,
             @Parameter(description = "Comma separated list of fields to be returned in response")
@@ -90,45 +93,44 @@ public class NewsController extends BasicSearchController<HelpCentreEntry> {
         HelpCentreEntry entry = service.findByUniqueId(id);
         return super.getEntityResponse(entry, fields, request);
     }
-	
-	 @Operation(
-	            summary = "Search News pages by given Lucene search query.",
-	            responses = {
-	                @ApiResponse(
-	                        content = {
-	                            @Content(
-	                                    mediaType = APPLICATION_JSON_VALUE,
-	                                    array =
-	                                            @ArraySchema(
-	                                                    schema =
-	                                                            @Schema(
-	                                                                    implementation =
-	                                                                            HelpCentreEntry.class)))
-	                        })
-	            })
-	    @GetMapping(
-	            value = "/search",
-	            produces = {APPLICATION_JSON_VALUE})
-	    public ResponseEntity<MessageConverterContext<HelpCentreEntry>> search(
-	            @Valid @ModelAttribute HelpCentreSearchRequest searchRequest,
-	            HttpServletRequest request,
-	            HttpServletResponse response) {
-	    	String query = searchRequest.getQuery();
-	    	String filerQuery ="(" +query +") AND " +  QUERY_FILTER;
-	    	searchRequest.setQuery(filerQuery);
-	        QueryResult<HelpCentreEntry> results = service.search(searchRequest);
-	        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
-	    }
 
-	
-	@Override
-	protected String getEntityId(HelpCentreEntry entity) {
-		return entity.getId();
-	}
+    @Operation(
+            summary = "Search News pages by given Lucene search query.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    array =
+                                            @ArraySchema(
+                                                    schema =
+                                                            @Schema(
+                                                                    implementation =
+                                                                            HelpCentreEntry.class)))
+                        })
+            })
+    @GetMapping(
+            value = "/search",
+            produces = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<MessageConverterContext<HelpCentreEntry>> search(
+            @Valid @ModelAttribute HelpCentreSearchRequest searchRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        String query = searchRequest.getQuery();
+        String filerQuery = "(" + query + ") AND " + QUERY_FILTER;
+        searchRequest.setQuery(filerQuery);
+        QueryResult<HelpCentreEntry> results = service.search(searchRequest);
+        return super.getSearchResponse(results, searchRequest.getFields(), request, response);
+    }
 
-	@Override
-	protected Optional<String> getEntityRedirectId(HelpCentreEntry entity, HttpServletRequest request) {
-		return Optional.empty();
-	}
+    @Override
+    protected String getEntityId(HelpCentreEntry entity) {
+        return entity.getId();
+    }
 
+    @Override
+    protected Optional<String> getEntityRedirectId(
+            HelpCentreEntry entity, HttpServletRequest request) {
+        return Optional.empty();
+    }
 }
