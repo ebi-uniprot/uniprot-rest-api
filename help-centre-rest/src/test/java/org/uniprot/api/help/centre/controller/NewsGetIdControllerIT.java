@@ -60,6 +60,7 @@ class NewsGetIdControllerIT extends AbstractGetByIdControllerIT {
     public static final String CONTENT_CLEAN = "clean content";
     public static final String CONTENT_ORIGINAL = "original content";
     public static final String CATEGORY = "news";
+    public static final String TYPE = "releaseNote";
 
     @Autowired private HelpCentreQueryRepository repository;
 
@@ -98,13 +99,11 @@ class NewsGetIdControllerIT extends AbstractGetByIdControllerIT {
     }
 
     @Disabled
-    void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {
-    	
-    }
+    void invalidIdReturnBadRequest(GetIdParameter idParameter) throws Exception {}
+
     @Disabled
-    void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
-    	
-    }
+    void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {}
+
     static class NewsGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override

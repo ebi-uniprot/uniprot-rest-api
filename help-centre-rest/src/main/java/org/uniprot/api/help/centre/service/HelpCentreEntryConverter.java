@@ -21,6 +21,7 @@ public class HelpCentreEntryConverter implements Function<HelpDocument, HelpCent
                 HelpCentreEntry.builder()
                         .id(helpDocument.getId())
                         .title(helpDocument.getTitle())
+                        .type(helpDocument.getType())
                         .lastModified(
                                 helpDocument
                                         .getLastModified()
@@ -35,6 +36,15 @@ public class HelpCentreEntryConverter implements Function<HelpDocument, HelpCent
 
         if (Utils.notNullNotEmpty(helpDocument.getMatches())) {
             builder.matches(helpDocument.getMatches());
+        }
+
+        if (Utils.notNull(helpDocument.getReleaseDate())) {
+            builder.releaseDate(
+            		helpDocument
+                    .getReleaseDate()
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate());
         }
 
         return builder.build();

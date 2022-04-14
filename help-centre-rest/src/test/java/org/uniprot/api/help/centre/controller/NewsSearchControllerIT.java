@@ -21,7 +21,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +51,9 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.help.HelpDocument;
 
 /**
- *
  * @author jluo
  * @date: 13 Apr 2022
- *
-*/
+ */
 @ContextConfiguration(
         classes = {
             HelpCentreStoreTestConfig.class,
@@ -200,7 +197,7 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
     @Test
     void canFindPartialMatchesInContent() throws Exception {
         saveEntry("1", "something else", "content has a word in title", "category", "news");
-        saveEntry("2", "title is lovely", "content", "category",  "news");
+        saveEntry("2", "title is lovely", "content", "category", "news");
 
         // when
         ResultActions response =
@@ -216,7 +213,7 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results.*.id", contains("2", "1")));
     }
-   
+
     @Test
     void suggestionNotGivenIfNotRequired() throws Exception {
         saveEntry("1", "title", "content", "category", "news");
@@ -238,7 +235,7 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(jsonPath("$.results.*.id", contains("3")))
                 .andExpect(jsonPath("$.suggestions").doesNotExist());
     }
-  
+
     @Test
     void canFindPartialWorldExactResultFirst() throws Exception {
         saveEntry("id0", "another fluffy protein", "content 0", "category", "news");
@@ -367,8 +364,7 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         }
     }
 
-    static class NewsSearchContentTypeParamResolver
-            extends AbstractSearchContentTypeParamResolver {
+    static class NewsSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
@@ -411,9 +407,11 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 HelpDocument.builder()
                         .id("id-value-" + i)
                         .title("title-value-" + i)
+                        .type("releaseNote")
                         .content("content-value-clean " + i)
                         .contentOriginal("content-value-original " + i)
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
+                        .releaseDate(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
                         .categories(List.of("category-value", "category-value-" + i, "news"))
                         .build();
         getStoreManager().saveDocs(getStoreType(), doc);
@@ -433,4 +431,3 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         getStoreManager().saveDocs(getStoreType(), doc);
     }
 }
-

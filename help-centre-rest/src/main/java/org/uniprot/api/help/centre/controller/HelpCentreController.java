@@ -44,7 +44,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
 
     private static final String HELP_CENTRE_ID_REGEX = "(?!^[0-9]+$)^.+$";
     private final HelpCentreService service;
-    private static final String QUERY_FILTER = "category:help";
+    private static final String QUERY_FILTER = "type:help";
 
     protected HelpCentreController(
             ApplicationEventPublisher eventPublisher,

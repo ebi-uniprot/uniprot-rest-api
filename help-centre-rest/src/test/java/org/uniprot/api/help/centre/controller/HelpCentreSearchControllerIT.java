@@ -198,7 +198,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void canFindPartialMatchesInContent() throws Exception {
         saveEntry("1", "something else", "content has a word in title", "category", "help");
-        saveEntry("2", "title is lovely", "content", "category",  "help");
+        saveEntry("2", "title is lovely", "content", "category", "help");
 
         // when
         ResultActions response =
@@ -214,13 +214,14 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(2)))
                 .andExpect(jsonPath("$.results.*.id", contains("2", "1")));
     }
+
     @Disabled
     @Test
     void suggestionGivenForSingleWordQuery() throws Exception {
-        saveEntry("id1", "title", "content 1",  "help");
+        saveEntry("id1", "title", "content 1", "help");
         saveEntry("id2", "ball", "content 2", "help");
-        saveEntry("id3", "ball", "content 3",  "help");
-        saveEntry("id4", "bill", "content 4",  "help");
+        saveEntry("id3", "ball", "content 3", "help");
+        saveEntry("id4", "bill", "content 4", "help");
 
         // when
         ResultActions response =
@@ -240,10 +241,11 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.suggestions[1].query", is("bill")))
                 .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
+
     @Disabled
     @Test
     void singleSuggestionGivenForMultiWordQuery() throws Exception {
-        saveEntry("id1", "title", "content 1", "category","help");
+        saveEntry("id1", "title", "content 1", "category", "help");
         saveEntry("id2", "protein ball", "content 2", "category", "help");
         saveEntry("id3", "protein ball", "content 3", "category", "help");
         saveEntry("id4", "protein bill", "content 4", "category", "help");
@@ -266,6 +268,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.suggestions[1].query", is("\"protein bill\"")))
                 .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
+
     @Disabled
     @Test
     void multipleSuggestionsGivenForMultiWordQuery() throws Exception {
@@ -316,6 +319,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.id", contains("3")))
                 .andExpect(jsonPath("$.suggestions").doesNotExist());
     }
+
     @Disabled
     @Test
     void multipleSuggestionsGivenForPhraseQuery() throws Exception {
@@ -382,6 +386,8 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .resultMatcher(jsonPath("$.results[0].id", is("id-value-10")))
                     .resultMatcher(jsonPath("$.results[0].title", is("title-value-10")))
                     .resultMatcher(jsonPath("$.results[0].lastModified", is("2021-07-10")))
+                    .resultMatcher(jsonPath("$.results[0].type", is("help")))
+                    .resultMatcher(jsonPath("$.results[0].releaseDate", is("2021-07-10")))
                     .resultMatcher(jsonPath("$.results[0].content").doesNotExist())
                     .build();
         }
@@ -516,11 +522,13 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         HelpDocument doc =
                 HelpDocument.builder()
                         .id("id-value-" + i)
+                        .type("help")
                         .title("title-value-" + i)
                         .content("content-value-clean " + i)
                         .contentOriginal("content-value-original " + i)
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
                         .categories(List.of("category-value", "category-value-" + i, "help"))
+                        .releaseDate(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
                         .build();
         getStoreManager().saveDocs(getStoreType(), doc);
     }
@@ -530,6 +538,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 HelpDocument.builder()
                         .id(id)
                         .title(title)
+                        .type("help")
                         .content(content)
                         .contentOriginal(content + "-original")
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, 1).getTime())
