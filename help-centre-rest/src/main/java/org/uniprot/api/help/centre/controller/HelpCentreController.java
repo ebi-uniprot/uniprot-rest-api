@@ -44,7 +44,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
 
     private static final String HELP_CENTRE_ID_REGEX = "(?!^[0-9]+$)^.+$";
     private final HelpCentreService service;
-    private static final String QUERY_FILTER = "type:help";
+    public static final String HELP_STR = "help";
 
     protected HelpCentreController(
             ApplicationEventPublisher eventPublisher,
@@ -112,9 +112,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
             @Valid @ModelAttribute HelpCentreSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        String query = searchRequest.getQuery();
-        String filerQuery = "(" + query + ") AND " + QUERY_FILTER;
-        searchRequest.setQuery(filerQuery);
+        searchRequest.setType(HELP_STR);
         QueryResult<HelpCentreEntry> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }

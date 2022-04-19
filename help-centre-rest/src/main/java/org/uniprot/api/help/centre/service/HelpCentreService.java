@@ -1,12 +1,16 @@
 package org.uniprot.api.help.centre.service;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
+import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
 import org.uniprot.api.help.centre.request.HelpCentreSearchRequest;
@@ -46,6 +50,9 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
             SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
                     .getSearchFieldItemByName("category")
                     .getFieldName();
+    private static final String TYPE_FIELD = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
+            .getSearchFieldItemByName("type")
+            .getFieldName();
     private final SearchFieldConfig searchFieldConfig;
     private final UniProtQueryProcessorConfig helpCentreQueryProcessorConfig;
 
@@ -66,14 +73,24 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
     public QueryResult<HelpCentreEntry> search(SearchRequest request) {
         HelpCentreSearchRequest searchRequest = (HelpCentreSearchRequest) request;
         String query = searchRequest.getQuery();
-        if (simpleSearch(query)) {
+        if (isDefaultSearch(query)) {
             // default simple search (query OR "query") will boost exact search
-            searchRequest.setQuery(query + " OR \"" + query + "\"");
+            searchRequest.setQuery("(" + query + " OR \"" + query + "\"" + ")");
         }
+        // add type filter
+        searchRequest.setQuery(searchRequest.getQuery() + " AND " + getTypeFilter(searchRequest.getType()));
+
         QueryResult<HelpCentreEntry> result = super.search(searchRequest);
-        if (simpleSearch(query) && Utils.notNullNotEmpty(result.getSuggestions())) {
-            searchRequest.setQuery(query);
-            QueryResult<HelpCentreEntry> suggester = super.search(request);
+
+        if (Utils.notNullNotEmpty(result.getSuggestions())) {
+            Collection<Suggestion> suggestions = result.getSuggestions();
+            if(isDefaultSearch(query)){
+                searchRequest.setQuery("(" + query + ") AND " + getTypeFilter(searchRequest.getType()));
+                QueryResult<HelpCentreEntry> suggester = super.search(request);
+                suggestions = suggester.getSuggestions();
+            }
+            List<Suggestion> suggestionsWithoutDefaultFilters =
+                    removeDefaultFiltersFromSuggestedQuery(suggestions, searchRequest.getType());
             result =
                     QueryResult.of(
                             result.getContent(),
@@ -81,9 +98,29 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
                             result.getFacets(),
                             null,
                             null,
-                            suggester.getSuggestions());
+                            suggestionsWithoutDefaultFilters);
         }
         return result;
+    }
+
+    private String getTypeFilter(String type){
+        return TYPE_FIELD + ":" + type;
+    }
+
+    private List<Suggestion> removeDefaultFiltersFromSuggestedQuery(
+            Collection<Suggestion> suggestions, String type) {
+        return suggestions.stream()
+                .map(suggestion -> removeDefaultFilter(suggestion, type))
+                .collect(Collectors.toList());
+    }
+
+    private Suggestion removeDefaultFilter(Suggestion suggestion, String type) {
+        String query = suggestion.getQuery();
+        query = query.replace("( ", "");
+        query = query.replace(" )", "");
+        query = query.replace(" " + TYPE_FIELD + ":" + type, "");
+        suggestion.setQuery(query);
+        return suggestion;
     }
 
     @Override
@@ -96,7 +133,7 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
         return helpCentreQueryProcessorConfig;
     }
 
-    private boolean simpleSearch(String query) {
+    private boolean isDefaultSearch(String query) {
         return !query.contains("\"")
                 && !SolrQueryUtil.hasFieldTerms(query, HELP_CENTRE_TITLE_FIELD)
                 && !SolrQueryUtil.hasFieldTerms(query, HELP_CENTRE_CATEGORY_FIELD)

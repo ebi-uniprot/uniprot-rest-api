@@ -222,6 +222,7 @@ public abstract class AbstractGetByIdControllerIT {
             }
         }
     }
+
     @Test
     void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {
         checkIdContentTypeParameterInput(contentTypeParam);

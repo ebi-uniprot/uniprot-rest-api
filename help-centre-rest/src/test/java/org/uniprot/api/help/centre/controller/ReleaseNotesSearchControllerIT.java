@@ -1,26 +1,5 @@
 package org.uniprot.api.help.centre.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.stream.IntStream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +29,27 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.help.HelpDocument;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 /**
  * @author jluo
  * @date: 13 Apr 2022
@@ -61,14 +61,14 @@ import org.uniprot.store.search.document.help.HelpDocument;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(HelpCentreController.class)
+@WebMvcTest(ReleaseNotesController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
-            NewsSearchControllerIT.NewsSearchContentTypeParamResolver.class,
-            NewsSearchControllerIT.NewsSearchParameterResolver.class
+            ReleaseNotesSearchControllerIT.ReleaseNotesSearchContentTypeParamResolver.class,
+            ReleaseNotesSearchControllerIT.ReleaseNotesSearchParameterResolver.class
         })
-public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT {
+public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Autowired private HelpCentreQueryRepository repository;
     @Autowired private HelpCentreFacetConfig facetConfig;
@@ -91,7 +91,7 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Override
     protected String getSearchRequestPath() {
-        return "/news/search";
+        return "/release-notes/search";
     }
 
     @Override
@@ -106,7 +106,11 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
-        return "";
+        String value = "*";
+        if("release_date".equals(searchField)){
+            value = "[* TO *]";
+        }
+        return value;
     }
 
     @Override
@@ -156,8 +160,8 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Test
     void searchReturnsTitleFirst() throws Exception {
-        saveEntry("1", "something else", "title is lovely", "category", "news");
-        saveEntry("2", "title is lovely", "content", "category", "news");
+        saveEntry("1", "something else", "title is lovely", "category", "releaseNotes");
+        saveEntry("2", "title is lovely", "content", "category", "releaseNotes");
 
         // when
         ResultActions response =
@@ -176,8 +180,8 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Test
     void canFindPartialMatchInTitle() throws Exception {
-        saveEntry("1", "something else", "content contains a word in title", "category", "news");
-        saveEntry("2", "title is lovely", "content", "category", "news");
+        saveEntry("1", "something else", "content contains a word in title", "category", "releaseNotes");
+        saveEntry("2", "title is lovely", "content", "category", "releaseNotes");
 
         // when
         ResultActions response =
@@ -196,8 +200,8 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Test
     void canFindPartialMatchesInContent() throws Exception {
-        saveEntry("1", "something else", "content has a word in title", "category", "news");
-        saveEntry("2", "title is lovely", "content", "category", "news");
+        saveEntry("1", "something else", "content has a word in title", "category", "releaseNotes");
+        saveEntry("2", "title is lovely", "content", "category", "releaseNotes");
 
         // when
         ResultActions response =
@@ -216,9 +220,9 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Test
     void suggestionNotGivenIfNotRequired() throws Exception {
-        saveEntry("1", "title", "content", "category", "news");
-        saveEntry("2", "ball", "content", "category", "news");
-        saveEntry("3", "bell", "content", "category", "news");
+        saveEntry("1", "title", "content", "category", "releaseNotes");
+        saveEntry("2", "ball", "content", "category", "releaseNotes");
+        saveEntry("3", "bell", "content", "category", "releaseNotes");
 
         // when
         ResultActions response =
@@ -238,10 +242,10 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
 
     @Test
     void canFindPartialWorldExactResultFirst() throws Exception {
-        saveEntry("id0", "another fluffy protein", "content 0", "category", "news");
-        saveEntry("id00", "another one fluffy protein", "content 00", "category", "news");
-        saveEntry("id1", "goat cabbage protein ball", "content 1", "category", "news");
-        saveEntry("id2", "goat cabbage protein with ball", "content 2", "category", "news");
+        saveEntry("id0", "another fluffy protein", "content 0", "category", "releaseNotes");
+        saveEntry("id00", "another one fluffy protein", "content 00", "category", "releaseNotes");
+        saveEntry("id1", "goat cabbage protein ball", "content 1", "category", "releaseNotes");
+        saveEntry("id2", "goat cabbage protein with ball", "content 2", "category", "releaseNotes");
 
         // when
         ResultActions response =
@@ -258,12 +262,39 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 .andExpect(jsonPath("$.results.*.id", contains("id1", "id2")));
     }
 
+    @Test
+    void singleSuggestionGivenForMultiWordQuery() throws Exception {
+        saveEntry("id1", "title", "content 1", "category", "releaseNotes");
+        saveEntry("id2", "protein ball", "content 2", "category", "releaseNotes");
+        saveEntry("id3", "protein ball", "content 3", "category", "releaseNotes");
+        saveEntry("id4", "protein bill", "content 4", "category", "releaseNotes");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "\"protein bell\"")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.suggestions.size()", is(2)))
+                .andExpect(jsonPath("$.suggestions[0].query", is("\"protein ball\"")))
+                .andExpect(jsonPath("$.suggestions[0].hits", is(2)))
+                .andExpect(jsonPath("$.suggestions[1].query", is("\"protein bill\"")))
+                .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
+    }
+
+
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
     }
 
-    static class NewsSearchParameterResolver extends AbstractSearchParameterResolver {
+    static class ReleaseNotesSearchParameterResolver extends AbstractSearchParameterResolver {
 
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
@@ -364,7 +395,7 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
         }
     }
 
-    static class NewsSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+    static class ReleaseNotesSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
@@ -407,12 +438,12 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 HelpDocument.builder()
                         .id("id-value-" + i)
                         .title("title-value-" + i)
-                        .type("releaseNote")
+                        .type(ReleaseNotesController.RELEASE_NOTES_STR)
                         .content("content-value-clean " + i)
                         .contentOriginal("content-value-original " + i)
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
                         .releaseDate(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
-                        .categories(List.of("category-value", "category-value-" + i, "news"))
+                        .categories(List.of("category-value", "category-value-" + i, "releaseNotes"))
                         .build();
         getStoreManager().saveDocs(getStoreType(), doc);
     }
@@ -422,6 +453,7 @@ public class NewsSearchControllerIT extends AbstractSearchWithFacetControllerIT 
                 HelpDocument.builder()
                         .id(id)
                         .title(title)
+                        .type(ReleaseNotesController.RELEASE_NOTES_STR)
                         .content(content)
                         .contentOriginal(content + "-original")
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, 1).getTime())

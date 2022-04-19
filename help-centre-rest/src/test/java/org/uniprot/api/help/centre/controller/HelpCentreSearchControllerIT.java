@@ -107,7 +107,11 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
-        return "";
+        String value = "*";
+        if("release_date".equals(searchField)){
+            value = "[* TO *]";
+        }
+        return value;
     }
 
     @Override
@@ -215,7 +219,6 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.results.*.id", contains("2", "1")));
     }
 
-    @Disabled
     @Test
     void suggestionGivenForSingleWordQuery() throws Exception {
         saveEntry("id1", "title", "content 1", "help");
@@ -242,7 +245,6 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
 
-    @Disabled
     @Test
     void singleSuggestionGivenForMultiWordQuery() throws Exception {
         saveEntry("id1", "title", "content 1", "category", "help");
@@ -269,7 +271,6 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
 
-    @Disabled
     @Test
     void multipleSuggestionsGivenForMultiWordQuery() throws Exception {
         saveEntry("id0", "another fluffy protein bill", "content 0", "category", "help");
@@ -320,7 +321,6 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(jsonPath("$.suggestions").doesNotExist());
     }
 
-    @Disabled
     @Test
     void multipleSuggestionsGivenForPhraseQuery() throws Exception {
         saveEntry("id0", "another fluffy protein bill", "content 0", "category", "help");
@@ -522,7 +522,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         HelpDocument doc =
                 HelpDocument.builder()
                         .id("id-value-" + i)
-                        .type("help")
+                        .type(HelpCentreController.HELP_STR)
                         .title("title-value-" + i)
                         .content("content-value-clean " + i)
                         .contentOriginal("content-value-original " + i)
@@ -538,7 +538,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 HelpDocument.builder()
                         .id(id)
                         .title(title)
-                        .type("help")
+                        .type(HelpCentreController.HELP_STR)
                         .content(content)
                         .contentOriginal(content + "-original")
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, 1).getTime())

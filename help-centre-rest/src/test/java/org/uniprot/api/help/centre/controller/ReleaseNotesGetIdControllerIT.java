@@ -47,20 +47,19 @@ import org.uniprot.store.search.document.help.HelpDocument;
             ErrorHandlerConfig.class
         })
 @ActiveProfiles(profiles = "offline")
-@WebMvcTest(NewsController.class)
+@WebMvcTest(ReleaseNotesController.class)
 @ExtendWith(
         value = {
             SpringExtension.class,
-            NewsGetIdControllerIT.NewsGetIdParameterResolver.class,
-            NewsGetIdControllerIT.NewsGetIdContentTypeParamResolver.class
+            ReleaseNotesGetIdControllerIT.ReleaseNotesGetIdParameterResolver.class,
+            ReleaseNotesGetIdControllerIT.ReleaseNotesGetIdContentTypeParamResolver.class
         })
-class NewsGetIdControllerIT extends AbstractGetByIdControllerIT {
-    private static final String ID = "news_id";
-    public static final String TITLE = "News Title";
+class ReleaseNotesGetIdControllerIT extends AbstractGetByIdControllerIT {
+    private static final String ID = "release_notes_id";
+    public static final String TITLE = "Release Notes Title";
     public static final String CONTENT_CLEAN = "clean content";
     public static final String CONTENT_ORIGINAL = "original content";
-    public static final String CATEGORY = "news";
-    public static final String TYPE = "releaseNote";
+    public static final String CATEGORY = "release_notes";
 
     @Autowired private HelpCentreQueryRepository repository;
 
@@ -95,7 +94,7 @@ class NewsGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Override
     protected String getIdRequestPath() {
-        return "/news/{id}";
+        return "/release-notes/{id}";
     }
 
     @Disabled
@@ -104,7 +103,7 @@ class NewsGetIdControllerIT extends AbstractGetByIdControllerIT {
     @Disabled
     void idBadRequestContentTypes(GetIdContentTypeParam contentTypeParam) throws Exception {}
 
-    static class NewsGetIdParameterResolver extends AbstractGetIdParameterResolver {
+    static class ReleaseNotesGetIdParameterResolver extends AbstractGetIdParameterResolver {
 
         @Override
         public GetIdParameter validIdParameter() {
@@ -157,7 +156,7 @@ class NewsGetIdControllerIT extends AbstractGetByIdControllerIT {
         }
     }
 
-    static class NewsGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver {
+    static class ReleaseNotesGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver {
 
         @Override
         public GetIdContentTypeParam idSuccessContentTypesParam() {

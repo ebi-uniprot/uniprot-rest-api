@@ -40,17 +40,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 13 Apr 2022
  */
-@Tag(name = "news", description = "UniProt Help centre API")
+@Tag(name = "release-notes", description = "UniProt Release Notes API")
 @RestController
 @Validated
-@RequestMapping("/news")
-public class NewsController extends BasicSearchController<HelpCentreEntry> {
-    // private static final String NEW_ID_REGEX = "(?!^[0-9]+$)^.+$";
+@RequestMapping("/release-notes")
+public class ReleaseNotesController extends BasicSearchController<HelpCentreEntry> {
     private final HelpCentreService service;
 
-    private static final String QUERY_FILTER = "(!type:help)";
+    public static final String RELEASE_NOTES_STR = "releaseNotes";
 
-    protected NewsController(
+    protected ReleaseNotesController(
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<HelpCentreEntry> converterContextFactory,
             HelpCentreService service) {
@@ -63,7 +62,7 @@ public class NewsController extends BasicSearchController<HelpCentreEntry> {
     }
 
     @Operation(
-            summary = "Get Help Centre Page by Id.",
+            summary = "Get Release Notes by Id.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -77,13 +76,7 @@ public class NewsController extends BasicSearchController<HelpCentreEntry> {
             value = "/{id}",
             produces = {APPLICATION_JSON_VALUE, MARKDOWN_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<HelpCentreEntry>> getByHelpCentrePageId(
-            @Parameter(description = "New page id to find")
-                    //                    @Pattern(
-                    //                            regexp = NEW_ID_REGEX,
-                    //                            flags = {Pattern.Flag.CASE_INSENSITIVE},
-                    //                            message = "{search.helpcentre.invalid.id}")
-                    @PathVariable("id")
-                    String id,
+            @Parameter(description = "Release Notes page id to find") @PathVariable("id") String id,
             @Parameter(description = "Comma separated list of fields to be returned in response")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.HELP)
                     @RequestParam(value = "fields", required = false)
@@ -95,7 +88,7 @@ public class NewsController extends BasicSearchController<HelpCentreEntry> {
     }
 
     @Operation(
-            summary = "Search News pages by given Lucene search query.",
+            summary = "Search Release Notes pages by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -116,9 +109,7 @@ public class NewsController extends BasicSearchController<HelpCentreEntry> {
             @Valid @ModelAttribute HelpCentreSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        String query = searchRequest.getQuery();
-        String filerQuery = "(" + query + ") AND " + QUERY_FILTER;
-        searchRequest.setQuery(filerQuery);
+        searchRequest.setType(RELEASE_NOTES_STR);
         QueryResult<HelpCentreEntry> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }

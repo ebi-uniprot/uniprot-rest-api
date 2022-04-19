@@ -40,11 +40,11 @@ public class HelpCentreEntryConverter implements Function<HelpDocument, HelpCent
 
         if (Utils.notNull(helpDocument.getReleaseDate())) {
             builder.releaseDate(
-            		helpDocument
-                    .getReleaseDate()
-                    .toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate());
+                    helpDocument
+                            .getReleaseDate()
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate());
         }
 
         return builder.build();
