@@ -23,6 +23,8 @@ public class HelpCentreEntry {
     private final String title;
 
     private final LocalDate lastModified;
+    private final LocalDate releaseDate;
+    private final String type;
 
     private final String content;
 

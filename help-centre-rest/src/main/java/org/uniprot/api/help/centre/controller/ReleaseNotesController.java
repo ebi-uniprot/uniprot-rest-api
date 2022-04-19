@@ -1,19 +1,23 @@
 package org.uniprot.api.help.centre.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.MARKDOWN_MEDIA_TYPE_VALUE;
 
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.request.HelpCentreSearchRequest;
@@ -33,20 +37,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
- * @author lgonzales
- * @since 07/07/2021
+ * @author jluo
+ * @date: 13 Apr 2022
  */
-@Tag(name = "help", description = "UniProt Help centre API")
+@Tag(name = "release-notes", description = "UniProt Release Notes API")
 @RestController
 @Validated
-@RequestMapping("/help")
-public class HelpCentreController extends BasicSearchController<HelpCentreEntry> {
-
-    private static final String HELP_CENTRE_ID_REGEX = "(?!^[0-9]+$)^.+$";
+@RequestMapping("/release-notes")
+public class ReleaseNotesController extends BasicSearchController<HelpCentreEntry> {
     private final HelpCentreService service;
-    public static final String HELP_STR = "help";
 
-    protected HelpCentreController(
+    public static final String RELEASE_NOTES_STR = "releaseNotes";
+
+    protected ReleaseNotesController(
             ApplicationEventPublisher eventPublisher,
             MessageConverterContextFactory<HelpCentreEntry> converterContextFactory,
             HelpCentreService service) {
@@ -59,7 +62,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
     }
 
     @Operation(
-            summary = "Get Help Centre Page by Id.",
+            summary = "Get Release Notes by Id.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -73,13 +76,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
             value = "/{id}",
             produces = {APPLICATION_JSON_VALUE, MARKDOWN_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<HelpCentreEntry>> getByHelpCentrePageId(
-            @Parameter(description = "Help centre page id to find")
-                    @Pattern(
-                            regexp = HELP_CENTRE_ID_REGEX,
-                            flags = {Pattern.Flag.CASE_INSENSITIVE},
-                            message = "{search.helpcentre.invalid.id}")
-                    @PathVariable("id")
-                    String id,
+            @Parameter(description = "Release Notes page id to find") @PathVariable("id") String id,
             @Parameter(description = "Comma separated list of fields to be returned in response")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.HELP)
                     @RequestParam(value = "fields", required = false)
@@ -91,7 +88,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
     }
 
     @Operation(
-            summary = "Search Help pages by given Lucene search query.",
+            summary = "Search Release Notes pages by given Lucene search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -112,7 +109,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
             @Valid @ModelAttribute HelpCentreSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        searchRequest.setType(HELP_STR);
+        searchRequest.setType(RELEASE_NOTES_STR);
         QueryResult<HelpCentreEntry> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
