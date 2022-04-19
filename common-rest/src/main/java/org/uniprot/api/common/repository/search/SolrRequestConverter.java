@@ -21,6 +21,7 @@ import org.apache.solr.common.params.ModifiableSolrParams;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.api.common.repository.search.request.BoostApplier;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -186,49 +187,52 @@ public class SolrRequestConverter {
             }
         }
 
+        // TODO: 14/04/2022 tidy this
         static void setQueryBoostConfigs(
                 ModifiableSolrParams solrQuery, String query, SolrQueryConfig boosts) {
-            Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
-            if (fieldQueryMatcher.find()) {
-                // a query involving field queries
-                if (notNullNotEmpty(boosts.getAdvancedSearchBoosts())) {
-                    boosts.getAdvancedSearchBoosts()
-                            .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
-                }
-                if (!nullOrEmpty(boosts.getAdvancedSearchBoostFunctions())) {
-                    solrQuery.add(BOOST_FUNCTIONS, boosts.getAdvancedSearchBoostFunctions());
-                }
-            } else {
-                // a default query
-                if (notNullNotEmpty(boosts.getDefaultSearchBoosts())) {
-                    // replace all occurrences of "{query}" with X, given that q=X
-                    boosts.getDefaultSearchBoosts()
-                            .forEach(boost -> addQueryBoost(solrQuery, boost, query));
-                }
-                if (!nullOrEmpty(boosts.getDefaultSearchBoostFunctions())) {
-                    solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
-                }
-            }
+            BoostApplier.addBoosts(solrQuery, query, boosts);
+
+//            Matcher fieldQueryMatcher = FIELD_QUERY_PATTERN.matcher(query);
+//            if (fieldQueryMatcher.find()) {
+//                // a query involving field queries
+//                if (notNullNotEmpty(boosts.getAdvancedSearchBoosts())) {
+//                    boosts.getAdvancedSearchBoosts()
+//                            .forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
+//                }
+//                if (!nullOrEmpty(boosts.getAdvancedSearchBoostFunctions())) {
+//                    solrQuery.add(BOOST_FUNCTIONS, boosts.getAdvancedSearchBoostFunctions());
+//                }
+//            } else {
+//                // a default query
+//                if (notNullNotEmpty(boosts.getDefaultSearchBoosts())) {
+//                    // replace all occurrences of "{query}" with X, given that q=X
+//                    boosts.getDefaultSearchBoosts()
+//                            .forEach(boost -> addQueryBoost(solrQuery, boost, query));
+//                }
+//                if (!nullOrEmpty(boosts.getDefaultSearchBoostFunctions())) {
+//                    solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
+//                }
+//            }
         }
 
-        private static void addQueryBoost(
-                ModifiableSolrParams solrQuery, String boost, String query) {
-            if (boostingOnANumericField(boost)) {
-                // only apply the boost if the value is numeric
-                if (StringUtils.isNumeric(query)) {
-                    // user query is numeric and therefore we can replace
-                    // the "{query}" placeholder with their value
-                    String processedBoost =
-                            boost.replace(BOOST_FIELD_TYPE_NUMBER, ":")
-                                    .replace(QUERY_PLACEHOLDER, "(" + query + ")");
-                    solrQuery.add(BOOST_QUERY, processedBoost);
-                }
-            } else {
-                // apply the boost as normal
-                String processedBoost = boost.replace(QUERY_PLACEHOLDER, "(" + query + ")");
-                solrQuery.add(BOOST_QUERY, processedBoost);
-            }
-        }
+//        private static void addQueryBoost(
+//                ModifiableSolrParams solrQuery, String boost, String query) {
+//            if (boostingOnANumericField(boost)) {
+//                // only apply the boost if the value is numeric
+//                if (StringUtils.isNumeric(query)) {
+//                    // user query is numeric and therefore we can replace
+//                    // the "{query}" placeholder with their value
+//                    String processedBoost =
+//                            boost.replace(BOOST_FIELD_TYPE_NUMBER, ":")
+//                                    .replace(QUERY_PLACEHOLDER, "(" + query + ")");
+//                    solrQuery.add(BOOST_QUERY, processedBoost);
+//                }
+//            } else {
+//                // apply the boost as normal
+//                String processedBoost = boost.replace(QUERY_PLACEHOLDER, "(" + query + ")");
+//                solrQuery.add(BOOST_QUERY, processedBoost);
+//            }
+//        }
 
         static void setQueryFields(ModifiableSolrParams solrQuery, SolrQueryConfig boosts) {
             if (notNullNotEmpty(boosts.getQueryFields())) {
@@ -239,9 +243,9 @@ public class SolrRequestConverter {
          * @param boostDefinition the boost definition
          * @return whether a boost definition involves a numeric field
          */
-        private static boolean boostingOnANumericField(String boostDefinition) {
-            return boostDefinition.contains(BOOST_FIELD_TYPE_NUMBER);
-        }
+//        private static boolean boostingOnANumericField(String boostDefinition) {
+//            return boostDefinition.contains(BOOST_FIELD_TYPE_NUMBER);
+//        }
 
         static void setDefaults(ModifiableSolrParams solrQuery, String defaultField) {
             if (defaultField != null) {

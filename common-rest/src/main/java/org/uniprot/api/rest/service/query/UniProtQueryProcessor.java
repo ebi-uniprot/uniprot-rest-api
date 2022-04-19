@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
+import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorPipeline;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
@@ -33,13 +34,17 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 public class UniProtQueryProcessor implements QueryProcessor {
     public static final String IMPOSSIBLE_FIELD = "NOT_REAL_FIELD";
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
-    private final UniProtQueryNodeProcessorPipeline queryProcessorPipeline;
+    private final QueryNodeProcessorPipeline queryProcessorPipeline;
 
     public static UniProtQueryProcessor newInstance(UniProtQueryProcessorConfig config) {
         return new UniProtQueryProcessor(new UniProtQueryNodeProcessorPipeline(config));
     }
 
-    public UniProtQueryProcessor(UniProtQueryNodeProcessorPipeline pipeline) {
+    public static UniProtQueryProcessor newInstance(QueryNodeProcessorPipeline pipeline) {
+        return new UniProtQueryProcessor(pipeline);
+    }
+
+    public UniProtQueryProcessor(QueryNodeProcessorPipeline pipeline) {
         queryProcessorPipeline = pipeline;
     }
 

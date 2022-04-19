@@ -21,6 +21,8 @@ import org.springframework.core.io.Resource;
  */
 @Slf4j
 public class SolrQueryConfigFileReader {
+    public static final String QUERY_PLACEHOLDER = "{query}";
+    public static final String BOOST_FIELD_TYPE_NUMBER = "=number:";
     private static final String COMMENT_PREFIX = "#";
     private static final String SPRING_CONFIG_LOCATION = "spring.config.location";
     private final SolrQueryConfig.SolrQueryConfigBuilder builder;
@@ -52,7 +54,9 @@ public class SolrQueryConfigFileReader {
     }
 
     public SolrQueryConfig getConfig() {
-        return builder.build();
+        SolrQueryConfig queryConfig = builder.build();
+        queryConfig.initialiseStaticAndFieldBoosts();
+        return queryConfig;
     }
 
     private void initialiseSolrQueryConfig() {
