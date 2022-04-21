@@ -179,6 +179,29 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
     }
 
     @Test
+    void searchReturnsNewestFirst() throws Exception {
+        saveEntry("First", 1,"same title", "same content", "category", "releaseNotes");
+        saveEntry("Fourth", 4, "same title", "same content", "category", "releaseNotes");
+        saveEntry("Third", 3,  "same title", "same content", "category", "releaseNotes");
+        saveEntry("Second", 2, "same title", "same content", "category", "releaseNotes");
+        saveEntry("Not Wanted", 2, "not the same", "same content", "category", "releaseNotes");
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "title")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(4)))
+                .andExpect(jsonPath("$.results.*.id", contains("Fourth", "Third", "Second", "First  ")));
+    }
+
+    @Test
     void canFindPartialMatchInTitle() throws Exception {
         saveEntry("1", "something else", "content contains a word in title", "category", "releaseNotes");
         saveEntry("2", "title is lovely", "content", "category", "releaseNotes");
@@ -457,6 +480,22 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                         .content(content)
                         .contentOriginal(content + "-original")
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, 1).getTime())
+                        .categories(List.of(categories))
+                        .build();
+
+        getStoreManager().saveDocs(getStoreType(), doc);
+    }
+
+    private void saveEntry(String id, int dayOfMonth, String title, String content, String... categories) {
+        HelpDocument doc =
+                HelpDocument.builder()
+                        .id(id)
+                        .title(title)
+                        .type(ReleaseNotesController.RELEASE_NOTES_STR)
+                        .content(content)
+                        .contentOriginal(content + "-original")
+                        .lastModified(new GregorianCalendar(2021, Calendar.JULY, 1).getTime())
+                        .releaseDate(new GregorianCalendar(1981, Calendar.NOVEMBER, dayOfMonth).getTime())
                         .categories(List.of(categories))
                         .build();
 

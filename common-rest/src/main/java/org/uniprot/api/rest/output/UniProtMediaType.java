@@ -44,6 +44,7 @@ public class UniProtMediaType {
                     XLS_MEDIA_TYPE,
                     FASTA_MEDIA_TYPE,
                     GFF_MEDIA_TYPE,
+                    MARKDOWN_MEDIA_TYPE,
                     OBO_MEDIA_TYPE,
                     RDF_MEDIA_TYPE,
                     MediaType.APPLICATION_JSON,
