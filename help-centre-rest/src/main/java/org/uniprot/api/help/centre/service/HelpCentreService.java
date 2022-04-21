@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
+import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
@@ -49,6 +50,10 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
     static final String HELP_CENTRE_CATEGORY_FIELD =
             SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
                     .getSearchFieldItemByName("category")
+                    .getFieldName();
+    static final String HELP_CENTRE_RELEASE_DATE_FIELD =
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
+                    .getSearchFieldItemByName("release_date")
                     .getFieldName();
     private static final String TYPE_FIELD = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
             .getSearchFieldItemByName("type")

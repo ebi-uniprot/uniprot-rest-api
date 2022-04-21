@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author lgonzales
@@ -25,6 +26,10 @@ public class HelpCentreMarkdownMessageConverter
         outputStream.write("\n".getBytes());
         outputStream.write(("title: " + entity.getTitle()).getBytes());
         outputStream.write("\n".getBytes());
+        if (Utils.notNull(entity.getReleaseDate())) {
+            outputStream.write(("date: " + entity.getReleaseDate()).getBytes());
+            outputStream.write("\n".getBytes());
+        }
         outputStream.write(("categories: " + String.join(",", entity.getCategories())).getBytes());
         outputStream.write("\n".getBytes());
         outputStream.write("---".getBytes());
