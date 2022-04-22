@@ -22,6 +22,7 @@ class DefaultTermExtractorTest {
         "a b a, a|b",
         "cdc7, cdc7",
         "cdc7 AND (reviewed:true), cdc7",
+        "HGNC\\:3689 AND (reviewed:true), HGNC\\:3689",
         "a (b:value OR (c:value AND d OR (e:value f) AND g)), a|d|f|g"
     })
     void extractsCorrectly(String query, String result) {
