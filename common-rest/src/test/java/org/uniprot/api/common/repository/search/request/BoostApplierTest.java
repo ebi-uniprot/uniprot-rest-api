@@ -25,7 +25,6 @@ class BoostApplierTest {
     @Test
     void noBoostsAdded() {
         SolrQueryConfig config = queryConfigBuilder.build();
-        config.initialiseStaticAndFieldBoosts();
 
         BoostApplier.addBoosts(solrQuery, "cdc7", config);
 
@@ -34,8 +33,7 @@ class BoostApplierTest {
 
     @Test
     void staticBoostsAdded() {
-        SolrQueryConfig config = queryConfigBuilder.defaultSearchBoost("static1:9606^1.0").build();
-        config.initialiseStaticAndFieldBoosts();
+        SolrQueryConfig config = queryConfigBuilder.addBoost("static1:9606^1.0").build();
 
         BoostApplier.addBoosts(solrQuery, "cdc7", config);
 
@@ -46,8 +44,7 @@ class BoostApplierTest {
     @Test
     void fieldBoostsAddedWhenQueryIsOneDefaultTerm() {
         SolrQueryConfig config =
-                queryConfigBuilder.defaultSearchBoost("field1:{query}^1.0").build();
-        config.initialiseStaticAndFieldBoosts();
+                queryConfigBuilder.addBoost("field1:{query}^1.0").build();
 
         BoostApplier.addBoosts(solrQuery, "cdc7", config);
 
@@ -58,8 +55,7 @@ class BoostApplierTest {
     @Test
     void numericFieldBoostAddedWhenQueryIsOneDefaultTerm() {
         SolrQueryConfig config =
-                queryConfigBuilder.defaultSearchBoost("field1=number:{query}^1.0").build();
-        config.initialiseStaticAndFieldBoosts();
+                queryConfigBuilder.addBoost("field1=number:{query}^1.0").build();
 
         BoostApplier.addBoosts(solrQuery, "9606", config);
 
@@ -71,10 +67,9 @@ class BoostApplierTest {
     void twoBoostsAddedWhenQueryIsOneDefaultTerm() {
         SolrQueryConfig config =
                 queryConfigBuilder
-                        .defaultSearchBoost("field1:{query}^1.0")
-                        .defaultSearchBoost("field2:{query}^2.0")
+                        .addBoost("field1:{query}^1.0")
+                        .addBoost("field2:{query}^2.0")
                         .build();
-        config.initialiseStaticAndFieldBoosts();
 
         BoostApplier.addBoosts(solrQuery, "cdc7", config);
 
@@ -85,8 +80,7 @@ class BoostApplierTest {
     @Test
     void fieldBoostsAddedWhenQueryIsTwoDefaultTerms() {
         SolrQueryConfig config =
-                queryConfigBuilder.defaultSearchBoost("field1:{query}^1.0").build();
-        config.initialiseStaticAndFieldBoosts();
+                queryConfigBuilder.addBoost("field1:{query}^1.0").build();
 
         BoostApplier.addBoosts(solrQuery, "cdc7 brca2", config);
 
@@ -97,8 +91,7 @@ class BoostApplierTest {
     @Test
     void fieldBoostsAddedWhenQueryIsOneDefaultTermAndOneFieldTerm() {
         SolrQueryConfig config =
-                queryConfigBuilder.defaultSearchBoost("field1:{query}^1.0").build();
-        config.initialiseStaticAndFieldBoosts();
+                queryConfigBuilder.addBoost("field1:{query}^1.0").build();
 
         BoostApplier.addBoosts(solrQuery, "cdc7 reviewed:true", config);
 
@@ -110,10 +103,9 @@ class BoostApplierTest {
     void staticAndFieldBoostsAdded() {
         SolrQueryConfig config =
                 queryConfigBuilder
-                        .defaultSearchBoost("static1:9606^2.0")
-                        .defaultSearchBoost("field1:{query}^1.0")
+                        .addBoost("static1:9606^2.0")
+                        .addBoost("field1:{query}^1.0")
                         .build();
-        config.initialiseStaticAndFieldBoosts();
 
         BoostApplier.addBoosts(solrQuery, "cdc7", config);
 
@@ -125,12 +117,11 @@ class BoostApplierTest {
     void staticAndFieldBoostsAddedForComplexQuery() {
         SolrQueryConfig config =
                 queryConfigBuilder
-                        .defaultSearchBoost("static1:9606^2.0")
-                        .defaultSearchBoost("field1:{query}^1.0")
-                        .defaultSearchBoost("field2:{query}^2.0")
-                        .defaultSearchBoost("field3=number:{query}^3.0")
+                        .addBoost("static1:9606^2.0")
+                        .addBoost("field1:{query}^1.0")
+                        .addBoost("field2:{query}^2.0")
+                        .addBoost("field3=number:{query}^3.0")
                         .build();
-        config.initialiseStaticAndFieldBoosts();
 
         BoostApplier.addBoosts(solrQuery, "cdc7 reviewed:true (other:value OR 4000 OR brca2)", config);
 
@@ -149,8 +140,7 @@ class BoostApplierTest {
 
     @Test
     void boostFunctionAdded() {
-        SolrQueryConfig config = queryConfigBuilder.defaultSearchBoostFunctions("function").build();
-        config.initialiseStaticAndFieldBoosts();
+        SolrQueryConfig config = queryConfigBuilder.boostFunctions("function").build();
 
         BoostApplier.addBoosts(solrQuery, "cdc7", config);
 

@@ -16,30 +16,13 @@ import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader
 @Getter
 @ToString
 public class SolrQueryConfig {
-    @Singular private final List<String> defaultSearchBoosts;
-    private final String defaultSearchBoostFunctions;
-    @Singular private final List<String> advancedSearchBoosts;
-    private final String advancedSearchBoostFunctions;
+    private final String boostFunctions;
 
     @Setter(value = AccessLevel.NONE)
     private List<String> fieldBoosts;
+
     @Setter(value = AccessLevel.NONE)
     private List<String> staticBoosts;
-
-    // TODO: 14/04/2022 probably remove defaultSearchBoosts and add directly to fieldBoosts and
-    // staticBoosts
-    public void initialiseStaticAndFieldBoosts() {
-        fieldBoosts = new ArrayList<>();
-        staticBoosts = new ArrayList<>();
-
-        for (String boost : defaultSearchBoosts) {
-            if (boost.contains(QUERY_PLACEHOLDER)) {
-                fieldBoosts.add(boost);
-            } else {
-                staticBoosts.add(boost);
-            }
-        }
-    }
 
     @Setter(AccessLevel.NONE)
     private String queryFields;
@@ -51,6 +34,19 @@ public class SolrQueryConfig {
     private String highlightFields;
 
     public static class SolrQueryConfigBuilder {
+        // do not make final because Lombok doesn't like it
+        private List<String> fieldBoosts = new ArrayList<>();
+        private List<String> staticBoosts = new ArrayList<>();
+
+        public SolrQueryConfigBuilder addBoost(String boost) {
+            if (boost.contains(QUERY_PLACEHOLDER)) {
+                fieldBoosts.add(boost);
+            } else {
+                staticBoosts.add(boost);
+            }
+            return this;
+        }
+
         public SolrQueryConfigBuilder queryFields(String queryFields) {
             this.queryFields =
                     Arrays.stream(queryFields.split(","))

@@ -54,9 +54,7 @@ public class SolrQueryConfigFileReader {
     }
 
     public SolrQueryConfig getConfig() {
-        SolrQueryConfig queryConfig = builder.build();
-        queryConfig.initialiseStaticAndFieldBoosts();
-        return queryConfig;
+        return builder.build();
     }
 
     private void initialiseSolrQueryConfig() {
@@ -78,7 +76,7 @@ public class SolrQueryConfigFileReader {
         String[] linesArr = lines.toArray(String[]::new);
         logSizeOfConfigFile(linesArr);
 
-        QueryConfigType queryConfigType = QueryConfigType.DEFAULT_SEARCH;
+        QueryConfigType queryConfigType = QueryConfigType.SEARCH;
         for (String line : linesArr) {
             String trimmedLine = line.trim();
             QueryConfigType parsedType = QueryConfigType.typeOf(trimmedLine);
@@ -133,17 +131,11 @@ public class SolrQueryConfigFileReader {
 
     private void addQueryConfig(QueryConfigType queryConfigType, String line) {
         switch (queryConfigType) {
-            case DEFAULT_SEARCH:
-                builder.defaultSearchBoost(line);
+            case SEARCH:
+                builder.addBoost(line);
                 break;
-            case DEFAULT_SEARCH_FUNCTIONS:
-                builder.defaultSearchBoostFunctions(line);
-                break;
-            case ADVANCED_SEARCH:
-                builder.advancedSearchBoost(line);
-                break;
-            case ADVANCED_SEARCH_FUNCTIONS:
-                builder.advancedSearchBoostFunctions(line);
+            case SEARCH_FUNCTIONS:
+                builder.boostFunctions(line);
                 break;
             case QUERY_FIELDS:
                 builder.queryFields(line);
@@ -158,11 +150,9 @@ public class SolrQueryConfigFileReader {
     }
 
     private enum QueryConfigType {
-        DEFAULT_SEARCH("# DEFAULT-SEARCH-BOOSTS"),
-        DEFAULT_SEARCH_FUNCTIONS("# DEFAULT-SEARCH-BOOST-FUNCTIONS"),
+        SEARCH("# SEARCH-BOOSTS"),
+        SEARCH_FUNCTIONS("# SEARCH-BOOST-FUNCTIONS"),
         QUERY_FIELDS("# QUERY-FIELDS"),
-        ADVANCED_SEARCH("# ADVANCED-SEARCH-BOOSTS"),
-        ADVANCED_SEARCH_FUNCTIONS("# ADVANCED-SEARCH-BOOST-FUNCTIONS"),
         STOP_WORDS("# STOP-WORDS"),
         HIGHLIGHT_FIELDS("# HIGHLIGHT-FIELDS");
 

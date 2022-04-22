@@ -7,7 +7,8 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -36,25 +37,14 @@ class SolrQueryConfigFileReaderTest {
     }
 
     @Test
-    void defaultBoostsLoadedCorrectly() {
-        assertThat(
-                reader.getConfig().getDefaultSearchBoosts(),
-                containsInAnyOrder("default1:{query}^1.0", "default2:9606^2.0"));
+    void boostsLoadedCorrectly() {
+        assertThat(reader.getConfig().getFieldBoosts(), containsInAnyOrder("default1:{query}^1.0"));
+        assertThat(reader.getConfig().getStaticBoosts(), containsInAnyOrder("default2:9606^2.0"));
     }
 
     @Test
-    void defaultBoostFunctionsLoadedCorrectly() {
-        assertThat(reader.getConfig().getDefaultSearchBoostFunctions(), is("default3"));
-    }
-
-    @Test
-    void advancedBoostsLoadedCorrectly() {
-        assertThat(reader.getConfig().getAdvancedSearchBoosts(), is(empty()));
-    }
-
-    @Test
-    void advancedBoostFunctionsLoadedCorrectly() {
-        assertThat(reader.getConfig().getAdvancedSearchBoostFunctions(), is("advanced1,advanced2"));
+    void boostFunctionsLoadedCorrectly() {
+        assertThat(reader.getConfig().getBoostFunctions(), is("default3"));
     }
 
     @Test
@@ -76,19 +66,18 @@ class SolrQueryConfigFileReaderTest {
     @Test
     void checkEmptyBoostMapsInitialisedCorrected() {
         SolrQueryConfig queryConfig = SolrQueryConfig.builder().build();
-        queryConfig.initialiseStaticAndFieldBoosts();
 
         assertThat(queryConfig.getFieldBoosts().size(), is(0));
+        assertThat(queryConfig.getStaticBoosts().size(), is(0));
     }
 
     @Test
     void checkBoostMapsInitialisedCorrectedWith1Value() {
         SolrQueryConfig queryConfig =
                 SolrQueryConfig.builder()
-                        .defaultSearchBoost("field1:{query}^1.1")
-                        .defaultSearchBoost("field2:9606^2.0")
+                        .addBoost("field1:{query}^1.1")
+                        .addBoost("field2:9606^2.0")
                         .build();
-        queryConfig.initialiseStaticAndFieldBoosts();
 
         List<String> fieldBoosts = queryConfig.getFieldBoosts();
         List<String> staticBoosts = queryConfig.getStaticBoosts();
@@ -104,12 +93,11 @@ class SolrQueryConfigFileReaderTest {
     void checkBoostMapsInitialisedCorrectedWith2Values() {
         SolrQueryConfig queryConfig =
                 SolrQueryConfig.builder()
-                        .defaultSearchBoost("default1:{query}^1.1")
-                        .defaultSearchBoost("default2:{query}^4")
-                        .defaultSearchBoost("static1:9606^2.0")
-                        .defaultSearchBoost("static2:hello^4")
+                        .addBoost("default1:{query}^1.1")
+                        .addBoost("default2:{query}^4")
+                        .addBoost("static1:9606^2.0")
+                        .addBoost("static2:hello^4")
                         .build();
-        queryConfig.initialiseStaticAndFieldBoosts();
 
         List<String> fieldBoosts = queryConfig.getFieldBoosts();
         List<String> staticBoosts = queryConfig.getStaticBoosts();

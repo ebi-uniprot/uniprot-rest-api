@@ -12,7 +12,10 @@ import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader
 import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 /**
- * Created 14/04/2022
+ * The purpose of this class is to apply the boosts of a {@link SolrQueryConfig} to a Solr query
+ * ({@link ModifiableSolrParams}), this includes field boosts, static boosts, and boost functions.
+ *
+ * <p>Created 14/04/2022
  *
  * @author Edd
  */
@@ -58,8 +61,8 @@ public class BoostApplier {
         staticBoosts.forEach(boost -> solrQuery.add(BOOST_QUERY, boost));
 
         // set boost functions
-        if (!nullOrEmpty(boosts.getDefaultSearchBoostFunctions())) {
-            solrQuery.add(BOOST_FUNCTIONS, boosts.getDefaultSearchBoostFunctions());
+        if (!nullOrEmpty(boosts.getBoostFunctions())) {
+            solrQuery.add(BOOST_FUNCTIONS, boosts.getBoostFunctions());
         }
     }
 }

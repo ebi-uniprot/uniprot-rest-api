@@ -44,7 +44,8 @@ class SolrRequestConverterTest {
         defaultTerms.stream().forEach(System.out::println);
 
         UniProtQueryProcessor processor =
-                UniProtQueryProcessor.newInstance(new BoostQueryNodeProcessorPipeline(defaultTerms));
+                UniProtQueryProcessor.newInstance(
+                        new BoostQueryNodeProcessorPipeline(defaultTerms));
         String query = "a b (c OR f:g)";
         System.out.println("Query is: " + query);
         processor.processQuery(query);
@@ -184,7 +185,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void entryRequestDoesNotSetDefaults() throws IOException {
+        void entryRequestDoesNotSetDefaults()  {
             // given
             String queryString = "query";
             SolrRequest request = SolrRequest.builder().query(queryString).build();
@@ -230,7 +231,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void doNotCreateQueryBoostsAndHighlightForPageSizeZero() throws IOException {
+        void doNotCreateQueryBoostsAndHighlightForPageSizeZero()  {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -238,8 +239,8 @@ class SolrRequestConverterTest {
                             .rows(0)
                             .queryConfig(
                                     SolrQueryConfig.builder()
-                                            .defaultSearchBoost("field1:value3^3")
-                                            .defaultSearchBoostFunctions("f1,f2")
+                                            .addBoost("field1:value3^3")
+                                            .boostFunctions("f1,f2")
                                             .highlightFields("h1,h2")
                                             .queryFields("field1,field2")
                                             .build())
@@ -259,7 +260,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void queryBoostsWithPlaceholderIsReplacedCorrectly() throws IOException {
+        void queryBoostsWithPlaceholderIsReplacedCorrectly()  {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -267,8 +268,8 @@ class SolrRequestConverterTest {
                             .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
-                                            .defaultSearchBoost("field1:{query}^3")
-                                            .defaultSearchBoost("field2:value3^2")
+                                            .addBoost("field1:{query}^3")
+                                            .addBoost("field2:value3^2")
                                             .build())
                             .build();
 
@@ -278,12 +279,12 @@ class SolrRequestConverterTest {
             assertNotNull(queryParams);
             // then
             List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
-            assertThat(boostQuery, contains("field1:(value1 value2)^3", "field2:value3^2"));
+            assertThat(boostQuery, containsInAnyOrder("field1:(value1)^3", "field1:(value2)^3", "field2:value3^2"));
             assertThat(queryParams.get("boost"), is(nullValue()));
         }
 
         @Test
-        void intQueryBoostWithPlaceholderAndIntQueryIsReplacedCorrectly() throws IOException {
+        void intQueryBoostWithPlaceholderAndIntQueryIsReplacedCorrectly() {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -291,7 +292,7 @@ class SolrRequestConverterTest {
                             .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
-                                            .defaultSearchBoost("field1=number:{query}^3")
+                                            .addBoost("field1=number:{query}^3")
                                             .build())
                             .build();
 
@@ -306,7 +307,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void intQueryBoostWithPlaceholderAndStringQueryIsReplacedCorrectly() throws IOException {
+        void intQueryBoostWithPlaceholderAndStringQueryIsReplacedCorrectly()  {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -314,7 +315,7 @@ class SolrRequestConverterTest {
                             .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
-                                            .defaultSearchBoost("field1=number:{query}^3")
+                                            .addBoost("field1=number:{query}^3")
                                             .build())
                             .build();
 
@@ -329,7 +330,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void defaultQueryBoostsAndFunctionsCreatedCorrectly() throws IOException {
+        void defaultQueryBoostsAndFunctionsCreatedCorrectly()  {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -337,9 +338,9 @@ class SolrRequestConverterTest {
                             .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
-                                            .defaultSearchBoost("field1:value3^3")
-                                            .defaultSearchBoost("field2:value4^2")
-                                            .defaultSearchBoostFunctions("f1,f2")
+                                            .addBoost("field1:value3^3")
+                                            .addBoost("field2:value4^2")
+                                            .boostFunctions("f1,f2")
                                             .build())
                             .build();
 
@@ -355,7 +356,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void queryFieldsQFCreatedCorrectly() throws IOException {
+        void queryFieldsQFCreatedCorrectly()  {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -374,7 +375,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void advancedSearchQueryBoostsAndFunctionsCreatedCorrectly() throws IOException {
+        void advancedSearchQueryBoostsAndFunctionsCreatedCorrectly()  {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -382,9 +383,9 @@ class SolrRequestConverterTest {
                             .rows(10)
                             .queryConfig(
                                     SolrQueryConfig.builder()
-                                            .advancedSearchBoost("field1:value3^3")
-                                            .advancedSearchBoost("field2:value4^2")
-                                            .advancedSearchBoostFunctions("f1,f2")
+                                            .addBoost("field1:value3^3")
+                                            .addBoost("field2:value4^2")
+                                            .boostFunctions("f1,f2")
                                             .build())
                             .build();
 
@@ -401,7 +402,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void highlightsFieldsCanBeCreatedCorrectly() throws IOException {
+        void highlightsFieldsCanBeCreatedCorrectly()  {
             // given
             SolrRequest request =
                     SolrRequest.builder()
