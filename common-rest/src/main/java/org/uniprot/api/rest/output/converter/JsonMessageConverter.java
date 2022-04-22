@@ -1,5 +1,22 @@
 package org.uniprot.api.rest.output.converter;
 
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.springframework.http.MediaType;
+import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.repository.search.suggestion.Suggestion;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.core.util.Utils;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.model.ReturnField;
+
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,22 +27,6 @@ import com.github.bohnman.squiggly.filter.SquigglyPropertyFilter;
 import com.github.bohnman.squiggly.parser.SquigglyParser;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import org.springframework.http.MediaType;
-import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.common.repository.search.suggestion.Suggestion;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.core.util.Utils;
-import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
-import org.uniprot.store.config.returnfield.model.ReturnField;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 /**
  * @param <T> instance of the object that is being written.
@@ -190,7 +191,8 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         generator.writeObject(errorMsg);
         generator.writeEndObject();
         // do not move flush to cleanUp() method, because it won't be called
-        // instead we're throwing another StopStreamException in AbstractUUWHttpMessageConverter, which
+        // instead we're throwing another StopStreamException in AbstractUUWHttpMessageConverter,
+        // which
         // is then handled in ResponseExceptionHandler
         generator.flush();
     }

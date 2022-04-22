@@ -31,6 +31,6 @@ class TaxonomyConfigureServiceTest {
         TaxonomyConfigureService service = new TaxonomyConfigureService();
         List<AdvancedSearchTerm> result = service.getSearchItems(CONTEXT_PATH);
         assertNotNull(result);
-        assertEquals(8, result.size());
+        assertEquals(10, result.size());
     }
 }

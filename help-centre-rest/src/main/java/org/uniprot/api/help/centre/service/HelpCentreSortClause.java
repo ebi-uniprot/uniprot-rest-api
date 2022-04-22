@@ -16,6 +16,8 @@ public class HelpCentreSortClause extends AbstractSolrSortClause {
 
     @PostConstruct
     public void init() {
+        addDefaultFieldOrderPair(
+                HelpCentreService.HELP_CENTRE_RELEASE_DATE_FIELD, SolrQuery.ORDER.desc);
         addDefaultFieldOrderPair(HelpCentreService.HELP_CENTRE_ID_FIELD, SolrQuery.ORDER.asc);
     }
 
