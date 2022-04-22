@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
@@ -55,9 +54,10 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
             SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
                     .getSearchFieldItemByName("release_date")
                     .getFieldName();
-    private static final String TYPE_FIELD = SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
-            .getSearchFieldItemByName("type")
-            .getFieldName();
+    private static final String TYPE_FIELD =
+            SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.HELP)
+                    .getSearchFieldItemByName("type")
+                    .getFieldName();
     private final SearchFieldConfig searchFieldConfig;
     private final UniProtQueryProcessorConfig helpCentreQueryProcessorConfig;
 
@@ -83,14 +83,16 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
             searchRequest.setQuery("(" + query + " OR \"" + query + "\"" + ")");
         }
         // add type filter
-        searchRequest.setQuery(searchRequest.getQuery() + " AND " + getTypeFilter(searchRequest.getType()));
+        searchRequest.setQuery(
+                searchRequest.getQuery() + " AND " + getTypeFilter(searchRequest.getType()));
 
         QueryResult<HelpCentreEntry> result = super.search(searchRequest);
 
         if (Utils.notNullNotEmpty(result.getSuggestions())) {
             Collection<Suggestion> suggestions = result.getSuggestions();
-            if(isDefaultSearch(query)){
-                searchRequest.setQuery("(" + query + ") AND " + getTypeFilter(searchRequest.getType()));
+            if (isDefaultSearch(query)) {
+                searchRequest.setQuery(
+                        "(" + query + ") AND " + getTypeFilter(searchRequest.getType()));
                 QueryResult<HelpCentreEntry> suggester = super.search(request);
                 suggestions = suggester.getSuggestions();
             }
@@ -108,7 +110,7 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
         return result;
     }
 
-    private String getTypeFilter(String type){
+    private String getTypeFilter(String type) {
         return TYPE_FIELD + ":" + type;
     }
 

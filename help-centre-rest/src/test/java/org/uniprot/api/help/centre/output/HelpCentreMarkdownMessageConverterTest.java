@@ -20,8 +20,12 @@ class HelpCentreMarkdownMessageConverterTest {
     private static final String MARKDOWN_CONTENT =
             "---\n" + "title: title value\n" + "categories: cat1,cat2\n" + "---\n" + "entity";
     private static final String MARKDOWN_CONTENT_WITH_DATE =
-            "---\n" + "title: title value\n"+ "date: 1981-11-01\n" + "categories: cat1,cat2\n" + "---\n" + "entity";
-
+            "---\n"
+                    + "title: title value\n"
+                    + "date: 1981-11-01\n"
+                    + "categories: cat1,cat2\n"
+                    + "---\n"
+                    + "entity";
 
     @Test
     void canWriteEntity() throws IOException {

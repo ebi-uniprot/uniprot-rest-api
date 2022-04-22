@@ -21,7 +21,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,7 +107,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "*";
-        if("release_date".equals(searchField)){
+        if ("release_date".equals(searchField)) {
             value = "[* TO *]";
         }
         return value;
@@ -147,16 +146,16 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results.*.id", contains("id-value-1", "id-value-2")))
-                .andExpect(
-                        jsonPath(
-                                "$.results[0].matches.title",
-                                contains("title-<span class=\"match-highlight\">value</span>-1")))
+                .andExpect(jsonPath("$.results.*.id", contains("id-value-2", "id-value-1")))
                 .andExpect(
                         jsonPath(
                                 "$.results[0].matches.content",
                                 contains(
-                                        "content-<span class=\"match-highlight\">value</span>-clean 1")));
+                                        "content-<span class=\"match-highlight\">value</span>-clean 2")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[0].matches.title",
+                                contains("title-<span class=\"match-highlight\">value</span>-2")));
     }
 
     @Test
@@ -407,7 +406,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
-                                    contains("id-value-10", "id-value-20", "id-value-30")))
+                                    contains("id-value-30", "id-value-20", "id-value-10")))
                     .build();
         }
 
@@ -456,7 +455,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
-                                    contains("id-value-10", "id-value-20", "id-value-30")))
+                                    contains("id-value-30", "id-value-20", "id-value-10")))
                     .resultMatcher(jsonPath("$.results.*.title").doesNotExist())
                     .build();
         }
@@ -469,7 +468,7 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
-                                    contains("id-value-10", "id-value-20", "id-value-30")))
+                                    contains("id-value-30", "id-value-20", "id-value-10")))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Category")))
                     .resultMatcher(jsonPath("$.facets[0].values.size()", greaterThan(3)))
                     .resultMatcher(
@@ -493,9 +492,9 @@ class HelpCentreSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                                             jsonPath(
                                                     "$.results.*.id",
                                                     contains(
-                                                            "id-value-10",
+                                                            "id-value-30",
                                                             "id-value-20",
-                                                            "id-value-30")))
+                                                            "id-value-10")))
                                     .build())
                     .build();
         }

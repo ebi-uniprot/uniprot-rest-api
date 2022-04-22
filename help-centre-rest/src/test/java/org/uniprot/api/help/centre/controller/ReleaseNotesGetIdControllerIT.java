@@ -156,7 +156,8 @@ class ReleaseNotesGetIdControllerIT extends AbstractGetByIdControllerIT {
         }
     }
 
-    static class ReleaseNotesGetIdContentTypeParamResolver extends AbstractGetIdContentTypeParamResolver {
+    static class ReleaseNotesGetIdContentTypeParamResolver
+            extends AbstractGetIdContentTypeParamResolver {
 
         @Override
         public GetIdContentTypeParam idSuccessContentTypesParam() {

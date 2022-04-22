@@ -1,5 +1,26 @@
 package org.uniprot.api.help.centre.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,27 +49,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.help.HelpDocument;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.stream.IntStream;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author jluo
@@ -107,7 +107,7 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
     @Override
     protected String getFieldValueForValidatedField(String searchField) {
         String value = "*";
-        if("release_date".equals(searchField)){
+        if ("release_date".equals(searchField)) {
             value = "[* TO *]";
         }
         return value;
@@ -146,16 +146,16 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results.*.id", contains("id-value-1", "id-value-2")))
+                .andExpect(jsonPath("$.results.*.id", contains("id-value-2", "id-value-1")))
                 .andExpect(
                         jsonPath(
                                 "$.results[0].matches.title",
-                                contains("title-<span class=\"match-highlight\">value</span>-1")))
+                                contains("title-<span class=\"match-highlight\">value</span>-2")))
                 .andExpect(
                         jsonPath(
                                 "$.results[0].matches.content",
                                 contains(
-                                        "content-<span class=\"match-highlight\">value</span>-clean 1")));
+                                        "content-<span class=\"match-highlight\">value</span>-clean 2")));
     }
 
     @Test
@@ -180,9 +180,9 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
 
     @Test
     void searchReturnsNewestFirst() throws Exception {
-        saveEntry("First", 1,"same title", "same content", "category", "releaseNotes");
+        saveEntry("First", 1, "same title", "same content", "category", "releaseNotes");
         saveEntry("Fourth", 4, "same title", "same content", "category", "releaseNotes");
-        saveEntry("Third", 3,  "same title", "same content", "category", "releaseNotes");
+        saveEntry("Third", 3, "same title", "same content", "category", "releaseNotes");
         saveEntry("Second", 2, "same title", "same content", "category", "releaseNotes");
         saveEntry("Not Wanted", 2, "not the same", "same content", "category", "releaseNotes");
 
@@ -198,12 +198,18 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(4)))
-                .andExpect(jsonPath("$.results.*.id", contains("Fourth", "Third", "Second", "First  ")));
+                .andExpect(
+                        jsonPath("$.results.*.id", contains("Fourth", "Third", "Second", "First")));
     }
 
     @Test
     void canFindPartialMatchInTitle() throws Exception {
-        saveEntry("1", "something else", "content contains a word in title", "category", "releaseNotes");
+        saveEntry(
+                "1",
+                "something else",
+                "content contains a word in title",
+                "category",
+                "releaseNotes");
         saveEntry("2", "title is lovely", "content", "category", "releaseNotes");
 
         // when
@@ -311,7 +317,6 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                 .andExpect(jsonPath("$.suggestions[1].hits", is(1)));
     }
 
-
     @Override
     protected List<String> getAllFacetFields() {
         return new ArrayList<>(facetConfig.getFacetNames());
@@ -346,7 +351,7 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
-                                    contains("id-value-10", "id-value-20", "id-value-30")))
+                                    contains("id-value-30", "id-value-20", "id-value-10")))
                     .build();
         }
 
@@ -395,7 +400,7 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
-                                    contains("id-value-10", "id-value-20", "id-value-30")))
+                                    contains("id-value-30", "id-value-20", "id-value-10")))
                     .resultMatcher(jsonPath("$.results.*.title").doesNotExist())
                     .build();
         }
@@ -408,7 +413,7 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
-                                    contains("id-value-10", "id-value-20", "id-value-30")))
+                                    contains("id-value-30", "id-value-20", "id-value-10")))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Category")))
                     .resultMatcher(jsonPath("$.facets[0].values.size()", greaterThan(3)))
                     .resultMatcher(
@@ -418,7 +423,8 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
         }
     }
 
-    static class ReleaseNotesSearchContentTypeParamResolver extends AbstractSearchContentTypeParamResolver {
+    static class ReleaseNotesSearchContentTypeParamResolver
+            extends AbstractSearchContentTypeParamResolver {
 
         @Override
         protected SearchContentTypeParam searchSuccessContentTypesParam() {
@@ -431,9 +437,9 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                                             jsonPath(
                                                     "$.results.*.id",
                                                     contains(
-                                                            "id-value-10",
+                                                            "id-value-30",
                                                             "id-value-20",
-                                                            "id-value-30")))
+                                                            "id-value-10")))
                                     .build())
                     .build();
         }
@@ -466,7 +472,8 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                         .contentOriginal("content-value-original " + i)
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
                         .releaseDate(new GregorianCalendar(2021, Calendar.JULY, i).getTime())
-                        .categories(List.of("category-value", "category-value-" + i, "releaseNotes"))
+                        .categories(
+                                List.of("category-value", "category-value-" + i, "releaseNotes"))
                         .build();
         getStoreManager().saveDocs(getStoreType(), doc);
     }
@@ -486,7 +493,8 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
         getStoreManager().saveDocs(getStoreType(), doc);
     }
 
-    private void saveEntry(String id, int dayOfMonth, String title, String content, String... categories) {
+    private void saveEntry(
+            String id, int dayOfMonth, String title, String content, String... categories) {
         HelpDocument doc =
                 HelpDocument.builder()
                         .id(id)
@@ -495,7 +503,9 @@ public class ReleaseNotesSearchControllerIT extends AbstractSearchWithFacetContr
                         .content(content)
                         .contentOriginal(content + "-original")
                         .lastModified(new GregorianCalendar(2021, Calendar.JULY, 1).getTime())
-                        .releaseDate(new GregorianCalendar(1981, Calendar.NOVEMBER, dayOfMonth).getTime())
+                        .releaseDate(
+                                new GregorianCalendar(1981, Calendar.NOVEMBER, dayOfMonth)
+                                        .getTime())
                         .categories(List.of(categories))
                         .build();
 
