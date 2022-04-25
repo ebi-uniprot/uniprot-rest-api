@@ -488,7 +488,7 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.facets.*.label", contains("Model organisms")))
+                .andExpect(jsonPath("$.facets.*.label", contains("Popular organisms")))
                 .andExpect(jsonPath("$.facets.*.name", contains("model_organism")))
                 .andExpect(jsonPath("$.facets[0].values.size()", is(5)))
                 .andExpect(jsonPath("$.facets[0].values.*.label").exists())
