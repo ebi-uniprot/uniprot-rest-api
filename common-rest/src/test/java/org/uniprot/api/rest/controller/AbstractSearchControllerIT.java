@@ -193,6 +193,26 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
     }
 
+    // Forward slashes were causing errors during parsing of query in {@link QueryProcessor}.
+    // This test checks that this does not happen.
+    @Test
+    void searchDefaultQueryWithForwardSlashesReturnSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "(6-phosphofructo-2-kinase/fructose-2,6-bisphosphatase 4)")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                // We are not interested in the actual results returned, we just want to make
+                // sure this query does not cause an error. (The search behaviour is instead
+                // delegated to store's integration-test module.)
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+    }
+
     @Test
     void searchQueryWithInvalidQueryFormatReturnBadRequest() throws Exception {
 
@@ -828,7 +848,8 @@ public abstract class AbstractSearchControllerIT {
     }
 
     protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
+                .getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }

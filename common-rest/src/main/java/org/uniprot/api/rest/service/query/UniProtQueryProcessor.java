@@ -9,6 +9,9 @@ import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxI
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
+
+import static org.uniprot.api.rest.validation.ValidSolrQuerySyntax.QuerySyntaxValidator.replaceForwardSlashes;
 
 /**
  * This class does the following:
@@ -48,7 +51,8 @@ public class UniProtQueryProcessor implements QueryProcessor {
         try {
             StandardSyntaxParser syntaxParser = new StandardSyntaxParser();
 
-            QueryNode queryTree = syntaxParser.parse(query, IMPOSSIBLE_FIELD);
+            String queryWithEscapedForwardSlashes = replaceForwardSlashes(query);
+            QueryNode queryTree = syntaxParser.parse(queryWithEscapedForwardSlashes, IMPOSSIBLE_FIELD);
             QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
             return processedQueryTree.toQueryString(ESCAPER).toString();
         } catch (Exception e) {
