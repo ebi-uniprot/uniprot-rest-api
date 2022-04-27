@@ -32,6 +32,7 @@ import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -64,6 +65,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
         this.queryService = queryService;
     }
 
+    @Hidden
     @GetMapping(
             value = "/{upi}/databases",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})

@@ -21,23 +21,18 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class GeneCentricUPIdRequest {
 
-    //    @Parameter(description = "Unique identifier for the Proteome entry")
-    //    @Pattern(
-    //            regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
-    //            flags = {Pattern.Flag.CASE_INSENSITIVE},
-    //            message = "{search.invalid.upid.value}")
-    //    private String upid;
-
     @ModelFieldMeta(
             reader = ReturnFieldMetaReaderImpl.class,
             path = "genecentric-return-fields.json")
+    @Parameter(hidden = true)
     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String fields;
 
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(
+            description = "Size of the result. Defaults to 25, and maximum is " + MAX_RESULTS_SIZE)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

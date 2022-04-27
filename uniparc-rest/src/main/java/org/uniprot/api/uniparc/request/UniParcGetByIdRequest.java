@@ -20,19 +20,25 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniParcGetByIdRequest {
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in the response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in the response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
 
-    @Parameter(description = "Comma separated list of UniParc cross reference database names")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of UniParc cross reference database names")
     @ValidCommaSeparatedItemsLength(maxLength = 50)
     @ValidEnumDisplayValue(enumDisplay = UniParcDatabase.class)
     private String dbTypes;
 
-    @Parameter(description = "Flag to filter by active(true) or inactive(false) cross reference")
+    @Parameter(
+            hidden = true,
+            description = "Flag to filter by active(true) or inactive(false) cross reference")
     private Boolean active;
 
-    @Parameter(description = "Comma separated list of taxonomy Ids")
+    @Parameter(hidden = true, description = "Comma separated list of taxonomy Ids")
     @ValidCommaSeparatedItemsLength(maxLength = 100)
     private String taxonIds;
 }

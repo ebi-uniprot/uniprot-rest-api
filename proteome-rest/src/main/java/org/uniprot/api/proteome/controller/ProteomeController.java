@@ -164,6 +164,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                             path = "proteome-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
                     @Parameter(
+                            hidden = true,
                             description =
                                     "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)

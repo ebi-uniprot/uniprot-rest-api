@@ -27,7 +27,8 @@ public class GeneCentricSearchRequest extends GeneCentricBasicRequest implements
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(
+            description = "Size of the result. Defaults to 25, and maximum is " + MAX_RESULTS_SIZE)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

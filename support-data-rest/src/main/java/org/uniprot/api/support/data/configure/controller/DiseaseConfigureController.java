@@ -18,15 +18,16 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author lgonzales
  * @since 19/03/2021
  */
 @Hidden
-// @Tag(
-//        name = "Configuration",
-//        description = "These services provide configuration data used in the UniProt website")
+ @Tag(
+        name = "Configuration",
+        description = "These services provide configuration data used in the UniProt website")
 @RestController
 @RequestMapping("/configure/diseases")
 public class DiseaseConfigureController {

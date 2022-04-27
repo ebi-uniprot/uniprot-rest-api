@@ -26,16 +26,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class GetByTaxonIdsRequest implements SearchRequest {
 
     @Parameter(hidden = true)
-    private static final String TAXONOMY_ID_LIST_REGEX = "^\\d+(?:,\\d+)*$";
-
-    @NotNull(message = "{search.required}")
-    @Parameter(description = "Comma separated list of taxonIds")
-    @Pattern(regexp = TAXONOMY_ID_LIST_REGEX, message = "{search.taxonomy.invalid.list.id}")
-    @ValidCommaSeparatedItemsLength(maxLength = 1000)
     private String taxonIds;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "taxonomy-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 

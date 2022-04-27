@@ -28,7 +28,9 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     private String accessions;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
@@ -38,7 +40,9 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     private String facets;
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
+    @Parameter(
+            hidden = true,
+            description = "Criteria to search the proteins. It can take any valid solr query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPROTKB,

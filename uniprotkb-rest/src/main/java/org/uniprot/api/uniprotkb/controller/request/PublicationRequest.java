@@ -23,7 +23,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class PublicationRequest {
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(
+            description = "Size of the result. Defaults to 25, and maximum is " + MAX_RESULTS_SIZE)
     @PositiveOrZero(message = "{search.positive}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

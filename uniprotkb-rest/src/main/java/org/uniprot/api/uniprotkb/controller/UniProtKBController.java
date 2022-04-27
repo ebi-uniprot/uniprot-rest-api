@@ -186,6 +186,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             path = "uniprotkb-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
+                            hidden = true,
                             description =
                                     "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
@@ -251,8 +252,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> stream(
             @Valid @ModelAttribute UniProtKBStreamRequest streamRequest,
-            @Parameter(hidden = true) @RequestHeader(value = "Accept-Encoding", required = false)
-                    String encoding,
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);

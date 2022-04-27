@@ -26,6 +26,7 @@ import org.uniprot.api.uniref.service.UniRefMemberService;
 import org.uniprot.core.uniref.UniRefMember;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -55,6 +56,7 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
         this.service = queryService;
     }
 
+    @Hidden
     @Tag(
             name = "uniref",
             description =

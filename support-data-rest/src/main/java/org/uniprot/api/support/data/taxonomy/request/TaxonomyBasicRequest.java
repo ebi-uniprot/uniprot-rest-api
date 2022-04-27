@@ -37,7 +37,9 @@ public class TaxonomyBasicRequest {
     private String sort;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "taxonomy-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 }

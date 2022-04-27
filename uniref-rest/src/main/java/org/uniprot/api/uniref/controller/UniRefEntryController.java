@@ -103,6 +103,7 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                             path = "uniref-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
                     @Parameter(
+                            hidden = true,
                             description =
                                     "Comma separated list of fields to be returned in response")
                     String fields,

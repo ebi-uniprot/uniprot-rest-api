@@ -212,11 +212,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> stream(
             @Valid @ModelAttribute UniParcStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
-                    MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
-
+        MediaType contentType = getAcceptHeader(request);
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             return super.streamRDF(
                     () -> queryService.streamRDF(streamRequest),
@@ -229,6 +226,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         }
     }
 
+    @Hidden
     @GetMapping(
             value = "/accession/{accession}",
             produces = {
@@ -274,6 +272,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(entry, getByIdRequest.getFields(), request);
     }
 
+    @Hidden
     @GetMapping(
             value = "/dbreference/{dbId}",
             produces = {
@@ -327,6 +326,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getSearchResponse(results, getByDbIdRequest.getFields(), request, response);
     }
 
+    @Hidden
     @GetMapping(
             value = "/proteome/{upId}",
             produces = {
@@ -378,6 +378,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getSearchResponse(results, getByUpIdRequest.getFields(), request, response);
     }
 
+    @Hidden
     @GetMapping(
             value = "/bestguess",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
@@ -410,6 +411,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         return super.getEntityResponse(bestGuess, bestGuessRequest.getFields(), request);
     }
 
+    @Hidden
     @GetMapping(
             value = "/sequence",
             produces = {

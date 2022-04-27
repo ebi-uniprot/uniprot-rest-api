@@ -34,12 +34,14 @@ public class UniProtKBBasicRequest {
     private String query;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 

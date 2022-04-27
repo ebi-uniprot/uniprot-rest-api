@@ -27,7 +27,8 @@ public class UniRefSearchRequest extends UniRefBasicRequest implements SearchReq
     @ValidFacets(facetConfig = UniRefFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(
+            description = "Size of the result. Defaults to 25, and maximum is " + MAX_RESULTS_SIZE)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

@@ -34,7 +34,9 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     private String ids;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniref-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
     private String fields;
 
@@ -45,6 +47,7 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniref-search-fields.json")
     @Parameter(
+            hidden = true,
             description = "Criteria to search UniRef clusters. It can take any valid solr query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(uniProtDataType = UniProtDataType.UNIREF, messagePrefix = "search.uniref")
@@ -63,13 +66,15 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
+    @Parameter(
+            hidden = true,
+            description = "Size of the result. Defaults to number of accessions passed.")
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniref-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIREF)
     private String sort;
 

@@ -123,6 +123,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                             path = "uniref-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
                     @Parameter(
+                            hidden = true,
                             description =
                                     "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
@@ -232,10 +233,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryLight>>> stream(
             @Valid @ModelAttribute UniRefStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
-                    MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
+
+        MediaType contentType = getAcceptHeader(request);
 
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             return super.streamRDF(

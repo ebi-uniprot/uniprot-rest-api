@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,6 +53,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
     private final TaxonomyService taxonomyService;
     private static final String TAXONOMY_ID_REGEX = "^[0-9]+$";
+    private static final String TAXONOMY_ID_LIST_REGEX = "^\\d+(?:,\\d+)*$";
 
     public TaxonomyController(
             ApplicationEventPublisher eventPublisher,
@@ -101,7 +103,10 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.taxonomy.invalid.id}")
                     String taxonId,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(
+                            hidden = true,
+                            description =
+                                    "Comma separated list of fields to be returned in response")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -142,9 +147,21 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getByIds(
+            @PathVariable("taxonIds")
+                    @Pattern(
+                            regexp = TAXONOMY_ID_REGEX,
+                            flags = {Pattern.Flag.CASE_INSENSITIVE},
+                            message = "{search.taxonomy.invalid.id}")
+                    @NotNull(message = "{search.required}")
+                    @Parameter(description = "Comma separated list of taxonIds, up to 1000")
+                    @Pattern(
+                            regexp = TAXONOMY_ID_LIST_REGEX,
+                            message = "{search.taxonomy.invalid.list.id}")
+                    String taxonIds,
             @Valid @ModelAttribute GetByTaxonIdsRequest getByTaxonIdsRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
+        getByTaxonIdsRequest.setTaxonIds(taxonIds);
         QueryResult<TaxonomyEntry> result = this.taxonomyService.search(getByTaxonIdsRequest);
         return super.getSearchResponse(
                 result,
@@ -218,9 +235,9 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
             @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request) {
+    	
+        MediaType contentType = getAcceptHeader(request);
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             return super.streamRDF(
                     () -> taxonomyService.streamRDF(streamRequest),

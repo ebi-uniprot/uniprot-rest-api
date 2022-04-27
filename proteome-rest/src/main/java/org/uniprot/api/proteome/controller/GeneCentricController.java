@@ -258,6 +258,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                             path = "genecentric-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
                     @RequestParam(value = "fields", required = false)
+                    @Parameter(hidden = true)
                     String fields,
             HttpServletRequest request) {
         GeneCentricEntry entry = service.findByUniqueId(accession.toUpperCase());

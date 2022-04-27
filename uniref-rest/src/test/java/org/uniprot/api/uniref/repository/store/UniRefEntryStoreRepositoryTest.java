@@ -273,7 +273,6 @@ class UniRefEntryStoreRepositoryTest {
         UniRefMemberRequest request = new UniRefMemberRequest();
         request.setSize(10);
         request.setCursor("3v3i3le3dck");
-        //   request.setId(UNIREF_ID_OK);
         QueryResult<UniRefMember> result = repository.getEntryMembers(request, UNIREF_ID_OK);
         assertNotNull(result);
 

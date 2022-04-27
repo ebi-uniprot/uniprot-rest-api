@@ -114,7 +114,10 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.literature.invalid.id}")
                     String citationId,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(
+                            hidden = true,
+                            description =
+                                    "Comma separated list of fields to be returned in response")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -196,10 +199,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> stream(
             @Valid @ModelAttribute LiteratureStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request) {
-
+    	 MediaType contentType = getAcceptHeader(request);
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             return super.streamRDF(
                     () -> literatureService.streamRDF(streamRequest),
