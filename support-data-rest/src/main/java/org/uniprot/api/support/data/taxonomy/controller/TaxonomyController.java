@@ -236,7 +236,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
             @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,
             HttpServletRequest request) {
-    	
+
         MediaType contentType = getAcceptHeader(request);
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             return super.streamRDF(

@@ -232,8 +232,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryLight>>> stream(
-            @Valid @ModelAttribute UniRefStreamRequest streamRequest,
-            HttpServletRequest request) {
+            @Valid @ModelAttribute UniRefStreamRequest streamRequest, HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
 

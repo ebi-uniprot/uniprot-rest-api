@@ -211,8 +211,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> stream(
-            @Valid @ModelAttribute UniParcStreamRequest streamRequest,
-            HttpServletRequest request) {
+            @Valid @ModelAttribute UniParcStreamRequest streamRequest, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             return super.streamRDF(

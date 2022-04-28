@@ -212,9 +212,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> stream(
             @Valid @ModelAttribute ProteomeStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request) {
+        MediaType contentType = getAcceptHeader(request);
         return super.stream(
                 () -> queryService.stream(streamRequest), streamRequest, contentType, request);
     }

@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @since 19/03/2021
  */
 @Hidden
- @Tag(
+@Tag(
         name = "Configuration",
         description = "These services provide configuration data used in the UniProt website")
 @RestController

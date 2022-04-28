@@ -47,7 +47,8 @@ public class UniRefBasicRequest {
 
     @Parameter(
             description =
-                    "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms")
+                    "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms",
+            example = "true")
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

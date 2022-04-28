@@ -24,7 +24,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -200,7 +199,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> stream(
             @Valid @ModelAttribute LiteratureStreamRequest streamRequest,
             HttpServletRequest request) {
-    	 MediaType contentType = getAcceptHeader(request);
+        MediaType contentType = getAcceptHeader(request);
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             return super.streamRDF(
                     () -> literatureService.streamRDF(streamRequest),
