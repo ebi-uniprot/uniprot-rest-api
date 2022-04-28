@@ -201,7 +201,9 @@ public abstract class AbstractSearchControllerIT {
         ResultActions response =
                 mockMvc.perform(
                         get(getSearchRequestPath())
-                                .param("query", "(6-phosphofructo-2-kinase/fructose-2,6-bisphosphatase 4)")
+                                .param(
+                                        "query",
+                                        "(6-phosphofructo-2-kinase/fructose-2,6-bisphosphatase 4)")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -848,8 +850,7 @@ public abstract class AbstractSearchControllerIT {
     }
 
     protected Stream<Arguments> getAllReturnedFields() {
-        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType())
-                .getReturnFields()
+        return ReturnFieldConfigFactory.getReturnFieldConfig(getUniProtDataType()).getReturnFields()
                 .stream()
                 .map(returnField -> Arguments.of(returnField.getName(), returnField.getPaths()));
     }
