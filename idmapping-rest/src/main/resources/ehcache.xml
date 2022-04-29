@@ -3,16 +3,15 @@
 	xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd">
 
 	<cache alias="pirIDMappingCache">
-
+		<key-type>java.lang.String</key-type>
+		<value-type>org.uniprot.api.idmapping.model.IdMappingJob</value-type>
 		<expiry>
-			<!-- entries in cache should expire if not accessed for this time -->
-			<tti unit="seconds">1200</tti>
+			<!-- Entries in the cache should expire after the defined time. -->
+			<ttl unit="seconds">1200</ttl>
 		</expiry>
-
 		<resources>
-			<heap unit="MB">4000</heap>
+			<heap unit="MB">500</heap>
 		</resources>
-
 		<heap-store-settings>
 			<max-object-graph-size>100000</max-object-graph-size>
 		</heap-store-settings>

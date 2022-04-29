@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.service.query;
 
+import static org.uniprot.api.rest.validation.ValidSolrQuerySyntax.QuerySyntaxValidator.replaceForwardSlashes;
+
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,7 +55,9 @@ public class UniProtQueryProcessor implements QueryProcessor {
         try {
             StandardSyntaxParser syntaxParser = new StandardSyntaxParser();
 
-            QueryNode queryTree = syntaxParser.parse(query, IMPOSSIBLE_FIELD);
+            String queryWithEscapedForwardSlashes = replaceForwardSlashes(query);
+            QueryNode queryTree =
+                    syntaxParser.parse(queryWithEscapedForwardSlashes, IMPOSSIBLE_FIELD);
             QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
             return processedQueryTree.toQueryString(ESCAPER).toString();
         } catch (Exception e) {

@@ -221,7 +221,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 "Sequence length",
                                 "Status",
                                 "Annotation score",
-                                "Model organisms",
+                                "Popular organisms",
                                 "Proteomes"));
         return List.of(rm1, rm2);
     }
@@ -289,7 +289,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 "Sequence length",
                                 "Status",
                                 "Annotation score",
-                                "Model organisms",
+                                "Popular organisms",
                                 "Proteomes"));
         ResultMatcher rm4 =
                 jsonPath(
