@@ -88,7 +88,7 @@ public class DataStoreTestConfig {
             @Value("${search.default.page.size:#{null}}") Integer defaultPageSize) {
         return new IdMappingPIRService(defaultPageSize) {
             @Override
-            public IdMappingResult mapIds(IdMappingJobRequest request) {
+            public IdMappingResult mapIds(IdMappingJobRequest request, String jobId) {
                 return null;
             }
         };
