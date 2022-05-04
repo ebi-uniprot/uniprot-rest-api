@@ -25,6 +25,10 @@ import org.uniprot.api.uniprotkb.service.UniProtKBEntryInteractionService;
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -66,6 +70,16 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
     @GetMapping(
             value = "/{accession}/interactions",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
+    @Operation(
+            summary = "Get list of interactions in the given entry accession.",
+            responses = {
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = InteractionEntry.class))
+                        })
+            })
     public ResponseEntity<MessageConverterContext<InteractionEntry>> getInteractions(
             @PathVariable("accession")
                     @Pattern(
