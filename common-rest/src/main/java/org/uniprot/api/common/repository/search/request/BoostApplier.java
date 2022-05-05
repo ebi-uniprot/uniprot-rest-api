@@ -50,7 +50,7 @@ public class BoostApplier {
                             // apply the boost if the value is non-numeric
                             if (!StringUtils.isNumeric(term)) {
                                 String processedBoost =
-                                        boost.replace(QUERY_PLACEHOLDER, "(" + term + ")");
+                                        boost.replace(QUERY_PLACEHOLDER, "( \"" + term + "\" )");
                                 solrQuery.add(BOOST_QUERY, processedBoost);
                             }
                         }
