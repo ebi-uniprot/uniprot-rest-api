@@ -46,18 +46,20 @@ public class RepositoryConfig {
 
     @Bean
     @Profile("live")
-    public SolrClient solrClient(HttpClient httpClient, RepositoryConfigProperties config) {
+    public SolrClient solrClient(RepositoryConfigProperties config) {
         String zookeeperhost = config.getZkHost();
+        if (!config.getUsername().isEmpty() && !config.getPassword().isEmpty()) {
+            SolrPreemptiveAuthInterceptor authInterceptor = new SolrPreemptiveAuthInterceptor(config);
+            HttpClientUtil.addRequestInterceptor(authInterceptor);
+        }
         if (zookeeperhost != null && !zookeeperhost.isEmpty()) {
             String[] zookeeperHosts = zookeeperhost.split(",");
             return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
-                    .withHttpClient(httpClient)
                     .withConnectionTimeout(config.getConnectionTimeout())
                     .withSocketTimeout(config.getSocketTimeout())
                     .build();
         } else if (!config.getHttphost().isEmpty()) {
             return new HttpSolrClient.Builder()
-                    .withHttpClient(httpClient)
                     .withBaseSolrUrl(config.getHttphost())
                     .build();
         } else {
