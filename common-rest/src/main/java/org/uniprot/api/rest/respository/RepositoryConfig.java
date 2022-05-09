@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import java.util.Optional;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpClientUtil;
@@ -41,27 +42,25 @@ public class RepositoryConfig {
             param.add(HttpClientUtil.PROP_BASIC_AUTH_USER, config.getUsername());
             param.add(HttpClientUtil.PROP_BASIC_AUTH_PASS, config.getPassword());
         }
-        return HttpClientUtil.createClient(param);
+
+        PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
+
+        return HttpClientUtil.createClient(param, manager, true);
     }
 
     @Bean
     @Profile("live")
-    public SolrClient solrClient(RepositoryConfigProperties config) {
+    public SolrClient solrClient(HttpClient httpClient, RepositoryConfigProperties config) {
         String zookeeperhost = config.getZkHost();
-        if (!config.getUsername().isEmpty() && !config.getPassword().isEmpty()) {
-            SolrPreemptiveAuthInterceptor authInterceptor = new SolrPreemptiveAuthInterceptor(config);
-            HttpClientUtil.addRequestInterceptor(authInterceptor);
-        }
         if (zookeeperhost != null && !zookeeperhost.isEmpty()) {
             String[] zookeeperHosts = zookeeperhost.split(",");
             return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
                     .withConnectionTimeout(config.getConnectionTimeout())
+                    .withHttpClient(httpClient)
                     .withSocketTimeout(config.getSocketTimeout())
                     .build();
         } else if (!config.getHttphost().isEmpty()) {
-            return new HttpSolrClient.Builder()
-                    .withBaseSolrUrl(config.getHttphost())
-                    .build();
+            return new HttpSolrClient.Builder().withBaseSolrUrl(config.getHttphost()).build();
         } else {
             throw new BeanCreationException(
                     "make sure your application.properties has eight solr zookeeperhost or httphost properties");

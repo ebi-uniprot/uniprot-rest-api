@@ -1,5 +1,9 @@
 package org.uniprot.api.rest.respository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.IOException;
+
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -10,10 +14,6 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class SolrPreemptiveAuthInterceptorTest {
 
@@ -26,14 +26,14 @@ class SolrPreemptiveAuthInterceptorTest {
         assertNotNull(auth);
         AuthState authState = Mockito.mock(AuthState.class);
         HttpContext context = Mockito.mock(HttpContext.class);
-        Mockito.when(context.getAttribute(HttpClientContext.TARGET_AUTH_STATE)).thenReturn(authState);
+        Mockito.when(context.getAttribute(HttpClientContext.TARGET_AUTH_STATE))
+                .thenReturn(authState);
 
         HttpHost httpHost = Mockito.mock(HttpHost.class);
         Mockito.when(httpHost.getHostName()).thenReturn("hostName");
         Mockito.when(httpHost.getPort()).thenReturn(8080);
 
         Mockito.when(context.getAttribute(HttpCoreContext.HTTP_TARGET_HOST)).thenReturn(httpHost);
-
 
         CredentialsProvider creds = Mockito.mock(CredentialsProvider.class);
         Mockito.when(context.getAttribute(HttpClientContext.CREDS_PROVIDER)).thenReturn(creds);

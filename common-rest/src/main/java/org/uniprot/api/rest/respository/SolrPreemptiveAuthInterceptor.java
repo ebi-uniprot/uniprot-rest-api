@@ -1,6 +1,9 @@
 package org.uniprot.api.rest.respository;
 
+import java.io.IOException;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
@@ -16,18 +19,18 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpCoreContext;
 
-import java.io.IOException;
-
 @Slf4j
-public class SolrPreemptiveAuthInterceptor  implements HttpRequestInterceptor {
+public class SolrPreemptiveAuthInterceptor implements HttpRequestInterceptor {
 
     private final RepositoryConfigProperties config;
 
-    public SolrPreemptiveAuthInterceptor(RepositoryConfigProperties config){
+    public SolrPreemptiveAuthInterceptor(RepositoryConfigProperties config) {
         this.config = config;
     }
+
     @Override
-    public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
+    public void process(HttpRequest request, HttpContext context)
+            throws HttpException, IOException {
         AuthState authState = (AuthState) context.getAttribute(HttpClientContext.TARGET_AUTH_STATE);
         // If no auth scheme available yet, try to initialize it preemptively
         if (authState.getAuthScheme() == null) {
@@ -36,10 +39,11 @@ public class SolrPreemptiveAuthInterceptor  implements HttpRequestInterceptor {
             HttpHost targetHost = (HttpHost) context.getAttribute(HttpCoreContext.HTTP_TARGET_HOST);
             AuthScope authScope = new AuthScope(targetHost.getHostName(), targetHost.getPort());
 
-            CredentialsProvider credsProvider = (CredentialsProvider) context.getAttribute(HttpClientContext.CREDS_PROVIDER);
+            CredentialsProvider credsProvider =
+                    (CredentialsProvider) context.getAttribute(HttpClientContext.CREDS_PROVIDER);
 
             Credentials creds = credsProvider.getCredentials(authScope);
-            if(creds == null){
+            if (creds == null) {
                 log.info("No Basic Auth credentials: add them");
                 creds = getCredentials(authScope);
             }
@@ -49,7 +53,8 @@ public class SolrPreemptiveAuthInterceptor  implements HttpRequestInterceptor {
 
     private Credentials getCredentials(AuthScope authScope) {
         if (!config.getUsername().isEmpty() && !config.getPassword().isEmpty()) {
-            UsernamePasswordCredentials creds = new UsernamePasswordCredentials(config.getUsername(), config.getPassword());
+            UsernamePasswordCredentials creds =
+                    new UsernamePasswordCredentials(config.getUsername(), config.getPassword());
 
             CredentialsProvider credsProvider = new BasicCredentialsProvider();
             credsProvider.setCredentials(authScope, creds);
