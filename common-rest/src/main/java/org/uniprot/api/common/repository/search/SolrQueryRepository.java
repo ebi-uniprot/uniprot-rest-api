@@ -36,6 +36,7 @@ import org.uniprot.store.search.document.Document;
  */
 public abstract class SolrQueryRepository<T extends Document> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SolrQueryRepository.class);
+    public static final String SPELLCHECK_PARAM = "spellcheck";
     private final TermInfoConverter termInfoConverter;
     private final SolrRequestConverter requestConverter;
 
@@ -132,7 +133,8 @@ public abstract class SolrQueryRepository<T extends Document> {
                     .set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
         } else {
             ((ModifiableSolrParams) solrQuery.getParams())
-                    .set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START);
+                    .set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START)
+                    .set(SPELLCHECK_PARAM, true);
         }
         return solrQuery.process(solrClient, collection.toString());
     }

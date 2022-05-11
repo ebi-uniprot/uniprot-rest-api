@@ -1,16 +1,20 @@
 package org.uniprot.api.rest.controller;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.rest.app.FakeBasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -72,5 +76,13 @@ class BasicSearchControllerTest {
         controller.getDeferredResultResponseEntity(() -> context, mock(HttpServletRequest.class));
 
         assertTrue(true);
+    }
+
+    @Test
+    void invalidMediaTypeThrowsException() throws InterruptedException {
+        setUp(false);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn("INVALID");
+        assertThrows(ImportantMessageServiceException.class, () -> controller.getAcceptHeader(request));
     }
 }
