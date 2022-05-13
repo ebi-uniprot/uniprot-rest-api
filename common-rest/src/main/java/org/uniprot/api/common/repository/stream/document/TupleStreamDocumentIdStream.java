@@ -25,8 +25,8 @@ public class TupleStreamDocumentIdStream implements DocumentIdStream {
 
     @SuppressWarnings("squid:S2095")
     public Stream<String> fetchIds(SolrRequest solrRequest) {
+        TupleStream tupleStream = tupleStreamTemplate.create(solrRequest);
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(solrRequest);
             tupleStream.open();
             return StreamSupport.stream(
                             new TupleStreamIterable(tupleStream, streamConfig.getIdFieldName())

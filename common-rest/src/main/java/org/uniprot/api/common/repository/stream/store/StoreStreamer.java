@@ -37,8 +37,8 @@ public class StoreStreamer<T> {
 
     @SuppressWarnings("squid:S2095")
     public Stream<T> idsToStoreStream(SolrRequest solrRequest) {
+        TupleStream tupleStream = tupleStreamTemplate.create(solrRequest);
         try {
-            TupleStream tupleStream = tupleStreamTemplate.create(solrRequest);
             tupleStream.open();
 
             BatchStoreIterable<T> batchStoreIterable =
@@ -51,6 +51,7 @@ public class StoreStreamer<T> {
                     .flatMap(Collection::stream)
                     .onClose(() -> closeTupleStream(tupleStream));
         } catch (IOException e) {
+            closeTupleStream(tupleStream);
             throw new IllegalStateException(e);
         }
     }
