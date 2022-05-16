@@ -83,6 +83,7 @@ class BasicSearchControllerTest {
         setUp(false);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn("INVALID");
-        assertThrows(ImportantMessageServiceException.class, () -> controller.getAcceptHeader(request));
+        assertThrows(
+                ImportantMessageServiceException.class, () -> controller.getAcceptHeader(request));
     }
 }
