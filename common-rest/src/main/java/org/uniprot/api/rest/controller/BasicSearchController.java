@@ -245,8 +245,8 @@ public abstract class BasicSearchController<T> {
         String mediaType = request.getHeader(HttpHeaders.ACCEPT);
         try {
             return UniProtMediaType.valueOf(mediaType);
-        } catch (InvalidMediaTypeException e){
-            throw new ImportantMessageServiceException("The mediaType is invalid: "+mediaType, e);
+        } catch (InvalidMediaTypeException e) {
+            throw new ImportantMessageServiceException("The mediaType is invalid: " + mediaType, e);
         }
     }
 

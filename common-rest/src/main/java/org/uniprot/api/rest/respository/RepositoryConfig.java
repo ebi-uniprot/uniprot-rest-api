@@ -12,6 +12,7 @@ import org.apache.solr.client.solrj.impl.HttpClientUtil;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,12 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
  */
 @Configuration
 public class RepositoryConfig {
+
+    @Value("${maxConnection}")
+    private Integer maxConnection;
+
+    @Value("${maxConnectionPerRoute}")
+    private Integer maxConnectionPerRoute;
 
     @Bean
     public RepositoryConfigProperties repositoryConfigProperties() {
@@ -39,12 +46,13 @@ public class RepositoryConfig {
         ModifiableSolrParams param = null;
         if (!config.getUsername().isEmpty() && !config.getPassword().isEmpty()) {
             param = new ModifiableSolrParams();
-            param.add(HttpClientUtil.PROP_BASIC_AUTH_USER, config.getUsername());
+            param.add(HttpClientUtil.PROP_BASIC_AUTH_USER, config.getUsername());1
             param.add(HttpClientUtil.PROP_BASIC_AUTH_PASS, config.getPassword());
         }
 
         PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
-
+        manager.setMaxTotal(this.maxConnection);
+        manager.setDefaultMaxPerRoute(maxConnectionPerRoute);
         return HttpClientUtil.createClient(param, manager, true);
     }
 

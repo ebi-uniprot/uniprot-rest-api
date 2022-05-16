@@ -16,6 +16,7 @@ class URLRetrievalSimulation extends Simulation {
   val httpConf = http
     .userAgentHeader("Benchmarker")
     .doNotTrackHeader("1")
+    .shareConnections()
 
   val host = conf.getString("a.s.host")
   val feeder = separatedValues(conf.getString("a.s.url.retrieval.list"), '#').random
