@@ -30,20 +30,20 @@ import static org.uniprot.api.common.concurrency.RateLimits.SEARCH_RATE_LIMIT_PE
  */
 @Configuration
 public class RepositoryConfig {
-    @Value("${rateLimitPerSecond.search:" + SEARCH_RATE_LIMIT_PER_MINUTE + "}")
-    private int searchRateLimitPerSecond;
+    @Value("${rateLimitPerMinute.search:" + SEARCH_RATE_LIMIT_PER_MINUTE + "}")
+    private int searchRateLimit;
 
-    @Value("${rateLimitPerSecond.getAll:" + GET_ALL_RATE_LIMIT_PER_MINUTE + "}")
-    private int getAllRateLimitPerSecond;
+    @Value("${rateLimitPerMinute.getAll:" + GET_ALL_RATE_LIMIT_PER_MINUTE + "}")
+    private int getAllRateLimit;
 
     @Bean
     public RateLimits rateLimits() {
         return RateLimits.builder()
                 .searchRateLimiter(
-                        RateLimiter.smoothBuilder(searchRateLimitPerSecond, Duration.ofSeconds(1))
+                        RateLimiter.smoothBuilder(searchRateLimit, Duration.ofSeconds(1))
                                 .build())
                 .getAllRateLimiter(
-                        RateLimiter.smoothBuilder(getAllRateLimitPerSecond, Duration.ofSeconds(1))
+                        RateLimiter.smoothBuilder(getAllRateLimit, Duration.ofSeconds(1))
                                 .build())
                 .build();
     }
