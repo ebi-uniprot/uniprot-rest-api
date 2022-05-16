@@ -53,7 +53,7 @@ class RampingURLRetrievalSimulation extends Simulation {
 
   setUp(
     instance.inject(
-      atOnceUsers(conf.getInt("a.s.url.retrieval.users")).throttle(
+      atOnceUsers(conf.getInt("a.s.url.retrieval.users"))))  .throttle(
         // ------------- CYCLE 1 -----------------
         // constant requests/sec
         reachRps(conf.getInt("a.s.url.retrieval.constantRPS")) in (10 seconds),
@@ -86,8 +86,7 @@ class RampingURLRetrievalSimulation extends Simulation {
         // constant requests/sec
         reachRps(conf.getInt("a.s.url.retrieval.constantRPS")) in (10 seconds),
         holdFor(conf.getInt("a.s.url.retrieval.constantRPSDuration") minutes)
-      ))
-  )
+      )
     .protocols(httpConf)
     .maxDuration(conf.getInt("a.s.url.retrieval.maxDuration") minutes)
     .assertions(global.successfulRequests.percent.gt(conf.getInt("a.s.url.retrieval.successPercentGreaterThan")),
