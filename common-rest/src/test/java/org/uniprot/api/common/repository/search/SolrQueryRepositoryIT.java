@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.uniprot.api.common.concurrency.RateLimits;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -53,6 +54,7 @@ class SolrQueryRepositoryIT {
             storeManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
             SolrClient solrClient = storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT);
             queryRepo = new GeneralSolrQueryRepository(solrClient, facetConfig);
+            System.out.println("thing");
         } catch (Exception e) {
             fail("Error to setup SolrQueryRepositoryTest", e);
         }
@@ -411,7 +413,8 @@ class SolrQueryRepositoryIT {
                     SolrCollection.uniprot,
                     UniProtDocument.class,
                     facetConfig,
-                    new GeneralSolrRequestConverter());
+                    new GeneralSolrRequestConverter(),
+                    RateLimits.builder().build());
         }
     }
 

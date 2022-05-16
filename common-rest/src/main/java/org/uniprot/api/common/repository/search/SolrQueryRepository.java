@@ -1,10 +1,5 @@
 package org.uniprot.api.common.repository.search;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
@@ -13,7 +8,9 @@ import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.uniprot.api.common.concurrency.RateLimits;
 import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.exception.ServiceTooBusyException;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetResponseConverter;
@@ -24,6 +21,11 @@ import org.uniprot.api.common.repository.search.term.TermInfo;
 import org.uniprot.api.common.repository.search.term.TermInfoConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Solr Basic Repository class to enable the execution of dynamically build queries in a solr
@@ -39,6 +41,7 @@ public abstract class SolrQueryRepository<T extends Document> {
     public static final String SPELLCHECK_PARAM = "spellcheck";
     private final TermInfoConverter termInfoConverter;
     private final SolrRequestConverter requestConverter;
+    private final RateLimits rateLimits;
 
     private final SolrClient solrClient;
     private final SolrCollection collection;
@@ -51,12 +54,14 @@ public abstract class SolrQueryRepository<T extends Document> {
             SolrCollection collection,
             Class<T> tClass,
             FacetConfig facetConfig,
-            SolrRequestConverter requestConverter) {
+            SolrRequestConverter requestConverter,
+            RateLimits rateLimits) {
         this.solrClient = solrClient;
         this.collection = collection;
         this.tClass = tClass;
         this.facetConverter = new FacetResponseConverter(facetConfig);
         this.requestConverter = requestConverter;
+        this.rateLimits = rateLimits;
         this.termInfoConverter = new TermInfoConverter();
         this.suggestionConverter = new SuggestionConverter();
     }
@@ -75,8 +80,8 @@ public abstract class SolrQueryRepository<T extends Document> {
             List<Suggestion> suggestions = suggestionConverter.convert(solrResponse);
 
             return QueryResult.of(resultList.stream(), page, facets, termInfos, null, suggestions);
-        } catch (InvalidRequestException ire) {
-            throw ire;
+        } catch (InvalidRequestException | ServiceTooBusyException e) {
+            throw e;
         } catch (Exception e) {
             if (e.getCause() instanceof InvalidRequestException) {
                 throw (InvalidRequestException) e.getCause();
@@ -101,6 +106,8 @@ public abstract class SolrQueryRepository<T extends Document> {
             } else {
                 return Optional.empty();
             }
+        } catch (ServiceTooBusyException e) {
+            throw e;
         } catch (Exception e) {
             throw new QueryRetrievalException("Error executing solr query", e);
         } finally {
@@ -115,10 +122,16 @@ public abstract class SolrQueryRepository<T extends Document> {
                         collection,
                         requestConverter.toJsonQueryRequest(request),
                         tClass);
-        return StreamSupport.stream(
-                        Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
-                        false)
-                .flatMap(Collection::stream);
+
+        if (this.rateLimits.getGetAllRateLimiter().tryAcquirePermit()) {
+            return StreamSupport.stream(
+                            Spliterators.spliteratorUnknownSize(
+                                    resultsIterator, Spliterator.ORDERED),
+                            false)
+                    .flatMap(Collection::stream);
+        } else {
+            throw new ServiceTooBusyException();
+        }
     }
 
     protected List<T> getResponseDocuments(QueryResponse solrResponse) {
@@ -136,7 +149,12 @@ public abstract class SolrQueryRepository<T extends Document> {
                     .set(CursorMarkParams.CURSOR_MARK_PARAM, CursorMarkParams.CURSOR_MARK_START)
                     .set(SPELLCHECK_PARAM, true);
         }
-        return solrQuery.process(solrClient, collection.toString());
+
+        if (this.rateLimits.getSearchRateLimiter().tryAcquirePermit()) {
+            return solrQuery.process(solrClient, collection.toString());
+        } else {
+            throw new ServiceTooBusyException();
+        }
     }
 
     private void logSolrQuery(SolrRequest request) {

@@ -2,6 +2,7 @@ package org.uniprot.api.proteome.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
+import org.uniprot.api.common.concurrency.RateLimits;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.store.search.SolrCollection;
@@ -17,12 +18,14 @@ public class GeneCentricQueryRepository extends SolrQueryRepository<GeneCentricD
     public GeneCentricQueryRepository(
             SolrClient solrClient,
             GeneCentricFacetConfig facetConfig,
-            SolrRequestConverter requestConverter) {
+            SolrRequestConverter requestConverter,
+            RateLimits rateLimits) {
         super(
                 solrClient,
                 SolrCollection.genecentric,
                 GeneCentricDocument.class,
                 facetConfig,
-                requestConverter);
+                requestConverter,
+                rateLimits);
     }
 }

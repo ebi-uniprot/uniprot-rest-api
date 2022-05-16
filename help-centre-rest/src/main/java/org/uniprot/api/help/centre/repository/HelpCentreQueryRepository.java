@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.stereotype.Repository;
+import org.uniprot.api.common.concurrency.RateLimits;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.core.util.Utils;
@@ -22,8 +23,9 @@ public class HelpCentreQueryRepository extends SolrQueryRepository<HelpDocument>
     protected HelpCentreQueryRepository(
             SolrClient solrClient,
             HelpCentreFacetConfig facetConfig,
-            SolrRequestConverter requestConverter) {
-        super(solrClient, SolrCollection.help, HelpDocument.class, facetConfig, requestConverter);
+            SolrRequestConverter requestConverter,
+            RateLimits rateLimits) {
+        super(solrClient, SolrCollection.help, HelpDocument.class, facetConfig, requestConverter, rateLimits);
     }
 
     @Override

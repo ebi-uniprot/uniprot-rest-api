@@ -2,6 +2,7 @@ package org.uniprot.api.support.data.keyword.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
+import org.uniprot.api.common.concurrency.RateLimits;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.store.search.SolrCollection;
@@ -14,12 +15,14 @@ public class KeywordRepository extends SolrQueryRepository<KeywordDocument> {
     protected KeywordRepository(
             SolrClient solrClient,
             SolrRequestConverter requestConverter,
-            KeywordFacetConfig facetConfig) {
+            KeywordFacetConfig facetConfig,
+            RateLimits rateLimits) {
         super(
                 solrClient,
                 SolrCollection.keyword,
                 KeywordDocument.class,
                 facetConfig,
-                requestConverter);
+                requestConverter,
+                rateLimits);
     }
 }

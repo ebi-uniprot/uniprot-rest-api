@@ -1,14 +1,15 @@
 package org.uniprot.api.help.centre.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.uniprot.api.common.concurrency.RateLimits;
+import org.uniprot.store.search.document.help.HelpDocument;
 
 import java.util.List;
 import java.util.Map;
 
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.uniprot.store.search.document.help.HelpDocument;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author lgonzales
@@ -26,7 +27,8 @@ class HelpCentreQueryRepositoryTest {
         QueryResponse queryResults = Mockito.mock(QueryResponse.class);
         Mockito.when(queryResults.getBeans(HelpDocument.class)).thenReturn(List.of(doc));
         Mockito.when(queryResults.getHighlighting()).thenReturn(highlight);
-        HelpCentreQueryRepository repository = new HelpCentreQueryRepository(null, null, null);
+        HelpCentreQueryRepository repository =
+                new HelpCentreQueryRepository(null, null, null, RateLimits.builder().build());
         List<HelpDocument> result = repository.getResponseDocuments(queryResults);
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -45,7 +47,8 @@ class HelpCentreQueryRepositoryTest {
         QueryResponse queryResults = Mockito.mock(QueryResponse.class);
         Mockito.when(queryResults.getBeans(HelpDocument.class)).thenReturn(List.of(doc));
 
-        HelpCentreQueryRepository repository = new HelpCentreQueryRepository(null, null, null);
+        HelpCentreQueryRepository repository =
+                new HelpCentreQueryRepository(null, null, null, RateLimits.builder().build());
         List<HelpDocument> result = repository.getResponseDocuments(queryResults);
 
         assertNotNull(result);

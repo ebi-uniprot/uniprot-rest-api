@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.repository.search.impl;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
+import org.uniprot.api.common.concurrency.RateLimits;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
@@ -18,12 +19,12 @@ public class UniprotQueryRepository extends SolrQueryRepository<UniProtDocument>
     public UniprotQueryRepository(
             SolrClient solrClient,
             UniProtKBFacetConfig facetConfig,
-            SolrRequestConverter requestConverter) {
+            SolrRequestConverter requestConverter, RateLimits rateLimits) {
         super(
                 solrClient,
                 SolrCollection.uniprot,
                 UniProtDocument.class,
                 facetConfig,
-                requestConverter);
+                requestConverter, rateLimits);
     }
 }

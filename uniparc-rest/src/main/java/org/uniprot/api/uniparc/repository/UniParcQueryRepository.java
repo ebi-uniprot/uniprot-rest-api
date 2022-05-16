@@ -2,6 +2,7 @@ package org.uniprot.api.uniparc.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
+import org.uniprot.api.common.concurrency.RateLimits;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
@@ -17,12 +18,12 @@ public class UniParcQueryRepository extends SolrQueryRepository<UniParcDocument>
     public UniParcQueryRepository(
             SolrClient solrClient,
             UniParcFacetConfig facetConfig,
-            SolrRequestConverter requestConverter) {
+            SolrRequestConverter requestConverter, RateLimits rateLimits) {
         super(
                 solrClient,
                 SolrCollection.uniparc,
                 UniParcDocument.class,
                 facetConfig,
-                requestConverter);
+                requestConverter, rateLimits);
     }
 }

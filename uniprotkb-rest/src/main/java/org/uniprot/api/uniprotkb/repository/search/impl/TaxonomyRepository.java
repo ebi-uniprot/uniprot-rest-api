@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.repository.search.impl;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
+import org.uniprot.api.common.concurrency.RateLimits;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.store.search.SolrCollection;
@@ -16,12 +17,12 @@ public class TaxonomyRepository extends SolrQueryRepository<TaxonomyDocument> {
     protected TaxonomyRepository(
             SolrClient solrClient,
             TaxonomyFacetConfig facetConfig,
-            SolrRequestConverter requestConverter) {
+            SolrRequestConverter requestConverter, RateLimits rateLimits) {
         super(
                 solrClient,
                 SolrCollection.taxonomy,
                 TaxonomyDocument.class,
                 facetConfig,
-                requestConverter);
+                requestConverter, rateLimits);
     }
 }
