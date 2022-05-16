@@ -82,6 +82,10 @@ class URLRetrievalSimulation extends Simulation {
         // peak requests/sec
         jumpToRps(conf.getInt("a.s.url.retrieval.maxRPS")),
         holdFor(conf.getInt("a.s.url.retrieval.maxRPSDuration") minutes),
+        // ------------- RETURN TO CONSTANT REQUESTS -----------------
+        // constant requests/sec
+        reachRps(conf.getInt("a.s.url.retrieval.constantRPS")) in (10 seconds),
+        holdFor(conf.getInt("a.s.url.retrieval.constantRPSDuration") minutes)
       )
   )
     .protocols(httpConf)
