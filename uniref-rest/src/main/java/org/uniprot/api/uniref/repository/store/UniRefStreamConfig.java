@@ -41,7 +41,7 @@ public class UniRefStreamConfig {
     public TupleStreamTemplate tupleStreamTemplate(
             StreamerConfigProperties configProperties,
             HttpClient httpClient,
-            @Qualifier("nonKBSolrClient") SolrClient solrClient,
+            SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)

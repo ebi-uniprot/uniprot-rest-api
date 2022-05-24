@@ -1,7 +1,6 @@
 package org.uniprot.api.aa.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -15,7 +14,7 @@ import org.uniprot.store.search.document.unirule.UniRuleDocument;
 @Repository
 public class UniRuleQueryRepository extends SolrQueryRepository<UniRuleDocument> {
     public UniRuleQueryRepository(
-            @Qualifier("nonKBSolrClient") SolrClient solrClient,
+            SolrClient solrClient,
             UniRuleFacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
         super(

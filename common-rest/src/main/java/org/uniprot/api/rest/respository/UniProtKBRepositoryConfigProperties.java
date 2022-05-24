@@ -10,8 +10,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author lgonzales
  */
 @Data
-@ConfigurationProperties(prefix = "spring.data.solr.nonkb")
-public class NonKBRepositoryConfigProperties {
+@ConfigurationProperties(prefix = "spring.data.solr.kb")
+public class UniProtKBRepositoryConfigProperties {
     private static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 1000 * 20;
     private static final int DEFAULT_SOCKET_TIMEOUT_MILLIS = 1000 * 60 * 60;
 

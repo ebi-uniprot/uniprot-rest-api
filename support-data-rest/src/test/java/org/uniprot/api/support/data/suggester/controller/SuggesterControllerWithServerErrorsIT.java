@@ -117,7 +117,7 @@ class SuggesterControllerWithServerErrorsIT {
     @TestConfiguration
     @Profile("server-errors")
     static class OtherConfig {
-        @Bean("nonKBSolrClient")
+        @Bean
         @Primary
         public SolrClient solrClient() {
             return mock(SolrClient.class);

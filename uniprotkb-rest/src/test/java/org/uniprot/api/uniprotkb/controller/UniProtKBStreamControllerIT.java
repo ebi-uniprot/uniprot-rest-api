@@ -38,6 +38,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -104,7 +105,11 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                     new HashMap<>());
     @Autowired UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private MockMvc mockMvc;
-    @Autowired private SolrClient solrClient;
+
+    @Autowired
+    @Qualifier("uniProtKBSolrClient")
+    private SolrClient solrClient;
+
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
