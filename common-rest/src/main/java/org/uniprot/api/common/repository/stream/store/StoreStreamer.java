@@ -49,7 +49,7 @@ public class StoreStreamer<T> {
             return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                     .flatMap(Collection::stream)
                     .onClose(() -> closeTupleStream(tupleStream));
-        } catch (IOException e) {
+        } catch (Exception e) {
             closeTupleStream(tupleStream);
             throw new IllegalStateException(e);
         }

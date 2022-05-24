@@ -33,7 +33,7 @@ public class TupleStreamDocumentIdStream implements DocumentIdStream {
                                     .spliterator(),
                             false)
                     .onClose(() -> closeTupleStream(tupleStream));
-        } catch (IOException e) {
+        } catch (Exception e) {
             closeTupleStream(tupleStream);
             throw new IllegalStateException(e);
         }

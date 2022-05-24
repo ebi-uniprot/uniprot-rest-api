@@ -26,13 +26,13 @@ import org.uniprot.store.datastore.voldemort.member.uniref.VoldemortInMemoryUniR
 @TestConfiguration
 public class DataStoreTestConfig {
 
-    @Bean
+    @Bean("nonKBHttpClient")
     @Profile("offline")
     public HttpClient httpClient() {
         return mock(HttpClient.class);
     }
 
-    @Bean
+    @Bean("nonKBSolrClient")
     @Profile("offline")
     public SolrClient unirefSolrClient() throws URISyntaxException {
         return mock(SolrClient.class);

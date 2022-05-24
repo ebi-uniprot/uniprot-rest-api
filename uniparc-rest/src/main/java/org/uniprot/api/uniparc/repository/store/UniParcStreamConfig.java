@@ -43,8 +43,8 @@ public class UniParcStreamConfig {
     @Bean
     public TupleStreamTemplate tupleStreamTemplate(
             StreamerConfigProperties configProperties,
-            HttpClient httpClient,
-            SolrClient solrClient,
+            @Qualifier("nonKBHttpClient") HttpClient httpClient,
+            @Qualifier("nonKBSolrClient") SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)

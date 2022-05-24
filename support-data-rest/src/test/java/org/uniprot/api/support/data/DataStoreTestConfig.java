@@ -16,13 +16,13 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 @TestConfiguration
 public class DataStoreTestConfig {
 
-    @Bean
+    @Bean("nonKBHttpClient")
     @Profile("offline")
     public HttpClient httpClient() {
         return mock(HttpClient.class);
     }
 
-    @Bean
+    @Bean("nonKBSolrClient")
     @Profile("offline")
     public SolrClient solrClient() {
         return mock(SolrClient.class);
