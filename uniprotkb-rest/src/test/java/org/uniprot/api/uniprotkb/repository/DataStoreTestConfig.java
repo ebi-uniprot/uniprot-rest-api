@@ -36,6 +36,12 @@ public class DataStoreTestConfig {
         return mock(HttpClient.class);
     }
 
+    @Bean("uniProtKBSolrClient")
+    @Profile("offline")
+    public SolrClient uniProtKBSolrClient() throws URISyntaxException {
+        return mock(SolrClient.class);
+    }
+
     @Bean
     @Profile("offline")
     public SolrClient solrClient() throws URISyntaxException {

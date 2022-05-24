@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.subcellular.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -17,8 +16,7 @@ public class SubcellularLocationRepository
         extends SolrQueryRepository<SubcellularLocationDocument> {
 
     protected SubcellularLocationRepository(
-            @Qualifier("nonKBSolrClient") SolrClient solrClient,
-            SolrRequestConverter requestConverter) {
+            SolrClient solrClient, SolrRequestConverter requestConverter) {
         super(
                 solrClient,
                 SolrCollection.subcellularlocation,

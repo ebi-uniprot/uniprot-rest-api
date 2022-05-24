@@ -1,7 +1,6 @@
 package org.uniprot.api.proteome.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -16,7 +15,7 @@ import org.uniprot.store.search.document.proteome.ProteomeDocument;
 public class ProteomeQueryRepository extends SolrQueryRepository<ProteomeDocument> {
 
     public ProteomeQueryRepository(
-            @Qualifier("nonKBSolrClient") SolrClient solrClient,
+            SolrClient solrClient,
             ProteomeFacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
         super(

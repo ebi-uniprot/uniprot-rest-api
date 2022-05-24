@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.keyword.repository;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -13,7 +12,7 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 public class KeywordRepository extends SolrQueryRepository<KeywordDocument> {
 
     protected KeywordRepository(
-            @Qualifier("nonKBSolrClient") SolrClient solrClient,
+            SolrClient solrClient,
             SolrRequestConverter requestConverter,
             KeywordFacetConfig facetConfig) {
         super(

@@ -22,13 +22,13 @@ import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEnt
 @TestConfiguration
 public class UniParcDataStoreTestConfig {
 
-    @Bean("nonKBHttpClient")
+    @Bean
     @Profile("offline")
     public HttpClient httpClient() {
         return mock(HttpClient.class);
     }
 
-    @Bean("nonKBSolrClient")
+    @Bean
     @Profile("offline")
     public SolrClient uniparcSolrClient() {
         return mock(SolrClient.class);

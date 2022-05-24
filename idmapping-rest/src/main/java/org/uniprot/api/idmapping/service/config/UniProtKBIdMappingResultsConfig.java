@@ -1,13 +1,19 @@
 package org.uniprot.api.idmapping.service.config;
 
+import static java.util.Arrays.asList;
+
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +29,9 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
+import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortRemoteUniProtKBEntryStore;
@@ -37,6 +45,18 @@ import org.uniprot.store.search.SolrCollection;
 @Import(RepositoryConfig.class)
 @Slf4j
 public class UniProtKBIdMappingResultsConfig {
+
+    @Bean("uniProtKBSolrClient")
+    @Profile("live")
+    public SolrClient uniProtKBSolrClient(
+            HttpClient httpClient, UniProtKBRepositoryConfigProperties config) {
+        return buildSolrClient(
+                httpClient,
+                config.getZkHost(),
+                config.getConnectionTimeout(),
+                config.getSocketTimeout(),
+                config.getHttphost());
+    }
 
     @Bean("uniProtKBStoreConfigProperties")
     @ConfigurationProperties(prefix = "voldemort.uniprot")
@@ -55,7 +75,7 @@ public class UniProtKBIdMappingResultsConfig {
             @Qualifier("uniProtKBStreamerConfigProperties")
                     StreamerConfigProperties configProperties,
             HttpClient httpClient,
-            SolrClient solrClient,
+            @Qualifier("uniProtKBSolrClient") SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)
@@ -124,5 +144,26 @@ public class UniProtKBIdMappingResultsConfig {
                         storeConfigProperties.getStoreName(),
                         storeConfigProperties.getHost());
         return new UniProtStoreClient<>(client);
+    }
+
+    private SolrClient buildSolrClient(
+            HttpClient httpClient,
+            String zkHost,
+            int connTimeout,
+            int sockTimeout,
+            String httpHost) {
+        if (Utils.notNullNotEmpty(zkHost)) {
+            String[] zookeeperHosts = zkHost.split(",");
+            return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
+                    .withConnectionTimeout(connTimeout)
+                    .withHttpClient(httpClient)
+                    .withSocketTimeout(sockTimeout)
+                    .build();
+        } else if (Utils.notNullNotEmpty(httpHost)) {
+            return new HttpSolrClient.Builder().withBaseSolrUrl(httpHost).build();
+        } else {
+            throw new BeanCreationException(
+                    "make sure your application.properties has right solr zookeeperhost or httphost properties");
+        }
     }
 }

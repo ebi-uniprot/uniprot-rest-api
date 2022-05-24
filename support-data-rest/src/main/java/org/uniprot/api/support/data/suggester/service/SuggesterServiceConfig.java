@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.suggester.service;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.store.search.SolrCollection;
@@ -16,7 +15,7 @@ import org.uniprot.store.search.SolrCollection;
 @Configuration
 public class SuggesterServiceConfig {
     @Bean
-    public SuggesterService suggesterService(@Qualifier("nonKBSolrClient") SolrClient solrClient) {
+    public SuggesterService suggesterService(SolrClient solrClient) {
         return new SuggesterService(solrClient, SolrCollection.suggest);
     }
 }

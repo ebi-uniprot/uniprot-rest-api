@@ -2,6 +2,7 @@ package org.uniprot.api.rest.respository;
 
 import static java.util.Arrays.asList;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.http.client.HttpClient;
@@ -12,7 +13,6 @@ import org.apache.solr.client.solrj.impl.HttpClientUtil;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -33,20 +33,14 @@ public class RepositoryConfig {
     }
 
     @Bean
-    public NonKBRepositoryConfigProperties nonKBRepositoryConfigProperties() {
-        return new NonKBRepositoryConfigProperties();
+    public UniProtKBRepositoryConfigProperties uniProtKBRepositoryConfigProperties() {
+        return new UniProtKBRepositoryConfigProperties();
     }
 
     @Bean
     @Profile("live")
     public HttpClient httpClient(RepositoryConfigProperties config) {
         return buildHttpClient(config.getUsername(), config.getPassword());
-    }
-
-    @Bean("nonKBHttpClient")
-    @Profile("live")
-    public HttpClient nonKBHttpClient(NonKBRepositoryConfigProperties nonKBConfig) {
-        return buildHttpClient(nonKBConfig.getUsername(), nonKBConfig.getPassword());
     }
 
     @Bean
@@ -60,19 +54,6 @@ public class RepositoryConfig {
                 config.getHttphost());
     }
 
-    @Bean("nonKBSolrClient")
-    @Profile("live")
-    public SolrClient nonKBSolrClient(
-            @Qualifier("nonKBHttpClient") HttpClient nonKBHttpClient,
-            NonKBRepositoryConfigProperties nonKBConfig) {
-        return buildSolrClient(
-                nonKBHttpClient,
-                nonKBConfig.getZkHost(),
-                nonKBConfig.getConnectionTimeout(),
-                nonKBConfig.getSocketTimeout(),
-                nonKBConfig.getHttphost());
-    }
-
     @Bean
     @Profile("live")
     public SolrRequestConverter requestConverter() {
@@ -83,14 +64,18 @@ public class RepositoryConfig {
         // I am creating HttpClient exactly in the same way it is created inside
         // CloudSolrClient.Builder,
         // but here I am just adding Credentials
-        ModifiableSolrParams param = null;
+        ModifiableSolrParams params = null;
         if (Utils.notNullNotEmpty(username) && Utils.notNullNotEmpty(password)) {
-            param = new ModifiableSolrParams();
-            param.add(HttpClientUtil.PROP_BASIC_AUTH_USER, username);
-            param.add(HttpClientUtil.PROP_BASIC_AUTH_PASS, password);
+            params = new ModifiableSolrParams();
+            params.add(HttpClientUtil.PROP_BASIC_AUTH_USER, username);
+            params.add(HttpClientUtil.PROP_BASIC_AUTH_PASS, password);
         }
         PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
-        return HttpClientUtil.createClient(param, manager, true);
+
+        if (Objects.isNull(params)) {
+            params = new ModifiableSolrParams();
+        }
+        return HttpClientUtil.createClient(params, manager, true);
     }
 
     private SolrClient buildSolrClient(
