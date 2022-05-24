@@ -20,8 +20,8 @@ import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdSt
 import org.uniprot.api.common.repository.stream.store.StoreConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
+import org.uniprot.api.rest.respository.NonKBRepositoryConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
@@ -51,8 +51,8 @@ public class UniParcIdMappingResultsConfig {
     @Bean("uniParcTupleStreamTemplate")
     public TupleStreamTemplate uniParcTupleStreamTemplate(
             StreamerConfigProperties uniParcStreamerConfigProperties,
-            HttpClient httpClient,
-            SolrClient solrClient,
+            @Qualifier("nonKBHttpClient") HttpClient httpClient,
+            @Qualifier("nonKBSolrClient") SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(uniParcStreamerConfigProperties)
@@ -74,7 +74,8 @@ public class UniParcIdMappingResultsConfig {
 
     @Bean("uniParcFacetTupleStreamTemplate")
     public FacetTupleStreamTemplate uniParcFacetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+            NonKBRepositoryConfigProperties configProperties,
+            @Qualifier("nonKBHttpClient") HttpClient httpClient) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniparc.name())
                 .zookeeperHost(configProperties.getZkHost())

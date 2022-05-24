@@ -57,7 +57,7 @@ public abstract class AbstractTupleStreamTemplate {
         // they share client caches
         context.workerID = collection.hashCode();
         context.numWorkers = 1;
-        SolrClientCache solrClientCache = new SolrClientCache(httpClient);
+        SolrClientCache solrClientCache = new SolrClientCache();
         context.setSolrClientCache(solrClientCache);
         this.streamContext = context;
         log.info("Created new StreamContext for {} ", collection);
