@@ -2,7 +2,6 @@ package org.uniprot.api.rest.respository;
 
 import static java.util.Arrays.asList;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.http.client.HttpClient;
@@ -64,7 +63,7 @@ public class RepositoryConfig {
         // I am creating HttpClient exactly in the same way it is created inside
         // CloudSolrClient.Builder,
         // but here I am just adding Credentials
-        ModifiableSolrParams params = null;
+        ModifiableSolrParams params = new ModifiableSolrParams();
         if (Utils.notNullNotEmpty(username) && Utils.notNullNotEmpty(password)) {
             params = new ModifiableSolrParams();
             params.add(HttpClientUtil.PROP_BASIC_AUTH_USER, username);
@@ -72,9 +71,6 @@ public class RepositoryConfig {
         }
         PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
 
-        if (Objects.isNull(params)) {
-            params = new ModifiableSolrParams();
-        }
         return HttpClientUtil.createClient(params, manager, true);
     }
 

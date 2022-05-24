@@ -35,7 +35,7 @@ public abstract class AbstractTupleStreamTemplate {
 
     protected StreamContext getStreamContext(String collection, HttpClient httpClient) {
         if (Objects.isNull(this.streamContext)) {
-            initStreamContext(collection, httpClient);
+            initStreamContext(collection);
         } else {
             log.debug("StreamContext already created for collection {}", collection);
         }
@@ -51,7 +51,7 @@ public abstract class AbstractTupleStreamTemplate {
     /**
      * For tweaking, see: https://www.mail-archive.com/solr-user@lucene.apache.org/msg131338.html
      */
-    private void initStreamContext(String collection, HttpClient httpClient) {
+    private void initStreamContext(String collection) {
         StreamContext context = new StreamContext();
         // this should be the same for each collection, so that
         // they share client caches
