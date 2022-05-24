@@ -21,7 +21,7 @@ import org.uniprot.api.common.repository.stream.store.StoreConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
+import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
@@ -74,7 +74,7 @@ public class UniRefIdMappingResultsConfig {
 
     @Bean("uniRefFacetTupleStreamTemplate")
     public FacetTupleStreamTemplate uniRefFacetTupleStreamTemplate(
-            UniProtKBRepositoryConfigProperties configProperties, HttpClient httpClient) {
+            RepositoryConfigProperties configProperties, HttpClient httpClient) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniref.name())
                 .zookeeperHost(configProperties.getZkHost())
