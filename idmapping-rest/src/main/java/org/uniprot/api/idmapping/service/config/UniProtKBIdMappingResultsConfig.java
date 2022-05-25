@@ -28,7 +28,6 @@ import org.uniprot.api.common.repository.stream.store.StoreConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
@@ -125,7 +124,7 @@ public class UniProtKBIdMappingResultsConfig {
 
     @Bean("uniproKBfacetTupleStreamTemplate")
     public FacetTupleStreamTemplate uniproKBfacetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+            UniProtKBRepositoryConfigProperties configProperties, HttpClient httpClient) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())
                 .zookeeperHost(configProperties.getZkHost())
