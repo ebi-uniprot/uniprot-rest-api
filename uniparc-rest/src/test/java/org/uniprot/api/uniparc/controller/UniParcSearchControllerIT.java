@@ -153,6 +153,9 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
             case "upid":
                 value = "UP000005640";
                 break;
+            case "proteomecomponent":
+                value = "chromosome";
+                break;
         }
         return value;
     }
