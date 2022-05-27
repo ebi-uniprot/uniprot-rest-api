@@ -39,7 +39,6 @@ class HttpServletRequestContentTypeMutatorTest {
 
     @BeforeEach
     void setUp() {
-        requestContentTypeMutator = new HttpServletRequestContentTypeMutator();
         PatternsRequestCondition patterns = mock(PatternsRequestCondition.class);
         when(patterns.getPatterns())
                 .thenReturn(new HashSet<>(Collections.singletonList("/a/b/{d}")));
@@ -58,6 +57,7 @@ class HttpServletRequestContentTypeMutatorTest {
         Map<RequestMappingInfo, HandlerMethod> handlerMap = new HashMap<>();
         handlerMap.put(requestMappingInfo, null);
         when(handlerMapping.getHandlerMethods()).thenReturn(handlerMap);
+        requestContentTypeMutator = new HttpServletRequestContentTypeMutator(handlerMapping);
     }
 
     @Test
@@ -73,7 +73,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getHeader(ACCEPT)).thenReturn(mediaType.toString());
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
         assertThat(mutableRequest.getHeader(ACCEPT), is(mediaType.toString()));
         assertThat(mutableRequest.getRequestURL().toString(), is(host + uri));
         assertThat(mutableRequest.getRequestURI(), is(uri));
@@ -92,7 +92,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getContextPath()).thenReturn("");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(FASTA_MEDIA_TYPE_VALUE));
         assertThat(mutableRequest.getRequestURL().toString(), is(host + entityPath));
@@ -111,7 +111,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getParameter(FORMAT)).thenReturn("fasta");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(FASTA_MEDIA_TYPE_VALUE));
     }
@@ -127,7 +127,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getParameter(FORMAT)).thenReturn("obo");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(UNKNOWN_MEDIA_TYPE_VALUE));
         verify(httpRequest)
@@ -147,7 +147,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getParameter(FORMAT)).thenReturn("WRONG");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(UNKNOWN_MEDIA_TYPE_VALUE));
         verify(httpRequest)
@@ -167,7 +167,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getHeader(ACCEPT)).thenReturn(UniProtMediaType.OBO_MEDIA_TYPE.toString());
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         String header = mutableRequest.getHeader(ACCEPT);
         assertThat(header, is(UNKNOWN_MEDIA_TYPE_VALUE));
@@ -187,7 +187,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getContextPath()).thenReturn("");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(APPLICATION_JSON_VALUE));
     }
@@ -207,7 +207,7 @@ class HttpServletRequestContentTypeMutatorTest {
 
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(APPLICATION_JSON_VALUE));
     }
@@ -224,7 +224,7 @@ class HttpServletRequestContentTypeMutatorTest {
         when(httpRequest.getContextPath()).thenReturn("");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         assertThat(mutableRequest.getHeader(ACCEPT), is(APPLICATION_JSON_VALUE));
         verify(httpRequest, times(0)).setAttribute(anyString(), anyString());
@@ -283,7 +283,7 @@ class HttpServletRequestContentTypeMutatorTest {
 
         // when
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         // then
         assertThat(mutableRequest.getHeader(HttpHeaders.ACCEPT_ENCODING), is("gzip"));
@@ -305,7 +305,7 @@ class HttpServletRequestContentTypeMutatorTest {
 
         // when
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
-        requestContentTypeMutator.mutate(mutableRequest, handlerMapping);
+        requestContentTypeMutator.mutate(mutableRequest);
 
         // then
         assertThat(

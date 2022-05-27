@@ -41,9 +41,9 @@ public class HttpCommonHeaderConfig {
     private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 
     @Autowired
-    public HttpCommonHeaderConfig(ServiceInfoConfig.ServiceInfo serviceInfo) {
+    public HttpCommonHeaderConfig(ServiceInfoConfig.ServiceInfo serviceInfo, RequestMappingHandlerMapping requestMappingHandlerMapping) {
         this.serviceInfo = serviceInfo;
-        this.requestContentTypeMutator = new HttpServletRequestContentTypeMutator();
+        this.requestContentTypeMutator = new HttpServletRequestContentTypeMutator(requestMappingHandlerMapping);
     }
 
     /**
@@ -57,15 +57,14 @@ public class HttpCommonHeaderConfig {
      * @return
      */
     @Bean("oncePerRequestFilter")
-    public OncePerRequestFilter oncePerRequestFilter(
-            RequestMappingHandlerMapping requestMappingHandlerMapping) {
+    public OncePerRequestFilter oncePerRequestFilter() {
         return new OncePerRequestFilter() {
             @Override
             protected void doFilterInternal(
                     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
                 MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
-                requestContentTypeMutator.mutate(mutableRequest, requestMappingHandlerMapping);
+                requestContentTypeMutator.mutate(mutableRequest);
 
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(

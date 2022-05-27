@@ -46,6 +46,10 @@ public class HttpServletRequestContentTypeMutator {
     final Map<String, Collection<MediaType>> resourcePath2MediaTypes = new HashMap<>();
     final List<String> resourcePath2MediaTypesKeys = new ArrayList<>();
 
+    public HttpServletRequestContentTypeMutator(RequestMappingHandlerMapping requestMappingHandlerMapping) {
+        initResourcePath2MediaTypesMap(requestMappingHandlerMapping);
+    }
+
     /**
      * This method gets all known paths and orders them so that paths containing
      * {@code @PathVariable}s appear last. This is important so that when finding matching paths in
@@ -61,17 +65,12 @@ public class HttpServletRequestContentTypeMutator {
         pathVariables.sort(stringComparator);
     }
 
-    public void mutate(
-            MutableHttpServletRequest request,
-            RequestMappingHandlerMapping requestMappingHandlerMapping) {
-        mutateAcceptHeader(request, requestMappingHandlerMapping);
+    public void mutate(MutableHttpServletRequest request) {
+        mutateAcceptHeader(request);
         mutateAcceptEncodingHeader(request);
     }
 
-    private void mutateAcceptHeader(
-            MutableHttpServletRequest request,
-            RequestMappingHandlerMapping requestMappingHandlerMapping) {
-        initResourcePath2MediaTypesMap(requestMappingHandlerMapping);
+    private void mutateAcceptHeader(MutableHttpServletRequest request) {
         Collection<MediaType> validMediaTypes = getValidMediaTypesForPath(request);
         if (validMediaTypes.isEmpty()) {
             return;
@@ -113,29 +112,21 @@ public class HttpServletRequestContentTypeMutator {
     }
 
     void initResourcePath2MediaTypesMap(RequestMappingHandlerMapping requestMappingHandlerMapping) {
-        if (resourcePath2MediaTypes.isEmpty()) {
-            requestMappingHandlerMapping
-                    .getHandlerMethods()
-                    .keySet()
-                    .forEach(
-                            mappingInfo ->
-                                    mappingInfo
-                                            .getPatternsCondition()
-                                            // for every resource path
-                                            .getPatterns()
-                                            .forEach(
-                                                    pattern ->
-                                                            // .. update map with: resource path ->
-                                                            // its valid mediatypes
-                                                            resourcePath2MediaTypes.put(
-                                                                    pattern,
-                                                                    mappingInfo
-                                                                            .getProducesCondition()
-                                                                            .getProducibleMediaTypes())));
+        requestMappingHandlerMapping
+          .getHandlerMethods()
+          .keySet()
+          .forEach(mappingInfo -> mappingInfo.getPatternsCondition()
+            // for every resource path
+            .getPatterns()
+            .forEach(
+              pattern ->
+                // .. update map with: resource path ->
+                // its valid mediatypes
+                resourcePath2MediaTypes.put(pattern, mappingInfo.getProducesCondition().getProducibleMediaTypes())
+            ));
 
-            resourcePath2MediaTypesKeys.addAll(resourcePath2MediaTypes.keySet());
-            orderKeysSoPathVariablesLast(resourcePath2MediaTypesKeys);
-        }
+        resourcePath2MediaTypesKeys.addAll(resourcePath2MediaTypes.keySet());
+        orderKeysSoPathVariablesLast(resourcePath2MediaTypesKeys);
     }
 
     String getMatchingPathPattern(String requestURI) {
