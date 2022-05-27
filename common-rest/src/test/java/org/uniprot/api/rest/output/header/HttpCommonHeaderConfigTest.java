@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.service.ServiceInfoConfig;
 
 class HttpCommonHeaderConfigTest {
@@ -33,7 +34,7 @@ class HttpCommonHeaderConfigTest {
                         ServiceInfoConfig.ServiceInfo.builder()
                                 .nonCacheablePaths(nonCacheablePaths)
                                 .cacheControlMaxAge(MAX_AGE)
-                                .build());
+                                .build(), mock(RequestMappingHandlerMapping.class));
     }
 
     @Test

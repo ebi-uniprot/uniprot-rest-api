@@ -14,6 +14,11 @@ import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipException;
 
@@ -71,6 +76,49 @@ class HttpServletRequestContentTypeMutatorIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         containsString(TSV_MEDIA_TYPE_VALUE)));
+    }
+
+    @Test
+    void canGetResourceWithAcceptableExtension_sameRequestMultiThread() throws Exception {
+
+        var threadService = Executors.newFixedThreadPool(2);
+        var responses = threadService.invokeAll(
+          IntStream.range(0, 100)
+            .<Callable<ResultActions>>mapToObj(i -> () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.txt")))
+            .collect(Collectors.toList())
+        );
+        threadService.shutdown();
+        responses.forEach(response -> {
+            try {
+                response.get().andDo(log())
+                  .andExpect(status().is(HttpStatus.OK.value()))
+                  .andExpect(
+                    header().string(
+                      HttpHeaders.CONTENT_TYPE,
+                      containsString(FF_MEDIA_TYPE_VALUE)));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Test
+    void canGetResourceWithAcceptableExtension_differentRequestMultiThread() throws Exception {
+        var threadService = Executors.newFixedThreadPool(2);
+        var responses = threadService.invokeAll(
+          List.<Callable<ResultActions>>of(
+            () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.tsv")),
+            () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.txt")),
+            () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.tsv")),
+            () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.txt"))
+          ));
+        threadService.shutdown();
+        Assertions.assertAll(
+          () -> responses.get(0).get().andDo(log()).andExpect(status().is(HttpStatus.OK.value())),
+          () -> responses.get(1).get().andDo(log()).andExpect(status().is(HttpStatus.OK.value())),
+          () -> responses.get(2).get().andDo(log()).andExpect(status().is(HttpStatus.OK.value())),
+          () -> responses.get(3).get().andDo(log()).andExpect(status().is(HttpStatus.OK.value()))
+        );
     }
 
     @Test
