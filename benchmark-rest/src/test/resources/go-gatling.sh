@@ -149,7 +149,7 @@ elif [ "$TEST_TYPE" == "daily-uniref" ]; then
     PROFILE_PROPERTIES+=" -Da.s.url.retrieval.successPercentGreaterThan=99"
 fi
 
-export MAVEN_OPTS="$MEMORY -Djava.net.useSystemProxies=true -Dgatling.http.ahc.readTimeout=7200000 -Dgatling.http.ahc.requestTimeout=7200000 -Dproperties.dir=/nfs/public/rw/homes/uni_ci/stress-tests/uniprot-api/conf $PROFILE_PROPERTIES"
+export MAVEN_OPTS="$MEMORY -Djava.net.useSystemProxies=true -Dgatling.http.requestTimeout=900000 -Dproperties.dir=/nfs/public/rw/homes/uni_ci/stress-tests/uniprot-api/conf $PROFILE_PROPERTIES"
 echo "Using MAVEN_OPTS=$MAVEN_OPTS"
 
 # create new results dir
