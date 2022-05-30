@@ -46,7 +46,8 @@ public class HttpServletRequestContentTypeMutator {
     final Map<String, Collection<MediaType>> resourcePath2MediaTypes = new HashMap<>();
     final List<String> resourcePath2MediaTypesKeys = new ArrayList<>();
 
-    public HttpServletRequestContentTypeMutator(RequestMappingHandlerMapping requestMappingHandlerMapping) {
+    public HttpServletRequestContentTypeMutator(
+            RequestMappingHandlerMapping requestMappingHandlerMapping) {
         initResourcePath2MediaTypesMap(requestMappingHandlerMapping);
     }
 
@@ -113,17 +114,23 @@ public class HttpServletRequestContentTypeMutator {
 
     void initResourcePath2MediaTypesMap(RequestMappingHandlerMapping requestMappingHandlerMapping) {
         requestMappingHandlerMapping
-          .getHandlerMethods()
-          .keySet()
-          .forEach(mappingInfo -> mappingInfo.getPatternsCondition()
-            // for every resource path
-            .getPatterns()
-            .forEach(
-              pattern ->
-                // .. update map with: resource path ->
-                // its valid mediatypes
-                resourcePath2MediaTypes.put(pattern, mappingInfo.getProducesCondition().getProducibleMediaTypes())
-            ));
+                .getHandlerMethods()
+                .keySet()
+                .forEach(
+                        mappingInfo ->
+                                mappingInfo
+                                        .getPatternsCondition()
+                                        // for every resource path
+                                        .getPatterns()
+                                        .forEach(
+                                                pattern ->
+                                                        // .. update map with: resource path ->
+                                                        // its valid mediatypes
+                                                        resourcePath2MediaTypes.put(
+                                                                pattern,
+                                                                mappingInfo
+                                                                        .getProducesCondition()
+                                                                        .getProducibleMediaTypes())));
 
         resourcePath2MediaTypesKeys.addAll(resourcePath2MediaTypes.keySet());
         orderKeysSoPathVariablesLast(resourcePath2MediaTypesKeys);

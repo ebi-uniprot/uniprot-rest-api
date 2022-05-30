@@ -34,7 +34,8 @@ class HttpCommonHeaderConfigTest {
                         ServiceInfoConfig.ServiceInfo.builder()
                                 .nonCacheablePaths(nonCacheablePaths)
                                 .cacheControlMaxAge(MAX_AGE)
-                                .build(), mock(RequestMappingHandlerMapping.class));
+                                .build(),
+                        mock(RequestMappingHandlerMapping.class));
     }
 
     @Test
