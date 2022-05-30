@@ -82,43 +82,72 @@ class HttpServletRequestContentTypeMutatorIT {
     void canGetResourceWithAcceptableExtension_sameRequestMultiThread() throws Exception {
 
         var threadService = Executors.newFixedThreadPool(2);
-        var responses = threadService.invokeAll(
-          IntStream.range(0, 100)
-            .<Callable<ResultActions>>mapToObj(i -> () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.txt")))
-            .collect(Collectors.toList())
-        );
+        var responses =
+                threadService.invokeAll(
+                        IntStream.range(0, 100)
+                                .<Callable<ResultActions>>mapToObj(
+                                        i ->
+                                                () ->
+                                                        mockMvc.perform(
+                                                                get(
+                                                                        FAKE_RESOURCE_BASE
+                                                                                + "/resource/ID.txt")))
+                                .collect(Collectors.toList()));
         threadService.shutdown();
-        responses.forEach(response -> {
-            try {
-                response.get().andDo(log())
-                  .andExpect(status().is(HttpStatus.OK.value()))
-                  .andExpect(
-                    header().string(
-                      HttpHeaders.CONTENT_TYPE,
-                      containsString(FF_MEDIA_TYPE_VALUE)));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        responses.forEach(
+                response -> {
+                    try {
+                        response.get()
+                                .andDo(log())
+                                .andExpect(status().is(HttpStatus.OK.value()))
+                                .andExpect(
+                                        header().string(
+                                                        HttpHeaders.CONTENT_TYPE,
+                                                        containsString(FF_MEDIA_TYPE_VALUE)));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
     }
 
     @Test
     void canGetResourceWithAcceptableExtension_differentRequestMultiThread() throws Exception {
         var threadService = Executors.newFixedThreadPool(2);
-        var responses = threadService.invokeAll(
-          List.<Callable<ResultActions>>of(
-            () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.tsv")),
-            () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.txt")),
-            () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.tsv")),
-            () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.txt"))
-          ));
+        var responses =
+                threadService.invokeAll(
+                        List.<Callable<ResultActions>>of(
+                                () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.tsv")),
+                                () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.txt")),
+                                () -> mockMvc.perform(get(FAKE_RESOURCE_BASE + "/resource/ID.tsv")),
+                                () ->
+                                        mockMvc.perform(
+                                                get(FAKE_RESOURCE_BASE + "/resource/ID.txt"))));
         threadService.shutdown();
         Assertions.assertAll(
-          () -> responses.get(0).get().andDo(log()).andExpect(status().is(HttpStatus.OK.value())),
-          () -> responses.get(1).get().andDo(log()).andExpect(status().is(HttpStatus.OK.value())),
-          () -> responses.get(2).get().andDo(log()).andExpect(status().is(HttpStatus.OK.value())),
-          () -> responses.get(3).get().andDo(log()).andExpect(status().is(HttpStatus.OK.value()))
-        );
+                () ->
+                        responses
+                                .get(0)
+                                .get()
+                                .andDo(log())
+                                .andExpect(status().is(HttpStatus.OK.value())),
+                () ->
+                        responses
+                                .get(1)
+                                .get()
+                                .andDo(log())
+                                .andExpect(status().is(HttpStatus.OK.value())),
+                () ->
+                        responses
+                                .get(2)
+                                .get()
+                                .andDo(log())
+                                .andExpect(status().is(HttpStatus.OK.value())),
+                () ->
+                        responses
+                                .get(3)
+                                .get()
+                                .andDo(log())
+                                .andExpect(status().is(HttpStatus.OK.value())));
     }
 
     @Test

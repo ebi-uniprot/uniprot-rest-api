@@ -41,9 +41,12 @@ public class HttpCommonHeaderConfig {
     private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 
     @Autowired
-    public HttpCommonHeaderConfig(ServiceInfoConfig.ServiceInfo serviceInfo, RequestMappingHandlerMapping requestMappingHandlerMapping) {
+    public HttpCommonHeaderConfig(
+            ServiceInfoConfig.ServiceInfo serviceInfo,
+            RequestMappingHandlerMapping requestMappingHandlerMapping) {
         this.serviceInfo = serviceInfo;
-        this.requestContentTypeMutator = new HttpServletRequestContentTypeMutator(requestMappingHandlerMapping);
+        this.requestContentTypeMutator =
+                new HttpServletRequestContentTypeMutator(requestMappingHandlerMapping);
     }
 
     /**
