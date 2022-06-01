@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.Test;
@@ -15,8 +17,6 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ResultsConfigTest {
 
@@ -57,7 +57,9 @@ class ResultsConfigTest {
         ResultsConfig config = new ResultsConfig();
         HttpClient httpClient = Mockito.mock(HttpClient.class);
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
-        assertThrows(BeanCreationException.class, () ->config.uniProtKBSolrClient(httpClient, configProps));
+        assertThrows(
+                BeanCreationException.class,
+                () -> config.uniProtKBSolrClient(httpClient, configProps));
     }
 
     @Test
@@ -68,7 +70,8 @@ class ResultsConfigTest {
         SolrRequestConverter converter = Mockito.mock(SolrRequestConverter.class);
         StreamerConfigProperties configProps = config.resultsConfigProperties();
 
-        TupleStreamTemplate result = config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+        TupleStreamTemplate result =
+                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
         assertNotNull(result);
     }
 
@@ -83,17 +86,19 @@ class ResultsConfigTest {
         rdfConfig.setMaxRetries(1);
         Mockito.when(configMock.rdfConfigProperties()).thenReturn(rdfConfig);
 
-
         HttpClient httpClient = Mockito.mock(HttpClient.class);
         SolrClient solrClient = Mockito.mock(SolrClient.class);
         SolrRequestConverter converter = Mockito.mock(SolrRequestConverter.class);
         StreamerConfigProperties configProps = config.resultsConfigProperties();
         configProps.setStoreFetchRetryDelayMillis(10);
-        TupleStreamTemplate tupleStreamTemplate = config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+        TupleStreamTemplate tupleStreamTemplate =
+                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
         RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         StreamerConfigProperties streamConfig = config.resultsConfigProperties();
-        TupleStreamDocumentIdStream documentIdStream = config.documentIdStream(tupleStreamTemplate, streamConfig);
-        Mockito.when(configMock.uniProtRDFStreamer(restTemplate, documentIdStream)).thenCallRealMethod();
+        TupleStreamDocumentIdStream documentIdStream =
+                config.documentIdStream(tupleStreamTemplate, streamConfig);
+        Mockito.when(configMock.uniProtRDFStreamer(restTemplate, documentIdStream))
+                .thenCallRealMethod();
         RDFStreamer result = configMock.uniProtRDFStreamer(restTemplate, documentIdStream);
         assertNotNull(result);
     }
@@ -107,11 +112,14 @@ class ResultsConfigTest {
         SolrRequestConverter converter = Mockito.mock(SolrRequestConverter.class);
         StreamerConfigProperties configProps = config.resultsConfigProperties();
         configProps.setStoreFetchRetryDelayMillis(10);
-        TupleStreamTemplate tupleStreamTemplate = config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+        TupleStreamTemplate tupleStreamTemplate =
+                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
         UniProtKBStoreClient uniprotClient = new UniProtKBStoreClient(null);
-        TupleStreamDocumentIdStream documentIdStream = config.documentIdStream(tupleStreamTemplate, configProps);
-        StoreStreamer<UniProtKBEntry> result = config.uniProtEntryStoreStreamer(uniprotClient, tupleStreamTemplate, configProps, documentIdStream);
+        TupleStreamDocumentIdStream documentIdStream =
+                config.documentIdStream(tupleStreamTemplate, configProps);
+        StoreStreamer<UniProtKBEntry> result =
+                config.uniProtEntryStoreStreamer(
+                        uniprotClient, tupleStreamTemplate, configProps, documentIdStream);
         assertNotNull(result);
     }
-
 }

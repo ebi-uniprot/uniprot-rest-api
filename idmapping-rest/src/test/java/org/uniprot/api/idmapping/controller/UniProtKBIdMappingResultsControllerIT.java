@@ -11,6 +11,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,8 +20,10 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUti
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_AC_ID_STR;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -36,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -49,6 +53,7 @@ import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.RDFPrologs;
@@ -56,6 +61,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /**
  * @author sahmad
@@ -74,6 +80,8 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
             "/idmapping/uniprotkb/results/stream/{jobId}";
 
     @Autowired private UniProtKBFacetConfig facetConfig;
+
+    @Autowired private UniProtKBIdService uniProtKBIdService;
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 
@@ -146,6 +154,9 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         for (int i = 1; i <= this.maxFromIdsAllowed; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
+
+        saveInactiveEntries();
+        ReflectionTestUtils.setField(uniProtKBIdService, "solrClient", cloudSolrClient);
     }
 
     @Test
@@ -167,6 +178,27 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andExpect(jsonPath("$.results.*.from", contains("Q00001", "Q00002")))
                 .andExpect(
                         jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "Q00002")));
+    }
+
+    @Test
+    void testUniProtKBToUniProtKBInactiveEntriesMapping() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001,I8FBX0");
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "I8FBX0")))
+                .andExpect(
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "I8FBX0")));
     }
 
     @Test
@@ -311,5 +343,16 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     @Override
     protected String getDefaultSearchQuery() {
         return "FGF1"; // geneName
+    }
+
+    private void saveInactiveEntries() throws IOException, SolrServerException {
+        UniProtDocument inactiveDoc = new UniProtDocument();
+        inactiveDoc.accession = "I8FBX0";
+        inactiveDoc.id = "INACTIVE_DROME";
+        inactiveDoc.idInactive = "INACTIVE_DROME";
+        inactiveDoc.inactiveReason = "DELETED";
+        inactiveDoc.active = false;
+        cloudSolrClient.addBean(SolrCollection.uniprot.name(), inactiveDoc);
+        cloudSolrClient.commit(SolrCollection.uniprot.name());
     }
 }
