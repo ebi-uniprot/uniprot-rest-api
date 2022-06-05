@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -33,7 +32,7 @@ public abstract class AbstractTupleStreamTemplate {
         return this.streamFactory;
     }
 
-    protected StreamContext getStreamContext(String collection, HttpClient httpClient) {
+    protected StreamContext getStreamContext(String collection) {
         if (Objects.isNull(this.streamContext)) {
             initStreamContext(collection);
         } else {

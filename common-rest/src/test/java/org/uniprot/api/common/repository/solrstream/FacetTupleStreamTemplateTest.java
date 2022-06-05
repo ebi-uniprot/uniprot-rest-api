@@ -30,7 +30,6 @@ class FacetTupleStreamTemplateTest {
                 FacetTupleStreamTemplate.builder()
                         .zookeeperHost(zkHost)
                         .collection(collection)
-                        .httpClient(httpClient)
                         .build();
     }
 

@@ -67,7 +67,6 @@ public class ResultsConfig {
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)
-                .httpClient(httpClient)
                 .solrClient(solrClient)
                 .solrRequestConverter(requestConverter)
                 .build();

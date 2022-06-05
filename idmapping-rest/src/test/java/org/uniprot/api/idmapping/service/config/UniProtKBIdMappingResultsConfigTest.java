@@ -1,22 +1,13 @@
 package org.uniprot.api.idmapping.service.config;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.web.client.RestTemplate;
-import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
-import org.uniprot.api.common.repository.stream.store.StoreStreamer;
-import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class UniProtKBIdMappingResultsConfigTest {
 
@@ -57,7 +48,8 @@ class UniProtKBIdMappingResultsConfigTest {
         UniProtKBIdMappingResultsConfig config = new UniProtKBIdMappingResultsConfig();
         UniProtKBRepositoryConfigProperties configProps = new UniProtKBRepositoryConfigProperties();
         HttpClient httpClient = Mockito.mock(HttpClient.class);
-        assertThrows(BeanCreationException.class, () ->config.uniProtKBSolrClient(httpClient, configProps));
+        assertThrows(
+                BeanCreationException.class,
+                () -> config.uniProtKBSolrClient(httpClient, configProps));
     }
-
 }

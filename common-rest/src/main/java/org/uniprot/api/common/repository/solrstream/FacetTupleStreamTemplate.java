@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.apache.solr.client.solrj.io.stream.expr.StreamExpression;
@@ -33,7 +32,6 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
     private final String zookeeperHost;
     private final String collection;
-    private final HttpClient httpClient;
 
     public TupleStream create(SolrStreamFacetRequest request, FacetConfig facetConfig) {
         try {
@@ -58,7 +56,7 @@ public class FacetTupleStreamTemplate extends AbstractTupleStreamTemplate {
             ListStreamExpression listStreamExpression = new ListStreamExpression(expressions);
             StreamFactory streamFactory = getStreamFactory(this.zookeeperHost, this.collection);
             TupleStream tupleStream = streamFactory.constructStream(listStreamExpression);
-            StreamContext clientContext = getStreamContext(this.collection, this.httpClient);
+            StreamContext clientContext = getStreamContext(this.collection);
             tupleStream.setStreamContext(clientContext);
             return tupleStream;
         } catch (IOException e) {

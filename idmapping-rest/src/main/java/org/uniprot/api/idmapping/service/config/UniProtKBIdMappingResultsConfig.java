@@ -78,7 +78,6 @@ public class UniProtKBIdMappingResultsConfig {
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)
-                .httpClient(httpClient)
                 .solrClient(solrClient)
                 .solrRequestConverter(requestConverter)
                 .build();
@@ -128,7 +127,6 @@ public class UniProtKBIdMappingResultsConfig {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())
                 .zookeeperHost(configProperties.getZkHost())
-                .httpClient(httpClient)
                 .build();
     }
 

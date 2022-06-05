@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -45,12 +44,11 @@ import org.uniprot.core.util.Utils;
 public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
     private static final String DEF_TYPE_VALUE = "edismax";
     private final StreamerConfigProperties streamConfig;
-    private final HttpClient httpClient;
     private final SolrClient solrClient;
     private final SolrRequestConverter solrRequestConverter;
 
     public TupleStream create(SolrRequest request) {
-        StreamContext streamContext = getStreamContext(streamConfig.getCollection(), httpClient);
+        StreamContext streamContext = getStreamContext(streamConfig.getCollection());
         StreamFactory streamFactory =
                 getStreamFactory(streamConfig.getZkHost(), streamConfig.getCollection());
 
