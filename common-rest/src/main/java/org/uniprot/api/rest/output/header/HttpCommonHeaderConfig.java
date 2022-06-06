@@ -119,5 +119,6 @@ public class HttpCommonHeaderConfig {
         response.addHeader(VARY, ACCEPT);
         response.addHeader(VARY, ACCEPT_ENCODING);
         response.addHeader(VARY, X_UNIPROT_RELEASE);
+        response.addHeader(VARY, X_API_DEPLOYMENT_DATE);
     }
 }

@@ -50,6 +50,7 @@ class HttpCommonHeaderConfigTest {
         verify(mockResponse).addHeader(VARY, ACCEPT);
         verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
         verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
+        verify(mockResponse).addHeader(VARY, X_API_DEPLOYMENT_DATE);
     }
 
     @Test
@@ -65,5 +66,6 @@ class HttpCommonHeaderConfigTest {
         verify(mockResponse).addHeader(VARY, ACCEPT);
         verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
         verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
+        verify(mockResponse).addHeader(VARY, X_API_DEPLOYMENT_DATE);
     }
 }
