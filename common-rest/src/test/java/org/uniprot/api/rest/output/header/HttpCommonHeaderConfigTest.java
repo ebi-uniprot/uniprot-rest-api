@@ -49,7 +49,7 @@ class HttpCommonHeaderConfigTest {
         verify(mockResponse).addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + MAX_AGE);
         verify(mockResponse).addHeader(VARY, ACCEPT);
         verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
-        verify(mockResponse).addHeader(VARY, X_RELEASE_NUMBER);
+        verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
     }
 
     @Test
@@ -64,6 +64,6 @@ class HttpCommonHeaderConfigTest {
         verify(mockResponse, never()).addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + MAX_AGE);
         verify(mockResponse).addHeader(VARY, ACCEPT);
         verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
-        verify(mockResponse).addHeader(VARY, X_RELEASE_NUMBER);
+        verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
     }
 }

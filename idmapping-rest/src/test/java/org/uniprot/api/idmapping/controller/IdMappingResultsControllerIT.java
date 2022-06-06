@@ -70,7 +70,7 @@ class IdMappingResultsControllerIT extends AbstractIdMappingPIRResultsController
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(defaultPageSize)))
@@ -96,7 +96,7 @@ class IdMappingResultsControllerIT extends AbstractIdMappingPIRResultsController
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
@@ -125,7 +125,7 @@ class IdMappingResultsControllerIT extends AbstractIdMappingPIRResultsController
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -152,7 +152,7 @@ class IdMappingResultsControllerIT extends AbstractIdMappingPIRResultsController
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -176,7 +176,7 @@ class IdMappingResultsControllerIT extends AbstractIdMappingPIRResultsController
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, "20"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "20"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(0)));

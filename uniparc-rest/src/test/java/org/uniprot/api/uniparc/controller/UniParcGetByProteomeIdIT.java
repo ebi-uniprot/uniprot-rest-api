@@ -140,7 +140,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -169,7 +169,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -199,7 +199,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083C05")))

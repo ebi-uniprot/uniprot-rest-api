@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RECORDS;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -75,7 +75,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(defaultPageSize)))
@@ -100,7 +100,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
@@ -128,7 +128,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -154,7 +154,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)))
                 .andExpect(
@@ -177,7 +177,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(X_TOTAL_RECORDS, String.valueOf(this.maxFromIdsAllowed)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(this.maxFromIdsAllowed)))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(0)));

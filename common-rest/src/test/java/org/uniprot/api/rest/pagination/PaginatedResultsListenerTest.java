@@ -34,8 +34,8 @@ class PaginatedResultsListenerTest {
         listener.onApplicationEvent(event);
 
         // then
-        assertNotNull(response.getHeader(X_TOTAL_RECORDS));
-        assertEquals("120", response.getHeader(X_TOTAL_RECORDS));
+        assertNotNull(response.getHeader(X_TOTAL_RESULTS));
+        assertEquals("120", response.getHeader(X_TOTAL_RESULTS));
 
         assertNotNull(response.getHeader("Link"));
         String expectedNextLink =
@@ -64,7 +64,7 @@ class PaginatedResultsListenerTest {
         // then
         assertNull(response.getHeader("Link"));
 
-        assertNotNull(response.getHeader(X_TOTAL_RECORDS));
-        assertEquals("12", response.getHeader(X_TOTAL_RECORDS));
+        assertNotNull(response.getHeader(X_TOTAL_RESULTS));
+        assertEquals("12", response.getHeader(X_TOTAL_RESULTS));
     }
 }

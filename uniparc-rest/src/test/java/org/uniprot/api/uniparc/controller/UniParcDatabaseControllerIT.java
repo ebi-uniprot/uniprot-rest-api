@@ -132,7 +132,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)));
 
@@ -153,7 +153,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "5"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(total - size)));
     }

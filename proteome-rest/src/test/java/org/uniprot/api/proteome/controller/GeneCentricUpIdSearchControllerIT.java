@@ -116,7 +116,7 @@ class GeneCentricUpIdSearchControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "7"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "7"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=5")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -265,7 +265,7 @@ class GeneCentricUpIdSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "7"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "7"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=5")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -287,7 +287,7 @@ class GeneCentricUpIdSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "7"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "7"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(2)));
     }
@@ -307,7 +307,7 @@ class GeneCentricUpIdSearchControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "3"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "3"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(
                         content()
@@ -367,7 +367,7 @@ class GeneCentricUpIdSearchControllerIT {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "3"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "3"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(xpath("//GeneCentrics").exists())
                 .andExpect(xpath("//GeneCentrics/GeneCentric").nodeCount(3))

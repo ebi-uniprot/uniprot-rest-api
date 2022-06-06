@@ -70,6 +70,7 @@ public class ServiceInfoConfig {
     public static class ServiceInfo {
         static final String RELEASE_NUMBER = "releaseNumber";
         static final String RELEASE_DATE = "releaseDate";
+        static final String DEPLOYMENT_DATE = "deploymentDate";
         static final String CACHE_CONTROL_MAX_AGE = "maxAgeInSeconds";
         private Map<String, Object> map;
         private Integer cacheControlMaxAge;
@@ -84,6 +85,10 @@ public class ServiceInfoConfig {
                 throw new IllegalStateException(
                         "Service information must contain a 'releaseDate' key. Please define it.");
             }
+            if (!map.containsKey(DEPLOYMENT_DATE)) {
+                throw new IllegalStateException(
+                        "Service information must contain a 'deploymentDate' key. Please define it.");
+            }
         }
 
         public String getReleaseNumber() {
@@ -92,6 +97,10 @@ public class ServiceInfoConfig {
 
         public String getReleaseDate() {
             return map.get(RELEASE_DATE).toString();
+        }
+
+        public String getDeploymentDate() {
+            return map.get(DEPLOYMENT_DATE).toString();
         }
 
         public Integer getMaxAgeInSeconds() {
