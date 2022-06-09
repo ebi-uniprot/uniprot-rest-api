@@ -181,7 +181,7 @@ public class UniProtEntryService
         // uniprotkb related stuff
         solrRequest.setQueryConfig(solrQueryConfig);
 
-        if (needsToFilterIsoform(uniProtRequest.getQuery(), uniProtRequest.isIncludeIsoform())) {
+        if (needsToFilterIsoform(solrRequest.getQuery(), uniProtRequest.isIncludeIsoform())) {
             addIsoformFilter(solrRequest);
         }
 
@@ -220,7 +220,12 @@ public class UniProtEntryService
                 SolrQueryUtil.hasFieldTerms(
                         query, getQueryFieldName(ACCESSION), getQueryFieldName("is_isoform"));
 
-        if (!hasIdFieldTerms) {
+        List<String> accessionValues = SolrQueryUtil.getTermValues(query, "accession");
+        boolean hasIsoforms =
+                !accessionValues.isEmpty()
+                        && accessionValues.stream().allMatch(acc -> acc.contains("-"));
+
+        if (!hasIdFieldTerms && !hasIsoforms) {
             return !isIncludeIsoform;
         } else {
             return false;

@@ -1339,6 +1339,34 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
     }
 
+    @Test
+    void searchDefaultSearchWithIsoform() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        UniProtKBId entryId = entry.getUniProtkbId();
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        // set the same uniprot id as canonical
+        UniProtKBEntryBuilder eb = UniProtKBEntryBuilder.from(entry);
+        eb.uniProtId(entryId);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, eb.build());
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=P21802-2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
