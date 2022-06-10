@@ -11,7 +11,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,7 +52,7 @@ import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
+import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.RDFPrologs;
@@ -81,7 +80,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @Autowired private UniProtKBFacetConfig facetConfig;
 
-    @Autowired private UniProtKBIdService uniProtKBIdService;
+    @Autowired private UniprotKBMappingRepository repository;
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 
@@ -155,8 +154,8 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
             saveEntry(i, cloudSolrClient, storeClient);
         }
 
-        saveInactiveEntries();
-        ReflectionTestUtils.setField(uniProtKBIdService, "solrClient", cloudSolrClient);
+        saveInactiveEntry();
+        ReflectionTestUtils.setField(repository, "solrClient", cloudSolrClient);
     }
 
     @Test
@@ -192,7 +191,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
@@ -345,7 +344,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         return "FGF1"; // geneName
     }
 
-    private void saveInactiveEntries() throws IOException, SolrServerException {
+    private void saveInactiveEntry() throws IOException, SolrServerException {
         UniProtDocument inactiveDoc = new UniProtDocument();
         inactiveDoc.accession = "I8FBX0";
         inactiveDoc.id = "INACTIVE_DROME";
