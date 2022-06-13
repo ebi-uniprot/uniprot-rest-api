@@ -223,9 +223,7 @@ public abstract class BasicIdService<T, U> {
         // accession -> entry map
         Map<String, T> idEntryMap = constructIdEntryMap(entries);
         // from -> uniprot entry
-        return mappedIdsInPage.stream()
-                .filter(mId -> idEntryMap.containsKey(mId.getTo()))
-                .map(mId -> convertToPair(mId, idEntryMap));
+        return mappedIdsInPage.stream().map(mId -> convertToPair(mId, idEntryMap));
     }
 
     /**
