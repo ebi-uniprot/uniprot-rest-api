@@ -3,11 +3,13 @@ package org.uniprot.api.uniprotkb.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -44,6 +46,8 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 public class UniProtEntryService
         extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
     public static final String ACCESSION = "accession_id";
+    public static final String PROTEIN_ID = "id";
+    public static final String IS_ISOFORM = "is_isoform";
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final SolrQueryConfig solrQueryConfig;
     private final UniProtQueryProcessorConfig uniProtQueryProcessorConfig;
@@ -131,6 +135,36 @@ public class UniProtEntryService
             throw e;
         } catch (Exception e) {
             String message = "Could not get accession for: [" + accession + "]";
+            throw new ServiceException(message, e);
+        }
+    }
+
+    public String findAccessionByProteinId(String proteinId) {
+        try {
+            SolrRequest solrRequest =
+                    SolrRequest.builder()
+                            .query(PROTEIN_ID + ":" + proteinId.toUpperCase() + " AND  " + IS_ISOFORM + ":false")
+                            .sorts(solrSortClause.getSort(null))
+                            .rows(NumberUtils.INTEGER_TWO)
+                            .build();
+            QueryResult<UniProtDocument> queryResult = repository.searchPage(solrRequest, null);
+            if(queryResult.getPage().getTotalElements() > 0){
+                List<UniProtDocument> docResult = queryResult.getContent().collect(Collectors.toList());
+                if(docResult.size() > 1){
+                    docResult = docResult.stream().filter(doc -> doc.active != null && doc.active).collect(Collectors.toList());
+                }
+                if(docResult.size() > 1){
+                    throw new ImportantMessageServiceException("Multiple accessions found for id: "+proteinId);
+                } else {
+                    return docResult.get(0).accession;
+                }
+            } else {
+                throw new ResourceNotFoundException("{search.not.found}");
+            }
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            String message = "Could not get protein id for: [" + proteinId + "]";
             throw new ServiceException(message, e);
         }
     }

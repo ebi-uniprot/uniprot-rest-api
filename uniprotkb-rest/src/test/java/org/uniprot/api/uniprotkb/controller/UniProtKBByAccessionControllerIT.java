@@ -397,6 +397,147 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DELETED")));
     }
 
+    @Test
+    void searchWithAccessionVersionEntriesRedirectToAccession() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "P21802.20")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LOCATION, "/unisave/P21802?from=P21802.20&versions=20&format=json"));
+    }
+
+    @Test
+    void searchWithIDForActiveEntriesRedirectToAccession() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "FGFR2_HUMAN")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=FGFR2_HUMAN"));
+    }
+
+    @Test
+    void searchWithIDResourceNotFound() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "FGFR2_DOG")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LOCATION, nullValue()));
+    }
+
+    @Test
+    void searchWithIDForDeMergedInactiveEntriesRedirectToAccession() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> mergedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DEMERGED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "FGFR2_HUMAN")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=FGFR2_HUMAN"));
+    }
+
+    @Test
+    void searchWithIDForMergedInactiveEntriesRedirectToAccession() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> mergedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.MERGED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, mergedList);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "Q14301_FGFR2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/Q14301?from=Q14301_FGFR2"));
+    }
+
+    @Test
+    void searchWithIDForDeletedInactiveEntriesRedirectToAccession() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        List<InactiveUniProtEntry> deletedList =
+                InactiveEntryMocker.create(InactiveEntryMocker.InactiveType.DELETED);
+        getStoreManager()
+                .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, deletedList);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "I8FBX2_YERPE")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
+    }
+
     @Override
     protected RestTemplate getRestTemple() {
         return restTemplate;
