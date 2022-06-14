@@ -220,7 +220,8 @@ public class UniProtEntryService
                 SolrQueryUtil.hasFieldTerms(
                         query, getQueryFieldName(ACCESSION), getQueryFieldName("is_isoform"));
 
-        List<String> accessionValues = SolrQueryUtil.getTermValues(query, "accession");
+        List<String> accessionValues =
+                SolrQueryUtil.getTermValuesWithWhitespaceAnalyzer(query, "accession");
         boolean hasIsoforms =
                 !accessionValues.isEmpty()
                         && accessionValues.stream().allMatch(acc -> acc.contains("-"));
