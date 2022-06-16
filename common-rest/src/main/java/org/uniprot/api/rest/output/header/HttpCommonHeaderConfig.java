@@ -36,6 +36,9 @@ public class HttpCommonHeaderConfig {
     public static final String X_API_DEPLOYMENT_DATE = "X-API-Deployment-Date";
     static final String ALLOW_ALL_ORIGINS = "*";
     public static final String X_TOTAL_RESULTS = "X-Total-Results";
+
+    public static final String X_TOTAL_RECORDS_OLD = "x-total-records";
+
     static final String PUBLIC_MAX_AGE = "public, max-age=";
     static final String NO_CACHE = "no-cache";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
@@ -75,6 +78,8 @@ public class HttpCommonHeaderConfig {
                         ACCESS_CONTROL_EXPOSE_HEADERS,
                         "Link, "
                                 + X_TOTAL_RESULTS
+                                + ", "
+                                + X_TOTAL_RECORDS_OLD
                                 + ", "
                                 + X_UNIPROT_RELEASE
                                 + ", "
