@@ -415,7 +415,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, "/unisave/P21802?from=P21802.20&versions=20&format=json"));
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        "/unisave/P21802?from=P21802.20&versions=20&format=json"));
     }
 
     @Test
@@ -436,7 +439,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=FGFR2_HUMAN"));
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/P21802?from=FGFR2_HUMAN"));
     }
 
     @Test
@@ -483,7 +489,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=FGFR2_HUMAN"));
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/P21802?from=FGFR2_HUMAN"));
     }
 
     @Test
@@ -509,7 +518,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/Q14301?from=Q14301_FGFR2"));
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/Q14301?from=Q14301_FGFR2"));
     }
 
     @Test
@@ -535,7 +547,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
     }
 
     @Override

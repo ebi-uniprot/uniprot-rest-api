@@ -143,18 +143,29 @@ public class UniProtEntryService
         try {
             SolrRequest solrRequest =
                     SolrRequest.builder()
-                            .query(PROTEIN_ID + ":" + proteinId.toUpperCase() + " AND  " + IS_ISOFORM + ":false")
+                            .query(
+                                    PROTEIN_ID
+                                            + ":"
+                                            + proteinId.toUpperCase()
+                                            + " AND  "
+                                            + IS_ISOFORM
+                                            + ":false")
                             .sorts(solrSortClause.getSort(null))
                             .rows(NumberUtils.INTEGER_TWO)
                             .build();
             QueryResult<UniProtDocument> queryResult = repository.searchPage(solrRequest, null);
-            if(queryResult.getPage().getTotalElements() > 0){
-                List<UniProtDocument> docResult = queryResult.getContent().collect(Collectors.toList());
-                if(docResult.size() > 1){
-                    docResult = docResult.stream().filter(doc -> doc.active != null && doc.active).collect(Collectors.toList());
+            if (queryResult.getPage().getTotalElements() > 0) {
+                List<UniProtDocument> docResult =
+                        queryResult.getContent().collect(Collectors.toList());
+                if (docResult.size() > 1) {
+                    docResult =
+                            docResult.stream()
+                                    .filter(doc -> doc.active != null && doc.active)
+                                    .collect(Collectors.toList());
                 }
-                if(docResult.size() > 1){
-                    throw new ImportantMessageServiceException("Multiple accessions found for id: "+proteinId);
+                if (docResult.size() > 1) {
+                    throw new ImportantMessageServiceException(
+                            "Multiple accessions found for id: " + proteinId);
                 } else {
                     return docResult.get(0).accession;
                 }

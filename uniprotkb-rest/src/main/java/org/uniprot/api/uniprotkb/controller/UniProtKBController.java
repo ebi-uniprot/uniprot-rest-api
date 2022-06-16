@@ -195,10 +195,10 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        if(accessionOrId.contains("_")){
+        if (accessionOrId.contains("_")) {
             String accession = entryService.findAccessionByProteinId(accessionOrId);
             return redirectToAccession(accessionOrId, accession, request);
-        } else if (accessionOrId.contains(".")){
+        } else if (accessionOrId.contains(".")) {
             return redirectToUniSave(accessionOrId, request);
         } else {
             if (isRDFAccept(request)) {
@@ -425,7 +425,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         }
     }
 
-    private ResponseEntity<MessageConverterContext<UniProtKBEntry>> redirectToUniSave(String accessionOrId, HttpServletRequest request) {
+    private ResponseEntity<MessageConverterContext<UniProtKBEntry>> redirectToUniSave(
+            String accessionOrId, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
 
         String uniProtPath = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
@@ -436,25 +437,30 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             String version = accessionOrId.substring(accessionOrId.indexOf('.') + 1);
             uniSavePath = uniProtPath.replace("uniprotkb", "unisave");
             uniSavePath = uniSavePath.substring(0, uniSavePath.lastIndexOf('/') + 1) + accession;
-            uniSavePath = uniSavePath +"?from=" + accessionOrId + "&versions=" + version + "&format=" + format;
+            uniSavePath =
+                    uniSavePath
+                            + "?from="
+                            + accessionOrId
+                            + "&versions="
+                            + version
+                            + "&format="
+                            + format;
         }
 
-        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(HttpStatus.SEE_OTHER)
-                .header(
-                        HttpHeaders.LOCATION,
-                        uniSavePath);
+        ResponseEntity.BodyBuilder responseBuilder =
+                ResponseEntity.status(HttpStatus.SEE_OTHER)
+                        .header(HttpHeaders.LOCATION, uniSavePath);
         return responseBuilder.headers(createHttpSearchHeader(contentType)).build();
     }
 
-    private ResponseEntity<MessageConverterContext<UniProtKBEntry>> redirectToAccession(String accessionOrId, String accession, HttpServletRequest request) {
+    private ResponseEntity<MessageConverterContext<UniProtKBEntry>> redirectToAccession(
+            String accessionOrId, String accession, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(HttpStatus.SEE_OTHER)
-                .header(
-                        HttpHeaders.LOCATION,
-                        getLocationURLForId(
-                                accession,
-                                accessionOrId,
-                                contentType));
+        ResponseEntity.BodyBuilder responseBuilder =
+                ResponseEntity.status(HttpStatus.SEE_OTHER)
+                        .header(
+                                HttpHeaders.LOCATION,
+                                getLocationURLForId(accession, accessionOrId, contentType));
         return responseBuilder.headers(createHttpSearchHeader(contentType)).build();
     }
 }
