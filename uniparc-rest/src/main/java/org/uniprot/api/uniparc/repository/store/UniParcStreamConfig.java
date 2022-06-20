@@ -48,7 +48,6 @@ public class UniParcStreamConfig {
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)
-                .httpClient(httpClient)
                 .solrClient(solrClient)
                 .solrRequestConverter(requestConverter)
                 .build();
@@ -88,7 +87,6 @@ public class UniParcStreamConfig {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniparc.name())
                 .zookeeperHost(configProperties.getZkHost())
-                .httpClient(httpClient)
                 .build();
     }
 

@@ -2,11 +2,14 @@ package org.uniprot.api.idmapping.service.impl;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -25,6 +28,7 @@ import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
  */
 @Profile("live")
 @Service
+@Slf4j
 public class PIRServiceImpl extends IdMappingPIRService {
     static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
 
@@ -60,15 +64,18 @@ public class PIRServiceImpl extends IdMappingPIRService {
     }
 
     @Override
-    public IdMappingResult mapIds(IdMappingJobRequest request) {
+    public IdMappingResult mapIds(IdMappingJobRequest request, String jobId) {
         HttpEntity<MultiValueMap<String, String>> requestBody =
                 new HttpEntity<>(createPostBody(request), HTTP_HEADERS);
-
+        log.info("Making PIR call for jobId {}", jobId);
+        ResponseEntity<String> pirResponse =
+                restTemplate.postForEntity(pirIdMappingUrl, requestBody, String.class);
+        log.info("PIR call returned for jobId {}", jobId);
         return pirResponseConverter.convertToIDMappings(
                 request,
                 this.maxIdMappingToIdsCountEnriched,
                 this.maxIdMappingToIdsCount,
-                restTemplate.postForEntity(pirIdMappingUrl, requestBody, String.class));
+                pirResponse);
     }
 
     private MultiValueMap<String, String> createPostBody(IdMappingJobRequest request) {

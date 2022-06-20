@@ -271,7 +271,7 @@ class TaxonomyGetIdsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "4"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "4"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
                 .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
@@ -292,7 +292,7 @@ class TaxonomyGetIdsControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RECORDS, "4"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "4"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(2)));
     }

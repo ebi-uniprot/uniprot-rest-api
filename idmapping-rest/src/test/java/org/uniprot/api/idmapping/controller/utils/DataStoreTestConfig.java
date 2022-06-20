@@ -39,6 +39,12 @@ public class DataStoreTestConfig {
         return mock(HttpClient.class);
     }
 
+    @Bean("uniProtKBSolrClient")
+    @Profile("offline")
+    public SolrClient uniProtKBSolrClient() throws URISyntaxException {
+        return mock(SolrClient.class);
+    }
+
     @Bean
     @Profile("offline")
     public SolrClient solrClient() throws URISyntaxException {
@@ -88,7 +94,7 @@ public class DataStoreTestConfig {
             @Value("${search.default.page.size:#{null}}") Integer defaultPageSize) {
         return new IdMappingPIRService(defaultPageSize) {
             @Override
-            public IdMappingResult mapIds(IdMappingJobRequest request) {
+            public IdMappingResult mapIds(IdMappingJobRequest request, String jobId) {
                 return null;
             }
         };

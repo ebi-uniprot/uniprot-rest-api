@@ -21,7 +21,7 @@ public abstract class IdMappingPIRService {
         this.defaultPageSize = defaultPageSize;
     }
 
-    public abstract IdMappingResult mapIds(IdMappingJobRequest request);
+    public abstract IdMappingResult mapIds(IdMappingJobRequest request, String jobId);
 
     public QueryResult<IdMappingStringPair> queryResultPage(
             IdMappingPageRequest request, IdMappingResult result) {

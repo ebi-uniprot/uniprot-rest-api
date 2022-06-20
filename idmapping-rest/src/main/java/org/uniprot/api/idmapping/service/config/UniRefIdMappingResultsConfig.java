@@ -56,7 +56,6 @@ public class UniRefIdMappingResultsConfig {
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(uniRefStreamerConfigProperties)
-                .httpClient(httpClient)
                 .solrClient(solrClient)
                 .solrRequestConverter(requestConverter)
                 .build();
@@ -78,7 +77,6 @@ public class UniRefIdMappingResultsConfig {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniref.name())
                 .zookeeperHost(configProperties.getZkHost())
-                .httpClient(httpClient)
                 .build();
     }
 

@@ -31,19 +31,26 @@ import org.uniprot.core.util.Utils;
 @Configuration
 @Import({ServiceInfoConfig.class})
 public class HttpCommonHeaderConfig {
-    public static final String X_RELEASE_NUMBER = "x-release-number";
-    public static final String X_RELEASE_DATE = "x-release-date";
+    public static final String X_UNIPROT_RELEASE = "X-UniProt-Release";
+    public static final String X_UNIPROT_RELEASE_DATE = "X-UniProt-Release-Date";
+    public static final String X_API_DEPLOYMENT_DATE = "X-API-Deployment-Date";
     static final String ALLOW_ALL_ORIGINS = "*";
-    public static final String X_TOTAL_RECORDS = "x-total-records";
+    public static final String X_TOTAL_RESULTS = "X-Total-Results";
+
+    public static final String X_TOTAL_RECORDS_OLD = "x-total-records";
+
     static final String PUBLIC_MAX_AGE = "public, max-age=";
     static final String NO_CACHE = "no-cache";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
     private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 
     @Autowired
-    public HttpCommonHeaderConfig(ServiceInfoConfig.ServiceInfo serviceInfo) {
+    public HttpCommonHeaderConfig(
+            ServiceInfoConfig.ServiceInfo serviceInfo,
+            RequestMappingHandlerMapping requestMappingHandlerMapping) {
         this.serviceInfo = serviceInfo;
-        this.requestContentTypeMutator = new HttpServletRequestContentTypeMutator();
+        this.requestContentTypeMutator =
+                new HttpServletRequestContentTypeMutator(requestMappingHandlerMapping);
     }
 
     /**
@@ -57,27 +64,31 @@ public class HttpCommonHeaderConfig {
      * @return
      */
     @Bean("oncePerRequestFilter")
-    public OncePerRequestFilter oncePerRequestFilter(
-            RequestMappingHandlerMapping requestMappingHandlerMapping) {
+    public OncePerRequestFilter oncePerRequestFilter() {
         return new OncePerRequestFilter() {
             @Override
             protected void doFilterInternal(
                     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
                 MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
-                requestContentTypeMutator.mutate(mutableRequest, requestMappingHandlerMapping);
+                requestContentTypeMutator.mutate(mutableRequest);
 
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(
                         ACCESS_CONTROL_EXPOSE_HEADERS,
                         "Link, "
-                                + X_TOTAL_RECORDS
+                                + X_TOTAL_RESULTS
                                 + ", "
-                                + X_RELEASE_NUMBER
+                                + X_TOTAL_RECORDS_OLD
                                 + ", "
-                                + X_RELEASE_DATE);
-                response.addHeader(X_RELEASE_NUMBER, serviceInfo.getReleaseNumber());
-                response.addHeader(X_RELEASE_DATE, serviceInfo.getReleaseDate());
+                                + X_UNIPROT_RELEASE
+                                + ", "
+                                + X_UNIPROT_RELEASE_DATE
+                                + ", "
+                                + X_API_DEPLOYMENT_DATE);
+                response.addHeader(X_UNIPROT_RELEASE, serviceInfo.getReleaseNumber());
+                response.addHeader(X_UNIPROT_RELEASE_DATE, serviceInfo.getReleaseDate());
+                response.addHeader(X_API_DEPLOYMENT_DATE, serviceInfo.getDeploymentDate());
                 handleGatewayCaching(request, response);
                 chain.doFilter(mutableRequest, response);
             }
@@ -112,6 +123,7 @@ public class HttpCommonHeaderConfig {
         // a key
         response.addHeader(VARY, ACCEPT);
         response.addHeader(VARY, ACCEPT_ENCODING);
-        response.addHeader(VARY, X_RELEASE_NUMBER);
+        response.addHeader(VARY, X_UNIPROT_RELEASE);
+        response.addHeader(VARY, X_API_DEPLOYMENT_DATE);
     }
 }

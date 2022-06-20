@@ -1,19 +1,26 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
+import static java.util.Arrays.asList;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -24,9 +31,11 @@ import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
+import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.service.RDFService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.util.Utils;
 
 /**
  * Created 21/08/18
@@ -38,15 +47,26 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @Slf4j
 public class ResultsConfig {
 
+    @Bean("uniProtKBSolrClient")
+    @Profile("live")
+    public SolrClient uniProtKBSolrClient(
+            HttpClient httpClient, UniProtKBRepositoryConfigProperties config) {
+        return buildSolrClient(
+                httpClient,
+                config.getZkHost(),
+                config.getConnectionTimeout(),
+                config.getSocketTimeout(),
+                config.getHttphost());
+    }
+
     @Bean
     public TupleStreamTemplate tupleStreamTemplate(
             StreamerConfigProperties configProperties,
             HttpClient httpClient,
-            SolrClient solrClient,
+            @Qualifier("uniProtKBSolrClient") SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(configProperties)
-                .httpClient(httpClient)
                 .solrClient(solrClient)
                 .solrRequestConverter(requestConverter)
                 .build();
@@ -119,5 +139,26 @@ public class ResultsConfig {
                 .tupleStreamTemplate(tupleStreamTemplate)
                 .streamConfig(streamConfig)
                 .build();
+    }
+
+    private SolrClient buildSolrClient(
+            HttpClient httpClient,
+            String zkHost,
+            int connTimeout,
+            int sockTimeout,
+            String httpHost) {
+        if (Utils.notNullNotEmpty(zkHost)) {
+            String[] zookeeperHosts = zkHost.split(",");
+            return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
+                    .withConnectionTimeout(connTimeout)
+                    .withHttpClient(httpClient)
+                    .withSocketTimeout(sockTimeout)
+                    .build();
+        } else if (Utils.notNullNotEmpty(httpHost)) {
+            return new HttpSolrClient.Builder().withBaseSolrUrl(httpHost).build();
+        } else {
+            throw new BeanCreationException(
+                    "make sure your application.properties has right solr zookeeperhost or httphost properties");
+        }
     }
 }

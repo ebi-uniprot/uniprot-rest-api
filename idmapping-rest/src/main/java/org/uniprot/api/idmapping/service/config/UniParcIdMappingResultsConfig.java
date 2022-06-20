@@ -56,7 +56,6 @@ public class UniParcIdMappingResultsConfig {
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
                 .streamConfig(uniParcStreamerConfigProperties)
-                .httpClient(httpClient)
                 .solrClient(solrClient)
                 .solrRequestConverter(requestConverter)
                 .build();
@@ -78,7 +77,6 @@ public class UniParcIdMappingResultsConfig {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniparc.name())
                 .zookeeperHost(configProperties.getZkHost())
-                .httpClient(httpClient)
                 .build();
     }
 

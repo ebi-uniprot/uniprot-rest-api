@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.io.SolrClientCache;
 import org.apache.solr.client.solrj.io.stream.StreamContext;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
@@ -33,9 +32,9 @@ public abstract class AbstractTupleStreamTemplate {
         return this.streamFactory;
     }
 
-    protected StreamContext getStreamContext(String collection, HttpClient httpClient) {
+    protected StreamContext getStreamContext(String collection) {
         if (Objects.isNull(this.streamContext)) {
-            initStreamContext(collection, httpClient);
+            initStreamContext(collection);
         } else {
             log.debug("StreamContext already created for collection {}", collection);
         }
@@ -51,13 +50,13 @@ public abstract class AbstractTupleStreamTemplate {
     /**
      * For tweaking, see: https://www.mail-archive.com/solr-user@lucene.apache.org/msg131338.html
      */
-    private void initStreamContext(String collection, HttpClient httpClient) {
+    private void initStreamContext(String collection) {
         StreamContext context = new StreamContext();
         // this should be the same for each collection, so that
         // they share client caches
         context.workerID = collection.hashCode();
         context.numWorkers = 1;
-        SolrClientCache solrClientCache = new SolrClientCache(httpClient);
+        SolrClientCache solrClientCache = new SolrClientCache();
         context.setSolrClientCache(solrClientCache);
         this.streamContext = context;
         log.info("Created new StreamContext for {} ", collection);

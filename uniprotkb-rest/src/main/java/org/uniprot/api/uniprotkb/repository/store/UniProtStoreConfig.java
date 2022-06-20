@@ -63,7 +63,6 @@ public class UniProtStoreConfig {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())
                 .zookeeperHost(configProperties.getZkHost())
-                .httpClient(httpClient)
                 .build();
     }
 }

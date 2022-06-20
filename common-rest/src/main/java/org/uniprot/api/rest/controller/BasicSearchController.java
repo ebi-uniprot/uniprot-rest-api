@@ -15,14 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskRejectedException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -244,7 +242,12 @@ public abstract class BasicSearchController<T> {
     protected abstract Optional<String> getEntityRedirectId(T entity, HttpServletRequest request);
 
     protected MediaType getAcceptHeader(HttpServletRequest request) {
-        return UniProtMediaType.valueOf(request.getHeader(HttpHeaders.ACCEPT));
+        String mediaType = request.getHeader(HttpHeaders.ACCEPT);
+        try {
+            return UniProtMediaType.valueOf(mediaType);
+        } catch (InvalidMediaTypeException e) {
+            throw new ImportantMessageServiceException("The mediaType is invalid: " + mediaType, e);
+        }
     }
 
     protected FileType getBestFileTypeFromRequest(HttpServletRequest request) {

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.service.ServiceInfoConfig;
 
 class HttpCommonHeaderConfigTest {
@@ -33,7 +34,8 @@ class HttpCommonHeaderConfigTest {
                         ServiceInfoConfig.ServiceInfo.builder()
                                 .nonCacheablePaths(nonCacheablePaths)
                                 .cacheControlMaxAge(MAX_AGE)
-                                .build());
+                                .build(),
+                        mock(RequestMappingHandlerMapping.class));
     }
 
     @Test
@@ -47,7 +49,8 @@ class HttpCommonHeaderConfigTest {
         verify(mockResponse).addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + MAX_AGE);
         verify(mockResponse).addHeader(VARY, ACCEPT);
         verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
-        verify(mockResponse).addHeader(VARY, X_RELEASE_NUMBER);
+        verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
+        verify(mockResponse).addHeader(VARY, X_API_DEPLOYMENT_DATE);
     }
 
     @Test
@@ -62,6 +65,7 @@ class HttpCommonHeaderConfigTest {
         verify(mockResponse, never()).addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + MAX_AGE);
         verify(mockResponse).addHeader(VARY, ACCEPT);
         verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
-        verify(mockResponse).addHeader(VARY, X_RELEASE_NUMBER);
+        verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
+        verify(mockResponse).addHeader(VARY, X_API_DEPLOYMENT_DATE);
     }
 }

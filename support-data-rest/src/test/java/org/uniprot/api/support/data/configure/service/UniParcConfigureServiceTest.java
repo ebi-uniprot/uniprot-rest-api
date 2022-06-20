@@ -38,7 +38,7 @@ class UniParcConfigureServiceTest {
         UniParcConfigureService service = new UniParcConfigureService();
         List<AdvancedSearchTerm> result = service.getSearchItems(CONTEXT_PATH);
         assertNotNull(result);
-        assertEquals(13, result.size());
+        assertEquals(14, result.size());
 
         AdvancedSearchTerm database =
                 result.stream()

@@ -48,7 +48,7 @@ class PIRServiceImplTest {
                         "http://localhost", new HttpEntity<>(map, HTTP_HEADERS), String.class))
                 .thenReturn(ResponseEntity.ok().body("From1\tTo1\n"));
 
-        IdMappingResult idMappingResult = pirService.mapIds(request);
+        IdMappingResult idMappingResult = pirService.mapIds(request, "dummyJobId");
         assertThat(
                 idMappingResult.getMappedIds(), contains(new IdMappingStringPair("From1", "To1")));
     }

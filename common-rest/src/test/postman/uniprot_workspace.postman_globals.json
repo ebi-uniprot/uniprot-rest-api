@@ -28,7 +28,7 @@
 		},
 		{
 			"key": "verifyXReleaseHeader",
-			"value": "(function verifyXRelease(xRelease){pm.test(\"x-release-number Header\", function () {\n    pm.response.to.have.header(\"x-release-number\");\n    pm.response.to.be.header(\"x-release-number\", xRelease);\n});\n\n\n})",
+			"value": "(function verifyXRelease(xRelease){pm.test(\"X-UniProt-Release Header\", function () {\n    pm.response.to.have.header(\"X-UniProt-Release\");\n    pm.response.to.be.header(\"X-UniProt-Release\", xRelease);\n});\n\n\n})",
 			"enabled": true
 		},
 		{
@@ -38,7 +38,7 @@
 		},
 		{
 			"key": "verifyExposeHeaders",
-			"value": "(function verifyExposeHeaders(headers='Link, x-total-records, x-release-number, x-release-date'){pm.test(\"Access-Control-Expose-Headers Header\", function () {\n    pm.response.to.have.header(\"Access-Control-Expose-Headers\");\n    pm.response.to.be.header(\"Access-Control-Expose-Headers\", headers);\n});\n})",
+			"value": "(function verifyExposeHeaders(headers='Link, X-Total-Results, X-UniProt-Release, X-UniProt-Release-Date'){pm.test(\"Access-Control-Expose-Headers Header\", function () {\n    pm.response.to.have.header(\"Access-Control-Expose-Headers\");\n    pm.response.to.be.header(\"Access-Control-Expose-Headers\", headers);\n});\n})",
 			"enabled": true
 		},
 		{
@@ -58,7 +58,7 @@
 		},
 		{
 			"key": "verifyHeaders",
-			"value": "(function verifyHeaders(\n    varyValue = 'Accept, Accept-Encoding', \n    status=200, \n    contentType='application/json', \n    headers='Link, x-total-records, x-release-number, x-release-date', \n    encode='chunked', \n    info='caching', \n    xRelease, \n    controlAllow) {\n    if(varyValue != \"none\") {\n        pm.test(\"Vary Header\", function () {\n                pm.response.to.be.header(\"Vary\", varyValue);\n        });\n    }\n\n    if(status != \"none\") {\n        pm.test(\"Status code Header\", function () {\n        pm.response.to.have.status(status);\n        });\n    }\n\n    if(contentType != \"none\") {\n        pm.test(\"Content-Type Header\", function () {\n            pm.response.to.be.header(\"Content-Type\", contentType);\n        }); \n    }\n\n    if(xRelease != \"none\") {\n        pm.test(\"X-Release Header\", function () {\n            pm.response.to.be.header(\"X-Release\", xRelease);\n        });\n    }\n\n    if(controlAllow != \"none\") {\n        pm.test(\"Access-Control-Allow-Origin Header\", function () {\n            pm.response.to.be.header(\"Access-Control-Allow-Origin\", controlAllow);\n        });\n    }\n\n    if(headers != \"none\") {\n        pm.test(\"Access-Control-Expose-Headers Header\", function () {\n            pm.response.to.be.header(\"Access-Control-Expose-Headers\", headers);\n        });\n    }\n\n    pm.test(\"Date Header\", function () {\n        pm.response.to.have.header(\"Date\");\n    });\n    \n    if(encode != \"none\") {\n        pm.test(\"Transfer-Encoding Header\", function () {\n            pm.response.to.be.header(\"Transfer-Encoding\", encode);\n        });\n    }\n\n    if(info != \"none\") {\n        pm.test(\"X-Cache-Info Header\", function () {\n                pm.expect(pm.response.headers.get(\"X-Cache-Info\")).to.be.oneOf([info, 'cached']);        \n        });\n    }\n})",
+			"value": "(function verifyHeaders(\n    varyValue = 'Accept, Accept-Encoding', \n    status=200, \n    contentType='application/json', \n    headers='Link, X-Total-Results, X-UniProt-Release, X-UniProt-Release-Date', \n    encode='chunked', \n    info='caching', \n    xRelease, \n    controlAllow) {\n    if(varyValue != \"none\") {\n        pm.test(\"Vary Header\", function () {\n                pm.response.to.be.header(\"Vary\", varyValue);\n        });\n    }\n\n    if(status != \"none\") {\n        pm.test(\"Status code Header\", function () {\n        pm.response.to.have.status(status);\n        });\n    }\n\n    if(contentType != \"none\") {\n        pm.test(\"Content-Type Header\", function () {\n            pm.response.to.be.header(\"Content-Type\", contentType);\n        }); \n    }\n\n    if(xRelease != \"none\") {\n        pm.test(\"X-Release Header\", function () {\n            pm.response.to.be.header(\"X-Release\", xRelease);\n        });\n    }\n\n    if(controlAllow != \"none\") {\n        pm.test(\"Access-Control-Allow-Origin Header\", function () {\n            pm.response.to.be.header(\"Access-Control-Allow-Origin\", controlAllow);\n        });\n    }\n\n    if(headers != \"none\") {\n        pm.test(\"Access-Control-Expose-Headers Header\", function () {\n            pm.response.to.be.header(\"Access-Control-Expose-Headers\", headers);\n        });\n    }\n\n    pm.test(\"Date Header\", function () {\n        pm.response.to.have.header(\"Date\");\n    });\n    \n    if(encode != \"none\") {\n        pm.test(\"Transfer-Encoding Header\", function () {\n            pm.response.to.be.header(\"Transfer-Encoding\", encode);\n        });\n    }\n\n    if(info != \"none\") {\n        pm.test(\"X-Cache-Info Header\", function () {\n                pm.expect(pm.response.headers.get(\"X-Cache-Info\")).to.be.oneOf([info, 'cached']);        \n        });\n    }\n})",
 			"enabled": true
 		},
 		{

@@ -79,7 +79,7 @@ class IdMappingPIRServiceTest {
         }
 
         @Override
-        public IdMappingResult mapIds(IdMappingJobRequest request) {
+        public IdMappingResult mapIds(IdMappingJobRequest request, String jobId) {
             return null;
         }
     }

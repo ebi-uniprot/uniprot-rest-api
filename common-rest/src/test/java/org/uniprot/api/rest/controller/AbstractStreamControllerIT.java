@@ -71,10 +71,6 @@ public abstract class AbstractStreamControllerIT {
             getTupleStreamTemplate()
                     .getStreamConfig()
                     .setZkHost(cluster.getZkServer().getZkAddress());
-            ReflectionTestUtils.setField(
-                    getTupleStreamTemplate(),
-                    "httpClient",
-                    cluster.getSolrClient().getHttpClient());
             ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamFactory", null);
             ReflectionTestUtils.setField(getTupleStreamTemplate(), "streamContext", null);
             cloudSolrClient = cluster.getSolrClient();
@@ -136,10 +132,6 @@ public abstract class AbstractStreamControllerIT {
                 getFacetTupleStreamTemplate(),
                 "zookeeperHost",
                 cluster.getZkServer().getZkAddress());
-        ReflectionTestUtils.setField(
-                getFacetTupleStreamTemplate(),
-                "httpClient",
-                cluster.getSolrClient().getHttpClient());
         ReflectionTestUtils.setField(getFacetTupleStreamTemplate(), "streamFactory", null);
         ReflectionTestUtils.setField(getFacetTupleStreamTemplate(), "streamContext", null);
     }

@@ -17,6 +17,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
+import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.idmapping.service.BasicIdService;
 import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
@@ -38,11 +39,14 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     private final StreamerConfigProperties streamConfig;
 
+    private final UniprotKBMappingRepository repository;
+
     public UniProtKBIdService(
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
             @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
             @Qualifier("uniProtKBStoreRetryPolicy") RetryPolicy<Object> storeFetchRetryPolicy,
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
+            UniprotKBMappingRepository repository,
             UniProtKBFacetConfig facetConfig,
             RDFStreamer uniProtKBRDFStreamer,
             UniProtStoreClient<UniProtKBEntry> storeClient,
@@ -56,15 +60,16 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;
+        this.repository = repository;
     }
 
     @Override
     protected UniProtKBEntryPair convertToPair(
             IdMappingStringPair mId, Map<String, UniProtKBEntry> idEntryMap) {
-        return UniProtKBEntryPair.builder()
-                .from(mId.getFrom())
-                .to(idEntryMap.get(mId.getTo()))
-                .build();
+        UniProtKBEntry toEntry =
+                idEntryMap.computeIfAbsent(mId.getTo(), repository::getDeletedEntry);
+
+        return UniProtKBEntryPair.builder().from(mId.getFrom()).to(toEntry).build();
     }
 
     @Override

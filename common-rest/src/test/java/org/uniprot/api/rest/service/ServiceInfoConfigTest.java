@@ -21,6 +21,7 @@ class ServiceInfoConfigTest {
         Map<String, Object> map = new HashMap<>();
         map.put(RELEASE_NUMBER, "value");
         map.put(RELEASE_DATE, "value");
+        map.put(DEPLOYMENT_DATE, "value");
         ServiceInfoConfig.ServiceInfo serviceInfo =
                 ServiceInfoConfig.ServiceInfo.builder().map(map).build();
         assertDoesNotThrow(serviceInfo::validate);
@@ -30,6 +31,7 @@ class ServiceInfoConfigTest {
     void validatingServiceInfoChecksForReleaseNumberAndThrowsException() {
         Map<String, Object> map = new HashMap<>();
         map.put(RELEASE_DATE, "value");
+        map.put(DEPLOYMENT_DATE, "value");
         ServiceInfoConfig.ServiceInfo serviceInfo =
                 ServiceInfoConfig.ServiceInfo.builder().map(map).build();
         assertThrows(IllegalStateException.class, serviceInfo::validate);
@@ -39,6 +41,17 @@ class ServiceInfoConfigTest {
     void validatingServiceInfoChecksForReleaseDateAndThrowsException() {
         Map<String, Object> map = new HashMap<>();
         map.put(RELEASE_NUMBER, "value");
+        map.put(DEPLOYMENT_DATE, "value");
+        ServiceInfoConfig.ServiceInfo serviceInfo =
+                ServiceInfoConfig.ServiceInfo.builder().map(map).build();
+        assertThrows(IllegalStateException.class, serviceInfo::validate);
+    }
+
+    @Test
+    void validatingServiceInfoChecksForDeploymentDateAndThrowsException() {
+        Map<String, Object> map = new HashMap<>();
+        map.put(RELEASE_NUMBER, "value");
+        map.put(RELEASE_DATE, "value");
         ServiceInfoConfig.ServiceInfo serviceInfo =
                 ServiceInfoConfig.ServiceInfo.builder().map(map).build();
         assertThrows(IllegalStateException.class, serviceInfo::validate);

@@ -24,7 +24,7 @@ public class DataStoreTestConfig {
         return Mockito.mock(HttpClient.class);
     }
 
-    @Bean()
+    @Bean
     @Profile("offline")
     public SolrClient solrClient() {
         return Mockito.mock(SolrClient.class);

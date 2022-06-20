@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import java.util.Optional;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpClientUtil;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.core.util.Utils;
 
 /**
  * Configure solr repository beans, that are used to retrieve data from a solr instance.
@@ -30,45 +32,66 @@ public class RepositoryConfig {
     }
 
     @Bean
+    public UniProtKBRepositoryConfigProperties uniProtKBRepositoryConfigProperties() {
+        return new UniProtKBRepositoryConfigProperties();
+    }
+
+    @Bean
     @Profile("live")
     public HttpClient httpClient(RepositoryConfigProperties config) {
-        // I am creating HttpClient exactly in the same way it is created inside
-        // CloudSolrClient.Builder,
-        // but here I am just adding Credentials
-        ModifiableSolrParams param = null;
-        if (!config.getUsername().isEmpty() && !config.getPassword().isEmpty()) {
-            param = new ModifiableSolrParams();
-            param.add(HttpClientUtil.PROP_BASIC_AUTH_USER, config.getUsername());
-            param.add(HttpClientUtil.PROP_BASIC_AUTH_PASS, config.getPassword());
-        }
-        return HttpClientUtil.createClient(param);
+        return buildHttpClient(config.getUsername(), config.getPassword());
     }
 
     @Bean
     @Profile("live")
     public SolrClient solrClient(HttpClient httpClient, RepositoryConfigProperties config) {
-        String zookeeperhost = config.getZkHost();
-        if (zookeeperhost != null && !zookeeperhost.isEmpty()) {
-            String[] zookeeperHosts = zookeeperhost.split(",");
-            return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
-                    .withHttpClient(httpClient)
-                    .withConnectionTimeout(config.getConnectionTimeout())
-                    .withSocketTimeout(config.getSocketTimeout())
-                    .build();
-        } else if (!config.getHttphost().isEmpty()) {
-            return new HttpSolrClient.Builder()
-                    .withHttpClient(httpClient)
-                    .withBaseSolrUrl(config.getHttphost())
-                    .build();
-        } else {
-            throw new BeanCreationException(
-                    "make sure your application.properties has eight solr zookeeperhost or httphost properties");
-        }
+        return buildSolrClient(
+                httpClient,
+                config.getZkHost(),
+                config.getConnectionTimeout(),
+                config.getSocketTimeout(),
+                config.getHttphost());
     }
 
     @Bean
     @Profile("live")
     public SolrRequestConverter requestConverter() {
         return new SolrRequestConverter();
+    }
+
+    private HttpClient buildHttpClient(String username, String password) {
+        // I am creating HttpClient exactly in the same way it is created inside
+        // CloudSolrClient.Builder,
+        // but here I am just adding Credentials
+        ModifiableSolrParams params = new ModifiableSolrParams();
+        if (Utils.notNullNotEmpty(username) && Utils.notNullNotEmpty(password)) {
+            params = new ModifiableSolrParams();
+            params.add(HttpClientUtil.PROP_BASIC_AUTH_USER, username);
+            params.add(HttpClientUtil.PROP_BASIC_AUTH_PASS, password);
+        }
+        PoolingHttpClientConnectionManager manager = new PoolingHttpClientConnectionManager();
+
+        return HttpClientUtil.createClient(params, manager, true);
+    }
+
+    private SolrClient buildSolrClient(
+            HttpClient httpClient,
+            String zkHost,
+            int connTimeout,
+            int sockTimeout,
+            String httpHost) {
+        if (Utils.notNullNotEmpty(zkHost)) {
+            String[] zookeeperHosts = zkHost.split(",");
+            return new CloudSolrClient.Builder(asList(zookeeperHosts), Optional.empty())
+                    .withConnectionTimeout(connTimeout)
+                    .withHttpClient(httpClient)
+                    .withSocketTimeout(sockTimeout)
+                    .build();
+        } else if (Utils.notNullNotEmpty(httpHost)) {
+            return new HttpSolrClient.Builder().withBaseSolrUrl(httpHost).build();
+        } else {
+            throw new BeanCreationException(
+                    "make sure your application.properties has right solr zookeeperhost or httphost properties");
+        }
     }
 }
