@@ -10,16 +10,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.store.search.document.suggest.SuggestDictionary.*;
-import static org.uniprot.store.search.field.SuggestField.Importance.medium;
+import static org.uniprot.store.search.field.SuggestField.Importance.*;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,13 +67,18 @@ class SuggesterControllerIT {
     }
 
     @BeforeEach
-    void setUp() throws IOException, SolrServerException {
+    void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
         populateIndexWithDocs();
     }
 
-    private void populateIndexWithDocs() throws IOException, SolrServerException {
+    @AfterEach
+    void tearDown() {
+        storeManager.cleanStore(DataStoreManager.StoreType.SUGGEST);
+    }
+
+    private void populateIndexWithDocs() {
         saveSuggestionDoc("myId", "myValue", asList("one", "two", "three"), MAIN, medium);
         saveSuggestionDoc("myId", "myValue", asList("one", "two"), GO, medium);
         saveSuggestionDoc("myId", "myValue", singletonList("one"), EC, medium);
@@ -147,6 +147,50 @@ class SuggesterControllerIT {
     }
 
     @Test
+    void importanceOrderTest() throws Exception {
+        // given
+        saveSuggestionDoc("1", "order value 1", singletonList("one"), EC, medium);
+        saveSuggestionDoc("2", "order value 1", singletonList("two"), EC, low);
+        saveSuggestionDoc("3", "order value 1", singletonList("three"), EC, highest);
+        saveSuggestionDoc("4", "order value 1", singletonList("four"), EC, high);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("dict", EC.name())
+                                .param("query", "order"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.suggestions.*.id", containsInAnyOrder("3", "4", "1", "2")));
+    }
+
+    @Test
+    void lowestImportanceShouldBeAtEnd() throws Exception {
+        // given
+        saveSuggestionDoc("1", "any data", singletonList("two"), EC, low);
+        saveSuggestionDoc("2", "any data", singletonList("one"), EC, medium);
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(SEARCH_RESOURCE)
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("dict", EC.name())
+                                .param("query", "any data"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.suggestions.*.id", containsInAnyOrder("2", "1")));
+    }
+
+    @Test
     void missingRequiredDictField() throws Exception {
         // when
         String requiredParam = "dict";
@@ -197,8 +241,7 @@ class SuggesterControllerIT {
                 .andExpect(jsonPath("$.messages", hasItem(containsString("Unknown dictionary"))));
     }
 
-    private void saveSuggestionDoc(String id, String value, List<String> altValues)
-            throws IOException, SolrServerException {
+    private void saveSuggestionDoc(String id, String value, List<String> altValues) {
         saveSuggestionDoc(
                 id, value, altValues, SuggestDictionary.TAXONOMY, SuggestField.Importance.medium);
     }
