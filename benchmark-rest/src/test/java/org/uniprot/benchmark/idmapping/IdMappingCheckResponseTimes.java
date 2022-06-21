@@ -181,7 +181,7 @@ public class IdMappingCheckResponseTimes {
             log.info("Redirect location: {}", location);
             if (Utils.notNull(location)) {
                 // ---- FETCH RESULTS OF JOB ----
-                String resultsUrl = host + location.toString() + resultsParams;
+                String resultsUrl = location.toString() + resultsParams;
                 stopWatch.start(resultsUrl);
                 ResponseEntity<String> responseEntity =
                         restTemplate.exchange(resultsUrl, HttpMethod.GET, httpEntity, String.class);

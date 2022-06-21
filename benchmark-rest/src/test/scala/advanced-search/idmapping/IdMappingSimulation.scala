@@ -30,8 +30,8 @@ class IdMappingSimulation extends Simulation {
   // ========================== SCENARIO VARIABLES: USER COUNT + ID COUNT ==========================
   val scenario1Users = conf.getInt("a.s.idmapping.scenario1.users")
   val scenario1IdCount = conf.getInt("a.s.idmapping.scenario1.idCount")
-  val scenario2Users = conf.getInt("a.s.idmapping.scenario2.idCount")
-  val scenario2IdCount = conf.getInt("a.s.idmapping.scenario2.users")
+  val scenario2Users = conf.getInt("a.s.idmapping.scenario2.users")
+  val scenario2IdCount = conf.getInt("a.s.idmapping.scenario2.idCount")
   val scenario3Users = conf.getInt("a.s.idmapping.scenario3.users")
   val scenario3IdCount = conf.getInt("a.s.idmapping.scenario3.idCount")
 
