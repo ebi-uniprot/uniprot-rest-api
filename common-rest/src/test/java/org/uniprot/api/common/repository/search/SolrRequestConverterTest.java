@@ -1,7 +1,16 @@
 package org.uniprot.api.common.repository.search;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
+
+import java.io.IOException;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -17,16 +26,10 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtDefaultFieldQueryNodeProcessor;
+
 import voldemort.utils.StringOutputStream;
 
-import java.io.IOException;
-import java.util.*;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created 17/06/19
@@ -185,7 +188,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void entryRequestDoesNotSetDefaults()  {
+        void entryRequestDoesNotSetDefaults() {
             // given
             String queryString = "query";
             SolrRequest request = SolrRequest.builder().query(queryString).build();
@@ -231,7 +234,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void doNotCreateQueryBoostsAndHighlightForPageSizeZero()  {
+        void doNotCreateQueryBoostsAndHighlightForPageSizeZero() {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -260,7 +263,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void queryBoostsWithPlaceholderIsReplacedCorrectly()  {
+        void queryBoostsWithPlaceholderIsReplacedCorrectly() {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -279,7 +282,10 @@ class SolrRequestConverterTest {
             assertNotNull(queryParams);
             // then
             List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
-            assertThat(boostQuery, containsInAnyOrder("field1:(value1)^3", "field1:(value2)^3", "field2:value3^2"));
+            assertThat(
+                    boostQuery,
+                    containsInAnyOrder(
+                            "field1:(value1)^3", "field1:(value2)^3", "field2:value3^2"));
             assertThat(queryParams.get("boost"), is(nullValue()));
         }
 
@@ -307,7 +313,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void intQueryBoostWithPlaceholderAndStringQueryIsReplacedCorrectly()  {
+        void intQueryBoostWithPlaceholderAndStringQueryIsReplacedCorrectly() {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -330,7 +336,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void defaultQueryBoostsAndFunctionsCreatedCorrectly()  {
+        void defaultQueryBoostsAndFunctionsCreatedCorrectly() {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -356,7 +362,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void queryFieldsQFCreatedCorrectly()  {
+        void queryFieldsQFCreatedCorrectly() {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -375,7 +381,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void advancedSearchQueryBoostsAndFunctionsCreatedCorrectly()  {
+        void advancedSearchQueryBoostsAndFunctionsCreatedCorrectly() {
             // given
             SolrRequest request =
                     SolrRequest.builder()
@@ -402,7 +408,7 @@ class SolrRequestConverterTest {
         }
 
         @Test
-        void highlightsFieldsCanBeCreatedCorrectly()  {
+        void highlightsFieldsCanBeCreatedCorrectly() {
             // given
             SolrRequest request =
                     SolrRequest.builder()

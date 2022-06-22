@@ -1,11 +1,11 @@
 package org.uniprot.api.common.repository.search;
 
-import lombok.*;
+import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader.QUERY_PLACEHOLDER;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader.QUERY_PLACEHOLDER;
+import lombok.*;
 
 /**
  * Created 04/09/19

@@ -1,17 +1,13 @@
 package org.uniprot.api.common.repository.search.request;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.uniprot.api.common.repository.search.SolrQueryConfigCreationException;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class DefaultTermExtractorTest {
     @ParameterizedTest
@@ -20,7 +16,12 @@ class DefaultTermExtractorTest {
         "field:a,",
         "a b, a|b",
         "a b a, a|b",
+        "a OR b OR a, a|b",
         "cdc7, cdc7",
+        "field:a AND P21802-2, P21802\\-2",
+        "field:a AND \"P21802-2\", \"P21802-2\"",
+        "\"a\", \"a\"",
+        "\"a b c\", \"a b c\"",
         "cdc7 AND (reviewed:true), cdc7",
         "HGNC\\:3689 AND (reviewed:true), HGNC\\:3689",
         "a (b:value OR (c:value AND d OR (e:value f) AND g)), a|d|f|g"

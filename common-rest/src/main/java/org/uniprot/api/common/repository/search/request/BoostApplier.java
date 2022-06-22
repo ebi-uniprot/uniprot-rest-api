@@ -1,15 +1,15 @@
 package org.uniprot.api.common.repository.search.request;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader.BOOST_FIELD_TYPE_NUMBER;
+import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader.QUERY_PLACEHOLDER;
+import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 import java.util.List;
 import java.util.Set;
 
-import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader.BOOST_FIELD_TYPE_NUMBER;
-import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader.QUERY_PLACEHOLDER;
-import static org.uniprot.core.util.Utils.nullOrEmpty;
+import org.apache.commons.lang.StringUtils;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.uniprot.api.common.repository.search.SolrQueryConfig;
 
 /**
  * The purpose of this class is to apply the boosts of a {@link SolrQueryConfig} to a Solr query
@@ -50,7 +50,7 @@ public class BoostApplier {
                             // apply the boost if the value is non-numeric
                             if (!StringUtils.isNumeric(term)) {
                                 String processedBoost =
-                                        boost.replace(QUERY_PLACEHOLDER, "( \"" + term + "\" )");
+                                        boost.replace(QUERY_PLACEHOLDER, "(" + term + ")");
                                 solrQuery.add(BOOST_QUERY, processedBoost);
                             }
                         }

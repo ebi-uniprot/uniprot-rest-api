@@ -1,17 +1,18 @@
 package org.uniprot.api.common.repository.search.request;
 
+import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.core.nodes.QuotedFieldQueryNode;
 import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtDefaultFieldQueryNodeProcessor;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
 
 /**
  * The purpose of this class is to extract default terms from an arbitrary query. Currently, this
@@ -55,7 +56,11 @@ public class DefaultTermExtractor {
             if (node instanceof FieldQueryNode
                     && ((FieldQueryNode) node).getField().equals(IMPOSSIBLE_FIELD)) {
                 String defaultQueryTerm = ((FieldQueryNode) node).getText().toString();
-                defaultTerms.add(ClientUtils.escapeQueryChars(defaultQueryTerm));
+                if (node instanceof QuotedFieldQueryNode) {
+                    defaultTerms.add("\"" + defaultQueryTerm + "\"");
+                } else {
+                    defaultTerms.add(ClientUtils.escapeQueryChars(defaultQueryTerm));
+                }
             }
             return super.postProcessNode(node);
         }
