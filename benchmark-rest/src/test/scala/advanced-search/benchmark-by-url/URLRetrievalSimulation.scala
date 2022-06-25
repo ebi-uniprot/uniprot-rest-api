@@ -9,7 +9,7 @@ import com.typesafe.config._
  * Simulates simple retrieval of URLs from the REST service. Since these URLs can be anywhere, this simulation
  * can be used to test anything.
  */
-class URLRetrievalSimulation extends Simulation {
+  class URLRetrievalSimulation extends Simulation {
 
   val conf = ConfigFactory.load()
 
