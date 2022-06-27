@@ -40,6 +40,10 @@ public class TupleStreamIterable implements Iterable<String> {
                         .withMaxRetries(MAX_RETRIES);
     }
 
+    public String getId() {
+        return this.id;
+    }
+
     @Override
     public Iterator<String> iterator() {
         return new Iterator<String>() {
