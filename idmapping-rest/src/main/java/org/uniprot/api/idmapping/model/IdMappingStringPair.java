@@ -13,6 +13,7 @@ import lombok.*;
 @ToString
 @EqualsAndHashCode
 public class IdMappingStringPair implements EntryPair<String> {
+    private static final long serialVersionUID = -2255505407227241111L;
     private final String from;
     private final String to;
 }

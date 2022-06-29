@@ -137,7 +137,13 @@
 			<artifactId>ehcache</artifactId>
 		</dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.17.4</version>
+        </dependency>
+
+        <dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 			<version>${jayway.version}</version>

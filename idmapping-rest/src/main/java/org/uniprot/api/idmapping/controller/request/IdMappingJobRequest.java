@@ -7,6 +7,8 @@ import lombok.Data;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidIdType;
 
+import java.io.Serializable;
+
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -16,7 +18,8 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @ValidFromAndTo
-public class IdMappingJobRequest {
+public class IdMappingJobRequest implements Serializable {
+    private static final long serialVersionUID = 3950807397142678483L;
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the from type")
     @ValidIdType(message = "{idmapping.invalid.from}")

@@ -11,6 +11,7 @@ import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.core.util.Utils;
 
@@ -25,16 +26,19 @@ public class JobTask implements Runnable {
     private static final int REST_EXCEPTION_CODE = 50;
     private final IdMappingJob job;
     private final IdMappingPIRService pirService;
+    private final IdMappingJobCacheService cacheService;
 
-    public JobTask(IdMappingJob job, IdMappingPIRService pirService) {
+    public JobTask(IdMappingJob job, IdMappingPIRService pirService, IdMappingJobCacheService cacheService) {
         this.job = job;
         this.pirService = pirService;
+        this.cacheService = cacheService;
     }
 
     @Override
     public void run() {
         this.job.setJobStatus(JobStatus.RUNNING);
         this.job.setUpdated(new Date());
+        this.cacheService.put(this.job.getJobId(), this.job);
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
             IdMappingResult pirResponse =
@@ -59,6 +63,8 @@ public class JobTask implements Runnable {
         } catch (RestClientException restException) {
             populateError(
                     List.of(new ProblemPair(REST_EXCEPTION_CODE, restException.getMessage())));
+        } finally {
+            this.cacheService.put(this.job.getJobId(), this.job);
         }
     }
 
