@@ -18,6 +18,8 @@
 		<logback.version>1.2.3</logback.version>
 
 		<jayway.version>2.4.0</jayway.version>
+		<redisson-version>3.17.4</redisson-version>
+		<embedded-redis.version>0.7.2</embedded-redis.version>
 	</properties>
 
 	<dependencies>
@@ -26,10 +28,6 @@
 			<artifactId>common-rest</artifactId>
 			<version>${project.parent.version}</version>
 			<exclusions>
-				<!-- <exclusion> -->
-				<!-- <groupId>org.springframework.boot</groupId> -->
-				<!-- <artifactId>spring-boot-starter-actuator</artifactId> -->
-				<!-- </exclusion> -->
 				<exclusion>
 					<groupId>org.apache.solr</groupId>
 					<artifactId>solr-solrj</artifactId>
@@ -128,22 +126,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
+
 		<dependency>
-			<groupId>javax.cache</groupId>
-			<artifactId>cache-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.ehcache</groupId>
-			<artifactId>ehcache</artifactId>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson</artifactId>
+			<version>${redisson-version}</version>
 		</dependency>
 
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson</artifactId>
-            <version>3.17.4</version>
-        </dependency>
-
-        <dependency>
+		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 			<version>${jayway.version}</version>
@@ -176,6 +166,13 @@
 			<artifactId>json-parser</artifactId>
 			<version>${uniprot-core.version}</version>
 			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<!-- Embedded Redis Server -->
+		<dependency>
+			<groupId>it.ozimov</groupId>
+			<artifactId>embedded-redis</artifactId>
+			<version>${embedded-redis.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

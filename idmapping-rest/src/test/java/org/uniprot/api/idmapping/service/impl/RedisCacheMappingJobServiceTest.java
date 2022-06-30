@@ -16,9 +16,9 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 
-class EhCacheMappingJobServiceTest {
+class RedisCacheMappingJobServiceTest {
     private Cache fakeCache;
-    private EhCacheMappingJobService jobService;
+    private RedisCacheMappingJobService jobService;
 
     @BeforeEach
     void setUp() {
@@ -29,7 +29,7 @@ class EhCacheMappingJobServiceTest {
 
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(Collections.singletonList(fakeCache));
-        this.jobService = new EhCacheMappingJobService(this.fakeCache);
+        this.jobService = new RedisCacheMappingJobService(this.fakeCache);
     }
 
     @Test

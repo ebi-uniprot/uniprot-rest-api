@@ -10,10 +10,10 @@ import org.uniprot.core.util.Utils;
  *
  * @author Edd
  */
-public class EhCacheMappingJobService implements IdMappingJobCacheService {
+public class RedisCacheMappingJobService implements IdMappingJobCacheService {
     private final Cache cache;
 
-    public EhCacheMappingJobService(Cache cache) {
+    public RedisCacheMappingJobService(Cache cache) {
         this.cache = cache;
     }
 

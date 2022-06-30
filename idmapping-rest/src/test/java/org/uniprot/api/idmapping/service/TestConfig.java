@@ -1,16 +1,26 @@
 package org.uniprot.api.idmapping.service;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.redisson.spring.cache.CacheConfig;
+import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean;
-import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.uniprot.api.idmapping.service.impl.EhCacheMappingJobService;
+import org.uniprot.api.idmapping.service.impl.RedisCacheMappingJobService;
+
+import redis.embedded.RedisServer;
 
 /**
  * @author sahmad
@@ -18,28 +28,43 @@ import org.uniprot.api.idmapping.service.impl.EhCacheMappingJobService;
  */
 @TestConfiguration
 public class TestConfig {
-    @Bean
+    private final RedisServer redisServer;
+
+    public TestConfig() {
+        this.redisServer = new RedisServer(6379);
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        try {
+            this.redisServer.start();
+        } catch (RuntimeException rte) {
+            // already running
+        }
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        this.redisServer.stop();
+    }
+
+    @Bean(destroyMethod = "shutdown")
     @Profile("offline")
-    public CacheManager cacheManager(Cache fakeCache) {
-        SimpleCacheManager cacheManager = new SimpleCacheManager();
-        cacheManager.setCaches(Collections.singletonList(fakeCache));
-        return cacheManager;
+    RedissonClient redisson() throws IOException {
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://127.0.0.1:6379");
+        return Redisson.create(config);
     }
 
     @Bean
     @Profile("offline")
-    public Cache fakeCache() {
-        ConcurrentMapCacheFactoryBean cacheFactoryBean = new ConcurrentMapCacheFactoryBean();
-        cacheFactoryBean.setName("fakeCache");
-        cacheFactoryBean.afterPropertiesSet();
-        return cacheFactoryBean.getObject();
-    }
-
-    @Bean
-    @Profile("offline")
-    public IdMappingJobCacheService cacheService(CacheManager cacheManager) {
-        Cache cache = cacheManager.getCache("fakeCache");
-        return new EhCacheMappingJobService(cache);
+    public IdMappingJobCacheService idMappingJobCacheService(RedissonClient redissonClient)
+            throws IOException {
+        Map<String, CacheConfig> config = new HashMap<>();
+        config.put("testMap", null);
+        CacheManager cacheManager = new RedissonSpringCacheManager(redissonClient, config);
+        Cache mappingCache = cacheManager.getCache("testMap");
+        return new RedisCacheMappingJobService(mappingCache);
     }
 
     @Bean
