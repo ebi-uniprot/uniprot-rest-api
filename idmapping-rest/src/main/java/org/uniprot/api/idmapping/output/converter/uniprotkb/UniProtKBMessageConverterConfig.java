@@ -12,7 +12,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
-import org.uniprot.api.idmapping.output.converter.EntryPairXmlMessageConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.rest.output.converter.RDFMessageConverter;
@@ -20,9 +19,6 @@ import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 import org.uniprot.core.parser.tsv.uniprot.UniProtKBEntryValueMapper;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.xml.jaxb.uniprot.Entry;
-import org.uniprot.core.xml.uniprot.UniProtEntryConverter;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 
 /**
@@ -67,11 +63,10 @@ public class UniProtKBMessageConverterConfig {
 
         String header = XML_DECLARATION + UNIPROTKB_XML_SCHEMA;
         String footer = COPYRIGHT_TAG + UNIPROTKB_XML_CLOSE_TAG;
-        EntryPairXmlMessageConverter<UniProtKBEntryPair, UniProtKBEntry, Entry> xmlConverter =
-                new EntryPairXmlMessageConverter<>(
+        UniProtKBEntryPairXmlMessageConverter xmlConverter =
+                new UniProtKBEntryPairXmlMessageConverter(
                         UniProtKBEntryPair.class,
                         UNIPROTKB_XML_CONTEXT,
-                        new UniProtEntryConverter(),
                         header,
                         footer,
                         downloadGatekeeper);

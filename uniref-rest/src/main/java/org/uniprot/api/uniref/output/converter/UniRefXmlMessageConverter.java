@@ -1,8 +1,12 @@
 package org.uniprot.api.uniref.output.converter;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import javax.xml.bind.Marshaller;
 
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.core.uniref.UniRefEntry;
@@ -14,7 +18,7 @@ import org.uniprot.core.xml.uniref.UniRefEntryConverter;
  * @date: 22 Aug 2019
  */
 public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRefEntry, Entry> {
-    private final UniRefEntryConverter converter;
+    private final ThreadLocal<UniRefEntryConverter> XML_CONVERTER = new ThreadLocal<>();
     private String header;
 
     public UniRefXmlMessageConverter(String version, String releaseDate) {
@@ -24,7 +28,6 @@ public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRe
     public UniRefXmlMessageConverter(
             String version, String releaseDate, Gatekeeper downloadGatekeeper) {
         super(UniRefEntry.class, ConverterConstants.UNIREF_XML_CONTEXT, downloadGatekeeper);
-        converter = new UniRefEntryConverter();
         header = ConverterConstants.UNIREF_XML_SCHEMA;
         if ((version != null) && (!version.isEmpty())) {
             header += " version=\"" + version + "\"";
@@ -44,9 +47,15 @@ public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRe
     }
 
     @Override
-    protected Entry toXml(UniRefEntry entity) {
+    protected void before(MessageConverterContext<UniRefEntry> context, OutputStream outputStream)
+            throws IOException {
+        super.before(context, outputStream);
+        XML_CONVERTER.set(new UniRefEntryConverter());
+    }
 
-        return converter.toXml(entity);
+    @Override
+    protected Entry toXml(UniRefEntry entity) {
+        return XML_CONVERTER.get().toXml(entity);
     }
 
     @Override
@@ -57,5 +66,11 @@ public class UniRefXmlMessageConverter extends AbstractXmlMessageConverter<UniRe
     @Override
     protected String getFooter() { // do not add copyright tag see TRM-27009
         return ConverterConstants.UNIREF_XML_CLOSE_TAG;
+    }
+
+    @Override
+    protected void cleanUp() {
+        super.cleanUp();
+        XML_CONVERTER.remove();
     }
 }

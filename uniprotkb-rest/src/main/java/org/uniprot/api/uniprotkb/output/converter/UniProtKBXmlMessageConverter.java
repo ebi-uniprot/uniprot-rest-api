@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import javax.xml.bind.Marshaller;
 
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
@@ -19,7 +20,7 @@ import org.uniprot.core.xml.uniprot.UniProtEntryConverter;
 
 public class UniProtKBXmlMessageConverter
         extends AbstractXmlMessageConverter<UniProtKBEntry, Entry> {
-    private final UniProtEntryConverter converter;
+    private final ThreadLocal<UniProtEntryConverter> XML_CONVERTER = new ThreadLocal<>();
 
     public UniProtKBXmlMessageConverter() {
         this(null);
@@ -27,12 +28,19 @@ public class UniProtKBXmlMessageConverter
 
     public UniProtKBXmlMessageConverter(Gatekeeper downloadGatekeeper) {
         super(UniProtKBEntry.class, UNIPROTKB_XML_CONTEXT, downloadGatekeeper);
-        converter = new UniProtEntryConverter();
+    }
+
+    @Override
+    protected void before(
+            MessageConverterContext<UniProtKBEntry> context, OutputStream outputStream)
+            throws IOException {
+        super.before(context, outputStream);
+        XML_CONVERTER.set(new UniProtEntryConverter());
     }
 
     @Override
     protected Entry toXml(UniProtKBEntry entity) {
-        return converter.toXml(entity);
+        return XML_CONVERTER.get().toXml(entity);
     }
 
     @Override
@@ -56,5 +64,11 @@ public class UniProtKBXmlMessageConverter
     @Override
     protected String getHeader() {
         return XML_DECLARATION + UNIPROTKB_XML_SCHEMA;
+    }
+
+    @Override
+    protected void cleanUp() {
+        super.cleanUp();
+        XML_CONVERTER.remove();
     }
 }

@@ -13,7 +13,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gatling.highcharts.version>3.3.0</gatling.highcharts.version>
-		<gatling-plugin.version>3.0.5</gatling-plugin.version>
+		<gatling-plugin.version>3.1.2</gatling-plugin.version>
 	</properties>
 
 	<dependencies>
