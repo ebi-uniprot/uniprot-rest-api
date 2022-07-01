@@ -91,7 +91,9 @@ class UniProtEntryQueryResultsConverter {
     }
 
     private boolean hasLineage(List<ReturnField> filters) {
-        return filters.stream().map(ReturnField::getName).anyMatch("lineage"::equals);
+        return filters.stream()
+                .map(ReturnField::getName)
+                .anyMatch(name -> "lineage".equals(name) || "lineage_ids".equals(name));
     }
 
     private Optional<UniProtKBEntry> addLineage(UniProtKBEntry entry) {
