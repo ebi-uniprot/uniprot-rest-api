@@ -231,6 +231,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
         List<String> unmappedIds = List.of("UnMappedId1", "UnMappedId2");
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         job.getIdMappingResult().setUnmappedIds(unmappedIds);
+        getJobOperation().getIdMappingJobCacheService().put(job.getJobId(), job);
 
         ResultActions response =
                 performRequest(

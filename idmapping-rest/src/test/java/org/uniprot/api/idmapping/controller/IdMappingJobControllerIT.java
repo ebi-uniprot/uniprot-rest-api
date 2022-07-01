@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -114,7 +115,7 @@ class IdMappingJobControllerIT {
         String jobId = extractJobId(response);
 
         ArgumentCaptor<IdMappingJob> jobCaptor = ArgumentCaptor.forClass(IdMappingJob.class);
-        verify(cacheService).put(eq(jobId), jobCaptor.capture());
+        verify(cacheService, times(3)).put(eq(jobId), jobCaptor.capture());
         assertThat(jobCaptor.getValue().getIdMappingRequest(), is(basicRequest));
     }
 

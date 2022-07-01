@@ -86,7 +86,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                     idMappingJob.getIdMappingRequest().getIds().split(",").length,
                     idsForLog(idMappingJob.getIdMappingRequest().getIds()));
             // create task and submit
-            JobTask jobTask = new JobTask(idMappingJob, pirService);
+            JobTask jobTask = new JobTask(idMappingJob, pirService, cacheService);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);

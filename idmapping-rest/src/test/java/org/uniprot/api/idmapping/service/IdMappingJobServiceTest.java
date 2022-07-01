@@ -2,6 +2,8 @@ package org.uniprot.api.idmapping.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -67,13 +69,12 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(response.getJobId());
     }
 
-    @Disabled
     @Test
     void testFinishedJob()
             throws InvalidKeySpecException, NoSuchAlgorithmException, InterruptedException {
         // when
         IdMappingJobRequest request = createIdMappingRequest();
-        when(this.pirService.mapIds(request, "dummyJobId"))
+        when(this.pirService.mapIds(any(IdMappingJobRequest.class), anyString()))
                 .thenReturn(
                         IdMappingResult.builder()
                                 .mappedId(new IdMappingStringPair("from", "to"))
@@ -83,7 +84,7 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submitResponse);
         Assertions.assertNotNull(submitResponse.getJobId());
         // then
-        Thread.sleep(5000); // delay to make sure that job is running
+        Thread.sleep(1000); // delay to make sure that job is running
         String jobId = submitResponse.getJobId();
         IdMappingJob submittedJob = this.cacheService.getJobAsResource(jobId);
         Assertions.assertNotNull(submittedJob);
@@ -109,7 +110,7 @@ class IdMappingJobServiceTest {
                                                 .mappedId(new IdMappingStringPair("from", "to"))
                                                 .build())))
                 .when(this.pirService)
-                .mapIds(request, "dummyJobId");
+                .mapIds(any(IdMappingJobRequest.class), anyString());
 
         JobSubmitResponse submitResponse = this.jobService.submitJob(request);
         Assertions.assertNotNull(submitResponse);
@@ -135,7 +136,7 @@ class IdMappingJobServiceTest {
         // when
         IdMappingJobRequest request = createIdMappingRequest();
         String errorMsg = "Error during rest call";
-        when(this.pirService.mapIds(request, "dummyJobId"))
+        when(this.pirService.mapIds(any(IdMappingJobRequest.class), anyString()))
                 .thenThrow(new RestClientException(errorMsg))
                 .thenReturn(IdMappingResult.builder().build());
 
@@ -147,7 +148,7 @@ class IdMappingJobServiceTest {
         IdMappingJob submittedJob = null;
         int attemptsRemaining = 5;
         while (attemptsRemaining-- > 0) {
-            Thread.sleep(3000); // delay to make sure that thread is picked to run
+            Thread.sleep(5000); // delay to make sure that thread is picked to run
             submittedJob = this.cacheService.getJobAsResource(jobId);
             if (submittedJob != null) {
                 break;
@@ -164,7 +165,7 @@ class IdMappingJobServiceTest {
         Assertions.assertNull(submittedJob.getIdMappingResult());
         Assertions.assertNotNull(submittedJob.getCreated());
         Assertions.assertNotNull(submittedJob.getUpdated());
-        Mockito.verify(pirService, times(1)).mapIds(request, "dummyJobId");
+        Mockito.verify(pirService, times(1)).mapIds(any(IdMappingJobRequest.class), anyString());
 
         this.jobService.submitJob(request);
         IdMappingJob newJobAsResource = this.cacheService.getJobAsResource(jobId);
@@ -238,9 +239,10 @@ class IdMappingJobServiceTest {
         JobSubmitResponse response2 = this.jobService.submitJob(request);
         Assertions.assertNotNull(response2);
         Assertions.assertEquals(response.getJobId(), response2.getJobId());
-        Assertions.assertEquals(job.getCreated(), created);
-        Assertions.assertNotEquals(updated, job.getUpdated());
-        Assertions.assertTrue((job.getUpdated().getTime() - updated.getTime()) > 0);
+        IdMappingJob updatedJob = this.cacheService.get(response.getJobId());
+        Assertions.assertEquals(updatedJob.getCreated(), created);
+        Assertions.assertNotEquals(updated, updatedJob.getUpdated());
+        Assertions.assertTrue((updatedJob.getUpdated().getTime() - updated.getTime()) > 0);
     }
 
     private IdMappingJobRequest createIdMappingRequest() {
