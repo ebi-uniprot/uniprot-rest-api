@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +26,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
-@PropertySource({"classpath:valid-field-whitelist.properties"})
+@PropertySources({
+    @PropertySource({"classpath:valid-field-whitelist.properties"}),
+    @PropertySource(value = "${valid.field.whitelist.file}", ignoreResourceNotFound = true)
+})
 @ConfigurationProperties(prefix = "whitelist")
 public class WhitelistFieldConfig {
 
