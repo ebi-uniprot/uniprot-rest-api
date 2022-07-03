@@ -93,6 +93,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
 
             // update expiry time
             job.setUpdated(new Date());
+            this.cacheService.put(jobId, job);
         }
 
         return new JobSubmitResponse(jobId);
