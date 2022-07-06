@@ -1,23 +1,13 @@
 ---
-clusterServersConfig:
+singleServerConfig:
   password: null
-  nodeAddresses:
-    - "redis://127.0.0.1:30001"
-    - "redis://127.0.0.1:30002"
-    - "redis://127.0.0.1:30003"
+  address: "redis://127.0.0.1:6379"
 
-#To run redis locally in cluster mode
+#To run redis locally
 #Step 1: Install redis
   # brew install redis
   # For other OS check https://redis.io/docs/getting-started/
-#Step 2: Download redis code from here https://github.com/redis/redis/archive/7.0.2.tar.gz
-#Step 3: Unzip it in a folder e.g. redis-7.0.2
-# Step 4: cd redis-7.0.2/utils/create-cluster/
-# Step 5: Edit script create-cluster to update BIN_PATH to redis installed in Step 1
-    # e.g. BIN_PATH="/usr/local/bin" on Mac
-# Step 6: Run redis cluster nodes by executing ./create-cluster start
-# Step 7: Create cluster by  executing ./create-cluster create
-# After Step 7 you should be able to connect the redis cluster.
-# Optional: To stop run command ./create-cluster stop
-# To get help run ./create-cluster help
+#Step 3: Start the server
+  #redis-server
+# Step 4: To stop ctrl+c
 
