@@ -190,7 +190,8 @@ public class UniProtEntryService
     public SolrRequest createDownloadSolrRequest(StreamRequest request) {
         UniProtKBStreamRequest uniProtRequest = (UniProtKBStreamRequest) request;
         SolrRequest solrRequest = super.createDownloadSolrRequest(request);
-        if (needsToFilterIsoform(uniProtRequest.getQuery(), uniProtRequest.isIncludeIsoform())) {
+        if (request.needsToFilterIsoform(
+                getQueryFieldName(ACCESSION), getQueryFieldName("is_isoform"))) {
             addIsoformFilter(solrRequest);
         }
         return solrRequest;
@@ -226,7 +227,10 @@ public class UniProtEntryService
         // uniprotkb related stuff
         solrRequest.setQueryConfig(solrQueryConfig);
 
-        if (needsToFilterIsoform(solrRequest.getQuery(), uniProtRequest.isIncludeIsoform())) {
+        if (request.needsToFilterIsoform(
+                getQueryFieldName(ACCESSION),
+                getQueryFieldName("is_isoform"),
+                solrRequest.getQuery())) {
             addIsoformFilter(solrRequest);
         }
 
@@ -248,34 +252,6 @@ public class UniProtEntryService
         List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
         queries.add(getQueryFieldName("is_isoform") + ":" + false);
         solrRequest.setFilterQueries(queries);
-    }
-
-    /**
-     * This method verify if we need to add isoform filter query to remove isoform entries
-     *
-     * <p>if the query does not have accession_id field (we should not filter isoforms when querying
-     * for accession_id) AND has includeIsoform params in the request URL Then we analyze the
-     * includeIsoform request parameter. IMPORTANT: Implementing this way, query search has
-     * precedence over isoform request parameter
-     *
-     * @return true if we need to add isoform filter query
-     */
-    private boolean needsToFilterIsoform(String query, boolean isIncludeIsoform) {
-        boolean hasIdFieldTerms =
-                SolrQueryUtil.hasFieldTerms(
-                        query, getQueryFieldName(ACCESSION), getQueryFieldName("is_isoform"));
-
-        List<String> accessionValues =
-                SolrQueryUtil.getTermValuesWithWhitespaceAnalyzer(query, "accession");
-        boolean hasIsoforms =
-                !accessionValues.isEmpty()
-                        && accessionValues.stream().allMatch(acc -> acc.contains("-"));
-
-        if (!hasIdFieldTerms && !hasIsoforms) {
-            return !isIncludeIsoform;
-        } else {
-            return false;
-        }
     }
 
     private boolean isSearchAll(UniProtKBSearchRequest uniProtRequest) {

@@ -52,7 +52,8 @@ class UniProtQueryProcessorTest {
         config =
                 UniProtQueryProcessorConfig.builder()
                         .optimisableFields(
-                                singletonList(searchFieldWithValidRegex(FIELD_NAME, "^P[0-9]+$")))
+                                singletonList(
+                                        searchFieldWithValidRegex(FIELD_NAME, "(?i)^P[0-9]+$")))
                         .whiteListFields(whitelistFields)
                         .build();
         processor = UniProtQueryProcessor.newInstance(config);
@@ -395,5 +396,23 @@ class UniProtQueryProcessorTest {
             String processedQuery = processor.processQuery(query);
             assertThat(processedQuery, is(query));
         }
+    }
+
+    @Test
+    void optimiseDefaultSearchValueLowercase() {
+        String processedQuery = processor.processQuery("GO:1234567 OR p12345");
+        assertThat(processedQuery, is("GO\\:1234567 OR " + FIELD_NAME + ":P12345"));
+    }
+
+    @Test
+    void changeLowercaseAccessionToUppercase() {
+        String processedQuery = processor.processQuery("GO:1234567 OR accession:p12345");
+        assertThat(processedQuery, is("GO\\:1234567 OR " + "accession:P12345"));
+    }
+
+    @Test
+    void uppercaseAccessionUnchanged() {
+        String processedQuery = processor.processQuery("GO:1234567 OR accession:P12345");
+        assertThat(processedQuery, is("GO\\:1234567 OR " + "accession:P12345"));
     }
 }

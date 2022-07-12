@@ -14,6 +14,7 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUti
 
 import java.util.List;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -156,5 +157,181 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                                         "Q00008", "Q00006", "Q00004", "Q00002")))
                 .andExpect(jsonPath("$.results.*.to.sequence").exists())
                 .andExpect(jsonPath("$.results.*.to.organism").doesNotExist());
+    }
+
+    @Test
+    void streamIdMappingWithIsoform() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("includeIsoform", "true"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(24)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains(
+                                        "Q00001",
+                                        "Q00002",
+                                        "Q00003",
+                                        "Q00004",
+                                        "Q00005",
+                                        "Q00005-2",
+                                        "Q00006",
+                                        "Q00007",
+                                        "Q00008",
+                                        "Q00009",
+                                        "Q00010",
+                                        "Q00010-2",
+                                        "Q00011",
+                                        "Q00012",
+                                        "Q00013",
+                                        "Q00014",
+                                        "Q00015",
+                                        "Q00015-2",
+                                        "Q00016",
+                                        "Q00017",
+                                        "Q00018",
+                                        "Q00019",
+                                        "Q00020",
+                                        "Q00020-2")));
+    }
+
+    @Test
+    void streamOnlyIsoform() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:true")
+                                .param("includeIsoform", "true"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(4)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains("Q00005-2", "Q00010-2", "Q00015-2", "Q00020-2")));
+    }
+
+    @Test
+    void streamOnlyReviewedIsoform() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:true AND reviewed:true")
+                                .param("includeIsoform", "true"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains("Q00010-2", "Q00020-2")));
+    }
+
+    @Test
+    void streamOnlyIsoformWithSorting() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:true")
+                                .param("includeIsoform", "true")
+                                .param("sort", "accession desc"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(4)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains("Q00020-2", "Q00015-2", "Q00010-2", "Q00005-2")));
+    }
+
+    @Test
+    void streamOnlyIsoformByQuery() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:true")
+                                .param("sort", "accession desc"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(4)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains("Q00020-2", "Q00015-2", "Q00010-2", "Q00005-2")));
+    }
+
+    @Test // includeIsoform=false has lower precedence than query is_isoform:true
+    void streamOnlyIsoformWithQuery() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:true")
+                                .param("includeIsoform", "false"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(4)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains("Q00005-2", "Q00010-2", "Q00015-2", "Q00020-2")));
+    }
+
+    @Test
+    void streamOnlyIsoformWithIncludeIsoformTrue() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:false")
+                                .param("includeIsoform", "true")
+                                .param("sort", "accession desc"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(20)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains(
+                                        "Q00020", "Q00019", "Q00018", "Q00017", "Q00016", "Q00015",
+                                        "Q00014", "Q00013", "Q00012", "Q00011", "Q00010", "Q00009",
+                                        "Q00008", "Q00007", "Q00006", "Q00005", "Q00004", "Q00003",
+                                        "Q00002", "Q00001")));
     }
 }

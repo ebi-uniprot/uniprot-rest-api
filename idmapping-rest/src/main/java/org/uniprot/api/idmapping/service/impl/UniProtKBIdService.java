@@ -33,6 +33,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 @Service
 public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKBEntryPair> {
 
+    public static final String ACCESSION = "accession_id";
+    public static final String IS_ISOFORM = "is_isoform";
+
     private final UniProtStoreClient<UniProtKBEntry> storeClient;
 
     private final RetryPolicy<Object> storeFetchRetryPolicy;
@@ -81,6 +84,13 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     protected String getSolrIdField() {
         return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
                 .getSearchFieldItemByName("accession_id")
+                .getFieldName();
+    }
+
+    @Override
+    protected String getTermsQueryField() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+                .getSearchFieldItemByName("accession")
                 .getFieldName();
     }
 
