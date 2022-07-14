@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
@@ -122,6 +123,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         // to be streamed (configured in {@link
         // org.uniprot.api.common.repository.store.StreamerConfigProperties})
         long queryHits = 100L;
+        JsonQueryRequest jsonQueryRequest = mock(JsonQueryRequest.class);
         QueryResponse response = mock(QueryResponse.class);
         SolrDocumentList results = mock(SolrDocumentList.class);
         when(results.getNumFound()).thenReturn(queryHits);
@@ -375,6 +377,33 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                                 .string(
                                         containsString(
                                                 "P00001\tRHEA:10596 RHEA-COMP:10136 RHEA-COMP:10137")));
+    }
+
+    @Test
+    void streamTooManyEntriesResponseError() throws Exception {
+        for (int i = 13; i <= 20; i++) {
+            saveEntry(i, "");
+        }
+        cloudSolrClient.commit(SolrCollection.uniprot.name());
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "content:*");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url", is("http://localhost/uniprotkb/stream")))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "Too many results to retrieve. Please refine your query or consider fetching batch by batch")));
     }
 
     @Override

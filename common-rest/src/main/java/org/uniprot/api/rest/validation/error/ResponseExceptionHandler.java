@@ -301,4 +301,17 @@ public class ResponseExceptionHandler {
         }
         throw ex;
     }
+
+    @ExceptionHandler({ForbiddenRequestException.class})
+    public ResponseEntity<ErrorInfo> handleForbiddenRequestException(
+            Throwable ex, HttpServletRequest request) {
+        String url = Encode.forHtml(request.getRequestURL().toString());
+        List<String> messages = new ArrayList<>();
+        messages.add(ex.getMessage());
+        addDebugError(request, ex, messages);
+        ErrorInfo error = new ErrorInfo(url, messages);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(getContentTypeFromRequest(request))
+                .body(error);
+    }
 }
