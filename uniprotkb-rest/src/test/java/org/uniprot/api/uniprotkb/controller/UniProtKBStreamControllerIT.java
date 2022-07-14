@@ -123,7 +123,6 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         // to be streamed (configured in {@link
         // org.uniprot.api.common.repository.store.StreamerConfigProperties})
         long queryHits = 100L;
-        JsonQueryRequest jsonQueryRequest = mock(JsonQueryRequest.class);
         QueryResponse response = mock(QueryResponse.class);
         SolrDocumentList results = mock(SolrDocumentList.class);
         when(results.getNumFound()).thenReturn(queryHits);
