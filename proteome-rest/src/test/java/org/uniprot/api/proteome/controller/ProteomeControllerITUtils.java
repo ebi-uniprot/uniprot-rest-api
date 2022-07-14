@@ -152,6 +152,7 @@ class ProteomeControllerITUtils {
         ProteomeEntryBuilder builder =
                 new ProteomeEntryBuilder()
                         .proteomeId(proteomeId)
+                        .proteinCount(i + 10)
                         .description(description)
                         .taxonomy(taxonomy)
                         .modified(modified)

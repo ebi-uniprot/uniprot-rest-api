@@ -341,12 +341,12 @@ class ProteomeSearchControllerIT extends AbstractSearchWithSuggestionsController
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UP000005231\tHomo sapiens\t9606\t21")))
+                                                                    "UP000005231\tHomo sapiens\t9606\t241")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UP000005520\tHomo sapiens\t9606\t21")))
+                                                                    "UP000005520\tHomo sapiens\t9606\t530")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
