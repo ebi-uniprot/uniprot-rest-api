@@ -1,8 +1,12 @@
 package org.uniprot.api.proteome.output.converter;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import javax.xml.bind.Marshaller;
 
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.core.xml.jaxb.proteome.Proteome;
@@ -14,7 +18,7 @@ import org.uniprot.core.xml.proteome.ProteomeConverter;
  */
 public class ProteomeXmlMessageConverter
         extends AbstractXmlMessageConverter<ProteomeEntry, Proteome> {
-    private final ProteomeConverter converter;
+    private final ThreadLocal<ProteomeConverter> XML_CONVERTER = new ThreadLocal<>();
     private static final String XML_CONTEXT = "org.uniprot.core.xml.jaxb.proteome";
     private static final String HEADER =
             "<proteomes xmlns=\"https://uniprot.org/uniprot\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://uniprot.org/uniprot https://www.uniprot.org/docs/proteome.xsd\">\n";
@@ -27,7 +31,6 @@ public class ProteomeXmlMessageConverter
 
     public ProteomeXmlMessageConverter(Gatekeeper downloadGatekeeper) {
         super(ProteomeEntry.class, XML_CONTEXT, downloadGatekeeper);
-        converter = new ProteomeConverter();
     }
 
     @Override
@@ -36,9 +39,15 @@ public class ProteomeXmlMessageConverter
     }
 
     @Override
-    protected Proteome toXml(ProteomeEntry entity) {
+    protected void before(MessageConverterContext<ProteomeEntry> context, OutputStream outputStream)
+            throws IOException {
+        super.before(context, outputStream);
+        XML_CONVERTER.set(new ProteomeConverter());
+    }
 
-        return converter.toXml(entity);
+    @Override
+    protected Proteome toXml(ProteomeEntry entity) {
+        return XML_CONVERTER.get().toXml(entity);
     }
 
     @Override
@@ -49,5 +58,11 @@ public class ProteomeXmlMessageConverter
     @Override
     protected String getFooter() {
         return FOOTER;
+    }
+
+    @Override
+    protected void cleanUp() {
+        super.cleanUp();
+        XML_CONVERTER.remove();
     }
 }

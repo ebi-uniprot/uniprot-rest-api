@@ -93,15 +93,16 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                     idsForLog(idMappingJob.getIdMappingRequest().getIds()));
             // create task and submit
             JobTask jobTask =
-                    shouldHandleInternally(request)
-                            ? new SolrJobTask(idMappingJob, idMappingRepository)
-                            : new PirJobTask(idMappingJob, pirService);
+              shouldHandleInternally(request)
+                ? new SolrJobTask(idMappingJob, idMappingRepository)
+                : new PirJobTask(idMappingJob, pirService, cacheService);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);
 
             // update expiry time
             job.setUpdated(new Date());
+            this.cacheService.put(jobId, job);
         }
 
         return new JobSubmitResponse(jobId);

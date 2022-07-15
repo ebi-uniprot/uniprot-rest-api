@@ -5,6 +5,7 @@ import java.security.spec.InvalidKeySpecException;
 
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 
 /**
  * @author sahmad
@@ -24,4 +25,6 @@ public interface JobOperation {
 
     IdMappingJob createAndPutJobInCacheWithOneToManyMapping(int idsCount, JobStatus jobStatus)
             throws Exception;
+
+    IdMappingJobCacheService getIdMappingJobCacheService();
 }

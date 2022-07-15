@@ -6,9 +6,13 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_X
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import javax.xml.bind.Marshaller;
 
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.Utils;
@@ -20,9 +24,8 @@ import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
  * @date: 21 Jun 2019
  */
 public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniParcEntry, Entry> {
-    private final UniParcEntryConverter converter;
-
     private String header;
+    private final ThreadLocal<UniParcEntryConverter> XML_CONVERTER = new ThreadLocal<>();
 
     public UniParcXmlMessageConverter(String version) {
         this(version, null);
@@ -30,7 +33,6 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
 
     public UniParcXmlMessageConverter(String version, Gatekeeper downloadGatekeeper) {
         super(UniParcEntry.class, UNIPARC_XML_CONTEXT, downloadGatekeeper);
-        converter = new UniParcEntryConverter();
         header = UNIPARC_XML_SCHEMA;
         if (Utils.notNullNotEmpty(version)) {
             String versionAttrib = " version=\"" + version + "\"" + ">\n";
@@ -45,9 +47,15 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
     }
 
     @Override
-    protected Entry toXml(UniParcEntry entity) {
+    protected void before(MessageConverterContext<UniParcEntry> context, OutputStream outputStream)
+            throws IOException {
+        super.before(context, outputStream);
+        XML_CONVERTER.set(new UniParcEntryConverter());
+    }
 
-        return converter.toXml(entity);
+    @Override
+    protected Entry toXml(UniParcEntry entity) {
+        return XML_CONVERTER.get().toXml(entity);
     }
 
     @Override
@@ -58,5 +66,11 @@ public class UniParcXmlMessageConverter extends AbstractXmlMessageConverter<UniP
     @Override
     protected String getFooter() {
         return COPYRIGHT_TAG + UNIPARC_XML_CLOSE_TAG;
+    }
+
+    @Override
+    protected void cleanUp() {
+        super.cleanUp();
+        XML_CONVERTER.remove();
     }
 }

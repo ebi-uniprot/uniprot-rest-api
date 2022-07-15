@@ -25,6 +25,10 @@ public abstract class AbstractJobOperation implements JobOperation {
         this.cacheService = cacheService;
     }
 
+    public IdMappingJobCacheService getIdMappingJobCacheService() {
+        return this.cacheService;
+    }
+
     public IdMappingJob createAndPutJobInCache(String from, String to, String fromIds)
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         Map<String, String> mappedIds =

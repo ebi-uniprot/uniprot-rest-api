@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.controller.request;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -16,7 +18,9 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @ValidFromAndTo
-public class IdMappingJobRequest {
+public class IdMappingJobRequest implements Serializable {
+    private static final long serialVersionUID = 3950807397142678483L;
+
     @NotNull(message = "{search.required}")
     @Parameter(description = "Name of the from type")
     @ValidIdType(message = "{idmapping.invalid.from}")

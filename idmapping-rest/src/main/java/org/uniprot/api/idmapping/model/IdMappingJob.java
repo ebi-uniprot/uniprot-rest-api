@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +17,8 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
  */
 @Data
 @Builder(toBuilder = true)
-public class IdMappingJob {
+public class IdMappingJob implements Serializable {
+    private static final long serialVersionUID = -9179860117114350789L;
     private String jobId;
     private JobStatus jobStatus;
     private IdMappingJobRequest idMappingRequest;

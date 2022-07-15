@@ -12,7 +12,6 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
-import org.uniprot.api.idmapping.output.converter.EntryPairXmlMessageConverter;
 import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.output.converter.ListMessageConverter;
 import org.uniprot.api.rest.output.converter.RDFMessageConverter;
@@ -20,9 +19,6 @@ import org.uniprot.api.rest.output.converter.TsvMessageConverter;
 import org.uniprot.api.rest.output.converter.XlsMessageConverter;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryValueMapper;
-import org.uniprot.core.uniparc.UniParcEntry;
-import org.uniprot.core.xml.jaxb.uniparc.Entry;
-import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 
 /**
@@ -63,11 +59,10 @@ public class UniParcMessageConverterConfig {
                         downloadGatekeeper));
         String header = XML_DECLARATION + UNIPARC_XML_SCHEMA;
         String footer = COPYRIGHT_TAG + UNIPARC_XML_CLOSE_TAG;
-        EntryPairXmlMessageConverter<UniParcEntryPair, UniParcEntry, Entry> xmlConverter =
-                new EntryPairXmlMessageConverter<>(
+        UniParcEntryPairXmlMessageConverter xmlConverter =
+                new UniParcEntryPairXmlMessageConverter(
                         UniParcEntryPair.class,
                         UNIPARC_XML_CONTEXT,
-                        new UniParcEntryConverter(),
                         header,
                         footer,
                         downloadGatekeeper);

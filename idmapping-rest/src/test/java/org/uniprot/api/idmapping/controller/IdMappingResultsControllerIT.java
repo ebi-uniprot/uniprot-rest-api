@@ -36,6 +36,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.ControllerITUtils;
 
 /**
@@ -248,7 +249,8 @@ class IdMappingResultsControllerIT extends AbstractIdMappingPIRResultsController
         List<String> unmappedIds = List.of("UnMappedId1", "UnMappedId2");
         IdMappingJob job = idMappingResultJobOp.createAndPutJobInCache();
         job.getIdMappingResult().setUnmappedIds(unmappedIds);
-
+        IdMappingJobCacheService cacheService = idMappingResultJobOp.getIdMappingJobCacheService();
+        cacheService.put(job.getJobId(), job);
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -284,8 +286,6 @@ class IdMappingResultsControllerIT extends AbstractIdMappingPIRResultsController
     void testIdMappingWithSuccess() throws Exception {
         // when
         IdMappingJob job = idMappingResultJobOp.createAndPutJobInCache();
-        String[] ids = job.getIdMappingRequest().getIds().split(",");
-
         ResultActions response =
                 getMockMvc()
                         .perform(

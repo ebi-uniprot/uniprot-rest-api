@@ -10,6 +10,7 @@ import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.core.util.Utils;
 
 import com.google.common.base.Stopwatch;
@@ -21,9 +22,13 @@ import com.google.common.base.Stopwatch;
 @Slf4j
 public abstract class JobTask implements Runnable {
     private final IdMappingJob job;
+    private final IdMappingJobCacheService cacheService;
 
-    public JobTask(IdMappingJob job) {
+    public JobTask(
+            IdMappingJob job,
+            IdMappingJobCacheService cacheService) {
         this.job = job;
+        this.cacheService = cacheService;
     }
 
     @Override
@@ -31,6 +36,7 @@ public abstract class JobTask implements Runnable {
         this.job.setJobStatus(JobStatus.RUNNING);
         this.job.setUpdated(new Date());
 
+        this.cacheService.put(this.job.getJobId(), this.job);
         Stopwatch stopwatch = Stopwatch.createStarted();
         IdMappingResult result = processTask(job);
         stopwatch.stop();
@@ -49,6 +55,7 @@ public abstract class JobTask implements Runnable {
             this.job.setIdMappingResult(result);
             this.job.setUpdated(new Date());
         }
+        this.cacheService.put(this.job.getJobId(), this.job);
     }
 
     protected abstract IdMappingResult processTask(IdMappingJob job);
