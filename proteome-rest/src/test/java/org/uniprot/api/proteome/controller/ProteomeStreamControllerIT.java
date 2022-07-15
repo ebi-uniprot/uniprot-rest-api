@@ -212,7 +212,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                                 .string(
                                         containsString(
                                                 "Proteome Id\tOrganism\tOrganism Id\tProtein count")))
-                .andExpect(content().string(containsString("UP000005010\tHomo sapiens\t9606\t21")));
+                .andExpect(content().string(containsString("UP000005010\tHomo sapiens\t9606\t20")));
     }
 
     @Test

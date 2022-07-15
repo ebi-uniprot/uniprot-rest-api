@@ -180,6 +180,7 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
         ProteomeEntryBuilder builder =
                 new ProteomeEntryBuilder()
                         .proteomeId(proteomeId)
+                        .proteinCount(38)
                         .description(description)
                         .taxonomy(taxonomy)
                         .modified(modified)
@@ -288,7 +289,7 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "UP000005640\tHomo sapiens\t9606\t21")))
+                                                                    "UP000005640\tHomo sapiens\t9606\t38")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
