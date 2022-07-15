@@ -6,12 +6,10 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.web.client.RestClientException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.core.util.Utils;
 
 import com.google.common.base.Stopwatch;
@@ -21,46 +19,39 @@ import com.google.common.base.Stopwatch;
  * @created 23/02/2021
  */
 @Slf4j
-public class JobTask implements Runnable {
-    private static final int REST_EXCEPTION_CODE = 50;
+public abstract class JobTask implements Runnable {
     private final IdMappingJob job;
-    private final IdMappingPIRService pirService;
 
-    public JobTask(IdMappingJob job, IdMappingPIRService pirService) {
+    public JobTask(IdMappingJob job) {
         this.job = job;
-        this.pirService = pirService;
     }
 
     @Override
     public void run() {
         this.job.setJobStatus(JobStatus.RUNNING);
         this.job.setUpdated(new Date());
-        try {
-            Stopwatch stopwatch = Stopwatch.createStarted();
-            IdMappingResult pirResponse =
-                    pirService.mapIds(this.job.getIdMappingRequest(), job.getJobId());
-            stopwatch.stop();
 
-            log.info(
-                    "[idmapping/run/{}] response took {} seconds (id count={})",
-                    job.getJobId(),
-                    stopwatch.elapsed(TimeUnit.SECONDS),
-                    job.getIdMappingRequest().getIds().split(",").length);
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        IdMappingResult result = processTask(job);
+        stopwatch.stop();
 
-            if (Utils.notNullNotEmpty(
-                    pirResponse.getErrors())) { //  app constraint violation limit exceed
-                populateError(pirResponse.getErrors());
-                this.job.setIdMappingResult(pirResponse);
-            } else { // no app constraint violation
-                this.job.setJobStatus(JobStatus.FINISHED);
-                this.job.setIdMappingResult(pirResponse);
-                this.job.setUpdated(new Date());
-            }
-        } catch (RestClientException restException) {
-            populateError(
-                    List.of(new ProblemPair(REST_EXCEPTION_CODE, restException.getMessage())));
+        log.info(
+                "[idmapping/run/{}] response took {} seconds (id count={})",
+                job.getJobId(),
+                stopwatch.elapsed(TimeUnit.SECONDS),
+                job.getIdMappingRequest().getIds().split(",").length);
+
+        if (Utils.notNullNotEmpty(result.getErrors())) { //  app constraint violation limit exceed
+            populateError(result.getErrors());
+            this.job.setIdMappingResult(result);
+        } else { // no app constraint violation
+            this.job.setJobStatus(JobStatus.FINISHED);
+            this.job.setIdMappingResult(result);
+            this.job.setUpdated(new Date());
         }
     }
+
+    protected abstract IdMappingResult processTask(IdMappingJob job);
 
     private void populateError(List<ProblemPair> errors) {
         this.job.setErrors(errors);
