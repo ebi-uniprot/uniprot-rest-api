@@ -19,11 +19,15 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.repository.IdMappingRepository;
+import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.store.search.SolrCollection;
 
 class SolrJobTaskTest {
     private SolrJobTask solrJobTask =
-            new SolrJobTask(mock(IdMappingJob.class), mock(IdMappingRepository.class));
+            new SolrJobTask(
+                    mock(IdMappingJob.class),
+                    mock(IdMappingJobCacheService.class),
+                    mock(IdMappingRepository.class));
 
     @Test
     void taskProcessingWillGetRequestFromJobObject() {
@@ -162,7 +166,9 @@ class SolrJobTaskTest {
 
     private IdMappingRepository mockRepo() {
         IdMappingRepository repo = mock(IdMappingRepository.class);
-        solrJobTask = new SolrJobTask(mock(IdMappingJob.class), repo);
+        solrJobTask =
+                new SolrJobTask(
+                        mock(IdMappingJob.class), mock(IdMappingJobCacheService.class), repo);
         return repo;
     }
 }

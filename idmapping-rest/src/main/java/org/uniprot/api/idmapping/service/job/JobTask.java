@@ -24,9 +24,7 @@ public abstract class JobTask implements Runnable {
     private final IdMappingJob job;
     private final IdMappingJobCacheService cacheService;
 
-    public JobTask(
-            IdMappingJob job,
-            IdMappingJobCacheService cacheService) {
+    public JobTask(IdMappingJob job, IdMappingJobCacheService cacheService) {
         this.job = job;
         this.cacheService = cacheService;
     }
