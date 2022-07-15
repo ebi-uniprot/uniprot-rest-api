@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;

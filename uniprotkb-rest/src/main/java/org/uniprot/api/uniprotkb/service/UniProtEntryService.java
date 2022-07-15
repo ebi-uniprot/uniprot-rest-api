@@ -236,7 +236,7 @@ public class UniProtEntryService
                 UniProtKBRequestUtil.needsToFilterIsoform(
                         getQueryFieldName(ACCESSION),
                         getQueryFieldName("is_isoform"),
-                        uniProtRequest.getQuery(),
+                        solrRequest.getQuery(),
                         uniProtRequest.isIncludeIsoform());
         if (filterIsoform) {
             addIsoformFilter(solrRequest);
