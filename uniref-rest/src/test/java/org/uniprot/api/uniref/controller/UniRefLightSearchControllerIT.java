@@ -277,7 +277,7 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                 value = ACC_PREF + 11;
                 break;
             case "created":
-                value = "[* TO *]";
+                value = "[2000-01-01 TO *]";
                 break;
             case "upi":
                 value = "UPI0000083A11";
