@@ -1674,7 +1674,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("accession:P21802"))
+                    .queryParam("query", Collections.singletonList("accession:p21802"))
                     .resultMatcher(jsonPath("$.results.*.primaryAccession", contains("P21802")))
                     .build();
         }
