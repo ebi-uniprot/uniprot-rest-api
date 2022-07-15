@@ -90,7 +90,13 @@ public class SolrStreamFacetRequest {
             List<String> ids,
             SearchRequest searchRequest) {
         return createSolrStreamFacetRequest(
-                solrQueryConfig, uniProtDataType, solrIdField, solrIdField, ids, searchRequest);
+                solrQueryConfig,
+                uniProtDataType,
+                solrIdField,
+                solrIdField,
+                ids,
+                searchRequest,
+                false);
     }
 
     public static SolrStreamFacetRequest createSolrStreamFacetRequest(
@@ -99,7 +105,8 @@ public class SolrStreamFacetRequest {
             String solrIdField,
             String termsQueryField,
             List<String> ids,
-            SearchRequest searchRequest) {
+            SearchRequest searchRequest,
+            boolean includeIsoform) {
 
         SolrStreamFacetRequest.SolrStreamFacetRequestBuilder solrRequestBuilder =
                 SolrStreamFacetRequest.builder();
@@ -132,7 +139,7 @@ public class SolrStreamFacetRequest {
             solrRequestBuilder.searchAccession(Boolean.TRUE);
         }
 
-        if (searchRequest.isIncludeIsoform()) {
+        if (includeIsoform) {
             solrRequestBuilder.searchAccession(Boolean.TRUE);
         }
 

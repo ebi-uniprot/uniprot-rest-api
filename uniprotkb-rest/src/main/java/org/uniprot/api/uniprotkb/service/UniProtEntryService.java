@@ -21,6 +21,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniProtSolrQueryConfig;
@@ -190,8 +191,13 @@ public class UniProtEntryService
     public SolrRequest createDownloadSolrRequest(StreamRequest request) {
         UniProtKBStreamRequest uniProtRequest = (UniProtKBStreamRequest) request;
         SolrRequest solrRequest = super.createDownloadSolrRequest(request);
-        if (request.needsToFilterIsoform(
-                getQueryFieldName(ACCESSION), getQueryFieldName("is_isoform"))) {
+        boolean filterIsoform =
+                UniProtKBRequestUtil.needsToFilterIsoform(
+                        getQueryFieldName(ACCESSION),
+                        getQueryFieldName("is_isoform"),
+                        uniProtRequest.getQuery(),
+                        uniProtRequest.isIncludeIsoform());
+        if (filterIsoform) {
             addIsoformFilter(solrRequest);
         }
         return solrRequest;
@@ -226,11 +232,13 @@ public class UniProtEntryService
 
         // uniprotkb related stuff
         solrRequest.setQueryConfig(solrQueryConfig);
-
-        if (request.needsToFilterIsoform(
-                getQueryFieldName(ACCESSION),
-                getQueryFieldName("is_isoform"),
-                solrRequest.getQuery())) {
+        boolean filterIsoform =
+                UniProtKBRequestUtil.needsToFilterIsoform(
+                        getQueryFieldName(ACCESSION),
+                        getQueryFieldName("is_isoform"),
+                        uniProtRequest.getQuery(),
+                        uniProtRequest.isIncludeIsoform());
+        if (filterIsoform) {
             addIsoformFilter(solrRequest);
         }
 

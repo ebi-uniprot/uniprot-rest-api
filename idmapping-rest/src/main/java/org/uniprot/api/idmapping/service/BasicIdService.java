@@ -35,6 +35,7 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -85,13 +86,18 @@ public abstract class BasicIdService<T, U> {
 
     public QueryResult<U> getMappedEntries(
             SearchRequest searchRequest, IdMappingResult mappingResult) {
+        return getMappedEntries(searchRequest, mappingResult, false);
+    }
+
+    public QueryResult<U> getMappedEntries(
+            SearchRequest searchRequest, IdMappingResult mappingResult, boolean includeIsoform) {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
 
         validateMappedIdsEnrichmentLimit(mappedIds);
 
         List<ProblemPair> warnings = new ArrayList<>();
-        if (needSearchInSolr(searchRequest)) {
+        if (needSearchInSolr(searchRequest, includeIsoform)) {
             List<String> toIds = getMappedToIds(mappedIds);
 
             long start = System.currentTimeMillis();
@@ -106,15 +112,15 @@ public abstract class BasicIdService<T, U> {
                                         + this.maxIdMappingToIdsCountWithFacets));
             }
 
-            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
+            SolrStreamFacetResponse solrStreamResponse =
+                    searchBySolrStream(toIds, searchRequest, includeIsoform);
             long end = System.currentTimeMillis();
             log.debug("Time taken to search solr in ms {}", (end - start));
 
             facets = solrStreamResponse.getFacets();
 
             List<String> solrToIds = solrStreamResponse.getIds();
-            if (Utils.notNullNotEmpty(searchRequest.getQuery())
-                    || searchRequest.isIncludeIsoform()) {
+            if (Utils.notNullNotEmpty(searchRequest.getQuery()) || includeIsoform) {
                 // Apply Filter in PIR result
                 mappedIds = applyQueryFilter(mappedIds, solrToIds);
             }
@@ -171,23 +177,30 @@ public abstract class BasicIdService<T, U> {
         return this.storeStreamer.streamEntries(toIds);
     }
 
-    private List<IdMappingStringPair> streamFilterAndSortEntries(
+    protected List<IdMappingStringPair> streamFilterAndSortEntries(
             StreamRequest streamRequest, List<IdMappingStringPair> mappedIds) {
+        return streamFilterAndSortEntries(streamRequest, mappedIds, false);
+    }
+
+    protected List<IdMappingStringPair> streamFilterAndSortEntries(
+            StreamRequest streamRequest,
+            List<IdMappingStringPair> mappedIds,
+            boolean includeIsoform) {
         if (Utils.notNull(streamRequest.getQuery())
                 || Utils.notNull(streamRequest.getSort())
-                || streamRequest.isIncludeIsoform()) {
+                || includeIsoform) {
             List<String> toIds = getMappedToIds(mappedIds);
 
             long start = System.currentTimeMillis();
 
             SearchRequest searchRequest = SearchStreamRequest.from(streamRequest);
-            SolrStreamFacetResponse solrStreamResponse = searchBySolrStream(toIds, searchRequest);
+            SolrStreamFacetResponse solrStreamResponse =
+                    searchBySolrStream(toIds, searchRequest, includeIsoform);
             long end = System.currentTimeMillis();
             log.debug("Time taken to search solr in ms {}", (end - start));
 
             List<String> solrToIds = solrStreamResponse.getIds();
-            if (Utils.notNullNotEmpty(streamRequest.getQuery())
-                    || streamRequest.isIncludeIsoform()) {
+            if (Utils.notNullNotEmpty(streamRequest.getQuery()) || includeIsoform) {
                 // Apply Filter in PIR result
                 mappedIds = applyQueryFilter(mappedIds, solrToIds);
             }
@@ -199,12 +212,17 @@ public abstract class BasicIdService<T, U> {
         return mappedIds;
     }
 
-    private SolrStreamFacetResponse searchBySolrStream(
-            List<String> ids, SearchRequest searchRequest) {
+    protected SolrStreamFacetResponse searchBySolrStream(
+            List<String> ids, SearchRequest searchRequest, boolean includeIsoform) {
         String termsField = getSolrIdField();
         // use accession field to get isoform also if asked for kb mapping
-        if (!searchRequest.needsToFilterIsoform(
-                UniProtKBIdService.ACCESSION, UniProtKBIdService.IS_ISOFORM)) {
+        boolean filterIsoform =
+                UniProtKBRequestUtil.needsToFilterIsoform(
+                        UniProtKBIdService.ACCESSION,
+                        UniProtKBIdService.IS_ISOFORM,
+                        searchRequest.getQuery(),
+                        includeIsoform);
+        if (!filterIsoform) {
             termsField = getTermsQueryField();
         }
         SolrStreamFacetRequest solrStreamRequest =
@@ -214,7 +232,8 @@ public abstract class BasicIdService<T, U> {
                         getSolrIdField(),
                         termsField,
                         ids,
-                        searchRequest);
+                        searchRequest,
+                        includeIsoform);
         TupleStream facetTupleStream = this.tupleStream.create(solrStreamRequest, facetConfig);
         return this.facetTupleStreamConverter.convert(
                 facetTupleStream, searchRequest.getFacetList());
@@ -312,11 +331,11 @@ public abstract class BasicIdService<T, U> {
         return entries.collect(Collectors.toMap(this::getEntryId, Function.identity()));
     }
 
-    private boolean needSearchInSolr(SearchRequest searchRequest) {
+    private boolean needSearchInSolr(SearchRequest searchRequest, boolean includeIsoform) {
         return Utils.notNullNotEmpty(searchRequest.getQuery())
                 || Utils.notNullNotEmpty(searchRequest.getFacets())
                 || Utils.notNullNotEmpty(searchRequest.getSort())
-                || searchRequest.isIncludeIsoform();
+                || includeIsoform;
     }
 
     public void validateMappedIdsEnrichmentLimit(List<IdMappingStringPair> mappedIds) {
@@ -340,7 +359,6 @@ public abstract class BasicIdService<T, U> {
         private final String query;
         private final String sort;
         private final String fields;
-        private final boolean includeIsoform;
         private Integer size;
 
         @Override
@@ -353,7 +371,6 @@ public abstract class BasicIdService<T, U> {
                     .fields(streamRequest.getFields())
                     .query(streamRequest.getQuery())
                     .sort(streamRequest.getSort())
-                    .includeIsoform(streamRequest.isIncludeIsoform())
                     .build();
         }
     }
