@@ -34,6 +34,7 @@ import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 @Builder
 public class UniProtQueryProcessor implements QueryProcessor {
     public static final String IMPOSSIBLE_FIELD = "NOT_REAL_FIELD";
+    public static final String UNIPROTKB_ACCESSION_FIELD = "accession";
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
     private final UniProtQueryNodeProcessorPipeline queryProcessorPipeline;
 

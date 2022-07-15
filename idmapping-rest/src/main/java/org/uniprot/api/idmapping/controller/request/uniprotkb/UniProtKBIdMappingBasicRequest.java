@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.controller.request.uniprotkb;
 
+import javax.validation.constraints.Pattern;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -41,4 +43,15 @@ public class UniProtKBIdMappingBasicRequest extends IdMappingPageRequest {
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
+
+    @Parameter(description = "Flag to include Isoform or not")
+    @Pattern(
+            regexp = "true|false",
+            flags = {Pattern.Flag.CASE_INSENSITIVE},
+            message = "{search.invalid.includeIsoform}")
+    private String includeIsoform;
+
+    public boolean isIncludeIsoform() {
+        return Boolean.parseBoolean(includeIsoform);
+    }
 }

@@ -16,6 +16,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -1367,6 +1368,34 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                         jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
     }
 
+    @Test
+    void searchDefaultSearchWithIsoformLowercase() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        UniProtKBId entryId = entry.getUniProtkbId();
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        // set the same uniprot id as canonical
+        UniProtKBEntryBuilder eb = UniProtKBEntryBuilder.from(entry);
+        eb.uniProtId(entryId);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, eb.build());
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=p21802-2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
@@ -1645,7 +1674,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("query", Collections.singletonList("accession:P21802"))
+                    .queryParam("query", Collections.singletonList("accession:p21802"))
                     .resultMatcher(jsonPath("$.results.*.primaryAccession", contains("P21802")))
                     .build();
         }
