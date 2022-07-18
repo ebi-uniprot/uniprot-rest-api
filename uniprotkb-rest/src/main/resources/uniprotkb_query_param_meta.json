@@ -652,10 +652,6 @@
     "type": "String"
   },
   {
-    "name": "lit_organisation",
-    "type": "String"
-  },
-  {
     "name": "lit_title",
     "type": "String"
   },
