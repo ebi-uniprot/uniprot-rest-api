@@ -39,7 +39,7 @@ class SolrJobTaskTest {
     }
 
     @Test
-    void unknownToDbWillCaseErrorMsg() {
+    void unknownToDBWillCauseErrorMsg() {
         var idMappingJob = mappingJob("UniParc", "unknown db");
 
         IdMappingResult actualProcessTaskResult = solrJobTask.processTask(idMappingJob);

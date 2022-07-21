@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.Size;
-
 import lombok.AllArgsConstructor;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -25,7 +23,7 @@ public class IdMappingRepository {
     private final SolrClient solrClient;
 
     public List<IdMappingStringPair> getAllMappingIds(
-            SolrCollection collection, @Size(max = MAX_ID_MAPPINGS_ALLOWED) List<String> searchIds)
+            SolrCollection collection, List<String> searchIds)
             throws SolrServerException, IOException {
         switch (collection) {
             case uniprot:
@@ -37,20 +35,21 @@ public class IdMappingRepository {
                 // uniref id is big (23 char e-g UniRef100_UPI0000072840) 100_000 can not fit in
                 // single request
                 int sublistSize = Math.min(searchIds.size(), MAX_ID_MAPPINGS_ALLOWED / 2);
+                var unirefSolrIdField = "id";
                 var unirefSolrMappingList =
                         getAllMatchingIds(
                                 solrClient,
                                 collection,
-                                "id",
-                                "id",
+                                unirefSolrIdField,
+                                unirefSolrIdField,
                                 searchIds.subList(0, sublistSize));
                 if (searchIds.size() > sublistSize) {
                     unirefSolrMappingList.addAll(
                             getAllMatchingIds(
                                     solrClient,
                                     collection,
-                                    "id",
-                                    "id",
+                                    unirefSolrIdField,
+                                    unirefSolrIdField,
                                     searchIds.subList(sublistSize, searchIds.size())));
                 }
                 return unirefSolrMappingList;
@@ -64,7 +63,7 @@ public class IdMappingRepository {
             SolrCollection collection,
             String searchField,
             String idField,
-            @Size(max = MAX_ID_MAPPINGS_ALLOWED) List<String> searchIds)
+            List<String> searchIds)
             throws SolrServerException, IOException {
 
         var filteredTermQueryWithIds =
@@ -73,7 +72,7 @@ public class IdMappingRepository {
         queryParamsMap.put("q", "*:*");
         queryParamsMap.put("fl", searchField + "," + idField);
         queryParamsMap.put("start", "0");
-        queryParamsMap.put("rows", "" + searchIds.size());
+        queryParamsMap.put("rows", String.valueOf(searchIds.size()));
         queryParamsMap.put("fq", filteredTermQueryWithIds);
         MapSolrParams queryParams = new MapSolrParams(queryParamsMap);
 

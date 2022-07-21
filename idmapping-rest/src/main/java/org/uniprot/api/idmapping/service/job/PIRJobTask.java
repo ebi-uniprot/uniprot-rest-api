@@ -7,11 +7,11 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 
-public class PirJobTask extends JobTask {
+public class PIRJobTask extends JobTask {
     private static final int REST_EXCEPTION_CODE = 50;
     private final IdMappingPIRService pirService;
 
-    public PirJobTask(
+    public PIRJobTask(
             IdMappingJob job,
             IdMappingJobCacheService cacheService,
             IdMappingPIRService pirService) {

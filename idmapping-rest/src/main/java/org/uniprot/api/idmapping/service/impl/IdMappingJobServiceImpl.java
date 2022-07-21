@@ -23,7 +23,7 @@ import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
-import org.uniprot.api.idmapping.service.job.PirJobTask;
+import org.uniprot.api.idmapping.service.job.PIRJobTask;
 import org.uniprot.api.idmapping.service.job.SolrJobTask;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
@@ -93,9 +93,9 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                     idsForLog(idMappingJob.getIdMappingRequest().getIds()));
             // create task and submit
             JobTask jobTask =
-                    shouldHandleInternally(request)
+                    canHandleInternally(request)
                             ? new SolrJobTask(idMappingJob, cacheService, idMappingRepository)
-                            : new PirJobTask(idMappingJob, cacheService, pirService);
+                            : new PIRJobTask(idMappingJob, cacheService, pirService);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);
@@ -108,8 +108,8 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         return new JobSubmitResponse(jobId);
     }
 
-    private boolean shouldHandleInternally(IdMappingJobRequest request) {
-        var toDb = request.getTo();
+    private boolean canHandleInternally(IdMappingJobRequest request) {
+        String toDb = request.getTo();
         return request.getFrom().equals(toDb)
                 && (UNIPARC.equals(toDb) || UNIREF_SET.contains(toDb));
     }

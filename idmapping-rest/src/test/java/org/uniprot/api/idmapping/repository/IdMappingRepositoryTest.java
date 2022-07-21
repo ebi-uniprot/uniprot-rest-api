@@ -68,7 +68,7 @@ class IdMappingRepositoryTest {
     }
 
     @Test
-    void canGetUniparcMapping() throws SolrServerException, IOException {
+    void canGetUniParcMapping() throws SolrServerException, IOException {
         var id1 = "UPI0000000001";
         var id50 = "UPI0000000050";
         var id91 = "UPI0000000091";

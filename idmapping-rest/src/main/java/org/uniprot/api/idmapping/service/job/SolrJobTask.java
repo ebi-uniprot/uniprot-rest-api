@@ -59,17 +59,25 @@ public class SolrJobTask extends JobTask {
         }
 
         var idMappingResultBuilder = IdMappingResult.builder().mappedIds(mappedIdsFromSolr);
-        if (mappedIdsFromSolr.size() != inputJobIds.size()) {
-            inputJobIds.forEach(
-                    id -> {
-                        if (mappedIdsFromSolr.stream()
-                                .filter(ret -> ret.getFrom().equals(id))
-                                .findAny()
-                                .isEmpty()) {
-                            idMappingResultBuilder.unmappedId(id);
-                        }
-                    });
+        if (someInputIdsNotFoundInSolr(mappedIdsFromSolr, inputJobIds)) {
+            for (String id : inputJobIds) {
+                if (idNotExistsInFromDB(mappedIdsFromSolr, id)) {
+                    idMappingResultBuilder.unmappedId(id);
+                }
+            }
         }
         return idMappingResultBuilder.build();
+    }
+
+    private boolean someInputIdsNotFoundInSolr(
+            List<IdMappingStringPair> mappedIdsFromSolr, List<String> inputJobIds) {
+        return mappedIdsFromSolr.size() != inputJobIds.size();
+    }
+
+    private boolean idNotExistsInFromDB(List<IdMappingStringPair> mappedIdsFromSolr, String id) {
+        return mappedIdsFromSolr.stream()
+                .filter(ret -> ret.getFrom().equals(id))
+                .findAny()
+                .isEmpty();
     }
 }
