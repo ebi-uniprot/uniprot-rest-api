@@ -30,16 +30,16 @@ public class SolrJobTask extends JobTask {
     @Override
     protected IdMappingResult processTask(IdMappingJob job) {
         String toDB = job.getIdMappingRequest().getTo();
-        var ids =
+        var inputJobIds =
                 Arrays.stream(job.getIdMappingRequest().getIds().split(","))
                         .collect(Collectors.toList());
 
         if (UNIREF_SET.contains(toDB)) {
-            return queryCollectionAndMapResults(uniref, ids);
+            return queryCollectionAndMapResults(uniref, inputJobIds);
         } else if (UNIPARC.equals(toDB)) {
-            return queryCollectionAndMapResults(uniparc, ids);
+            return queryCollectionAndMapResults(uniparc, inputJobIds);
         } else if (UNIPROTKB_SET.contains(toDB)) {
-            return queryCollectionAndMapResults(uniprot, ids);
+            return queryCollectionAndMapResults(uniprot, inputJobIds);
         }
 
         return IdMappingResult.builder()
@@ -48,28 +48,28 @@ public class SolrJobTask extends JobTask {
     }
 
     private IdMappingResult queryCollectionAndMapResults(
-            SolrCollection collection, List<String> ids) {
-        List<IdMappingStringPair> retList;
+            SolrCollection collection, List<String> inputJobIds) {
+        List<IdMappingStringPair> mappedIdsFromSolr;
         try {
-            retList = repo.getAllMappingIds(collection, ids);
+            mappedIdsFromSolr = repo.getAllMappingIds(collection, inputJobIds);
         } catch (SolrServerException | IOException e) {
             return IdMappingResult.builder()
                     .error(new ProblemPair(EXCEPTION_CODE, "Mapping request got failed"))
                     .build();
         }
 
-        var builder = IdMappingResult.builder().mappedIds(retList);
-        if (retList.size() != ids.size()) {
-            ids.forEach(
+        var idMappingResultBuilder = IdMappingResult.builder().mappedIds(mappedIdsFromSolr);
+        if (mappedIdsFromSolr.size() != inputJobIds.size()) {
+            inputJobIds.forEach(
                     id -> {
-                        if (retList.stream()
+                        if (mappedIdsFromSolr.stream()
                                 .filter(ret -> ret.getFrom().equals(id))
                                 .findAny()
                                 .isEmpty()) {
-                            builder.unmappedId(id);
+                            idMappingResultBuilder.unmappedId(id);
                         }
                     });
         }
-        return builder.build();
+        return idMappingResultBuilder.build();
     }
 }

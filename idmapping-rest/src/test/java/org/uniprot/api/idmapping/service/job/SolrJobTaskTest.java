@@ -65,9 +65,9 @@ class SolrJobTaskTest {
         IdMappingRepository repo = mockRepo();
         when(repo.getAllMappingIds(any(), any())).thenThrow(new SolrServerException("solr error"));
 
-        var ret = solrJobTask.processTask(mappingJob("db", "UniRef50"));
+        var idMappingResult = solrJobTask.processTask(mappingJob("db", "UniRef50"));
 
-        List<ProblemPair> errors = ret.getErrors();
+        List<ProblemPair> errors = idMappingResult.getErrors();
         assertEquals(1, errors.size());
         assertEquals(50, errors.get(0).getCode());
         assertEquals("Mapping request got failed", errors.get(0).getMessage());
@@ -111,12 +111,13 @@ class SolrJobTaskTest {
         when(repo.getAllMappingIds(any(), any()))
                 .thenReturn(List.of(new IdMappingStringPair("from", "to")));
 
-        var ret = solrJobTask.processTask(mappingJob("UniProtKB_AC-ID", "UniProtKB_AC-ID"));
+        var idMappingResult =
+                solrJobTask.processTask(mappingJob("UniProtKB_AC-ID", "UniProtKB_AC-ID"));
 
-        assertTrue(ret.getErrors().isEmpty());
-        assertTrue(ret.getUnmappedIds().isEmpty());
-        assertFalse(ret.getMappedIds().isEmpty());
-        assertEquals("to", ret.getMappedIds().get(0).getTo());
+        assertTrue(idMappingResult.getErrors().isEmpty());
+        assertTrue(idMappingResult.getUnmappedIds().isEmpty());
+        assertFalse(idMappingResult.getMappedIds().isEmpty());
+        assertEquals("to", idMappingResult.getMappedIds().get(0).getTo());
     }
 
     @Test
@@ -124,12 +125,13 @@ class SolrJobTaskTest {
         IdMappingRepository repo = mockRepo();
         when(repo.getAllMappingIds(any(), any())).thenReturn(List.of());
 
-        var ret = solrJobTask.processTask(mappingJob("UniProtKB_AC-ID", "UniProtKB_AC-ID"));
+        var idMappingResult =
+                solrJobTask.processTask(mappingJob("UniProtKB_AC-ID", "UniProtKB_AC-ID"));
 
-        assertTrue(ret.getErrors().isEmpty());
-        assertFalse(ret.getUnmappedIds().isEmpty());
-        assertEquals("Ids", ret.getUnmappedIds().get(0));
-        assertTrue(ret.getMappedIds().isEmpty());
+        assertTrue(idMappingResult.getErrors().isEmpty());
+        assertFalse(idMappingResult.getUnmappedIds().isEmpty());
+        assertEquals("Ids", idMappingResult.getUnmappedIds().get(0));
+        assertTrue(idMappingResult.getMappedIds().isEmpty());
     }
 
     @Test
@@ -138,15 +140,15 @@ class SolrJobTaskTest {
         when(repo.getAllMappingIds(any(), any()))
                 .thenReturn(List.of(new IdMappingStringPair("2", "2")));
 
-        var ret =
+        var idMappingResult =
                 solrJobTask.processTask(mappingJob("UniProtKB_AC-ID", "UniProtKB_AC-ID", "1,2,3"));
 
-        assertTrue(ret.getErrors().isEmpty());
-        assertFalse(ret.getMappedIds().isEmpty());
-        assertEquals("2", ret.getMappedIds().get(0).getTo());
-        assertFalse(ret.getUnmappedIds().isEmpty());
-        assertEquals("1", ret.getUnmappedIds().get(0));
-        assertEquals("3", ret.getUnmappedIds().get(1));
+        assertTrue(idMappingResult.getErrors().isEmpty());
+        assertFalse(idMappingResult.getMappedIds().isEmpty());
+        assertEquals("2", idMappingResult.getMappedIds().get(0).getTo());
+        assertFalse(idMappingResult.getUnmappedIds().isEmpty());
+        assertEquals("1", idMappingResult.getUnmappedIds().get(0));
+        assertEquals("3", idMappingResult.getUnmappedIds().get(1));
     }
 
     private IdMappingJob mappingJob(String from, String to) {

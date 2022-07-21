@@ -73,18 +73,18 @@ class IdMappingRepositoryTest {
         var id50 = "UPI0000000050";
         var id91 = "UPI0000000091";
 
-        var ret =
+        var mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniparc, List.of(id1, id50, id91));
 
         assertAll(
-                () -> assertEquals(3, ret.size()),
-                () -> assertEquals(id1, ret.get(0).getFrom()),
-                () -> assertEquals(id1, ret.get(0).getTo()),
-                () -> assertEquals(id50, ret.get(1).getFrom()),
-                () -> assertEquals(id50, ret.get(1).getTo()),
-                () -> assertEquals(id91, ret.get(2).getFrom()),
-                () -> assertEquals(id91, ret.get(2).getTo()));
+                () -> assertEquals(3, mappedIdsPairs.size()),
+                () -> assertEquals(id1, mappedIdsPairs.get(0).getFrom()),
+                () -> assertEquals(id1, mappedIdsPairs.get(0).getTo()),
+                () -> assertEquals(id50, mappedIdsPairs.get(1).getFrom()),
+                () -> assertEquals(id50, mappedIdsPairs.get(1).getTo()),
+                () -> assertEquals(id91, mappedIdsPairs.get(2).getFrom()),
+                () -> assertEquals(id91, mappedIdsPairs.get(2).getTo()));
     }
 
     @Test
@@ -93,31 +93,31 @@ class IdMappingRepositoryTest {
         var id99 = "UniRef100_UPI0000000099";
         var id98 = "UniRef100_UPI0000000098";
 
-        var ret =
+        var mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniref, List.of(id100, id99, id98));
 
         assertAll(
-                () -> assertEquals(3, ret.size()),
-                () -> assertEquals(id100, ret.get(2).getFrom()),
-                () -> assertEquals(id100, ret.get(2).getTo()),
-                () -> assertEquals(id99, ret.get(1).getFrom()),
-                () -> assertEquals(id99, ret.get(1).getTo()),
-                () -> assertEquals(id98, ret.get(0).getFrom()),
-                () -> assertEquals(id98, ret.get(0).getTo()));
+                () -> assertEquals(3, mappedIdsPairs.size()),
+                () -> assertEquals(id100, mappedIdsPairs.get(2).getFrom()),
+                () -> assertEquals(id100, mappedIdsPairs.get(2).getTo()),
+                () -> assertEquals(id99, mappedIdsPairs.get(1).getFrom()),
+                () -> assertEquals(id99, mappedIdsPairs.get(1).getTo()),
+                () -> assertEquals(id98, mappedIdsPairs.get(0).getFrom()),
+                () -> assertEquals(id98, mappedIdsPairs.get(0).getTo()));
     }
 
     @Test
     void queryingSameIdMultipleWillReturn1Result() throws SolrServerException, IOException {
         var id50 = "UPI0000000050";
 
-        var ret =
+        var mappedIdsPairs =
                 idMappingRepository.getAllMappingIds(
                         SolrCollection.uniparc, List.of(id50, id50, id50));
 
         assertAll(
-                () -> assertEquals(1, ret.size()),
-                () -> assertEquals(id50, ret.get(0).getFrom()),
-                () -> assertEquals(id50, ret.get(0).getTo()));
+                () -> assertEquals(1, mappedIdsPairs.size()),
+                () -> assertEquals(id50, mappedIdsPairs.get(0).getFrom()),
+                () -> assertEquals(id50, mappedIdsPairs.get(0).getTo()));
     }
 }

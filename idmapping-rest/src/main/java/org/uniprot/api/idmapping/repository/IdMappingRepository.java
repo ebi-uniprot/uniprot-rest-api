@@ -3,7 +3,6 @@ package org.uniprot.api.idmapping.repository;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.Size;
@@ -37,23 +36,24 @@ public class IdMappingRepository {
             case uniref:
                 // uniref id is big (23 char e-g UniRef100_UPI0000072840) 100_000 can not fit in
                 // single request
-                var sublistSize = Math.min(searchIds.size(), MAX_ID_MAPPINGS_ALLOWED / 2);
-                var ret =
+                int sublistSize = Math.min(searchIds.size(), MAX_ID_MAPPINGS_ALLOWED / 2);
+                var unirefSolrMappingList =
                         getAllMatchingIds(
                                 solrClient,
                                 collection,
                                 "id",
                                 "id",
                                 searchIds.subList(0, sublistSize));
-                if (searchIds.size() > sublistSize)
-                    ret.addAll(
+                if (searchIds.size() > sublistSize) {
+                    unirefSolrMappingList.addAll(
                             getAllMatchingIds(
                                     solrClient,
                                     collection,
                                     "id",
                                     "id",
                                     searchIds.subList(sublistSize, searchIds.size())));
-                return ret;
+                }
+                return unirefSolrMappingList;
             default:
                 return List.of();
         }
@@ -67,15 +67,15 @@ public class IdMappingRepository {
             @Size(max = MAX_ID_MAPPINGS_ALLOWED) List<String> searchIds)
             throws SolrServerException, IOException {
 
-        var filteredQuery =
+        var filteredTermQueryWithIds =
                 String.format("({!terms f=%s}%s)", searchField, String.join(",", searchIds));
-        final Map<String, String> queryParamMap = new HashMap<>();
-        queryParamMap.put("q", "*:*");
-        queryParamMap.put("fl", searchField + "," + idField);
-        queryParamMap.put("start", "0");
-        queryParamMap.put("rows", "" + searchIds.size());
-        queryParamMap.put("fq", filteredQuery);
-        MapSolrParams queryParams = new MapSolrParams(queryParamMap);
+        var queryParamsMap = new HashMap<String, String>();
+        queryParamsMap.put("q", "*:*");
+        queryParamsMap.put("fl", searchField + "," + idField);
+        queryParamsMap.put("start", "0");
+        queryParamsMap.put("rows", "" + searchIds.size());
+        queryParamsMap.put("fq", filteredTermQueryWithIds);
+        MapSolrParams queryParams = new MapSolrParams(queryParamsMap);
 
         return client.query(collection.name(), queryParams).getResults().stream()
                 .map(
