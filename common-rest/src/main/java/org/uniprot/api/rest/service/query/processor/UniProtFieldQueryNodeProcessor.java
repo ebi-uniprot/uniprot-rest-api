@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.service.query.processor;
 
 import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
+import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.UNIPROTKB_ACCESSION_FIELD;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.List;
@@ -90,9 +91,13 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
                                                         && text.matches(f.getValidRegex()))
                                 .findFirst();
 
-                return optionalSearchField.map(f -> f.getFieldName() + ":" + text).orElse(text);
+                return optionalSearchField
+                        .map(f -> f.getFieldName() + ":" + text.toUpperCase())
+                        .orElse(text);
             } else if (whiteListFields.containsKey(field.toLowerCase())) {
                 return field.toUpperCase() + "\\:" + text;
+            } else if (UNIPROTKB_ACCESSION_FIELD.equals(field)) {
+                return field + ":" + text.toUpperCase();
             } else {
                 return super.toQueryString(escaper);
             }

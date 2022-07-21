@@ -57,6 +57,9 @@ public class IdMappingUniProtKBITUtils {
     public static final String UNIPROTKB_STR = "UniProtKB";
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+    private static final UniProtKBEntry TEMPLATE_ISOFORM_ENTRY =
+            UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+
     private static final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
@@ -121,14 +124,32 @@ public class IdMappingUniProtKBITUtils {
         UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
         String acc = String.format("Q%05d", i);
         entryBuilder.primaryAccession(acc);
+        UniProtKBEntryBuilder isoFormEntryBuilder =
+                UniProtKBEntryBuilder.from(TEMPLATE_ISOFORM_ENTRY);
         if (i % 2 == 0) {
             entryBuilder.entryType(UniProtKBEntryType.SWISSPROT);
             entryBuilder.uniProtId("FGFR12345_HUMAN");
+            isoFormEntryBuilder.entryType(UniProtKBEntryType.SWISSPROT);
         } else {
             entryBuilder.uniProtId("ATPG_12345");
             entryBuilder.entryType(UniProtKBEntryType.TREMBL);
+            isoFormEntryBuilder.entryType(UniProtKBEntryType.TREMBL);
         }
+        saveEntry(i, cloudSolrClient, storeClient, entryBuilder);
 
+        if (i % 5 == 0) { // create isoform
+            isoFormEntryBuilder.primaryAccession(acc + "-2");
+            isoFormEntryBuilder.uniProtId("FGFR12345_HUMAN");
+            saveEntry(i, cloudSolrClient, storeClient, isoFormEntryBuilder);
+        }
+    }
+
+    private static void saveEntry(
+            int i,
+            SolrClient cloudSolrClient,
+            UniProtStoreClient<UniProtKBEntry> storeClient,
+            UniProtKBEntryBuilder entryBuilder)
+            throws IOException, SolrServerException {
         List<Comment> comments = createAllComments();
         entryBuilder.extraAttributesAdd(UniProtKBEntryBuilder.UNIPARC_ID_ATTRIB, "UP1234567890");
         entryBuilder.lineagesAdd(TaxonomyLineageTest.getCompleteTaxonomyLineage());
@@ -158,7 +179,9 @@ public class IdMappingUniProtKBITUtils {
         doc.uniparc = "UPI0000000001";
         doc.computationalPubmedIds.add("890123456");
         doc.communityPubmedIds.add("1234567");
-        doc.isIsoform = i % 10 == 0;
+        if (doc.accession.contains("-")) {
+            doc.isIsoform = true;
+        }
         doc.proteomes.add("UP000000000");
         doc.apApu.add("Search All");
         doc.apApuEv.add("Search All");

@@ -10,16 +10,22 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
+import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
+import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingStreamRequest;
+import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.idmapping.service.BasicIdService;
 import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
+import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -32,6 +38,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
  */
 @Service
 public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKBEntryPair> {
+
+    public static final String ACCESSION = "accession_id";
+    public static final String IS_ISOFORM = "is_isoform";
 
     private final UniProtStoreClient<UniProtKBEntry> storeClient;
 
@@ -64,6 +73,17 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     }
 
     @Override
+    public QueryResult<UniProtKBEntryPair> getMappedEntries(
+            SearchRequest searchRequest, IdMappingResult mappingResult) {
+
+        UniProtKBIdMappingSearchRequest kbIdMappingSearchRequest =
+                (UniProtKBIdMappingSearchRequest) searchRequest;
+
+        return super.getMappedEntries(
+                searchRequest, mappingResult, kbIdMappingSearchRequest.isIncludeIsoform());
+    }
+
+    @Override
     protected UniProtKBEntryPair convertToPair(
             IdMappingStringPair mId, Map<String, UniProtKBEntry> idEntryMap) {
         UniProtKBEntry toEntry =
@@ -85,6 +105,13 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     }
 
     @Override
+    protected String getTermsQueryField() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+                .getSearchFieldItemByName("accession")
+                .getFieldName();
+    }
+
+    @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
     }
@@ -98,5 +125,14 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                         storeClient,
                         storeFetchRetryPolicy);
         return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
+    }
+
+    @Override
+    protected List<IdMappingStringPair> streamFilterAndSortEntries(
+            StreamRequest streamRequest, List<IdMappingStringPair> mappedIds) {
+        UniProtKBIdMappingStreamRequest kbIdMappingStreamRequest =
+                (UniProtKBIdMappingStreamRequest) streamRequest;
+        return super.streamFilterAndSortEntries(
+                streamRequest, mappedIds, kbIdMappingStreamRequest.isIncludeIsoform());
     }
 }

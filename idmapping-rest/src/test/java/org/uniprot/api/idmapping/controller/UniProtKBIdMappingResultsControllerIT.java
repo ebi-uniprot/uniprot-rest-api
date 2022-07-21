@@ -3,6 +3,8 @@ package org.uniprot.api.idmapping.controller;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -18,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_AC_ID_STR;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
 import java.io.IOException;
 import java.util.List;
@@ -232,6 +235,204 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                 contains("Q00010", "Q00008", "Q00006")))
                 .andExpect(jsonPath("$.results.*.to.sequence").exists())
                 .andExpect(jsonPath("$.results.*.to.organism").doesNotExist());
+    }
+
+    @Test
+    void testIdMappingWithIsoform() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxFromIdsAllowed);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("includeIsoform", "true")
+                                .param("size", "10"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(10)))
+                .andExpect(
+                        header().string(
+                                        X_TOTAL_RESULTS,
+                                        String.valueOf(this.maxFromIdsAllowed + 4)))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains(
+                                        "Q00001",
+                                        "Q00002",
+                                        "Q00003",
+                                        "Q00004",
+                                        "Q00005",
+                                        "Q00005-2",
+                                        "Q00006",
+                                        "Q00007",
+                                        "Q00008",
+                                        "Q00009")));
+    }
+
+    @Test
+    void testIdMappingFilteringIsoform() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxFromIdsAllowed);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("includeIsoform", "false")
+                                .param("size", "10"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(10)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(this.maxFromIdsAllowed)))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains(
+                                        "Q00001", "Q00002", "Q00003", "Q00004", "Q00005", "Q00006",
+                                        "Q00007", "Q00008", "Q00009", "Q00010")));
+    }
+
+    @Test
+    void testIdMappingWithSortedIsoform() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxFromIdsAllowed);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("includeIsoform", "true")
+                                .param("sort", "accession desc")
+                                .param("size", "10"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(10)))
+                .andExpect(
+                        header().string(
+                                        X_TOTAL_RESULTS,
+                                        String.valueOf(this.maxFromIdsAllowed + 4)))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains(
+                                        "Q00020-2",
+                                        "Q00020",
+                                        "Q00019",
+                                        "Q00018",
+                                        "Q00017",
+                                        "Q00016",
+                                        "Q00015-2",
+                                        "Q00015",
+                                        "Q00014",
+                                        "Q00013")));
+    }
+
+    @Test
+    void testIdMappingQueryIsoform() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxFromIdsAllowed);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:true")
+                                .param("includeIsoform", "false")
+                                .param("size", "10"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(4)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(4)))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains("Q00005-2", "Q00010-2", "Q00015-2", "Q00020-2")));
+    }
+
+    @Test
+    void testIdMappingIsoform() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxFromIdsAllowed);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:false")
+                                .param("includeIsoform", "true")
+                                .param("size", "10"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(10)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(20)))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains(
+                                        "Q00001", "Q00002", "Q00003", "Q00004", "Q00005", "Q00006",
+                                        "Q00007", "Q00008", "Q00009", "Q00010")));
+    }
+
+    @Test
+    void testIdMappingWithIncludeIsoformAndIsIsoformTrue() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxFromIdsAllowed);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:true")
+                                .param("includeIsoform", "true")
+                                .param("size", "10"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(4)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(4)))
+                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains("Q00005-2", "Q00010-2", "Q00015-2", "Q00020-2")));
+    }
+
+    @Test
+    void testIdMappingQueryIsoformAndIncludeIsoformFalse() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(this.maxFromIdsAllowed);
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("query", "is_isoform:false")
+                                .param("includeIsoform", "false")
+                                .param("size", "10"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(10)))
+                .andExpect(header().string(X_TOTAL_RESULTS, String.valueOf(20)))
+                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                contains(
+                                        "Q00001", "Q00002", "Q00003", "Q00004", "Q00005", "Q00006",
+                                        "Q00007", "Q00008", "Q00009", "Q00010")));
     }
 
     @Test
