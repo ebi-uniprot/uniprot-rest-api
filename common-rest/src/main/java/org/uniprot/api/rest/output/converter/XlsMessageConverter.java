@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
@@ -26,6 +27,7 @@ import org.uniprot.store.config.returnfield.model.ReturnField;
  * @date: 1 May 2019
  */
 public class XlsMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
+    public static final int MAX_CELL_LENGTH = SpreadsheetVersion.EXCEL2007.getMaxTextLength();
     private static final Logger LOGGER = getLogger(XlsMessageConverter.class);
     private static final ThreadLocal<SXSSFWorkbook> TL_WORK_BOOK = new ThreadLocal<>();
     private static final ThreadLocal<SXSSFSheet> TL_SHEET = new ThreadLocal<>();
@@ -33,6 +35,7 @@ public class XlsMessageConverter<T> extends AbstractEntityHttpMessageConverter<T
     private final ReturnFieldConfig fieldConfig;
     private final EntityValueMapper<T> entityMapper;
     private static final ThreadLocal<List<ReturnField>> TL_FIELDS = new ThreadLocal<>();
+    public static final String TRUNCATED = "(truncated)";
 
     public XlsMessageConverter(
             Class<T> messageConverterEntryClass,
@@ -106,8 +109,14 @@ public class XlsMessageConverter<T> extends AbstractEntityHttpMessageConverter<T
 
     private void updateRow(Row row, List<String> result) {
         for (int cellnum = 0; cellnum < result.size(); cellnum++) {
+            String cellValue = result.get(cellnum);
             Cell cell = row.createCell(cellnum);
-            cell.setCellValue(result.get(cellnum));
+            // truncate if the length exceeds the limit and append truncated string literal
+            if (cellValue.length() > MAX_CELL_LENGTH) {
+                cellValue =
+                        cellValue.substring(0, MAX_CELL_LENGTH - TRUNCATED.length()) + TRUNCATED;
+            }
+            cell.setCellValue(cellValue);
         }
     }
 }
