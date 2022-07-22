@@ -366,7 +366,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 getMockMvc()
                         .perform(
                                 get(SEARCH_RESOURCE
-                                                + "?query=accession:P21802&fields=accession,gene_primary")
+                                                + "?query=accession:p21802&fields=accession,gene_primary")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -774,7 +774,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=accession:Q14301&fields=accession")
+                                get(SEARCH_RESOURCE + "?query=accession:q14301&fields=accession")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -786,7 +786,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=Q14301&fields=accession")
+                                get(SEARCH_RESOURCE + "?query=q14301&fields=accession")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -1001,6 +1001,38 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")));
+    }
+
+    @Test
+    @Tag("TRM-28235")
+    void searchForCanonicalIsoformForEntriesWithoutIsoformByAccession() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when search accession by id field, returns only itself
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=accession:q8dia7-1")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q8DIA7")));
+
+        // when search accession by default deefault search
+        response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=q8dia7-1")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q8DIA7")));
     }
 
     @Test

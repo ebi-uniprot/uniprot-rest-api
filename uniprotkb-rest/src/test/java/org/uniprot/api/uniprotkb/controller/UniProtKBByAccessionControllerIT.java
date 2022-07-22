@@ -218,7 +218,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     @Test
     void canSearchCanonicalIsoFormEntryFromAccessionEndpoint() throws Exception {
         // given
-        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL_ISOFORM);
@@ -226,7 +229,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-        // when
+
+        // when is an accession that has isoforms (alternative products comment)
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -234,7 +238,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                         .param("fields", "accession,organism_name")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
-        // then
+        // then return the canonical isoform entry
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -242,6 +246,20 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(jsonPath("$.organism").exists())
                 // ensure other parts of the entry were not returned (using one example)
                 .andExpect(jsonPath("$.comments").doesNotExist());
+
+        // when is an accession without isoforms (Alternative products comment)
+        response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "q8dia7-1")
+                                        .param("fields", "accession,organism_name")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then return the canonical entry
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.primaryAccession", is("Q8DIA7")));
     }
 
     @Test
