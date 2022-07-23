@@ -49,6 +49,7 @@ public class UniProtEntryService
     public static final String ACCESSION = "accession_id";
     public static final String PROTEIN_ID = "id";
     public static final String IS_ISOFORM = "is_isoform";
+    public static final String CANONICAL_ISOFORM = "-1";
     private final UniProtEntryQueryResultsConverter resultsConverter;
     private final SolrQueryConfig solrQueryConfig;
     private final UniProtQueryProcessorConfig uniProtQueryProcessorConfig;
@@ -119,12 +120,14 @@ public class UniProtEntryService
     public UniProtKBEntry findByUniqueId(String accession, String fields) {
         try {
             List<ReturnField> fieldList = OutputFieldsParser.parse(fields, returnFieldConfig);
-            SolrRequest solrRequest =
-                    SolrRequest.builder()
-                            .query(ACCESSION + ":" + accession.toUpperCase())
-                            .rows(NumberUtils.INTEGER_ONE)
-                            .build();
+            accession = accession.toUpperCase();
+            SolrRequest solrRequest = buildSolrRequest(accession);
             Optional<UniProtDocument> optionalDoc = repository.getEntry(solrRequest);
+            if (accession.endsWith(CANONICAL_ISOFORM) && optionalDoc.isEmpty()) {
+                accession = accession.substring(0, accession.indexOf(CANONICAL_ISOFORM));
+                solrRequest = buildSolrRequest(accession);
+                optionalDoc = repository.getEntry(solrRequest);
+            }
             Optional<UniProtKBEntry> optionalUniProtEntry =
                     optionalDoc
                             .map(doc -> resultsConverter.convertDoc(doc, fieldList))
@@ -138,6 +141,13 @@ public class UniProtEntryService
             String message = "Could not get accession for: [" + accession + "]";
             throw new ServiceException(message, e);
         }
+    }
+
+    private SolrRequest buildSolrRequest(String accession) {
+        return SolrRequest.builder()
+                .query(ACCESSION + ":" + accession)
+                .rows(NumberUtils.INTEGER_ONE)
+                .build();
     }
 
     public String findAccessionByProteinId(String proteinId) {
