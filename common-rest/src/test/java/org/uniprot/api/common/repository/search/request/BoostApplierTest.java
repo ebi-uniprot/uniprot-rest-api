@@ -155,7 +155,9 @@ class BoostApplierTest {
                         .build();
 
         BoostApplier.addBoosts(
-                solrQuery, "\"cdc7\" reviewed:true (other:value OR 4000 OR \"brca2 values\")", config);
+                solrQuery,
+                "\"cdc7\" reviewed:true (other:value OR 4000 OR \"brca2 values\")",
+                config);
 
         List<String> bqs = Arrays.asList(solrQuery.getParams("bq"));
         assertThat(

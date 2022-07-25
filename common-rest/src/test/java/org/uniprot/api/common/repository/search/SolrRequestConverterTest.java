@@ -4,17 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
 
 import java.io.IOException;
 import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
-import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfigHandler;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.common.params.SolrParams;
@@ -24,8 +19,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.facet.FakeFacetConfig;
-import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
-import org.uniprot.api.rest.service.query.processor.UniProtDefaultFieldQueryNodeProcessor;
 
 import voldemort.utils.StringOutputStream;
 
@@ -39,51 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Slf4j
 class SolrRequestConverterTest {
     private SolrRequestConverter converter;
-
-    @Test
-    void extractDefaultTerms() throws QueryNodeException {
-        Set<String> defaultTerms = new HashSet<>();
-        System.out.println("Default Terms before:");
-        defaultTerms.stream().forEach(System.out::println);
-
-        UniProtQueryProcessor processor =
-                UniProtQueryProcessor.newInstance(
-                        new BoostQueryNodeProcessorPipeline(defaultTerms));
-        String query = "a b (c OR f:g)";
-        System.out.println("Query is: " + query);
-        processor.processQuery(query);
-
-        System.out.println("Default Terms after processing:");
-        defaultTerms.stream().forEach(System.out::println);
-    }
-
-    private static class BoostQueryNodeProcessorPipeline
-            extends org.apache.lucene.queryparser.flexible.core.processors
-                    .QueryNodeProcessorPipeline {
-        public BoostQueryNodeProcessorPipeline(Set<String> defaultTerms) {
-            super(new StandardQueryConfigHandler());
-
-            add(new BoostQueryHandler(defaultTerms));
-        }
-    }
-
-    private static class BoostQueryHandler extends UniProtDefaultFieldQueryNodeProcessor {
-        private final Set<String> defaultTerms;
-
-        BoostQueryHandler(Set<String> defaultTerms) {
-            this.defaultTerms = defaultTerms;
-        }
-
-        @Override
-        protected QueryNode postProcessNode(QueryNode node) {
-            if (node instanceof FieldQueryNode
-                    && ((FieldQueryNode) node).getField().equals(IMPOSSIBLE_FIELD)) {
-                String defaultQueryTerm = ((FieldQueryNode) node).getText().toString();
-                defaultTerms.add(defaultQueryTerm);
-            }
-            return super.postProcessNode(node);
-        }
-    }
 
     @BeforeEach
     void setup() {
@@ -405,6 +353,34 @@ class SolrRequestConverterTest {
             List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
             assertThat(boostQuery, contains("field1:value3^3", "field2:value4^2"));
             assertThat(queryParams.get("boost"), is("f1,f2"));
+        }
+
+        @Test
+        void advancedSearchQueryBoostsForFieldsAndPlaceHolderCreatedCorrectly() {
+            // given
+            SolrRequest request =
+                    SolrRequest.builder()
+                            .query("field1:value1 value2")
+                            .rows(10)
+                            .queryConfig(
+                                    SolrQueryConfig.builder()
+                                            .addBoost("field1:value3^3")
+                                            .addBoost("field2:value4^2")
+                                            .addBoost("field3:{query}^4")
+                                            .build())
+                            .build();
+
+            // when
+            JsonQueryRequest solrQuery = converter.toJsonQueryRequest(request);
+
+            SolrParams queryParams = solrQuery.getParams();
+            assertNotNull(queryParams);
+
+            // then
+            List<String> boostQuery = Arrays.asList(queryParams.getParams("bq"));
+            assertThat(
+                    boostQuery,
+                    contains("field3:(value2)^4", "field1:value3^3", "field2:value4^2"));
         }
 
         @Test
