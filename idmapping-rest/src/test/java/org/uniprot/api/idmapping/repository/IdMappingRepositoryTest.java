@@ -127,12 +127,12 @@ class IdMappingRepositoryTest {
         var nonExist = "UPI0110000050";
 
         var mappedIdsPairs =
-          idMappingRepository.getAllMappingIds(
-            SolrCollection.uniparc, List.of(nonExist, existId));
+                idMappingRepository.getAllMappingIds(
+                        SolrCollection.uniparc, List.of(nonExist, existId));
 
         assertAll(
-          () -> assertEquals(1, mappedIdsPairs.size()),
-          () -> assertEquals(existId, mappedIdsPairs.get(0).getFrom()),
-          () -> assertEquals(existId, mappedIdsPairs.get(0).getTo()));
+                () -> assertEquals(1, mappedIdsPairs.size()),
+                () -> assertEquals(existId, mappedIdsPairs.get(0).getFrom()),
+                () -> assertEquals(existId, mappedIdsPairs.get(0).getTo()));
     }
 }
