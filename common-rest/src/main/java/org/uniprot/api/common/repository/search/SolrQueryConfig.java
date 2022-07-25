@@ -1,8 +1,8 @@
 package org.uniprot.api.common.repository.search;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import static org.uniprot.api.common.repository.search.SolrQueryConfigFileReader.QUERY_PLACEHOLDER;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.*;
@@ -16,10 +16,13 @@ import lombok.*;
 @Getter
 @ToString
 public class SolrQueryConfig {
-    @Singular private final List<String> defaultSearchBoosts;
-    private final String defaultSearchBoostFunctions;
-    @Singular private final List<String> advancedSearchBoosts;
-    private final String advancedSearchBoostFunctions;
+    private final String boostFunctions;
+
+    @Setter(value = AccessLevel.NONE)
+    private List<String> fieldBoosts;
+
+    @Setter(value = AccessLevel.NONE)
+    private List<String> staticBoosts;
 
     @Setter(AccessLevel.NONE)
     private String queryFields;
@@ -31,6 +34,19 @@ public class SolrQueryConfig {
     private String highlightFields;
 
     public static class SolrQueryConfigBuilder {
+        // do not make final because Lombok doesn't like it
+        private List<String> fieldBoosts = new ArrayList<>();
+        private List<String> staticBoosts = new ArrayList<>();
+
+        public SolrQueryConfigBuilder addBoost(String boost) {
+            if (boost.contains(QUERY_PLACEHOLDER)) {
+                fieldBoosts.add(boost);
+            } else {
+                staticBoosts.add(boost);
+            }
+            return this;
+        }
+
         public SolrQueryConfigBuilder queryFields(String queryFields) {
             this.queryFields =
                     Arrays.stream(queryFields.split(","))

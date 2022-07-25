@@ -12,7 +12,7 @@ import org.uniprot.api.common.repository.search.SolrRequest;
  *
  * @author Edd
  */
-class UniProtDefaultFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
+public class UniProtDefaultFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
 
     @Override
     protected QueryNode preProcessNode(QueryNode node) {
