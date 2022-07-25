@@ -120,4 +120,19 @@ class IdMappingRepositoryTest {
                 () -> assertEquals(id50, mappedIdsPairs.get(0).getFrom()),
                 () -> assertEquals(id50, mappedIdsPairs.get(0).getTo()));
     }
+
+    @Test
+    void queryingSomeIdsNotExistInSolr() throws SolrServerException, IOException {
+        var existId = "UPI0000000050";
+        var nonExist = "UPI0110000050";
+
+        var mappedIdsPairs =
+          idMappingRepository.getAllMappingIds(
+            SolrCollection.uniparc, List.of(nonExist, existId));
+
+        assertAll(
+          () -> assertEquals(1, mappedIdsPairs.size()),
+          () -> assertEquals(existId, mappedIdsPairs.get(0).getFrom()),
+          () -> assertEquals(existId, mappedIdsPairs.get(0).getTo()));
+    }
 }
