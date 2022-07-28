@@ -21,7 +21,12 @@ import org.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
     ViewByServiceConfig.class,
     UniProtKBCacheConfig.class
 })
-@ComponentScan(basePackages = {"org.uniprot.api.uniprotkb", "org.uniprot.api.rest"})
+@ComponentScan(
+        basePackages = {
+            "org.uniprot.api.uniprotkb",
+            "org.uniprot.api.rest",
+            "org.uniprot.api.common.repository.stream.store.uniprotkb"
+        })
 public class UniProtKBREST {
     public static void main(String[] args) {
         SpringApplication.run(UniProtKBREST.class, args);

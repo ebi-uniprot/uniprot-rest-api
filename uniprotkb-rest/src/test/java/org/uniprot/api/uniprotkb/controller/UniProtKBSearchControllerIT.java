@@ -61,6 +61,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithSuggestionsControllerIT;
 import org.uniprot.api.rest.controller.SaveScenario;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -73,7 +74,6 @@ import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.TaxonomyRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
@@ -134,7 +134,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
     @Autowired private UniprotQueryRepository repository;
 
-    @Autowired private TaxonomyRepository taxRepository;
+    @Autowired private TaxonomyLineageRepository taxRepository;
 
     @Value("${search.default.page.size:#{null}}")
     private Integer solrBatchSize;

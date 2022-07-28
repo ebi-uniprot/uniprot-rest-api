@@ -29,7 +29,10 @@ import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdSt
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBStoreStreamer;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.api.rest.service.RDFPrologs;
@@ -77,20 +80,23 @@ public class ResultsConfig {
             UniProtKBStoreClient uniProtClient,
             TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("streamConfig") StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream) {
+            TupleStreamDocumentIdStream documentIdStream,
+            TaxonomyLineageService taxonomyLineageService) {
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
                         .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
-        return StoreStreamer.<UniProtKBEntry>builder()
-                .streamConfig(streamConfig)
-                .storeClient(uniProtClient)
-                .tupleStreamTemplate(tupleStreamTemplate)
-                .storeFetchRetryPolicy(storeRetryPolicy)
-                .documentIdStream(documentIdStream)
-                .build();
+        StoreStreamerConfig<UniProtKBEntry> config =
+                StoreStreamerConfig.<UniProtKBEntry>builder()
+                        .streamConfig(streamConfig)
+                        .storeClient(uniProtClient)
+                        .tupleStreamTemplate(tupleStreamTemplate)
+                        .storeFetchRetryPolicy(storeRetryPolicy)
+                        .documentIdStream(documentIdStream)
+                        .build();
+        return new UniProtKBStoreStreamer(config, taxonomyLineageService);
     }
 
     @Bean(name = "streamConfig")

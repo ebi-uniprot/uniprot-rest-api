@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.repository.search.impl;
+package org.uniprot.api.common.repository.stream.store.uniprotkb;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;
@@ -12,10 +12,10 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
  * @date: 16 Oct 2019
  */
 @Repository
-public class TaxonomyRepository extends SolrQueryRepository<TaxonomyDocument> {
-    protected TaxonomyRepository(
+public class TaxonomyLineageRepository extends SolrQueryRepository<TaxonomyDocument> {
+    protected TaxonomyLineageRepository(
             SolrClient solrClient,
-            TaxonomyFacetConfig facetConfig,
+            TaxonomyLineageFacetConfig facetConfig,
             SolrRequestConverter requestConverter) {
         super(
                 solrClient,

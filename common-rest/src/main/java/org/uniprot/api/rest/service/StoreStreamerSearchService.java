@@ -27,7 +27,7 @@ import org.uniprot.store.search.document.Document;
 
 public abstract class StoreStreamerSearchService<D extends Document, R>
         extends BasicSearchService<D, R> {
-    private final StoreStreamer<R> storeStreamer;
+    protected final StoreStreamer<R> storeStreamer;
     private final FacetTupleStreamTemplate tupleStreamTemplate;
     private final FacetTupleStreamConverter tupleStreamConverter;
     private final SolrQueryConfig solrQueryConfig;
@@ -102,7 +102,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
                         cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
 
         // get n entries from store
-        Stream<R> entries = this.storeStreamer.streamEntries(idsInPage);
+        Stream<R> entries = streamEntries(idsInPage, idsRequest);
 
         // facets may be set when facetList is passed but that should not be returned with cursor
         List<Facet> facets = solrStreamResponse.getFacets();
@@ -111,6 +111,10 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
         }
 
         return QueryResult.of(entries, cursorPage, facets, null, null, null);
+    }
+
+    protected Stream<R> streamEntries(List<String> idsInPage, IdsSearchRequest request) {
+        return this.storeStreamer.streamEntries(idsInPage);
     }
 
     protected SolrRequest createDownloadSolrRequest(StreamRequest request) {

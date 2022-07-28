@@ -13,6 +13,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyLineage;
@@ -33,14 +34,14 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
  */
 class UniProtEntryQueryResultsConverterTest {
     private UniProtKBStoreClient entryStore;
-    private TaxonomyService taxonomyService;
+    private TaxonomyLineageService taxonomyLineageService;
     private UniProtEntryQueryResultsConverter converter;
 
     @BeforeEach
     void setUp() {
         entryStore = mock(UniProtKBStoreClient.class);
-        taxonomyService = mock(TaxonomyService.class);
-        converter = new UniProtEntryQueryResultsConverter(entryStore, taxonomyService);
+        taxonomyLineageService = mock(TaxonomyLineageService.class);
+        converter = new UniProtEntryQueryResultsConverter(entryStore, taxonomyLineageService);
     }
 
     @Test
@@ -73,7 +74,7 @@ class UniProtEntryQueryResultsConverterTest {
         List<TaxonomyLineage> lineages =
                 singletonList(new TaxonomyLineageBuilder().taxonId(taxon).build());
         when(taxEntry.getLineages()).thenReturn(lineages);
-        when(taxonomyService.findById(taxon)).thenReturn(taxEntry);
+        when(taxonomyLineageService.findById(taxon)).thenReturn(taxEntry);
         Optional<UniProtKBEntry> optEntry = Optional.of(entry);
         when(entryStore.getEntry(acc)).thenReturn(optEntry);
 

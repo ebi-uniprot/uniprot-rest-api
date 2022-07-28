@@ -23,6 +23,7 @@ import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdSt
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
@@ -63,13 +64,15 @@ public class UniRefStreamConfig {
                         .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
-        return StoreStreamer.<UniRefEntryLight>builder()
-                .streamConfig(streamConfig)
-                .storeClient(uniRefLightStoreClient)
-                .tupleStreamTemplate(tupleStreamTemplate)
-                .storeFetchRetryPolicy(storeRetryPolicy)
-                .documentIdStream(documentIdStream)
-                .build();
+        StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig =
+                StoreStreamerConfig.<UniRefEntryLight>builder()
+                        .streamConfig(streamConfig)
+                        .storeClient(uniRefLightStoreClient)
+                        .tupleStreamTemplate(tupleStreamTemplate)
+                        .storeFetchRetryPolicy(storeRetryPolicy)
+                        .documentIdStream(documentIdStream)
+                        .build();
+        return new StoreStreamer<>(storeStreamerConfig);
     }
 
     @Bean
