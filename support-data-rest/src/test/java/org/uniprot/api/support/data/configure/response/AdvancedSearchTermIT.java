@@ -69,9 +69,7 @@ class AdvancedSearchTermIT {
                         "Function [CC]",
                         "Caution",
                         "Sites",
-                        "Calcium binding",
                         "DNA binding",
-                        "Nucleotide binding",
                         "Pathway",
                         "Miscellaneous [CC]"
                     });

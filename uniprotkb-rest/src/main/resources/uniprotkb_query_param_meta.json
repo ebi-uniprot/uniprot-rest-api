@@ -292,18 +292,6 @@
     "type": "String"
   },
   {
-    "name": "ft_ca_bind",
-    "type": "String"
-  },
-  {
-    "name": "ftev_ca_bind",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_ca_bind",
-    "type": "String"
-  },
-  {
     "name": "ft_zn_fing",
     "type": "String"
   },
@@ -325,18 +313,6 @@
   },
   {
     "name": "ftlen_dna_bind",
-    "type": "String"
-  },
-  {
-    "name": "ft_np_bind",
-    "type": "String"
-  },
-  {
-    "name": "ftev_np_bind",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_np_bind",
     "type": "String"
   },
   {
@@ -397,18 +373,6 @@
   },
   {
     "name": "ftlen_act_site",
-    "type": "String"
-  },
-  {
-    "name": "ft_metal",
-    "type": "String"
-  },
-  {
-    "name": "ftev_metal",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_metal",
     "type": "String"
   },
   {
