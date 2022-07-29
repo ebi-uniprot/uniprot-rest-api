@@ -23,7 +23,7 @@ import org.uniprot.api.uniprotkb.view.TaxonomyNode;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtViewByTaxonomyLineageServiceTest {
+class UniProtViewByTaxonomyServiceTest {
     @Mock private SolrClient solrClient;
 
     @Mock private TaxonomyService taxonService;

@@ -15,7 +15,12 @@ import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
  */
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class})
-@ComponentScan(basePackages = {"org.uniprot.api.idmapping", "org.uniprot.api.rest"})
+@ComponentScan(
+        basePackages = {
+            "org.uniprot.api.idmapping",
+            "org.uniprot.api.rest",
+            "org.uniprot.api.common.repository.stream.store.uniprotkb"
+        })
 public class IdMappingREST {
     public static void main(String[] args) {
         SpringApplication.run(IdMappingREST.class, args);

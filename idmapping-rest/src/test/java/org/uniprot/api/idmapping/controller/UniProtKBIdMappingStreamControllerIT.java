@@ -1,13 +1,13 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
@@ -29,12 +29,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
@@ -43,6 +45,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 /**
  * @author lgonzales
@@ -75,6 +78,8 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
 
     @Autowired private RestTemplate uniProtKBRestTemplate;
 
+    @Autowired private TaxonomyLineageRepository taxRepository;
+
     @Override
     protected String getIdMappingResultPath() {
         return UNIPROTKB_ID_MAPPING_STREAM_RESULT_PATH;
@@ -102,7 +107,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
-        return List.of(SolrCollection.uniprot);
+        return List.of(SolrCollection.uniprot, SolrCollection.taxonomy);
     }
 
     @Override
@@ -125,6 +130,12 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
         for (int i = 1; i <= 20; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
+
+        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
+
+        TaxonomyDocument taxonomyDocument = createTaxonomyEntry(9606L);
+        cloudSolrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
+        cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
 
     @Test
@@ -333,5 +344,36 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                                         "Q00014", "Q00013", "Q00012", "Q00011", "Q00010", "Q00009",
                                         "Q00008", "Q00007", "Q00006", "Q00005", "Q00004", "Q00003",
                                         "Q00002", "Q00001")));
+    }
+
+    @Test
+    void streamCanReturnLineageData() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(6);
+
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", "accession,lineage"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(6)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                containsInAnyOrder(
+                                        "Q00001", "Q00002", "Q00003", "Q00004", "Q00005",
+                                        "Q00006")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.lineages[0].taxonId",
+                                contains(9607, 9607, 9607, 9607, 9607, 9607)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.lineages[1].taxonId",
+                                contains(9608, 9608, 9608, 9608, 9608, 9608)));
     }
 }

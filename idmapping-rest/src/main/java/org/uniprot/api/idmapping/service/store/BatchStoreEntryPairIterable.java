@@ -61,7 +61,7 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
     }
 
     protected List<T> convertBatch(Set<String> tos, List<IdMappingStringPair> batch) {
-        List<S> entries = Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(tos));
+        List<S> entries = getEntriesFromStore(tos);
 
         // entry -> map <entryId, entry>
         Map<String, S> idEntryMap =
@@ -72,6 +72,10 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
                 .filter(mId -> idEntryMap.containsKey(mId.getTo()))
                 .map(mId -> convertToPair(mId, idEntryMap))
                 .collect(Collectors.toList());
+    }
+
+    protected List<S> getEntriesFromStore(Set<String> tos) {
+        return Failsafe.with(retryPolicy).get(() -> storeClient.getEntries(tos));
     }
 
     protected abstract T convertToPair(IdMappingStringPair mId, Map<String, S> idEntryMap);

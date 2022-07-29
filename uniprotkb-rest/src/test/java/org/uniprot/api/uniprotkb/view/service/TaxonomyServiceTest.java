@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.uniprotkb.view.TaxonomyNode;
 
-class TaxonomyLineageServiceTest {
+class TaxonomyServiceTest {
 
     @Test
     void test() {

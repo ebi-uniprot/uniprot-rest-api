@@ -14,8 +14,10 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingSearchRequest;
 import org.uniprot.api.idmapping.controller.request.uniprotkb.UniProtKBIdMappingStreamRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
@@ -24,11 +26,15 @@ import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.idmapping.service.BasicIdService;
 import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
+import org.uniprot.api.rest.output.converter.OutputFieldsParser;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
@@ -50,6 +56,10 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     private final UniprotKBMappingRepository repository;
 
+    private final TaxonomyLineageService lineageService;
+
+    private final ReturnFieldConfig returnFieldConfig;
+
     public UniProtKBIdService(
             @Qualifier("uniProtKBEntryStoreStreamer") StoreStreamer<UniProtKBEntry> storeStreamer,
             @Qualifier("uniproKBfacetTupleStreamTemplate") FacetTupleStreamTemplate tupleStream,
@@ -59,7 +69,8 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             UniProtKBFacetConfig facetConfig,
             RDFStreamer uniProtKBRDFStreamer,
             UniProtStoreClient<UniProtKBEntry> storeClient,
-            SolrQueryConfig uniProtKBSolrQueryConf) {
+            SolrQueryConfig uniProtKBSolrQueryConf,
+            TaxonomyLineageService lineageService) {
         super(
                 storeStreamer,
                 tupleStream,
@@ -70,6 +81,9 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;
         this.repository = repository;
+        this.lineageService = lineageService;
+        this.returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
     }
 
     @Override
@@ -81,6 +95,12 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
         return super.getMappedEntries(
                 searchRequest, mappingResult, kbIdMappingSearchRequest.isIncludeIsoform());
+    }
+
+    @Override
+    protected Stream<UniProtKBEntry> getEntries(List<String> toIds, String fields) {
+        StoreRequest storeRequest = StoreRequest.builder().addLineage(addLineage(fields)).build();
+        return this.storeStreamer.streamEntries(toIds, storeRequest);
     }
 
     @Override
@@ -117,13 +137,16 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     }
 
     @Override
-    protected Stream<UniProtKBEntryPair> streamEntries(List<IdMappingStringPair> mappedIds) {
+    protected Stream<UniProtKBEntryPair> streamEntries(
+            List<IdMappingStringPair> mappedIds, String fields) {
         UniProtKBBatchStoreEntryPairIterable batchIterable =
                 new UniProtKBBatchStoreEntryPairIterable(
                         mappedIds,
                         streamConfig.getStoreBatchSize(),
                         storeClient,
-                        storeFetchRetryPolicy);
+                        storeFetchRetryPolicy,
+                        lineageService,
+                        addLineage(fields));
         return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
     }
 
@@ -134,5 +157,12 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 (UniProtKBIdMappingStreamRequest) streamRequest;
         return super.streamFilterAndSortEntries(
                 streamRequest, mappedIds, kbIdMappingStreamRequest.isIncludeIsoform());
+    }
+
+    private boolean addLineage(String fields) {
+        List<ReturnField> fieldList = OutputFieldsParser.parse(fields, returnFieldConfig);
+        return fieldList.stream()
+                .map(ReturnField::getName)
+                .anyMatch(name -> "lineage".equals(name) || "lineage_ids".equals(name));
     }
 }
