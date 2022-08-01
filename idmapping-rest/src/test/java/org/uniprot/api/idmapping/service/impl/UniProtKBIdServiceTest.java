@@ -102,4 +102,31 @@ class UniProtKBIdServiceTest {
         assertThrows(
                 QueryRetrievalException.class, () -> idService.convertToPair(idPair, idEntryMap));
     }
+
+    @Test
+    void isLineageAllowedFoundLineage() throws Exception {
+        SolrClient solrClient = Mockito.mock(SolrClient.class);
+
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        assertTrue(idService.isLineageAllowed("lineage"));
+    }
+
+    @Test
+    void isLineageAllowedFoundLineageIds() throws Exception {
+        SolrClient solrClient = Mockito.mock(SolrClient.class);
+
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        assertTrue(idService.isLineageAllowed("lineage_ids"));
+    }
+
+    @Test
+    void isLineageAllowedNotFound() throws Exception {
+        SolrClient solrClient = Mockito.mock(SolrClient.class);
+
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        assertTrue(idService.isLineageAllowed("INVALID"));
+    }
 }

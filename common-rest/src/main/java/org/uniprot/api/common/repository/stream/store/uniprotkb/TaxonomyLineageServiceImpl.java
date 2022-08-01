@@ -98,7 +98,7 @@ public class TaxonomyLineageServiceImpl extends BasicSearchService<TaxonomyDocum
 
         @Override
         public TaxonomyEntry apply(TaxonomyDocument taxonomyDocument) {
-            log.info("fetch taxonomy=" + taxonomyDocument.getTaxId());
+            log.debug("fetch taxonomy=" + taxonomyDocument.getTaxId());
             try {
                 return objectMapper.readValue(
                         taxonomyDocument.getTaxonomyObj(), TaxonomyEntry.class);
