@@ -17,6 +17,7 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.repository.IdMappingRepository;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.core.uniparc.UniParcEntry;
@@ -95,9 +96,15 @@ public class DataStoreTestConfig {
         return new IdMappingPIRService(defaultPageSize) {
             @Override
             public IdMappingResult mapIds(IdMappingJobRequest request, String jobId) {
-                return null;
+                return IdMappingResult.builder().build();
             }
         };
+    }
+
+    @Bean
+    @Profile("offline")
+    public IdMappingRepository idMappingRepo() throws URISyntaxException {
+        return new IdMappingRepository(uniProtKBSolrClient(), solrClient());
     }
 
     @Bean

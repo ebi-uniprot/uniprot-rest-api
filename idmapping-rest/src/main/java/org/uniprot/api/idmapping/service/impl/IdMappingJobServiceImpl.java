@@ -17,11 +17,14 @@ import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.repository.IdMappingRepository;
 import org.uniprot.api.idmapping.service.HashGenerator;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
+import org.uniprot.api.idmapping.service.job.PIRJobTask;
+import org.uniprot.api.idmapping.service.job.SolrJobTask;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
@@ -58,6 +61,7 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
     private final HashGenerator hashGenerator;
+    private final IdMappingRepository idMappingRepository;
 
     @Value("${id.mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
     private Integer maxIdMappingToIdsCountEnriched;
@@ -65,11 +69,13 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     public IdMappingJobServiceImpl(
             IdMappingJobCacheService cacheService,
             IdMappingPIRService pirService,
-            ThreadPoolTaskExecutor jobTaskExecutor) {
+            ThreadPoolTaskExecutor jobTaskExecutor,
+            IdMappingRepository idMappingRepository) {
         this.cacheService = cacheService;
         this.pirService = pirService;
         this.jobTaskExecutor = jobTaskExecutor;
         this.hashGenerator = new HashGenerator();
+        this.idMappingRepository = idMappingRepository;
     }
 
     @Override
@@ -86,7 +92,10 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
                     idMappingJob.getIdMappingRequest().getIds().split(",").length,
                     idsForLog(idMappingJob.getIdMappingRequest().getIds()));
             // create task and submit
-            JobTask jobTask = new JobTask(idMappingJob, pirService, cacheService);
+            JobTask jobTask =
+                    canHandleInternally(request)
+                            ? new SolrJobTask(idMappingJob, cacheService, idMappingRepository)
+                            : new PIRJobTask(idMappingJob, cacheService, pirService);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);
@@ -97,6 +106,12 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         }
 
         return new JobSubmitResponse(jobId);
+    }
+
+    private boolean canHandleInternally(IdMappingJobRequest request) {
+        String toDb = request.getTo();
+        return request.getFrom().equals(toDb)
+                && (UNIPARC.equals(toDb) || UNIREF_SET.contains(toDb));
     }
 
     @Override

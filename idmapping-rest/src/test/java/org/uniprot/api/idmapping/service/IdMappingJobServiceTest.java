@@ -181,7 +181,7 @@ class IdMappingJobServiceTest {
         void setUp() {
             ServletContext mockContext = mock(ServletContext.class);
             when(mockContext.getContextPath()).thenReturn("/proteins/api");
-            idMappingJobService = new IdMappingJobServiceImpl(null, null, null);
+            idMappingJobService = new IdMappingJobServiceImpl(null, null, null, null);
         }
 
         @ParameterizedTest(name = "{index}: {0}")
