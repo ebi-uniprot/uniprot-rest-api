@@ -114,8 +114,6 @@ class UniProtKBIdServiceTest {
 
     @Test
     void isLineageAllowedFoundLineageIds() throws Exception {
-        SolrClient solrClient = Mockito.mock(SolrClient.class);
-
         UniProtKBIdService idService =
                 new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
         assertTrue(idService.isLineageAllowed("lineage_ids"));
@@ -127,6 +125,6 @@ class UniProtKBIdServiceTest {
 
         UniProtKBIdService idService =
                 new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
-        assertTrue(idService.isLineageAllowed("INVALID"));
+        assertFalse(idService.isLineageAllowed("accession"));
     }
 }
