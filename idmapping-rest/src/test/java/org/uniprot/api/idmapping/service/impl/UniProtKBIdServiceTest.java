@@ -25,7 +25,8 @@ class UniProtKBIdServiceTest {
     void convertToPair() {
         UniprotKBMappingRepository repository = new UniprotKBMappingRepository(null);
         UniProtKBIdService idService =
-                new UniProtKBIdService(null, null, null, null, repository, null, null, null, null);
+                new UniProtKBIdService(
+                        null, null, null, null, repository, null, null, null, null, null);
         IdMappingStringPair idPair = new IdMappingStringPair("P21802", "P21802");
         Map<String, UniProtKBEntry> idEntryMap = new HashMap<>();
         UniProtKBEntry entry =
@@ -51,7 +52,8 @@ class UniProtKBIdServiceTest {
                 .thenReturn(solrDocument);
 
         UniProtKBIdService idService =
-                new UniProtKBIdService(null, null, null, null, repository, null, null, null, null);
+                new UniProtKBIdService(
+                        null, null, null, null, repository, null, null, null, null, null);
         IdMappingStringPair idPair = new IdMappingStringPair("I8FBX0", "I8FBX0");
         Map<String, UniProtKBEntry> idEntryMap = new HashMap<>();
         UniProtKBEntryPair result = idService.convertToPair(idPair, idEntryMap);
@@ -77,7 +79,8 @@ class UniProtKBIdServiceTest {
                 .thenReturn(solrDocument);
 
         UniProtKBIdService idService =
-                new UniProtKBIdService(null, null, null, null, repository, null, null, null, null);
+                new UniProtKBIdService(
+                        null, null, null, null, repository, null, null, null, null, null);
         IdMappingStringPair idPair = new IdMappingStringPair("P21802", "P21802");
         Map<String, UniProtKBEntry> idEntryMap = new HashMap<>();
         assertThrows(
@@ -92,10 +95,38 @@ class UniProtKBIdServiceTest {
                 .thenThrow(new IOException("SolrError"));
 
         UniProtKBIdService idService =
-                new UniProtKBIdService(null, null, null, null, repository, null, null, null, null);
+                new UniProtKBIdService(
+                        null, null, null, null, repository, null, null, null, null, null);
         IdMappingStringPair idPair = new IdMappingStringPair("P21802", "P21802");
         Map<String, UniProtKBEntry> idEntryMap = new HashMap<>();
         assertThrows(
                 QueryRetrievalException.class, () -> idService.convertToPair(idPair, idEntryMap));
+    }
+
+    @Test
+    void isLineageAllowedFoundLineage() throws Exception {
+        SolrClient solrClient = Mockito.mock(SolrClient.class);
+
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        assertTrue(idService.isLineageAllowed("lineage"));
+    }
+
+    @Test
+    void isLineageAllowedFoundLineageIds() throws Exception {
+        SolrClient solrClient = Mockito.mock(SolrClient.class);
+
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        assertTrue(idService.isLineageAllowed("lineage_ids"));
+    }
+
+    @Test
+    void isLineageAllowedNotFound() throws Exception {
+        SolrClient solrClient = Mockito.mock(SolrClient.class);
+
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        assertTrue(idService.isLineageAllowed("INVALID"));
     }
 }

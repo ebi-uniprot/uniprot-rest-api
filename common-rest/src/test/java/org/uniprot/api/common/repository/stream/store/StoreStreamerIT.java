@@ -177,13 +177,16 @@ class StoreStreamerIT {
                         .tupleStreamTemplate(mockTupleStreamTemplate)
                         .streamConfig(streamConfig)
                         .build();
-        return StoreStreamer.<String>builder()
-                .streamConfig(streamConfig)
-                .tupleStreamTemplate(mockTupleStreamTemplate)
-                .storeClient(fakeStore)
-                .storeFetchRetryPolicy(new RetryPolicy<>().withMaxRetries(3))
-                .documentIdStream(idStream)
-                .build();
+
+        StoreStreamerConfig<String> storeStreamerConfig =
+                StoreStreamerConfig.<String>builder()
+                        .streamConfig(streamConfig)
+                        .tupleStreamTemplate(mockTupleStreamTemplate)
+                        .storeClient(fakeStore)
+                        .storeFetchRetryPolicy(new RetryPolicy<>().withMaxRetries(3))
+                        .documentIdStream(idStream)
+                        .build();
+        return new StoreStreamer<>(storeStreamerConfig);
     }
 
     private FakeDocument doc(int id) {

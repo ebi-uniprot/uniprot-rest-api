@@ -47,10 +47,6 @@ public abstract class BasicSearchService<D extends Document, R> {
     @Value("${search.default.page.size:#{null}}")
     private Integer defaultPageSize;
 
-    public BasicSearchService(SolrQueryRepository<D> repository, Function<D, R> entryConverter) {
-        this(repository, entryConverter, null, null, null);
-    }
-
     public BasicSearchService(
             SolrQueryRepository<D> repository,
             Function<D, R> entryConverter,

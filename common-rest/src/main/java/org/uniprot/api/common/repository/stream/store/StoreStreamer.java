@@ -6,16 +6,11 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.common.TupleStreamIterable;
-import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.document.DocumentIdStream;
-import org.uniprot.store.datastore.UniProtStoreClient;
 
 /**
  * The purpose of this class is to stream results from a data-store, e.g., Voldemort. Clients of
@@ -26,26 +21,28 @@ import org.uniprot.store.datastore.UniProtStoreClient;
  *
  * @author Edd
  */
-@Builder
 @Slf4j
 public class StoreStreamer<T> {
-    private final UniProtStoreClient<T> storeClient;
-    private final TupleStreamTemplate tupleStreamTemplate;
-    private final StreamerConfigProperties streamConfig;
-    private final RetryPolicy<Object> storeFetchRetryPolicy;
-    private final DocumentIdStream documentIdStream;
+
+    protected StoreStreamerConfig<T> config;
+
+    public StoreStreamer(StoreStreamerConfig<T> config) {
+        this.config = config;
+    }
+
+    public Stream<T> idsToStoreStream(SolrRequest solrRequest) {
+        return idsToStoreStream(solrRequest, StoreRequest.builder().build());
+    }
 
     @SuppressWarnings("squid:S2095")
-    public Stream<T> idsToStoreStream(SolrRequest solrRequest) {
-        TupleStream tupleStream = tupleStreamTemplate.create(solrRequest);
+    public Stream<T> idsToStoreStream(SolrRequest solrRequest, StoreRequest storeRequest) {
+        TupleStream tupleStream = config.getTupleStreamTemplate().create(solrRequest);
         try {
             tupleStream.open();
+            TupleStreamIterable iterable =
+                    new TupleStreamIterable(tupleStream, config.getStreamConfig().getIdFieldName());
             BatchStoreIterable<T> batchStoreIterable =
-                    new BatchStoreIterable<>(
-                            new TupleStreamIterable(tupleStream, streamConfig.getIdFieldName()),
-                            storeClient,
-                            storeFetchRetryPolicy,
-                            streamConfig.getStoreBatchSize());
+                    getBatchStoreIterable(iterable, storeRequest);
             return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                     .flatMap(Collection::stream)
                     .onClose(() -> closeTupleStream(tupleStream));
@@ -56,19 +53,27 @@ public class StoreStreamer<T> {
     }
 
     public Stream<String> idsStream(SolrRequest solrRequest) {
-        return documentIdStream.fetchIds(solrRequest);
+        return config.getDocumentIdStream().fetchIds(solrRequest);
     }
 
     public Stream<T> streamEntries(List<String> accessions) {
-        BatchStoreIterable<T> batchStoreIterable =
-                new BatchStoreIterable<>(
-                        accessions,
-                        storeClient,
-                        storeFetchRetryPolicy,
-                        streamConfig.getStoreBatchSize());
+        return streamEntries(accessions, StoreRequest.builder().build());
+    }
+
+    public Stream<T> streamEntries(List<String> accessions, StoreRequest storeRequest) {
+        BatchStoreIterable<T> batchStoreIterable = getBatchStoreIterable(accessions, storeRequest);
         return StreamSupport.stream(batchStoreIterable.spliterator(), false)
                 .flatMap(Collection::stream)
                 .onClose(() -> log.debug("Finished streaming entries."));
+    }
+
+    protected BatchStoreIterable<T> getBatchStoreIterable(
+            Iterable<String> iterableIds, StoreRequest storeRequest) {
+        return new BatchStoreIterable<>(
+                iterableIds,
+                config.getStoreClient(),
+                config.getStoreFetchRetryPolicy(),
+                config.getStreamConfig().getStoreBatchSize());
     }
 
     private void closeTupleStream(TupleStream tupleStream) {

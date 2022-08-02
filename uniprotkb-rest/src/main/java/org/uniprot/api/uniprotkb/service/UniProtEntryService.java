@@ -17,8 +17,12 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
+import org.uniprot.api.rest.request.BasicRequest;
+import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
@@ -67,7 +71,7 @@ public class UniProtEntryService
             SolrQueryConfig uniProtKBSolrQueryConf,
             UniProtKBStoreClient entryStore,
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
-            TaxonomyService taxService,
+            TaxonomyLineageService taxService,
             FacetTupleStreamTemplate facetTupleStreamTemplate,
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
@@ -143,6 +147,13 @@ public class UniProtEntryService
         }
     }
 
+    @Override
+    public Stream<UniProtKBEntry> stream(StreamRequest request) {
+        SolrRequest query = createDownloadSolrRequest(request);
+        StoreRequest storeRequest = buildStoreRequest(request);
+        return super.storeStreamer.idsToStoreStream(query, storeRequest);
+    }
+
     private SolrRequest buildSolrRequest(String accession) {
         return SolrRequest.builder()
                 .query(ACCESSION + ":" + accession)
@@ -214,6 +225,13 @@ public class UniProtEntryService
     }
 
     @Override
+    protected Stream<UniProtKBEntry> streamEntries(
+            List<String> idsInPage, IdsSearchRequest request) {
+        StoreRequest storeRequest = buildStoreRequest(request);
+        return this.storeStreamer.streamEntries(idsInPage, storeRequest);
+    }
+
+    @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
     }
@@ -270,6 +288,16 @@ public class UniProtEntryService
         List<String> queries = new ArrayList<>(solrRequest.getFilterQueries());
         queries.add(getQueryFieldName("is_isoform") + ":" + false);
         solrRequest.setFilterQueries(queries);
+    }
+
+    private StoreRequest buildStoreRequest(BasicRequest request) {
+        List<ReturnField> fieldList =
+                OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
+        StoreRequest.StoreRequestBuilder storeRequest = StoreRequest.builder();
+        if (resultsConverter.hasLineage(fieldList)) {
+            storeRequest.addLineage(true);
+        }
+        return storeRequest.build();
     }
 
     private boolean isSearchAll(UniProtKBSearchRequest uniProtRequest) {

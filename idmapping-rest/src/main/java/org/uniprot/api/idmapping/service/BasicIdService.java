@@ -45,7 +45,7 @@ import org.uniprot.store.config.UniProtDataType;
  */
 @Slf4j
 public abstract class BasicIdService<T, U> {
-    private final StoreStreamer<T> storeStreamer;
+    protected final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
     private final RDFStreamer rdfStreamer;
@@ -134,7 +134,7 @@ public abstract class BasicIdService<T, U> {
         int pageSize = getPageSize(searchRequest);
         CursorPage cursor = CursorPage.of(searchRequest.getCursor(), pageSize, mappedIds.size());
         long start = System.currentTimeMillis();
-        Stream<U> result = getPagedEntries(mappedIds, cursor);
+        Stream<U> result = getPagedEntries(mappedIds, cursor, searchRequest.getFields());
         long end = System.currentTimeMillis();
         log.debug("Total time taken to call voldemort in ms {}", (end - start));
 
@@ -144,7 +144,7 @@ public abstract class BasicIdService<T, U> {
     public Stream<U> streamEntries(StreamRequest streamRequest, IdMappingResult mappingResult) {
         List<IdMappingStringPair> mappedIds =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds());
-        return streamEntries(mappedIds);
+        return streamEntries(mappedIds, streamRequest.getFields());
     }
 
     public Stream<String> streamRDF(StreamRequest streamRequest, IdMappingResult mappingResult) {
@@ -171,9 +171,9 @@ public abstract class BasicIdService<T, U> {
 
     protected abstract UniProtDataType getUniProtDataType();
 
-    protected abstract Stream<U> streamEntries(List<IdMappingStringPair> mappedIds);
+    protected abstract Stream<U> streamEntries(List<IdMappingStringPair> mappedIds, String fields);
 
-    protected Stream<T> getEntries(List<String> toIds) {
+    protected Stream<T> getEntries(List<String> toIds, String fields) {
         return this.storeStreamer.streamEntries(toIds);
     }
 
@@ -248,7 +248,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     private Stream<U> getPagedEntries(
-            List<IdMappingStringPair> mappedIdPairs, CursorPage cursorPage) {
+            List<IdMappingStringPair> mappedIdPairs, CursorPage cursorPage, String fields) {
         List<IdMappingStringPair> mappedIdsInPage =
                 mappedIdPairs.subList(
                         cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
@@ -258,7 +258,7 @@ public abstract class BasicIdService<T, U> {
                 mappedIdsInPage.stream()
                         .map(IdMappingStringPair::getTo)
                         .collect(Collectors.toSet());
-        Stream<T> entries = getEntries(new ArrayList<>(toIds));
+        Stream<T> entries = getEntries(new ArrayList<>(toIds), fields);
         // accession -> entry map
         Map<String, T> idEntryMap = constructIdEntryMap(entries);
         // from -> uniprot entry

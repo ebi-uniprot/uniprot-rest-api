@@ -14,6 +14,7 @@ import net.jodah.failsafe.RetryPolicy;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprotkb.*;
@@ -45,12 +46,12 @@ class UniProtEntryQueryResultsConverter {
                     .handle(IOException.class)
                     .withDelay(Duration.ofMillis(100))
                     .withMaxRetries(5);
-    private final TaxonomyService taxonomyService;
+    private final TaxonomyLineageService taxonomyLineageService;
 
     UniProtEntryQueryResultsConverter(
-            UniProtKBStoreClient entryStore, TaxonomyService taxonomyService) {
+            UniProtKBStoreClient entryStore, TaxonomyLineageService taxonomyLineageService) {
         this.entryStore = entryStore;
-        this.taxonomyService = taxonomyService;
+        this.taxonomyLineageService = taxonomyLineageService;
     }
 
     QueryResult<UniProtKBEntry> convertQueryResult(
@@ -90,14 +91,14 @@ class UniProtEntryQueryResultsConverter {
         return Optional.of(e);
     }
 
-    private boolean hasLineage(List<ReturnField> filters) {
+    boolean hasLineage(List<ReturnField> filters) {
         return filters.stream()
                 .map(ReturnField::getName)
                 .anyMatch(name -> "lineage".equals(name) || "lineage_ids".equals(name));
     }
 
     private Optional<UniProtKBEntry> addLineage(UniProtKBEntry entry) {
-        TaxonomyEntry taxEntry = taxonomyService.findById(entry.getOrganism().getTaxonId());
+        TaxonomyEntry taxEntry = taxonomyLineageService.findById(entry.getOrganism().getTaxonId());
         if (Utils.notNull(taxEntry)) {
             UniProtKBEntryBuilder builder = UniProtKBEntryBuilder.from(entry);
             return Optional.of(builder.lineagesSet(taxEntry.getLineages()).build());

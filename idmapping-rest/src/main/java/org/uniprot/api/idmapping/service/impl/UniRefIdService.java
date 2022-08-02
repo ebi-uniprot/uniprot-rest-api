@@ -80,7 +80,8 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
     }
 
     @Override
-    protected Stream<UniRefEntryPair> streamEntries(List<IdMappingStringPair> mappedIds) {
+    protected Stream<UniRefEntryPair> streamEntries(
+            List<IdMappingStringPair> mappedIds, String fields) {
         UniRefBatchStoreEntryPairIterable batchIterable =
                 new UniRefBatchStoreEntryPairIterable(
                         mappedIds,

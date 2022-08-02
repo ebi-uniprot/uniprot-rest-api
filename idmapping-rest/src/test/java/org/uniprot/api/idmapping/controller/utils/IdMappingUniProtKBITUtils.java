@@ -12,12 +12,16 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.gene.Gene;
+import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyLineageTest;
 import org.uniprot.core.json.parser.uniprot.FeatureTest;
 import org.uniprot.core.json.parser.uniprot.GeneLocationTest;
 import org.uniprot.core.json.parser.uniprot.OrganimHostTest;
 import org.uniprot.core.json.parser.uniprot.UniProtKBCrossReferenceTest;
 import org.uniprot.core.json.parser.uniprot.comment.*;
+import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.comment.Comment;
@@ -40,6 +44,7 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
@@ -142,6 +147,27 @@ public class IdMappingUniProtKBITUtils {
             isoFormEntryBuilder.uniProtId("FGFR12345_HUMAN");
             saveEntry(i, cloudSolrClient, storeClient, isoFormEntryBuilder);
         }
+    }
+
+    public static TaxonomyDocument createTaxonomyEntry(long taxId) throws Exception {
+        TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
+        TaxonomyEntry taxonomyEntry =
+                entryBuilder
+                        .taxonId(taxId)
+                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 1).build())
+                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 2).build())
+                        .build();
+
+        byte[] taxonomyObj =
+                TaxonomyJsonConfig.getInstance()
+                        .getFullObjectMapper()
+                        .writeValueAsBytes(taxonomyEntry);
+
+        return TaxonomyDocument.builder()
+                .id(String.valueOf(taxId))
+                .taxId(taxId)
+                .taxonomyObj(taxonomyObj)
+                .build();
     }
 
     private static void saveEntry(

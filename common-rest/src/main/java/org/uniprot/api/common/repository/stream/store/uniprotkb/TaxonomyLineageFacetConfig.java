@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.repository.search.impl;
+package org.uniprot.api.common.repository.stream.store.uniprotkb;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
  * @date: 16 Oct 2019
  */
 @Component
-public class TaxonomyFacetConfig extends FacetConfig {
+public class TaxonomyLineageFacetConfig extends FacetConfig {
 
     private Map<String, FacetProperty> facet = new HashMap<>();
 

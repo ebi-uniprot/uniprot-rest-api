@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
@@ -47,17 +46,23 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
+import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.core.taxonomy.TaxonomyRank;
+import org.uniprot.core.taxonomy.impl.*;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
@@ -73,6 +78,7 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /**
@@ -112,6 +118,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired private TaxonomyLineageRepository taxRepository;
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -127,6 +134,8 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
         when(solrClient.query(anyString(), any())).thenReturn(response);
+
+        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
     }
 
     @Test
@@ -208,6 +217,43 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder("P00011-2", "P00012-2")));
+    }
+
+    @Test
+    void streamCanReturnLineageData() throws Exception {
+        // when
+        MockHttpServletRequestBuilder requestBuilder =
+                get(streamRequestPath)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "*:*")
+                        .param("fields", "accession,lineage_ids");
+
+        MvcResult response = mockMvc.perform(requestBuilder).andReturn();
+
+        // then
+        mockMvc.perform(asyncDispatch(response))
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(10)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.primaryAccession",
+                                containsInAnyOrder(
+                                        "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
+                                        "P00007", "P00008", "P00009", "P00010")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.lineages[0].taxonId",
+                                contains(
+                                        9607, 9607, 9607, 9607, 9607, 9607, 9607, 9607, 9607,
+                                        9607)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.lineages[1].taxonId",
+                                contains(
+                                        9608, 9608, 9608, 9608, 9608, 9608, 9608, 9608, 9608,
+                                        9608)));
     }
 
     @Test
@@ -406,7 +452,7 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
-        return Collections.singletonList(SolrCollection.uniprot);
+        return List.of(SolrCollection.uniprot, SolrCollection.taxonomy);
     }
 
     @Override
@@ -426,6 +472,31 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         saveEntry(11, "-2");
         saveEntry(12, "-2");
         cloudSolrClient.commit(SolrCollection.uniprot.name());
+
+        saveTaxonomyEntry(9606L);
+        cloudSolrClient.commit(SolrCollection.taxonomy.name());
+    }
+
+    private void saveTaxonomyEntry(long taxId) throws Exception {
+        TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
+        TaxonomyEntry taxonomyEntry =
+                entryBuilder
+                        .taxonId(taxId)
+                        .rank(TaxonomyRank.SPECIES)
+                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 1).build())
+                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 2).build())
+                        .build();
+        byte[] taxonomyObj =
+                TaxonomyJsonConfig.getInstance()
+                        .getFullObjectMapper()
+                        .writeValueAsBytes(taxonomyEntry);
+
+        TaxonomyDocument.TaxonomyDocumentBuilder docBuilder =
+                TaxonomyDocument.builder()
+                        .taxId(taxId)
+                        .id(String.valueOf(taxId))
+                        .taxonomyObj(taxonomyObj);
+        cloudSolrClient.addBean(SolrCollection.taxonomy.name(), docBuilder.build());
     }
 
     private void saveEntry(int i, String isoFormString) throws Exception {

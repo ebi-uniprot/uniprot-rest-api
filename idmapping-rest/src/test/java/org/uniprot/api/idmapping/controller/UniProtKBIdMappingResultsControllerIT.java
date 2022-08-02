@@ -1,11 +1,6 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -13,6 +8,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,6 +47,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
@@ -63,6 +60,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /**
@@ -101,9 +99,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @Autowired private RestTemplate uniProtKBRestTemplate;
 
+    @Autowired private TaxonomyLineageRepository taxRepository;
+
     @Override
     protected List<SolrCollection> getSolrCollections() {
-        return List.of(SolrCollection.uniprot);
+        return List.of(SolrCollection.uniprot, SolrCollection.taxonomy);
     }
 
     @Override
@@ -159,6 +159,12 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
         saveInactiveEntry();
         ReflectionTestUtils.setField(repository, "solrClient", cloudSolrClient);
+
+        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
+
+        TaxonomyDocument taxonomyDocument = createTaxonomyEntry(9606L);
+        cloudSolrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
+        cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
 
     @Test
@@ -456,6 +462,36 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andExpect(jsonPath("$.results.*.from", contains("Q00002", "Q00001")))
                 .andExpect(
                         jsonPath("$.results.*.to.primaryAccession", contains("Q00002", "Q00001")));
+    }
+
+    @Test
+    void testCanReturnLineageData() throws Exception {
+        // when
+        IdMappingJob job = getJobOperation().createAndPutJobInCache(5);
+
+        ResultActions response =
+                mockMvc.perform(
+                        get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("fields", "accession,lineage"));
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(jsonPath("$.results.size()", is(5)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                containsInAnyOrder(
+                                        "Q00001", "Q00002", "Q00003", "Q00004", "Q00005")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.lineages[0].taxonId",
+                                contains(9607, 9607, 9607, 9607, 9607)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.lineages[1].taxonId",
+                                contains(9608, 9608, 9608, 9608, 9608)));
     }
 
     @Test

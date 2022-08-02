@@ -1,9 +1,14 @@
 package org.uniprot.api.idmapping.service.store.impl;
 
+import static org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchStoreIterableUtil.populateLineageInEntry;
+
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.jodah.failsafe.RetryPolicy;
 
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
@@ -17,12 +22,19 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 public class UniProtKBBatchStoreEntryPairIterable
         extends BatchStoreEntryPairIterable<UniProtKBEntryPair, UniProtKBEntry> {
 
+    private final TaxonomyLineageService taxonomyLineageService;
+    private final boolean addLineage;
+
     public UniProtKBBatchStoreEntryPairIterable(
             Iterable<IdMappingStringPair> sourceIterable,
             int batchSize,
             UniProtStoreClient<UniProtKBEntry> storeClient,
-            RetryPolicy<Object> retryPolicy) {
+            RetryPolicy<Object> retryPolicy,
+            TaxonomyLineageService taxonomyLineageService,
+            boolean addLineage) {
         super(sourceIterable, batchSize, storeClient, retryPolicy);
+        this.addLineage = addLineage;
+        this.taxonomyLineageService = taxonomyLineageService;
     }
 
     @Override
@@ -37,5 +49,14 @@ public class UniProtKBBatchStoreEntryPairIterable
     @Override
     protected String getEntryId(UniProtKBEntry entry) {
         return entry.getPrimaryAccession().getValue();
+    }
+
+    @Override
+    protected List<UniProtKBEntry> getEntriesFromStore(Set<String> tos) {
+        List<UniProtKBEntry> entries = super.getEntriesFromStore(tos);
+        if (addLineage) {
+            entries = populateLineageInEntry(taxonomyLineageService, entries);
+        }
+        return entries;
     }
 }

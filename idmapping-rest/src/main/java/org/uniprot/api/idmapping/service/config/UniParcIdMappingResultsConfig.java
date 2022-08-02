@@ -19,6 +19,7 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.store.StoreConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
@@ -87,13 +88,15 @@ public class UniParcIdMappingResultsConfig {
             @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig,
             @Qualifier("uniParcDocumentIdStream") TupleStreamDocumentIdStream documentIdStream,
             @Qualifier("uniParcStoreRetryPolicy") RetryPolicy<Object> uniParcStoreRetryPolicy) {
-        return StoreStreamer.<UniParcEntry>builder()
-                .streamConfig(streamConfig)
-                .storeClient(storeClient)
-                .tupleStreamTemplate(tupleStreamTemplate)
-                .storeFetchRetryPolicy(uniParcStoreRetryPolicy)
-                .documentIdStream(documentIdStream)
-                .build();
+        StoreStreamerConfig<UniParcEntry> storeStreamerConfig =
+                StoreStreamerConfig.<UniParcEntry>builder()
+                        .streamConfig(streamConfig)
+                        .storeClient(storeClient)
+                        .tupleStreamTemplate(tupleStreamTemplate)
+                        .storeFetchRetryPolicy(uniParcStoreRetryPolicy)
+                        .documentIdStream(documentIdStream)
+                        .build();
+        return new StoreStreamer<>(storeStreamerConfig);
     }
 
     @Bean("uniParcStoreRetryPolicy")
