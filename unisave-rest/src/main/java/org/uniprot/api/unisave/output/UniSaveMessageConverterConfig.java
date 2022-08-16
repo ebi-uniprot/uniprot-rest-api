@@ -18,6 +18,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
+import org.uniprot.api.rest.output.converter.ErrorMessageXlsConverter;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.output.converter.UniSaveFastaMessageConverter;
 import org.uniprot.api.unisave.output.converter.UniSaveFlatFileMessageConverter;
@@ -40,6 +41,7 @@ public class UniSaveMessageConverterConfig {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
+                converters.add(new ErrorMessageXlsConverter());
                 converters.add(new UniSaveFastaMessageConverter());
                 converters.add(new UniSaveFlatFileMessageConverter());
                 converters.add(new UniSaveTSVMessageConverter());

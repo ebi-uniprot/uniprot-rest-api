@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
@@ -512,24 +511,32 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
-                                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE))
+                                                    .string(
+                                                            "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID"))
                                     .build())
                     .build();
         }

@@ -314,7 +314,12 @@ public class ArbaSearchControllerIT extends AbstractRuleSearchWithFacetControlle
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    is(
+                                                                            "Error messages\nThe rule_id value has invalid format. It should match the regular expression 'ARBA[0-9]{8}'"))))
                                     .build())
                     .build();
         }

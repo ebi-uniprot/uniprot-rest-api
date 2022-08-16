@@ -42,6 +42,7 @@ public class MessageConverterConfig {
                 int index = 0;
 
                 converters.add(index++, new ErrorMessageConverter());
+                converters.add(index++, new ErrorMessageXlsConverter());
                 converters.add(index++, new ListMessageConverter(downloadGatekeeper));
 
                 ReturnFieldConfig litReturnConfig =

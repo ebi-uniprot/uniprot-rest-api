@@ -3,9 +3,11 @@ package org.uniprot.api.rest.output.converter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.AbstractGenericHttpMessageConverter;
@@ -15,21 +17,14 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorInfo;
 
 /**
- * This class is responsible to write error message body for http status BAD REQUESTS (400)
+ * This class is responsible to write XLS error message body for http status BAD REQUESTS (400)
  *
  * @author lgonzales
  */
-public class ErrorMessageConverter extends AbstractGenericHttpMessageConverter<ErrorInfo> {
+public class ErrorMessageXlsConverter extends AbstractGenericHttpMessageConverter<ErrorInfo> {
 
-    public ErrorMessageConverter() {
-        super(
-                UniProtMediaType.FF_MEDIA_TYPE,
-                UniProtMediaType.FASTA_MEDIA_TYPE,
-                UniProtMediaType.GFF_MEDIA_TYPE,
-                UniProtMediaType.LIST_MEDIA_TYPE,
-                UniProtMediaType.TSV_MEDIA_TYPE,
-                UniProtMediaType.OBO_MEDIA_TYPE,
-                UniProtMediaType.MARKDOWN_MEDIA_TYPE);
+    public ErrorMessageXlsConverter() {
+        super(UniProtMediaType.XLS_MEDIA_TYPE);
     }
 
     @Override
@@ -43,13 +38,22 @@ public class ErrorMessageConverter extends AbstractGenericHttpMessageConverter<E
             throws IOException, HttpMessageNotWritableException {
         if (errorInfo.getMessages() != null) {
             OutputStream outputStream = httpOutputMessage.getBody();
-            String header = "Error messages" + System.lineSeparator();
-            outputStream.write(header.getBytes(StandardCharsets.UTF_8));
-            String responseBody =
-                    errorInfo.getMessages().stream()
-                            .collect(Collectors.joining(System.lineSeparator()));
-            outputStream.write(responseBody.getBytes(StandardCharsets.UTF_8));
-            outputStream.flush();
+            try (SXSSFWorkbook workbook = new SXSSFWorkbook(errorInfo.getMessages().size() + 1)) {
+
+                SXSSFSheet sheet = (workbook.createSheet());
+                Row headerRow = sheet.createRow(0);
+                Cell headerCell = headerRow.createCell(0);
+                headerCell.setCellValue("Error messages");
+                int rowNum = 1;
+                for (String message : errorInfo.getMessages()) {
+                    Row messageRow = sheet.createRow(rowNum);
+                    Cell messageCell = messageRow.createCell(0);
+                    messageCell.setCellValue(message);
+                    rowNum++;
+                }
+                workbook.write(outputStream);
+                workbook.dispose();
+            }
         }
     }
 

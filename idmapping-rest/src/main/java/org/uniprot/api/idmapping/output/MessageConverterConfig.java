@@ -34,12 +34,7 @@ import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
-import org.uniprot.api.rest.output.converter.TsvMessageConverter;
-import org.uniprot.api.rest.output.converter.XlsMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -63,6 +58,7 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 int index = 0;
                 converters.add(index++, new ErrorMessageConverter());
+                converters.add(index++, new ErrorMessageXlsConverter());
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages
 

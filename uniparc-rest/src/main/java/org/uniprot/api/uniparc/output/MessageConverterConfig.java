@@ -22,13 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.ErrorMessageConverter;
-import org.uniprot.api.rest.output.converter.ErrorMessageXMLConverter;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
-import org.uniprot.api.rest.output.converter.RDFMessageConverter;
-import org.uniprot.api.rest.output.converter.TsvMessageConverter;
-import org.uniprot.api.rest.output.converter.XlsMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.api.uniparc.output.converter.UniParcFastaMessageConverter;
 import org.uniprot.api.uniparc.output.converter.UniParcXmlMessageConverter;
 import org.uniprot.core.json.parser.uniparc.UniParcCrossRefJsonConfig;
@@ -55,6 +49,7 @@ public class MessageConverterConfig {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
+                converters.add(new ErrorMessageXlsConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter(downloadGatekeeper));
 

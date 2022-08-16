@@ -1,7 +1,6 @@
 package org.uniprot.api.help.centre.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.emptyString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -189,7 +188,10 @@ class HelpCentreGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.MARKDOWN_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            "Error messages\nThe 'id' is invalid. It can not be a number."))
                                     .build())
                     .build();
         }

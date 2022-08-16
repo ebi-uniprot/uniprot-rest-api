@@ -351,7 +351,11 @@ class GeneCentricUpIdSearchControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\nThe 'upid' value has invalid format. It should be a valid Proteome UPID")));
     }
 
     @Test
