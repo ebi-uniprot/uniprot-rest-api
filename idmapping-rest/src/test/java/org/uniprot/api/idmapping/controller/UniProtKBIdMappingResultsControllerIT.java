@@ -546,11 +546,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         content()
                                 .string(
                                         containsString(
-                                                "Q00001\tQ00001\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00002\tQ00002\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 2 gene 2 gene 2\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00003\tQ00003\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00004\tQ00004\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 4 gene 4 gene 4\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00005\tQ00005\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2, FGFR-2, EC 2.7.10.1 (K-sam, KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
+                                                "Q00001\tQ00001\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00002\tQ00002\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 2 gene 2 gene 2\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00003\tQ00003\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00004\tQ00004\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 4 gene 4 gene 4\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00005\tQ00005\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
     }
 
     @Test
