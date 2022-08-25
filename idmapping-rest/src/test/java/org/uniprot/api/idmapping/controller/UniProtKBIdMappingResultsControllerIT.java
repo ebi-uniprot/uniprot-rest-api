@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_AC_ID_STR;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
 import java.io.IOException;
@@ -574,6 +575,100 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andExpect(
                         jsonPath("$.facets[0].values.*.label", contains("Reviewed (Swiss-Prot)")))
                 .andExpect(jsonPath("$.facets[0].values.*.count", contains(5)));
+    }
+
+    @Test
+    void testIdMappingWithProteinVersions() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001,Q00002.2,Q00003.3");
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.from",
+                                containsInAnyOrder("Q00001", "Q00002.2", "Q00003.3")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                containsInAnyOrder("Q00001", "Q00002", "Q00003")));
+    }
+
+    @Test
+    void testIdMappingWithTSVSubSequenceValid() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001[10-20],Q00002[20-30]");
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param("subSequence", "true"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString(">tr|Q00001|10-20\nLVVVTMATLSL\n")))
+                .andExpect(content().string(containsString(">sp|Q00002|20-30\nLARPSFSLVED")));
+    }
+
+    @Test
+    void testIdMappingWithTSVSubSequenceInValidContentType() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001[10-20],Q00002[20-30]");
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("subSequence", "invalid"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid subSequence parameter value. Expected true or false",
+                                        "Invalid content type received, 'application/json'. 'subSequence' parameter only accepted for 'text/plain;format=fasta' content type.")));
+    }
+
+    @Test
+    void testIdMappingWithTSVSubSequenceInValidFromIds() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001[10-20],Q00002,Q00003");
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param("subSequence", "true"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(emptyString()));
+        // After Merge pull request https://github.com/ebi-uniprot/uniprot-rest-api/pull/288 use the
+        // code below
+        // .andExpect(content().string(containsString("Invalid request received. Unable to compute
+        // fasta subsequence for IDs: Q00002,Q00003. Expected format is accession[begin-end], for
+        // example:Q00001[10-20]")));
     }
 
     @Override

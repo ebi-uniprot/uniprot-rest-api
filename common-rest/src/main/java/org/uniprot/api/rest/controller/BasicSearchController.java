@@ -128,10 +128,21 @@ public abstract class BasicSearchController<T> {
             boolean isDownload,
             HttpServletRequest request,
             HttpServletResponse response) {
+        return this.getSearchResponse(result, fields, isDownload, false, request, response);
+    }
+
+    protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
+            QueryResult<T> result,
+            String fields,
+            boolean isDownload,
+            boolean subSequence,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
 
         context.setFields(fields);
+        context.setSubsequence(subSequence);
         context.setFacets(result.getFacets());
         context.setFileType(getBestFileTypeFromRequest(request));
         context.setMatchedFields(result.getMatchedFields());
@@ -260,7 +271,7 @@ public abstract class BasicSearchController<T> {
         return contentType.equals(RDF_MEDIA_TYPE);
     }
 
-    private MessageConverterContext<T> createStreamContext(
+    protected MessageConverterContext<T> createStreamContext(
             StreamRequest streamRequest, MediaType contentType, HttpServletRequest request) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setDownloadContentDispositionHeader(streamRequest.isDownload());

@@ -4,12 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrDocument;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
@@ -104,7 +106,7 @@ class UniProtKBIdServiceTest {
     }
 
     @Test
-    void isLineageAllowedFoundLineage() throws Exception {
+    void isLineageAllowedFoundLineage() {
         SolrClient solrClient = Mockito.mock(SolrClient.class);
 
         UniProtKBIdService idService =
@@ -113,18 +115,56 @@ class UniProtKBIdServiceTest {
     }
 
     @Test
-    void isLineageAllowedFoundLineageIds() throws Exception {
+    void isLineageAllowedFoundLineageIds() {
         UniProtKBIdService idService =
                 new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
         assertTrue(idService.isLineageAllowed("lineage_ids"));
     }
 
     @Test
-    void isLineageAllowedNotFound() throws Exception {
+    void isLineageAllowedNotFound() {
         SolrClient solrClient = Mockito.mock(SolrClient.class);
 
         UniProtKBIdService idService =
                 new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
         assertFalse(idService.isLineageAllowed("accession"));
+    }
+
+    @Test
+    void validateSubSequenceRequestValid() {
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        IdMappingStringPair id1 = IdMappingStringPair.builder().from("P21802[10-20]").build();
+        IdMappingStringPair id2 = IdMappingStringPair.builder().from("P12345[50-60]").build();
+        List<IdMappingStringPair> mappedIds = List.of(id1, id2);
+        assertDoesNotThrow(() -> idService.validateSubSequenceRequest(mappedIds, true));
+    }
+
+    @Test
+    void validateSubSequenceRequestThownExceptionIfNotAllSubSequenceFrom() {
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        IdMappingStringPair id1 = IdMappingStringPair.builder().from("P21802[10-20]").build();
+        IdMappingStringPair id2 = IdMappingStringPair.builder().from("P12345").build();
+        IdMappingStringPair id3 = IdMappingStringPair.builder().from("P05067").build();
+        List<IdMappingStringPair> mappedIds = List.of(id1, id2, id3);
+        InvalidRequestException exception =
+                assertThrows(
+                        InvalidRequestException.class,
+                        () -> idService.validateSubSequenceRequest(mappedIds, true));
+        assertNotNull(exception);
+        assertEquals(
+                "Unable to compute fasta subsequence for IDs: P12345,P05067. Expected format is accession[begin-end], for example:Q00001[10-20]",
+                exception.getMessage());
+    }
+
+    @Test
+    void validateSubSequenceRequestDoNotValidateFalseSubSequence() {
+        UniProtKBIdService idService =
+                new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
+        IdMappingStringPair id1 = IdMappingStringPair.builder().from("P21802[10-20]").build();
+        IdMappingStringPair id2 = IdMappingStringPair.builder().from("P12345").build();
+        List<IdMappingStringPair> mappedIds = List.of(id1, id2);
+        assertDoesNotThrow(() -> idService.validateSubSequenceRequest(mappedIds, false));
     }
 }

@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -79,6 +80,7 @@ class PIRResponseConverterTest {
     void filterInvalidIdsFromResponse() {
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setTo("UniProtKB");
+        request.setIds("ID1");
 
         ResponseEntity<String> responseEntity =
                 ResponseEntity.status(HttpStatus.OK)
@@ -164,6 +166,115 @@ class PIRResponseConverterTest {
         assertThat(result.getWarnings(), is(emptyList()));
     }
 
+    @Test
+    void checkUniProtKBSubSequenceFoundCorrectly() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo(UNIPROTKB_STR);
+
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "Taxonomy ID: 9606\n"
+                                        + "\n"
+                                        + "P00001\tP00001\n"
+                                        + "P00002\tP00002;Q00002\n"
+                                        + "P00003\n"
+                                        + "P00004\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "MSG: 200 -- 2 IDs have no matches: \"P00003,P00004,\".\n");
+
+        List<String> ids =
+                List.of("P00001[10-20]", "P00002[20-30]", "P00003[30-40]", "P00004[40-50]");
+        String idsStr = String.join(",", ids);
+        request.setIds(idsStr);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+
+        assertThat(
+                result.getMappedIds(),
+                contains(
+                        new IdMappingStringPair("P00001[10-20]", "P00001"),
+                        new IdMappingStringPair("P00002[20-30]", "P00002"),
+                        new IdMappingStringPair("P00002[20-30]", "Q00002")));
+        assertThat(result.getUnmappedIds(), contains("P00003[30-40]", "P00004[40-50]"));
+        assertThat(result.getWarnings(), is(emptyList()));
+    }
+
+    @Test
+    void checkUniProtKBSubSequenceMixedInputError() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo(UNIPROTKB_STR);
+
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "Taxonomy ID: 9606\n"
+                                        + "\n"
+                                        + "P00001\tP00001\n"
+                                        + "P00002\tP00002;Q00002\n"
+                                        + "P00003\n"
+                                        + "P00004\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "MSG: 200 -- 2 IDs have no matches: \"P00003,P00004,\".\n");
+
+        List<String> ids = List.of("P00001[10-20]", "P00002[20-30]", "P00003.3", "P00004");
+        String idsStr = String.join(",", ids);
+        request.setIds(idsStr);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+
+        assertThat(
+                result.getMappedIds(),
+                contains(
+                        new IdMappingStringPair("P00001[10-20]", "P00001"),
+                        new IdMappingStringPair("P00002[20-30]", "P00002"),
+                        new IdMappingStringPair("P00002[20-30]", "Q00002")));
+        assertThat(result.getUnmappedIds(), contains("P00003.3", "P00004"));
+        assertThat(result.getWarnings(), is(emptyList()));
+    }
+
+    @Test
+    void checkUniProtKBWithVersionFoundCorrectly() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo(UNIPROTKB_STR);
+
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "Taxonomy ID: 9606\n"
+                                        + "\n"
+                                        + "P00001\tP00001\n"
+                                        + "P00002\tP00002;Q00002\n"
+                                        + "P00003\n"
+                                        + "P00004\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "MSG: 200 -- 2 IDs have no matches: \"P00003,P00004,\".\n");
+
+        List<String> ids = List.of("P00001.1", "P00002.2", "P00003.3", "P00004.4");
+        String idsStr = String.join(",", ids);
+        request.setIds(idsStr);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+
+        assertThat(
+                result.getMappedIds(),
+                contains(
+                        new IdMappingStringPair("P00001.1", "P00001"),
+                        new IdMappingStringPair("P00002.2", "P00002"),
+                        new IdMappingStringPair("P00002.2", "Q00002")));
+        assertThat(result.getUnmappedIds(), contains("P00003.3", "P00004.4"));
+        assertThat(result.getWarnings(), is(emptyList()));
+    }
+
     @ParameterizedTest
     @MethodSource("validToAndIdPairs")
     void checkValidPairs(String to, String id) {
@@ -193,6 +304,7 @@ class PIRResponseConverterTest {
     void checkIdMappingResultWithWarning() {
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setTo("UniProtKB");
+        request.setIds("ID1");
         // when  more than allowed ids (20 for tests) for enrichment
         ResponseEntity<String> responseEntity =
                 ResponseEntity.status(HttpStatus.OK)

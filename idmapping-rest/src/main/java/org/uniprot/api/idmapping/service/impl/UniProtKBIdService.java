@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.service.impl;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -10,6 +11,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
@@ -93,6 +95,9 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
         UniProtKBIdMappingSearchRequest kbIdMappingSearchRequest =
                 (UniProtKBIdMappingSearchRequest) searchRequest;
 
+        validateSubSequenceRequest(
+                mappingResult.getMappedIds(), kbIdMappingSearchRequest.isSubSequence());
+
         return super.getMappedEntries(
                 searchRequest, mappingResult, kbIdMappingSearchRequest.isIncludeIsoform());
     }
@@ -156,6 +161,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             StreamRequest streamRequest, List<IdMappingStringPair> mappedIds) {
         UniProtKBIdMappingStreamRequest kbIdMappingStreamRequest =
                 (UniProtKBIdMappingStreamRequest) streamRequest;
+        validateSubSequenceRequest(mappedIds, kbIdMappingStreamRequest.isSubSequence());
         return super.streamFilterAndSortEntries(
                 streamRequest, mappedIds, kbIdMappingStreamRequest.isIncludeIsoform());
     }
@@ -165,5 +171,21 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
         return fieldList.stream()
                 .map(ReturnField::getName)
                 .anyMatch(name -> "lineage".equals(name) || "lineage_ids".equals(name));
+    }
+
+    void validateSubSequenceRequest(List<IdMappingStringPair> mappedIds, boolean isSubsequence) {
+        if (isSubsequence) {
+            String notSubSequenceIds =
+                    mappedIds.stream()
+                            .map(IdMappingStringPair::getFrom)
+                            .filter(id -> !id.contains("["))
+                            .collect(Collectors.joining(","));
+            if (!notSubSequenceIds.isEmpty()) {
+                throw new InvalidRequestException(
+                        "Unable to compute fasta subsequence for IDs: "
+                                + notSubSequenceIds
+                                + ". Expected format is accession[begin-end], for example:Q00001[10-20]");
+            }
+        }
     }
 }

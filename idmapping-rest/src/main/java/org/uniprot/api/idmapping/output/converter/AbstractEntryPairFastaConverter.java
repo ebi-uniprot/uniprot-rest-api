@@ -26,8 +26,8 @@ public abstract class AbstractEntryPairFastaConverter<T extends EntryPair<U>, U>
 
     @Override
     protected void writeEntity(T entryPair, OutputStream outputStream) throws IOException {
-        outputStream.write((toFasta(entryPair.getTo()) + "\n").getBytes());
+        outputStream.write((toFasta(entryPair) + "\n").getBytes());
     }
 
-    protected abstract String toFasta(U entry);
+    protected abstract String toFasta(T entryPair);
 }

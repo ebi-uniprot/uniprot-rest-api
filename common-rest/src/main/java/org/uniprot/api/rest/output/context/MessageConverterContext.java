@@ -35,6 +35,7 @@ public class MessageConverterContext<T> {
     private Collection<String> failedIds;
     private Collection<ProblemPair> warnings;
     private boolean isLargeDownload;
+    private boolean subsequence;
 
     MessageConverterContext<T> asCopy() {
         return MessageConverterContext.<T>builder()
@@ -52,6 +53,7 @@ public class MessageConverterContext<T> {
                 .suggestions(this.suggestions)
                 .warnings(this.warnings)
                 .isLargeDownload(this.isLargeDownload)
+                .subsequence(subsequence)
                 .build();
     }
 }
