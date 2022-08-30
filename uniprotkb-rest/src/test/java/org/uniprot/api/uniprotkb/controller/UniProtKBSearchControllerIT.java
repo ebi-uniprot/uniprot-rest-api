@@ -1933,12 +1933,12 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL, FGAM synthase")))
+                                                                    "Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL (FGAM synthase)")))
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             containsString(
-                                                                    "P21802\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2, FGFR-2")))
+                                                                    "P21802\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2 (FGFR-2)")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
