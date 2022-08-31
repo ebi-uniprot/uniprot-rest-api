@@ -146,15 +146,16 @@ class UniProtKBIdServiceTest {
                 new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
         IdMappingStringPair id1 = IdMappingStringPair.builder().from("P21802[10-20]").build();
         IdMappingStringPair id2 = IdMappingStringPair.builder().from("P12345").build();
-        IdMappingStringPair id3 = IdMappingStringPair.builder().from("P05067").build();
-        List<IdMappingStringPair> mappedIds = List.of(id1, id2, id3);
+        IdMappingStringPair id3 = IdMappingStringPair.builder().from("P12345[a-b]").build();
+        IdMappingStringPair id4 = IdMappingStringPair.builder().from("P05067[1:20]").build();
+        List<IdMappingStringPair> mappedIds = List.of(id1, id2, id3, id4);
         InvalidRequestException exception =
                 assertThrows(
                         InvalidRequestException.class,
                         () -> idService.validateSubSequenceRequest(mappedIds, true));
         assertNotNull(exception);
         assertEquals(
-                "Unable to compute fasta subsequence for IDs: P12345,P05067. Expected format is accession[begin-end], for example:Q00001[10-20]",
+                "Unable to compute fasta subsequence for IDs: P12345,P12345[a-b],P05067[1:20]. Expected format is accession[begin-end], for example:Q00001[10-20]",
                 exception.getMessage());
     }
 

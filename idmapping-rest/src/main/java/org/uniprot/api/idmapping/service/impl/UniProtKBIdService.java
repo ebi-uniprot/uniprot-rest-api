@@ -49,6 +49,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     public static final String ACCESSION = "accession_id";
     public static final String IS_ISOFORM = "is_isoform";
+    public static final String SUB_SEQUENCE_PATTERN = ".*\\[\\d{1,5}-\\d{1,5}]";
 
     private final UniProtStoreClient<UniProtKBEntry> storeClient;
 
@@ -175,15 +176,15 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     void validateSubSequenceRequest(List<IdMappingStringPair> mappedIds, boolean isSubsequence) {
         if (isSubsequence) {
-            String notSubSequenceIds =
+            String invalidSubSequenceIds =
                     mappedIds.stream()
                             .map(IdMappingStringPair::getFrom)
-                            .filter(id -> !id.contains("["))
+                            .filter(id -> !id.matches(SUB_SEQUENCE_PATTERN))
                             .collect(Collectors.joining(","));
-            if (!notSubSequenceIds.isEmpty()) {
+            if (!invalidSubSequenceIds.isEmpty()) {
                 throw new InvalidRequestException(
                         "Unable to compute fasta subsequence for IDs: "
-                                + notSubSequenceIds
+                                + invalidSubSequenceIds
                                 + ". Expected format is accession[begin-end], for example:Q00001[10-20]");
             }
         }

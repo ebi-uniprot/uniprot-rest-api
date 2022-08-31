@@ -18,6 +18,7 @@ import org.uniprot.core.uniprotkb.impl.EntryAuditBuilder;
 import org.uniprot.core.uniprotkb.impl.GeneBuilder;
 import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 
 class UniProtKBEntryPairFastaMessageConverterTest {
 
@@ -66,6 +67,11 @@ class UniProtKBEntryPairFastaMessageConverterTest {
                                                                         .build())
                                                         .build())
                                         .build())
+                        .organism(
+                                new OrganismBuilder()
+                                        .taxonId(9606L)
+                                        .scientificName("OName")
+                                        .build())
                         .proteinExistence(ProteinExistence.HOMOLOGY)
                         .sequence(new SequenceBuilder("ABCDEFGHIJKLMNOPQRSTUVXZ").build())
                         .entryAudit(new EntryAuditBuilder().sequenceVersion(2).build())
@@ -75,7 +81,7 @@ class UniProtKBEntryPairFastaMessageConverterTest {
         String result = converter.toFasta(entryPair);
         assertNotNull(result);
         assertEquals(
-                ">sp|P21802|P21802_HUMAN PName GN=P53 PE=3 SV=2\n" + "ABCDEFGHIJKLMNOPQRSTUVXZ",
+                ">sp|P21802|P21802_HUMAN PName OS=OName OX=9606 GN=P53 PE=3 SV=2\nABCDEFGHIJKLMNOPQRSTUVXZ",
                 result);
     }
 }
