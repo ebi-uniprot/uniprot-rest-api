@@ -17,7 +17,7 @@ public class UniParcEntryPairFastaMessageConverter
     }
 
     @Override
-    protected String toFasta(UniParcEntry entry) {
-        return UniParcFastaParser.toFasta(entry);
+    protected String toFasta(UniParcEntryPair entryPair) {
+        return UniParcFastaParser.toFasta(entryPair.getTo());
     }
 }

@@ -3,10 +3,11 @@ package org.uniprot.api.idmapping.service;
 import static java.util.Arrays.asList;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,12 +66,13 @@ public class PIRResponseConverter {
         HttpStatus statusCode = response.getStatusCode();
         if (statusCode.equals(HttpStatus.OK)) {
             if (response.hasBody()) {
+                Map<String, String> mappedRequestIds = getMappedRequestIds(request);
                 response.getBody()
                         .lines()
                         .filter(line -> !line.startsWith("Taxonomy ID:"))
                         .filter(Utils::notNullNotEmpty)
                         //                        .filter(line -> !line.startsWith("MSG:"))
-                        .forEach(line -> convertLine(line, request, builder));
+                        .forEach(line -> convertLine(line, request, mappedRequestIds, builder));
                 // populate  error  if needed
                 Optional<ProblemPair> optError =
                         getOptionalLimitError(maxToIdsAllowed, builder.build());
@@ -98,6 +100,7 @@ public class PIRResponseConverter {
     private void convertLine(
             String line,
             IdMappingJobRequest request,
+            Map<String, String> mappedId,
             IdMappingResult.IdMappingResultBuilder builder) {
         if (line.startsWith("MSG:")) {
             if (line.endsWith(NO_MATCHES_PIR_RESPONSE)) {
@@ -106,9 +109,9 @@ public class PIRResponseConverter {
         } else {
             String[] rowParts = line.split("\t");
             if (rowParts.length == 1) {
-                builder.unmappedId(rowParts[0]);
+                builder.unmappedId(getFromValue(mappedId, rowParts[0]));
             } else {
-                String fromValue = rowParts[0];
+                String fromValue = getFromValue(mappedId, rowParts[0]);
                 Arrays.stream(rowParts[1].split(";"))
                         // filter based on valid to
                         .filter(toValue -> isValidIdPattern(request.getTo(), toValue))
@@ -121,6 +124,35 @@ public class PIRResponseConverter {
                         .forEach(builder::mappedId);
             }
         }
+    }
+
+    private String getFromValue(Map<String, String> mappedIds, String fromValue) {
+        return mappedIds.getOrDefault(fromValue, fromValue);
+    }
+
+    private Map<String, String> getMappedRequestIds(IdMappingJobRequest request) {
+        Map<String, String> mappedIds = new HashMap<>();
+        if (request.getTo().equals(UNIPROTKB_STR)
+                && (request.getIds().contains("[") || request.getIds().contains("."))) {
+            String ids = String.join(",", request.getIds());
+            mappedIds =
+                    Arrays.stream(ids.split(","))
+                            .map(this::getMappedId)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+        return mappedIds;
+    }
+
+    private Map.Entry<String, String> getMappedId(String id) {
+        Map.Entry<String, String> result = null;
+        if (id.contains(".")) {
+            result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(".")), id);
+        }
+        if (id.contains("[")) {
+            result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf("[")), id);
+        }
+        return result;
     }
 
     private Optional<ProblemPair> getOptionalLimitError(

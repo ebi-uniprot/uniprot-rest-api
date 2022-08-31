@@ -18,7 +18,7 @@ public class UniRefEntryFastaMessageConverter
     }
 
     @Override
-    protected String toFasta(UniRefEntryLight entry) {
-        return UniRefFastaParser.toFasta(entry);
+    protected String toFasta(UniRefEntryPair entryPair) {
+        return UniRefFastaParser.toFasta(entryPair.getTo());
     }
 }

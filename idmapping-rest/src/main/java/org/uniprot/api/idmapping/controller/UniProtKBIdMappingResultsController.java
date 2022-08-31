@@ -34,6 +34,7 @@ import org.uniprot.api.idmapping.service.impl.UniProtKBIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -131,7 +132,13 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
         QueryResult<UniProtKBEntryPair> result =
                 this.idService.getMappedEntries(
                         searchRequest, cachedJobResult.getIdMappingResult());
-        return super.getSearchResponse(result, searchRequest.getFields(), request, response);
+        return super.getSearchResponse(
+                result,
+                searchRequest.getFields(),
+                false,
+                searchRequest.isSubSequence(),
+                request,
+                response);
     }
 
     @GetMapping(
@@ -210,5 +217,16 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
     protected Optional<String> getEntityRedirectId(
             UniProtKBEntryPair entity, HttpServletRequest request) {
         return Optional.empty();
+    }
+
+    @Override
+    protected MessageConverterContext<UniProtKBEntryPair> createStreamContext(
+            StreamRequest streamRequest, MediaType contentType, HttpServletRequest request) {
+        UniProtKBIdMappingStreamRequest idMappingStreamRequest =
+                (UniProtKBIdMappingStreamRequest) streamRequest;
+        MessageConverterContext<UniProtKBEntryPair> context =
+                super.createStreamContext(streamRequest, contentType, request);
+        context.setSubsequence(idMappingStreamRequest.isSubSequence());
+        return context;
     }
 }

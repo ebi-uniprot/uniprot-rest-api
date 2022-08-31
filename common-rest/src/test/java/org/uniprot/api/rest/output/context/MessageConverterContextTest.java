@@ -41,6 +41,7 @@ class MessageConverterContextTest {
                         .matchedFields(matchedFields)
                         .fields(fields)
                         .resource(resource)
+                        .subsequence(true)
                         .build();
 
         assertThat(context.getContentType(), is(contentType));
@@ -51,6 +52,7 @@ class MessageConverterContextTest {
         assertThat(context.getMatchedFields(), is(matchedFields));
         assertThat(context.getFields(), is(fields));
         assertThat(context.getResource(), is(resource));
+        assertThat(context.isSubsequence(), is(true));
     }
 
     @Test
@@ -75,6 +77,7 @@ class MessageConverterContextTest {
                         .matchedFields(matchedFIelds)
                         .fields(fields)
                         .resource(resource)
+                        .subsequence(true)
                         .build();
 
         MessageConverterContext<String> contextCopy = context.asCopy();
@@ -87,6 +90,7 @@ class MessageConverterContextTest {
         assertThat(contextCopy.getMatchedFields(), is(matchedFIelds));
         assertThat(contextCopy.getFields(), is(fields));
         assertThat(contextCopy.getResource(), is(resource));
+        assertThat(contextCopy.isSubsequence(), is(true));
     }
 
     @Test

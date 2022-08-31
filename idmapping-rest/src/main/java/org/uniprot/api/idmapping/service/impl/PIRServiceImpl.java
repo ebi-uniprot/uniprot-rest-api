@@ -1,6 +1,10 @@
 package org.uniprot.api.idmapping.service.impl;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,10 +43,8 @@ public class PIRServiceImpl extends IdMappingPIRService {
     public final String pirIdMappingUrl;
     private final RestTemplate restTemplate;
     private final PIRResponseConverter pirResponseConverter;
-
-    private Integer maxIdMappingToIdsCountEnriched;
-
-    private Integer maxIdMappingToIdsCount;
+    private final Integer maxIdMappingToIdsCountEnriched;
+    private final Integer maxIdMappingToIdsCount;
 
     @Autowired
     public PIRServiceImpl(
@@ -80,7 +82,7 @@ public class PIRServiceImpl extends IdMappingPIRService {
 
     private MultiValueMap<String, String> createPostBody(IdMappingJobRequest request) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("ids", String.join(",", request.getIds()));
+        map.add("ids", getIdsFromRequest(request));
 
         map.add("from", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getFrom()));
         map.add("to", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getTo()));
@@ -90,5 +92,27 @@ public class PIRServiceImpl extends IdMappingPIRService {
         map.add("async", "NO");
 
         return map;
+    }
+
+    private String getIdsFromRequest(IdMappingJobRequest request) {
+        String ids = String.join(",", request.getIds());
+        if (request.getTo().equals(UNIPROTKB_STR)) {
+            ids =
+                    Arrays.stream(ids.split(","))
+                            .map(this::cleanIdBeforeSubmit)
+                            .collect(Collectors.joining(","));
+        }
+        return ids;
+    }
+
+    private String cleanIdBeforeSubmit(String id) {
+        String result = id;
+        if (id.contains(".")) {
+            result = id.substring(0, id.indexOf("."));
+        }
+        if (id.contains("[")) {
+            result = id.substring(0, id.indexOf("["));
+        }
+        return result.strip();
     }
 }

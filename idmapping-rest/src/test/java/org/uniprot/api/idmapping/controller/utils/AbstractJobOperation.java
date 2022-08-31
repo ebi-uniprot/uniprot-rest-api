@@ -36,10 +36,24 @@ public abstract class AbstractJobOperation implements JobOperation {
                         .collect(
                                 Collectors.toMap(
                                         Function.identity(),
-                                        Function.identity(),
+                                        this::getValue,
                                         (a, b) -> a,
                                         LinkedHashMap::new));
         return createAndPutJobInCache(from, to, mappedIds);
+    }
+
+    private String getValue(String value) {
+        String result = value;
+        int subSequenceIndex = value.indexOf("[");
+        if (subSequenceIndex > 0) {
+            result = value.substring(0, subSequenceIndex);
+        } else {
+            int versionIndex = value.indexOf(".");
+            if (versionIndex > 0) {
+                result = value.substring(0, versionIndex);
+            }
+        }
+        return result;
     }
 
     public IdMappingJob createAndPutJobInCache() throws Exception {
