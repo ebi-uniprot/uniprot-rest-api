@@ -132,20 +132,26 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
 
     private Map<String, LiteratureEntry> getPubMedLiteratureEntryMap(
             List<PublicationDocument> content) {
-        BooleanQuery.Builder pubmedIdsQuery = new BooleanQuery.Builder();
-        content.stream()
-                .map(PublicationDocument::getCitationId)
-                .forEach(
-                        pubmedId ->
-                                pubmedIdsQuery.add(
-                                        new TermQuery(new Term(idFieldName, pubmedId)),
-                                        BooleanClause.Occur.SHOULD));
-        SolrRequest pubmedIdsSolrRequest = getSolrRequest(pubmedIdsQuery.build().toString());
-        Stream<LiteratureDocument> all = literatureRepository.getAll(pubmedIdsSolrRequest);
-        return all.map(literatureEntryConverter)
-                .collect(
-                        Collectors.toMap(
-                                this::getCitationIdFromEntry, literatureEntry -> literatureEntry));
+        Map<String, LiteratureEntry> result = new HashMap<>();
+        if (!content.isEmpty()) {
+            BooleanQuery.Builder pubmedIdsQuery = new BooleanQuery.Builder();
+            content.stream()
+                    .map(PublicationDocument::getCitationId)
+                    .forEach(
+                            pubmedId ->
+                                    pubmedIdsQuery.add(
+                                            new TermQuery(new Term(idFieldName, pubmedId)),
+                                            BooleanClause.Occur.SHOULD));
+            SolrRequest pubmedIdsSolrRequest = getSolrRequest(pubmedIdsQuery.build().toString());
+            Stream<LiteratureDocument> all = literatureRepository.getAll(pubmedIdsSolrRequest);
+            result =
+                    all.map(literatureEntryConverter)
+                            .collect(
+                                    Collectors.toMap(
+                                            this::getCitationIdFromEntry,
+                                            literatureEntry -> literatureEntry));
+        }
+        return result;
     }
 
     private String getCitationIdFromEntry(LiteratureEntry entry) {
