@@ -368,22 +368,36 @@ class KeywordSearchControllerIT extends AbstractSearchWithFacetControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe keyword keyword_id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe keyword keyword_id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    is(
+                                                                            "Error messages\nThe keyword keyword_id filter value has invalid format. It should match the regular expression 'KW-[0-9]{4}'"))))
                                     .build())
                     .build();
         }

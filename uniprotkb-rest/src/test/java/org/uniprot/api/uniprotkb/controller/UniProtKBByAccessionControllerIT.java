@@ -798,32 +798,53 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FF_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

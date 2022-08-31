@@ -44,6 +44,7 @@ public class MessageConverterConfig {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
+                converters.add(new ErrorMessageXlsConverter());
                 converters.add(0, jsonMessageConverter);
                 converters.add(1, new HelpCentreMarkdownMessageConverter());
             }

@@ -1,11 +1,6 @@
 package org.uniprot.api.support.data.disease.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.support.data.disease.controller.DiseaseSearchControllerIT.SEARCH_ACCESSION1;
@@ -107,22 +102,35 @@ public class DiseaseSearchContentTypeParamResolver extends AbstractSearchContent
                 .contentTypeParam(
                         ContentTypeParam.builder()
                                 .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                .resultMatcher(content().string(isEmptyString()))
+                                .resultMatcher(
+                                        content()
+                                                .string(
+                                                        is(
+                                                                "Error messages\n'random_field' is not a valid search field")))
                                 .build())
                 .contentTypeParam(
                         ContentTypeParam.builder()
                                 .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                .resultMatcher(content().string(isEmptyString()))
+                                .resultMatcher(
+                                        content()
+                                                .string(
+                                                        is(
+                                                                "Error messages\n'random_field' is not a valid search field")))
                                 .build())
                 .contentTypeParam(
                         ContentTypeParam.builder()
                                 .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                .resultMatcher(content().string(isEmptyString()))
+                                .resultMatcher(
+                                        content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                 .build())
                 .contentTypeParam(
                         ContentTypeParam.builder()
                                 .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                                .resultMatcher(content().string(isEmptyString()))
+                                .resultMatcher(
+                                        content()
+                                                .string(
+                                                        is(
+                                                                "Error messages\n'random_field' is not a valid search field")))
                                 .build())
                 .build();
     }

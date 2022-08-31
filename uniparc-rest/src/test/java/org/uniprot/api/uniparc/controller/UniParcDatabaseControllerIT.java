@@ -363,12 +363,16 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            "Error messages\nThe 'upi' value has invalid format. It should be a valid UniParc UPI"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .build();
         }

@@ -43,6 +43,7 @@ public class MessageConverterConfig {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
+                converters.add(new ErrorMessageXlsConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter(downloadGatekeeper));
                 converters.add(new GeneCentricFastaMessageConverter(downloadGatekeeper));

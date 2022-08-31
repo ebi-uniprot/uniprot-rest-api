@@ -289,12 +289,20 @@ public class GeneCentricGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .build();
         }

@@ -2,7 +2,6 @@ package org.uniprot.api.support.data.disease.controller;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -269,7 +268,7 @@ class DiseaseStreamControllerIT extends AbstractRDFStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(content().string("Error messages\n'query' is a required parameter"));
     }
 
     @Test
@@ -309,7 +308,7 @@ class DiseaseStreamControllerIT extends AbstractRDFStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE));
     }
 
     @Test
@@ -354,7 +353,7 @@ class DiseaseStreamControllerIT extends AbstractRDFStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.OBO_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(content().string("Error messages\n'query' is a required parameter"));
     }
 
     @Test
@@ -397,7 +396,7 @@ class DiseaseStreamControllerIT extends AbstractRDFStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(content().string("Error messages\n'query' is a required parameter"));
     }
 
     private void saveEntry(long suffix) {

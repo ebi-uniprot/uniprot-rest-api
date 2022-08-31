@@ -61,6 +61,7 @@ public class MessageConverterConfig {
                         ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIRULE);
 
                 converters.add(new ErrorMessageConverter());
+                converters.add(new ErrorMessageXlsConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter(downloadGatekeeper));
                 converters.add(

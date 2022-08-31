@@ -3,7 +3,6 @@ package org.uniprot.api.uniparc.controller;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -239,17 +238,24 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            "Error messages\nThe 'upi' value has invalid format. It should be a valid UniParc UPI"))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            "Error messages\nThe 'upi' value has invalid format. It should be a valid UniParc UPI"))
                                     .build())
                     .build();
         }

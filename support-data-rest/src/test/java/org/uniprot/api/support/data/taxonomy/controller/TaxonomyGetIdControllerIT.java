@@ -377,17 +377,26 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControll
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe taxonomy id value should be a number")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe taxonomy id value should be a number")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()

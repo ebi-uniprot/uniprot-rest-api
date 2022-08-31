@@ -332,7 +332,7 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.messages.*",
@@ -342,22 +342,35 @@ public class SubcellularLocationSearchControllerIT extends AbstractSearchControl
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe subcellular location id filter value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe subcellular location id filter value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                                    .resultMatcher(content().string(isEmptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe subcellular location id filter value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
                                     .build())
                     .build();
         }

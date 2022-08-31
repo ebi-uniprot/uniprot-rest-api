@@ -236,7 +236,7 @@ class GeneCentricStreamControllerIT extends AbstractSolrStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(content().string(is("Error messages\n'query' is a required parameter")));
     }
 
     @Test

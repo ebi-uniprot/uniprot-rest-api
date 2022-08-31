@@ -86,6 +86,7 @@ public class MessageConverterConfig {
                                 new UniProtKBEntryValueMapper(),
                                 downloadGatekeeper));
                 converters.add(index++, new ErrorMessageConverter());
+                converters.add(index++, new ErrorMessageXlsConverter());
                 converters.add(index++, new UniProtKBXmlMessageConverter(downloadGatekeeper));
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages

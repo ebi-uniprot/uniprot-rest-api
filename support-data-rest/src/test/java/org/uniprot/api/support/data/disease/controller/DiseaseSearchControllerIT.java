@@ -1,11 +1,6 @@
 package org.uniprot.api.support.data.disease.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.ArrayList;
@@ -158,7 +153,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchControllerIT {
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("name:[1 TO 10]"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",
@@ -173,7 +168,7 @@ public class DiseaseSearchControllerIT extends AbstractSearchControllerIT {
                     .queryParam(
                             "query",
                             Collections.singletonList("id:[INVALID to INVALID123] OR name:123"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
                                     "$.messages.*",

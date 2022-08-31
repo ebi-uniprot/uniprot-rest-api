@@ -345,17 +345,28 @@ public class UniRuleSearchControllerIT extends AbstractRuleSearchWithFacetContro
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    is(
+                                                                            "Error messages\nThe unirule_id value has invalid format. It should match the regular expression 'UR[0-9]{9}'"))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    is(
+                                                                            "Error messages\nThe unirule_id value has invalid format. It should match the regular expression 'UR[0-9]{9}'"))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .build();
         }

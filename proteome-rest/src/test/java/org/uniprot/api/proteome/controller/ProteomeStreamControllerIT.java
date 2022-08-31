@@ -230,7 +230,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(content().string(is("Error messages\n'query' is a required parameter")));
     }
 
     @Test
@@ -315,7 +315,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.LIST_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(content().string(is("Error messages\n'query' is a required parameter")));
     }
 
     @Test
@@ -355,7 +355,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
                         header().string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.XLS_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(emptyString()));
+                .andExpect(content().contentType(UniProtMediaType.XLS_MEDIA_TYPE));
     }
 
     @Test

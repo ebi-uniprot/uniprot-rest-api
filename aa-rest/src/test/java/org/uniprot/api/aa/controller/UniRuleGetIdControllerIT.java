@@ -3,7 +3,6 @@ package org.uniprot.api.aa.controller;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -332,17 +331,26 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe UniRule id value has invalid format. It should match the regular expression 'UR[0-9]{9}|MF_[0-9]{5}|PIRSR[0-9]+(-[0-9]+)?|PIRNR[0-9]+|RU[0-9]{6}|PRU[0-9]{5}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(emptyString()))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe UniRule id value has invalid format. It should match the regular expression 'UR[0-9]{9}|MF_[0-9]{5}|PIRSR[0-9]+(-[0-9]+)?|PIRNR[0-9]+|RU[0-9]{6}|PRU[0-9]{5}'")))
                                     .build())
                     .build();
         }

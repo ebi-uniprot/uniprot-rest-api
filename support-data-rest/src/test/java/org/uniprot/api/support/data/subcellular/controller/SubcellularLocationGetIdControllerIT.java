@@ -282,22 +282,35 @@ public class SubcellularLocationGetIdControllerIT
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe subcellular location id value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe subcellular location id value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
-                                    .resultMatcher(content().string(is(emptyString())))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            is(
+                                                                    "Error messages\nThe subcellular location id value has invalid format. It should match the regular expression 'SL-[0-9]{4}'")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
