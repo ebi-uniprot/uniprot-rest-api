@@ -342,7 +342,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
                                             content()
                                                     .string(
                                                             is(
-                                                                    "Error messages\nThe citation id has invalid format. It should be a PubMedId (number) or with CI-\\w{13} or IND[0-9]+")))
+                                                                    "Error messages\nThe citation id has invalid format. It should be a PubMedId (number) or with CI-\\w{1,13} or IND[0-9]+")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -351,7 +351,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
                                             content()
                                                     .string(
                                                             is(
-                                                                    "Error messages\nThe citation id has invalid format. It should be a PubMedId (number) or with CI-\\w{13} or IND[0-9]+")))
+                                                                    "Error messages\nThe citation id has invalid format. It should be a PubMedId (number) or with CI-\\w{1,13} or IND[0-9]+")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
