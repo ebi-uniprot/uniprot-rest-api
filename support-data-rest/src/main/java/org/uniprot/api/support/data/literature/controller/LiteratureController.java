@@ -64,7 +64,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class LiteratureController extends BasicSearchController<LiteratureEntry> {
 
     private final LiteratureService literatureService;
-    private static final String LITERATURE_ID_REGEX = "^[0-9]+$|CI-\\w{13}$|IND[0-9]+$";
+    private static final String LITERATURE_ID_REGEX = "^[0-9]+$|CI-\\w{1,13}$|IND[0-9]+$";
 
     public LiteratureController(
             ApplicationEventPublisher eventPublisher,
