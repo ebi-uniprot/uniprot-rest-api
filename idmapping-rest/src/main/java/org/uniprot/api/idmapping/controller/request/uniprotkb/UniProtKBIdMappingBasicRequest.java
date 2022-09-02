@@ -57,10 +57,10 @@ public class UniProtKBIdMappingBasicRequest extends IdMappingPageRequest {
     @ValidContentTypes(
             contentTypes = {UniProtMediaType.FASTA_MEDIA_TYPE_VALUE},
             message = "{search.invalid.contentType.subsequence}")
-    private String subSequence;
+    private String subsequence;
 
     public boolean isSubSequence() {
-        return Boolean.parseBoolean(subSequence);
+        return Boolean.parseBoolean(subsequence);
     }
 
     public boolean isIncludeIsoform() {

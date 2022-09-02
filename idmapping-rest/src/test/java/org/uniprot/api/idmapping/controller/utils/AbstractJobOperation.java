@@ -44,9 +44,9 @@ public abstract class AbstractJobOperation implements JobOperation {
 
     private String getValue(String value) {
         String result = value;
-        int subSequenceIndex = value.indexOf("[");
-        if (subSequenceIndex > 0) {
-            result = value.substring(0, subSequenceIndex);
+        int subsequenceIndex = value.indexOf("[");
+        if (subsequenceIndex > 0) {
+            result = value.substring(0, subsequenceIndex);
         } else {
             int versionIndex = value.indexOf(".");
             if (versionIndex > 0) {
