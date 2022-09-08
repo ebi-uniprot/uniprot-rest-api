@@ -1,9 +1,7 @@
 package org.uniprot.api.support.data.taxonomy.request;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,9 +38,14 @@ public class TaxonomySolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.TAXONOMY.toString().toLowerCase(), new HashMap<>());
+        Set<String> searchFields =
+                taxonomySearchFieldConfig.getSearchFieldItems().stream()
+                        .map(SearchFieldItem::getFieldName)
+                        .collect(Collectors.toSet());
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(taxonomySearchFieldConfig))
                 .whiteListFields(taxonomyWhiteListFields)
+                .searchFieldsNames(searchFields)
                 .build();
     }
 

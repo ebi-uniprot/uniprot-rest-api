@@ -1,7 +1,6 @@
 package org.uniprot.api.rest.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -60,6 +59,7 @@ class BasicSearchServiceTest {
                         return UniProtQueryProcessorConfig.builder()
                                 .optimisableFields(emptyList())
                                 .whiteListFields(emptyMap())
+                                .searchFieldsNames(emptySet())
                                 .build();
                     }
                 };

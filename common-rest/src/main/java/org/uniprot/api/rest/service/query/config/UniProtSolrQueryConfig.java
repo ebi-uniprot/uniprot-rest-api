@@ -1,9 +1,7 @@
 package org.uniprot.api.rest.service.query.config;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -47,9 +45,14 @@ public class UniProtSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.UNIPROTKB.toString().toLowerCase(),
                                 new HashMap<>());
+        Set<String> searchFields =
+                uniProtKBSearchFieldConfig.getSearchFieldItems().stream()
+                        .map(SearchFieldItem::getFieldName)
+                        .collect(Collectors.toSet());
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(uniProtKBSearchFieldConfig))
                 .whiteListFields(uniprotWhiteListFields)
+                .searchFieldsNames(searchFields)
                 .build();
     }
 

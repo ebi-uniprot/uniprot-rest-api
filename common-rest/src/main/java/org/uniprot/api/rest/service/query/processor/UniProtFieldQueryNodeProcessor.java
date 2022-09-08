@@ -4,9 +4,7 @@ import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBL
 import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.UNIPROTKB_ACCESSION_FIELD;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FuzzyQueryNode;
@@ -22,13 +20,11 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  * @author Edd
  */
 class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
-    private final List<SearchFieldItem> optimisableFields;
-    private final Map<String, String> whiteListFields;
+    public static final String SOLR_FIELD_SEPARATOR = ":";
+    private final UniProtQueryProcessorConfig conf;
 
-    UniProtFieldQueryNodeProcessor(
-            List<SearchFieldItem> optimisableFields, Map<String, String> whiteListFields) {
-        this.whiteListFields = whiteListFields;
-        this.optimisableFields = optimisableFields;
+    UniProtFieldQueryNodeProcessor(UniProtQueryProcessorConfig conf) {
+        this.conf = conf;
     }
 
     @Override
@@ -52,8 +48,7 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
                     ((FuzzyQueryNode) node).setField(null);
                 }
             } else {
-                return new UniProtFieldQueryNode(
-                        (FieldQueryNode) node, optimisableFields, whiteListFields);
+                return new UniProtFieldQueryNode((FieldQueryNode) node, conf);
             }
         }
         return node;
@@ -67,14 +62,13 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
     private static class UniProtFieldQueryNode extends FieldQueryNode {
         private final List<SearchFieldItem> optimisableFields;
         private final Map<String, String> whiteListFields;
+        private final Set<String> searchFields;
 
-        public UniProtFieldQueryNode(
-                FieldQueryNode node,
-                List<SearchFieldItem> optimisableFields,
-                Map<String, String> whiteListFields) {
+        public UniProtFieldQueryNode(FieldQueryNode node, UniProtQueryProcessorConfig conf) {
             super(node.getField(), node.getText(), node.getBegin(), node.getEnd());
-            this.optimisableFields = optimisableFields;
-            this.whiteListFields = whiteListFields;
+            this.optimisableFields = conf.getOptimisableFields();
+            this.whiteListFields = conf.getWhiteListFields();
+            this.searchFields = conf.getSearchFieldsNames();
         }
 
         @Override
@@ -83,24 +77,54 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
             String text = getTextAsString();
 
             if (field.equals(IMPOSSIBLE_FIELD)) {
-                Optional<SearchFieldItem> optionalSearchField =
-                        optimisableFields.stream()
-                                .filter(
-                                        f ->
-                                                notNullNotEmpty(f.getValidRegex())
-                                                        && text.matches(f.getValidRegex()))
-                                .findFirst();
-
-                return optionalSearchField
-                        .map(f -> f.getFieldName() + ":" + text.toUpperCase())
-                        .orElse(text);
-            } else if (whiteListFields.containsKey(field.toLowerCase())) {
+                return defaultSearchToQueryString(text);
+            } else if (validWhiteListFields(field, text)) {
                 return field.toUpperCase() + "\\:" + text;
             } else if (UNIPROTKB_ACCESSION_FIELD.equals(field)) {
-                return field + ":" + text.toUpperCase();
+                return field + SOLR_FIELD_SEPARATOR + text.toUpperCase();
+            } else if (validFieldIgnoreCase(field)) {
+                return field.toLowerCase() + SOLR_FIELD_SEPARATOR + text;
             } else {
                 return super.toQueryString(escaper);
             }
+        }
+
+        private boolean validWhiteListFields(String field, String text) {
+            boolean result = false;
+            if (whiteListFields.containsKey(field.toLowerCase())) {
+                String validRegex = whiteListFields.get(field.toLowerCase());
+                result = text.matches(validRegex);
+            }
+            return result;
+        }
+
+        private boolean validFieldIgnoreCase(String field) {
+            String fieldNameLowerCase = field.toLowerCase();
+            return searchFields.stream().anyMatch(fieldNameLowerCase::equals);
+        }
+
+        private String defaultSearchToQueryString(String text) {
+            Optional<SearchFieldItem> optionalSearchField =
+                    optimisableFields.stream()
+                            .filter(
+                                    f ->
+                                            notNullNotEmpty(f.getValidRegex())
+                                                    && text.matches(f.getValidRegex()))
+                            .findFirst();
+
+            return optionalSearchField
+                    .map(f -> f.getFieldName() + SOLR_FIELD_SEPARATOR + text.toUpperCase())
+                    .orElse(checkUnderScoreInText(text));
+        }
+
+        private String checkUnderScoreInText(String text) {
+            String[] splittedText = text.strip().split("_");
+            if (splittedText.length == 2
+                    && splittedText[0].matches("[a-zA-Z]+")
+                    && splittedText[1].matches("[0-9]+")) {
+                text = "\"" + splittedText[0] + " " + splittedText[1] + "\"";
+            }
+            return text;
         }
     }
 }

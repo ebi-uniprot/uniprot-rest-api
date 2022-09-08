@@ -1,9 +1,7 @@
 package org.uniprot.api.support.data.subcellular.request;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,9 +38,14 @@ public class SubcellularLocationSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.SUBCELLLOCATION.toString().toLowerCase(),
                                 new HashMap<>());
+        Set<String> searchFields =
+                subcellSearchFieldConfig.getSearchFieldItems().stream()
+                        .map(SearchFieldItem::getFieldName)
+                        .collect(Collectors.toSet());
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(subcellSearchFieldConfig))
                 .whiteListFields(subcellWhiteListFields)
+                .searchFieldsNames(searchFields)
                 .build();
     }
 

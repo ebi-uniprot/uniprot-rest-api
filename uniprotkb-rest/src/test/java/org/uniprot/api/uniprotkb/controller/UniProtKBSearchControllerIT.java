@@ -15,6 +15,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -1424,6 +1425,68 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(
                         jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
+    }
+
+    @Test
+    void searchDefaultSearchRheaUpperCase() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+        // Add rhea id that can be found as default search
+        UniProtKBEntryBuilder eb = UniProtKBEntryBuilder.from(entry);
+        ProteinDescriptionBuilder pd =
+                ProteinDescriptionBuilder.from(entry.getProteinDescription());
+        pd.allergenName(new NameBuilder().value("Injected RHEA:10596").build());
+        eb.proteinDescription(pd.build());
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, eb.build());
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "RHEA:10596")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].primaryAccession", is("P21802")));
+    }
+
+    @Test
+    void searchDefaultSearchWithUnderscoreIds() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+        // Add rhea id that can be found as default search
+        UniProtKBEntryBuilder eb = UniProtKBEntryBuilder.from(entry);
+        ProteinDescriptionBuilder pd =
+                ProteinDescriptionBuilder.from(entry.getProteinDescription());
+        pd.allergenName(new NameBuilder().value("Injected VAR test 004127").build());
+        eb.proteinDescription(pd.build());
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, eb.build());
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "VAR_004127")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[0].primaryAccession", is("P21802")));
     }
 
     @Override
