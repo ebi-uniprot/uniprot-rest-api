@@ -463,6 +463,10 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(containsString("Invalid request received. Unable to compute fasta subsequence for IDs: Q00002,Q00003. Expected format is accession[begin-end], for example:Q00001[10-20]")));
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Invalid request received. Unable to compute fasta subsequence for IDs: Q00002,Q00003. Expected format is accession[begin-end], for example:Q00001[10-20]")));
     }
 }
