@@ -5,7 +5,6 @@ import static java.util.Collections.emptyMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,10 +33,7 @@ public class LiteratureSolrQueryConfig {
     @Bean
     public UniProtQueryProcessorConfig literatureQueryProcessorConfig(
             SearchFieldConfig literatureSearchFieldConfig) {
-        Set<String> searchFields =
-                literatureSearchFieldConfig.getSearchFieldItems().stream()
-                        .map(SearchFieldItem::getFieldName)
-                        .collect(Collectors.toSet());
+        Set<String> searchFields = literatureSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(literatureSearchFieldConfig))
                 .whiteListFields(emptyMap())

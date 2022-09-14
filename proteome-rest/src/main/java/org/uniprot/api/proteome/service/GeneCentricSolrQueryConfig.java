@@ -1,7 +1,6 @@
 package org.uniprot.api.proteome.service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,10 +37,7 @@ public class GeneCentricSolrQueryConfig {
                         .getOrDefault(
                                 UniProtDataType.GENECENTRIC.toString().toLowerCase(),
                                 new HashMap<>());
-        Set<String> searchFields =
-                geneCentricSearchFieldConfig.getSearchFieldItems().stream()
-                        .map(SearchFieldItem::getFieldName)
-                        .collect(Collectors.toSet());
+        Set<String> searchFields = geneCentricSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(
                         getDefaultSearchOptimisedFieldItems(geneCentricSearchFieldConfig))

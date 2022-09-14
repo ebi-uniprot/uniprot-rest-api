@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.keyword.service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,10 +35,7 @@ public class KeywordSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.KEYWORD.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields =
-                keywordSearchFieldConfig.getSearchFieldItems().stream()
-                        .map(SearchFieldItem::getFieldName)
-                        .collect(Collectors.toSet());
+        Set<String> searchFields = keywordSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(keywordSearchFieldConfig))
                 .whiteListFields(keywordWhiteListFields)

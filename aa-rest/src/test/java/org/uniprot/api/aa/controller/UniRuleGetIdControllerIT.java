@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -165,7 +164,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
         ResultActions response = getMockMvc().perform(requestBuilder);
 
         // then no validation error
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath("$.url", not(emptyOrNullString())))
                 .andExpect(jsonPath("$.messages.*", contains("Resource not found")));

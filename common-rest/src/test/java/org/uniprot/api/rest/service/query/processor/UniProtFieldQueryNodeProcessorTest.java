@@ -17,7 +17,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 class UniProtFieldQueryNodeProcessorTest {
 
     @Test
-    void processInvalidFieldNameUpperCaseThanDoNothing() throws QueryNodeException {
+    void processInvalidFieldNameUpperCaseThenDoNothing() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
@@ -30,7 +30,7 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
-    void processValidFieldNameUpperCaseThanChangeItToLowerCase() throws QueryNodeException {
+    void processValidFieldNameUpperCaseThenChangeItToLowerCase() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
@@ -43,7 +43,7 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
-    void processValidFieldNameMultipleCaseThanChangeItToLowerCase() throws QueryNodeException {
+    void processValidFieldNameMultipleCaseThenChangeItToLowerCase() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
@@ -56,7 +56,7 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
-    void processDefaultSearchWithUnderScoreThanRemoveUnderScoreAndDoubleQuote()
+    void processDefaultSearchWithUnderScoreThenRemoveUnderScoreAndDoubleQuote()
             throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
@@ -67,6 +67,20 @@ class UniProtFieldQueryNodeProcessorTest {
         CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
         assertNotNull(result);
         assertEquals("\"VAR 99999\"", result);
+    }
+
+    @Test
+    void processDefaultSearchWithUnderScoreThenRemoveUnderScoreAndDoubleQuoteWithVSF()
+            throws QueryNodeException {
+        UniProtQueryProcessorConfig conf =
+                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+        UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
+
+        FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, "VSF_99999", 1, 2);
+        QueryNode processedNode = processor.process(node);
+        CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
+        assertNotNull(result);
+        assertEquals("\"VSF 99999\"", result);
     }
 
     @Test
@@ -96,7 +110,7 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
-    void processDefaultSearchWithOpitimisableWhiteListThanAddFieldName() throws QueryNodeException {
+    void processDefaultSearchWithOpitimisableWhiteListThenAddFieldName() throws QueryNodeException {
         SearchFieldItem optimisableField = new SearchFieldItem();
         optimisableField.setFieldName("field");
         optimisableField.setValidRegex("^[0-9]*");
@@ -134,7 +148,7 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
-    void processAccessionThanUpperCaseValue() throws QueryNodeException {
+    void processAccessionThenUpperCaseValue() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
@@ -163,7 +177,7 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
-    void processWhiteListThanScapeColon() throws QueryNodeException {
+    void processWhiteListThenScapeColon() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
                 UniProtQueryProcessorConfig.builder()
                         .searchFieldsNames(Set.of("field"))

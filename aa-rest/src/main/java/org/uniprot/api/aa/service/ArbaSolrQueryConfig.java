@@ -1,7 +1,6 @@
 package org.uniprot.api.aa.service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,10 +39,7 @@ public class ArbaSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.ARBA.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields =
-                arbaSearchFieldConfig.getSearchFieldItems().stream()
-                        .map(SearchFieldItem::getFieldName)
-                        .collect(Collectors.toSet());
+        Set<String> searchFields = arbaSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(arbaSearchFieldConfig))
                 .whiteListFields(uniRuleWhiteListFields)

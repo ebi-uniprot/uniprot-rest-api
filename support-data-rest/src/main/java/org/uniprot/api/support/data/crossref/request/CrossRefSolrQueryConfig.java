@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.crossref.request;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,10 +37,7 @@ public class CrossRefSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.CROSSREF.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields =
-                crossRefSearchFieldConfig.getSearchFieldItems().stream()
-                        .map(SearchFieldItem::getFieldName)
-                        .collect(Collectors.toSet());
+        Set<String> searchFields = crossRefSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(crossRefSearchFieldConfig))
                 .whiteListFields(crossRefWhiteListFields)

@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.disease.request;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,10 +36,7 @@ public class DiseaseSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.DISEASE.toString().toLowerCase(), new HashMap<>());
-        Set<String> searchFields =
-                diseaseSearchFieldConfig.getSearchFieldItems().stream()
-                        .map(SearchFieldItem::getFieldName)
-                        .collect(Collectors.toSet());
+        Set<String> searchFields = diseaseSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(diseaseSearchFieldConfig))
                 .whiteListFields(diseaseWhitelistFields)
