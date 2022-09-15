@@ -24,10 +24,12 @@ public class UniProtQueryProcessorConfig {
     private final List<SearchFieldItem> optimisableFields;
     private final Map<String, String> whiteListFields;
     private final Set<String> stopwords;
+    private final Set<String> searchFieldsNames;
 
     public static class UniProtQueryProcessorConfigBuilder {
         private List<SearchFieldItem> optimisableFields = emptyList();
         private Map<String, String> whiteListFields = emptyMap();
         private Set<String> stopwords = emptySet();
+        private Set<String> searchFields = emptySet();
     }
 }

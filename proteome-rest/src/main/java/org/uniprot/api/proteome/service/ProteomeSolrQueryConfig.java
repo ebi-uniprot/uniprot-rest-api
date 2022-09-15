@@ -1,9 +1,6 @@
 package org.uniprot.api.proteome.service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,9 +36,11 @@ public class ProteomeSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.PROTEOME.toString().toLowerCase(), new HashMap<>());
+        Set<String> searchFields = proteomeSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(proteomeSearchFieldConfig))
                 .whiteListFields(proteomeWhiteListFields)
+                .searchFieldsNames(searchFields)
                 .build();
     }
 

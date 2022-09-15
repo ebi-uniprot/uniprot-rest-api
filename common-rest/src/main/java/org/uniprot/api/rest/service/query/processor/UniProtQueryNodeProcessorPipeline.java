@@ -19,12 +19,10 @@ import org.apache.lucene.queryparser.flexible.standard.config.StandardQueryConfi
  * @author Edd
  */
 public class UniProtQueryNodeProcessorPipeline extends QueryNodeProcessorPipeline {
-    public UniProtQueryNodeProcessorPipeline(UniProtQueryProcessorConfig conf) {
+    public UniProtQueryNodeProcessorPipeline(UniProtQueryProcessorConfig queryProcessorConfig) {
         super(new StandardQueryConfigHandler());
 
-        add(
-                new UniProtFieldQueryNodeProcessor(
-                        conf.getOptimisableFields(), conf.getWhiteListFields()));
+        add(new UniProtFieldQueryNodeProcessor(queryProcessorConfig));
         add(new UniProtOpenRangeQueryNodeProcessor());
         add(new UniProtPointRangeQueryNodeProcessor());
         add(new UniProtTermRangeQueryNodeProcessor());

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -55,6 +56,7 @@ class UniProtQueryProcessorTest {
                                 singletonList(
                                         searchFieldWithValidRegex(FIELD_NAME, "(?i)^P[0-9]+$")))
                         .whiteListFields(whitelistFields)
+                        .searchFieldsNames(Set.of("field"))
                         .build();
         processor = UniProtQueryProcessor.newInstance(config);
     }
@@ -225,6 +227,41 @@ class UniProtQueryProcessorTest {
                         + " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is(query));
+    }
+
+    @Test
+    void handleUpperCaseFieldSearch() {
+        String query = "FIELD:thing";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is("field:thing"));
+    }
+
+    @Test
+    void handleCamelCaseFieldSearch() {
+        String query = "Field:thing_value";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is("field:thing_value"));
+    }
+
+    @Test
+    void handleUnderscoreDefaultSearch() {
+        String query = "VAR_99999";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is("\"VAR 99999\""));
+    }
+
+    @Test
+    void handleInvalidPrefixUnderscoreDefaultSearch() {
+        String query = "9999_99999";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is("9999_99999"));
+    }
+
+    @Test
+    void handleInvalidSuffixUnderScoreDefaultSearch() {
+        String query = "VAR_VAR";
+        String processedQuery = processor.processQuery(query);
+        assertThat(processedQuery, is("VAR_VAR"));
     }
 
     @Test

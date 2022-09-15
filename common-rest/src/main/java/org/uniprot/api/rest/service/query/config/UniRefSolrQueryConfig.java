@@ -5,6 +5,7 @@ import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -41,9 +42,11 @@ public class UniRefSolrQueryConfig {
                         .getField()
                         .getOrDefault(
                                 UniProtDataType.UNIREF.toString().toLowerCase(), new HashMap<>());
+        Set<String> searchFields = uniRefSearchFieldConfig.getSearchFieldNames();
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(uniRefSearchFieldConfig))
                 .whiteListFields(uniRefWhiteListFields)
+                .searchFieldsNames(searchFields)
                 .build();
     }
 

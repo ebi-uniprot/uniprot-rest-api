@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.repository.search.impl;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.*;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +30,7 @@ public class PublicationSolrQueryConfig {
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(emptyList())
                 .whiteListFields(emptyMap())
+                .searchFieldsNames(emptySet())
                 .build();
     }
 }
