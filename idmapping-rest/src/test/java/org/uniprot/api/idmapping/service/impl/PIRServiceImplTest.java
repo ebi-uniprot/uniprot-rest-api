@@ -2,9 +2,12 @@ package org.uniprot.api.idmapping.service.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.HTTP_HEADERS;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +60,7 @@ class PIRServiceImplTest {
     @Test
     void createsSubSequenceExpectedResult() {
         IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setFrom("UniProtKB_AC-ID");
+        request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
         request.setIds("P00001[10-20],P00002[20-30]");
         request.setTaxId("taxId");
@@ -84,7 +87,7 @@ class PIRServiceImplTest {
     @Test
     void createsWIthUniProtKBVersionResult() {
         IdMappingJobRequest request = new IdMappingJobRequest();
-        request.setFrom("UniProtKB_AC-ID");
+        request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
         request.setIds("P00001.1,P00002.2");
         request.setTaxId("taxId");
@@ -106,5 +109,29 @@ class PIRServiceImplTest {
                 idMappingResult.getMappedIds(),
                 contains(new IdMappingStringPair("P00001.1", "P00001")));
         assertThat(idMappingResult.getUnmappedIds(), contains("P00002.2"));
+    }
+
+    @Test
+    void testGetIdsFromRequestForStringID() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom("STRING");
+        request.setTo(UNIPROTKB_STR);
+        String origIds =
+                "511145.b0584,208964.PA2398,196627.cg3353,246196.MSMEI_0939,55601.VANGNB10_67p009,9606.ENSP00000318585";
+        request.setIds(origIds);
+        String processedIds = pirService.getIdsFromRequest(request);
+        assertThat(processedIds, equalTo(origIds));
+    }
+
+    @Test
+    void testGetIdsFromRequestForAccessionId() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+        String origIds = "P00001.1,P00002.2";
+        request.setIds(origIds);
+        String processedIds = pirService.getIdsFromRequest(request);
+        assertThat(processedIds, not(origIds));
+        assertThat(processedIds, equalTo("P00001,P00002"));
     }
 }
