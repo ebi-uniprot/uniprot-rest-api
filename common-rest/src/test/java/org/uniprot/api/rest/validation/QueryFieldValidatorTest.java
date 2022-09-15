@@ -138,7 +138,7 @@ class QueryFieldValidatorTest {
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
-        boolean result = validator.isValid("HGNC:12345 AND PR:12345 AND SLP:000001924", null);
+        boolean result = validator.isValid("HGNC:12345 AND PR:12345 AND SLP:000001924 AND HostDB:ENSG00000182022 AND MetaCyc:HS04074-MON AND EcoCyc:PD00221", null);
         assertTrue(result);
     }
 
@@ -293,6 +293,9 @@ class QueryFieldValidatorTest {
             whiteListFields.put("hgnc", "^[0-9]+$");
             whiteListFields.put("pr", "^[0-9]+$");
             whiteListFields.put("slp", "^[0-9]{9}$");
+            whiteListFields.put("hostdb", "^[0-9A-Za-z-]+$");
+            whiteListFields.put("ecocyc", "^[0-9A-Za-z-]+$");
+            whiteListFields.put("metacyc", "^[0-9A-Za-z-]+$");
             Map<String, Map<String, String>> whiteListCollection = new HashMap<>();
             whiteListCollection.put("uniprotkb", whiteListFields);
             config.setField(whiteListCollection);

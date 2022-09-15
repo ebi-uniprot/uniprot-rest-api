@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.service.impl;
 
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
-import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -94,9 +94,9 @@ public class PIRServiceImpl extends IdMappingPIRService {
         return map;
     }
 
-    private String getIdsFromRequest(IdMappingJobRequest request) {
+    String getIdsFromRequest(IdMappingJobRequest request) {
         String ids = String.join(",", request.getIds());
-        if (request.getTo().equals(UNIPROTKB_STR)) {
+        if (request.getFrom().equals(ACC_ID_STR)) {
             ids =
                     Arrays.stream(ids.split(","))
                             .map(this::cleanIdBeforeSubmit)
