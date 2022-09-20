@@ -138,7 +138,10 @@ class QueryFieldValidatorTest {
         FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
         validator.initialize(validSolrQueryFields);
 
-        boolean result = validator.isValid("HGNC:12345 AND PR:12345 AND SLP:000001924 AND HostDB:ENSG00000182022 AND MetaCyc:HS04074-MON AND EcoCyc:PD00221", null);
+        boolean result =
+                validator.isValid(
+                        "HGNC:12345 AND PR:12345 AND SLP:000001924 AND HostDB:ENSG00000182022 AND MetaCyc:HS04074-MON AND EcoCyc:PD00221",
+                        null);
         assertTrue(result);
     }
 

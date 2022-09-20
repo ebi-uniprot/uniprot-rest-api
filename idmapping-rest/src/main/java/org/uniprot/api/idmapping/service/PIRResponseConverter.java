@@ -132,7 +132,7 @@ public class PIRResponseConverter {
 
     private Map<String, String> getMappedRequestIds(IdMappingJobRequest request) {
         Map<String, String> mappedIds = new HashMap<>();
-        if (request.getTo().equals(UNIPROTKB_STR)
+        if (ACC_ID_STR.equals(request.getFrom())
                 && (request.getIds().contains("[") || request.getIds().contains("."))) {
             String ids = String.join(",", request.getIds());
             mappedIds =
