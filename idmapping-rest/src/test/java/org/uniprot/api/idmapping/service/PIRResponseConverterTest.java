@@ -14,6 +14,8 @@ import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -381,7 +383,12 @@ class PIRResponseConverterTest {
                                         + "9606.ENSP00000246672\tP20393\n"
                                         + "9606.ENSP00000344430\tA6NMD0\n");
 
-        List<String> ids = List.of("9606.ENSP00000244751", "9606.ENSP00000353292", "9606.ENSP00000246672", "9606.ENSP00000344430");
+        List<String> ids =
+                List.of(
+                        "9606.ENSP00000244751",
+                        "9606.ENSP00000353292",
+                        "9606.ENSP00000246672",
+                        "9606.ENSP00000344430");
         String idsStr = String.join(",", ids);
         request.setIds(idsStr);
         IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
@@ -392,8 +399,28 @@ class PIRResponseConverterTest {
                         new IdMappingStringPair("9606.ENSP00000353292", "P37088"),
                         new IdMappingStringPair("9606.ENSP00000246672", "P20393"),
                         new IdMappingStringPair("9606.ENSP00000344430", "A6NMD0")));
-        assertThat(result.getUnmappedIds(),is(emptyList()));
+        assertThat(result.getUnmappedIds(), is(emptyList()));
         assertThat(result.getWarnings(), is(emptyList()));
+    }
+
+    @Test
+    void testGetMappedRequestIds() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setIds("P12345.6,9606.ENSP00000386219,9606.ENSP00000318585,Q98765[12-22],Q12345");
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+        Map<String, String> mappedRequestIds = converter.getMappedRequestIds(request);
+        assertTrue(Set.of("P12345", "Q98765").containsAll(mappedRequestIds.keySet()));
+    }
+
+    @Test
+    void testGetMappedRequestIdsWithDuplicateIds() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setIds("P12345.6,P12345.3");
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+        // duplicateKeyException
+        assertThrows(IllegalStateException.class, () -> converter.getMappedRequestIds(request));
     }
 
     private static Stream<Arguments> invalidToAndIdPairs() {
