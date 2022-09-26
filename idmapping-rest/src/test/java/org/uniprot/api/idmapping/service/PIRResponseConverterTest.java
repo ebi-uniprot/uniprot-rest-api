@@ -381,7 +381,12 @@ class PIRResponseConverterTest {
                                         + "9606.ENSP00000246672\tP20393\n"
                                         + "9606.ENSP00000344430\tA6NMD0\n");
 
-        List<String> ids = List.of("9606.ENSP00000244751", "9606.ENSP00000353292", "9606.ENSP00000246672", "9606.ENSP00000344430");
+        List<String> ids =
+                List.of(
+                        "9606.ENSP00000244751",
+                        "9606.ENSP00000353292",
+                        "9606.ENSP00000246672",
+                        "9606.ENSP00000344430");
         String idsStr = String.join(",", ids);
         request.setIds(idsStr);
         IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
@@ -392,7 +397,7 @@ class PIRResponseConverterTest {
                         new IdMappingStringPair("9606.ENSP00000353292", "P37088"),
                         new IdMappingStringPair("9606.ENSP00000246672", "P20393"),
                         new IdMappingStringPair("9606.ENSP00000344430", "A6NMD0")));
-        assertThat(result.getUnmappedIds(),is(emptyList()));
+        assertThat(result.getUnmappedIds(), is(emptyList()));
         assertThat(result.getWarnings(), is(emptyList()));
     }
 

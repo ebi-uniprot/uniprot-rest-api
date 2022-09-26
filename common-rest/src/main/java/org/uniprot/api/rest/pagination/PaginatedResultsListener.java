@@ -42,7 +42,7 @@ public class PaginatedResultsListener implements ApplicationListener<PaginatedRe
             }
 
             Long totalRecords = page.getTotalElements();
-            if (totalRecords > 0) {
+            if (totalRecords >= 0) {
                 response.addHeader(X_TOTAL_RESULTS, totalRecords.toString());
             }
         }
