@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,9 @@ import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.PIRResponseConverter;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 
 /**
  * Created 17/02/2021
@@ -39,6 +42,15 @@ public class PIRServiceImpl extends IdMappingPIRService {
     static {
         HTTP_HEADERS.setContentType(APPLICATION_FORM_URLENCODED);
     }
+    // regex = ACCESSION+(Sequence or Version)
+    //       =
+    // ([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z]([0-9][A-Z][A-Z0-9]{2}){1,2}[0-9])(-[0-9]+)?(\[[0-9]+\-[0-9]+\]|\.[0-9]+)
+    public static final Pattern UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION =
+            Pattern.compile(
+                    SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+                                    .getSearchFieldItemByName("accession_id")
+                                    .getValidRegex()
+                            + "(\\[[0-9]+\\-[0-9]+\\]|\\.[0-9]+)");
 
     public final String pirIdMappingUrl;
     private final RestTemplate restTemplate;
@@ -107,11 +119,13 @@ public class PIRServiceImpl extends IdMappingPIRService {
 
     private String cleanIdBeforeSubmit(String id) {
         String result = id;
-        if (id.contains(".")) {
-            result = id.substring(0, id.indexOf("."));
-        }
-        if (id.contains("[")) {
-            result = id.substring(0, id.indexOf("["));
+        if (UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION.matcher(id).matches()) {
+            if (id.contains(".")) {
+                result = id.substring(0, id.indexOf("."));
+            }
+            if (id.contains("[")) {
+                result = id.substring(0, id.indexOf("["));
+            }
         }
         return result.strip();
     }
