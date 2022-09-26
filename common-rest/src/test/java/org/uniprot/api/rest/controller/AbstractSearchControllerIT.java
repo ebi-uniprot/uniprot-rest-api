@@ -137,7 +137,8 @@ public abstract class AbstractSearchControllerIT {
                 response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(
-                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                        .andExpect(header().string(X_TOTAL_RESULTS, "0"));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
