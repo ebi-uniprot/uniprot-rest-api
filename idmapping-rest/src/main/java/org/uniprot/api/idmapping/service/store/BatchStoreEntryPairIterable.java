@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
@@ -15,6 +16,7 @@ import org.uniprot.store.datastore.UniProtStoreClient;
  * @author lgonzales
  * @since 05/03/2021
  */
+@Slf4j
 public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
         implements Iterable<Collection<T>> {
     private final Iterator<IdMappingStringPair> sourceIterator;
@@ -61,8 +63,10 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
     }
 
     protected List<T> convertBatch(Set<String> tos, List<IdMappingStringPair> batch) {
+        long start = System.currentTimeMillis();
         List<S> entries = getEntriesFromStore(tos);
-
+        long end = System.currentTimeMillis();
+        log.info("Total {} entries fetched from voldemort in {} ms", tos.size(), (end - start));
         // entry -> map <entryId, entry>
         Map<String, S> idEntryMap =
                 entries.stream().collect(Collectors.toMap(this::getEntryId, Function.identity()));

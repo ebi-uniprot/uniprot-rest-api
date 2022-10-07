@@ -31,7 +31,10 @@ public class PIRJobTask extends JobTask {
                     .error(new ProblemPair(REST_EXCEPTION_CODE, restException.getMessage()))
                     .build();
         } catch (Exception ex) {
-            log.error("Error while processing PIR response for jobId {} and the error is {}", job.getJobId(), ex.getCause());
+            log.error(
+                    "Error while processing PIR response for jobId {} and the error is {}",
+                    job.getJobId(),
+                    ex.getCause());
             return IdMappingResult.builder()
                     .error(new ProblemPair(REST_EXCEPTION_CODE, "Internal server error."))
                     .build();
