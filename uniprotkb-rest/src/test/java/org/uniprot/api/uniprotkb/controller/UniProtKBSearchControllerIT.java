@@ -1607,6 +1607,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             UniProtDocument doc = new UniProtDocument();
             doc.accession = "P00001";
             doc.active = true;
+            doc.fragment = true;
+            doc.precursor = true;
             doc.isIsoform = false;
             doc.otherOrganism = "Search All";
             doc.organismHostIds.add(9606);
