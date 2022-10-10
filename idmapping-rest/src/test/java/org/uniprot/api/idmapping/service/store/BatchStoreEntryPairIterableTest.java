@@ -117,6 +117,9 @@ class BatchStoreEntryPairIterableTest {
         protected String getEntryId(FakeName entry) {
             return entry.getTo();
         }
+
+        @Override
+        protected void logTiming(int batchSize, long start, long end) {}
     }
 
     @AllArgsConstructor

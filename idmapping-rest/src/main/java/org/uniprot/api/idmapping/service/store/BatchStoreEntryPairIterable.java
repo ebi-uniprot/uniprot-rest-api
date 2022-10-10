@@ -1,10 +1,15 @@
 package org.uniprot.api.idmapping.service.store;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
@@ -16,7 +21,6 @@ import org.uniprot.store.datastore.UniProtStoreClient;
  * @author lgonzales
  * @since 05/03/2021
  */
-@Slf4j
 public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
         implements Iterable<Collection<T>> {
     private final Iterator<IdMappingStringPair> sourceIterator;
@@ -66,7 +70,9 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
         long start = System.currentTimeMillis();
         List<S> entries = getEntriesFromStore(tos);
         long end = System.currentTimeMillis();
-        log.info("Total {} entries fetched from voldemort in {} ms", tos.size(), (end - start));
+        if (tos.size() >= 100) { // temp code block
+            logTiming(tos.size(), start, end);
+        }
         // entry -> map <entryId, entry>
         Map<String, S> idEntryMap =
                 entries.stream().collect(Collectors.toMap(this::getEntryId, Function.identity()));
@@ -85,4 +91,7 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
     protected abstract T convertToPair(IdMappingStringPair mId, Map<String, S> idEntryMap);
 
     protected abstract String getEntryId(S entry);
+
+    protected abstract void logTiming(
+            int batchSize, long start, long end); // temp method, remove after testing
 }

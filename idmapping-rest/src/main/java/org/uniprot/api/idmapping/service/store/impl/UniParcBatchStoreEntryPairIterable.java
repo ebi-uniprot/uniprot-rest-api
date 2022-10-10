@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.service.store.impl;
 
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -14,6 +15,7 @@ import org.uniprot.store.datastore.UniProtStoreClient;
  * @author lgonzales
  * @since 05/03/2021
  */
+@Slf4j
 public class UniParcBatchStoreEntryPairIterable
         extends BatchStoreEntryPairIterable<UniParcEntryPair, UniParcEntry> {
 
@@ -37,5 +39,13 @@ public class UniParcBatchStoreEntryPairIterable
     @Override
     protected String getEntryId(UniParcEntry entry) {
         return entry.getUniParcId().getValue();
+    }
+
+    @Override
+    protected void logTiming(int batchSize, long start, long end) {
+        log.info(
+                "Total {} UniParc entries fetched from voldemort in {} ms",
+                batchSize,
+                (end - start));
     }
 }
