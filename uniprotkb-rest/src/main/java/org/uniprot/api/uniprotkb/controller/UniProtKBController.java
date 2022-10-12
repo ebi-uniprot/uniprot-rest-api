@@ -48,6 +48,7 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -190,6 +191,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             path = "uniprotkb-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
+                            hidden = true,
                             description =
                                     "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
@@ -262,7 +264,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> stream(
             @Valid @ModelAttribute UniProtKBStreamRequest streamRequest,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
@@ -329,6 +330,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         return getByAccessions(accessionsRequest, request, response);
     }
 
+    @Hidden
     @Tag(name = "uniprotkb")
     @RequestMapping(
             value = "/accessions",

@@ -30,6 +30,7 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,6 +41,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 22/02/2021
  */
+@Hidden
 @Tag(name = "job", description = "APIs related to job")
 @RestController
 @RequestMapping(IDMAPPING_PATH)
@@ -59,6 +61,7 @@ public class IdMappingJobController {
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
+            hidden = true,
             summary = "Submit a job.",
             responses = {
                 @ApiResponse(
@@ -78,6 +81,7 @@ public class IdMappingJobController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
+            hidden = true,
             summary = "Get the status of a job.",
             responses = {
                 @ApiResponse(
@@ -97,6 +101,7 @@ public class IdMappingJobController {
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
+            hidden = true,
             summary = "Get the details of a job.",
             responses = {
                 @ApiResponse(

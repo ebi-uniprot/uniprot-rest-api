@@ -20,7 +20,7 @@ public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchReque
     @Parameter(hidden = true)
     private static final String PROTEOME_ID_STR = "upid";
 
-    @Parameter(description = "UniProt Proteome UPID")
+    @Parameter(hidden = true, description = "UniProt Proteome UPID")
     @NotNull(message = "{search.required}")
     private String upId;
 

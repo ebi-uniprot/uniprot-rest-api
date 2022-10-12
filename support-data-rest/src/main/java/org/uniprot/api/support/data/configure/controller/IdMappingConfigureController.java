@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.support.data.configure.response.IdMappingField;
 import org.uniprot.api.support.data.configure.service.IdMappingConfigureService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 15/03/2021
  */
+@Hidden
 @Tag(
         name = "Configuration",
         description = "These services provide configuration data used in UniProt website")

@@ -34,6 +34,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,6 +46,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 25/02/2021
  */
+@Hidden
 @Tag(name = "results", description = "APIs to get result of the submitted job.")
 @RestController
 @RequestMapping(
@@ -86,6 +88,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Search result of UniParc sequence entry (or entries) by a submitted job id.",
             responses = {
                 @ApiResponse(
@@ -139,6 +142,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Stream a UniParc sequence entry (or entries) by a submitted job id.",
             responses = {
                 @ApiResponse(

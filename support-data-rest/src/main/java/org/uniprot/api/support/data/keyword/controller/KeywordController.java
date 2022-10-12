@@ -41,6 +41,7 @@ import org.uniprot.api.support.data.keyword.service.KeywordService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.UniProtDataType;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -49,6 +50,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Hidden
 @Tag(
         name = "Keyword",
         description =
@@ -88,6 +90,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Get Keyword by keywordId.",
             responses = {
                 @ApiResponse(
@@ -134,6 +137,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Search Keywords by given Lucene search query.",
             responses = {
                 @ApiResponse(
@@ -171,6 +175,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Download Keywords by given Lucene search query.",
             responses = {
                 @ApiResponse(

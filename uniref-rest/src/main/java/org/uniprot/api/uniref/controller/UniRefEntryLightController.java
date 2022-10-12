@@ -41,6 +41,7 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -110,8 +111,8 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getById(
-            @Parameter(description = "Unique identifier for the UniRef cluster")
-                    @PathVariable("id")
+            @PathVariable("id")
+                    @Parameter(description = "Unique identifier for the UniRef cluster")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
@@ -122,6 +123,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                             path = "uniref-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
                     @Parameter(
+                            hidden = true,
                             description =
                                     "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
@@ -230,11 +232,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryLight>>> stream(
-            @Valid @ModelAttribute UniRefStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
-                    MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
-            HttpServletRequest request) {
+            @Valid @ModelAttribute UniRefStreamRequest streamRequest, HttpServletRequest request) {
+
+        MediaType contentType = getAcceptHeader(request);
 
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             return super.streamRDF(
@@ -284,6 +284,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
         return getByIds(idsRequest, request, response);
     }
 
+    @Hidden
     @SuppressWarnings("squid:S3752")
     @Tag(name = "uniref")
     @RequestMapping(

@@ -32,6 +32,7 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -43,6 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 25/02/2021
  */
+@Hidden
 @Tag(name = "results", description = "APIs to get result of the submitted job.")
 @RestController
 @RequestMapping(
@@ -83,6 +85,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Search result of UniRef cluster (or clusters) by a submitted job id.",
             responses = {
                 @ApiResponse(
@@ -128,6 +131,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Stream an UniRef cluster (or clusters) retrieved by a submitted job id.",
             responses = {
                 @ApiResponse(

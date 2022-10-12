@@ -34,18 +34,21 @@ public class UniRefBasicRequest {
     private String query;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniref-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIREF)
     private String sort;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniref-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
     private String fields;
 
     @Parameter(
             description =
-                    "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms")
+                    "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms",
+            example = "true")
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

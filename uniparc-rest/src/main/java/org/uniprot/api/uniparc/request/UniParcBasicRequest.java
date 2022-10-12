@@ -30,12 +30,14 @@ public class UniParcBasicRequest {
     protected String query;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniparc-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     protected String sort;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     protected String fields;
 }

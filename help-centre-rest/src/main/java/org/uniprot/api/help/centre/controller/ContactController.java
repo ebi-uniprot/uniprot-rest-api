@@ -13,6 +13,10 @@ import org.uniprot.api.help.centre.model.ContactForm;
 import org.uniprot.api.help.centre.model.Token;
 import org.uniprot.api.help.centre.service.ContactService;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+
+@Hidden
 @RestController
 @Validated
 @RequestMapping("/contact")
@@ -24,6 +28,7 @@ public class ContactController {
         this.service = service;
     }
 
+    @Operation(hidden = true)
     @GetMapping(
             value = "/token",
             produces = {APPLICATION_JSON_VALUE})
@@ -34,6 +39,7 @@ public class ContactController {
         return ResponseEntity.ok().body(token);
     }
 
+    @Operation(hidden = true)
     @PostMapping(
             value = "/send",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,

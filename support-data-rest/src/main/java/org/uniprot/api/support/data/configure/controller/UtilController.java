@@ -13,6 +13,7 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.support.data.configure.response.SolrJsonQuery;
 import org.uniprot.api.support.data.configure.service.UtilService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Hidden
 @Tag(
         name = "Configuration",
         description = "This service provides Utility endpoints for UniProt website")

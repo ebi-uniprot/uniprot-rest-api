@@ -37,14 +37,16 @@ public class GeneCentricBasicRequest {
     private String query;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "genecentric-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String sort;
 
     @ModelFieldMeta(
             reader = ReturnFieldMetaReaderImpl.class,
             path = "genecentric-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String fields;
 }

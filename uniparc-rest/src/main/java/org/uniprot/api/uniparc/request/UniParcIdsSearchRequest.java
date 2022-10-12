@@ -37,17 +37,21 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     private String upis;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidFacets(facetConfig = UniParcFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
     @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniparc-search-fields.json")
-    @Parameter(description = "Criteria to search the uniparc. It can take any valid solr query.")
+    @Parameter(
+            hidden = true,
+            description = "Criteria to search the uniparc. It can take any valid solr query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPARC,
@@ -55,6 +59,7 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     protected String query;
 
     @Parameter(
+            hidden = true,
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
@@ -66,13 +71,15 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
+    @Parameter(
+            hidden = true,
+            description = "Size of the result. Defaults to number of accessions passed.")
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniparc-search-fields.json")
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(hidden = true, description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String sort;
 

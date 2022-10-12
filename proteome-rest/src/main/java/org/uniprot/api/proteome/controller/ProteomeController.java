@@ -164,6 +164,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                             path = "proteome-return-fields.json")
                     @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
                     @Parameter(
+                            hidden = true,
                             description =
                                     "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
@@ -211,9 +212,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> stream(
             @Valid @ModelAttribute ProteomeStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    MediaType contentType,
             HttpServletRequest request) {
+        MediaType contentType = getAcceptHeader(request);
         return super.stream(
                 () -> queryService.stream(streamRequest), streamRequest, contentType, request);
     }

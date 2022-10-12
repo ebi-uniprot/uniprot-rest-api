@@ -20,14 +20,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 @EqualsAndHashCode(callSuper = true)
 public class GeneCentricSearchRequest extends GeneCentricBasicRequest implements SearchRequest {
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidFacets(facetConfig = GeneCentricFacetConfig.class)
     private String facets;
 
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(
+            description = "Size of the result. Defaults to 25, and maximum is " + MAX_RESULTS_SIZE)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

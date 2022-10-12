@@ -1,7 +1,5 @@
 package org.uniprot.api.uniparc.request;
 
-import javax.validation.constraints.NotNull;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,10 +14,7 @@ public class UniParcGetByDBRefIdRequest extends UniParcGetByIdPageSearchRequest 
     @Parameter(hidden = true)
     private static final String DB_ID_STR = "dbid";
 
-    @Parameter(
-            description =
-                    "UniParc cross reference id, eg. AAC02967 (EMBL) or XP_006524055 (RefSeq)")
-    @NotNull(message = "{search.required}")
+    @Parameter(hidden = true)
     private String dbId;
 
     @Override

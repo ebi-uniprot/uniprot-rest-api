@@ -12,6 +12,7 @@ import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 import org.uniprot.api.support.data.configure.service.DiseaseConfigureService;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 19/03/2021
  */
+@Hidden
 @Tag(
         name = "Configuration",
         description = "These services provide configuration data used in the UniProt website")
@@ -35,6 +37,7 @@ public class DiseaseConfigureController {
         this.service = service;
     }
 
+    @Hidden
     @Operation(
             summary = "List of return fields available in the disease services.",
             responses = {
@@ -56,6 +59,7 @@ public class DiseaseConfigureController {
         return service.getResultFields();
     }
 
+    @Hidden
     @Operation(
             summary = "List of search fields available in the disease services.",
             responses = {

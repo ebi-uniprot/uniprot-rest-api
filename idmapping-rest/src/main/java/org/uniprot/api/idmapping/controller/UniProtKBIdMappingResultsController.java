@@ -37,6 +37,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -48,6 +49,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 17/02/2021
  */
+@Hidden
 @Tag(name = "results", description = "APIs to get result of the submitted job.")
 @Slf4j
 @RestController
@@ -92,6 +94,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary =
                     "Search result for a UniProtKB protein entry (or entries) mapped by a submitted job id.",
             responses = {
@@ -155,6 +158,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 RDF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.",
             responses = {
                 @ApiResponse(

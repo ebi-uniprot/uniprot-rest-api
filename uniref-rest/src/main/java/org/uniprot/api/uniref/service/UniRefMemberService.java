@@ -26,13 +26,13 @@ public class UniRefMemberService {
         this.entryStoreRepository = entryStoreRepository;
     }
 
-    public QueryResult<UniRefMember> retrieveMembers(UniRefMemberRequest memberRequest) {
+    public QueryResult<UniRefMember> retrieveMembers(UniRefMemberRequest memberRequest, String id) {
         try {
-            return entryStoreRepository.getEntryMembers(memberRequest);
+            return entryStoreRepository.getEntryMembers(memberRequest, id);
         } catch (ResourceNotFoundException e) {
             throw e;
         } catch (Exception e) {
-            String message = "Could not get members for id: [" + memberRequest.getId() + "]";
+            String message = "Could not get members for id: [" + id + "]";
             throw new ServiceException(message, e);
         }
     }

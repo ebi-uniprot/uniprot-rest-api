@@ -23,7 +23,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class PublicationRequest {
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(
+            description = "Size of the result. Defaults to 25, and maximum is " + MAX_RESULTS_SIZE)
     @PositiveOrZero(message = "{search.positive}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
@@ -31,12 +32,12 @@ public class PublicationRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Facet filter query for Publications")
+    @Parameter(hidden = true, description = "Facet filter query for Publications")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFacetFields(facetConfig = PublicationFacetConfig.class)
     private String facetFilter;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     @ValidFacets(facetConfig = PublicationFacetConfig.class)
     private String facets;

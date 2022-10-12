@@ -26,6 +26,7 @@ import org.uniprot.store.search.domain.DatabaseGroup;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.FieldGroup;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,6 +34,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Hidden
 @Tag(
         name = "Configuration",
         description = "These services provide configuration data used in the UniProt website")

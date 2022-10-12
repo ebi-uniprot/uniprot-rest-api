@@ -39,6 +39,7 @@ import org.uniprot.core.util.Utils;
 
 import com.google.common.base.Stopwatch;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,6 +52,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  *
  * @author Edd
  */
+@Hidden
 @Tag(name = "results", description = "APIs to get result of the submitted job.")
 @RestController
 @Validated
@@ -85,6 +87,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             value = "/results/{jobId}",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     @Operation(
+            hidden = true,
             summary = "Search result by a submitted job id.",
             responses = {
                 @ApiResponse(
@@ -134,6 +137,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Stream result by a submitted job id.",
             responses = {
                 @ApiResponse(

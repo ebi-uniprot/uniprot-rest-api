@@ -154,7 +154,7 @@
 							</packageLocations>
 							<openApiDirectory>target/generatedsources/swagger/</openApiDirectory>
 							<openApiFileName>uniref-openapi3.yaml</openApiFileName>
-							<serverBaseUrl>https://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
+							<serverBaseUrl>https://rest.uniprot.org</serverBaseUrl>
 						</configuration>
 						<dependencies>
 							<dependency>

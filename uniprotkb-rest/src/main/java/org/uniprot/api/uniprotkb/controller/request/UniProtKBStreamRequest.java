@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniProtKBStreamRequest extends UniProtKBBasicRequest implements StreamRequest {
 
     @Parameter(
+            hidden = true,
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(

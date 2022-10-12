@@ -26,25 +26,22 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class GetByTaxonIdsRequest implements SearchRequest {
 
     @Parameter(hidden = true)
-    private static final String TAXONOMY_ID_LIST_REGEX = "^\\d+(?:,\\d+)*$";
-
-    @NotNull(message = "{search.required}")
-    @Parameter(description = "Comma separated list of taxonIds")
-    @Pattern(regexp = TAXONOMY_ID_LIST_REGEX, message = "{search.taxonomy.invalid.list.id}")
-    @ValidCommaSeparatedItemsLength(maxLength = 1000)
     private String taxonIds;
 
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "taxonomy-return-fields.json")
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(
+            hidden = true,
+            description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true, description = "Name of the facet search")
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
     @Parameter(
+            hidden = true,
             description =
                     "Criteria to filter by facet value. It can any supported valid Lucene query.")
     @ValidSolrQuerySyntax(message = "{search.taxonomy.ids.invalid.facet.filter}")
@@ -52,6 +49,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
     private String facetFilter;
 
     @Parameter(
+            hidden = true,
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
