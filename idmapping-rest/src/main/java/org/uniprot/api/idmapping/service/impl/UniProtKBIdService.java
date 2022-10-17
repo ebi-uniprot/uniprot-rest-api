@@ -91,7 +91,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     @Override
     public QueryResult<UniProtKBEntryPair> getMappedEntries(
-            SearchRequest searchRequest, IdMappingResult mappingResult) {
+            SearchRequest searchRequest, IdMappingResult mappingResult, String jobId) {
 
         UniProtKBIdMappingSearchRequest kbIdMappingSearchRequest =
                 (UniProtKBIdMappingSearchRequest) searchRequest;
@@ -100,7 +100,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 mappingResult.getMappedIds(), kbIdMappingSearchRequest.isSubSequence());
 
         return super.getMappedEntries(
-                searchRequest, mappingResult, kbIdMappingSearchRequest.isIncludeIsoform());
+                searchRequest, mappingResult, kbIdMappingSearchRequest.isIncludeIsoform(), jobId);
     }
 
     @Override
@@ -159,12 +159,12 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
 
     @Override
     protected List<IdMappingStringPair> streamFilterAndSortEntries(
-            StreamRequest streamRequest, List<IdMappingStringPair> mappedIds) {
+            StreamRequest streamRequest, List<IdMappingStringPair> mappedIds, String jobId) {
         UniProtKBIdMappingStreamRequest kbIdMappingStreamRequest =
                 (UniProtKBIdMappingStreamRequest) streamRequest;
         validateSubSequenceRequest(mappedIds, kbIdMappingStreamRequest.isSubSequence());
         return super.streamFilterAndSortEntries(
-                streamRequest, mappedIds, kbIdMappingStreamRequest.isIncludeIsoform());
+                streamRequest, mappedIds, kbIdMappingStreamRequest.isIncludeIsoform(), jobId);
     }
 
     boolean isLineageAllowed(String fields) {
