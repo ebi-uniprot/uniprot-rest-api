@@ -112,7 +112,9 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
 
         QueryResult<UniRefEntryPair> result =
                 this.idService.getMappedEntries(
-                        searchRequest, cachedJobResult.getIdMappingResult());
+                        searchRequest,
+                        cachedJobResult.getIdMappingResult(),
+                        cachedJobResult.getJobId());
 
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
@@ -163,11 +165,15 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
 
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             Supplier<Stream<String>> result =
-                    () -> this.idService.streamRDF(streamRequest, idMappingResult);
+                    () ->
+                            this.idService.streamRDF(
+                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniRefEntryPair>> result =
-                    () -> this.idService.streamEntries(streamRequest, idMappingResult);
+                    () ->
+                            this.idService.streamEntries(
+                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
             return super.stream(result, streamRequest, contentType, request);
         }
     }

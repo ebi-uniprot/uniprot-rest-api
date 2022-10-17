@@ -84,21 +84,24 @@ class BatchStoreEntryPairIterableTest {
 
     @Test
     void testLoggingUniParc() {
-        BatchStoreEntryPairIterable<UniParcEntryPair, UniParcEntry> iterable = new UniParcBatchStoreEntryPairIterable(List.of(), 10, null, null);
+        BatchStoreEntryPairIterable<UniParcEntryPair, UniParcEntry> iterable =
+                new UniParcBatchStoreEntryPairIterable(List.of(), 10, null, null);
         iterable.logTiming(1, 2, 3);
         assertNotNull(iterable);
     }
 
     @Test
     void testLoggingUniProtKB() {
-        BatchStoreEntryPairIterable<UniProtKBEntryPair, UniProtKBEntry> iterable = new UniProtKBBatchStoreEntryPairIterable(List.of(), 10, null, null, null, false);
+        BatchStoreEntryPairIterable<UniProtKBEntryPair, UniProtKBEntry> iterable =
+                new UniProtKBBatchStoreEntryPairIterable(List.of(), 10, null, null, null, false);
         iterable.logTiming(1, 2, 3);
         assertNotNull(iterable);
     }
 
     @Test
     void testLoggingUniRef() {
-        BatchStoreEntryPairIterable<UniRefEntryPair, UniRefEntryLight> iterable = new UniRefBatchStoreEntryPairIterable(List.of(), 10, null, null);
+        BatchStoreEntryPairIterable<UniRefEntryPair, UniRefEntryLight> iterable =
+                new UniRefBatchStoreEntryPairIterable(List.of(), 10, null, null);
         iterable.logTiming(1, 2, 3);
         assertNotNull(iterable);
     }
