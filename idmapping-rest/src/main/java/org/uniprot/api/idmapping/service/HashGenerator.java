@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -41,10 +42,11 @@ public class HashGenerator {
         StringBuilder builder = new StringBuilder();
         builder.append(request.getFrom().strip().toLowerCase());
         builder.append(request.getTo().strip().toLowerCase());
-        List.of(request.getIds().strip().split(",")).stream()
-                .map(String::toLowerCase)
-                .map(String::strip)
-                .forEach(builder::append);
+        builder.append(
+                List.of(request.getIds().strip().split(",")).stream()
+                        .map(String::toLowerCase)
+                        .map(String::strip)
+                        .collect(Collectors.joining(",")));
 
         if (Utils.notNullNotEmpty(request.getTaxId())) {
             builder.append(request.getTaxId().strip().toLowerCase());
