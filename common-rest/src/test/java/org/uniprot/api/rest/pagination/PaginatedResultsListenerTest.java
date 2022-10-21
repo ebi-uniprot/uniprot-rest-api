@@ -67,4 +67,29 @@ class PaginatedResultsListenerTest {
         assertNotNull(response.getHeader(X_TOTAL_RESULTS));
         assertEquals("12", response.getHeader(X_TOTAL_RESULTS));
     }
+
+    @Test
+    void onApplicationEventWithEmptyResult() {
+        // given
+        String currentCursor = new BigInteger("10,currentCursor".getBytes()).toString(36);
+        CursorPage page = CursorPage.of(currentCursor, 10);
+        page.setTotalElements(0L);
+        page.setNextCursor("nextCursor");
+
+        HttpServletResponse response = new MockHttpServletResponse();
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer("http://localhost/test"));
+
+        PaginatedResultsEvent event = new PaginatedResultsEvent(this, request, response, page);
+        PaginatedResultsListener listener = new PaginatedResultsListener();
+
+        // when
+        listener.onApplicationEvent(event);
+
+        // then
+        assertNull(response.getHeader("Link"));
+
+        assertNotNull(response.getHeader(X_TOTAL_RESULTS));
+        assertEquals("0", response.getHeader(X_TOTAL_RESULTS));
+    }
 }

@@ -1,6 +1,12 @@
 package org.uniprot.api.idmapping.service.store;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,8 +67,12 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
     }
 
     protected List<T> convertBatch(Set<String> tos, List<IdMappingStringPair> batch) {
+        long start = System.currentTimeMillis();
         List<S> entries = getEntriesFromStore(tos);
-
+        long end = System.currentTimeMillis();
+        if (tos.size() >= 100) { // temp code block
+            logTiming(tos.size(), start, end);
+        }
         // entry -> map <entryId, entry>
         Map<String, S> idEntryMap =
                 entries.stream().collect(Collectors.toMap(this::getEntryId, Function.identity()));
@@ -81,4 +91,7 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
     protected abstract T convertToPair(IdMappingStringPair mId, Map<String, S> idEntryMap);
 
     protected abstract String getEntryId(S entry);
+
+    protected abstract void logTiming(
+            int batchSize, long start, long end); // temp method, remove after testing
 }

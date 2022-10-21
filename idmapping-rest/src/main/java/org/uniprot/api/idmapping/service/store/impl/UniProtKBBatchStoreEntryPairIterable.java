@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
@@ -19,6 +20,7 @@ import org.uniprot.store.datastore.UniProtStoreClient;
  * @author lgonzales
  * @since 05/03/2021
  */
+@Slf4j
 public class UniProtKBBatchStoreEntryPairIterable
         extends BatchStoreEntryPairIterable<UniProtKBEntryPair, UniProtKBEntry> {
 
@@ -58,5 +60,13 @@ public class UniProtKBBatchStoreEntryPairIterable
             entries = populateLineageInEntry(taxonomyLineageService, entries);
         }
         return entries;
+    }
+
+    @Override
+    protected void logTiming(int batchSize, long start, long end) {
+        log.info(
+                "Total {} UniProtKB entries fetched from voldemort in {} ms",
+                batchSize,
+                (end - start));
     }
 }

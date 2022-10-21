@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.service;
 import static java.util.Arrays.asList;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 
 import java.util.*;
@@ -130,9 +131,9 @@ public class PIRResponseConverter {
         return mappedIds.getOrDefault(fromValue, fromValue);
     }
 
-    private Map<String, String> getMappedRequestIds(IdMappingJobRequest request) {
+    Map<String, String> getMappedRequestIds(IdMappingJobRequest request) {
         Map<String, String> mappedIds = new HashMap<>();
-        if (request.getTo().equals(UNIPROTKB_STR)
+        if (ACC_ID_STR.equals(request.getFrom())
                 && (request.getIds().contains("[") || request.getIds().contains("."))) {
             String ids = String.join(",", request.getIds());
             mappedIds =
@@ -146,11 +147,13 @@ public class PIRResponseConverter {
 
     private Map.Entry<String, String> getMappedId(String id) {
         Map.Entry<String, String> result = null;
-        if (id.contains(".")) {
-            result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(".")), id);
-        }
-        if (id.contains("[")) {
-            result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf("[")), id);
+        if (UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION.matcher(id).matches()) {
+            if (id.contains(".")) {
+                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(".")), id);
+            }
+            if (id.contains("[")) {
+                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf("[")), id);
+            }
         }
         return result;
     }

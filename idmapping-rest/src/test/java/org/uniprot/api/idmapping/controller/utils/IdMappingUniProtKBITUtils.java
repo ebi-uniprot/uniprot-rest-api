@@ -204,6 +204,8 @@ public class IdMappingUniProtKBITUtils {
         doc.unirefCluster100 = "UniRef100_P00001";
         doc.uniparc = "UPI0000000001";
         doc.computationalPubmedIds.add("890123456");
+        doc.fragment = true;
+        doc.precursor = true;
         doc.communityPubmedIds.add("1234567");
         if (doc.accession.contains("-")) {
             doc.isIsoform = true;

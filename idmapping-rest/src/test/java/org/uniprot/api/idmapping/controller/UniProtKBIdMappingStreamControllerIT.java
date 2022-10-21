@@ -414,7 +414,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                 performRequest(
                         get(getIdMappingResultPath(), job.getJobId())
                                 .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
-                                .param("subSequence", "true"));
+                                .param("subsequence", "true"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -434,7 +434,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                 mockMvc.perform(
                         get(getIdMappingResultPath(), job.getJobId())
                                 .header(ACCEPT, APPLICATION_JSON_VALUE)
-                                .param("subSequence", "invalid"));
+                                .param("subsequence", "invalid"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -443,8 +443,8 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                         jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
-                                        "Invalid subSequence parameter value. Expected true or false",
-                                        "Invalid content type received, 'application/json'. 'subSequence' parameter only accepted for 'text/plain;format=fasta' content type.")));
+                                        "Invalid subsequence parameter value. Expected true or false",
+                                        "Invalid content type received, 'application/json'. 'subsequence' parameter only accepted for 'text/plain;format=fasta' content type.")));
     }
 
     @Test
@@ -458,7 +458,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                 performRequest(
                         get(getIdMappingResultPath(), job.getJobId())
                                 .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
-                                .param("subSequence", "true"));
+                                .param("subsequence", "true"));
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))

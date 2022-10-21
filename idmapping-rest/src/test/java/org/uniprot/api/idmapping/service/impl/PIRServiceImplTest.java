@@ -10,6 +10,7 @@ import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.HTTP_HEADERS
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -133,5 +134,43 @@ class PIRServiceImplTest {
         String processedIds = pirService.getIdsFromRequest(request);
         assertThat(processedIds, not(origIds));
         assertThat(processedIds, equalTo("P00001,P00002"));
+    }
+
+    @Test
+    void testGetIdsFromRequestWithMixedAccessions() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+        String origIds = "P00001.1,9606.ENSP00000318585,P00002.2,9606.ENSP00000318555,P12345";
+        request.setIds(origIds);
+        String processedIds = pirService.getIdsFromRequest(request);
+        assertThat(processedIds, not(origIds));
+        assertThat(
+                processedIds,
+                equalTo("P00001,9606.ENSP00000318585,P00002,9606.ENSP00000318555,P12345"));
+    }
+
+    @Test
+    void testThrowsExceptionWhenDuplicateIds() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+        request.setIds("P00001.1,P00001.2");
+        request.setTaxId("taxId");
+
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("ids", "P00001,P00001"); // submit to PIR without version data
+        map.add("from", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getFrom()));
+        map.add("to", IdMappingFieldConfig.convertDbNameToPIRDbName(request.getTo()));
+        map.add("tax_off", "NO"); // we do not need PIR's header line, "Taxonomy ID:"
+        map.add("taxid", request.getTaxId());
+        map.add("async", "NO");
+
+        when(restTemplate.postForEntity(
+                        "http://localhost", new HttpEntity<>(map, HTTP_HEADERS), String.class))
+                .thenReturn(ResponseEntity.ok().body("P00001\tP00001"));
+
+        Assertions.assertThrows(
+                IllegalStateException.class, () -> pirService.mapIds(request, "dummyJobId"));
     }
 }

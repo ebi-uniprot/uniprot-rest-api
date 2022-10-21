@@ -10,9 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
+import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -169,6 +172,7 @@ class PIRResponseConverterTest {
     @Test
     void checkUniProtKBSubSequenceFoundCorrectly() {
         IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
 
         ResponseEntity<String> responseEntity =
@@ -206,6 +210,7 @@ class PIRResponseConverterTest {
     @Test
     void checkUniProtKBSubSequenceMixedInputError() {
         IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
 
         ResponseEntity<String> responseEntity =
@@ -242,6 +247,7 @@ class PIRResponseConverterTest {
     @Test
     void checkUniProtKBWithVersionFoundCorrectly() {
         IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
 
         ResponseEntity<String> responseEntity =
@@ -362,6 +368,59 @@ class PIRResponseConverterTest {
                 "Id Mapping API is not supported for mapping results with \"mapped to\" IDs more than 4",
                 result.getErrors().get(0).getMessage());
         assertEquals(40, result.getErrors().get(0).getCode());
+    }
+
+    @Test
+    void testStringIdToUniProtKB() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo(UNIPROTKB_STR);
+
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "9606.ENSP00000244751\tQ9HCH3\n"
+                                        + "9606.ENSP00000353292\tP37088\n"
+                                        + "9606.ENSP00000246672\tP20393\n"
+                                        + "9606.ENSP00000344430\tA6NMD0\n");
+
+        List<String> ids =
+                List.of(
+                        "9606.ENSP00000244751",
+                        "9606.ENSP00000353292",
+                        "9606.ENSP00000246672",
+                        "9606.ENSP00000344430");
+        String idsStr = String.join(",", ids);
+        request.setIds(idsStr);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+        assertThat(
+                result.getMappedIds(),
+                contains(
+                        new IdMappingStringPair("9606.ENSP00000244751", "Q9HCH3"),
+                        new IdMappingStringPair("9606.ENSP00000353292", "P37088"),
+                        new IdMappingStringPair("9606.ENSP00000246672", "P20393"),
+                        new IdMappingStringPair("9606.ENSP00000344430", "A6NMD0")));
+        assertThat(result.getUnmappedIds(), is(emptyList()));
+        assertThat(result.getWarnings(), is(emptyList()));
+    }
+
+    @Test
+    void testGetMappedRequestIds() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setIds("P12345.6,9606.ENSP00000386219,9606.ENSP00000318585,Q98765[12-22],Q12345");
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+        Map<String, String> mappedRequestIds = converter.getMappedRequestIds(request);
+        assertTrue(Set.of("P12345", "Q98765").containsAll(mappedRequestIds.keySet()));
+    }
+
+    @Test
+    void testGetMappedRequestIdsWithDuplicateIds() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setIds("P12345.6,P12345.3");
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+        // duplicateKeyException
+        assertThrows(IllegalStateException.class, () -> converter.getMappedRequestIds(request));
     }
 
     private static Stream<Arguments> invalidToAndIdPairs() {

@@ -85,12 +85,15 @@ public abstract class BasicIdService<T, U> {
     }
 
     public QueryResult<U> getMappedEntries(
-            SearchRequest searchRequest, IdMappingResult mappingResult) {
-        return getMappedEntries(searchRequest, mappingResult, false);
+            SearchRequest searchRequest, IdMappingResult mappingResult, String jobId) {
+        return getMappedEntries(searchRequest, mappingResult, false, jobId);
     }
 
     public QueryResult<U> getMappedEntries(
-            SearchRequest searchRequest, IdMappingResult mappingResult, boolean includeIsoform) {
+            SearchRequest searchRequest,
+            IdMappingResult mappingResult,
+            boolean includeIsoform,
+            String jobId) {
         List<IdMappingStringPair> mappedIds = mappingResult.getMappedIds();
         List<Facet> facets = null;
 
@@ -115,7 +118,10 @@ public abstract class BasicIdService<T, U> {
             SolrStreamFacetResponse solrStreamResponse =
                     searchBySolrStream(toIds, searchRequest, includeIsoform);
             long end = System.currentTimeMillis();
-            log.debug("Time taken to search solr in ms {}", (end - start));
+            log.info(
+                    "Time taken to search solr in ms {} for jobId {} in getMappedEntries",
+                    (end - start),
+                    jobId);
 
             facets = solrStreamResponse.getFacets();
 
@@ -136,20 +142,25 @@ public abstract class BasicIdService<T, U> {
         long start = System.currentTimeMillis();
         Stream<U> result = getPagedEntries(mappedIds, cursor, searchRequest.getFields());
         long end = System.currentTimeMillis();
-        log.debug("Total time taken to call voldemort in ms {}", (end - start));
+        log.info(
+                "Total time taken to call voldemort in ms {} for jobId {} in getMappedEntries",
+                (end - start),
+                jobId);
 
         return QueryResult.of(result, cursor, facets, mappingResult.getUnmappedIds(), warnings);
     }
 
-    public Stream<U> streamEntries(StreamRequest streamRequest, IdMappingResult mappingResult) {
+    public Stream<U> streamEntries(
+            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId) {
         List<IdMappingStringPair> mappedIds =
-                streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds());
+                streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);
         return streamEntries(mappedIds, streamRequest.getFields());
     }
 
-    public Stream<String> streamRDF(StreamRequest streamRequest, IdMappingResult mappingResult) {
+    public Stream<String> streamRDF(
+            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId) {
         List<IdMappingStringPair> fromToPairs =
-                streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds());
+                streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);
         // get unique entry ids
         List<String> entryIds = new ArrayList<>();
         fromToPairs.stream()
@@ -178,14 +189,15 @@ public abstract class BasicIdService<T, U> {
     }
 
     protected List<IdMappingStringPair> streamFilterAndSortEntries(
-            StreamRequest streamRequest, List<IdMappingStringPair> mappedIds) {
-        return streamFilterAndSortEntries(streamRequest, mappedIds, false);
+            StreamRequest streamRequest, List<IdMappingStringPair> mappedIds, String jobId) {
+        return streamFilterAndSortEntries(streamRequest, mappedIds, false, jobId);
     }
 
     protected List<IdMappingStringPair> streamFilterAndSortEntries(
             StreamRequest streamRequest,
             List<IdMappingStringPair> mappedIds,
-            boolean includeIsoform) {
+            boolean includeIsoform,
+            String jobId) {
         if (Utils.notNull(streamRequest.getQuery())
                 || Utils.notNull(streamRequest.getSort())
                 || includeIsoform) {
@@ -197,7 +209,10 @@ public abstract class BasicIdService<T, U> {
             SolrStreamFacetResponse solrStreamResponse =
                     searchBySolrStream(toIds, searchRequest, includeIsoform);
             long end = System.currentTimeMillis();
-            log.debug("Time taken to search solr in ms {}", (end - start));
+            log.info(
+                    "Time taken to search solr in ms {} for jobId {} in streamFilterAndSortEntries",
+                    (end - start),
+                    jobId);
 
             List<String> solrToIds = solrStreamResponse.getIds();
             if (Utils.notNullNotEmpty(streamRequest.getQuery()) || includeIsoform) {

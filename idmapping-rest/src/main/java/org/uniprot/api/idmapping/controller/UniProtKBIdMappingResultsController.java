@@ -131,7 +131,9 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
 
         QueryResult<UniProtKBEntryPair> result =
                 this.idService.getMappedEntries(
-                        searchRequest, cachedJobResult.getIdMappingResult());
+                        searchRequest,
+                        cachedJobResult.getIdMappingResult(),
+                        cachedJobResult.getJobId());
         return super.getSearchResponse(
                 result,
                 searchRequest.getFields(),
@@ -199,11 +201,15 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
 
         if (contentType.equals(RDF_MEDIA_TYPE)) {
             Supplier<Stream<String>> result =
-                    () -> this.idService.streamRDF(streamRequest, idMappingResult);
+                    () ->
+                            this.idService.streamRDF(
+                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniProtKBEntryPair>> result =
-                    () -> this.idService.streamEntries(streamRequest, idMappingResult);
+                    () ->
+                            this.idService.streamEntries(
+                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
             return super.stream(result, streamRequest, contentType, request);
         }
     }

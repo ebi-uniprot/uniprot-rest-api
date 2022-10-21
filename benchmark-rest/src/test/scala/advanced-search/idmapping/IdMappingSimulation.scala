@@ -39,11 +39,11 @@ class IdMappingSimulation extends Simulation {
   val rawAccessions = Source.fromFile(conf.getString("a.s.idmapping.accessions.csv")).getLines.mkString
   val accessions = rawAccessions.split(",").map(_.trim()).toSeq
   val scenario1RandomIdFeeder =
-    Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario1Users)))
+    Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario1IdCount)))
   val scenario2RandomIdFeeder =
-    Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario2Users)))
+    Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario2IdCount)))
   val scenario3RandomIdFeeder =
-    Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario3Users)))
+    Iterator.continually(Map("randomIds" -> getRandomisedIds(scenario3IdCount)))
 
   def getRandomisedIds(count: Integer): String = {
     scala.util.Random.shuffle(accessions).slice(0, count).mkString(",")
@@ -87,7 +87,7 @@ class IdMappingSimulation extends Simulation {
                 )
             )
         }.doIfEquals("${jobStatus}", "FINISHED") {
-          exec(http(s"GET /results/JOB_ID $requestId")
+          exec(http(s"GET /results/stream/JOB_ID $requestId")
             .get(resultsUrl + "/${jobId}?" + resultsParams)
             .check(status.is(200)))
         }

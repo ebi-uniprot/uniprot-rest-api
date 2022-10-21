@@ -3,7 +3,7 @@ package org.uniprot.api.idmapping.service.store;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,8 +15,13 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.idmapping.model.EntryPair;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.model.*;
+import org.uniprot.api.idmapping.service.store.impl.UniParcBatchStoreEntryPairIterable;
+import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
+import org.uniprot.api.idmapping.service.store.impl.UniRefBatchStoreEntryPairIterable;
+import org.uniprot.core.uniparc.UniParcEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.RetrievalException;
 
@@ -77,6 +82,30 @@ class BatchStoreEntryPairIterableTest {
         assertThrows(RetrievalException.class, iterator::next);
     }
 
+    @Test
+    void testLoggingUniParc() {
+        BatchStoreEntryPairIterable<UniParcEntryPair, UniParcEntry> iterable =
+                new UniParcBatchStoreEntryPairIterable(List.of(), 10, null, null);
+        iterable.logTiming(1, 2, 3);
+        assertNotNull(iterable);
+    }
+
+    @Test
+    void testLoggingUniProtKB() {
+        BatchStoreEntryPairIterable<UniProtKBEntryPair, UniProtKBEntry> iterable =
+                new UniProtKBBatchStoreEntryPairIterable(List.of(), 10, null, null, null, false);
+        iterable.logTiming(1, 2, 3);
+        assertNotNull(iterable);
+    }
+
+    @Test
+    void testLoggingUniRef() {
+        BatchStoreEntryPairIterable<UniRefEntryPair, UniRefEntryLight> iterable =
+                new UniRefBatchStoreEntryPairIterable(List.of(), 10, null, null);
+        iterable.logTiming(1, 2, 3);
+        assertNotNull(iterable);
+    }
+
     private FakeName fn(String to, String name) {
         return FakeName.builder().to(to).name(name).build();
     }
@@ -117,6 +146,9 @@ class BatchStoreEntryPairIterableTest {
         protected String getEntryId(FakeName entry) {
             return entry.getTo();
         }
+
+        @Override
+        protected void logTiming(int batchSize, long start, long end) {}
     }
 
     @AllArgsConstructor
