@@ -1850,7 +1850,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             + "OR reviewed:INVALID OR organism_id:invalid OR virus_host_id:invalid OR taxonomy_id:invalid "
                                             + "OR is_isoform:invalid OR structure_3d:invalid OR active:invalid OR proteome:INVALID"
                                             + "OR uniparc:invalid OR uniref_cluster_50:invalid OR uniref_cluster_90:invalid "
-                                            + "OR uniref_cluster_100:invalid"))
+                                            + "OR uniref_cluster_100:invalid OR fragment:INVALID OR precursor:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -1860,6 +1860,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             "The 'proteome' filter value has invalid format. It should match the regular expression UP[0-9]{9}",
                                             "The 'is_isoform' filter value can only be true or false",
                                             "The 'reviewed' filter value can only be true or false",
+                                            "The 'fragment' filter value can only be true or false",
+                                            "The 'precursor' filter value can only be true or false",
                                             "The 'active' parameter can only be true or false",
                                             "The 'organism_id' filter value should be a number",
                                             "The 'structure_3d' filter value can only be true or false",
