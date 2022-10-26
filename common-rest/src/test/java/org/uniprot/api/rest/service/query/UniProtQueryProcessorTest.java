@@ -247,7 +247,7 @@ class UniProtQueryProcessorTest {
     void handleUnderscoreDefaultSearch() {
         String query = "VAR_99999";
         String processedQuery = processor.processQuery(query);
-        assertThat(processedQuery, is("\"VAR 99999\""));
+        assertThat(processedQuery, is("\"VAR_99999\""));
     }
 
     @Test

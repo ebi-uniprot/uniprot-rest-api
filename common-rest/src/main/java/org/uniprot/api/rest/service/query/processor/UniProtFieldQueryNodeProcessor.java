@@ -122,7 +122,7 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
             if (splittedText.length == 2
                     && splittedText[0].matches("[a-zA-Z]+")
                     && splittedText[1].matches("[0-9]+")) {
-                text = "\"" + splittedText[0] + " " + splittedText[1] + "\"";
+                text = "\"" + text + "\"";
             }
             return text;
         }

@@ -224,7 +224,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getResultsResultMatchers() {
         ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY));
-        ResultMatcher rm2 = jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(2));
+        ResultMatcher rm2 = jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(3));
         ResultMatcher rm3 = jsonPath("$.results.*.sequence").exists();
         ResultMatcher rm4 = jsonPath("$.results.*.sequence", notNullValue());
         ResultMatcher rm5 = jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13));
@@ -237,7 +237,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
         ResultMatcher rm2 = jsonPath("$.facets.*.label", contains("Database", "Organisms"));
         ResultMatcher rm3 =
                 jsonPath("$.facets.*.name", contains("database_facet", "organism_name"));
-        ResultMatcher rm4 = jsonPath("$.facets[0].values", iterableWithSize(1));
+        ResultMatcher rm4 = jsonPath("$.facets[0].values", iterableWithSize(2));
         ResultMatcher rm5 = jsonPath("$.facets[0].values[0].label", is("UniProtKB"));
         ResultMatcher rm6 = jsonPath("$.facets[0].values[0].value", is("1"));
         ResultMatcher rm7 = jsonPath("$.facets[0].values[0].count", is(10));

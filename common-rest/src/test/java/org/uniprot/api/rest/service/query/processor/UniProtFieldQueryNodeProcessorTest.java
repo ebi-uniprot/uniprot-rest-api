@@ -66,7 +66,7 @@ class UniProtFieldQueryNodeProcessorTest {
         QueryNode processedNode = processor.process(node);
         CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
         assertNotNull(result);
-        assertEquals("\"VAR 99999\"", result);
+        assertEquals("\"VAR_99999\"", result);
     }
 
     @Test
@@ -80,7 +80,7 @@ class UniProtFieldQueryNodeProcessorTest {
         QueryNode processedNode = processor.process(node);
         CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
         assertNotNull(result);
-        assertEquals("\"VSF 99999\"", result);
+        assertEquals("\"VSF_99999\"", result);
     }
 
     @Test
