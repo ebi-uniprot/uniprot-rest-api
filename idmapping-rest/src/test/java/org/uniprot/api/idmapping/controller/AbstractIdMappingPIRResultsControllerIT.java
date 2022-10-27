@@ -82,8 +82,8 @@ public abstract class AbstractIdMappingPIRResultsControllerIT {
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid request received. "
-                                                + LIMIT_EXCEED_ERROR.getMessage()
-                                                + this.maxToIdsAllowed)));
+                                                + LIMIT_EXCEED_ERROR.getErrorMessage(
+                                                        this.maxToIdsAllowed))));
         ;
     }
 

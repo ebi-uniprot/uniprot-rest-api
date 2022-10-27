@@ -185,7 +185,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
         if (Utils.notNullNotEmpty(result.getMappedIds())
                 && result.getMappedIds().size() > this.maxIdMappingToIdsCount) {
             throw new InvalidRequestException(
-                    LIMIT_EXCEED_ERROR.getMessage() + this.maxIdMappingToIdsCount);
+                    LIMIT_EXCEED_ERROR.getErrorMessage(this.maxIdMappingToIdsCount));
         }
     }
 }

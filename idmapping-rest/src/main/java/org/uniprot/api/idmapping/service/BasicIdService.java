@@ -111,8 +111,8 @@ public abstract class BasicIdService<T, U> {
                 warnings.add(
                         new ProblemPair(
                                 FACET_WARNING.getCode(),
-                                FACET_WARNING.getMessage()
-                                        + this.maxIdMappingToIdsCountWithFacets));
+                                FACET_WARNING.getErrorMessage(
+                                        this.maxIdMappingToIdsCountWithFacets)));
             }
 
             SolrStreamFacetResponse solrStreamResponse =
@@ -356,7 +356,7 @@ public abstract class BasicIdService<T, U> {
     public void validateMappedIdsEnrichmentLimit(List<IdMappingStringPair> mappedIds) {
         if (mappedIds.size() > this.maxIdMappingToIdsCountEnriched) {
             throw new InvalidRequestException(
-                    ENRICHMENT_WARNING.getMessage() + this.maxIdMappingToIdsCountEnriched);
+                    ENRICHMENT_WARNING.getErrorMessage(this.maxIdMappingToIdsCountEnriched));
         }
     }
 
