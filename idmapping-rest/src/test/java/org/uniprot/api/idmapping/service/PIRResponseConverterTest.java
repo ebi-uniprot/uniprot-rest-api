@@ -329,7 +329,7 @@ class PIRResponseConverterTest {
         assertFalse(result.getWarnings().isEmpty());
         assertEquals(1, result.getWarnings().size());
         assertEquals(
-                ENRICHMENT_WARNING.getMessage() + maxCountForDataEnrich,
+                ENRICHMENT_WARNING.getErrorMessage(maxCountForDataEnrich),
                 result.getWarnings().get(0).getMessage());
         assertThat(result.getUnmappedIds(), is(emptyList()));
     }
@@ -365,7 +365,7 @@ class PIRResponseConverterTest {
         assertThat(result.getUnmappedIds(), is(emptyList()));
         assertEquals(1, result.getErrors().size());
         assertEquals(
-                "Id Mapping API is not supported for mapping results with \"mapped to\" IDs more than 4",
+                "Id Mapping API is not supported for mapping results with more than 4 \"mapped to\" IDs",
                 result.getErrors().get(0).getMessage());
         assertEquals(40, result.getErrors().get(0).getCode());
     }

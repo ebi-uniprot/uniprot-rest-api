@@ -165,7 +165,7 @@ public class PIRResponseConverter {
             return Optional.of(
                     new ProblemPair(
                             LIMIT_EXCEED_ERROR.getCode(),
-                            LIMIT_EXCEED_ERROR.getMessage() + maxToIdsAllowed));
+                            LIMIT_EXCEED_ERROR.getErrorMessage(maxToIdsAllowed)));
         }
         return Optional.empty();
     }
@@ -178,7 +178,7 @@ public class PIRResponseConverter {
             return Optional.of(
                     new ProblemPair(
                             ENRICHMENT_WARNING.getCode(),
-                            ENRICHMENT_WARNING.getMessage() + maxToUniProtIdsAllowed));
+                            ENRICHMENT_WARNING.getErrorMessage(maxToUniProtIdsAllowed)));
         }
         return Optional.empty();
     }

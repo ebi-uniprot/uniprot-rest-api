@@ -365,7 +365,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
                         jsonPath(
                                 "$.warnings[0].message",
                                 is(
-                                        "Filters are not supported for mapping results with IDs more than 10")));
+                                        "Filters are not supported for mapping results with more than 10 IDs")));
     }
 
     private Stream<Arguments> getAllSearchFields() {

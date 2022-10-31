@@ -166,8 +166,8 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid request received. "
-                                                + ENRICHMENT_WARNING.getMessage()
-                                                + this.maxToIdsEnrichAllowed)));
+                                                + ENRICHMENT_WARNING.getErrorMessage(
+                                                        this.maxToIdsEnrichAllowed))));
     }
 
     // ---------------------------------------------------------------------------------

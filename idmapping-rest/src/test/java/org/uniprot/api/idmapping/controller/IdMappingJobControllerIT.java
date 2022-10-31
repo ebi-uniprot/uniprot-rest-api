@@ -518,8 +518,8 @@ class IdMappingJobControllerIT {
                         .warning(
                                 new ProblemPair(
                                         ENRICHMENT_WARNING.getCode(),
-                                        ENRICHMENT_WARNING.getMessage()
-                                                + this.maxAllowedIdsToEnrich))
+                                        ENRICHMENT_WARNING.getErrorMessage(
+                                                this.maxAllowedIdsToEnrich)))
                         .build();
 
         IdMappingJob job =
@@ -546,7 +546,7 @@ class IdMappingJobControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.warnings[0].message",
-                                is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
+                                is(ENRICHMENT_WARNING.getErrorMessage(this.maxAllowedIdsToEnrich))))
                 .andExpect(jsonPath("$.warnings[0].code", is(ENRICHMENT_WARNING.getCode())));
     }
 
@@ -623,7 +623,7 @@ class IdMappingJobControllerIT {
                         .error(
                                 new ProblemPair(
                                         LIMIT_EXCEED_ERROR.getCode(),
-                                        LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds))
+                                        LIMIT_EXCEED_ERROR.getErrorMessage(this.maxAllowedToIds)))
                         .build();
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -655,7 +655,7 @@ class IdMappingJobControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.errors[0].message",
-                                is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
+                                is(LIMIT_EXCEED_ERROR.getErrorMessage(this.maxAllowedToIds))));
     }
 
     @Test
