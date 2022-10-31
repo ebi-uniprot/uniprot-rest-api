@@ -8,15 +8,15 @@ import lombok.Getter;
  */
 @Getter
 public enum PredefinedIdMappingStatus {
-    FACET_WARNING(20, "Filters are not supported for mapping results with more than {} IDs"),
+    FACET_WARNING(20, "Filters are not supported for mapping results with more than %d IDs"),
     ENRICHMENT_WARNING(
             21,
-            "UniProt data enrichment is not supported for mapping results with more than {} \"mapped to\" IDs"),
+            "UniProt data enrichment is not supported for mapping results with more than %d \"mapped to\" IDs"),
     LIMIT_EXCEED_ERROR(
             40,
-            "Id Mapping API is not supported for mapping results with more than {} \"mapped to\" IDs");
-    private String message;
-    private int code;
+            "Id Mapping API is not supported for mapping results with more than %d \"mapped to\" IDs");
+    private final String message;
+    private final int code;
 
     PredefinedIdMappingStatus(int code, String message) {
         this.code = code;
@@ -24,6 +24,6 @@ public enum PredefinedIdMappingStatus {
     }
 
     public String getErrorMessage(int limit) {
-        return message.replaceAll("\\{\\}", String.valueOf(limit));
+        return String.format(message, limit);
     }
 }
