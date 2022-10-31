@@ -6,12 +6,17 @@ import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBL
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxImpl;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 class UniProtFieldQueryNodeProcessorTest {
@@ -190,5 +195,83 @@ class UniProtFieldQueryNodeProcessorTest {
         CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
         assertNotNull(result);
         assertEquals("SLP\\:123", result);
+    }
+
+    @ParameterizedTest(name = "[\"{0}\" is \"{1}\"]")
+    @MethodSource("getWildcardSearchQuery")
+    void processDefaultSearchWithLeadingWildcard(String inputQuery, String expectedQuery)
+            throws QueryNodeException {
+        UniProtQueryProcessorConfig conf =
+                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).build();
+        UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
+
+        FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, inputQuery, 1, 2);
+        QueryNode processedNode = processor.process(node);
+        CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
+        assertNotNull(result);
+        assertEquals(expectedQuery, result);
+    }
+
+    private static Stream<Arguments> getWildcardSearchQuery() {
+        return Stream.of(
+                Arguments.of("*quick brown fox", "quick brown fox"),
+                Arguments.of("**quick brown fox", "quick brown fox"),
+                Arguments.of("*quick brown fox*", "quick brown fox*"),
+                Arguments.of("*quick * brown fox*", "quick * brown fox*"),
+                Arguments.of("*p12345", "p12345"));
+    }
+
+    @ParameterizedTest(name = "[\"{0}:{1}\" is \"{2}\"]")
+    @MethodSource("getWildcardSearchQueryWithField")
+    void processFieldSearchWithLeadingWildcard(
+            String fieldName, String inputQuery, String expectedQuery) throws QueryNodeException {
+        UniProtQueryProcessorConfig conf =
+                UniProtQueryProcessorConfig.builder()
+                        .searchFieldsNames(Set.of("field"))
+                        .whiteListFields(Map.of("slp", "^[0-9]{3}$"))
+                        .build();
+        UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
+
+        FieldQueryNode node = new FieldQueryNode(fieldName, inputQuery, 1, 2);
+        QueryNode processedNode = processor.process(node);
+        CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
+        assertNotNull(result);
+        assertEquals(expectedQuery, result);
+    }
+
+    private static Stream<Arguments> getWildcardSearchQueryWithField() {
+        return Stream.of(
+                Arguments.of("other_field", "*quick brown fox", "other_field:quick\\ brown\\ fox"),
+                Arguments.of(
+                        UniProtQueryProcessor.UNIPROTKB_ACCESSION_FIELD,
+                        "*p12345",
+                        UniProtQueryProcessor.UNIPROTKB_ACCESSION_FIELD + ":P12345"),
+                Arguments.of("SLP", "*123", "SLP\\:123"),
+                Arguments.of("FIELD", "*random search text", "field:random search text"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getQueryWithSupportedLeadingWildcard")
+    void testWithLeadingWildcard(String fieldName, String inputQuery, String expectedQuery)
+            throws QueryNodeException {
+        UniProtQueryProcessorConfig conf =
+                UniProtQueryProcessorConfig.builder()
+                        .leadingWildcardFields(Set.of("gene", "protein_name"))
+                        .searchFieldsNames(Set.of("field"))
+                        .whiteListFields(Map.of("slp", "^[0-9]{3}$"))
+                        .build();
+        UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
+
+        FieldQueryNode node = new FieldQueryNode(fieldName, inputQuery, 1, 2);
+        QueryNode processedNode = processor.process(node);
+        CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
+        assertNotNull(result);
+        assertEquals(expectedQuery, result);
+    }
+
+    private static Stream<Arguments> getQueryWithSupportedLeadingWildcard() {
+        return Stream.of(
+                Arguments.of("gene", "*CIROP", "gene:*CIROP"),
+                Arguments.of("protein_name", "*CLRN2", "protein_name:*CLRN2"));
     }
 }

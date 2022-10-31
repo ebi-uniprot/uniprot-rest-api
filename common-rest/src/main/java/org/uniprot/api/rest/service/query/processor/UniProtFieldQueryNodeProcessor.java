@@ -35,7 +35,7 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
     @Override
     protected QueryNode postProcessNode(QueryNode node) {
         // do not delegate to UniProtFieldQueryNode unless we want
-        if (node instanceof FieldQueryNode) {
+        if (node instanceof FieldQueryNode) { // NOT_REAL_FIELD:drome
             // handle all subtypes of FieldQueryNode
             if (node instanceof QuotedFieldQueryNode) {
                 CharSequence field = ((QuotedFieldQueryNode) node).getField();
@@ -63,18 +63,20 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
         private final List<SearchFieldItem> optimisableFields;
         private final Map<String, String> whiteListFields;
         private final Set<String> searchFields;
+        private final Set<String> leadingWildcardFields;
 
         public UniProtFieldQueryNode(FieldQueryNode node, UniProtQueryProcessorConfig conf) {
             super(node.getField(), node.getText(), node.getBegin(), node.getEnd());
             this.optimisableFields = conf.getOptimisableFields();
             this.whiteListFields = conf.getWhiteListFields();
             this.searchFields = conf.getSearchFieldsNames();
+            this.leadingWildcardFields = conf.getLeadingWildcardFields();
         }
 
         @Override
         public CharSequence toQueryString(EscapeQuerySyntax escaper) {
             String field = getField().toString();
-            String text = getTextAsString();
+            String text = stripLeadingWildcardIfNeeded(field, getTextAsString());
 
             if (field.equals(IMPOSSIBLE_FIELD)) {
                 return defaultSearchToQueryString(text);
@@ -87,6 +89,16 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
             } else {
                 return super.toQueryString(escaper);
             }
+        }
+
+        private String stripLeadingWildcardIfNeeded(String field, String text) {
+            if (!this.leadingWildcardFields.contains(field)) {
+                while (text.length() > 1 && (text.startsWith("*") || text.startsWith("?"))) {
+                    text = text.substring(1);
+                    this.text = text;
+                }
+            }
+            return text;
         }
 
         private boolean validWhiteListFields(String field, String text) {

@@ -25,11 +25,13 @@ public class UniProtQueryProcessorConfig {
     private final Map<String, String> whiteListFields;
     private final Set<String> stopwords;
     private final Set<String> searchFieldsNames;
+    private final Set<String> leadingWildcardFields; // fields which support leading wildcard
 
     public static class UniProtQueryProcessorConfigBuilder {
         private List<SearchFieldItem> optimisableFields = emptyList();
         private Map<String, String> whiteListFields = emptyMap();
         private Set<String> stopwords = emptySet();
         private Set<String> searchFields = emptySet();
+        private Set<String> leadingWildcardFields = emptySet();
     }
 }
