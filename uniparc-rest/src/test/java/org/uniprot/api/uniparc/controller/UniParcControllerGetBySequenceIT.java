@@ -193,7 +193,7 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(jsonPath("uniParcCrossReferences", iterableWithSize(6)))
                 .andExpect(jsonPath("uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("uniParcCrossReferences[*].version", notNullValue()))
                 .andExpect(jsonPath("uniParcCrossReferences[*].versionI", notNullValue()))
@@ -347,7 +347,7 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(4)))
+                .andExpect(jsonPath("$.uniParcCrossReferences", iterableWithSize(5)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
@@ -355,7 +355,7 @@ class UniParcControllerGetBySequenceIT {
                 .andExpect(
                         jsonPath(
                                 "$.uniParcCrossReferences[*].active",
-                                contains(true, true, true, true)))
+                                contains(true, true, true, true, true)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
                 .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
     }

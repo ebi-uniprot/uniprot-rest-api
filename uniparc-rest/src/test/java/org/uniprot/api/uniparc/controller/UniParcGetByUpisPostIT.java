@@ -146,7 +146,7 @@ class UniParcGetByUpisPostIT extends AbstractGetByIdsPostControllerIT {
     @Override
     protected List<ResultMatcher> getResultsResultMatchers() {
         ResultMatcher rm1 = jsonPath("$.results.*.uniParcId", contains(TEST_IDS_ARRAY));
-        ResultMatcher rm2 = jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(2));
+        ResultMatcher rm2 = jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(3));
         ResultMatcher rm3 = jsonPath("$.results.*.sequence").exists();
         ResultMatcher rm4 = jsonPath("$.results.*.sequence", notNullValue());
         ResultMatcher rm5 = jsonPath("$.results[0].sequenceFeatures", iterableWithSize(13));

@@ -81,7 +81,7 @@ class UniParcCrossReferenceTaxonomyFilterTest {
     void testFilterByNonMatchingTaxon() {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xRef = uniParcEntry.getUniParcCrossReferences();
-        assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
+        assertEquals(3, this.uniParcEntry.getUniParcCrossReferences().size());
         List<String> taxonFilter = Collections.singletonList("0");
         // filter by Cross Ref taxon
         UniParcEntry filteredEntry = uniParcTaxonomyFilter.apply(this.uniParcEntry, taxonFilter);
