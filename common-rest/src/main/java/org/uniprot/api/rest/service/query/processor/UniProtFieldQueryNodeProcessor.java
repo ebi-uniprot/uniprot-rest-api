@@ -35,7 +35,7 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
     @Override
     protected QueryNode postProcessNode(QueryNode node) {
         // do not delegate to UniProtFieldQueryNode unless we want
-        if (node instanceof FieldQueryNode) { // NOT_REAL_FIELD:drome
+        if (node instanceof FieldQueryNode) {
             // handle all subtypes of FieldQueryNode
             if (node instanceof QuotedFieldQueryNode) {
                 CharSequence field = ((QuotedFieldQueryNode) node).getField();
