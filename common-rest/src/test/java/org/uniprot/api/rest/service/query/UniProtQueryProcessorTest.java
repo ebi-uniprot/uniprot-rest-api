@@ -482,8 +482,7 @@ class UniProtQueryProcessorTest {
                         "quick AND brown AND ( fox OR field:text )"),
                 Arguments.of("* AND field:*text*", "* AND field:text*"),
                 Arguments.of("? AND field:?text?", "? AND field:text?"),
-                Arguments.of("? AND field:???text?", "? AND field:text?")
-                );
+                Arguments.of("? AND field:???text?", "? AND field:text?"));
     }
 
     @ParameterizedTest
@@ -497,7 +496,6 @@ class UniProtQueryProcessorTest {
         return Stream.of(
                 Arguments.of("gene:*CIROP AND field:*text", "gene:*CIROP AND field:text"),
                 Arguments.of("protein_name:*CLRN2 AND *text", "protein_name:*CLRN2 AND text"),
-                Arguments.of("protein_name:?CLRN2 AND ?text", "protein_name:?CLRN2 AND text")
-                );
+                Arguments.of("protein_name:?CLRN2 AND ?text", "protein_name:?CLRN2 AND text"));
     }
 }
