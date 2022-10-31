@@ -146,6 +146,9 @@ public class SolrQueryConfigFileReader {
             case HIGHLIGHT_FIELDS:
                 builder.highlightFields(line);
                 break;
+            case LEADING_WILDCARD_SUPPORTED_FIELDS:
+                builder.leadingWildcardFields(line);
+                break;
         }
     }
 
@@ -154,7 +157,8 @@ public class SolrQueryConfigFileReader {
         SEARCH_FUNCTIONS("# SEARCH-BOOST-FUNCTIONS"),
         QUERY_FIELDS("# QUERY-FIELDS"),
         STOP_WORDS("# STOP-WORDS"),
-        HIGHLIGHT_FIELDS("# HIGHLIGHT-FIELDS");
+        HIGHLIGHT_FIELDS("# HIGHLIGHT-FIELDS"),
+        LEADING_WILDCARD_SUPPORTED_FIELDS("# LEADING-WILDCARD-SUPPORTED-FIELDS");
 
         private final String prefix;
 

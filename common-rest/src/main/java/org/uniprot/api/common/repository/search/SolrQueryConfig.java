@@ -33,6 +33,9 @@ public class SolrQueryConfig {
     @Setter(AccessLevel.NONE)
     private String highlightFields;
 
+    @Setter(AccessLevel.NONE)
+    private Set<String> leadingWildcardFields; // fields which support leading wildcard
+
     public static class SolrQueryConfigBuilder {
         // do not make final because Lombok doesn't like it
         private List<String> fieldBoosts = new ArrayList<>();
@@ -58,6 +61,14 @@ public class SolrQueryConfig {
         public SolrQueryConfigBuilder stopWords(String stopWords) {
             this.stopWords =
                     Arrays.stream(stopWords.split(","))
+                            .map(String::trim)
+                            .collect(Collectors.toSet());
+            return this;
+        }
+
+        public SolrQueryConfigBuilder leadingWildcardFields(String leadingWildcardFields) {
+            this.leadingWildcardFields =
+                    Arrays.stream(leadingWildcardFields.split(","))
                             .map(String::trim)
                             .collect(Collectors.toSet());
             return this;

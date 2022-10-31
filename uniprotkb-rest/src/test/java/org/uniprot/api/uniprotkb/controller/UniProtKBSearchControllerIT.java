@@ -15,6 +15,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -1517,6 +1518,31 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(jsonPath("$.results.*.features").exists())
                 .andExpect(jsonPath("$.results.*.uniProtKBCrossReferences").doesNotExist())
                 .andExpect(jsonPath("$.results[0].features[0].type", is("Natural variant")));
+    }
+
+    @Test
+    void searchGeneNameWithLeadingWildcardSucess() throws Exception {
+        // given
+        UniProtKBEntry canonicalEntry =
+                UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, canonicalEntry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=gene:*GFR2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.uniProtkbId",
+                                contains(canonicalEntry.getUniProtkbId().getValue())))
+                .andExpect(jsonPath("$.results.*.genes[0].geneName.value", contains("FGFR2")));
     }
 
     @Override

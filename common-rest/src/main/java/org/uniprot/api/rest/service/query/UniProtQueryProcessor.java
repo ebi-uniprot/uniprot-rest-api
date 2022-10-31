@@ -60,7 +60,8 @@ public class UniProtQueryProcessor implements QueryProcessor {
             QueryNode queryTree =
                     syntaxParser.parse(queryWithEscapedForwardSlashes, IMPOSSIBLE_FIELD);
             QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
-            return processedQueryTree.toQueryString(ESCAPER).toString();
+            String processedQuery = processedQueryTree.toQueryString(ESCAPER).toString();
+            return processedQuery;
         } catch (Exception e) {
             log.warn("Problem processing user query: " + query, e);
             return query;
