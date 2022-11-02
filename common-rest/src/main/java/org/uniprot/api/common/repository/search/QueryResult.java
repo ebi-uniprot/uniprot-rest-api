@@ -69,6 +69,18 @@ public class QueryResult<T> {
         return new QueryResult<>(content, page, facets, null, null, failedIds, warnings);
     }
 
+    public static <T> QueryResult<T> of(
+            Stream<T> content,
+            Page page,
+            Collection<Facet> facets,
+            Collection<TermInfo> termInfos,
+            Collection<String> failedIds,
+            Collection<Suggestion> suggestions,
+            Collection<ProblemPair> warnings) {
+        return new QueryResult<>(
+                content, page, facets, termInfos, suggestions, failedIds, warnings);
+    }
+
     public Page getPageAndClean() {
         Page result = this.page;
         this.page = null;
