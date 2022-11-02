@@ -2,7 +2,9 @@ package org.uniprot.api.uniprotkb.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -102,7 +105,9 @@ public class UniProtEntryService
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
         List<ReturnField> fields = OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
-        return resultsConverter.convertQueryResult(results, fields);
+        ProblemPair warning = getLeadingWildcardIgnoredWarning(request.getQuery());
+        Set<ProblemPair> warnings = Objects.isNull(warning) ? null : Set.of(warning);
+        return resultsConverter.convertQueryResult(results, fields, warnings);
     }
 
     @Override
@@ -313,5 +318,15 @@ public class UniProtEntryService
 
     private String getQueryFieldName(String active) {
         return searchFieldConfig.getSearchFieldItemByName(active).getFieldName();
+    }
+
+    private ProblemPair getLeadingWildcardIgnoredWarning(String query) {
+        if (SolrQueryUtil.ignoreLeadingWildcard(
+                query, this.uniProtQueryProcessorConfig.getLeadingWildcardFields())) {
+            return new ProblemPair(
+                    0,
+                    "Leading wildcard is not supported and ignored except for field 'gene' and 'protein_name'.");
+        }
+        return null;
     }
 }

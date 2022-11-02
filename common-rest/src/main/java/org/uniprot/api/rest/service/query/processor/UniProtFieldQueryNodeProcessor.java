@@ -13,6 +13,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QuotedFieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import org.uniprot.store.search.SolrQueryUtil;
 
 /**
  * Created 23/08/2020
@@ -92,11 +93,9 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
         }
 
         private String stripLeadingWildcardIfNeeded(String field, String text) {
-            if (!this.leadingWildcardFields.contains(field)) {
-                while (text.length() > 1 && (text.startsWith("*") || text.startsWith("?"))) {
-                    text = text.substring(1);
-                    this.text = text;
-                }
+            while (SolrQueryUtil.ignoreLeadingWildcard(field, text, this.leadingWildcardFields)) {
+                text = text.substring(1);
+                this.text = text;
             }
             return text;
         }
