@@ -324,8 +324,8 @@ public class UniProtEntryService
         if (SolrQueryUtil.ignoreLeadingWildcard(
                 query, this.uniProtQueryProcessorConfig.getLeadingWildcardFields())) {
             return new ProblemPair(
-                    0,
-                    "Leading wildcard is not supported and ignored except for field 'gene' and 'protein_name'.");
+                    41,
+                    "Leading wildcard (*, ?) was removed for this search. Please check the help page for more information on using wildcards on queries.");
         }
         return null;
     }
