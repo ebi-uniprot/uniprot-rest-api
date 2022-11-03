@@ -105,7 +105,10 @@ public class UniProtEntryService
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
         List<ReturnField> fields = OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
-        ProblemPair warning = getLeadingWildcardIgnoredWarning(request.getQuery());
+        ProblemPair warning =
+                getLeadingWildcardIgnoredWarning(
+                        request.getQuery(),
+                        this.uniProtQueryProcessorConfig.getLeadingWildcardFields());
         Set<ProblemPair> warnings = Objects.isNull(warning) ? null : Set.of(warning);
         return resultsConverter.convertQueryResult(results, fields, warnings);
     }
@@ -318,15 +321,5 @@ public class UniProtEntryService
 
     private String getQueryFieldName(String active) {
         return searchFieldConfig.getSearchFieldItemByName(active).getFieldName();
-    }
-
-    private ProblemPair getLeadingWildcardIgnoredWarning(String query) {
-        if (SolrQueryUtil.ignoreLeadingWildcard(
-                query, this.uniProtQueryProcessorConfig.getLeadingWildcardFields())) {
-            return new ProblemPair(
-                    41,
-                    "Leading wildcard (*, ?) was removed for this search. Please check the help page for more information on using wildcards on queries.");
-        }
-        return null;
     }
 }

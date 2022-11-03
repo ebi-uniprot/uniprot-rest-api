@@ -482,7 +482,8 @@ class UniProtQueryProcessorTest {
                         "quick AND brown AND ( fox OR field:text )"),
                 Arguments.of("* AND field:*text*", "* AND field:text*"),
                 Arguments.of("? AND field:?text?", "? AND field:text?"),
-                Arguments.of("? AND field:???text?", "? AND field:text?"));
+                Arguments.of("? AND field:???text?", "? AND field:text?"),
+                Arguments.of("\"*quick brown fox\"", "\"*quick brown fox\""));
     }
 
     @ParameterizedTest

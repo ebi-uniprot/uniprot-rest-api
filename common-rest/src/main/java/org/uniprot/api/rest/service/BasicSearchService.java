@@ -1,6 +1,9 @@
 package org.uniprot.api.rest.service;
 
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
+
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
@@ -23,6 +27,7 @@ import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 
 /**
@@ -224,5 +229,14 @@ public abstract class BasicSearchService<D extends Document, R> {
 
     protected Integer getDefaultPageSize() {
         return this.defaultPageSize;
+    }
+
+    protected ProblemPair getLeadingWildcardIgnoredWarning(
+            String query, Set<String> leadWildcardSupportedFields) {
+        if (SolrQueryUtil.ignoreLeadingWildcard(query, leadWildcardSupportedFields)) {
+            return new ProblemPair(
+                    LEADING_WILDCARD_IGNORED.getCode(), LEADING_WILDCARD_IGNORED.getMessage());
+        }
+        return null;
     }
 }

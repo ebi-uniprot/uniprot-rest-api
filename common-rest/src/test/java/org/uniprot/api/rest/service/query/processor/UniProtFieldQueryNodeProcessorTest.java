@@ -218,7 +218,8 @@ class UniProtFieldQueryNodeProcessorTest {
                 Arguments.of("**quick brown fox", "quick brown fox"),
                 Arguments.of("*quick brown fox*", "quick brown fox*"),
                 Arguments.of("*quick * brown fox*", "quick * brown fox*"),
-                Arguments.of("*p12345", "p12345"));
+                Arguments.of("*p12345", "p12345"),
+                Arguments.of("\"*quick brown fox\"", "\"*quick brown fox\""));
     }
 
     @ParameterizedTest(name = "[\"{0}:{1}\" is \"{2}\"]")
