@@ -97,16 +97,17 @@ public abstract class BasicSearchService<D extends Document, R> {
 
     public QueryResult<R> search(SearchRequest request) {
         SolrRequest solrRequest = createSearchSolrRequest(request);
-
         QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
         Stream<R> converted = results.getContent().map(entryConverter).filter(Objects::nonNull);
+        Set<ProblemPair> warnings = getWarnings(request.getQuery(), Set.of());
         return QueryResult.of(
                 converted,
                 results.getPage(),
                 results.getFacets(),
                 null,
                 null,
-                results.getSuggestions());
+                results.getSuggestions(),
+                warnings);
     }
 
     public Stream<R> stream(StreamRequest request) {
@@ -231,7 +232,13 @@ public abstract class BasicSearchService<D extends Document, R> {
         return this.defaultPageSize;
     }
 
-    protected ProblemPair getLeadingWildcardIgnoredWarning(
+    protected Set<ProblemPair> getWarnings(String query, Set<String> leadWildcardSupportedFields) {
+        ProblemPair warning = getLeadingWildcardIgnoredWarning(query, leadWildcardSupportedFields);
+        Set<ProblemPair> warnings = Objects.isNull(warning) ? null : Set.of(warning);
+        return warnings;
+    }
+
+    private ProblemPair getLeadingWildcardIgnoredWarning(
             String query, Set<String> leadWildcardSupportedFields) {
         if (SolrQueryUtil.ignoreLeadingWildcard(query, leadWildcardSupportedFields)) {
             return new ProblemPair(

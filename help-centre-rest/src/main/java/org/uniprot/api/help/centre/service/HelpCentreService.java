@@ -2,11 +2,13 @@ package org.uniprot.api.help.centre.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
@@ -98,6 +100,9 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
             }
             List<Suggestion> suggestionsWithoutDefaultFilters =
                     removeDefaultFiltersFromSuggestedQuery(suggestions, searchRequest.getType());
+
+            Set<ProblemPair> warnings = getWarnings(request.getQuery(), helpCentreQueryProcessorConfig.getLeadingWildcardFields());
+
             result =
                     QueryResult.of(
                             result.getContent(),
@@ -105,7 +110,7 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
                             result.getFacets(),
                             null,
                             null,
-                            suggestionsWithoutDefaultFilters);
+                            suggestionsWithoutDefaultFilters, warnings);
         }
         return result;
     }

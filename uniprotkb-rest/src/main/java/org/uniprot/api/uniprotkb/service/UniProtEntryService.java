@@ -105,11 +105,7 @@ public class UniProtEntryService
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
         List<ReturnField> fields = OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
-        ProblemPair warning =
-                getLeadingWildcardIgnoredWarning(
-                        request.getQuery(),
-                        this.uniProtQueryProcessorConfig.getLeadingWildcardFields());
-        Set<ProblemPair> warnings = Objects.isNull(warning) ? null : Set.of(warning);
+        Set<ProblemPair> warnings = getWarnings(request.getQuery(), this.uniProtQueryProcessorConfig.getLeadingWildcardFields());
         return resultsConverter.convertQueryResult(results, fields, warnings);
     }
 
