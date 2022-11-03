@@ -814,6 +814,28 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(jsonPath("$.results.size()", is(1)));
     }
 
+    @Test
+    void searchWithLeadingWildcardIgnoredWarningSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                                .param("query", "*valuerandom"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.warnings.length()", is(1)))
+                .andExpect(
+                        jsonPath(
+                                "$.warnings[0].message",
+                                is(
+                                        "Leading wildcard (*, ?) was removed for this search. Please check the help page for more information on using wildcards on queries.")))
+                .andExpect(jsonPath("$.warnings[0].code", is(41)));
+    }
+
     protected DataStoreManager getStoreManager() {
         return storeManager;
     }

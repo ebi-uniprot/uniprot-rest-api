@@ -1,43 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.startsWith;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
-
-import lombok.extern.slf4j.Slf4j;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.junit.jupiter.api.AfterEach;
@@ -111,7 +74,43 @@ import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
 
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
@@ -1544,39 +1543,6 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 contains(canonicalEntry.getUniProtkbId().getValue())))
                 .andExpect(jsonPath("$.results.*.genes[0].geneName.value", contains("FGFR2")))
                 .andExpect(jsonPath("$.warnings").doesNotExist());
-    }
-
-    @Test
-    void searchGeneNameWithLeadingWildcardIgnoredWarningSuccess() throws Exception {
-        // given
-        UniProtKBEntry canonicalEntry =
-                UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, canonicalEntry);
-
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(SEARCH_RESOURCE + "?query=*FGFR2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        response.andDo(print())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.results.*.uniProtkbId",
-                                contains(canonicalEntry.getUniProtkbId().getValue())))
-                .andExpect(jsonPath("$.results.*.genes[0].geneName.value", contains("FGFR2")))
-                .andExpect(jsonPath("$.warnings").exists())
-                .andExpect(jsonPath("$.warnings.length()", is(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.warnings[0].message",
-                                is(
-                                        "Leading wildcard is not supported and ignored except for field 'gene' and 'protein_name'.")))
-                .andExpect(jsonPath("$.warnings[0].code", is(0)));
     }
 
     @Override

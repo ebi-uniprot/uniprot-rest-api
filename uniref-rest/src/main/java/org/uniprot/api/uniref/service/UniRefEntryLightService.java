@@ -2,12 +2,14 @@ package org.uniprot.api.uniref.service;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -97,6 +99,7 @@ public class UniRefEntryLightService
     public QueryResult<UniRefEntryLight> search(SearchRequest request) {
         UniRefSearchRequest unirefRequest = (UniRefSearchRequest) request;
         QueryResult<UniRefEntryLight> result = super.search(request);
+        Set<ProblemPair> warnings = getWarnings(request.getQuery(), uniRefQueryProcessorConfig.getLeadingWildcardFields());
         if (!unirefRequest.isComplete()) {
             Stream<UniRefEntryLight> content =
                     result.getContent().map(this::removeOverLimitAndCleanMemberId);
@@ -108,11 +111,11 @@ public class UniRefEntryLightService
                             result.getFacets(),
                             null,
                             null,
-                            result.getSuggestions());
+                            result.getSuggestions(), warnings);
         } else {
             Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
 
-            result = QueryResult.of(content, result.getPage(), result.getFacets());
+            result = QueryResult.of(content, result.getPage(), result.getFacets(), null, warnings);
         }
         return result;
     }
