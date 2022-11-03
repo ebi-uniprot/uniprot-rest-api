@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -105,7 +104,10 @@ public class UniProtEntryService
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
         List<ReturnField> fields = OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
-        Set<ProblemPair> warnings = getWarnings(request.getQuery(), this.uniProtQueryProcessorConfig.getLeadingWildcardFields());
+        Set<ProblemPair> warnings =
+                getWarnings(
+                        request.getQuery(),
+                        this.uniProtQueryProcessorConfig.getLeadingWildcardFields());
         return resultsConverter.convertQueryResult(results, fields, warnings);
     }
 

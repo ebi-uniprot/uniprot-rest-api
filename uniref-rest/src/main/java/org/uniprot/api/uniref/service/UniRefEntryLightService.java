@@ -99,7 +99,9 @@ public class UniRefEntryLightService
     public QueryResult<UniRefEntryLight> search(SearchRequest request) {
         UniRefSearchRequest unirefRequest = (UniRefSearchRequest) request;
         QueryResult<UniRefEntryLight> result = super.search(request);
-        Set<ProblemPair> warnings = getWarnings(request.getQuery(), uniRefQueryProcessorConfig.getLeadingWildcardFields());
+        Set<ProblemPair> warnings =
+                getWarnings(
+                        request.getQuery(), uniRefQueryProcessorConfig.getLeadingWildcardFields());
         if (!unirefRequest.isComplete()) {
             Stream<UniRefEntryLight> content =
                     result.getContent().map(this::removeOverLimitAndCleanMemberId);
@@ -111,7 +113,8 @@ public class UniRefEntryLightService
                             result.getFacets(),
                             null,
                             null,
-                            result.getSuggestions(), warnings);
+                            result.getSuggestions(),
+                            warnings);
         } else {
             Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
 

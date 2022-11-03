@@ -99,7 +99,10 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
                 content.stream()
                         .map(e -> publicationConverter.apply(e, pubmedLiteratureEntryMap))
                         .filter(Objects::nonNull);
-        Set<ProblemPair> warnings = getWarnings(request.getQuery(), literatureQueryProcessorConfig.getLeadingWildcardFields());
+        Set<ProblemPair> warnings =
+                getWarnings(
+                        request.getQuery(),
+                        literatureQueryProcessorConfig.getLeadingWildcardFields());
         return QueryResult.of(converted, results.getPage(), results.getFacets(), null, warnings);
     }
 

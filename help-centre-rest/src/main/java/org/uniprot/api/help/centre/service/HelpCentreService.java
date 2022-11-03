@@ -101,7 +101,10 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
             List<Suggestion> suggestionsWithoutDefaultFilters =
                     removeDefaultFiltersFromSuggestedQuery(suggestions, searchRequest.getType());
 
-            Set<ProblemPair> warnings = getWarnings(request.getQuery(), helpCentreQueryProcessorConfig.getLeadingWildcardFields());
+            Set<ProblemPair> warnings =
+                    getWarnings(
+                            request.getQuery(),
+                            helpCentreQueryProcessorConfig.getLeadingWildcardFields());
 
             result =
                     QueryResult.of(
@@ -110,7 +113,8 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
                             result.getFacets(),
                             null,
                             null,
-                            suggestionsWithoutDefaultFilters, warnings);
+                            suggestionsWithoutDefaultFilters,
+                            warnings);
         }
         return result;
     }
