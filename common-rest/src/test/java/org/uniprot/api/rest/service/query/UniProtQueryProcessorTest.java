@@ -145,9 +145,9 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
-    void optimiseWhitelistFieldQueryAndDefaultSearchValue() {
-        String processedQuery = processor.processQuery("GO:1234567 OR P12345");
-        assertThat(processedQuery, is("GO\\:1234567 OR " + FIELD_NAME + ":P12345"));
+    void optimiseWhitelistFieldQueryValue() {
+        String processedQuery = processor.processQuery("GO:1234567");
+        assertThat(processedQuery, is("GO\\:1234567"));
     }
 
     @Test
@@ -209,21 +209,16 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
-    void optimisesPartOfQuery() {
-        String processedQuery = processor.processQuery("a OR P12345");
-        assertThat(processedQuery, is("a OR " + FIELD_NAME + ":P12345"));
+    void optimiseSingleTermQuery() {
+        String processedQuery = processor.processQuery("P12345");
+        assertThat(processedQuery, is(FIELD_NAME + ":P12345"));
     }
 
     @Test
-    void complexQueryWithOptimisation() {
-        String ACC = "P12345";
-        String pre = "a OR ( b AND ( +c:something AND -d:something ) AND ( ";
-        String post = " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
-        String query = pre + ACC + post;
-        String processedQuery = processor.processQuery(query);
-        assertThat(processedQuery, is(pre + FIELD_NAME + ":" + ACC + post));
+    void doNotOptimisesPartOfQuery() {
+        String processedQuery = processor.processQuery("a OR P12345");
+        assertThat(processedQuery, is("a OR P12345"));
     }
-
     @Test
     void complexQueryWithNoOptimisation() {
         String query =
@@ -277,7 +272,7 @@ class UniProtQueryProcessorTest {
                 .when(mockPipeline)
                 .process(any(QueryNode.class));
 
-        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline);
+        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline, null);
         String query = "anything";
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is(query));
@@ -291,7 +286,7 @@ class UniProtQueryProcessorTest {
                 .when(mockPipeline)
                 .process(any(QueryNode.class));
 
-        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline);
+        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline, null);
         String query = "anything";
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is(query));
@@ -442,8 +437,8 @@ class UniProtQueryProcessorTest {
 
     @Test
     void optimiseDefaultSearchValueLowercase() {
-        String processedQuery = processor.processQuery("GO:1234567 OR p12345");
-        assertThat(processedQuery, is("GO\\:1234567 OR " + FIELD_NAME + ":P12345"));
+        String processedQuery = processor.processQuery("p12345");
+        assertThat(processedQuery, is(FIELD_NAME + ":P12345"));
     }
 
     @Test

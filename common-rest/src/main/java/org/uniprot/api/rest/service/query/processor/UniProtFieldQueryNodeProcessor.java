@@ -2,7 +2,6 @@ package org.uniprot.api.rest.service.query.processor;
 
 import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
 import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.UNIPROTKB_ACCESSION_FIELD;
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.*;
 
@@ -12,7 +11,6 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QuotedFieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.EscapeQuerySyntax;
 import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessorImpl;
-import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 
 /**
@@ -61,14 +59,12 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
     }
 
     private static class UniProtFieldQueryNode extends FieldQueryNode {
-        private final List<SearchFieldItem> optimisableFields;
         private final Map<String, String> whiteListFields;
         private final Set<String> searchFields;
         private final Set<String> leadingWildcardFields;
 
         public UniProtFieldQueryNode(FieldQueryNode node, UniProtQueryProcessorConfig conf) {
             super(node.getField(), node.getText(), node.getBegin(), node.getEnd());
-            this.optimisableFields = conf.getOptimisableFields();
             this.whiteListFields = conf.getWhiteListFields();
             this.searchFields = conf.getSearchFieldsNames();
             this.leadingWildcardFields = conf.getLeadingWildcardFields();
@@ -115,20 +111,6 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
         }
 
         private String defaultSearchToQueryString(String text) {
-            Optional<SearchFieldItem> optionalSearchField =
-                    optimisableFields.stream()
-                            .filter(
-                                    f ->
-                                            notNullNotEmpty(f.getValidRegex())
-                                                    && text.matches(f.getValidRegex()))
-                            .findFirst();
-
-            return optionalSearchField
-                    .map(f -> f.getFieldName() + SOLR_FIELD_SEPARATOR + text.toUpperCase())
-                    .orElse(checkUnderScoreInText(text));
-        }
-
-        private String checkUnderScoreInText(String text) {
             String[] splittedText = text.strip().split("_");
             if (splittedText.length == 2
                     && splittedText[0].matches("[a-zA-Z]+")
