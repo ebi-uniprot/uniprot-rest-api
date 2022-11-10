@@ -1,31 +1,30 @@
 package org.uniprot.api.rest.message;
 
-
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {MessageConfig.class, MessageProducer.class, MessageConsumer.class, MessageConfigTest.class})
+@TestPropertySource(locations = "classpath:application.properties")
+@ContextConfiguration(
+        classes = {
+            MessageConfig.class,
+            MessageProducer.class,
+            MessageConsumer.class,
+            MessageConfigTest.class
+        })
 class RabbitMessageIT {
 
-   @Autowired
-   private RabbitTemplate rabbitTemplate;
+    @Autowired private RabbitTemplate rabbitTemplate;
 
-   static EmbeddedInMemoryQpidBroker embeddedBroker;
+    @Autowired private MessageProducer producer;
+    static EmbeddedInMemoryQpidBroker embeddedBroker;
 
     @BeforeAll
     static void init() throws Exception {
@@ -34,14 +33,16 @@ class RabbitMessageIT {
     }
 
     @Test
-    void testSendMessage(){
-
-        rabbitTemplate.convertAndSend("teste", "this is a test message");
-//        Assertions.assertEquals("this is a test message", template.receiveAndConvert(queueName));
+    void testSendMessage() {
+        this.producer.send("********************* This is a test message ************************");
+        //        ((AmqpTemplate) rabbitTemplate).convertAndSend("teste", "this is another test
+        // message");
+        System.out.println();
     }
 
     @AfterAll
-    static void shutdown() {
+    static void shutdown() throws InterruptedException {
+        Thread.sleep(1000);
         embeddedBroker.shutdown();
     }
 }

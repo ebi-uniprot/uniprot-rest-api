@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MessageConfig {
 
-/*    @Bean
+    /*    @Bean
     public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
         connectionFactory.setUsername("guest");
@@ -38,8 +38,4 @@ public class MessageConfig {
     public Binding testeBinding(Queue testeQueue, DirectExchange exchange) {
         return BindingBuilder.bind(testeQueue).to(exchange).with("routing-key-teste");
     }
-
-
-
-
 }

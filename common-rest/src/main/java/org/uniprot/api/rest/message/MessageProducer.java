@@ -6,8 +6,6 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 @Component
 public class MessageProducer {
 
@@ -25,7 +23,6 @@ public class MessageProducer {
         messageProperties.setHeader("ultima", "sim");
         Message message = new Message(messageBody.getBytes(), messageProperties);
 
-        rabbitTemplate.convertAndSend("direct-exchange", "routing-key-teste", message);
+        this.rabbitTemplate.convertAndSend("direct-exchange", "routing-key-teste", message);
     }
-
 }

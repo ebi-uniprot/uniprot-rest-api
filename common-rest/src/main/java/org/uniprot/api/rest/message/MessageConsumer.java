@@ -10,7 +10,11 @@ public class MessageConsumer {
 
     @RabbitListener(queues = {"${queue.name}"})
     public void receive(@Payload Message<String> message) {
-        System.out.println("Message " + message.getPayload() + " with ultima header " + message.getHeaders().get("ultima"));
+        System.out.println(
+                "Message "
+                        + message.getPayload()
+                        + " with ultima header "
+                        + message.getHeaders().get("ultima"));
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
