@@ -1,31 +1,29 @@
 package org.uniprot.api.rest.message;
 
+
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.AmqpAdmin;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-
 @SpringJUnitConfig
-@ContextConfiguration(classes = {MessageConfig.class, MessageProducer.class, MessageConsumer.class})
+@ContextConfiguration(classes = {MessageConfig.class, MessageProducer.class, MessageConsumer.class, MessageConfigTest.class})
 class RabbitMessageIT {
 
-    @Autowired
-    RabbitTemplate rabbitTemplate;
+   @Autowired
+   private RabbitTemplate rabbitTemplate;
 
-    /*@RegisterExtension */
-    static EmbeddedInMemoryQpidBroker embeddedBroker;
+   static EmbeddedInMemoryQpidBroker embeddedBroker;
 
     @BeforeAll
     static void init() throws Exception {
@@ -35,8 +33,9 @@ class RabbitMessageIT {
 
     @Test
     void testSendMessage(){
-        Message message = new Message("message body".getBytes(StandardCharsets.UTF_8), null);
-        rabbitTemplate.send("","", message);
+
+        rabbitTemplate.convertAndSend("teste", "this is a test message");
+//        Assertions.assertEquals("this is a test message", template.receiveAndConvert(queueName));
     }
 
     @AfterAll
