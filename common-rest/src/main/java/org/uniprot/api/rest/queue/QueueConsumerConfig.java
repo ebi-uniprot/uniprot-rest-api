@@ -13,16 +13,16 @@ import org.springframework.context.annotation.Configuration;
  * @created 22/11/2022
  */
 @Configuration
-public abstract class AbstractConsumerConfig {
-    protected abstract void setQueueName(SimpleMessageListenerContainer messageListenerContainer);
+public class QueueConsumerConfig {
 
     @Bean
     public MessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory,
-                                                                   @Qualifier("Consumer") MessageListener messageListener) {
+                                                                   @Qualifier("Consumer") MessageListener messageListener,
+                                                             RabbitMQConfigProperties rabbitMQConfigProperties) {
 
         SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
         simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
-        setQueueName(simpleMessageListenerContainer);
+        simpleMessageListenerContainer.setQueueNames(rabbitMQConfigProperties.getQueueName());
         simpleMessageListenerContainer.setMessageListener(messageListener);
         return simpleMessageListenerContainer;
     }

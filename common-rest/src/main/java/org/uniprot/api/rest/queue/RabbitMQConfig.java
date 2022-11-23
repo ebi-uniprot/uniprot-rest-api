@@ -24,34 +24,44 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     @Bean
-    public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
-        connectionFactory.setUsername("guest");// TODO externalise
-        connectionFactory.setPassword("guest");
-        connectionFactory.setPort(5672);
+    public RabbitMQConfigProperties rabbitMQConfigProperties(){
+        return new RabbitMQConfigProperties();
+    }
+
+    @Bean
+    public ConnectionFactory connectionFactory(RabbitMQConfigProperties rabbitMQConfigProperties) {
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitMQConfigProperties.getHost());
+        connectionFactory.setUsername(rabbitMQConfigProperties.getUser());
+        connectionFactory.setPassword(rabbitMQConfigProperties.getPassword());
+        connectionFactory.setPort(rabbitMQConfigProperties.getPort());
         return connectionFactory;
     }
 
     @Bean
-    public Exchange uniProtKBExchange(){
-        return ExchangeBuilder.directExchange(RabbitMQBinding.UNIPROTKB.getExchangeName()).durable(true).build();
+    public Exchange downloadExchange(RabbitMQConfigProperties rabbitMQConfigProperties){
+        return ExchangeBuilder.directExchange(rabbitMQConfigProperties.getExchangeName())
+                .durable(rabbitMQConfigProperties.isDurable()).build();
     }
 
     @Bean
-    public Queue uniProtKBStreamQueue() {
-        return QueueBuilder.durable(RabbitMQBinding.UNIPROTKB.getQueueName()).build();
+    public Queue downloadQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
+        if(rabbitMQConfigProperties.isDurable()){
+            return QueueBuilder.durable(rabbitMQConfigProperties.getQueueName()).build();
+        } else {
+            return QueueBuilder.nonDurable(rabbitMQConfigProperties.getQueueName()).build();
+        }
     }
 
     @Bean
-    public Binding uniProtKBStreamBinding(){
+    public Binding downloadBinding(Queue downloadQueue, Exchange downloadExchange,
+                                   RabbitMQConfigProperties rabbitMQConfigProperties){
         return BindingBuilder
-                .bind(uniProtKBStreamQueue())
-                .to((DirectExchange) uniProtKBExchange())
-                .with(RabbitMQBinding.UNIPROTKB.getRoutingKey());
+                .bind(downloadQueue)
+                .to((DirectExchange) downloadExchange)
+                .with(rabbitMQConfigProperties.getRoutingKey());
     }
-    // TODO add similar config for uniref and uniparc
 
-    @Bean // TODO do we need it?
+    @Bean
     public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
         RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
         return rabbitAdmin ;

@@ -12,9 +12,9 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
  * @created 21/11/2022
  */
 @RestController
-public class UniProtKBAsyncStreamController {
+public class UniProtKBDownloadController {
     private final ProducerMessageService messageService;
-    public UniProtKBAsyncStreamController(ProducerMessageService messageService) {
+    public UniProtKBDownloadController(ProducerMessageService messageService) {
         this.messageService = messageService;
     }
 

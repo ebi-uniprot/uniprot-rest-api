@@ -12,15 +12,16 @@ import org.springframework.context.annotation.Configuration;
  * @created 22/11/2022
  */
 @Configuration
-public abstract class AbstractProducerConfig {
-
-    protected abstract void setRabbitExchange(RabbitTemplate template);
+public class MessageProducerConfig {
 
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter jsonMessageConverter) {
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
+                                         RabbitMQConfigProperties rabbitMQConfigProperties,
+                                         MessageConverter jsonMessageConverter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(jsonMessageConverter);
-        setRabbitExchange(template);
+        template.setExchange(rabbitMQConfigProperties.getExchangeName());
+        template.setRoutingKey(rabbitMQConfigProperties.getRoutingKey());
         return template;
     }
 

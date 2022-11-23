@@ -22,8 +22,9 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     public String sendMessage(StreamRequest streamRequest) {
         // compute job id TODO
         String jobId = "123456789";
-        // write to redis
+        // write to redis TODO
         this.rabbitTemplate.convertAndSend(streamRequest);
+        // write to redis and send message to queue should be atomic
         return jobId;
     }
 }
