@@ -115,25 +115,6 @@ class UniProtFieldQueryNodeProcessorTest {
     }
 
     @Test
-    void processDefaultSearchWithOpitimisableWhiteListThenAddFieldName() throws QueryNodeException {
-        SearchFieldItem optimisableField = new SearchFieldItem();
-        optimisableField.setFieldName("field");
-        optimisableField.setValidRegex("^[0-9]*");
-        UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder()
-                        .searchFieldsNames(Set.of("field"))
-                        .optimisableFields(List.of(optimisableField))
-                        .build();
-        UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
-
-        FieldQueryNode node = new FieldQueryNode(IMPOSSIBLE_FIELD, "1245", 1, 2);
-        QueryNode processedNode = processor.process(node);
-        CharSequence result = processedNode.toQueryString(new EscapeQuerySyntaxImpl());
-        assertNotNull(result);
-        assertEquals("field:1245", result);
-    }
-
-    @Test
     void processDefaultSearchWithNoOpitimisableWhiteListValue() throws QueryNodeException {
         SearchFieldItem optimisableField = new SearchFieldItem();
         optimisableField.setFieldName("field");
