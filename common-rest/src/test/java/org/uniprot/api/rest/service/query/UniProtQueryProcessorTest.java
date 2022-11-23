@@ -219,6 +219,13 @@ class UniProtQueryProcessorTest {
         String processedQuery = processor.processQuery("a OR P12345");
         assertThat(processedQuery, is("a OR P12345"));
     }
+
+    @Test
+    void doNotOptimisesPartBeforeOfQuery() {
+        String processedQuery = processor.processQuery("P12345 AND cancer");
+        assertThat(processedQuery, is("P12345 AND cancer"));
+    }
+
     @Test
     void complexQueryWithNoOptimisation() {
         String query =
