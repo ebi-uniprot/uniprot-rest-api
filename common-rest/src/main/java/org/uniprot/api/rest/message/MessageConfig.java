@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@EnableRabbit
-@Configuration
+//@EnableRabbit
+//@Configuration
 public class MessageConfig {
 
     /*    @Bean
@@ -22,7 +22,7 @@ public class MessageConfig {
     }*/
 
     @Value("${queue.name}")
-    private String queueName;
+    private String queueName="test";
 
     @Bean
     public Queue testeQueue() {

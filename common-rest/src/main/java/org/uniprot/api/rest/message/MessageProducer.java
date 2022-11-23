@@ -6,7 +6,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class MessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
