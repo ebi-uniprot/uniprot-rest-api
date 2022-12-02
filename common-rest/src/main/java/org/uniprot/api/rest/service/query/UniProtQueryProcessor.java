@@ -1,6 +1,11 @@
 package org.uniprot.api.rest.service.query;
 
 import static org.uniprot.api.rest.validation.ValidSolrQuerySyntax.QuerySyntaxValidator.replaceForwardSlashes;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +17,7 @@ import org.apache.lucene.queryparser.flexible.standard.parser.EscapeQuerySyntaxI
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
  * This class does the following:
@@ -38,16 +44,20 @@ public class UniProtQueryProcessor implements QueryProcessor {
     public static final String UNIPROTKB_ACCESSION_FIELD = "accession";
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
     private final QueryNodeProcessorPipeline queryProcessorPipeline;
+    private final List<SearchFieldItem> optimisableFields;
 
     public static UniProtQueryProcessor newInstance(UniProtQueryProcessorConfig config) {
-        return new UniProtQueryProcessor(new UniProtQueryNodeProcessorPipeline(config));
+        return new UniProtQueryProcessor(
+                new UniProtQueryNodeProcessorPipeline(config), config.getOptimisableFields());
     }
 
     public static UniProtQueryProcessor newInstance(QueryNodeProcessorPipeline pipeline) {
-        return new UniProtQueryProcessor(pipeline);
+        return new UniProtQueryProcessor(pipeline, Collections.emptyList());
     }
 
-    public UniProtQueryProcessor(QueryNodeProcessorPipeline pipeline) {
+    public UniProtQueryProcessor(
+            QueryNodeProcessorPipeline pipeline, List<SearchFieldItem> optimisableFields) {
+        this.optimisableFields = optimisableFields;
         queryProcessorPipeline = pipeline;
     }
 
@@ -55,8 +65,8 @@ public class UniProtQueryProcessor implements QueryProcessor {
     public String processQuery(String query) {
         try {
             StandardSyntaxParser syntaxParser = new StandardSyntaxParser();
-
-            String queryWithEscapedForwardSlashes = replaceForwardSlashes(query);
+            String optimisedQuery = proccessOptimisableFields(query);
+            String queryWithEscapedForwardSlashes = replaceForwardSlashes(optimisedQuery);
             QueryNode queryTree =
                     syntaxParser.parse(queryWithEscapedForwardSlashes, IMPOSSIBLE_FIELD);
             QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
@@ -66,5 +76,19 @@ public class UniProtQueryProcessor implements QueryProcessor {
             log.warn("Problem processing user query: " + query, e);
             return query;
         }
+    }
+
+    private String proccessOptimisableFields(String text) {
+        Optional<SearchFieldItem> optionalSearchField =
+                optimisableFields.stream()
+                        .filter(
+                                f ->
+                                        notNullNotEmpty(f.getValidRegex())
+                                                && text.matches(f.getValidRegex()))
+                        .findFirst();
+
+        return optionalSearchField
+                .map(f -> f.getFieldName() + ":" + text.toUpperCase())
+                .orElse(text);
     }
 }
