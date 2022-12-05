@@ -239,7 +239,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
                 jsonPath("$.facets.*.name", contains("database_facet", "organism_name"));
         ResultMatcher rm4 = jsonPath("$.facets[0].values", iterableWithSize(2));
         ResultMatcher rm5 = jsonPath("$.facets[0].values[0].label", is("UniProtKB"));
-        ResultMatcher rm6 = jsonPath("$.facets[0].values[0].value", is("1"));
+        ResultMatcher rm6 = jsonPath("$.facets[0].values[0].value", is("100"));
         ResultMatcher rm7 = jsonPath("$.facets[0].values[0].count", is(10));
         ResultMatcher rm8 = jsonPath("$.facets[1].values", iterableWithSize(2));
         ResultMatcher rm9 = jsonPath("$.facets[1].values.*.label").doesNotExist();
@@ -322,7 +322,7 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected String getQueryFilter() {
-        return "database_facet:1";
+        return "database_facet:100";
     }
 
     @Override
