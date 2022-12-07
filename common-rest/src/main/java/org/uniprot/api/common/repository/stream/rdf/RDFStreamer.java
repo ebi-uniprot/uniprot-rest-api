@@ -34,8 +34,8 @@ public class RDFStreamer {
     }
 
     public Stream<String> idsToRDFStoreStream(SolrRequest solrRequest) {
-        List<String> accessions = fetchIds(solrRequest).collect(Collectors.toList());
-        return streamRDFXML(accessions.stream());
+        List<String> entryIds = fetchIds(solrRequest).collect(Collectors.toList());
+        return streamRDFXML(entryIds.stream());
     }
 
     public Stream<String> streamRDFXML(Stream<String> entryIds) {
