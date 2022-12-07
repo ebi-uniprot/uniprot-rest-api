@@ -1,7 +1,7 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +10,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
@@ -23,30 +24,46 @@ public class UniProtKBMessageListener implements MessageListener {
 
     private final MessageConverter converter;
     private final UniProtEntryService service;
+    private final DownloadConfigProperties downloadConfigProperties;
 
-    public UniProtKBMessageListener(MessageConverter converter, UniProtEntryService service) {
+    public UniProtKBMessageListener(MessageConverter converter, UniProtEntryService service, DownloadConfigProperties downloadConfigProperties) {
         this.converter = converter;
         this.service = service;
+        this.downloadConfigProperties = downloadConfigProperties;
     }
 
     @Override
     public void onMessage(Message message) {
         UniProtKBStreamRequest request = (UniProtKBStreamRequest) converter.fromMessage(message);
-        //Stream<String> ids = service.streamIds(request);
         String jobId = message.getMessageProperties().getHeader("jobId");
 
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-        String messageText = "message_" + format.format(new Date()) + jobId;
-        log.info("Message received" + messageText);
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        Path idsFile = Paths.get(downloadConfigProperties.getFolder(), jobId);
+        if(Files.notExists(idsFile)){
+            Stream<String> ids = streamIds(request);
+            saveIdsInTempFile(idsFile, ids);
+            //redis update status?
+        } else {
+            //redis update status?
         }
-        log.info("Message processed" + messageText);
+
+        //TESTING TO ALSO CREATE RESULT
+        log.info("Message processed");
         // talk to redis
         // talk to solr
         // write to nfs
         // acknowledge the queue with failure/success
+    }
+
+    private void saveIdsInTempFile(Path filePath, Stream<String> ids) {
+        Iterable<String> source = ids::iterator;
+        try {
+            Files.write(filePath, source, StandardOpenOption.CREATE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    Stream<String> streamIds(UniProtKBStreamRequest request) {
+        return service.streamIds(request);
     }
 }
