@@ -2,6 +2,7 @@ package org.uniprot.api.common.repository.stream.rdf;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -33,8 +34,8 @@ public class RDFStreamer {
     }
 
     public Stream<String> idsToRDFStoreStream(SolrRequest solrRequest) {
-        Stream<String> idsStream = fetchIds(solrRequest);
-        return streamRDFXML(idsStream);
+        List<String> accessions = fetchIds(solrRequest).collect(Collectors.toList());
+        return streamRDFXML(accessions.stream());
     }
 
     public Stream<String> streamRDFXML(Stream<String> entryIds) {
@@ -47,7 +48,7 @@ public class RDFStreamer {
                         .flatMap(Collection::stream)
                         .onClose(
                                 () ->
-                                        log.debug(
+                                        log.info(
                                                 "Finished streaming over search results and fetching from RDF server."));
 
         // prepend rdf prolog then rdf data and then append closing rdf tag
