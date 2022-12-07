@@ -1,16 +1,14 @@
-package org.uniprot.api.rest.message;
+package org.uniprot.api.rest.download.message;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-//@EnableRabbit
-//@Configuration
+// @EnableRabbit
+// @Configuration
 public class MessageConfig {
 
     /*    @Bean
@@ -22,7 +20,7 @@ public class MessageConfig {
     }*/
 
     @Value("${queue.name}")
-    private String queueName="test";
+    private String queueName = "test";
 
     @Bean
     public Queue testeQueue() {

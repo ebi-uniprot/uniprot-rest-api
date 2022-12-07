@@ -1,8 +1,8 @@
-package org.uniprot.api.rest.queue;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
+package org.uniprot.api.rest.download.queue;
 
 import lombok.Data;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Rabbit MQ properties bean that will be injected with values from application.properties.
@@ -27,4 +27,6 @@ public class RabbitMQConfigProperties {
     private String routingKey;
 
     private boolean durable;
+
+    private int concurrentConsumers;
 }

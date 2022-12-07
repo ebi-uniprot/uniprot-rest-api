@@ -1,14 +1,12 @@
-package org.uniprot.api.rest.message;
+package org.uniprot.api.rest.download.message;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Component;
 
-//@Component
+// @Component
 public class MessageConsumer {
 
-//    @RabbitListener(queues = {"${queue.name}"})
+    //    @RabbitListener(queues = {"${queue.name}"})
     public void receive(@Payload Message<String> message) {
         System.out.println(
                 "Message "

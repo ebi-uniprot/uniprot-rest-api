@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.message;
+package org.uniprot.api.rest.download.message;
 
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;

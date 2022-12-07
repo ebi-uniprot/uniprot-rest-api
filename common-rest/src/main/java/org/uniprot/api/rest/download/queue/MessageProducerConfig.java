@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.queue;
+package org.uniprot.api.rest.download.queue;
 
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -15,9 +15,10 @@ import org.springframework.context.annotation.Configuration;
 public class MessageProducerConfig {
 
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory,
-                                         RabbitMQConfigProperties rabbitMQConfigProperties,
-                                         MessageConverter jsonMessageConverter) {
+    public RabbitTemplate rabbitTemplate(
+            ConnectionFactory connectionFactory,
+            RabbitMQConfigProperties rabbitMQConfigProperties,
+            MessageConverter jsonMessageConverter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(jsonMessageConverter);
         template.setExchange(rabbitMQConfigProperties.getExchangeName());
@@ -27,7 +28,8 @@ public class MessageProducerConfig {
 
     @Bean
     public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+        converter.setCreateMessageIds(true);
+        return converter;
     }
-
 }

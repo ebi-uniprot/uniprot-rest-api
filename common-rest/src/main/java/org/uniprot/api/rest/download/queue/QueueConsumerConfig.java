@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.queue;
+package org.uniprot.api.rest.download.queue;
 
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -16,14 +16,18 @@ import org.springframework.context.annotation.Configuration;
 public class QueueConsumerConfig {
 
     @Bean
-    public MessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory,
-                                                                   @Qualifier("Consumer") MessageListener messageListener,
-                                                             RabbitMQConfigProperties rabbitMQConfigProperties) {
+    public MessageListenerContainer messageListenerContainer(
+            ConnectionFactory connectionFactory,
+            @Qualifier("Consumer") MessageListener messageListener,
+            RabbitMQConfigProperties rabbitMQConfigProperties) {
 
-        SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
+        SimpleMessageListenerContainer simpleMessageListenerContainer =
+                new SimpleMessageListenerContainer();
         simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
         simpleMessageListenerContainer.setQueueNames(rabbitMQConfigProperties.getQueueName());
         simpleMessageListenerContainer.setMessageListener(messageListener);
+        simpleMessageListenerContainer.setConcurrentConsumers(
+                rabbitMQConfigProperties.getConcurrentConsumers());
         return simpleMessageListenerContainer;
     }
 }

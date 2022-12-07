@@ -1,12 +1,11 @@
-package org.uniprot.api.rest.message;
+package org.uniprot.api.rest.download.message;
 
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Component;
 
-//@Component
+// @Component
 public class MessageProducer {
 
     private final RabbitTemplate rabbitTemplate;

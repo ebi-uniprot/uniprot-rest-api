@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.rest.queue.ProducerMessageService;
+import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 
 /**
@@ -14,6 +14,7 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 @RestController
 public class UniProtKBDownloadController {
     private final ProducerMessageService messageService;
+
     public UniProtKBDownloadController(ProducerMessageService messageService) {
         this.messageService = messageService;
     }

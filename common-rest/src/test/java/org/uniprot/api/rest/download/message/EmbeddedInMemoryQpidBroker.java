@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.message;
+package org.uniprot.api.rest.download.message;
 
 import java.net.URL;
 import java.util.HashMap;

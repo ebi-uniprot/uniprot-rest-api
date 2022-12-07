@@ -1,5 +1,4 @@
-package org.uniprot.api.rest.queue;
-
+package org.uniprot.api.rest.download.queue;
 
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
@@ -17,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Initialisation code for Rabbit MQ to be used by both producer and consumer
+ *
  * @author sahmad
  * @created 23/11/2022
  */
@@ -24,13 +24,14 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     @Bean
-    public RabbitMQConfigProperties rabbitMQConfigProperties(){
+    public RabbitMQConfigProperties rabbitMQConfigProperties() {
         return new RabbitMQConfigProperties();
     }
 
     @Bean
     public ConnectionFactory connectionFactory(RabbitMQConfigProperties rabbitMQConfigProperties) {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(rabbitMQConfigProperties.getHost());
+        CachingConnectionFactory connectionFactory =
+                new CachingConnectionFactory(rabbitMQConfigProperties.getHost());
         connectionFactory.setUsername(rabbitMQConfigProperties.getUser());
         connectionFactory.setPassword(rabbitMQConfigProperties.getPassword());
         connectionFactory.setPort(rabbitMQConfigProperties.getPort());
@@ -38,14 +39,15 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Exchange downloadExchange(RabbitMQConfigProperties rabbitMQConfigProperties){
+    public Exchange downloadExchange(RabbitMQConfigProperties rabbitMQConfigProperties) {
         return ExchangeBuilder.directExchange(rabbitMQConfigProperties.getExchangeName())
-                .durable(rabbitMQConfigProperties.isDurable()).build();
+                .durable(rabbitMQConfigProperties.isDurable())
+                .build();
     }
 
     @Bean
     public Queue downloadQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
-        if(rabbitMQConfigProperties.isDurable()){
+        if (rabbitMQConfigProperties.isDurable()) {
             return QueueBuilder.durable(rabbitMQConfigProperties.getQueueName()).build();
         } else {
             return QueueBuilder.nonDurable(rabbitMQConfigProperties.getQueueName()).build();
@@ -53,10 +55,11 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding downloadBinding(Queue downloadQueue, Exchange downloadExchange,
-                                   RabbitMQConfigProperties rabbitMQConfigProperties){
-        return BindingBuilder
-                .bind(downloadQueue)
+    public Binding downloadBinding(
+            Queue downloadQueue,
+            Exchange downloadExchange,
+            RabbitMQConfigProperties rabbitMQConfigProperties) {
+        return BindingBuilder.bind(downloadQueue)
                 .to((DirectExchange) downloadExchange)
                 .with(rabbitMQConfigProperties.getRoutingKey());
     }
@@ -64,6 +67,6 @@ public class RabbitMQConfig {
     @Bean
     public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
         RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
-        return rabbitAdmin ;
+        return rabbitAdmin;
     }
 }

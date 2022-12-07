@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.queue;
+package org.uniprot.api.rest.download.queue;
 
 import org.uniprot.api.rest.request.StreamRequest;
 

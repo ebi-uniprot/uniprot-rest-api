@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.message;
+package org.uniprot.api.rest.download.message;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
