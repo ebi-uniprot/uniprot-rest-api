@@ -232,6 +232,28 @@ class QueryFieldValidatorTest {
         assertEquals("taxonomy_id", validator.getErrorFields(ErrorType.VALUE).get(0));
     }
 
+    @Test
+    void isValidWithForwardSlashReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("a/b//c", null);
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidInvalidFieldWithForwardSlashReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("invalid:a//b/c", null);
+        assertFalse(result);
+        assertEquals(1, validator.getErrorFields(ErrorType.FIELD).size());
+        assertEquals("invalid", validator.getErrorFields(ErrorType.FIELD).get(0));
+    }
+
     private ValidSolrQueryFields getMockedValidSolrQueryFields() {
         ValidSolrQueryFields validSolrQueryFields = Mockito.mock(ValidSolrQueryFields.class);
         Mockito.when(validSolrQueryFields.uniProtDataType()).thenReturn(UniProtDataType.UNIPROTKB);

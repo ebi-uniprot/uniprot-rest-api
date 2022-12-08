@@ -1,7 +1,7 @@
 package org.uniprot.api.rest.service.query;
 
-import static org.uniprot.api.rest.validation.ValidSolrQuerySyntax.QuerySyntaxValidator.replaceForwardSlashes;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
+import static org.uniprot.store.search.SolrQueryUtil.*;
 
 import java.util.Collections;
 import java.util.List;

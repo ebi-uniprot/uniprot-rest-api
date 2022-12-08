@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.validation;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static org.uniprot.store.search.SolrQueryUtil.*;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -96,6 +97,7 @@ public @interface ValidSolrQueryFields {
                 try {
                     QueryParser qp = new QueryParser(DEFAULT_FIELD_NAME, new WhitespaceAnalyzer());
                     qp.setAllowLeadingWildcard(true);
+                    queryString = replaceForwardSlashes(queryString);
                     Query query = qp.parse(queryString);
                     if (!(query instanceof MatchAllDocsQuery)) {
                         isValid = hasValidQueryField(query, context);
