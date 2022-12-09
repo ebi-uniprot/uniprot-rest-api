@@ -48,7 +48,7 @@ public class RDFStreamer {
                         .flatMap(Collection::stream)
                         .onClose(
                                 () ->
-                                        log.info(
+                                        log.debug(
                                                 "Finished streaming over search results and fetching from RDF server."));
 
         // prepend rdf prolog then rdf data and then append closing rdf tag
