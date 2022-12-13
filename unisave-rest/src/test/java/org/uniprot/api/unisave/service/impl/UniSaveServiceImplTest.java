@@ -13,6 +13,11 @@ import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
 import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED_SEQUENCE_MEMBER;
 import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +66,7 @@ class UniSaveServiceImplTest {
             when(identifierStatus.getTargetAccession()).thenReturn(targetAcc);
             ReleaseImpl release = new ReleaseImpl();
             release.setReleaseNumber(releaseNumber);
+            release.setReleaseDate(new Date());
             when(identifierStatus.getEventRelease()).thenReturn(release);
             EventTypeEnum eventType = EventTypeEnum.MERGED;
             when(identifierStatus.getEventTypeEnum()).thenReturn(eventType);
@@ -77,6 +83,35 @@ class UniSaveServiceImplTest {
             assertThat(events.get(0).getEventType(), is(eventType.toString()));
             assertThat(events.get(0).getTargetAccession(), is(targetAcc));
             assertThat(events.get(0).getRelease(), is(releaseNumber));
+        }
+
+        @Test
+        void canGetAccessionStatusFilterFutureReleaseEvents() {
+            // given
+            String accession = ACCESSION;
+            String targetAcc = "target acc";
+            String releaseNumber = "1";
+            AccessionStatusInfoImpl status = new AccessionStatusInfoImpl();
+            status.setAccession(accession);
+            IdentifierStatus identifierStatus = mock(IdentifierStatus.class);
+            when(identifierStatus.getTargetAccession()).thenReturn(targetAcc);
+            ReleaseImpl release = new ReleaseImpl();
+            release.setReleaseNumber(releaseNumber);
+            Date dt = Date.from(LocalDate.now().atStartOfDay(ZoneOffset.systemDefault()).plusDays(1).toInstant());
+            release.setReleaseDate(dt);
+            when(identifierStatus.getEventRelease()).thenReturn(release);
+            EventTypeEnum eventType = EventTypeEnum.MERGED;
+            when(identifierStatus.getEventTypeEnum()).thenReturn(eventType);
+            status.setEvents(singletonList(identifierStatus));
+            when(uniSaveRepository.retrieveEntryStatusInfo(accession)).thenReturn(status);
+
+            // when
+            UniSaveEntry entry = uniSaveService.getAccessionStatus(accession);
+
+            // then
+            List<AccessionEvent> events = entry.getEvents();
+            assertThat(entry.getAccession(), is(accession));
+            assertThat(events, hasSize(0));
         }
 
         @Test
