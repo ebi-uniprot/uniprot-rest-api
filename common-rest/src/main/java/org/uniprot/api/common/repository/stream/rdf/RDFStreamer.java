@@ -2,6 +2,7 @@ package org.uniprot.api.common.repository.stream.rdf;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -33,8 +34,8 @@ public class RDFStreamer {
     }
 
     public Stream<String> idsToRDFStoreStream(SolrRequest solrRequest) {
-        Stream<String> idsStream = fetchIds(solrRequest);
-        return streamRDFXML(idsStream);
+        List<String> entryIds = fetchIds(solrRequest).collect(Collectors.toList());
+        return streamRDFXML(entryIds.stream());
     }
 
     public Stream<String> streamRDFXML(Stream<String> entryIds) {
