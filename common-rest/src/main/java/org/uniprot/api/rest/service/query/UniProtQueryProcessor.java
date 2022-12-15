@@ -79,16 +79,17 @@ public class UniProtQueryProcessor implements QueryProcessor {
     }
 
     private String proccessOptimisableFields(String text) {
+        String cleanQuery = text.strip().replaceAll("^\\(|\\)$", "");
         Optional<SearchFieldItem> optionalSearchField =
                 optimisableFields.stream()
                         .filter(
                                 f ->
                                         notNullNotEmpty(f.getValidRegex())
-                                                && text.matches(f.getValidRegex()))
+                                                && cleanQuery.strip().matches(f.getValidRegex()))
                         .findFirst();
 
         return optionalSearchField
-                .map(f -> f.getFieldName() + ":" + text.toUpperCase())
+                .map(f -> f.getFieldName() + ":" + cleanQuery.toUpperCase())
                 .orElse(text);
     }
 }
