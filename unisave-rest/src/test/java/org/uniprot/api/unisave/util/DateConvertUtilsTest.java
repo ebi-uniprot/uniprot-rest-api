@@ -25,4 +25,9 @@ class DateConvertUtilsTest {
         assertEquals(now, result);
     }
 
+    @Test
+    void convertToLocalDateViaInstantWithNullThrowsIllegalArgumentException() {
+       assertThrows(IllegalArgumentException.class, () ->DateConvertUtils.convertToLocalDateViaInstant(null));
+    }
+
 }

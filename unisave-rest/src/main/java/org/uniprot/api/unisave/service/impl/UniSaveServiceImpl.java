@@ -234,7 +234,7 @@ public class UniSaveServiceImpl implements UniSaveService {
 
     private List<AccessionEvent> entryStatusInfoToEvents(AccessionStatusInfo statusInfo) {
         return statusInfo.getEvents().stream()
-                .filter(this::filterEventWithReleaseDate)
+                .filter(this::isEventDateOnOrBeforeCurrentReleaseDate)
                 .map(
                         event ->
                                 AccessionEvent.builder()
@@ -327,7 +327,7 @@ public class UniSaveServiceImpl implements UniSaveService {
         return date.compareTo(LatestReleaseCache.currentDate) <= 0;
     }
 
-    private boolean filterEventWithReleaseDate(org.uniprot.api.unisave.repository.domain.AccessionEvent event) {
+    private boolean isEventDateOnOrBeforeCurrentReleaseDate(org.uniprot.api.unisave.repository.domain.AccessionEvent event) {
         boolean result = false;
         if(event.getEventRelease() != null && event.getEventRelease().getReleaseDate() != null) {
             LocalDate date = DateConvertUtils.convertToLocalDateViaInstant(event.getEventRelease().getReleaseDate());
