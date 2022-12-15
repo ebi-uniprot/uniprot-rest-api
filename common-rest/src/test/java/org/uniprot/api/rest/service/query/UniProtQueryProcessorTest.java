@@ -456,8 +456,8 @@ class UniProtQueryProcessorTest {
 
     @Test
     void doNotOptimiseDefaultSearchWithComplexQuery() {
-        String processedQuery = processor.processQuery("p12345 cancer");
-        assertThat(processedQuery, is("p12345 AND cancer"));
+        String processedQuery = processor.processQuery("(p12345 cancer)");
+        assertThat(processedQuery, is("( p12345 AND cancer )"));
     }
 
     @Test
