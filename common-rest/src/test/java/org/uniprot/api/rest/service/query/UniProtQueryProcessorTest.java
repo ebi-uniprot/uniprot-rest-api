@@ -461,6 +461,12 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
+    void doNotOptimiseDefaultSearchWithComplexWithBracketsQuery() {
+        String processedQuery = processor.processQuery("(p12345) AND (cancer)");
+        assertThat(processedQuery, is("( p12345 ) AND ( cancer )"));
+    }
+
+    @Test
     void changeLowercaseAccessionToUppercase() {
         String processedQuery = processor.processQuery("GO:1234567 OR accession:p12345");
         assertThat(processedQuery, is("GO\\:1234567 OR " + "accession:P12345"));
