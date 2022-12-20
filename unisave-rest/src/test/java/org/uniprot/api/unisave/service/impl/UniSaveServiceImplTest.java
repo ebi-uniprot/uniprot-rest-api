@@ -14,8 +14,6 @@ import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.AGGREGATED
 import static org.uniprot.api.unisave.service.impl.UniSaveServiceImpl.LATEST_RELEASE;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
@@ -97,7 +95,12 @@ class UniSaveServiceImplTest {
             when(identifierStatus.getTargetAccession()).thenReturn(targetAcc);
             ReleaseImpl release = new ReleaseImpl();
             release.setReleaseNumber(releaseNumber);
-            Date dt = Date.from(LocalDate.now().atStartOfDay(ZoneOffset.systemDefault()).plusDays(1).toInstant());
+            Date dt =
+                    Date.from(
+                            LocalDate.now()
+                                    .atStartOfDay(ZoneOffset.systemDefault())
+                                    .plusDays(1)
+                                    .toInstant());
             release.setReleaseDate(dt);
             when(identifierStatus.getEventRelease()).thenReturn(release);
             EventTypeEnum eventType = EventTypeEnum.MERGED;
