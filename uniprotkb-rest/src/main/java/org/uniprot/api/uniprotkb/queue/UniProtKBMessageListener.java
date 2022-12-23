@@ -41,12 +41,12 @@ public class UniProtKBMessageListener implements MessageListener {
         if(Files.notExists(idsFile)){
             Stream<String> ids = streamIds(request);
             saveIdsInTempFile(idsFile, ids);
-            //redis update status?
+            // redis update status?
         } else {
-            //redis update status?
+            // redis update status?
         }
 
-        //TESTING TO ALSO CREATE RESULT
+        // TESTING TO ALSO CREATE RESULT
         log.info("Message processed");
         // talk to redis
         // talk to solr
