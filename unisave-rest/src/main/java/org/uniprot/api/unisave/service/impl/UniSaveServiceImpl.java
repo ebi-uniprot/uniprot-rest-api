@@ -327,10 +327,13 @@ public class UniSaveServiceImpl implements UniSaveService {
         return date.compareTo(LatestReleaseCache.currentDate) <= 0;
     }
 
-    private boolean isEventDateOnOrBeforeCurrentReleaseDate(org.uniprot.api.unisave.repository.domain.AccessionEvent event) {
+    private boolean isEventDateOnOrBeforeCurrentReleaseDate(
+            org.uniprot.api.unisave.repository.domain.AccessionEvent event) {
         boolean result = false;
-        if(event.getEventRelease() != null && event.getEventRelease().getReleaseDate() != null) {
-            LocalDate date = DateConvertUtils.convertToLocalDateViaInstant(event.getEventRelease().getReleaseDate());
+        if (event.getEventRelease() != null && event.getEventRelease().getReleaseDate() != null) {
+            LocalDate date =
+                    DateConvertUtils.convertToLocalDateViaInstant(
+                            event.getEventRelease().getReleaseDate());
             updateLatestReleaseCache();
             result = date.compareTo(LatestReleaseCache.currentDate) <= 0;
         }

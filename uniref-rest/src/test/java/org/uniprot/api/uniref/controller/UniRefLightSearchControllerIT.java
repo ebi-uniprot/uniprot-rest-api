@@ -212,6 +212,27 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
                 .andExpect(jsonPath("$.results[*].organismCount", contains(12)));
     }
 
+    @Test
+    void searchByUniRefId() throws Exception {
+        // given
+        UniRefEntry entry = UniRefEntryMocker.createEntry(1, 12, UniRefType.UniRef50);
+        saveEntry(entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getSearchRequestPath() + "?query=UniRef50_P03901")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results[*].id", contains("UniRef50_P03901")));
+    }
+
     @Override
     protected List<Triple<String, String, List<String>>> getTriplets() {
         return List.of(
