@@ -26,7 +26,10 @@ public class UniProtKBMessageListener implements MessageListener {
     private final UniProtEntryService service;
     private final DownloadConfigProperties downloadConfigProperties;
 
-    public UniProtKBMessageListener(MessageConverter converter, UniProtEntryService service, DownloadConfigProperties downloadConfigProperties) {
+    public UniProtKBMessageListener(
+            MessageConverter converter,
+            UniProtEntryService service,
+            DownloadConfigProperties downloadConfigProperties) {
         this.converter = converter;
         this.service = service;
         this.downloadConfigProperties = downloadConfigProperties;
@@ -38,7 +41,7 @@ public class UniProtKBMessageListener implements MessageListener {
         String jobId = message.getMessageProperties().getHeader("jobId");
 
         Path idsFile = Paths.get(downloadConfigProperties.getFolder(), jobId);
-        if(Files.notExists(idsFile)){
+        if (Files.notExists(idsFile)) {
             Stream<String> ids = streamIds(request);
             saveIdsInTempFile(idsFile, ids);
             // redis update status?

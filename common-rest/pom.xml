@@ -196,11 +196,13 @@
 			<version>1.2.2</version>
 		</dependency>
 
-		<dependency><!-- TODO this is not the latest version, i had to use old version for embedded redis to work during integ test -->
-            <!-- we can either do mock test or provide latest executable as mentioned in https://github.com/ozimov/embedded-redis -->
+		<dependency><!-- TODO this is not the latest version, i had to use old 
+				version for embedded redis to work during integ test -->
+			<!-- we can either do mock test or provide latest executable as mentioned 
+				in https://github.com/ozimov/embedded-redis -->
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson-spring-data-20</artifactId>
-<!--			<artifactId>redisson-spring-data-30</artifactId>-->
+			<!-- <artifactId>redisson-spring-data-30</artifactId> -->
 			<version>${redisson-spring-data-version}</version>
 		</dependency>
 
