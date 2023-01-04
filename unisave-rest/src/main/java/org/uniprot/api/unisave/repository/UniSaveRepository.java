@@ -1,9 +1,9 @@
 package org.uniprot.api.unisave.repository;
 
+import static org.uniprot.api.unisave.util.DateConvertUtils.convertToLocalDateViaInstant;
+
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
@@ -322,14 +322,6 @@ public class UniSaveRepository {
         entryImpl.setLastRelease((Release) array[8]);
 
         return entryImpl;
-    }
-
-    private LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
-        if (dateToConvert instanceof java.sql.Date) {
-            return ((java.sql.Date) dateToConvert).toLocalDate();
-        } else {
-            return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        }
     }
 
     private List<String> findReplacingAcc(List<IdentifierStatus> status, Release rel) {
