@@ -46,7 +46,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  * @author Edd
  */
 class UniProtQueryProcessorTest {
-    private static final String FIELD_NAME = "acc";
+    private static final String FIELD_NAME = "accession";
     private UniProtQueryProcessor processor;
     private UniProtQueryProcessorConfig config;
 
