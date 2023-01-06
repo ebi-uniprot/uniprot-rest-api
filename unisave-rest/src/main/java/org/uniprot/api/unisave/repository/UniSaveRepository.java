@@ -1,5 +1,7 @@
 package org.uniprot.api.unisave.repository;
 
+import static org.uniprot.api.unisave.util.DateConvertUtils.convertToLocalDateViaInstant;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +20,6 @@ import org.uniprot.api.unisave.repository.domain.*;
 import org.uniprot.api.unisave.repository.domain.impl.*;
 import org.uniprot.api.unisave.service.ServiceConfig;
 import org.uniprot.core.util.Utils;
-
-import static org.uniprot.api.unisave.util.DateConvertUtils.convertToLocalDateViaInstant;
 
 @Profile({"live", "offline"})
 @Service
