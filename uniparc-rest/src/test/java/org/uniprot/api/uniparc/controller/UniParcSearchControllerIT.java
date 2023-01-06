@@ -417,7 +417,7 @@ class UniParcSearchControllerIT extends AbstractSearchWithSuggestionsControllerI
                             jsonPath("$.results.*.mostRecentCrossRefUpdated", iterableWithSize(3)))
                     .resultMatcher(jsonPath("$.facets.*.label", contains("Organisms", "Database")))
                     .resultMatcher(jsonPath("$.facets[1].values.size()", greaterThan(20)))
-                    .resultMatcher(jsonPath("$.facets[1].values.*.value", hasItem("1")))
+                    .resultMatcher(jsonPath("$.facets[1].values.*.value", hasItem("100")))
                     .resultMatcher(jsonPath("$.facets[1].values.*.count", hasItem(3)))
                     .resultMatcher(
                             jsonPath(

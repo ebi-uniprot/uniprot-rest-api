@@ -1,14 +1,11 @@
-package org.uniprot.api.rest.message;
+package org.uniprot.api.rest.download.message;
 
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Component;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-@Component
+// @Component
 public class MessageProducer {
 
     private final RabbitTemplate rabbitTemplate;
@@ -25,7 +22,6 @@ public class MessageProducer {
         messageProperties.setHeader("ultima", "sim");
         Message message = new Message(messageBody.getBytes(), messageProperties);
 
-        rabbitTemplate.convertAndSend("direct-exchange", "routing-key-teste", message);
+        this.rabbitTemplate.convertAndSend("direct-exchange", "routing-key-teste", message);
     }
-
 }

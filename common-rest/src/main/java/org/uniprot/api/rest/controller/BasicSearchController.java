@@ -235,7 +235,7 @@ public abstract class BasicSearchController<T> {
                         }
                     });
         } catch (TaskRejectedException ex) {
-            log.debug(
+            log.info(
                     "Task executor rejected stream request (space inside={})",
                     downloadGatekeeper.getSpaceInside());
             setTooManyRequestsResponse(deferredResult);
@@ -315,11 +315,10 @@ public abstract class BasicSearchController<T> {
                             .body(context);
             context.setLargeDownload(true);
 
-            log.debug(
-                    "Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
+            log.info("Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
             deferredResult.setResult(okayResponse);
         } else {
-            log.debug(
+            log.info(
                     "Gatekeeper did NOT let me in (space inside={})",
                     downloadGatekeeper.getSpaceInside());
             setTooManyRequestsResponse(deferredResult);

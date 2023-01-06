@@ -1,18 +1,20 @@
-package org.uniprot.api.rest.message;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.qpid.server.SystemLauncher;
-import org.apache.qpid.server.configuration.IllegalConfigurationException;
-import org.apache.qpid.server.model.SystemConfig;
+package org.uniprot.api.rest.download.message;
 
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
-public class EmbeddedInMemoryQpidBroker  implements AutoCloseable {
+import lombok.extern.slf4j.Slf4j;
 
-    private static final String DEFAULT_INITIAL_CONFIGURATION_LOCATION = "qpid-embedded-inmemory-configuration.json";
+import org.apache.qpid.server.SystemLauncher;
+import org.apache.qpid.server.configuration.IllegalConfigurationException;
+import org.apache.qpid.server.model.SystemConfig;
+
+@Slf4j
+public class EmbeddedInMemoryQpidBroker implements AutoCloseable {
+
+    private static final String DEFAULT_INITIAL_CONFIGURATION_LOCATION =
+            "qpid-embedded-inmemory-configuration.json";
 
     private boolean startupLoggedToSystemOut = true;
 
@@ -43,14 +45,21 @@ public class EmbeddedInMemoryQpidBroker  implements AutoCloseable {
         Map<String, Object> attributes = new HashMap<>();
         URL initialConfigUrl = this.initialConfigurationUrl;
         if (initialConfigUrl == null) {
-            log.debug("Will attempt to load config from CLASSPATH {}", this.initialConfigurationLocation);
-            initialConfigUrl = EmbeddedInMemoryQpidBroker.class.getClassLoader().getResource(this.initialConfigurationLocation);
+            log.debug(
+                    "Will attempt to load config from CLASSPATH {}",
+                    this.initialConfigurationLocation);
+            initialConfigUrl =
+                    EmbeddedInMemoryQpidBroker.class
+                            .getClassLoader()
+                            .getResource(this.initialConfigurationLocation);
         }
         if (initialConfigUrl == null) {
-            throw new IllegalConfigurationException("Configuration location '" + this.initialConfigurationLocation + "' not found");
+            throw new IllegalConfigurationException(
+                    "Configuration location '" + this.initialConfigurationLocation + "' not found");
         }
         attributes.put(SystemConfig.TYPE, "Memory");
-        attributes.put(SystemConfig.INITIAL_CONFIGURATION_LOCATION, initialConfigUrl.toExternalForm());
+        attributes.put(
+                SystemConfig.INITIAL_CONFIGURATION_LOCATION, initialConfigUrl.toExternalForm());
         attributes.put(SystemConfig.STARTUP_LOGGED_TO_SYSTEM_OUT, this.startupLoggedToSystemOut);
         return attributes;
     }
@@ -63,7 +72,8 @@ public class EmbeddedInMemoryQpidBroker  implements AutoCloseable {
         this.startupLoggedToSystemOut = startupLoggedToSystemOut;
     }
 
-    public EmbeddedInMemoryQpidBroker withInitialConfigurationLocation(String initialConfigurationLocation) {
+    public EmbeddedInMemoryQpidBroker withInitialConfigurationLocation(
+            String initialConfigurationLocation) {
         setInitialConfigurationLocation(initialConfigurationLocation);
         return this;
     }

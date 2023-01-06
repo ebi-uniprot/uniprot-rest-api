@@ -156,7 +156,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
         } finally {
             if (downloadGatekeeper != null && context.isLargeDownload()) {
                 downloadGatekeeper.exit();
-                log.debug(
+                log.info(
                         "Gatekeeper let me out (space inside={})",
                         downloadGatekeeper.getSpaceInside());
             }

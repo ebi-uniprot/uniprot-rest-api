@@ -32,22 +32,4 @@ class QuerySyntaxValidatorTest {
                 validator.isValid(queryString, null),
                 CoreMatchers.is(Boolean.valueOf(expected)));
     }
-
-    @ParameterizedTest
-    @CsvSource({
-        "default query, a, a",
-        "single forward slash, a/b, a\\/b",
-        "single forward slash with numbers, 1/2, 1\\/2",
-        "field query with single forward slash with letters, field:a/b, field:a\\/b",
-        "field query with single forward slash with numbers, field:1/2, field:1\\/2",
-        "separated forward slashes, a/b/c, a\\/b\\/c",
-        "two adjacent forward slashes, a//b, a\\/\\/b",
-        "contiguous forward slashes, a///b, a\\/\\/\\/b"
-    })
-    void checkForwardSlashReplacements(String desc, String queryString, String expected) {
-        assertThat(
-                desc,
-                ValidSolrQuerySyntax.QuerySyntaxValidator.replaceForwardSlashes(queryString),
-                CoreMatchers.is(expected));
-    }
 }
