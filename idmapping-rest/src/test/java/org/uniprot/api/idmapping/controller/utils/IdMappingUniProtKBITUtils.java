@@ -239,13 +239,6 @@ public class IdMappingUniProtKBITUtils {
                 code ->
                         doc.goWithEvidenceMaps.put(
                                 "go_" + code, Collections.singleton("Search All")));
-        Arrays.stream(CommentType.values())
-                .forEach(
-                        type -> {
-                            String typeName = type.name().toLowerCase();
-                            doc.commentEvMap.put(
-                                    "ccev_" + typeName, Collections.singleton("Search All"));
-                        });
         doc.commentMap.put("cc_unknown", Collections.singleton("Search All"));
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), doc);
         cloudSolrClient.commit(SolrCollection.uniprot.name());
