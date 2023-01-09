@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.message.MessageConfigTest;
 import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 /**
  * @author sahmad
@@ -27,7 +28,7 @@ public class DownloadJobRepositoryTest {
     public void whenSavingJob_thenAvailableOnRetrieval() throws Exception {
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
         jobBuilder.id("123456789").query("test query").fields("field1,field2,field3");
-        jobBuilder.retried(1).status("NEW");
+        jobBuilder.retried(1).status(JobStatus.NEW);
         DownloadJob job = jobBuilder.build();
         jobRepository.save(job);
         DownloadJob retrievedJob = jobRepository.findById(job.getId()).get();
