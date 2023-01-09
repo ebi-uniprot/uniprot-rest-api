@@ -90,8 +90,6 @@ public class UniProtQueryProcessor implements QueryProcessor {
                                                 && cleanQuery.strip().matches(f.getValidRegex()))
                         .findFirst();
 
-        return optionalSearchField
-                .map(f -> f.getFieldName() + ":" + cleanQuery.toUpperCase())
-                .orElse(text);
+        return optionalSearchField.map(f -> f.getFieldName() + ":" + cleanQuery).orElse(text);
     }
 }
