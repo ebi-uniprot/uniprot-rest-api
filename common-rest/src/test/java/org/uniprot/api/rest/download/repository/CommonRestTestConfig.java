@@ -9,6 +9,8 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
@@ -20,10 +22,10 @@ import redis.embedded.RedisServer;
  * @created 24/02/2021
  */
 @TestConfiguration
-public class TestConfig {
+public class CommonRestTestConfig {
     private final RedisServer redisServer;
 
-    public TestConfig() {
+    public CommonRestTestConfig() {
         this.redisServer = new RedisServer(6370);
     }
 
@@ -53,5 +55,19 @@ public class TestConfig {
         Config config = new Config();
         config.useSingleServer().setAddress("redis://127.0.0.1:6370");
         return Redisson.create(config);
+    }
+
+    @Bean("Consumer")
+    @Profile("offline")
+    public MessageListener getMessageListener() {
+        return new FakeMessageListener();
+    }
+
+    class FakeMessageListener implements MessageListener {
+
+        @Override
+        public void onMessage(Message message) {
+            // do nothing
+        }
     }
 }

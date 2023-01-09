@@ -1,5 +1,10 @@
 package org.uniprot.api.rest.download.queue;
 
+import java.sql.Timestamp;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,6 +24,7 @@ import org.uniprot.api.rest.request.StreamRequest;
  * @created 22/11/2022
  */
 @Service
+@Slf4j
 public class RabbitProducerMessageService implements ProducerMessageService {
 
     private final RabbitTemplate rabbitTemplate;
@@ -26,7 +32,7 @@ public class RabbitProducerMessageService implements ProducerMessageService {
 
     private DownloadJobRepository jobRepository;
 
-    private HashGenerator hashGenerator;
+    private HashGenerator<StreamRequest> hashGenerator;
 
     private static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT"; // TODO Parametrized it
 
@@ -37,7 +43,8 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         this.rabbitTemplate = rabbitTemplate;
         this.converter = converter;
         this.jobRepository = downloadJobRepository;
-        this.hashGenerator = new HashGenerator(new DownloadRequestToArrayConverter(), SALT_STR);
+        // TODO make it a bean without new
+        this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
     @Override
@@ -47,18 +54,29 @@ public class RabbitProducerMessageService implements ProducerMessageService {
             MessageProperties messageProperties = new MessageProperties();
             messageProperties.setHeader("jobId", jobId);
             Message message = converter.toMessage(streamRequest, messageProperties);
-
             // write to redis and put on queue
-            DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
-            jobBuilder.id(jobId).status(JobStatus.NEW);
-            jobBuilder
-                    .query(streamRequest.getQuery())
-                    .fields(streamRequest.getFields())
-                    .sort(streamRequest.getSort());
-            this.jobRepository.save(jobBuilder.build());
-            this.rabbitTemplate.send(message);
+            createDownloadJob(jobId, streamRequest);
+            try {
+                this.rabbitTemplate.send(message);
+            } catch (AmqpException amqpException) {
+                log.error("Unable to send message to the queue with exception {}", amqpException);
+                this.jobRepository.deleteById(jobId);
+                throw amqpException;
+            }
         }
-        // write to redis and send message to queue should be atomic
         return jobId;
+    }
+
+    private void createDownloadJob(String jobId, StreamRequest streamRequest) {
+        DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        jobBuilder.id(jobId).status(JobStatus.NEW);
+        jobBuilder
+                .query(streamRequest.getQuery())
+                .fields(streamRequest.getFields())
+                .sort(streamRequest.getSort())
+                .created(now)
+                .updated(now);
+        this.jobRepository.save(jobBuilder.build());
     }
 }

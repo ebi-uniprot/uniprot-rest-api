@@ -19,7 +19,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 @ActiveProfiles(profiles = "offline")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-        classes = {TestConfig.class, MessageConfigTest.class, RedisConfiguration.class})
+        classes = {CommonRestTestConfig.class, MessageConfigTest.class, RedisConfiguration.class})
 public class DownloadJobRepositoryTest {
 
     @Autowired private DownloadJobRepository jobRepository;
