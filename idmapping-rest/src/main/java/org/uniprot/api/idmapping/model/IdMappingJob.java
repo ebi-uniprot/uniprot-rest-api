@@ -8,8 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 
 import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 /**
  * @author sahmad

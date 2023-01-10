@@ -18,7 +18,7 @@ import org.springframework.data.redis.core.RedisHash;
 @Builder
 public class DownloadJob implements Serializable {
     @Id private String id;
-    private String status; // use enum todo
+    private JobStatus status;
     private Timestamp created;
     private Timestamp updated;
     private String error;

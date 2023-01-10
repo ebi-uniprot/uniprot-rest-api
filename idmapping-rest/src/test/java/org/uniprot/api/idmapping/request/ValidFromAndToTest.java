@@ -15,8 +15,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.controller.request.ValidFromAndTo;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
+import org.uniprot.api.rest.request.idmapping.ValidFromAndTo;
 
 /**
  * @author sahmad

@@ -1,6 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
-import static org.uniprot.api.idmapping.controller.response.JobStatus.FINISHED;
+import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.model.IdMappingJob;

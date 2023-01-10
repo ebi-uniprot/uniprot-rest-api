@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

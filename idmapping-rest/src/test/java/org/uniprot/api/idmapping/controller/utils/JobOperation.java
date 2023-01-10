@@ -3,9 +3,9 @@ package org.uniprot.api.idmapping.controller.utils;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 /**
  * @author sahmad
