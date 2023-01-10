@@ -1,7 +1,9 @@
 package org.uniprot.api.uniprotkb.queue;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.nio.file.*;
+import java.util.List;
 import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -11,13 +13,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.support.ResourceRegion;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.GenericHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import org.uniprot.api.rest.output.converter.JsonMessageConverter;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 /**
  * @author sahmad
@@ -30,6 +44,7 @@ public class UniProtKBMessageListener implements MessageListener {
     private final MessageConverter converter;
     private final UniProtEntryService service;
     private final DownloadConfigProperties downloadConfigProperties;
+    private final List<HttpMessageConverter<?>> messageConverters;
 
     private DownloadJobRepository jobRepository;
 
@@ -37,11 +52,13 @@ public class UniProtKBMessageListener implements MessageListener {
             MessageConverter converter,
             UniProtEntryService service,
             DownloadConfigProperties downloadConfigProperties,
-            DownloadJobRepository jobRepository) {
+            DownloadJobRepository jobRepository,
+            RequestMappingHandlerAdapter contentAdapter) {
         this.converter = converter;
         this.service = service;
         this.downloadConfigProperties = downloadConfigProperties;
         this.jobRepository = jobRepository;
+        this.messageConverters = contentAdapter.getMessageConverters();
     }
 
     @Override
@@ -54,6 +71,12 @@ public class UniProtKBMessageListener implements MessageListener {
         }
         DownloadJob downloadJob = optDownloadJob.get();
         downloadJob.setStatus(JobStatus.RUNNING);
+        String contentType = message.getMessageProperties().getHeader("content-type");
+
+        if(contentType == null){ //TODO: REMOVE IT
+            contentType = "application/json";
+        }
+
         Path idsFile = Paths.get(downloadConfigProperties.getFolder(), jobId);
         if (Files.notExists(idsFile)) {
             updateDownloadJob(downloadJob, JobStatus.RUNNING);
@@ -64,12 +87,24 @@ public class UniProtKBMessageListener implements MessageListener {
             // redis update status?
         }
 
+        Type type = (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntry>>() {
+        }).getType();
+        AbstractUUWHttpMessageConverter outputWriter = getOutputWriter(contentType, type);
+        //outputWriter.writeContents(context, new File);
+
         // TESTING TO ALSO CREATE RESULT
         log.info("Message processed");
-        // talk to redis
-        // talk to solr
-        // write to nfs
+
         // acknowledge the queue with failure/success
+    }
+
+    private AbstractUUWHttpMessageConverter getOutputWriter(String contentType, Type type) {
+        MediaType mediaType = UniProtMediaType.valueOf(contentType);
+
+        return (AbstractUUWHttpMessageConverter) messageConverters.stream()
+                .filter(c -> c instanceof AbstractUUWHttpMessageConverter)
+                .filter(c -> ((GenericHttpMessageConverter<?>) c).canWrite(type, MessageConverterContext.class, mediaType))
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("Unable to find "));
     }
 
     private void saveIdsInTempFile(Path filePath, Stream<String> ids) {
