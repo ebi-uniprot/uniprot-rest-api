@@ -1,20 +1,12 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.*;
-import java.util.List;
-import java.sql.Timestamp;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.GenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -22,16 +14,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.sql.Timestamp;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -66,34 +68,34 @@ public class UniProtKBMessageListener implements MessageListener {
         UniProtKBStreamRequest request = (UniProtKBStreamRequest) converter.fromMessage(message);
         String jobId = message.getMessageProperties().getHeader("jobId");
         Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
-        if (optDownloadJob.isEmpty()) {
-            // TODO handle error
-        }
-        DownloadJob downloadJob = optDownloadJob.get();
-        downloadJob.setStatus(JobStatus.RUNNING);
-        String contentType = message.getMessageProperties().getHeader("content-type");
+        if(optDownloadJob.isPresent()) {
+            DownloadJob downloadJob = optDownloadJob.get();
+            String contentType = message.getMessageProperties().getHeader("content-type");
 
-        if(contentType == null){ //TODO: REMOVE IT
-            contentType = "application/json";
-        }
+            if (contentType == null) { //TODO: REMOVE IT
+                contentType = "application/json";
+            }
 
-        Path idsFile = Paths.get(downloadConfigProperties.getFolder(), jobId);
-        if (Files.notExists(idsFile)) {
-            updateDownloadJob(downloadJob, JobStatus.RUNNING);
-            Stream<String> ids = streamIds(request);
-            saveIdsInTempFile(idsFile, ids);
-            updateDownloadJob(downloadJob, JobStatus.FINISHED);
+            Path idsFile = Paths.get(downloadConfigProperties.getFolder(), jobId);
+            if (Files.notExists(idsFile)) {
+                updateDownloadJobWithRetry(downloadJob, JobStatus.RUNNING);
+                getAndWriteResult(idsFile, request);
+                updateDownloadJobWithRetry(downloadJob, JobStatus.FINISHED);
+            } else {
+                log.info("The job id {} is already processed", jobId);
+                updateDownloadJob(downloadJob, JobStatus.FINISHED);
+            }
+            Type type = (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntry>>() {
+            }).getType();
+            AbstractUUWHttpMessageConverter outputWriter = getOutputWriter(contentType, type);
+            //outputWriter.writeContents(context, new File);
+
+            // TESTING TO ALSO CREATE RESULT
+            log.info("Message processed");
         } else {
-            // redis update status?
+            // TODO should we replay the message?
+            log.error("Unable to find job id {} in db", jobId);
         }
-
-        Type type = (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntry>>() {
-        }).getType();
-        AbstractUUWHttpMessageConverter outputWriter = getOutputWriter(contentType, type);
-        //outputWriter.writeContents(context, new File);
-
-        // TESTING TO ALSO CREATE RESULT
-        log.info("Message processed");
 
         // acknowledge the queue with failure/success
     }
@@ -107,23 +109,55 @@ public class UniProtKBMessageListener implements MessageListener {
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("Unable to find "));
     }
 
-    private void saveIdsInTempFile(Path filePath, Stream<String> ids) {
-        Iterable<String> source = ids::iterator;
+    private void getAndWriteResult(Path idsFile, UniProtKBStreamRequest request) {
         try {
-            Files.write(filePath, source, StandardOpenOption.CREATE);
-        } catch (IOException e) {
-            e.printStackTrace();
+            Stream<String> ids = streamIds(request);
+            saveIdsInTempFile(idsFile, ids);
+        } catch (IOException ex){
+            // we should delete the file TODO
+        } catch (Exception e) {
+            //
+            log.error("Unable to write output to fs", e);
+            // TODO replay on queue
+            // update retried count
         }
+
+    }
+
+    private void saveIdsInTempFile(Path filePath, Stream<String> ids) throws IOException{
+        Iterable<String> source = ids::iterator;
+        Files.write(filePath, source, StandardOpenOption.CREATE);
     }
 
     Stream<String> streamIds(UniProtKBStreamRequest request) {
         return service.streamIds(request);
     }
 
-    private void updateDownloadJob(DownloadJob downloadJob, JobStatus jobStatus) {
+    private void updateDownloadJobWithRetry(DownloadJob downloadJob, JobStatus status) {
+        Failsafe.with(redisRetryPolicy())
+                .onFailure(throwable -> log.error("Failed to update job {} with error", downloadJob.getId(), throwable))
+                .get(() -> updateDownloadJob(downloadJob, status));
+    }
+    private DownloadJob updateDownloadJob(DownloadJob downloadJob, JobStatus jobStatus) {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         downloadJob.setUpdated(now);
         downloadJob.setStatus(jobStatus);
-        this.jobRepository.save(downloadJob);
+        return this.jobRepository.save(downloadJob);
+    }
+
+    // TODO make it a bean with config externalised
+    public RetryPolicy<Object> redisRetryPolicy() {
+        int redisRetryDelay = 5000;
+        int maxRetries = 5;
+        int maxRedisRetryDelay = redisRetryDelay * 8;
+        return new RetryPolicy<>()
+                .handle(Exception.class)
+                .withBackoff(redisRetryDelay, maxRedisRetryDelay, ChronoUnit.MILLIS)
+                .withMaxRetries(maxRetries)
+                .onRetry(
+                        e ->
+                                log.warn(
+                                        "Call to redis server failed. Failure #{}. Retrying. Failed error {}",
+                                        e.getAttemptCount(), e.getLastFailure()));
     }
 }
