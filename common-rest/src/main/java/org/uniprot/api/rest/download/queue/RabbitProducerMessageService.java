@@ -74,9 +74,9 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         jobBuilder
                 .query(streamRequest.getQuery())
                 .fields(streamRequest.getFields())
-                .sort(streamRequest.getSort())
-                .created(now)
-                .updated(now);
+                .sort(streamRequest.getSort());
+        // .created(now)
+        // .updated(now);
         this.jobRepository.save(jobBuilder.build());
     }
 }

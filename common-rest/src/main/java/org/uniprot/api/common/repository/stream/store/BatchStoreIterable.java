@@ -1,5 +1,6 @@
 package org.uniprot.api.common.repository.stream.store;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.jodah.failsafe.Failsafe;
@@ -18,6 +19,16 @@ public class BatchStoreIterable<T> extends BatchIterable<T> {
             RetryPolicy<Object> retryPolicy,
             int batchSize) {
         super(sourceIterable, batchSize);
+        this.storeClient = storeClient;
+        this.retryPolicy = retryPolicy;
+    }
+
+    public BatchStoreIterable(
+            Iterator<String> sourceIterator,
+            UniProtStoreClient<T> storeClient,
+            RetryPolicy<Object> retryPolicy,
+            int batchSize) {
+        super(sourceIterator, batchSize);
         this.storeClient = storeClient;
         this.retryPolicy = retryPolicy;
     }

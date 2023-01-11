@@ -10,23 +10,18 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.GenericHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
+import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,8 +45,7 @@ public class UniProtKBMessageListener implements MessageListener {
     private final MessageConverter converter;
     private final UniProtEntryService service;
     private final DownloadConfigProperties downloadConfigProperties;
-    private final List<HttpMessageConverter<?>> messageConverters;
-
+    private final DownloadResultWriter downloadResultWriter;
     private DownloadJobRepository jobRepository;
 
     private final RabbitTemplate rabbitTemplate;
@@ -67,12 +61,14 @@ public class UniProtKBMessageListener implements MessageListener {
             UniProtEntryService service,
             DownloadConfigProperties downloadConfigProperties,
             DownloadJobRepository jobRepository,
+            DownloadResultWriter downloadResultWriter,
             RequestMappingHandlerAdapter contentAdapter,
             RabbitTemplate rabbitTemplate) {
         this.converter = converter;
         this.service = service;
         this.downloadConfigProperties = downloadConfigProperties;
         this.jobRepository = jobRepository;
+        this.downloadResultWriter = downloadResultWriter;
         this.messageConverters = contentAdapter.getMessageConverters();
         this.rabbitTemplate = rabbitTemplate;
     }
@@ -98,16 +94,13 @@ public class UniProtKBMessageListener implements MessageListener {
             Path idsFile = Paths.get(downloadConfigProperties.getFolder(), jobId);
             if (Files.notExists(idsFile)) {
                 updateDownloadJobWithRetry(downloadJob, JobStatus.RUNNING);
-                getAndWriteResult(idsFile, request);
+                getAndWriteResult(request, idsFile, jobId, contentType);
                 updateDownloadJobWithRetry(downloadJob, JobStatus.FINISHED);
             } else {
                 log.info("The job id {} is already processed", jobId);
                 updateDownloadJob(downloadJob, JobStatus.FINISHED);
             }
-            Type type = (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntry>>() {
-            }).getType();
-            AbstractUUWHttpMessageConverter outputWriter = getOutputWriter(contentType, type);
-            //outputWriter.writeContents(context, new File);
+
 
             // TESTING TO ALSO CREATE RESULT
             log.info("Message processed");
@@ -139,9 +132,13 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private void getAndWriteResult(Path idsFile, UniProtKBStreamRequest request) {
+    private void getAndWriteResult(UniProtKBStreamRequest request, Path idsFile, String jobId, String contentType) {
         try {
             Stream<String> ids = streamIds(request);
             saveIdsInTempFile(idsFile, ids);
+            MediaType mediaType = UniProtMediaType.valueOf(contentType);
+            StoreRequest storeRequest = service.buildStoreRequest(request);
+            downloadResultWriter.writeResult(request, idsFile, jobId, mediaType, storeRequest);
         } catch (IOException ex){
             // we should delete the file TODO
         } catch (Exception e) {
