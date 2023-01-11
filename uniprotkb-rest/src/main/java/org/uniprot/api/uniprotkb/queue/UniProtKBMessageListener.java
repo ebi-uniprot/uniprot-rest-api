@@ -62,14 +62,12 @@ public class UniProtKBMessageListener implements MessageListener {
             DownloadConfigProperties downloadConfigProperties,
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
-            RequestMappingHandlerAdapter contentAdapter,
             RabbitTemplate rabbitTemplate) {
         this.converter = converter;
         this.service = service;
         this.downloadConfigProperties = downloadConfigProperties;
         this.jobRepository = jobRepository;
         this.downloadResultWriter = downloadResultWriter;
-        this.messageConverters = contentAdapter.getMessageConverters();
         this.rabbitTemplate = rabbitTemplate;
     }
 
@@ -122,16 +120,6 @@ public class UniProtKBMessageListener implements MessageListener {
         this.rabbitTemplate.convertAndSend(rejectedQueueName, message);
     }
 
-    private AbstractUUWHttpMessageConverter getOutputWriter(String contentType, Type type) {
-        MediaType mediaType = UniProtMediaType.valueOf(contentType);
-
-        return (AbstractUUWHttpMessageConverter) messageConverters.stream()
-                .filter(c -> c instanceof AbstractUUWHttpMessageConverter)
-                .filter(c -> ((GenericHttpMessageConverter<?>) c).canWrite(type, MessageConverterContext.class, mediaType))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Unable to find "));
-    }
-
-    private void getAndWriteResult(Path idsFile, UniProtKBStreamRequest request) {
     private void getAndWriteResult(UniProtKBStreamRequest request, Path idsFile, String jobId, String contentType) {
         try {
             Stream<String> ids = streamIds(request);
@@ -147,7 +135,6 @@ public class UniProtKBMessageListener implements MessageListener {
             // TODO replay on queue
             // update retried count
         }
-
     }
 
     private void saveIdsInTempFile(Path filePath, Stream<String> ids) throws IOException{
