@@ -45,6 +45,20 @@ public class RabbitMQConfig {
                 .build();
     }
 
+    /**
+     * Relationship among downloadQueue(DQ), retryQueue(RQ) and undeliveredQueue(UQ) :
+     * Producer writes message to the exchange and the consumer receives the message from DQ.
+     * If the consumer processes the message successfully then the message is removed from DQ.
+     * Else the message is sent to dead letter queue(RQ) of DQ.
+     * RQ has
+     *  a. no consumer
+     *  b. ttl of n millis
+     *  c. DLQ is DQ.
+     * So after passing n millis, the message of RQ is sent to its DLQ (DQ).
+     * The consumer picks the message from DQ.
+     * If the max retry of the message is not reached, the message is reprocessed.
+     * Else the message is sent to UQ.
+     */
     @Bean
     public Queue downloadQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
         return QueueBuilder
