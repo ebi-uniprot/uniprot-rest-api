@@ -51,7 +51,8 @@ public class RedisConfiguration {
     }
 
     @Bean
-    public RedisCustomConversions redisCustomConversions(BytesToTimestampConverter bytesToTimestampConverter) {
+    public RedisCustomConversions redisCustomConversions(
+            BytesToTimestampConverter bytesToTimestampConverter) {
         return new RedisCustomConversions(List.of(bytesToTimestampConverter));
     }
 }

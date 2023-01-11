@@ -96,12 +96,12 @@ public class ResultsConfig {
                         .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
         return StoreStreamerConfig.<UniProtKBEntry>builder()
-                        .streamConfig(streamConfig)
-                        .storeClient(uniProtClient)
-                        .tupleStreamTemplate(tupleStreamTemplate)
-                        .storeFetchRetryPolicy(storeRetryPolicy)
-                        .documentIdStream(documentIdStream)
-                        .build();
+                .streamConfig(streamConfig)
+                .storeClient(uniProtClient)
+                .tupleStreamTemplate(tupleStreamTemplate)
+                .storeFetchRetryPolicy(storeRetryPolicy)
+                .documentIdStream(documentIdStream)
+                .build();
     }
 
     @Bean(name = "streamConfig")

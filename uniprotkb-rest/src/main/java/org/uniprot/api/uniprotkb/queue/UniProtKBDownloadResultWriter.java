@@ -1,26 +1,5 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.GenericHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
-import org.uniprot.api.common.repository.stream.store.StoreRequest;
-
-import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
-import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchStoreIterable;
-import org.uniprot.api.rest.download.DownloadResultWriter;
-
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
-import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
@@ -33,6 +12,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.GenericHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
+import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchStoreIterable;
+import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
 @Component
 @Slf4j
 public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
@@ -43,13 +42,15 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
     protected final TaxonomyLineageService lineageService;
     private final MessageConverterContextFactory.Resource resource;
 
-    private static final Type type = (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntry>>() {
-    }).getType();
+    private static final Type type =
+            (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntry>>() {})
+                    .getType();
 
-    public UniProtKBDownloadResultWriter(RequestMappingHandlerAdapter contentAdapter,
-                                         MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
-                                         StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
-                                         TaxonomyLineageService lineageService) {
+    public UniProtKBDownloadResultWriter(
+            RequestMappingHandlerAdapter contentAdapter,
+            MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
+            StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
+            TaxonomyLineageService lineageService) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
         this.storeStreamerConfig = storeStreamerConfig;
@@ -57,18 +58,31 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
         this.resource = MessageConverterContextFactory.Resource.UNIPROTKB;
     }
 
-    public void writeResult(StreamRequest request, Path idFile, String jobId, MediaType contentType, StoreRequest storeRequest){
+    public void writeResult(
+            StreamRequest request,
+            Path idFile,
+            String jobId,
+            MediaType contentType,
+            StoreRequest storeRequest) {
         Path resultPath = Paths.get("/tmp/downloadOutput", jobId);
-        AbstractUUWHttpMessageConverter<UniProtKBEntry, UniProtKBEntry> outputWriter = getOutputWriter(contentType, type);
+        AbstractUUWHttpMessageConverter<UniProtKBEntry, UniProtKBEntry> outputWriter =
+                getOutputWriter(contentType, type);
         try (Stream<String> ids = Files.lines(idFile);
-             OutputStream output = Files.newOutputStream(resultPath, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-             ){
-            BatchStoreIterable<UniProtKBEntry> batchStoreIterable = getBatchStoreIterable(ids.iterator(), storeRequest);
-            Stream<UniProtKBEntry> entities = StreamSupport.stream(batchStoreIterable.spliterator(), false)
-                    .flatMap(Collection::stream)
-                    .onClose(() -> log.debug("Finished streaming entries."));
+                OutputStream output =
+                        Files.newOutputStream(
+                                resultPath,
+                                StandardOpenOption.WRITE,
+                                StandardOpenOption.CREATE,
+                                StandardOpenOption.TRUNCATE_EXISTING)) {
+            BatchStoreIterable<UniProtKBEntry> batchStoreIterable =
+                    getBatchStoreIterable(ids.iterator(), storeRequest);
+            Stream<UniProtKBEntry> entities =
+                    StreamSupport.stream(batchStoreIterable.spliterator(), false)
+                            .flatMap(Collection::stream)
+                            .onClose(() -> log.debug("Finished streaming entries."));
 
-            MessageConverterContext<UniProtKBEntry> context = converterContextFactory.get(resource, contentType);
+            MessageConverterContext<UniProtKBEntry> context =
+                    converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
             context.setContentType(contentType);
             context.setEntities(entities);
@@ -81,11 +95,23 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
         }
     }
 
-    private AbstractUUWHttpMessageConverter<UniProtKBEntry,UniProtKBEntry> getOutputWriter(MediaType contentType, Type type) {
-        return (AbstractUUWHttpMessageConverter<UniProtKBEntry,UniProtKBEntry>) messageConverters.stream()
-                .filter(c -> c instanceof AbstractUUWHttpMessageConverter)
-                .filter(c -> ((GenericHttpMessageConverter<?>) c).canWrite(type, MessageConverterContext.class, contentType))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Unable to find Message converter"));
+    private AbstractUUWHttpMessageConverter<UniProtKBEntry, UniProtKBEntry> getOutputWriter(
+            MediaType contentType, Type type) {
+        return (AbstractUUWHttpMessageConverter<UniProtKBEntry, UniProtKBEntry>)
+                messageConverters.stream()
+                        .filter(c -> c instanceof AbstractUUWHttpMessageConverter)
+                        .filter(
+                                c ->
+                                        ((GenericHttpMessageConverter<?>) c)
+                                                .canWrite(
+                                                        type,
+                                                        MessageConverterContext.class,
+                                                        contentType))
+                        .findFirst()
+                        .orElseThrow(
+                                () ->
+                                        new IllegalArgumentException(
+                                                "Unable to find Message converter"));
     }
 
     private BatchStoreIterable<UniProtKBEntry> getBatchStoreIterable(
@@ -98,5 +124,4 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
                 lineageService,
                 storeRequest.isAddLineage());
     }
-
 }

@@ -124,10 +124,7 @@ class ResultsConfigTest {
                 config.documentIdStream(tupleStreamTemplate, configProps);
         StoreStreamerConfig<UniProtKBEntry> result =
                 config.storeStreamerConfig(
-                        uniprotClient,
-                        tupleStreamTemplate,
-                        configProps,
-                        documentIdStream);
+                        uniprotClient, tupleStreamTemplate, configProps, documentIdStream);
         assertNotNull(result);
     }
 
@@ -137,12 +134,11 @@ class ResultsConfigTest {
 
         TaxonomyLineageService taxonomyLineageService =
                 Mockito.mock(TaxonomyLineageServiceImpl.class);
-        StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig = Mockito.mock(StoreStreamerConfig.class);
+        StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig =
+                Mockito.mock(StoreStreamerConfig.class);
 
         StoreStreamer<UniProtKBEntry> result =
-                config.uniProtEntryStoreStreamer(
-                        storeStreamerConfig,
-                        taxonomyLineageService);
+                config.uniProtEntryStoreStreamer(storeStreamerConfig, taxonomyLineageService);
         assertNotNull(result);
     }
 }
