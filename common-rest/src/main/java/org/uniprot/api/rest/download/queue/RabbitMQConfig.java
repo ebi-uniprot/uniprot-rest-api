@@ -47,11 +47,30 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue downloadQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
-        if (rabbitMQConfigProperties.isDurable()) {
-            return QueueBuilder.durable(rabbitMQConfigProperties.getQueueName()).build();
-        } else {
-            return QueueBuilder.nonDurable(rabbitMQConfigProperties.getQueueName()).build();
-        }
+        return QueueBuilder
+                .durable(rabbitMQConfigProperties.getQueueName())
+                .deadLetterExchange(rabbitMQConfigProperties.getExchangeName())
+                .deadLetterRoutingKey(rabbitMQConfigProperties.getRetryQueueName())
+                .quorum()
+                .build();
+    }
+
+    @Bean
+    Queue retryQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
+        return QueueBuilder.durable(rabbitMQConfigProperties.getRetryQueueName())
+                .deadLetterExchange(rabbitMQConfigProperties.getExchangeName())
+                .deadLetterRoutingKey(rabbitMQConfigProperties.getRoutingKey())
+                .ttl(rabbitMQConfigProperties.getRetryDelayInMillis())
+                .quorum()
+                .build();
+    }
+
+    // queue where failed messages after maximum retries will end up
+    @Bean
+    Queue undeliveredQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
+        return QueueBuilder.durable(rabbitMQConfigProperties.getRejectedQueueName())
+                .quorum()
+                .build();
     }
 
     @Bean
@@ -65,8 +84,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    Binding retryBinding(Queue retryQueue, Exchange downloadExchange) {
+        return BindingBuilder.bind(retryQueue).to((DirectExchange) downloadExchange).with(retryQueue.getName());
+    }
+    @Bean
+    Binding undeliveredBinding(Queue undeliveredQueue, Exchange downloadExchange) {
+        return BindingBuilder.bind(undeliveredQueue).to((DirectExchange) downloadExchange).with(undeliveredQueue.getName());
+    }
+
+    @Bean
     public AmqpAdmin amqpAdmin(ConnectionFactory connectionFactory) {
         RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
         return rabbitAdmin;
     }
+
 }

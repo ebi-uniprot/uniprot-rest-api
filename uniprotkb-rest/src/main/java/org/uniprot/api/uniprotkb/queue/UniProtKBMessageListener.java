@@ -5,7 +5,9 @@ import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.GenericHttpMessageConverter;
@@ -32,6 +34,8 @@ import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -50,17 +54,27 @@ public class UniProtKBMessageListener implements MessageListener {
 
     private DownloadJobRepository jobRepository;
 
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${spring.amqp.rabbit.rejectedQueueName}")
+    private String rejectedQueueName;
+
+    @Value("${spring.amqp.rabbit.retryMaxCount}")
+    private Integer retryCount;
+
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
             DownloadConfigProperties downloadConfigProperties,
             DownloadJobRepository jobRepository,
-            RequestMappingHandlerAdapter contentAdapter) {
+            RequestMappingHandlerAdapter contentAdapter,
+            RabbitTemplate rabbitTemplate) {
         this.converter = converter;
         this.service = service;
         this.downloadConfigProperties = downloadConfigProperties;
         this.jobRepository = jobRepository;
         this.messageConverters = contentAdapter.getMessageConverters();
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
@@ -68,6 +82,11 @@ public class UniProtKBMessageListener implements MessageListener {
         UniProtKBStreamRequest request = (UniProtKBStreamRequest) converter.fromMessage(message);
         String jobId = message.getMessageProperties().getHeader("jobId");
         Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
+        if(isMaxRetriedReached(message)){
+            sendToUndeliveredQueue(jobId, message);
+            return;
+        }
+
         if(optDownloadJob.isPresent()) {
             DownloadJob downloadJob = optDownloadJob.get();
             String contentType = message.getMessageProperties().getHeader("content-type");
@@ -98,6 +117,16 @@ public class UniProtKBMessageListener implements MessageListener {
         }
 
         // acknowledge the queue with failure/success
+    }
+
+    private boolean isMaxRetriedReached(Message message) {
+        List<Map<String, ?>> xDeaths = message.getMessageProperties().getHeader("x-death");
+        return !Objects.isNull(xDeaths) && getRetryCount(xDeaths.get(0)) >= this.retryCount;
+    }
+
+    private void sendToUndeliveredQueue(String jobId, Message message) {
+        log.warn("Maximum retry {} reached for jobId {}. Sending to rejected queue", retryCount, jobId);
+        this.rabbitTemplate.convertAndSend(rejectedQueueName, message);
     }
 
     private AbstractUUWHttpMessageConverter getOutputWriter(String contentType, Type type) {
@@ -159,5 +188,13 @@ public class UniProtKBMessageListener implements MessageListener {
                                 log.warn(
                                         "Call to redis server failed. Failure #{}. Retrying. Failed error {}",
                                         e.getAttemptCount(), e.getLastFailure()));
+    }
+
+    private int getRetryCount(Map<String, ?> xDeath) {
+        if (xDeath != null && !xDeath.isEmpty()) {
+            Long count = (Long) xDeath.get("count");
+            return count.intValue();
+        }
+        return 0;
     }
 }

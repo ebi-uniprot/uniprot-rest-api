@@ -28,6 +28,7 @@ public class QueueConsumerConfig {
         simpleMessageListenerContainer.setMessageListener(messageListener);
         simpleMessageListenerContainer.setConcurrentConsumers(
                 rabbitMQConfigProperties.getConcurrentConsumers());
+        simpleMessageListenerContainer.setDefaultRequeueRejected(false);
         return simpleMessageListenerContainer;
     }
 }

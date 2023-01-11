@@ -29,4 +29,14 @@ public class RabbitMQConfigProperties {
     private boolean durable;
 
     private int concurrentConsumers;
+
+    private boolean defaultRequeueRejected;
+
+    private int retryDelayInMillis;
+
+    private int retryMaxCount;
+
+    private String retryQueueName;
+
+    private String rejectedQueueName;
 }
