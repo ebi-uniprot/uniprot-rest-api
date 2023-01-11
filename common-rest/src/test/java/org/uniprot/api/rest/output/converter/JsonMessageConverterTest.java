@@ -285,7 +285,7 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"primaryAccession\":\"P00001\"},{\"primaryAccession\":\"P00001\"}]}",
+                "{\"results\":[{\"primaryAccession\":\"P00001\"},\n{\"primaryAccession\":\"P00001\"}]}",
                 result);
     }
 
