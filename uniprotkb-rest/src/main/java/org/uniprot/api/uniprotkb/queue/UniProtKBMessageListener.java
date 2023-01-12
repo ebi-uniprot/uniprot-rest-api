@@ -140,9 +140,6 @@ public class UniProtKBMessageListener implements MessageListener {
                 throw new MessageListenerException(e);
             }
             throw new MessageListenerException(ex);
-        } catch (Exception e) {
-            log.warn("Unable to write output to fs for job id {}", jobId);
-            throw new MessageListenerException(e);
         }
     }
 
