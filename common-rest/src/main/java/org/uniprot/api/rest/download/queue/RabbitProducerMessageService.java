@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.download.queue;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,7 +70,7 @@ public class RabbitProducerMessageService implements ProducerMessageService {
 
     private void createDownloadJob(String jobId, StreamRequest streamRequest) {
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
-        Timestamp now = new Timestamp(System.currentTimeMillis());
+        LocalDateTime now = LocalDateTime.now();
         jobBuilder.id(jobId).status(JobStatus.NEW);
         jobBuilder
                 .query(streamRequest.getQuery())

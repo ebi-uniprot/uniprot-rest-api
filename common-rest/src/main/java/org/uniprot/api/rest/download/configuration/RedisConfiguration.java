@@ -1,8 +1,5 @@
 package org.uniprot.api.rest.download.configuration;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -13,9 +10,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.convert.RedisCustomConversions;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.uniprot.api.rest.download.model.DownloadJob;
+
+import java.io.IOException;
 
 /**
  * TODO check possible duplicate code in {@link
@@ -48,11 +46,5 @@ public class RedisConfiguration {
         RedisTemplate<String, DownloadJob> template = new RedisTemplate<>();
         template.setConnectionFactory(redissonConnectionFactory);
         return template;
-    }
-
-    @Bean
-    public RedisCustomConversions redisCustomConversions(
-            BytesToTimestampConverter bytesToTimestampConverter) {
-        return new RedisCustomConversions(List.of(bytesToTimestampConverter));
     }
 }
