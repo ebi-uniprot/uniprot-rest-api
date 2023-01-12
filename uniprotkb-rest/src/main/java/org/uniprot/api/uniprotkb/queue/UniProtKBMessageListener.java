@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -154,7 +155,7 @@ public class UniProtKBMessageListener implements MessageListener {
 
     private void updateDownloadJob(Message message, DownloadJob downloadJob, JobStatus jobStatus) {
         if(Objects.nonNull(downloadJob)) {
-            Timestamp now = new Timestamp(System.currentTimeMillis());
+            LocalDateTime now = LocalDateTime.now();
             downloadJob.setUpdated(now);
             downloadJob.setStatus(jobStatus);
             downloadJob.setRetried(getRetryCount(message));
