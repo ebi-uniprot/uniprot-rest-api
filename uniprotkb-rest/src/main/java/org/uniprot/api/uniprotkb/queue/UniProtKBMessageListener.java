@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
@@ -40,8 +39,8 @@ import java.util.stream.Stream;
 @Slf4j
 public class UniProtKBMessageListener implements MessageListener {
 
-    private static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
-    private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
+    static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
+    static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
 
     private final MessageConverter converter;
     private final UniProtEntryService service;
@@ -80,7 +79,6 @@ public class UniProtKBMessageListener implements MessageListener {
         String jobId = null;
         DownloadJob downloadJob = null;
         try {
-            UniProtKBStreamRequest request = (UniProtKBStreamRequest) converter.fromMessage(message);
             jobId = message.getMessageProperties().getHeader("jobId");
             Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
             String errorMsg = "Unable to find jobId " + jobId  + " in db";
@@ -93,7 +91,7 @@ public class UniProtKBMessageListener implements MessageListener {
                 return;
             }
 
-            processMessage(message, request, downloadJob);
+            processMessage(message, downloadJob);
 
             log.info("Message with jobId {} processed successfully", jobId);
         } catch (Exception ex){
@@ -106,7 +104,8 @@ public class UniProtKBMessageListener implements MessageListener {
         }
     }
 
-    private void processMessage(Message message, UniProtKBStreamRequest request, DownloadJob downloadJob) {
+    private void processMessage(Message message, DownloadJob downloadJob) {
+        UniProtKBStreamRequest request = (UniProtKBStreamRequest) this.converter.fromMessage(message);
         String jobId = downloadJob.getId();
         String contentType = message.getMessageProperties().getHeader("content-type");
 
@@ -137,7 +136,7 @@ public class UniProtKBMessageListener implements MessageListener {
             try {
                 Files.delete(idsFile);
             } catch (IOException e) {
-                log.warn("Unable to delete file during IOException failure for job id {}", jobId);
+                log.warn("Unable to delete file {} during IOException failure for job id {}", idsFile.toFile().getName(), jobId);
                 throw new MessageListenerException(e);
             }
             throw new MessageListenerException(ex);
@@ -192,7 +191,7 @@ public class UniProtKBMessageListener implements MessageListener {
         return null;
     }
 
-    private Message addAdditionalHeaders(Message message, Exception ex) {
+    Message addAdditionalHeaders(Message message, Exception ex) {
         MessageBuilder builder = MessageBuilder.fromMessage(message);
         Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
         if(Objects.nonNull(retryCount)){
@@ -207,5 +206,9 @@ public class UniProtKBMessageListener implements MessageListener {
         builder.setHeader(CURRENT_RETRIED_COUNT_HEADER, retryCount);
         builder.setHeader(CURRENT_RETRIED_ERROR_HEADER, stackTrace);
         return  builder.build();
+    }
+
+    void setMaxRetryCount(Integer maxRetryCount){
+        this.maxRetryCount = maxRetryCount;
     }
 }
