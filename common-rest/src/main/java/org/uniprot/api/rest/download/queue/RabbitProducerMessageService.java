@@ -30,12 +30,7 @@ public class RabbitProducerMessageService implements ProducerMessageService {
 
     private final RabbitTemplate rabbitTemplate;
     private final MessageConverter converter;
-
-    private DownloadJobRepository jobRepository;
-
-    private HashGenerator<StreamRequest> hashGenerator;
-
-    private static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT"; // TODO Parametrized it
+    private final DownloadJobRepository jobRepository;
 
     public RabbitProducerMessageService(
             MessageConverter converter,
@@ -44,17 +39,13 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         this.rabbitTemplate = rabbitTemplate;
         this.converter = converter;
         this.jobRepository = downloadJobRepository;
-        // TODO make it a bean without new
-        this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
     @Override
-    public String sendMessage(StreamRequest streamRequest) {
-        String jobId = this.hashGenerator.generateHash(streamRequest);
+    public void sendMessage(StreamRequest streamRequest, MessageProperties messageHeader) {
+        String jobId = messageHeader.getHeader("jobId");
         if (!this.jobRepository.existsById(jobId)) {
-            MessageProperties messageProperties = new MessageProperties();
-            messageProperties.setHeader("jobId", jobId);
-            Message message = converter.toMessage(streamRequest, messageProperties);
+            Message message = converter.toMessage(streamRequest, messageHeader);
             // write to redis and put on queue
             createDownloadJob(jobId, streamRequest);
             try {
@@ -65,7 +56,6 @@ public class RabbitProducerMessageService implements ProducerMessageService {
                 throw amqpException;
             }
         }
-        return jobId;
     }
 
     private void createDownloadJob(String jobId, StreamRequest streamRequest) {

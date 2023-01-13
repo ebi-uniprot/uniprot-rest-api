@@ -16,6 +16,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
@@ -46,7 +47,7 @@ public class UniProtKBMessageListener implements MessageListener {
     private final UniProtEntryService service;
     private final DownloadConfigProperties downloadConfigProperties;
     private final DownloadResultWriter downloadResultWriter;
-    private DownloadJobRepository jobRepository;
+    private final DownloadJobRepository jobRepository;
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -107,11 +108,7 @@ public class UniProtKBMessageListener implements MessageListener {
     private void processMessage(Message message, DownloadJob downloadJob) {
         UniProtKBStreamRequest request = (UniProtKBStreamRequest) this.converter.fromMessage(message);
         String jobId = downloadJob.getId();
-        String contentType = message.getMessageProperties().getHeader("content-type");
-
-        if (contentType == null) { //TODO: REMOVE IT
-            contentType = "application/json";
-        }
+        String contentType = message.getMessageProperties().getHeader(UniProtKBDownloadController.CONTENT_TYPE);
 
         Path idsFile = Paths.get(downloadConfigProperties.getFolder(), jobId);
         if (Files.notExists(idsFile)) {

@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.download.queue;
 
+import org.springframework.amqp.core.MessageProperties;
 import org.uniprot.api.rest.request.StreamRequest;
 
 /**
@@ -7,5 +8,5 @@ import org.uniprot.api.rest.request.StreamRequest;
  * @created 22/11/2022
  */
 public interface ProducerMessageService {
-    String sendMessage(StreamRequest streamRequest);
+    void sendMessage(StreamRequest streamRequest, MessageProperties messageHeader);
 }
