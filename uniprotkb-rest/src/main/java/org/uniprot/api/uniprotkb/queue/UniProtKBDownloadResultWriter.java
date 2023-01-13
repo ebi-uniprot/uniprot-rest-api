@@ -63,7 +63,7 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
             Path idFile,
             String jobId,
             MediaType contentType,
-            StoreRequest storeRequest) {
+            StoreRequest storeRequest) throws IOException {
         Path resultPath = Paths.get("/tmp/downloadOutput", jobId);
         AbstractUUWHttpMessageConverter<UniProtKBEntry, UniProtKBEntry> outputWriter =
                 getOutputWriter(contentType, type);
@@ -90,8 +90,6 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, output, start, counter);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.download;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.springframework.http.MediaType;
@@ -13,5 +14,5 @@ public interface DownloadResultWriter {
             Path idFile,
             String jobId,
             MediaType contentType,
-            StoreRequest storeRequest);
+            StoreRequest storeRequest) throws IOException;
 }

@@ -39,8 +39,8 @@ import java.util.stream.Stream;
 @Slf4j
 public class UniProtKBMessageListener implements MessageListener {
 
-    private static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
-    private static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
+    static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
+    static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
 
     private final MessageConverter converter;
     private final UniProtEntryService service;
@@ -136,7 +136,7 @@ public class UniProtKBMessageListener implements MessageListener {
             try {
                 Files.delete(idsFile);
             } catch (IOException e) {
-                log.warn("Unable to delete file during IOException failure for job id {}", jobId);
+                log.warn("Unable to delete file {} during IOException failure for job id {}", idsFile.toFile().getName(), jobId);
                 throw new MessageListenerException(e);
             }
             throw new MessageListenerException(ex);
@@ -191,7 +191,7 @@ public class UniProtKBMessageListener implements MessageListener {
         return null;
     }
 
-    private Message addAdditionalHeaders(Message message, Exception ex) {
+    Message addAdditionalHeaders(Message message, Exception ex) {
         MessageBuilder builder = MessageBuilder.fromMessage(message);
         Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
         if(Objects.nonNull(retryCount)){
@@ -206,5 +206,9 @@ public class UniProtKBMessageListener implements MessageListener {
         builder.setHeader(CURRENT_RETRIED_COUNT_HEADER, retryCount);
         builder.setHeader(CURRENT_RETRIED_ERROR_HEADER, stackTrace);
         return  builder.build();
+    }
+
+    void setMaxRetryCount(Integer maxRetryCount){
+        this.maxRetryCount = maxRetryCount;
     }
 }
