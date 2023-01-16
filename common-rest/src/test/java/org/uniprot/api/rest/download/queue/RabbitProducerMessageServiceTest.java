@@ -57,7 +57,7 @@ class RabbitProducerMessageServiceTest {
     }
 
     @Test
-    void sendMessageWithExistJob() {
+    void sendMessageWithJobExists() {
         when(jobRepository.existsById(any())).thenReturn(true);
         service.sendMessage(streamRequest, messageHeader);
         verify(converter, times(0)).toMessage(streamRequest, messageHeader);
@@ -87,5 +87,4 @@ class RabbitProducerMessageServiceTest {
         private String sort;
         private String download;
     }
-
 }
