@@ -8,7 +8,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
-import org.uniprot.api.rest.download.message.MessageConfigTest;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
@@ -18,8 +17,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
  */
 @ActiveProfiles(profiles = "offline")
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(
-        classes = {CommonRestTestConfig.class, MessageConfigTest.class, RedisConfiguration.class})
+@ContextConfiguration(classes = {CommonRestTestConfig.class, RedisConfiguration.class})
 public class DownloadJobRepositoryTest {
 
     @Autowired private DownloadJobRepository jobRepository;
