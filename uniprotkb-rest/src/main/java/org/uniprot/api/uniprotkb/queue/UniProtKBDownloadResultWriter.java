@@ -26,6 +26,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchStoreIterable;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
@@ -39,6 +40,7 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
     private final List<HttpMessageConverter<?>> messageConverters;
     private final MessageConverterContextFactory<UniProtKBEntry> converterContextFactory;
     protected final StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig;
+    private final DownloadConfigProperties downloadConfigProperties;
     protected final TaxonomyLineageService lineageService;
     private final MessageConverterContextFactory.Resource resource;
 
@@ -50,10 +52,12 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
             StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
+            DownloadConfigProperties downloadConfigProperties,
             TaxonomyLineageService lineageService) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
         this.storeStreamerConfig = storeStreamerConfig;
+        this.downloadConfigProperties = downloadConfigProperties;
         this.lineageService = lineageService;
         this.resource = MessageConverterContextFactory.Resource.UNIPROTKB;
     }
@@ -63,8 +67,9 @@ public class UniProtKBDownloadResultWriter implements DownloadResultWriter {
             Path idFile,
             String jobId,
             MediaType contentType,
-            StoreRequest storeRequest) throws IOException {
-        Path resultPath = Paths.get("/tmp/downloadOutput", jobId);
+            StoreRequest storeRequest)
+            throws IOException {
+        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), jobId);
         AbstractUUWHttpMessageConverter<UniProtKBEntry, UniProtKBEntry> outputWriter =
                 getOutputWriter(contentType, type);
         try (Stream<String> ids = Files.lines(idFile);

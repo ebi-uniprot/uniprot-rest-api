@@ -1,5 +1,17 @@
 package org.uniprot.api.uniprotkb.queue;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
+import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,37 +30,18 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
-import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
-
 @ExtendWith({MockitoExtension.class})
 public class UniProtKBMessageListenerTest {
-    @Mock
-    private MessageConverter converter;
-    @Mock
-    private UniProtEntryService service;
-    @Mock
-    DownloadConfigProperties downloadConfigProperties;
+    @Mock private MessageConverter converter;
+    @Mock private UniProtEntryService service;
+    @Mock DownloadConfigProperties downloadConfigProperties;
 
-    @Mock
-    DownloadJobRepository jobRepository;
+    @Mock DownloadJobRepository jobRepository;
 
-    @Mock
-    private DownloadResultWriter downloadResultWriter;
-    @Mock
-    RabbitTemplate rabbitTemplate;
+    @Mock private DownloadResultWriter downloadResultWriter;
+    @Mock RabbitTemplate rabbitTemplate;
 
-    @InjectMocks
-    private UniProtKBMessageListener uniProtKBMessageListener;
+    @InjectMocks private UniProtKBMessageListener uniProtKBMessageListener;
 
     @Test
     void testOnMessage() throws IOException {
@@ -62,7 +55,7 @@ public class UniProtKBMessageListenerTest {
         List<String> accessions = List.of("P12345", "P05067");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(streamRequest);
-        when(this.downloadConfigProperties.getFolder()).thenReturn("target");
+        when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.service.streamIds(streamRequest)).thenReturn(accessions.stream());
         this.uniProtKBMessageListener.setMaxRetryCount(3);
 
@@ -91,9 +84,10 @@ public class UniProtKBMessageListenerTest {
         List<String> accessions = List.of("P12345", "P05067");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(streamRequest);
-        when(this.downloadConfigProperties.getFolder()).thenReturn("target");
+        when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.service.streamIds(streamRequest)).thenReturn(accessions.stream());
-        Mockito.doThrow(new IOException("Forced IO Exception")).when(this.downloadResultWriter)
+        Mockito.doThrow(new IOException("Forced IO Exception"))
+                .when(this.downloadResultWriter)
                 .writeResult(any(), any(), any(), any(), any());
         this.uniProtKBMessageListener.setMaxRetryCount(3);
 
@@ -120,25 +114,36 @@ public class UniProtKBMessageListenerTest {
     }
 
     @Test
-    void testOnMessageWhenExceptionIsThrown(){
-        Message message = MessageBuilder.withBody("test".getBytes()).setHeader("jobId", "12345").build();
+    void testOnMessageWhenExceptionIsThrown() {
+        Message message =
+                MessageBuilder.withBody("test".getBytes()).setHeader("jobId", "12345").build();
         this.uniProtKBMessageListener.setMaxRetryCount(0);
         Assertions.assertDoesNotThrow(() -> this.uniProtKBMessageListener.onMessage(message));
     }
 
     @Test
-    void testAddAdditionalHeaders(){
-        Message message = MessageBuilder.withBody("test".getBytes()).setHeader("jobId", "12345").build();
-        MessageListenerException mle = new MessageListenerException("This is a test exception messsage");
-        Message messageWithHeaders = this.uniProtKBMessageListener.addAdditionalHeaders(message, mle);
+    void testAddAdditionalHeaders() {
+        Message message =
+                MessageBuilder.withBody("test".getBytes()).setHeader("jobId", "12345").build();
+        MessageListenerException mle =
+                new MessageListenerException("This is a test exception messsage");
+        Message messageWithHeaders =
+                this.uniProtKBMessageListener.addAdditionalHeaders(message, mle);
         Assertions.assertNotNull(messageWithHeaders);
         Assertions.assertEquals(message.getBody(), messageWithHeaders.getBody());
         Assertions.assertEquals(1, message.getMessageProperties().getHeaders().size());
-        Assertions.assertEquals((String) message.getMessageProperties().getHeader("jobId"),
+        Assertions.assertEquals(
+                (String) message.getMessageProperties().getHeader("jobId"),
                 messageWithHeaders.getMessageProperties().getHeader("jobId"));
         // newly added headers
         Assertions.assertEquals(3, messageWithHeaders.getMessageProperties().getHeaders().size());
-        Assertions.assertEquals(1, (Integer) messageWithHeaders.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER));
-        Assertions.assertNotNull(messageWithHeaders.getMessageProperties().getHeader(CURRENT_RETRIED_ERROR_HEADER));
+        Assertions.assertEquals(
+                1,
+                (Integer)
+                        messageWithHeaders
+                                .getMessageProperties()
+                                .getHeader(CURRENT_RETRIED_COUNT_HEADER));
+        Assertions.assertNotNull(
+                messageWithHeaders.getMessageProperties().getHeader(CURRENT_RETRIED_ERROR_HEADER));
     }
 }

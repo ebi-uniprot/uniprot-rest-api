@@ -1,5 +1,11 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +21,7 @@ import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
-import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.util.Optional;
-
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 
 /**
  * @author sahmad
@@ -38,11 +37,12 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
 
     private static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT"; // TODO Parametrized it
 
-    public UniProtKBDownloadController(ProducerMessageService messageService,
-                                       ApplicationEventPublisher eventPublisher,
-                                       MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
-                                       ThreadPoolTaskExecutor downloadTaskExecutor,
-                                       Gatekeeper downloadGatekeeper) {
+    public UniProtKBDownloadController(
+            ProducerMessageService messageService,
+            ApplicationEventPublisher eventPublisher,
+            MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
+            ThreadPoolTaskExecutor downloadTaskExecutor,
+            Gatekeeper downloadGatekeeper) {
         super(
                 eventPublisher,
                 converterContextFactory,
@@ -55,8 +55,8 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
     }
 
     @GetMapping("/run") // TODO make it post to be consistent with idmapping job
-    public ResponseEntity<String> submitJob(@ModelAttribute UniProtKBStreamRequest streamRequest,
-                                            HttpServletRequest httpRequest) {
+    public ResponseEntity<String> submitJob(
+            @ModelAttribute UniProtKBStreamRequest streamRequest, HttpServletRequest httpRequest) {
         MessageProperties messageHeader = new MessageProperties();
         String jobId = this.hashGenerator.generateHash(streamRequest);
         messageHeader.setHeader(JOB_ID, jobId);
@@ -71,7 +71,8 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
     }
 
     @Override
-    protected Optional<String> getEntityRedirectId(UniProtKBEntry entity, HttpServletRequest request) {
+    protected Optional<String> getEntityRedirectId(
+            UniProtKBEntry entity, HttpServletRequest request) {
         return Optional.empty();
     }
 }

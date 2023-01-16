@@ -9,5 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "download")
 public class DownloadConfigProperties {
-    private String folder;
+    private String idFilesFolder;
+    private String resultFilesFolder;
 }

@@ -1,6 +1,19 @@
 package org.uniprot.api.uniprotkb.queue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -19,18 +32,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -82,20 +83,23 @@ public class UniProtKBMessageListener implements MessageListener {
         try {
             jobId = message.getMessageProperties().getHeader("jobId");
             Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
-            String errorMsg = "Unable to find jobId " + jobId  + " in db";
+            String errorMsg = "Unable to find jobId " + jobId + " in db";
             downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
 
             if (isMaxRetriedReached(message)) {
                 updateDownloadJob(message, downloadJob, JobStatus.ERROR);
                 sendToUndeliveredQueue(jobId, message);
-                log.error("Message with job id {} discarded after max retry {}", jobId, this.maxRetryCount);
+                log.error(
+                        "Message with job id {} discarded after max retry {}",
+                        jobId,
+                        this.maxRetryCount);
                 return;
             }
 
             processMessage(message, downloadJob);
 
             log.info("Message with jobId {} processed successfully", jobId);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             log.error("Download job id {} failed with error {}", jobId, ex.getStackTrace());
             Message updatedMessage = addAdditionalHeaders(message, ex);
             // TODO test what if this fails. need to x-death in this case
@@ -106,11 +110,13 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private void processMessage(Message message, DownloadJob downloadJob) {
-        UniProtKBStreamRequest request = (UniProtKBStreamRequest) this.converter.fromMessage(message);
+        UniProtKBStreamRequest request =
+                (UniProtKBStreamRequest) this.converter.fromMessage(message);
         String jobId = downloadJob.getId();
-        String contentType = message.getMessageProperties().getHeader(UniProtKBDownloadController.CONTENT_TYPE);
+        String contentType =
+                message.getMessageProperties().getHeader(UniProtKBDownloadController.CONTENT_TYPE);
 
-        Path idsFile = Paths.get(downloadConfigProperties.getFolder(), jobId);
+        Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
         if (Files.notExists(idsFile)) {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
             getAndWriteResult(request, idsFile, jobId, contentType);
@@ -121,26 +127,30 @@ public class UniProtKBMessageListener implements MessageListener {
         }
     }
 
-    private void getAndWriteResult(UniProtKBStreamRequest request, Path idsFile, String jobId, String contentType) {
+    private void getAndWriteResult(
+            UniProtKBStreamRequest request, Path idsFile, String jobId, String contentType) {
         try {
             Stream<String> ids = streamIds(request);
             saveIdsInTempFile(idsFile, ids);
             MediaType mediaType = UniProtMediaType.valueOf(contentType);
             StoreRequest storeRequest = service.buildStoreRequest(request);
             downloadResultWriter.writeResult(request, idsFile, jobId, mediaType, storeRequest);
-        } catch (IOException ex){
+        } catch (IOException ex) {
             log.warn("Unable to write file due to IOException for job id {}", jobId);
             try {
                 Files.delete(idsFile);
             } catch (IOException e) {
-                log.warn("Unable to delete file {} during IOException failure for job id {}", idsFile.toFile().getName(), jobId);
+                log.warn(
+                        "Unable to delete file {} during IOException failure for job id {}",
+                        idsFile.toFile().getName(),
+                        jobId);
                 throw new MessageListenerException(e);
             }
             throw new MessageListenerException(ex);
         }
     }
 
-    private void saveIdsInTempFile(Path filePath, Stream<String> ids) throws IOException{
+    private void saveIdsInTempFile(Path filePath, Stream<String> ids) throws IOException {
         Iterable<String> source = ids::iterator;
         Files.write(filePath, source, StandardOpenOption.CREATE);
     }
@@ -150,7 +160,7 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private void updateDownloadJob(Message message, DownloadJob downloadJob, JobStatus jobStatus) {
-        if(Objects.nonNull(downloadJob)) {
+        if (Objects.nonNull(downloadJob)) {
             LocalDateTime now = LocalDateTime.now();
             downloadJob.setUpdated(now);
             downloadJob.setStatus(jobStatus);
@@ -171,7 +181,10 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private void sendToUndeliveredQueue(String jobId, Message message) {
-        log.warn("Maximum retry {} reached for jobId {}. Sending to rejected queue", this.maxRetryCount, jobId);
+        log.warn(
+                "Maximum retry {} reached for jobId {}. Sending to rejected queue",
+                this.maxRetryCount,
+                jobId);
         this.rabbitTemplate.convertAndSend(rejectedQueueName, message);
     }
 
@@ -182,8 +195,11 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private String getLastError(Message message) {
-        if(Objects.nonNull(message.getMessageProperties().getHeader(CURRENT_RETRIED_ERROR_HEADER))){
-            return message.getMessageProperties().getHeader(CURRENT_RETRIED_ERROR_HEADER).toString();
+        if (Objects.nonNull(
+                message.getMessageProperties().getHeader(CURRENT_RETRIED_ERROR_HEADER))) {
+            return message.getMessageProperties()
+                    .getHeader(CURRENT_RETRIED_ERROR_HEADER)
+                    .toString();
         }
         return null;
     }
@@ -191,21 +207,22 @@ public class UniProtKBMessageListener implements MessageListener {
     Message addAdditionalHeaders(Message message, Exception ex) {
         MessageBuilder builder = MessageBuilder.fromMessage(message);
         Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
-        if(Objects.nonNull(retryCount)){
+        if (Objects.nonNull(retryCount)) {
             retryCount++;
         } else {
             retryCount = 1;
         }
 
-        String stackTrace = Arrays.stream(ex.getStackTrace())
-                .map(StackTraceElement::toString)
-                .collect(Collectors.joining("\n"));
+        String stackTrace =
+                Arrays.stream(ex.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.joining("\n"));
         builder.setHeader(CURRENT_RETRIED_COUNT_HEADER, retryCount);
         builder.setHeader(CURRENT_RETRIED_ERROR_HEADER, stackTrace);
-        return  builder.build();
+        return builder.build();
     }
 
-    void setMaxRetryCount(Integer maxRetryCount){
+    void setMaxRetryCount(Integer maxRetryCount) {
         this.maxRetryCount = maxRetryCount;
     }
 }

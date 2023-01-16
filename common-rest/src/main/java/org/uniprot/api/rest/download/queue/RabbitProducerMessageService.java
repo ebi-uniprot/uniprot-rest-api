@@ -1,6 +1,5 @@
 package org.uniprot.api.rest.download.queue;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +11,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
-import org.uniprot.api.rest.download.model.HashGenerator;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.request.StreamRequest;
