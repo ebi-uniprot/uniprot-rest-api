@@ -1,6 +1,11 @@
 package org.uniprot.api.rest.download.queue;
 
+import static org.assertj.core.api.Fail.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import lombok.Data;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,18 +21,11 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.request.StreamRequest;
 
-import static org.assertj.core.api.Fail.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class RabbitProducerMessageServiceTest {
-    @Mock
-    private MessageConverter converter;
-    @Mock
-    private RabbitTemplate rabbitTemplate;
-    @Mock
-    private DownloadJobRepository jobRepository;
+    @Mock private MessageConverter converter;
+    @Mock private RabbitTemplate rabbitTemplate;
+    @Mock private DownloadJobRepository jobRepository;
     private RabbitProducerMessageService service;
     private StreamRequest streamRequest;
     private MessageProperties messageHeader;
@@ -47,11 +45,12 @@ class RabbitProducerMessageServiceTest {
     @Test
     void sendMessage() {
         when(converter.toMessage(any(StreamRequest.class), any(MessageProperties.class)))
-                .thenReturn(new Message(new byte[]{}, messageHeader));
+                .thenReturn(new Message(new byte[] {}, messageHeader));
         when(jobRepository.existsById(any())).thenReturn(false);
         when(jobRepository.save(any(DownloadJob.class))).thenReturn(downloadJob);
         service.sendMessage(streamRequest, messageHeader);
-        verify(converter, times(1)).toMessage(any(StreamRequest.class), any(MessageProperties.class));
+        verify(converter, times(1))
+                .toMessage(any(StreamRequest.class), any(MessageProperties.class));
         verify(rabbitTemplate, times(1)).send(any(Message.class));
         verify(jobRepository, times(1)).save(any(DownloadJob.class));
     }
@@ -81,11 +80,10 @@ class RabbitProducerMessageServiceTest {
     }
 
     @Data
-    class FakeStreamRequest implements StreamRequest{
+    class FakeStreamRequest implements StreamRequest {
         private String query;
         private String fields;
         private String sort;
         private String download;
     }
-
 }
