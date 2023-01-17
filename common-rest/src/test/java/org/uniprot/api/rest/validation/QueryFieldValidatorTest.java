@@ -112,7 +112,7 @@ class QueryFieldValidatorTest {
                 validator.isValid(
                         "((organism_id:9606) OR "
                                 + "(gene:\"CDC7\") OR "
-                                + "((cc_bpcp_kinetics:\"value\" AND ccev_bpcp_kinetics:\"value\")))",
+                                + "(cc_bpcp_kinetics:\"value\"))",
                         null);
         assertTrue(result);
     }
@@ -127,7 +127,7 @@ class QueryFieldValidatorTest {
                 validator.isValid(
                         "(((organism_id:9606) OR (organism_id:1234)) AND "
                                 + "(gene:\"CDC7\") AND "
-                                + "((cc_bpcp_kinetics:1234 AND ccev_bpcp_kinetics:\"the value\")))",
+                                + "(cc_bpcp_kinetics:1234))",
                         null);
         assertTrue(result);
     }
