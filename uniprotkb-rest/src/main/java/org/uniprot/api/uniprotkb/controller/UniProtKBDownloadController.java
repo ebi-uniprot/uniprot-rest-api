@@ -1,6 +1,12 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.GFF_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
 
 import java.util.Optional;
 
@@ -12,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -28,8 +35,9 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
  * @created 21/11/2022
  */
 @RestController
+@RequestMapping(value = DOWNLOAD_RESOURCE)
 public class UniProtKBDownloadController extends BasicSearchController<UniProtKBEntry> {
-
+    static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE+"/download";
     private final ProducerMessageService messageService;
     private final HashGenerator<StreamRequest> hashGenerator;
     public static final String JOB_ID = "jobId";
@@ -54,7 +62,17 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
-    @GetMapping("/run") // TODO make it post to be consistent with idmapping job
+    @GetMapping(value = "/run",
+            produces = {
+                    TSV_MEDIA_TYPE_VALUE,
+                    FF_MEDIA_TYPE_VALUE,
+                    LIST_MEDIA_TYPE_VALUE,
+                    APPLICATION_XML_VALUE,
+                    APPLICATION_JSON_VALUE,
+                    XLS_MEDIA_TYPE_VALUE,
+                    FASTA_MEDIA_TYPE_VALUE,
+                    GFF_MEDIA_TYPE_VALUE
+            }) // TODO make it post to be consistent with idmapping job
     public ResponseEntity<String> submitJob(
             @ModelAttribute UniProtKBStreamRequest streamRequest, HttpServletRequest httpRequest) {
         MessageProperties messageHeader = new MessageProperties();
