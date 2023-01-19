@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -12,9 +13,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 
+import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -30,6 +34,7 @@ import org.mockito.Mockito;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
@@ -121,6 +126,11 @@ public class UniProtKBDownloadControllerIT extends AbstractStreamControllerIT {
             downloadJobRepository; // RedisRepository with inMemory redis server
 
 
+    @Value("${download.idFilesFolder}")
+    private String idsFolder;
+    @Value("${download.resultFilesFolder}")
+    private String resultFolder;
+
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
@@ -165,7 +175,26 @@ public class UniProtKBDownloadControllerIT extends AbstractStreamControllerIT {
                         jsonPath(
                                 "$.*",
                                 Matchers.notNullValue()));
-        Thread.sleep(50000);
+        String jobId = response.andReturn().getResponse().getContentAsString();
+        Thread.sleep(10000); // TODO give enough time to consumer to process the request.. ideally we should loop on status api call until the job is completed
+        // verify the ids file and clean up
+        Path idsFilePath = Path.of(this.idsFolder + "/" + jobId);
+        Assertions.assertTrue(Files.exists(idsFilePath));
+        List<String> ids = Files.readAllLines(idsFilePath);
+        Assertions.assertNotNull(ids);
+        Assertions.assertTrue(ids.containsAll(List.of("P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
+                "P00007", "P00008", "P00009", "P00010")));
+        Files.delete(idsFilePath);
+        Assertions.assertTrue(Files.notExists(idsFilePath));
+        // verify result file and delete it
+        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
+        Assertions.assertTrue(Files.exists(resultFilePath));
+        String resultsJson = Files.readString(resultFilePath);
+        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
+        Assertions.assertTrue(List.of("P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
+                        "P00007", "P00008", "P00009", "P00010").containsAll(primaryAccessions));
+        Files.delete(resultFilePath);
+        Assertions.assertTrue(Files.notExists(resultFilePath));
     }
 
     @Override
