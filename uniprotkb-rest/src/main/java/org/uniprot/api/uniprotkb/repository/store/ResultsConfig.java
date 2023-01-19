@@ -65,7 +65,6 @@ public class ResultsConfig {
     @Bean
     public TupleStreamTemplate tupleStreamTemplate(
             StreamerConfigProperties configProperties,
-            HttpClient httpClient,
             @Qualifier("uniProtKBSolrClient") SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()

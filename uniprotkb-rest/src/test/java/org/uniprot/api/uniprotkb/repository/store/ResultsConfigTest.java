@@ -73,8 +73,7 @@ class ResultsConfigTest {
         SolrRequestConverter converter = Mockito.mock(SolrRequestConverter.class);
         StreamerConfigProperties configProps = config.resultsConfigProperties();
 
-        TupleStreamTemplate result =
-                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+        TupleStreamTemplate result = config.tupleStreamTemplate(configProps, solrClient, converter);
         assertNotNull(result);
     }
 
@@ -95,7 +94,7 @@ class ResultsConfigTest {
         StreamerConfigProperties configProps = config.resultsConfigProperties();
         configProps.setStoreFetchRetryDelayMillis(10);
         TupleStreamTemplate tupleStreamTemplate =
-                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+                config.tupleStreamTemplate(configProps, solrClient, converter);
         RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         StreamerConfigProperties streamConfig = config.resultsConfigProperties();
         TupleStreamDocumentIdStream documentIdStream =
@@ -118,7 +117,7 @@ class ResultsConfigTest {
         StreamerConfigProperties configProps = config.resultsConfigProperties();
         configProps.setStoreFetchRetryDelayMillis(10);
         TupleStreamTemplate tupleStreamTemplate =
-                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+                config.tupleStreamTemplate(configProps, solrClient, converter);
         UniProtKBStoreClient uniprotClient = new UniProtKBStoreClient(null);
         TupleStreamDocumentIdStream documentIdStream =
                 config.documentIdStream(tupleStreamTemplate, configProps);

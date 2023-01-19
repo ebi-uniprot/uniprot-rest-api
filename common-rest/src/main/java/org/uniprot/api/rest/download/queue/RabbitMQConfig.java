@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Initialisation code for Rabbit MQ to be used by both producer and consumer
@@ -29,6 +30,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    @Profile("live")
     public ConnectionFactory connectionFactory(RabbitMQConfigProperties rabbitMQConfigProperties) {
         CachingConnectionFactory connectionFactory =
                 new CachingConnectionFactory(rabbitMQConfigProperties.getHost());

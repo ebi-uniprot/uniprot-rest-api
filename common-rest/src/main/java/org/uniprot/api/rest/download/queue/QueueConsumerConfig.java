@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * @author sahmad
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 public class QueueConsumerConfig {
 
     @Bean
+    @Profile("live")
     public MessageListenerContainer messageListenerContainer(
             ConnectionFactory connectionFactory,
             @Qualifier("Consumer") MessageListener messageListener,

@@ -9,8 +9,6 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageListener;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
@@ -57,17 +55,17 @@ public class CommonRestTestConfig {
         return Redisson.create(config);
     }
 
-    @Bean("Consumer")
-    @Profile("offline")
-    public MessageListener getMessageListener() {
-        return new FakeMessageListener();
-    }
-
-    class FakeMessageListener implements MessageListener {
-
-        @Override
-        public void onMessage(Message message) {
-            // do nothing
-        }
-    }
+    //    @Bean("Consumer")
+    //    @Profile("offline")
+    //    public MessageListener getMessageListener() {
+    //        return new FakeMessageListener();
+    //    }
+    //
+    //    class FakeMessageListener implements MessageListener {
+    //
+    //        @Override
+    //        public void onMessage(Message message) {
+    //            // do nothing
+    //        }
+    //    }
 }

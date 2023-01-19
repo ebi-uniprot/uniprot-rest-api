@@ -37,7 +37,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
 public class UniProtKBDownloadController extends BasicSearchController<UniProtKBEntry> {
-    static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE+"/download";
+    static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;
     private final HashGenerator<StreamRequest> hashGenerator;
     public static final String JOB_ID = "jobId";
@@ -62,16 +62,17 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
-    @GetMapping(value = "/run",
+    @GetMapping(
+            value = "/run",
             produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    FF_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE,
-                    APPLICATION_XML_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    GFF_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                FF_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                GFF_MEDIA_TYPE_VALUE
             }) // TODO make it post to be consistent with idmapping job
     public ResponseEntity<String> submitJob(
             @ModelAttribute UniProtKBStreamRequest streamRequest, HttpServletRequest httpRequest) {

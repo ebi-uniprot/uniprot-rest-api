@@ -1,7 +1,5 @@
 package org.uniprot.api.rest.download;
 
-
-
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -15,7 +13,7 @@ public class MessageQueueTestConfig {
 
     @Bean
     @Profile("offline")
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         return new RabbitTemplate(connectionFactory);
     }
 
@@ -30,7 +28,7 @@ public class MessageQueueTestConfig {
     @Profile("offline")
     public RabbitProperties rabbitProperties() {
         RabbitProperties props = new RabbitProperties();
-        props.setPort(6672);
+        props.setPort(6672); // TODO externalise
         return props;
     }
 }
