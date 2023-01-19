@@ -1,9 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,11 +32,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -74,8 +87,11 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UniProtKBDownloadControllerIT extends AbstractStreamControllerIT {
-
-    private static final String streamRequestPath = "/uniprotkb/stream";
+// TODO currently we manually need to create test ids and result folders
+// download.idFilesFolder=target/download/ids
+// download.resultFilesFolder=target/download/result
+// ideally they  should be created on  start of application if not already created
+    private static final String DOWNLOAD_RUN_PATH = UniProtKBDownloadController.DOWNLOAD_RESOURCE + "/run";
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
     private final UniProtEntryConverter documentConverter =
@@ -88,7 +104,8 @@ public class UniProtKBDownloadControllerIT extends AbstractStreamControllerIT {
                     new HashMap<>());
     @Autowired UniProtStoreClient<UniProtKBEntry> storeClient;
     @Autowired private MockMvc mockMvc;
-
+    @Autowired
+    private EmbeddedInMemoryQpidBroker embeddedBroker;
     @Autowired
     @Qualifier("uniProtKBSolrClient")
     private SolrClient solrClient;
@@ -103,11 +120,11 @@ public class UniProtKBDownloadControllerIT extends AbstractStreamControllerIT {
     private DownloadJobRepository
             downloadJobRepository; // RedisRepository with inMemory redis server
 
-    private EmbeddedInMemoryQpidBroker embeddedBroker;
+
 
     @BeforeAll
     void saveEntriesInSolrAndStore() throws Exception {
-        startEmbeddedMessageBroker();
+//        startEmbeddedMessageBroker();
         saveEntries();
 
         // for the following tests, ensure the number of hits
@@ -124,19 +141,31 @@ public class UniProtKBDownloadControllerIT extends AbstractStreamControllerIT {
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
     }
 
-    private void startEmbeddedMessageBroker() throws Exception {
-        embeddedBroker = new EmbeddedInMemoryQpidBroker();
-        embeddedBroker.start();
-    }
-
     @Test
-    void sendAndProcessDownloadMessage() {
+    void sendAndProcessDownloadMessage() throws Exception {
         // producer sends the download request to the queue
         // producer uses downloadJobRepository to write to in memory
         // consumer receives the message
         // writes to ids and result
         Assertions.assertNotNull("true");
         System.out.println("stub");
+        // when
+
+        MockHttpServletRequestBuilder requestBuilder =
+                get(DOWNLOAD_RUN_PATH)
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", "content:*");
+        ResultActions response = this.mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.*",
+                                Matchers.notNullValue()));
+        Thread.sleep(50000);
     }
 
     @Override

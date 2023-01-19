@@ -80,6 +80,7 @@ public class UniProtKBMessageListener implements MessageListener {
     public void onMessage(Message message) {
         String jobId = null;
         DownloadJob downloadJob = null;
+        log.info("################### Listener ");
         try {
             jobId = message.getMessageProperties().getHeader("jobId");
             Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
@@ -136,6 +137,7 @@ public class UniProtKBMessageListener implements MessageListener {
             StoreRequest storeRequest = service.buildStoreRequest(request);
             downloadResultWriter.writeResult(request, idsFile, jobId, mediaType, storeRequest);
         } catch (IOException ex) {
+            log.error(ex.getMessage());
             log.warn("Unable to write file due to IOException for job id {}", jobId);
             try {
                 Files.delete(idsFile);

@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Profile;
 public class QueueConsumerConfig {
 
     @Bean
-    @Profile("live")
     public MessageListenerContainer messageListenerContainer(
             ConnectionFactory connectionFactory,
             @Qualifier("Consumer") MessageListener messageListener,
