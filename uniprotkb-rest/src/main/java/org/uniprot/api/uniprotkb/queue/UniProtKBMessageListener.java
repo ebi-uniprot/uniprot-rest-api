@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,6 +62,7 @@ public class UniProtKBMessageListener implements MessageListener {
     @Value("${spring.amqp.rabbit.retryQueueName}")
     private String retryQueueName;
 
+    static AtomicInteger times = new AtomicInteger(0);
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
@@ -80,12 +82,12 @@ public class UniProtKBMessageListener implements MessageListener {
     public void onMessage(Message message) {
         String jobId = null;
         DownloadJob downloadJob = null;
-        log.info("################### Listener ");
         try {
             jobId = message.getMessageProperties().getHeader("jobId");
             Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
             String errorMsg = "Unable to find jobId " + jobId + " in db";
             downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
+            System.out.println("#################### times called " + times.incrementAndGet());
 
             if (isMaxRetriedReached(message)) {
                 updateDownloadJob(message, downloadJob, JobStatus.ERROR);
@@ -179,6 +181,7 @@ public class UniProtKBMessageListener implements MessageListener {
 
     private int getRetryCount(Message message) {
         Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
+        log.info("#################### retryCount " + retryCount);
         return Objects.nonNull(retryCount) ? retryCount : 0;
     }
 

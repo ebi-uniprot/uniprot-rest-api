@@ -9,4 +9,6 @@ import org.uniprot.api.rest.request.StreamRequest;
  */
 public interface ProducerMessageService {
     void sendMessage(StreamRequest streamRequest, MessageProperties messageHeader);
+
+    void logAlreadyProcessed(String jobId);
 }

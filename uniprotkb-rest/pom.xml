@@ -251,6 +251,20 @@
 			<version>8.0.6</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.qpid/qpid-broker-plugins-management-http -->
+		<dependency>
+			<groupId>org.apache.qpid</groupId>
+			<artifactId>qpid-broker-plugins-management-http</artifactId>
+			<version>8.0.6</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<version>4.2.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

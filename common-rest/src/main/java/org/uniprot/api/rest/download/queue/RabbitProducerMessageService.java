@@ -42,16 +42,27 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     public void sendMessage(StreamRequest streamRequest, MessageProperties messageHeader) {
         String jobId = messageHeader.getHeader("jobId");
         if (!this.jobRepository.existsById(jobId)) {
-            Message message = converter.toMessage(streamRequest, messageHeader);
-            // write to redis and put on queue
-            createDownloadJob(jobId, streamRequest);
-            try {
-                this.rabbitTemplate.send(message);
-            } catch (AmqpException amqpException) {
-                log.error("Unable to send message to the queue with exception {}", amqpException);
-                this.jobRepository.deleteById(jobId);
-                throw amqpException;
-            }
+            doSendMessage(streamRequest, messageHeader, jobId);
+        } else {
+            logAlreadyProcessed(jobId);
+        }
+    }
+
+    public void logAlreadyProcessed(String jobId) {
+        log.info("Job is already processed {}", jobId);
+    }
+
+    private void doSendMessage(
+            StreamRequest streamRequest, MessageProperties messageHeader, String jobId) {
+        Message message = converter.toMessage(streamRequest, messageHeader);
+        // write to redis and put on queue
+        createDownloadJob(jobId, streamRequest);
+        try {
+            this.rabbitTemplate.send(message);
+        } catch (AmqpException amqpException) {
+            log.error("Unable to send message to the queue with exception {}", amqpException);
+            this.jobRepository.deleteById(jobId);
+            throw amqpException;
         }
     }
 

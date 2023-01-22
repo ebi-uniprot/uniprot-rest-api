@@ -4,13 +4,18 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.qpid.server.SystemLauncher;
 import org.apache.qpid.server.configuration.IllegalConfigurationException;
 import org.apache.qpid.server.model.SystemConfig;
+import org.springframework.boot.test.context.TestConfiguration;
 
 @Slf4j
+@TestConfiguration
 public class EmbeddedInMemoryQpidBroker implements AutoCloseable {
 
     private static final String DEFAULT_INITIAL_CONFIGURATION_LOCATION =
@@ -28,10 +33,12 @@ public class EmbeddedInMemoryQpidBroker implements AutoCloseable {
         this.systemLauncher = new SystemLauncher();
     }
 
+    @PostConstruct
     public void start() throws Exception {
         this.systemLauncher.startup(createSystemConfig());
     }
 
+    @PreDestroy
     public void shutdown() {
         this.systemLauncher.shutdown();
     }

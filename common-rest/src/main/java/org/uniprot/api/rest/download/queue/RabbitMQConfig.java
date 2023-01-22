@@ -68,9 +68,9 @@ public class RabbitMQConfig {
     @Bean
     Queue retryQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
         return QueueBuilder.durable(rabbitMQConfigProperties.getRetryQueueName())
+                .ttl(rabbitMQConfigProperties.getRetryDelayInMillis())
                 .deadLetterExchange(rabbitMQConfigProperties.getExchangeName())
                 .deadLetterRoutingKey(rabbitMQConfigProperties.getRoutingKey())
-                .ttl(rabbitMQConfigProperties.getRetryDelayInMillis())
                 .quorum()
                 .build();
     }

@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
-import org.uniprot.api.rest.download.message.EmbeddedInMemoryQpidBroker;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -30,14 +29,6 @@ import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEnt
  */
 @TestConfiguration
 public class DataStoreTestConfig {
-
-    @Bean
-    public EmbeddedInMemoryQpidBroker embeddedInMemoryQpidBroker() throws Exception {
-        EmbeddedInMemoryQpidBroker eb = new EmbeddedInMemoryQpidBroker();
-        eb.start();
-        return eb;
-    }
-
     @Bean
     @Profile("offline")
     public HttpClient httpClient() {
