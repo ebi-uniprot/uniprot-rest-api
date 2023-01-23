@@ -46,7 +46,7 @@ api:settings:
 
 api:test:
   stage: test
-  image: [maven:3.6.3-jdk-11, docker:latest]
+  image: docker:latest
   services:
     - docker:dind
   script:
