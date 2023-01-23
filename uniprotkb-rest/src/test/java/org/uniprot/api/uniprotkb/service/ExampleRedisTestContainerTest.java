@@ -11,8 +11,10 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 public class ExampleRedisTestContainerTest {
     @Container
-    public GenericContainer redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
-            .withExposedPorts(6379).withReuse(true);
+    public GenericContainer redis =
+            new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine"))
+                    .withExposedPorts(6379)
+                    .withReuse(true);
 
     @BeforeEach
     public void setUp() {
@@ -25,4 +27,3 @@ public class ExampleRedisTestContainerTest {
         Assertions.assertTrue(this.redis.isRunning());
     }
 }
-
