@@ -15,7 +15,7 @@ import org.apache.qpid.server.model.SystemConfig;
 import org.springframework.boot.test.context.TestConfiguration;
 
 @Slf4j
-@TestConfiguration
+//@TestConfiguration
 public class EmbeddedInMemoryQpidBroker implements AutoCloseable {
 
     private static final String DEFAULT_INITIAL_CONFIGURATION_LOCATION =
@@ -33,12 +33,12 @@ public class EmbeddedInMemoryQpidBroker implements AutoCloseable {
         this.systemLauncher = new SystemLauncher();
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void start() throws Exception {
         this.systemLauncher.startup(createSystemConfig());
     }
 
-    @PreDestroy
+//    @PreDestroy
     public void shutdown() {
         this.systemLauncher.shutdown();
     }
