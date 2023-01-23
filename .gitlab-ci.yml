@@ -46,9 +46,6 @@ api:settings:
 
 api:test:
   stage: test
-  image: docker:latest
-  services:
-    - docker:dind
   script:
     - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS} 2>&1'
     - 'echo "Maven install successful"'
