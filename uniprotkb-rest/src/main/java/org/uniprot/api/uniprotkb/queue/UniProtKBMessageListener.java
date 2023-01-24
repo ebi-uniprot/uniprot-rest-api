@@ -6,9 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,13 +83,7 @@ public class UniProtKBMessageListener implements MessageListener {
         DownloadJob downloadJob = null;
         try {
             jobId = message.getMessageProperties().getHeader("jobId");
-            Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
-            String errorMsg = "Unable to find jobId " + jobId + " in db";
-            downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
-            log.info("#################### times called " + times.incrementAndGet());//TODO remove
-
             if (isMaxRetriedReached(message)) {
-                updateDownloadJob(message, downloadJob, JobStatus.ERROR);
                 sendToUndeliveredQueue(jobId, message);
                 log.error(
                         "Message with job id {} discarded after max retry {}",
@@ -100,16 +92,24 @@ public class UniProtKBMessageListener implements MessageListener {
                 return;
             }
 
+            Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
+            String errorMsg = "Unable to find jobId " + jobId + " in db";
+            downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
+            log.info("#################### times called " + times.incrementAndGet());//TODO remove
+
             processMessage(message, downloadJob);
 
             log.info("Message with jobId {} processed successfully", jobId);
         } catch (Exception ex) {
-            log.error("Download job id {} failed with error {}", jobId, ex.getStackTrace());
-            Message updatedMessage = addAdditionalHeaders(message, ex);
-            // TODO test what if this fails. need to x-death in this case
-            updateDownloadJob(updatedMessage, downloadJob, JobStatus.ERROR);
-            // TODO test what if this fails.
-            sendToRetryQueue(jobId, updatedMessage);
+            if(getRetryCountByBroker(message) <= this.maxRetryCount) {
+                log.error("Download job id {} failed with error {}", jobId, ex.getStackTrace());
+                Message updatedMessage = addAdditionalHeaders(message, ex);
+                updateDownloadJob(updatedMessage, downloadJob, JobStatus.ERROR);
+                sendToRetryQueue(jobId, updatedMessage);
+            } else {
+                // the flow should not come here, letting the flow complete without rethrowing exception to avoid poison message
+                log.error("Message with jobId {} failed due to error {} which is not handled", jobId, ex);
+            }
         }
     }
 
@@ -174,6 +174,7 @@ public class UniProtKBMessageListener implements MessageListener {
             downloadJob.setError(error);
             this.jobRepository.save(downloadJob);
         }
+        dummyMethodForTesting(downloadJob.getId(), jobStatus);
     }
 
     private boolean isMaxRetriedReached(Message message) {
@@ -181,9 +182,29 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private int getRetryCount(Message message) {
-        Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
+        Integer retryCountHandledError = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
+        Integer retryCountUnhandledError = getRetryCountByBroker(message);
+        int retryCount = Math.max(Objects.nonNull(retryCountHandledError) ? retryCountHandledError : 0, retryCountUnhandledError);
         log.info("#################### retryCount " + retryCount);
-        return Objects.nonNull(retryCount) ? retryCount : 0;
+        return retryCount;
+    }
+
+    private int getRetryCountByBroker(Message message) {
+        int retriedByBroker = 0;
+        List<Map<String, ?>> xDeaths = message.getMessageProperties().getHeader("x-death");
+        if(Objects.nonNull(xDeaths)){
+            Map<String, ?> xDeathCount = xDeaths.get(0);
+            if(Objects.nonNull(xDeathCount) && !xDeathCount.isEmpty()){
+                retriedByBroker = ((Long) xDeathCount.get("count")).intValue();
+            }
+        }
+
+        if(retriedByBroker > 0){
+            String jobId = message.getMessageProperties().getHeader("jobId");
+            log.error("This x-death retry count {} should be null, something unexpected has happened during processing of job {}", retriedByBroker, jobId);
+        }
+
+        return retriedByBroker;
     }
 
     private void sendToUndeliveredQueue(String jobId, Message message) {
@@ -192,6 +213,7 @@ public class UniProtKBMessageListener implements MessageListener {
                 this.maxRetryCount,
                 jobId);
         this.rabbitTemplate.convertAndSend(rejectedQueueName, message);
+        log.info("Message with jobId {} sent to rejected queue {}", jobId, this.rejectedQueueName);
     }
 
     private void sendToRetryQueue(String jobId, Message message) {
@@ -230,5 +252,8 @@ public class UniProtKBMessageListener implements MessageListener {
 
     void setMaxRetryCount(Integer maxRetryCount) {
         this.maxRetryCount = maxRetryCount;
+    }
+    void dummyMethodForTesting(String jobId, JobStatus jobStatus){
+        // do nothing
     }
 }
