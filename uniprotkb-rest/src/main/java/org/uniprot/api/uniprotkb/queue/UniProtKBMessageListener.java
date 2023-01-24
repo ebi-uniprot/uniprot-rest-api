@@ -63,6 +63,7 @@ public class UniProtKBMessageListener implements MessageListener {
     private String retryQueueName;
 
     static AtomicInteger times = new AtomicInteger(0);
+
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
@@ -87,7 +88,7 @@ public class UniProtKBMessageListener implements MessageListener {
             Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
             String errorMsg = "Unable to find jobId " + jobId + " in db";
             downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
-            System.out.println("#################### times called " + times.incrementAndGet());
+            log.info("#################### times called " + times.incrementAndGet());//TODO remove
 
             if (isMaxRetriedReached(message)) {
                 updateDownloadJob(message, downloadJob, JobStatus.ERROR);

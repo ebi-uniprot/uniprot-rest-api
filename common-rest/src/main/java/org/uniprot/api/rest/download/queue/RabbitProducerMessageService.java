@@ -43,6 +43,7 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         String jobId = messageHeader.getHeader("jobId");
         if (!this.jobRepository.existsById(jobId)) {
             doSendMessage(streamRequest, messageHeader, jobId);
+            log.info("Message with jobId {} ready to be processed", jobId);
         } else {
             logAlreadyProcessed(jobId);
         }
@@ -57,8 +58,10 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         Message message = converter.toMessage(streamRequest, messageHeader);
         // write to redis and put on queue
         createDownloadJob(jobId, streamRequest);
+        log.info("Message with jobId {} created in redis", jobId);
         try {
             this.rabbitTemplate.send(message);
+            log.info("Message with jobId sent to download queue {}", jobId);
         } catch (AmqpException amqpException) {
             log.error("Unable to send message to the queue with exception {}", amqpException);
             this.jobRepository.deleteById(jobId);

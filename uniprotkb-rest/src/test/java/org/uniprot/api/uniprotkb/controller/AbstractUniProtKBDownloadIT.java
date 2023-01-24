@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -7,6 +18,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
+import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,8 +26,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.testcontainers.containers.RabbitMQContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -33,35 +43,34 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//@Testcontainers
 public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControllerIT {
 
-//    @Container
-    static RabbitMQContainer rabbitMQContainer = new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management")).withReuse(true);
+    static RabbitMQContainer rabbitMQContainer =
+            new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
 
     @DynamicPropertySource
-    public static void setUpThings(DynamicPropertyRegistry propertyRegistry){
+    public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
         Startables.deepStart(rabbitMQContainer).join();
+        assertTrue(rabbitMQContainer.isRunning());
         propertyRegistry.add("spring.amqp.rabbit.port", rabbitMQContainer::getFirstMappedPort);
         propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getContainerIpAddress);
-        System.out.println();
     }
+
     @Value("${download.idFilesFolder}")
     protected String idsFolder;
 
     @Value("${download.resultFilesFolder}")
     protected String resultFolder;
+
+    @Value("${spring.amqp.rabbit.queueName}")
+    protected String downloadQueue;
+
+    @Value("${spring.amqp.rabbit.retryQueueName}")
+    protected String retryQueue;
+
+    @Value(("${spring.amqp.rabbit.rejectedQueueName}"))
+    protected String rejectedQueue;
 
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
@@ -78,13 +87,24 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     @Qualifier("uniProtKBSolrClient")
     private SolrClient solrClient;
 
-    @Autowired private TaxonomyLineageRepository taxRepository;
+    @Autowired
+    private TaxonomyLineageRepository taxRepository;
+
+    @Autowired
+    protected AmqpAdmin amqpAdmin;
 
     @Autowired
     private UniProtStoreClient<UniProtKBEntry> storeClient; // in memory voldemort store client
 
+    private void purgeAllQueues() {
+        this.amqpAdmin.purgeQueue(downloadQueue, true);
+        this.amqpAdmin.purgeQueue(retryQueue, true);
+        this.amqpAdmin.purgeQueue(rejectedQueue, true);
+    }
+
     @BeforeAll
-    void saveEntriesInSolrAndStore() throws Exception {
+    public void saveEntriesInSolrAndStore() throws Exception {
+        cleanUpFiles();
         saveEntries();
 
         // for the following tests, ensure the number of hits
@@ -102,9 +122,10 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     }
 
     @AfterAll
-    void cleanUpFiles() throws IOException {
+    public void cleanUpFiles() throws IOException {
         cleanUpFolder(this.idsFolder);
         cleanUpFolder(this.resultFolder);
+        purgeAllQueues();
     }
 
     private void cleanUpFolder(String folder) throws IOException {

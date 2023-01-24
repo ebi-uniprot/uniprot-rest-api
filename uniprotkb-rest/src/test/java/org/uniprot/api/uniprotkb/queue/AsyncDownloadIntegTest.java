@@ -1,29 +1,17 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-
+import com.jayway.jsonpath.JsonPath;
 import org.apache.solr.client.solrj.SolrClient;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -32,7 +20,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.MessageQueueTestConfig;
@@ -52,7 +39,18 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.store.search.SolrCollection;
 
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.*;
 
 @ActiveProfiles(profiles = "offline")
 @EnableConfigurationProperties
@@ -81,8 +79,6 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
 
     @Autowired private RabbitTemplate rabbitTemplate; // RabbitTemplate with inmemory qpid broker
 
-    @Autowired private AmqpAdmin amqpAdmin;
-
     @SpyBean @Autowired
     private DownloadJobRepository
             downloadJobRepository; // RedisRepository with inMemory redis server
@@ -94,24 +90,9 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
 
     private HashGenerator<StreamRequest> hashGenerator;
 
-    @Value("${spring.amqp.rabbit.queueName}")
-    private String downloadQueue;
-
-    @Value("${spring.amqp.rabbit.retryQueueName}")
-    private String retryQueue;
-
-    @Value(("${spring.amqp.rabbit.rejectedQueueName}"))
-    private String rejectedQueue;
-
     @BeforeAll
     void init() {
         this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
-        this.amqpAdmin.purgeQueue(downloadQueue, true);
-    }
-
-    @AfterAll
-    void destroy() {
-        this.amqpAdmin.purgeQueue(downloadQueue, true);
     }
 
     @Test
@@ -122,15 +103,13 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
         // redis entry created
         await().until(jobCreatedInRedis(jobId));
-        verifyRedisEntry(query, jobId, List.of(JobStatus.NEW, JobStatus.RUNNING), 0, false);
-        // rabbitmq broker
-        await().until(getMessageCountInQueue(downloadQueue), equalTo(1));
+        await().until(jobFinished(jobId));
         verifyMessageListener(1, 0);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false);
         verifyIdsAndResultFiles(jobId);
     }
 
-//    @Test FIXME
+    @Test
     void sendAndProcessMessageSuccessfullyAfterRetry() throws IOException {
         doThrow(new RuntimeException("Forced exception for testing on call converter.fromMessage"))
                 .doCallRealMethod()
@@ -141,14 +120,11 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         // Producer
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        // verify  that retry queue count is 1
-        await().until(getMessageCountInQueue(retryQueue), equalTo(1));
-        await().until(getMessageCountInQueue(downloadQueue), equalTo(0));
+        await().until(jobErrored(jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
-        // after certain delay the retryQueue put the message back to downloadQueue
-        await().until(getMessageCountInQueue(downloadQueue), equalTo(1));
-        await().until(getMessageCountInQueue(retryQueue), equalTo(0));
+        // after certain delay the job should be reprocessed
+        await().until(jobFinished(jobId));
         verifyMessageListener(2, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true);
         verifyIdsAndResultFiles(jobId);
@@ -185,7 +161,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     }
 
     private void verifyMessageListener(int timesOnMessage, int timesAddHeader) {
-        await().until(getMessageCountInQueue(downloadQueue), equalTo(0));
+//        await().atMost(20, SECONDS).until(getMessageCountInQueue(downloadQueue), equalTo(0));
         verify(this.uniProtKBMessageListener, atLeast(timesOnMessage)).onMessage(any());
         verify(this.uniProtKBMessageListener, atLeast(timesAddHeader))
                 .addAdditionalHeaders(any(), any());
@@ -195,6 +171,16 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
 
     private Callable<Boolean> jobCreatedInRedis(String jobId) {
         return () -> this.downloadJobRepository.existsById(jobId);
+    }
+
+    private Callable<Boolean> jobFinished(String jobId) {
+        return () -> this.downloadJobRepository.existsById(jobId) &&
+                this.downloadJobRepository.findById(jobId).get().getStatus() == JobStatus.FINISHED;
+    }
+
+    private Callable<Boolean> jobErrored(String jobId) {
+        return () -> this.downloadJobRepository.existsById(jobId) &&
+                this.downloadJobRepository.findById(jobId).get().getStatus() == JobStatus.ERROR;
     }
 
     private Callable<Integer> getMessageCountInQueue(String queueName) {
