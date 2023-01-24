@@ -166,7 +166,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     }
 
     @Test
-    void sendAndProcessMessageWithUnhandledExceptionShouldEndUpInRejectedQueue() throws InterruptedException, IOException {
+    void sendAndProcessMessageWithUnhandledExceptionShouldBeDiscarded() throws InterruptedException, IOException {
         // when
         String query = "field:value";
         UniProtKBStreamRequest request = new UniProtKBStreamRequest();
