@@ -163,6 +163,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
+			<artifactId>spark-indexer</artifactId>
+			<version>${uniprot-store.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
 			<artifactId>json-parser</artifactId>
 			<version>${uniprot-core.version}</version>
 			<type>test-jar</type>
