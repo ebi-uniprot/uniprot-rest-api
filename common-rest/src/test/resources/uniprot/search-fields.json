@@ -105,14 +105,6 @@
     "example": "UP000005640"
   },
   {
-    "label": "Kinetics",
-    "field": "cc_bpcp_kinetics",
-    "evidenceField": "ccev_bpcp_kinetics",
-    "dataType": "string",
-    "description": "Search by biophysicochemical properties: kinetic parameters",
-    "example": "aspartate"
-  },
-  {
     "label": "Mass(Da)",
     "sortField": "mass",
     "dataType": "integer",
