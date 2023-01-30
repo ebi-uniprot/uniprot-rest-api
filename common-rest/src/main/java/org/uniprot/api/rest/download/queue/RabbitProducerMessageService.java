@@ -9,6 +9,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -23,6 +24,7 @@ import org.uniprot.api.rest.request.StreamRequest;
  */
 @Service
 @Slf4j
+@Profile({"asyncDownload"})
 public class RabbitProducerMessageService implements ProducerMessageService {
 
     private final RabbitTemplate rabbitTemplate;

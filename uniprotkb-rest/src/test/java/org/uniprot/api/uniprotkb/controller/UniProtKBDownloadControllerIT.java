@@ -18,7 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.rest.download.MessageQueueTestConfig;
+import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -28,14 +28,14 @@ import org.uniprot.store.search.SolrCollection;
 import com.jayway.jsonpath.JsonPath;
 
 @Slf4j
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "asyncDownload"})
 @WebMvcTest({UniProtKBDownloadController.class})
 @ContextConfiguration(
         classes = {
             DataStoreTestConfig.class,
             UniProtKBREST.class,
             ErrorHandlerConfig.class,
-            MessageQueueTestConfig.class,
+            AsyncDownloadTestConfig.class,
             RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)

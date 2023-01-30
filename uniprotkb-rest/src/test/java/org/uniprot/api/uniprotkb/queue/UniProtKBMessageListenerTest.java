@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.queue;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.CONTENT_TYPE;
 import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
 import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
 
@@ -75,10 +76,12 @@ public class UniProtKBMessageListenerTest {
     @Test
     void testOnMessageWithIOExceptionDuringWrite() throws IOException {
         UniProtKBStreamRequest streamRequest = new UniProtKBStreamRequest();
-        streamRequest.setQuery("field:value");
+        streamRequest.setQuery("field2:value2");
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(streamRequest.toString().getBytes());
-        Message message = builder.setHeader("jobId", jobId).build();
+        String contentType = "application/json";
+        Message message =
+                builder.setHeader("jobId", jobId).setHeader(CONTENT_TYPE, contentType).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
         // stub
         List<String> accessions = List.of("P12345", "P05067");
@@ -101,15 +104,12 @@ public class UniProtKBMessageListenerTest {
     @Test
     void testOnMessageWhenMaxRetryReached() throws IOException {
         UniProtKBStreamRequest streamRequest = new UniProtKBStreamRequest();
-        streamRequest.setQuery("field:value");
+        streamRequest.setQuery("field1:value1");
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(streamRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
-        // stub
-        when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         this.uniProtKBMessageListener.setMaxRetryCount(0);
-
         Assertions.assertDoesNotThrow(() -> this.uniProtKBMessageListener.onMessage(message));
     }
 

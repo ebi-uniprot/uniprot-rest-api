@@ -19,6 +19,7 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
@@ -36,6 +37,7 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
  * @author sahmad
  * @created 22/11/2022
  */
+@Profile({"live", "asyncDownload"})
 @Service("Consumer")
 @Slf4j
 public class UniProtKBMessageListener implements MessageListener {

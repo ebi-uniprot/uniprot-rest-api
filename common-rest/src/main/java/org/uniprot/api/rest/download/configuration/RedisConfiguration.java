@@ -23,6 +23,7 @@ import org.uniprot.api.rest.download.model.DownloadJob;
  * @created 22/12/2022
  */
 @Configuration
+@Profile({"asyncDownload"})
 @EnableRedisRepositories(basePackages = "org.uniprot.api.rest.download.repository")
 public class RedisConfiguration {
     @Bean
@@ -31,7 +32,7 @@ public class RedisConfiguration {
     }
 
     @Bean(destroyMethod = "shutdown")
-    @Profile("live")
+    @Profile("asyncDownload & live")
     public RedissonClient redisson(@Value("classpath:/redisson.yaml") Resource configFile)
             throws IOException {
         Config config = Config.fromYAML(configFile.getInputStream());

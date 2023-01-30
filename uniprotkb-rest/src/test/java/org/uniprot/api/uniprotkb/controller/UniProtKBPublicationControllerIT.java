@@ -33,6 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.uniprotkb.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.UniProtKBObjectsForTests;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -51,8 +52,9 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
  * @since 2019-07-10
  */
 @Slf4j
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
-@ActiveProfiles(profiles = "offline")
+@ContextConfiguration(
+        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
+@ActiveProfiles(profiles = {"offline"})
 @WebMvcTest(UniProtKBPublicationController.class)
 @AutoConfigureWebClient
 @ExtendWith(value = {SpringExtension.class})

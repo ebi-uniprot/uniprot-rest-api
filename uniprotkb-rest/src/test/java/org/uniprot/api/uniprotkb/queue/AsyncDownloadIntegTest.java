@@ -37,7 +37,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.rest.download.MessageQueueTestConfig;
+import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
@@ -56,7 +56,7 @@ import org.uniprot.store.search.SolrCollection;
 
 import com.jayway.jsonpath.JsonPath;
 
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "asyncDownload"})
 @EnableConfigurationProperties
 @PropertySource("classpath:application.properties")
 @ContextConfiguration(
@@ -64,7 +64,7 @@ import com.jayway.jsonpath.JsonPath;
             DataStoreTestConfig.class,
             UniProtKBREST.class,
             UniProtStoreConfig.class,
-            MessageQueueTestConfig.class,
+            AsyncDownloadTestConfig.class,
             RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)

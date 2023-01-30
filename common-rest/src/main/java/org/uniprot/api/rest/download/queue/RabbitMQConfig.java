@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Profile;
  * @created 23/11/2022
  */
 @Configuration
+@Profile({"asyncDownload"})
 public class RabbitMQConfig {
 
     @Bean
@@ -30,7 +31,6 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    @Profile("live")
     public ConnectionFactory connectionFactory(RabbitMQConfigProperties rabbitMQConfigProperties) {
         CachingConnectionFactory connectionFactory =
                 new CachingConnectionFactory(rabbitMQConfigProperties.getHost());

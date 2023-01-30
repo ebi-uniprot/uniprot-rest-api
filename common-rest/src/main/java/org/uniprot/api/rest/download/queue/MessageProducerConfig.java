@@ -13,10 +13,10 @@ import org.springframework.context.annotation.Profile;
  * @created 22/11/2022
  */
 @Configuration
+@Profile({"asyncDownload"})
 public class MessageProducerConfig {
 
     @Bean
-    @Profile("live")
     public RabbitTemplate rabbitTemplate(
             ConnectionFactory connectionFactory,
             RabbitMQConfigProperties rabbitMQConfigProperties,
