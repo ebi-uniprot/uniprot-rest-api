@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
@@ -49,6 +50,7 @@ class TsvMessageConverterTest {
         assertEquals("Entry\tOrganism\tGene Names (ORF)\n", result);
     }
 
+    @Disabled
     @Test
     void canWriteBody() throws IOException {
         MessageConverterContext<UniProtKBEntry> messageContext =

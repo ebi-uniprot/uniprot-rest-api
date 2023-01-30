@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
-@Profile({"offline & !asyncDownload", "use-fake-app"})
+@Profile({"offline & !asyncDownload", "use-fake-app", "server-errors"})
 @TestConfiguration
 public class AsyncDownloadMocks {
     @Bean
