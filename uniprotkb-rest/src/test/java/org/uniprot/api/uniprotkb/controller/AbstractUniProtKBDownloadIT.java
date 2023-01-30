@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
@@ -48,13 +49,20 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
 
     static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
+    static GenericContainer<?> redisContainer =
+            new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
 
     @DynamicPropertySource
     public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
-        Startables.deepStart(rabbitMQContainer).join();
+        Startables.deepStart(rabbitMQContainer, redisContainer).join();
         assertTrue(rabbitMQContainer.isRunning());
+        assertTrue(redisContainer.isRunning());
         propertyRegistry.add("spring.amqp.rabbit.port", rabbitMQContainer::getFirstMappedPort);
         propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getContainerIpAddress);
+        System.setProperty("uniprot.redis.host", redisContainer.getHost());
+        System.setProperty(
+                "uniprot.redis.port", String.valueOf(redisContainer.getFirstMappedPort()));
+        propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
     }
 
     @Value("${download.idFilesFolder}")
@@ -87,11 +95,9 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     @Qualifier("uniProtKBSolrClient")
     private SolrClient solrClient;
 
-    @Autowired
-    private TaxonomyLineageRepository taxRepository;
+    @Autowired private TaxonomyLineageRepository taxRepository;
 
-    @Autowired
-    protected AmqpAdmin amqpAdmin;
+    @Autowired protected AmqpAdmin amqpAdmin;
 
     @Autowired
     private UniProtStoreClient<UniProtKBEntry> storeClient; // in memory voldemort store client

@@ -79,6 +79,7 @@ public class UniProtKBMessageListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
+        log.info("#################### times called " + times.incrementAndGet()); // TODO remove
         String jobId = null;
         DownloadJob downloadJob = null;
         try {
@@ -95,20 +96,23 @@ public class UniProtKBMessageListener implements MessageListener {
             Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
             String errorMsg = "Unable to find jobId " + jobId + " in db";
             downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
-            log.info("#################### times called " + times.incrementAndGet());//TODO remove
 
             processMessage(message, downloadJob);
 
             log.info("Message with jobId {} processed successfully", jobId);
         } catch (Exception ex) {
-            if(getRetryCountByBroker(message) <= this.maxRetryCount) {
+            if (getRetryCountByBroker(message) <= this.maxRetryCount) {
                 log.error("Download job id {} failed with error {}", jobId, ex.getStackTrace());
                 Message updatedMessage = addAdditionalHeaders(message, ex);
                 updateDownloadJob(updatedMessage, downloadJob, JobStatus.ERROR);
                 sendToRetryQueue(jobId, updatedMessage);
             } else {
-                // the flow should not come here, letting the flow complete without rethrowing exception to avoid poison message
-                log.error("Message with jobId {} failed due to error {} which is not handled", jobId, ex);
+                // the flow should not come here, letting the flow complete without rethrowing
+                // exception to avoid poison message
+                log.error(
+                        "Message with jobId {} failed due to error {} which is not handled",
+                        jobId,
+                        ex);
             }
         }
     }
@@ -182,9 +186,13 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private int getRetryCount(Message message) {
-        Integer retryCountHandledError = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
+        Integer retryCountHandledError =
+                message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
         Integer retryCountUnhandledError = getRetryCountByBroker(message);
-        int retryCount = Math.max(Objects.nonNull(retryCountHandledError) ? retryCountHandledError : 0, retryCountUnhandledError);
+        int retryCount =
+                Math.max(
+                        Objects.nonNull(retryCountHandledError) ? retryCountHandledError : 0,
+                        retryCountUnhandledError);
         log.info("#################### retryCount " + retryCount);
         return retryCount;
     }
@@ -192,16 +200,19 @@ public class UniProtKBMessageListener implements MessageListener {
     private int getRetryCountByBroker(Message message) {
         int retriedByBroker = 0;
         List<Map<String, ?>> xDeaths = message.getMessageProperties().getHeader("x-death");
-        if(Objects.nonNull(xDeaths)){
+        if (Objects.nonNull(xDeaths)) {
             Map<String, ?> xDeathCount = xDeaths.get(0);
-            if(Objects.nonNull(xDeathCount) && !xDeathCount.isEmpty()){
+            if (Objects.nonNull(xDeathCount) && !xDeathCount.isEmpty()) {
                 retriedByBroker = ((Long) xDeathCount.get("count")).intValue();
             }
         }
 
-        if(retriedByBroker > 0){
+        if (retriedByBroker > 0) {
             String jobId = message.getMessageProperties().getHeader("jobId");
-            log.error("This x-death retry count {} should be null, something unexpected has happened during processing of job {}", retriedByBroker, jobId);
+            log.error(
+                    "This x-death retry count {} should be null, something unexpected has happened during processing of job {}",
+                    retriedByBroker,
+                    jobId);
         }
 
         return retriedByBroker;
@@ -253,7 +264,8 @@ public class UniProtKBMessageListener implements MessageListener {
     void setMaxRetryCount(Integer maxRetryCount) {
         this.maxRetryCount = maxRetryCount;
     }
-    void dummyMethodForTesting(String jobId, JobStatus jobStatus){
+
+    void dummyMethodForTesting(String jobId, JobStatus jobStatus) {
         // do nothing
     }
 }

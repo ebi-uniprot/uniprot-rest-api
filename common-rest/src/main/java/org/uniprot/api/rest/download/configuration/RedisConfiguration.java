@@ -26,7 +26,6 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 @EnableRedisRepositories(basePackages = "org.uniprot.api.rest.download.repository")
 public class RedisConfiguration {
     @Bean
-    @Profile("live")
     public RedissonConnectionFactory redissonConnectionFactory(RedissonClient redisson) {
         return new RedissonConnectionFactory(redisson);
     }

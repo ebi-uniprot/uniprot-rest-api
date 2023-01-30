@@ -19,7 +19,7 @@
 		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
 		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
 		<micrometer-registry-prometheus.version>1.6.6</micrometer-registry-prometheus.version>
-		<redisson-spring-data-version>2.15.2</redisson-spring-data-version>
+		<redisson-spring-data-version>3.17.7</redisson-spring-data-version>
 		<!-- <redisson-spring-data-version>2.15.2</redisson-spring-data-version> -->
 		<embedded-redis.version>0.7.3</embedded-redis.version>
 	</properties>
@@ -196,13 +196,9 @@
 			<version>1.2.2</version>
 		</dependency>
 
-		<dependency><!-- TODO this is not the latest version, i had to use old 
-				version for embedded redis to work during integ test -->
-			<!-- we can either do mock test or provide latest executable as mentioned 
-				in https://github.com/ozimov/embedded-redis -->
+		<dependency>
 			<groupId>org.redisson</groupId>
-			<artifactId>redisson-spring-data-20</artifactId>
-			<!-- <artifactId>redisson-spring-data-30</artifactId> -->
+			<artifactId>redisson-spring-data-27</artifactId>
 			<version>${redisson-spring-data-version}</version>
 		</dependency>
 

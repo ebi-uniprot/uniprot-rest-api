@@ -17,11 +17,12 @@ import org.uniprot.api.rest.download.model.JobStatus;
  */
 @ActiveProfiles(profiles = "offline")
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {CommonRestTestConfig.class, RedisConfiguration.class})
+@ContextConfiguration(classes = {RedisConfiguration.class})
 public class DownloadJobRepositoryTest {
 
     @Autowired private DownloadJobRepository jobRepository;
 
+    // TODO use testcontainer for this test tow ork
     @Test
     public void whenSavingJob_thenAvailableOnRetrieval() throws Exception {
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();

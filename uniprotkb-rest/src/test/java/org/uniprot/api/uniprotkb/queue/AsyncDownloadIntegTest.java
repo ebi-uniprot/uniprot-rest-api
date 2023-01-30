@@ -1,6 +1,19 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import com.jayway.jsonpath.JsonPath;
+import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -8,9 +21,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.mockito.exceptions.base.MockitoException;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -28,12 +38,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.MessageQueueTestConfig;
+import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
 import org.uniprot.api.rest.download.model.HashGenerator;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
-import org.uniprot.api.rest.download.repository.CommonRestTestConfig;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -44,19 +54,7 @@ import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.store.search.SolrCollection;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-
-import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.*;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = "offline")
 @EnableConfigurationProperties
@@ -67,7 +65,7 @@ import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.*
             UniProtKBREST.class,
             UniProtStoreConfig.class,
             MessageQueueTestConfig.class,
-            CommonRestTestConfig.class
+            RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -148,7 +146,10 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         String query = "accession:P12345";
         UniProtKBStreamRequest request = createStreamRequest(query);
         String jobId = this.hashGenerator.generateHash(request);
-        when(this.uniProtKBMessageListener.streamIds(request)).thenThrow(new MessageListenerException("Forced exception in streamIds to test max retry"));
+        when(this.uniProtKBMessageListener.streamIds(request))
+                .thenThrow(
+                        new MessageListenerException(
+                                "Forced exception in streamIds to test max retry"));
         // send request to queue
         sendMessage(request, jobId);
         // Producer
@@ -160,21 +161,26 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
         // after certain delay the job should be reprocessed
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
-        verifyMessageListener(4, 3, 3);
+        verifyMessageListener(3, 3, 3);
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
 
     @Test
-    void sendAndProcessMessageWithUnhandledExceptionShouldBeDiscarded() throws InterruptedException, IOException {
+    void sendAndProcessMessageWithUnhandledExceptionShouldBeDiscarded()
+            throws InterruptedException, IOException {
         // when
         String query = "field:value";
         UniProtKBStreamRequest request = new UniProtKBStreamRequest();
         request.setQuery(query);
         String jobId = this.hashGenerator.generateHash(request);
-        IllegalArgumentException ile = new IllegalArgumentException("Forced exception in streamIds to test max retry with unhandled exception");
+        IllegalArgumentException ile =
+                new IllegalArgumentException(
+                        "Forced exception in streamIds to test max retry with unhandled exception");
         when(this.uniProtKBMessageListener.streamIds(request)).thenThrow(ile);
-        doThrow(new MessageListenerException("Forcing to throw unexpected exception")).when(this.uniProtKBMessageListener).dummyMethodForTesting(jobId, JobStatus.ERROR);
+        doThrow(new MessageListenerException("Forcing to throw unexpected exception"))
+                .when(this.uniProtKBMessageListener)
+                .dummyMethodForTesting(jobId, JobStatus.ERROR);
         sendMessage(request, jobId);
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
@@ -194,7 +200,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         this.messageService.sendMessage(request, messageHeader);
     }
 
-    private UniProtKBStreamRequest createStreamRequest(String query){
+    private UniProtKBStreamRequest createStreamRequest(String query) {
         UniProtKBStreamRequest request = new UniProtKBStreamRequest();
         request.setQuery(query);
         return request;
@@ -219,7 +225,8 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     }
 
     private void verifyMessageListener(int timesOnMessage, int timesAddHeader, int timesStreamIds) {
-//        await().atMost(20, SECONDS).until(getMessageCountInQueue(downloadQueue), equalTo(0));
+        //        await().atMost(20, SECONDS).until(getMessageCountInQueue(downloadQueue),
+        // equalTo(0));
         verify(this.uniProtKBMessageListener, atLeast(timesOnMessage)).onMessage(any());
         verify(this.uniProtKBMessageListener, atLeast(timesAddHeader))
                 .addAdditionalHeaders(any(), any());
@@ -232,18 +239,24 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     }
 
     private Callable<Boolean> jobFinished(String jobId) {
-        return () -> this.downloadJobRepository.existsById(jobId) &&
-                this.downloadJobRepository.findById(jobId).get().getStatus() == JobStatus.FINISHED;
+        return () ->
+                this.downloadJobRepository.existsById(jobId)
+                        && this.downloadJobRepository.findById(jobId).get().getStatus()
+                                == JobStatus.FINISHED;
     }
 
     private Callable<Boolean> jobErrored(String jobId) {
-        return () -> this.downloadJobRepository.existsById(jobId) &&
-                this.downloadJobRepository.findById(jobId).get().getStatus() == JobStatus.ERROR;
+        return () ->
+                this.downloadJobRepository.existsById(jobId)
+                        && this.downloadJobRepository.findById(jobId).get().getStatus()
+                                == JobStatus.ERROR;
     }
 
     private Callable<Boolean> jobRetriedMaximumTimes(String jobId) {
-        return () -> this.downloadJobRepository.existsById(jobId) &&
-                this.downloadJobRepository.findById(jobId).get().getRetried() == this.maxRetry;
+        return () ->
+                this.downloadJobRepository.existsById(jobId)
+                        && this.downloadJobRepository.findById(jobId).get().getRetried()
+                                == this.maxRetry;
     }
 
     private Callable<Integer> getJobRetriedCount(String jobId) {

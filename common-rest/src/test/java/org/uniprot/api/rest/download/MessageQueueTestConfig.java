@@ -1,5 +1,10 @@
 package org.uniprot.api.rest.download;
 
+import java.io.IOException;
+
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -34,5 +39,16 @@ public class MessageQueueTestConfig {
         connectionFactory.setUsername(rabbitMQConfigProperties.getUser());
         connectionFactory.setPassword(rabbitMQConfigProperties.getPassword());
         return connectionFactory;
+    }
+
+    @Bean
+    @Profile("offline")
+    public RedissonClient redisson() throws IOException {
+        Config config = new Config();
+        String host = System.getProperty("uniprot.redis.host");
+        String port = System.getProperty("uniprot.redis.port");
+        config.useSingleServer().setAddress("redis://" + host + ":" + port).setPassword(null);
+        RedissonClient client = Redisson.create(config);
+        return client;
     }
 }

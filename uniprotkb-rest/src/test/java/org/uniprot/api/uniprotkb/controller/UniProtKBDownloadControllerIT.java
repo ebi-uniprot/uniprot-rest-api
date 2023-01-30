@@ -19,7 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.MessageQueueTestConfig;
-import org.uniprot.api.rest.download.repository.CommonRestTestConfig;
+import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -36,7 +36,7 @@ import com.jayway.jsonpath.JsonPath;
             UniProtKBREST.class,
             ErrorHandlerConfig.class,
             MessageQueueTestConfig.class,
-            CommonRestTestConfig.class
+            RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)
 @AutoConfigureWebClient
