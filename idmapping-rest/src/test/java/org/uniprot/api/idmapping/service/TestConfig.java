@@ -4,7 +4,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.redisson.spring.cache.CacheConfig;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -15,39 +20,41 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.uniprot.api.idmapping.service.impl.RedisCacheMappingJobService;
 
+import redis.embedded.RedisServer;
+
 /**
  * @author sahmad
  * @created 24/02/2021
  */
 @TestConfiguration
 public class TestConfig {
-    //    private final RedisServer redisServer;
-    //
-    //    public TestConfig() {
-    //        this.redisServer = new RedisServer(6379);
-    //    }
-    //
-    //    @PostConstruct
-    //    public void postConstruct() {
-    //        try {
-    //            this.redisServer.start();
-    //        } catch (RuntimeException rte) {
-    //            // already running
-    //        }
-    //    }
-    //
-    //    @PreDestroy
-    //    public void preDestroy() {
-    //        this.redisServer.stop();
-    //    }
-    //
-    //    @Bean(destroyMethod = "shutdown")
-    //    @Profile("offline")
-    //    RedissonClient redisson() throws IOException {
-    //        Config config = new Config();
-    //        config.useSingleServer().setAddress("redis://127.0.0.1:6379");
-    //        return Redisson.create(config);
-    //    }
+    private final RedisServer redisServer;
+
+    public TestConfig() {
+        this.redisServer = new RedisServer(6379);
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        try {
+            this.redisServer.start();
+        } catch (RuntimeException rte) {
+            // already running
+        }
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        this.redisServer.stop();
+    }
+
+    @Bean(destroyMethod = "shutdown")
+    @Profile("offline")
+    RedissonClient redisson() throws IOException {
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://127.0.0.1:6379");
+        return Redisson.create(config);
+    }
 
     @Bean
     @Profile("offline")

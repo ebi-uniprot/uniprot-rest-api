@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb;
+package org.uniprot.api;
 
 import static org.mockito.Mockito.mock;
 
@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
-@Profile("offline & !asyncDownload")
+@Profile({"offline & !asyncDownload", "use-fake-app"})
 @TestConfiguration
 public class AsyncDownloadMocks {
     @Bean
