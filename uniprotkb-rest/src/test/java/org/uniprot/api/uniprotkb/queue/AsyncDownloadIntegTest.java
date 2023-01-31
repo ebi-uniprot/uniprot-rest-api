@@ -99,7 +99,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
 
     @BeforeAll
     void init() {
-        this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
+        this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), "SALT_STR");
     }
 
     @Test

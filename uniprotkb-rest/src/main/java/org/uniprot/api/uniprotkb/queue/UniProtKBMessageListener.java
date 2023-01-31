@@ -179,8 +179,8 @@ public class UniProtKBMessageListener implements MessageListener {
             String error = getLastError(message);
             downloadJob.setError(error);
             this.jobRepository.save(downloadJob);
+            dummyMethodForTesting(downloadJob.getId(), jobStatus);
         }
-        dummyMethodForTesting(downloadJob.getId(), jobStatus);
     }
 
     private boolean isMaxRetriedReached(Message message) {

@@ -50,7 +50,7 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
     public static final String JOB_ID = "jobId";
     public static final String CONTENT_TYPE = "content-type";
 
-    public static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT"; // TODO Parametrized it
+    private static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT";
 
     public UniProtKBDownloadController(
             ProducerMessageService messageService,
@@ -67,7 +67,6 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
                 downloadGatekeeper);
         this.messageService = messageService;
         this.jobRepository = jobRepository;
-        // TODO make it a bean without new
         this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
