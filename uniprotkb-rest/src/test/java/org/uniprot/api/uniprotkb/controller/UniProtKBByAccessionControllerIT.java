@@ -34,6 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.client.RestTemplate;
+import org.uniprot.api.AsyncDownloadMocks;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -66,7 +67,8 @@ import org.uniprot.store.search.SolrCollection;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** @author lgonzales */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
+@ContextConfiguration(
+        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniProtKBController.class)

@@ -110,6 +110,7 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
 
     @BeforeAll
     public void saveEntriesInSolrAndStore() throws Exception {
+        prepareDownloadFolders();
         cleanUpFiles();
         saveEntries();
 
@@ -125,6 +126,11 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         when(solrClient.query(anyString(), any())).thenReturn(response);
 
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
+    }
+
+    private void prepareDownloadFolders() throws IOException {
+        Files.createDirectories(Path.of(this.idsFolder));
+        Files.createDirectories(Path.of(this.resultFolder));
     }
 
     @AfterAll

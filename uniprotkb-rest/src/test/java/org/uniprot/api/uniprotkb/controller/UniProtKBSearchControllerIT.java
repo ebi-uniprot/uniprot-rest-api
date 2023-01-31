@@ -59,6 +59,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
+import org.uniprot.api.AsyncDownloadMocks;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithSuggestionsControllerIT;
@@ -113,7 +114,12 @@ import org.uniprot.store.search.domain.impl.GoEvidences;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(
-        classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
+        classes = {
+            DataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class,
+            ErrorHandlerConfig.class
+        })
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniProtKBController.class)

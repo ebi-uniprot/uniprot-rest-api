@@ -51,6 +51,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.uniprot.api.AsyncDownloadMocks;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -90,7 +91,12 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest({UniProtKBController.class})
 @ContextConfiguration(
-        classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
+        classes = {
+            DataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class,
+            ErrorHandlerConfig.class
+        })
 @ExtendWith(
         value = {
             SpringExtension.class,
