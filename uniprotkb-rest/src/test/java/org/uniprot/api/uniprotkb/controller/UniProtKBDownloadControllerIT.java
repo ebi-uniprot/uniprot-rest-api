@@ -42,10 +42,6 @@ import com.jayway.jsonpath.JsonPath;
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
-    // TODO currently we manually need to create test ids and result folders
-    // download.idFilesFolder=target/download/ids
-    // download.resultFilesFolder=target/download/result
-    // ideally they  should be created on  start of application if not already created
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
@@ -88,10 +84,6 @@ public class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT 
         return this.facetTupleStreamTemplate;
     }
 
-    @Override
-    protected void getAndVerifyDetails(String query) {
-        // TODO  implement once details endpoint is created
-    }
 
     protected String getDownloadAPIsBasePath() {
         return UniProtKBDownloadController.DOWNLOAD_RESOURCE;

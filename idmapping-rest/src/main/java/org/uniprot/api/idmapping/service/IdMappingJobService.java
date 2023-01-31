@@ -1,6 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
-import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 

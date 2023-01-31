@@ -36,7 +36,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;

@@ -4,6 +4,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -21,11 +22,17 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Utils;
@@ -279,6 +286,51 @@ public abstract class BasicSearchController<T> {
         return context;
     }
 
+    protected ResponseEntity<JobStatusResponse> createAsyncDownloadStatus(DownloadJob job, String url){
+        ResponseEntity<JobStatusResponse> response;
+        switch (job.getStatus()) {
+            case NEW:
+            case RUNNING:
+                response = ResponseEntity.ok(new JobStatusResponse(job.getStatus()));
+                break;
+            case FINISHED:
+                String redirectUrl = constructDownloadRedirectUrl(job.getId(), url);
+                response =
+                        ResponseEntity.status(HttpStatus.SEE_OTHER)
+                                .header(HttpHeaders.LOCATION, redirectUrl)
+                                .body(new JobStatusResponse(JobStatus.FINISHED));
+                break;
+            default:
+                ProblemPair error = new ProblemPair(0, job.getError());
+                response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body(new JobStatusResponse(List.of(error)));
+                break;
+        }
+
+        return response;
+    }
+
+    protected String constructDownloadRedirectUrl(String jobId, String url) {
+        String requestBaseUrl = extractRequestBaseUrl(url);
+        String redirectUrl = requestBaseUrl + "results/" + jobId; //TODO what about format?
+        return redirectUrl;
+    }
+
+    protected DownloadJob getAsyncDownloadJob(DownloadJobRepository jobRepository, String jobId){
+        Optional<DownloadJob> optJob = jobRepository.findById(jobId);
+        DownloadJob job =
+                optJob.orElseThrow(
+                        () ->
+                                new ResourceNotFoundException(
+                                        "jobId" + jobId + "doesn't exist"));
+        return job;
+    }
+
+    private String extractRequestBaseUrl(String url){
+        int index = url.indexOf("status");
+        return index == -1 ? url.substring(0, url.indexOf("details")).replaceFirst("http://", "https://")
+                : url.substring(0, index).replaceFirst("http://", "https://");
+    }
     private void runRequestNow(
             Supplier<MessageConverterContext<T>> contextSupplier,
             HttpServletRequest request,

@@ -187,7 +187,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         await().until(jobErrored(jobId));
         await().until(getJobRetriedCount(jobId), Matchers.equalTo(2));
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
-        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
+//        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }

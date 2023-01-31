@@ -13,7 +13,7 @@ import org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController;
 import org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController;
 import org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequestToArrayConverter;
-import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.repository.IdMappingRepository;
