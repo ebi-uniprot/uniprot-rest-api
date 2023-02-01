@@ -1,11 +1,13 @@
 package org.uniprot.api.rest.output.job;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
+
 import lombok.Data;
+
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.request.StreamRequest;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author lgonzales

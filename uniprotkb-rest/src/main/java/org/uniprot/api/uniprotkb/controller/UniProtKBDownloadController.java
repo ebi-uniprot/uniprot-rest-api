@@ -1,9 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +33,10 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
  * @author sahmad
@@ -70,11 +72,10 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
-    @PostMapping(
-            value = "/run",
-            produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<JobSubmitResponse> submitJob(
-            @Valid @ModelAttribute UniProtKBStreamRequest streamRequest, HttpServletRequest httpRequest) {
+            @Valid @ModelAttribute UniProtKBStreamRequest streamRequest,
+            HttpServletRequest httpRequest) {
         MessageProperties messageHeader = new MessageProperties();
         String jobId = this.hashGenerator.generateHash(streamRequest);
         messageHeader.setHeader(JOB_ID, jobId);
@@ -114,7 +115,9 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         detailResponse.setFields(job.getFields());
         detailResponse.setSort(job.getSort());
         if (JobStatus.FINISHED == job.getStatus()) {
-            detailResponse.setRedirectURL(constructDownloadRedirectUrl(job.getId(), servletRequest.getRequestURL().toString()));
+            detailResponse.setRedirectURL(
+                    constructDownloadRedirectUrl(
+                            job.getId(), servletRequest.getRequestURL().toString()));
         } else if (JobStatus.ERROR == job.getStatus()) {
             ProblemPair error = new ProblemPair(0, job.getError());
             detailResponse.setErrors(List.of(error));

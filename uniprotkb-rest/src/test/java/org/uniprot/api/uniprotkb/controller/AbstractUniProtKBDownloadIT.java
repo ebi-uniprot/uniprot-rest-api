@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -31,6 +32,7 @@ import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
@@ -102,16 +104,9 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     @Autowired
     private UniProtStoreClient<UniProtKBEntry> storeClient; // in memory voldemort store client
 
-    private void purgeAllQueues() {
-        this.amqpAdmin.purgeQueue(downloadQueue, true);
-        this.amqpAdmin.purgeQueue(retryQueue, true);
-        this.amqpAdmin.purgeQueue(rejectedQueue, true);
-    }
-
     @BeforeAll
     public void saveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
-        cleanUpFiles();
         saveEntries();
 
         // for the following tests, ensure the number of hits
@@ -133,12 +128,15 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         Files.createDirectories(Path.of(this.resultFolder));
     }
 
-    @AfterAll
-    public void cleanUpFiles() throws IOException {
-        cleanUpFolder(this.idsFolder);
-        cleanUpFolder(this.resultFolder);
-        purgeAllQueues();
+    public void cleanUpData(String jobId) throws IOException {
+        Path idsPath = Paths.get(this.idsFolder, jobId);
+        Files.deleteIfExists(idsPath);
+        Path resultsPath = Paths.get(this.resultFolder, jobId);
+        Files.deleteIfExists(resultsPath);
+        getDownloadJobRepository().deleteById(jobId);
     }
+
+    protected abstract DownloadJobRepository getDownloadJobRepository();
 
     private void cleanUpFolder(String folder) throws IOException {
         Files.list(Path.of(folder))

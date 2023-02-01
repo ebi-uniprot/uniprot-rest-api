@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.rest.output.job.JobDetailResponse;
-import org.uniprot.api.rest.output.job.JobStatusResponse;
-import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.output.job.JobDetailResponse;
+import org.uniprot.api.rest.output.job.JobStatusResponse;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 import io.swagger.v3.oas.annotations.Operation;

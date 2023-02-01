@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.queue;
 
 import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -9,6 +10,7 @@ import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.*
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,10 +18,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -81,8 +80,6 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
             solrClient; // this is NOT inmemory solr cluster client, see CloudSolrClient in parent
     // class
 
-    @Autowired private RabbitTemplate rabbitTemplate; // RabbitTemplate with inmemory qpid broker
-
     @SpyBean @Autowired
     private DownloadJobRepository
             downloadJobRepository; // RedisRepository with inMemory redis server
@@ -116,6 +113,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         verifyMessageListener(1, 0, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false);
         verifyIdsAndResultFiles(jobId);
+        cleanUpData(jobId);
     }
 
     @Test
@@ -135,10 +133,11 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
         // after certain delay the job should be reprocessed
-        await().until(jobFinished(jobId));
+        await().atMost(15, SECONDS).until(jobFinished(jobId));
         verifyMessageListener(2, 1, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true);
         verifyIdsAndResultFiles(jobId);
+        cleanUpData(jobId);
     }
 
     @Test
@@ -164,6 +163,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         //        verifyMessageListener(3, 3, 3);
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
         verifyIdsAndResultFilesDoNotExist(jobId);
+        cleanUpData(jobId);
     }
 
     @Test
@@ -187,9 +187,10 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         await().until(jobErrored(jobId));
         await().until(getJobRetriedCount(jobId), Matchers.equalTo(2));
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
-//        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
+        //        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true);
         verifyIdsAndResultFilesDoNotExist(jobId);
+        cleanUpData(jobId);
     }
 
     private void sendMessage(UniProtKBStreamRequest request, String jobId) {
@@ -263,7 +264,13 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     }
 
     private Callable<Integer> getJobRetriedCount(String jobId) {
-        return () -> this.downloadJobRepository.findById(jobId).get().getRetried();
+        return () -> {
+            Optional<DownloadJob> optJob = this.downloadJobRepository.findById(jobId);
+            if (optJob.isPresent()) {
+                return optJob.get().getRetried();
+            }
+            return 0;
+        };
     }
 
     private Callable<Integer> getMessageCountInQueue(String queueName) {
@@ -287,10 +294,10 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
 
     private void verifyIdsAndResultFilesDoNotExist(String jobId) throws IOException {
         // verify the ids file
-        Path idsFilePath = Path.of(this.idsFolder + "/" + jobId);
+        Path idsFilePath = Paths.get(this.idsFolder, jobId);
         Assertions.assertTrue(Files.notExists(idsFilePath));
         // verify result file
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
+        Path resultFilePath = Paths.get(this.resultFolder, jobId);
         Assertions.assertTrue(Files.notExists(resultFilePath));
     }
 
@@ -307,5 +314,10 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     @Override
     protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
         return this.facetTupleStreamTemplate;
+    }
+
+    @Override
+    protected DownloadJobRepository getDownloadJobRepository() {
+        return this.downloadJobRepository;
     }
 }

@@ -20,6 +20,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -44,6 +45,8 @@ import com.jayway.jsonpath.JsonPath;
 public class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
+
+    @Autowired private DownloadJobRepository downloadJobRepository;
 
     @Override
     protected void verifyIdsAndResultFiles(String jobId) throws IOException {
@@ -84,8 +87,11 @@ public class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT 
         return this.facetTupleStreamTemplate;
     }
 
-
     protected String getDownloadAPIsBasePath() {
         return UniProtKBDownloadController.DOWNLOAD_RESOURCE;
+    }
+
+    protected DownloadJobRepository getDownloadJobRepository(){
+        return this.downloadJobRepository;
     }
 }

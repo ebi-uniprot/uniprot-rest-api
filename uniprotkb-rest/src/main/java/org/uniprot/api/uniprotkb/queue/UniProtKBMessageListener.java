@@ -81,7 +81,7 @@ public class UniProtKBMessageListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        log.info("#################### times called " + times.incrementAndGet()); // TODO remove
+        log.info(this + " #################### times called " + times.incrementAndGet()); // TODO remove
         String jobId = null;
         DownloadJob downloadJob = null;
         try {
@@ -269,5 +269,17 @@ public class UniProtKBMessageListener implements MessageListener {
 
     void dummyMethodForTesting(String jobId, JobStatus jobStatus) {
         // do nothing
+    }
+
+    @Override
+    public String toString() {
+        return "UniProtKBMessageListener{" +
+                "converter=" + converter.hashCode() +
+                ", service=" + service.hashCode() +
+                ", downloadConfigProperties=" + downloadConfigProperties.hashCode() +
+                ", downloadResultWriter=" + downloadResultWriter.hashCode() +
+                ", jobRepository=" + jobRepository.hashCode() +
+                ", rabbitTemplate=" + rabbitTemplate.hashCode() +
+                '}';
     }
 }

@@ -286,7 +286,8 @@ public abstract class BasicSearchController<T> {
         return context;
     }
 
-    protected ResponseEntity<JobStatusResponse> createAsyncDownloadStatus(DownloadJob job, String url){
+    protected ResponseEntity<JobStatusResponse> createAsyncDownloadStatus(
+            DownloadJob job, String url) {
         ResponseEntity<JobStatusResponse> response;
         switch (job.getStatus()) {
             case NEW:
@@ -302,8 +303,9 @@ public abstract class BasicSearchController<T> {
                 break;
             default:
                 ProblemPair error = new ProblemPair(0, job.getError());
-                response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                    .body(new JobStatusResponse(List.of(error)));
+                response =
+                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(new JobStatusResponse(List.of(error)));
                 break;
         }
 
@@ -312,25 +314,25 @@ public abstract class BasicSearchController<T> {
 
     protected String constructDownloadRedirectUrl(String jobId, String url) {
         String requestBaseUrl = extractRequestBaseUrl(url);
-        String redirectUrl = requestBaseUrl + "results/" + jobId; //TODO what about format?
+        String redirectUrl = requestBaseUrl + "results/" + jobId; // TODO what about format?
         return redirectUrl;
     }
 
-    protected DownloadJob getAsyncDownloadJob(DownloadJobRepository jobRepository, String jobId){
+    protected DownloadJob getAsyncDownloadJob(DownloadJobRepository jobRepository, String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job =
                 optJob.orElseThrow(
-                        () ->
-                                new ResourceNotFoundException(
-                                        "jobId" + jobId + "doesn't exist"));
+                        () -> new ResourceNotFoundException("jobId" + jobId + "doesn't exist"));
         return job;
     }
 
-    private String extractRequestBaseUrl(String url){
+    private String extractRequestBaseUrl(String url) {
         int index = url.indexOf("status");
-        return index == -1 ? url.substring(0, url.indexOf("details")).replaceFirst("http://", "https://")
+        return index == -1
+                ? url.substring(0, url.indexOf("details")).replaceFirst("http://", "https://")
                 : url.substring(0, index).replaceFirst("http://", "https://");
     }
+
     private void runRequestNow(
             Supplier<MessageConverterContext<T>> contextSupplier,
             HttpServletRequest request,

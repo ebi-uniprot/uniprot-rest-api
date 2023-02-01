@@ -1,19 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.io.IOException;
-import java.util.concurrent.Callable;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -28,6 +14,18 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.rest.download.model.JobStatus;
 
+import java.io.IOException;
+import java.util.concurrent.Callable;
+
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDownloadIT {
 
@@ -38,21 +36,25 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void runStarQuerySuccess() throws Exception {
         String query = "*:*";
         String jobId = callRunAPIAndVerify(query);
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         verifyIdsAndResultFiles(jobId);
+        cleanUpData(jobId);
     }
 
     @Test
     void runStarQueryMoreThanOnceShouldProcessOnlyOnceSuccess() throws Exception {
         String query = "*";
         String jobId = callRunAPIAndVerify(query);
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         String newJobId = callRunAPIAndVerify(query);
         Assertions.assertNotNull(newJobId);
         Assertions.assertEquals(jobId, newJobId);
         getAndVerifyDetails(jobId);
         verifyIdsAndResultFiles(jobId);
+        cleanUpData(jobId);
     }
 
     private Callable<JobStatus> jobProcessed(String jobId) {
@@ -64,7 +66,6 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         MockHttpServletRequestBuilder requestBuilder =
                 get(jobStatusUrl, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
         ResultActions response = this.mockMvc.perform(requestBuilder);
-
         // then
         response.andDo(log())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
@@ -110,4 +111,5 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     }
 
     protected abstract void verifyIdsAndResultFiles(String jobId) throws IOException;
+
 }
