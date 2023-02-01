@@ -130,13 +130,14 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         Files.createDirectories(Path.of(this.resultFolder));
     }
 
-    public void cleanUpData(String jobId, MediaType contentType) throws IOException {
-        Path idsPath = Paths.get(this.idsFolder, jobId);
-        Files.deleteIfExists(idsPath);
-        String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
-        Path resultsPath = Paths.get(this.resultFolder, jobId + fileExt);
-        Files.deleteIfExists(resultsPath);
-        getDownloadJobRepository().deleteById(jobId);
+    @AfterAll
+    public void cleanUpData() throws IOException {
+        cleanUpFolder(this.idsFolder);
+        cleanUpFolder(this.resultFolder);
+        getDownloadJobRepository().deleteAll();
+        this.amqpAdmin.purgeQueue(rejectedQueue, true);
+        this.amqpAdmin.purgeQueue(downloadQueue, true);
+        this.amqpAdmin.purgeQueue(retryQueue, true);
     }
 
     protected abstract DownloadJobRepository getDownloadJobRepository();

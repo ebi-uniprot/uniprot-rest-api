@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,30 +39,37 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     @Test
     void runStarQuerySuccess() throws Exception {
         String query = "*:*";
-        String jobId = callRunAPIAndVerify(query, MediaType.APPLICATION_JSON.toString());
+        MediaType contentType = MediaType.APPLICATION_JSON;
+        String jobId = callRunAPIAndVerify(query, contentType);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
+        ResultActions resultActions = callGetJobStatus(jobId);
+        resultActions.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(redirectedUrlPattern("**/uniprotkb/download/results/" + jobId + ".json"))
+                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
+                .andExpect(jsonPath("$.errors").doesNotExist());
         verifyIdsAndResultFiles(jobId, MediaType.APPLICATION_JSON);
-        cleanUpData(jobId, MediaType.APPLICATION_JSON);
     }
 
     @Test
     void runStarQueryMoreThanOnceShouldProcessOnlyOnceSuccess() throws Exception {
         String query = "*";
-        String jobId = callRunAPIAndVerify(query, MediaType.APPLICATION_JSON.toString());
+        MediaType contentType = MediaType.APPLICATION_JSON;
+        String jobId = callRunAPIAndVerify(query, contentType);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         Optional<DownloadJob> optJob1 = getDownloadJobRepository().findById(jobId);
-        String newJobId = callRunAPIAndVerify(query, MediaType.APPLICATION_JSON.toString());
+        String newJobId = callRunAPIAndVerify(query, contentType);
         assertNotNull(newJobId);
         assertEquals(jobId, newJobId);
         Optional<DownloadJob> optJob2 = getDownloadJobRepository().findById(jobId);
         assertAll(() -> assertTrue(optJob1.isPresent()), () -> assertTrue(optJob2.isPresent()));
         assertEquals(optJob1.get(), optJob2.get());
-        verifyIdsAndResultFiles(jobId, MediaType.APPLICATION_JSON);
-        cleanUpData(jobId, MediaType.APPLICATION_JSON);
+        verifyIdsAndResultFiles(jobId, contentType);
     }
 
     private Callable<JobStatus> jobProcessed(String jobId) {
@@ -69,12 +77,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     }
 
     protected JobStatus getJobStatus(String jobId) throws Exception {
-        String jobStatusUrl = getDownloadAPIsBasePath() + "/status/{jobId}";
-        MockHttpServletRequestBuilder requestBuilder =
-                get(jobStatusUrl, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
-        ResultActions response = this.mockMvc.perform(requestBuilder);
+        ResultActions response = callGetJobStatus(jobId);
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", Matchers.notNullValue()));
         String responseAsString = response.andReturn().getResponse().getContentAsString();
@@ -83,7 +88,16 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return JobStatus.valueOf(status);
     }
 
-    protected String callRunAPIAndVerify(String query, String contentType) throws Exception {
+    @NotNull
+    private ResultActions callGetJobStatus(String jobId) throws Exception {
+        String jobStatusUrl = getDownloadAPIsBasePath() + "/status/{jobId}";
+        MockHttpServletRequestBuilder requestBuilder =
+                get(jobStatusUrl, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
+        ResultActions response = this.mockMvc.perform(requestBuilder);
+        return response;
+    }
+
+    protected String callRunAPIAndVerify(String query, MediaType contentType) throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
                         .header(ACCEPT, contentType)
@@ -110,10 +124,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         ResultActions response = this.mockMvc.perform(requestBuilder);
 
         // then
-        response.andDo(print())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.query", Matchers.notNullValue()))
+                .andExpect(jsonPath("$.redirectURL", Matchers.endsWith(jobId + ".json")))
                 .andExpect(jsonPath("$.errors").doesNotExist());
     }
 

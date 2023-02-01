@@ -114,9 +114,8 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         await().until(jobCreatedInRedis(jobId));
         await().until(jobFinished(jobId));
         verifyMessageListener(1, 0, 1);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false, contentType);
         verifyIdsAndResultFiles(jobId, contentType);
-        cleanUpData(jobId, contentType);
     }
 
     @Test
@@ -135,13 +134,12 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         await().until(jobCreatedInRedis(jobId));
         await().until(jobErrored(jobId));
         // verify  redis
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true, contentType);
         // after certain delay the job should be reprocessed
         await().until(jobFinished(jobId));
         verifyMessageListener(2, 1, 1);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true, contentType);
         verifyIdsAndResultFiles(jobId, contentType);
-        cleanUpData(jobId, contentType);
     }
 
     @Test
@@ -162,13 +160,12 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         await().until(jobErrored(jobId));
         await().until(jobRetriedMaximumTimes(jobId));
         // verify  redis
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true, contentType);
         // after certain delay the job should be reprocessed
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
         //        verifyMessageListener(3, 3, 3);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true, contentType);
         verifyIdsAndResultFilesDoNotExist(jobId, contentType);
-        cleanUpData(jobId, contentType);
     }
 
     @Test
@@ -194,9 +191,8 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         await().until(getJobRetriedCount(jobId), Matchers.equalTo(2));
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
         //        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true, contentType);
         verifyIdsAndResultFilesDoNotExist(jobId, contentType);
-        cleanUpData(jobId, contentType);
     }
 
 
@@ -214,7 +210,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     }
 
     private void verifyRedisEntry(
-            String query, String jobId, List<JobStatus> statuses, int retryCount, boolean isError) {
+            String query, String jobId, List<JobStatus> statuses, int retryCount, boolean isError, MediaType contentType) {
         Optional<DownloadJob> optDownloadJob = this.downloadJobRepository.findById(jobId);
         assertTrue(optDownloadJob.isPresent());
         System.out.println(optDownloadJob.get());
@@ -226,6 +222,14 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         assertEquals(retryCount, optDownloadJob.get().getRetried());
         assertTrue(statuses.contains(optDownloadJob.get().getStatus()));
         assertEquals(isError, Objects.nonNull(optDownloadJob.get().getError()));
+        if(optDownloadJob.get().getStatus() == JobStatus.FINISHED) {
+            assertNotNull(optDownloadJob.get().getResultFile());
+            String ext = "." + UniProtMediaType.getFileExtension(contentType);
+            String expectedFile = jobId + ext;
+            assertEquals(expectedFile, optDownloadJob.get().getResultFile());
+        } else {
+            assertNull(optDownloadJob.get().getResultFile());
+        }
         assertAll(
                 () -> assertNotNull(optDownloadJob.get().getCreated()),
                 () -> assertNotNull(optDownloadJob.get().getUpdated()));
