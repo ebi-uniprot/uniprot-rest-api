@@ -23,6 +23,7 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -33,6 +34,7 @@ import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
@@ -50,9 +52,9 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControllerIT {
 
     static RabbitMQContainer rabbitMQContainer =
-            new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
+            new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management")).withReuse(true);
     static GenericContainer<?> redisContainer =
-            new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
+            new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379).withReuse(true);
 
     @DynamicPropertySource
     public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
@@ -128,10 +130,11 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         Files.createDirectories(Path.of(this.resultFolder));
     }
 
-    public void cleanUpData(String jobId) throws IOException {
+    public void cleanUpData(String jobId, MediaType contentType) throws IOException {
         Path idsPath = Paths.get(this.idsFolder, jobId);
         Files.deleteIfExists(idsPath);
-        Path resultsPath = Paths.get(this.resultFolder, jobId);
+        String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
+        Path resultsPath = Paths.get(this.resultFolder, jobId + fileExt);
         Files.deleteIfExists(resultsPath);
         getDownloadJobRepository().deleteById(jobId);
     }

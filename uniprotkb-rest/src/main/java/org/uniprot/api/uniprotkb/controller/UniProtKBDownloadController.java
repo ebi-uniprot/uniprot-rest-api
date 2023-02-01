@@ -1,6 +1,8 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
@@ -13,6 +15,7 @@ import javax.validation.Valid;
 
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
@@ -72,14 +75,25 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
-    @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/run",
+            produces = {
+                    TSV_MEDIA_TYPE_VALUE,
+                    FF_MEDIA_TYPE_VALUE,
+                    LIST_MEDIA_TYPE_VALUE,
+                    APPLICATION_XML_VALUE,
+                    APPLICATION_JSON_VALUE,
+                    FASTA_MEDIA_TYPE_VALUE,
+                    GFF_MEDIA_TYPE_VALUE,
+                    RDF_MEDIA_TYPE_VALUE
+                    })
     public ResponseEntity<JobSubmitResponse> submitJob(
             @Valid @ModelAttribute UniProtKBStreamRequest streamRequest,
             HttpServletRequest httpRequest) {
         MessageProperties messageHeader = new MessageProperties();
-        String jobId = this.hashGenerator.generateHash(streamRequest);
+        MediaType contentType = getAcceptHeader(httpRequest);
+        String jobId = this.hashGenerator.generateHash(streamRequest, contentType);
         messageHeader.setHeader(JOB_ID, jobId);
-        messageHeader.setHeader(CONTENT_TYPE, getAcceptHeader(httpRequest));
+        messageHeader.setHeader(CONTENT_TYPE, contentType);
         this.messageService.sendMessage(streamRequest, messageHeader);
         return ResponseEntity.ok(new JobSubmitResponse(jobId));
     }
@@ -117,7 +131,7 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         if (JobStatus.FINISHED == job.getStatus()) {
             detailResponse.setRedirectURL(
                     constructDownloadRedirectUrl(
-                            job.getId(), servletRequest.getRequestURL().toString()));
+                            job.getResultFile(), servletRequest.getRequestURL().toString()));
         } else if (JobStatus.ERROR == job.getStatus()) {
             ProblemPair error = new ProblemPair(0, job.getError());
             detailResponse.setErrors(List.of(error));

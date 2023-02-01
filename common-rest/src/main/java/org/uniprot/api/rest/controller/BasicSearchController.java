@@ -295,7 +295,7 @@ public abstract class BasicSearchController<T> {
                 response = ResponseEntity.ok(new JobStatusResponse(job.getStatus()));
                 break;
             case FINISHED:
-                String redirectUrl = constructDownloadRedirectUrl(job.getId(), url);
+                String redirectUrl = constructDownloadRedirectUrl(job.getResultFile(), url);
                 response =
                         ResponseEntity.status(HttpStatus.SEE_OTHER)
                                 .header(HttpHeaders.LOCATION, redirectUrl)
@@ -312,18 +312,15 @@ public abstract class BasicSearchController<T> {
         return response;
     }
 
-    protected String constructDownloadRedirectUrl(String jobId, String url) {
+    protected String constructDownloadRedirectUrl(String resultFile, String url) {
         String requestBaseUrl = extractRequestBaseUrl(url);
-        String redirectUrl = requestBaseUrl + "results/" + jobId; // TODO what about format?
-        return redirectUrl;
+        return requestBaseUrl + "results/" + resultFile;
     }
 
     protected DownloadJob getAsyncDownloadJob(DownloadJobRepository jobRepository, String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
-        DownloadJob job =
-                optJob.orElseThrow(
+        return optJob.orElseThrow(
                         () -> new ResourceNotFoundException("jobId" + jobId + "doesn't exist"));
-        return job;
     }
 
     private String extractRequestBaseUrl(String url) {

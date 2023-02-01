@@ -36,9 +36,9 @@ public class DownloadJob implements Serializable {
     private LocalDateTime updated;
 
     private String error;
-    private String result;
     private int retried;
     private String query;
     private String fields;
     private String sort;
+    private String resultFile;
 }

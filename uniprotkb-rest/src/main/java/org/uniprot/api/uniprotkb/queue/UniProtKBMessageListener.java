@@ -129,22 +129,23 @@ public class UniProtKBMessageListener implements MessageListener {
         Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
         if (Files.notExists(idsFile)) {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
-            getAndWriteResult(request, idsFile, jobId, contentType);
-            updateDownloadJob(message, downloadJob, JobStatus.FINISHED);
+            String resultFile = getAndWriteResult(request, idsFile, jobId, contentType);
+            updateDownloadJob(message, downloadJob, JobStatus.FINISHED, resultFile);
         } else {
             log.info("The job {} is already processed", jobId);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED);
         }
     }
 
-    private void getAndWriteResult(
+    private String getAndWriteResult(
             UniProtKBStreamRequest request, Path idsFile, String jobId, String contentType) {
         try {
             Stream<String> ids = streamIds(request);
             saveIdsInTempFile(idsFile, ids);
             MediaType mediaType = UniProtMediaType.valueOf(contentType);
             StoreRequest storeRequest = service.buildStoreRequest(request);
-            downloadResultWriter.writeResult(request, idsFile, jobId, mediaType, storeRequest);
+            String resultFile = downloadResultWriter.writeResult(request, idsFile, jobId, mediaType, storeRequest);
+            return resultFile;
         } catch (IOException ex) {
             log.error(ex.getMessage());
             log.warn("Unable to write file due to IOException for job id {}", jobId);
@@ -171,6 +172,10 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private void updateDownloadJob(Message message, DownloadJob downloadJob, JobStatus jobStatus) {
+        updateDownloadJob(message, downloadJob, jobStatus, null);
+    }
+
+    private void updateDownloadJob(Message message, DownloadJob downloadJob, JobStatus jobStatus, String resultFile) {
         if (Objects.nonNull(downloadJob)) {
             LocalDateTime now = LocalDateTime.now();
             downloadJob.setUpdated(now);
@@ -178,6 +183,7 @@ public class UniProtKBMessageListener implements MessageListener {
             downloadJob.setRetried(getRetryCount(message));
             String error = getLastError(message);
             downloadJob.setError(error);
+            downloadJob.setResultFile(resultFile);
             this.jobRepository.save(downloadJob);
             dummyMethodForTesting(downloadJob.getId(), jobStatus);
         }

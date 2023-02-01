@@ -24,6 +24,7 @@ import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
@@ -51,14 +52,15 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
         this.resource = resource;
     }
 
-    public void writeResult(
+    public String writeResult(
             StreamRequest request,
             Path idFile,
             String jobId,
             MediaType contentType,
             StoreRequest storeRequest)
             throws IOException {
-        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), jobId);
+        String resultFile = jobId + "." + UniProtMediaType.getFileExtension(contentType);
+        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFile);
         AbstractUUWHttpMessageConverter<T, T> outputWriter =
                 getOutputWriter(contentType, getType());
         try (Stream<String> ids = Files.lines(idFile);
@@ -84,6 +86,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, output, start, counter);
         }
+        return resultFile;
     }
 
     private AbstractUUWHttpMessageConverter<T, T> getOutputWriter(
