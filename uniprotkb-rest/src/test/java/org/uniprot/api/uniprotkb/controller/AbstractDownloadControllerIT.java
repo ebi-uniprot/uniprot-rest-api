@@ -16,6 +16,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
@@ -96,6 +97,39 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         getAndVerifyDetails(jobId, contentType);
     }
 
+    @Test
+    void submitJobWithoutContentTypeDefaultsToJson() throws Exception {
+        // when
+        String query = "content:*";
+        String fields = "accession";
+        String jobId = callRunAPIAndVerify(query, fields, null);
+        // then
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        getAndVerifyDetails(jobId, MediaType.APPLICATION_JSON);
+    }
+    @Test
+    void submitJobUnsupportedContentTypeFailure() throws Exception {
+        // when
+        MediaType contentType = UniProtMediaType.valueOf(XLS_MEDIA_TYPE_VALUE);
+        String query = "content:*";
+        String fields = "accession,rhea";
+        // then
+        MockHttpServletRequestBuilder requestBuilder =
+                post(getDownloadAPIsBasePath() + "/run")
+                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        .param("query", query)
+                        .param("fields", fields)
+                        .param("contentType", contentType.toString());
+        ResultActions response = this.mockMvc.perform(requestBuilder);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.*", Matchers.contains("Invalid content type received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml].")));
+    }
+
     protected JobStatus getJobStatus(String jobId) throws Exception {
         ResultActions response = callGetJobStatus(jobId);
         // then
@@ -128,7 +162,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", query)
                         .param("fields", fields)
-                        .param("contentType", contentType.toString());
+                        .param("contentType", Objects.isNull(contentType) ? null : contentType.toString());
         ResultActions response = this.mockMvc.perform(requestBuilder);
 
         // then

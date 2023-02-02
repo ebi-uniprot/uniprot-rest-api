@@ -6,6 +6,7 @@ import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import javax.validation.Valid;
 
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +27,7 @@ import org.uniprot.api.rest.download.model.HashGenerator;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
@@ -78,6 +81,11 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         MessageProperties messageHeader = new MessageProperties();
         String jobId = this.hashGenerator.generateHash(request);
         messageHeader.setHeader(JOB_ID, jobId);
+
+        if(Objects.isNull(request.getContentType())){
+            request.setContentType(APPLICATION_JSON_VALUE);
+        }
+
         this.messageService.sendMessage(request, messageHeader);
         return ResponseEntity.ok(new JobSubmitResponse(jobId));
     }
