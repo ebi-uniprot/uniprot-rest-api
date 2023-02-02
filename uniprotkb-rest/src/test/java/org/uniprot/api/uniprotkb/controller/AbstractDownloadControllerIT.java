@@ -118,7 +118,6 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         MediaType contentType = UniProtMediaType.valueOf(XLS_MEDIA_TYPE_VALUE);
         String query = "content:*";
         String fields = "accession,rhea";
-        // then
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
@@ -195,6 +194,67 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andExpect(jsonPath("$.errors.length()", is(1)))
                 .andExpect(jsonPath("$.errors[0].code", is(EXCEPTION_CODE)))
                 .andExpect(jsonPath("$.errors[0].message", is(errMsg)));
+    }
+
+    @Test
+    void getStatusReturnsNew() throws Exception {
+        String jobId = UUID.randomUUID().toString();
+        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
+        DownloadJob job = builder.id(jobId).status(JobStatus.NEW).build();
+        DownloadJobRepository repo = getDownloadJobRepository();
+        repo.save(job);
+        await().until(() -> repo.existsById(jobId));
+
+        ResultActions response = callGetJobStatus(jobId);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.NEW.toString())))
+                .andExpect(jsonPath("$.errors").doesNotExist());
+    }
+
+    @Test
+    void getStatusForUnknownJobId() throws Exception {
+        String jobId = UUID.randomUUID().toString();
+        ResultActions response = callGetJobStatus(jobId);
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", contains("Resource not found")));
+    }
+
+    @Test
+    void getDetailsForRunningJob() throws Exception {
+        String jobId = UUID.randomUUID().toString();
+        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
+        String query = "my:query";
+        DownloadJob job = builder.id(jobId).status(JobStatus.RUNNING).query(query).build();
+        DownloadJobRepository repo = getDownloadJobRepository();
+        repo.save(job);
+        await().until(() -> repo.existsById(jobId));
+
+        ResultActions response = callGetJobDetails(jobId);
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.query", is(query)))
+                .andExpect(jsonPath("$.errors").doesNotExist());
+    }
+
+    @Test
+    void getDetailsForUnknownJobId() throws Exception {
+        String jobId = UUID.randomUUID().toString();
+        ResultActions response = callGetJobDetails(jobId);
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages", contains("Resource not found")));
     }
 
     @Test
