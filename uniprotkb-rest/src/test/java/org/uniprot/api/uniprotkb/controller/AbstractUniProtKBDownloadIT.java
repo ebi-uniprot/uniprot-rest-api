@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.lifecycle.Startables;
@@ -105,6 +107,10 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     @Autowired
     private UniProtStoreClient<UniProtKBEntry> storeClient; // in memory voldemort store client
 
+    @Autowired
+    @Qualifier("rdfRestTemplate")
+    private RestTemplate restTemplate;
+
     @BeforeAll
     public void saveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
@@ -122,6 +128,8 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         when(solrClient.query(anyString(), any())).thenReturn(response);
 
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
+        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
+        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     private void prepareDownloadFolders() throws IOException {

@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
@@ -30,6 +31,9 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.request.DownloadRequest;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+
 @Slf4j
 public abstract class AbstractDownloadResultWriter<T> implements DownloadResultWriter {
 
@@ -38,18 +42,21 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
     protected final StoreStreamerConfig<T> storeStreamerConfig;
     private final DownloadConfigProperties downloadConfigProperties;
     private final MessageConverterContextFactory.Resource resource;
+    private final RDFStreamer rdfStreamer;
 
     public AbstractDownloadResultWriter(
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<T> converterContextFactory,
             StoreStreamerConfig<T> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
+            RDFStreamer rdfStreamer,
             MessageConverterContextFactory.Resource resource) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
         this.storeStreamerConfig = storeStreamerConfig;
         this.downloadConfigProperties = downloadConfigProperties;
         this.resource = resource;
+        this.rdfStreamer = rdfStreamer;
     }
 
     public String writeResult(
@@ -70,17 +77,29 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                 StandardOpenOption.WRITE,
                                 StandardOpenOption.CREATE,
                                 StandardOpenOption.TRUNCATE_EXISTING)) {
-            BatchStoreIterable<T> batchStoreIterable =
-                    getBatchStoreIterable(ids.iterator(), storeRequest);
-            Stream<T> entities =
-                    StreamSupport.stream(batchStoreIterable.spliterator(), false)
-                            .flatMap(Collection::stream)
-                            .onClose(() -> log.debug("Finished streaming entries."));
 
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
             context.setContentType(contentType);
-            context.setEntities(entities);
+
+            if(contentType.equals(RDF_MEDIA_TYPE)){
+                Stream<String> rdfResponse = this.rdfStreamer.streamRDFXML(ids);
+                context.setEntityIds(rdfResponse);
+            } else {
+                BatchStoreIterable<T> batchStoreIterable =
+                        getBatchStoreIterable(ids.iterator(), storeRequest);
+                Stream<T> entities =
+                        StreamSupport.stream(batchStoreIterable.spliterator(), false)
+                                .flatMap(Collection::stream)
+                                .onClose(() -> log.debug("Finished streaming entries."));
+
+                if (contentType.equals(LIST_MEDIA_TYPE)) {
+                    Stream<String> accessions = entities.map(this::getEntityId);
+                    context.setEntityIds(accessions);
+                }  else {
+                    context.setEntities(entities);
+                }
+            }
 
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
@@ -107,4 +126,6 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             Iterator<String> idsIterator, StoreRequest storeRequest);
 
     public abstract Type getType();
+
+    protected abstract String getEntityId(T entity);
 }

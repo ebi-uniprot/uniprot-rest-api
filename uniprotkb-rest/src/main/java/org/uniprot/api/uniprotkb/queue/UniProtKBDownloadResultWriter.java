@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
@@ -34,12 +35,14 @@ public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<
             MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
             StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            TaxonomyLineageService lineageService) {
+            TaxonomyLineageService lineageService,
+            RDFStreamer uniProtRDFStreamer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
+                uniProtRDFStreamer,
                 MessageConverterContextFactory.Resource.UNIPROTKB);
         this.lineageService = lineageService;
     }
@@ -59,5 +62,10 @@ public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<
     @Override
     public Type getType() {
         return type;
+    }
+
+    @Override
+    protected String getEntityId(UniProtKBEntry entity) {
+        return entity.getPrimaryAccession().getValue();
     }
 }

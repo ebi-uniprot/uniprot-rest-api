@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.download.queue;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,11 +76,15 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
         LocalDateTime now = LocalDateTime.now();
         jobBuilder.id(jobId).status(JobStatus.NEW);
+        String contentType =
+                Objects.nonNull(downloadRequest.getContentType())
+                        ? downloadRequest.getContentType().toString()
+                        : null;
         jobBuilder
                 .query(downloadRequest.getQuery())
                 .fields(downloadRequest.getFields())
                 .sort(downloadRequest.getSort())
-                .contentType(downloadRequest.getContentType().toString())
+                .contentType(contentType)
                 .created(now)
                 .updated(now);
         this.jobRepository.save(jobBuilder.build());

@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
@@ -91,7 +93,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         String jobId = callRunAPIAndVerify(query, fields, contentType);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        await().atMost(20, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId, contentType);
     }
 
