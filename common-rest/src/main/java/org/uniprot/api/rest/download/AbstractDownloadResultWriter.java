@@ -1,5 +1,8 @@
 package org.uniprot.api.rest.download;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
@@ -30,9 +33,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 import org.uniprot.api.rest.request.DownloadRequest;
-
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 
 @Slf4j
 public abstract class AbstractDownloadResultWriter<T> implements DownloadResultWriter {
@@ -82,7 +82,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             context.setFields(request.getFields());
             context.setContentType(contentType);
 
-            if(contentType.equals(RDF_MEDIA_TYPE)){
+            if (contentType.equals(RDF_MEDIA_TYPE)) {
                 Stream<String> rdfResponse = this.rdfStreamer.streamRDFXML(ids);
                 context.setEntityIds(rdfResponse);
             } else {
@@ -96,7 +96,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                 if (contentType.equals(LIST_MEDIA_TYPE)) {
                     Stream<String> accessions = entities.map(this::getEntityId);
                     context.setEntityIds(accessions);
-                }  else {
+                } else {
                     context.setEntities(entities);
                 }
             }
