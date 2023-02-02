@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.DownloadRequest;
 
 /**
  * Common for all, UniProtKB, UniParc and UniRef
@@ -41,10 +41,10 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     }
 
     @Override
-    public void sendMessage(StreamRequest streamRequest, MessageProperties messageHeader) {
+    public void sendMessage(DownloadRequest downloadRequest, MessageProperties messageHeader) {
         String jobId = messageHeader.getHeader("jobId");
         if (!this.jobRepository.existsById(jobId)) {
-            doSendMessage(streamRequest, messageHeader, jobId);
+            doSendMessage(downloadRequest, messageHeader, jobId);
             log.info("Message with jobId {} ready to be processed", jobId);
         } else {
             logAlreadyProcessed(jobId);
@@ -56,10 +56,10 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     }
 
     private void doSendMessage(
-            StreamRequest streamRequest, MessageProperties messageHeader, String jobId) {
-        Message message = converter.toMessage(streamRequest, messageHeader);
+            DownloadRequest downloadRequest, MessageProperties messageHeader, String jobId) {
+        Message message = converter.toMessage(downloadRequest, messageHeader);
         // write to redis and put on queue
-        createDownloadJob(jobId, streamRequest);
+        createDownloadJob(jobId, downloadRequest);
         log.info("Message with jobId {} created in redis", jobId);
         try {
             this.rabbitTemplate.send(message);
@@ -71,14 +71,15 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         }
     }
 
-    private void createDownloadJob(String jobId, StreamRequest streamRequest) {
+    private void createDownloadJob(String jobId, DownloadRequest downloadRequest) {
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
         LocalDateTime now = LocalDateTime.now();
         jobBuilder.id(jobId).status(JobStatus.NEW);
         jobBuilder
-                .query(streamRequest.getQuery())
-                .fields(streamRequest.getFields())
-                .sort(streamRequest.getSort())
+                .query(downloadRequest.getQuery())
+                .fields(downloadRequest.getFields())
+                .sort(downloadRequest.getSort())
+                .contentType(downloadRequest.getContentType().toString())
                 .created(now)
                 .updated(now);
         this.jobRepository.save(jobBuilder.build());

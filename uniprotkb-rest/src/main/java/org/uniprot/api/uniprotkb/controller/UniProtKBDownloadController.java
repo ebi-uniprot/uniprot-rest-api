@@ -1,8 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
@@ -15,7 +13,6 @@ import javax.validation.Valid;
 
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +29,8 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
-import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
+import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,9 +48,8 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
     static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;
     private final DownloadJobRepository jobRepository;
-    private final HashGenerator<StreamRequest> hashGenerator;
+    private final HashGenerator<DownloadRequest> hashGenerator;
     public static final String JOB_ID = "jobId";
-    public static final String CONTENT_TYPE = "content-type";
 
     private static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT";
 
@@ -75,26 +71,14 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
-    @PostMapping(value = "/run",
-            produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    FF_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE,
-                    APPLICATION_XML_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    GFF_MEDIA_TYPE_VALUE,
-                    RDF_MEDIA_TYPE_VALUE
-                    })
+    @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<JobSubmitResponse> submitJob(
-            @Valid @ModelAttribute UniProtKBStreamRequest streamRequest,
+            @Valid @ModelAttribute UniProtKBDownloadRequest request,
             HttpServletRequest httpRequest) {
         MessageProperties messageHeader = new MessageProperties();
-        MediaType contentType = getAcceptHeader(httpRequest);
-        String jobId = this.hashGenerator.generateHash(streamRequest, contentType);
+        String jobId = this.hashGenerator.generateHash(request);
         messageHeader.setHeader(JOB_ID, jobId);
-        messageHeader.setHeader(CONTENT_TYPE, contentType);
-        this.messageService.sendMessage(streamRequest, messageHeader);
+        this.messageService.sendMessage(request, messageHeader);
         return ResponseEntity.ok(new JobSubmitResponse(jobId));
     }
 
@@ -128,6 +112,7 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         detailResponse.setQuery(job.getQuery());
         detailResponse.setFields(job.getFields());
         detailResponse.setSort(job.getSort());
+        detailResponse.setContentType(job.getContentType());
         if (JobStatus.FINISHED == job.getStatus()) {
             detailResponse.setRedirectURL(
                     constructDownloadRedirectUrl(

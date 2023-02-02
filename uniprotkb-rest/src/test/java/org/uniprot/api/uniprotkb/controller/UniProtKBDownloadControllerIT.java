@@ -94,7 +94,7 @@ public class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT 
         return UniProtKBDownloadController.DOWNLOAD_RESOURCE;
     }
 
-    protected DownloadJobRepository getDownloadJobRepository(){
+    protected DownloadJobRepository getDownloadJobRepository() {
         return this.downloadJobRepository;
     }
 }

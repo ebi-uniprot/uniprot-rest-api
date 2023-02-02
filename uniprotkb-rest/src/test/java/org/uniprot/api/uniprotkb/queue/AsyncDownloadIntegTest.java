@@ -1,11 +1,10 @@
 package org.uniprot.api.uniprotkb.queue;
 
 import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.JOB_ID;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,10 +17,12 @@ import java.util.concurrent.Callable;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,11 +47,11 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.AbstractUniProtKBDownloadIT;
 import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.store.search.SolrCollection;
@@ -91,7 +92,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
 
     @SpyBean @Autowired private MessageConverter messageConverter;
 
-    private HashGenerator<StreamRequest> hashGenerator;
+    private HashGenerator<DownloadRequest> hashGenerator;
 
     @Value("${spring.amqp.rabbit.retryMaxCount}")
     private int maxRetry;
@@ -104,9 +105,9 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     @Test
     void sendAndProcessDownloadMessageSuccessfully() throws IOException {
         String query = "content:*";
-        UniProtKBStreamRequest request = createStreamRequest(query);
         MediaType contentType = MediaType.APPLICATION_JSON;
-        String jobId = this.hashGenerator.generateHash(request, contentType);
+        UniProtKBDownloadRequest request = createDownloadRequest(query, contentType);
+        String jobId = this.hashGenerator.generateHash(request);
         sendMessage(request, jobId, contentType);
         // Producer
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
@@ -125,9 +126,9 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
                 .when(this.messageConverter)
                 .fromMessage(any());
         String query = "reviewed:true";
-        UniProtKBStreamRequest request = createStreamRequest(query);
         MediaType contentType = MediaType.APPLICATION_JSON;
-        String jobId = this.hashGenerator.generateHash(request, contentType);
+        UniProtKBDownloadRequest request = createDownloadRequest(query, contentType);
+        String jobId = this.hashGenerator.generateHash(request);
         sendMessage(request, jobId, contentType);
         // Producer
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
@@ -145,9 +146,9 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     @Test
     void sendAndProcessMessageFailAfterMaximumRetry() throws IOException {
         String query = "accession:P12345";
-        UniProtKBStreamRequest request = createStreamRequest(query);
         MediaType contentType = MediaType.APPLICATION_JSON;
-        String jobId = this.hashGenerator.generateHash(request, contentType);
+        UniProtKBDownloadRequest request = createDownloadRequest(query, contentType);
+        String jobId = this.hashGenerator.generateHash(request);
         when(this.uniProtKBMessageListener.streamIds(request))
                 .thenThrow(
                         new MessageListenerException(
@@ -172,11 +173,12 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     void sendAndProcessMessageWithUnhandledExceptionShouldBeDiscarded()
             throws InterruptedException, IOException {
         // when
-        String query = "field:value";
-        UniProtKBStreamRequest request = new UniProtKBStreamRequest();
-        request.setQuery(query);
         MediaType contentType = MediaType.APPLICATION_JSON;
-        String jobId = this.hashGenerator.generateHash(request, contentType);
+        String query = "field:value";
+        UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
+        request.setQuery(query);
+        request.setContentType(contentType.toString());
+        String jobId = this.hashGenerator.generateHash(request);
         IllegalArgumentException ile =
                 new IllegalArgumentException(
                         "Forced exception in streamIds to test max retry with unhandled exception");
@@ -195,22 +197,27 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         verifyIdsAndResultFilesDoNotExist(jobId, contentType);
     }
 
-
-    private void sendMessage(UniProtKBStreamRequest request, String jobId, MediaType contentType) {
+    private void sendMessage(
+            UniProtKBDownloadRequest request, String jobId, MediaType contentType) {
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID, jobId);
-        messageHeader.setHeader(CONTENT_TYPE, contentType);
         this.messageService.sendMessage(request, messageHeader);
     }
 
-    private UniProtKBStreamRequest createStreamRequest(String query) {
-        UniProtKBStreamRequest request = new UniProtKBStreamRequest();
+    private UniProtKBDownloadRequest createDownloadRequest(String query, MediaType contentType) {
+        UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
         request.setQuery(query);
+        request.setContentType(contentType.toString());
         return request;
     }
 
     private void verifyRedisEntry(
-            String query, String jobId, List<JobStatus> statuses, int retryCount, boolean isError, MediaType contentType) {
+            String query,
+            String jobId,
+            List<JobStatus> statuses,
+            int retryCount,
+            boolean isError,
+            MediaType contentType) {
         Optional<DownloadJob> optDownloadJob = this.downloadJobRepository.findById(jobId);
         assertTrue(optDownloadJob.isPresent());
         System.out.println(optDownloadJob.get());
@@ -222,7 +229,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         assertEquals(retryCount, optDownloadJob.get().getRetried());
         assertTrue(statuses.contains(optDownloadJob.get().getStatus()));
         assertEquals(isError, Objects.nonNull(optDownloadJob.get().getError()));
-        if(optDownloadJob.get().getStatus() == JobStatus.FINISHED) {
+        if (optDownloadJob.get().getStatus() == JobStatus.FINISHED) {
             assertNotNull(optDownloadJob.get().getResultFile());
             String ext = "." + UniProtMediaType.getFileExtension(contentType);
             String expectedFile = jobId + ext;
@@ -303,7 +310,8 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         Assertions.assertNotNull(primaryAccessions);
     }
 
-    private void verifyIdsAndResultFilesDoNotExist(String jobId, MediaType contentType) throws IOException {
+    private void verifyIdsAndResultFilesDoNotExist(String jobId, MediaType contentType)
+            throws IOException {
         // verify the ids file
         Path idsFilePath = Paths.get(this.idsFolder, jobId);
         Assertions.assertTrue(Files.notExists(idsFilePath));

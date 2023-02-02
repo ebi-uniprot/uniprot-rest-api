@@ -320,7 +320,7 @@ public abstract class BasicSearchController<T> {
     protected DownloadJob getAsyncDownloadJob(DownloadJobRepository jobRepository, String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         return optJob.orElseThrow(
-                        () -> new ResourceNotFoundException("jobId" + jobId + "doesn't exist"));
+                () -> new ResourceNotFoundException("jobId" + jobId + "doesn't exist"));
     }
 
     private String extractRequestBaseUrl(String url) {

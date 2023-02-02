@@ -1,12 +1,13 @@
 package org.uniprot.api.rest.download.model;
 
+import java.util.Objects;
 import java.util.function.Function;
 
-import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.DownloadRequest;
 
-public class DownloadRequestToArrayConverter implements Function<StreamRequest, char[]> {
+public class DownloadRequestToArrayConverter implements Function<DownloadRequest, char[]> {
     @Override
-    public char[] apply(StreamRequest request) {
+    public char[] apply(DownloadRequest request) {
         StringBuilder builder = new StringBuilder();
         builder.append(request.getQuery().strip().toLowerCase());
         if (request.hasFields()) {
@@ -14,6 +15,10 @@ public class DownloadRequestToArrayConverter implements Function<StreamRequest, 
         }
         if (request.hasSort()) {
             builder.append(request.getSort().strip().toLowerCase());
+        }
+
+        if (Objects.nonNull(request.getContentType())) {
+            builder.append(request.getContentType().toString().toLowerCase());
         }
         return builder.toString().toCharArray();
     }

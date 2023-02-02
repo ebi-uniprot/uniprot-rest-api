@@ -28,7 +28,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
-import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.DownloadRequest;
 
 @Slf4j
 public abstract class AbstractDownloadResultWriter<T> implements DownloadResultWriter {
@@ -53,7 +53,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
     }
 
     public String writeResult(
-            StreamRequest request,
+            DownloadRequest request,
             Path idFile,
             String jobId,
             MediaType contentType,

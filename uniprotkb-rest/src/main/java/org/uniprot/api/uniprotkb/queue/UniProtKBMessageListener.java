@@ -29,8 +29,8 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
+import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
 /**
@@ -81,7 +81,10 @@ public class UniProtKBMessageListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        log.info(this + " #################### times called " + times.incrementAndGet()); // TODO remove
+        log.info(
+                this
+                        + " #################### times called "
+                        + times.incrementAndGet()); // TODO remove
         String jobId = null;
         DownloadJob downloadJob = null;
         try {
@@ -120,12 +123,10 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private void processMessage(Message message, DownloadJob downloadJob) {
-        UniProtKBStreamRequest request =
-                (UniProtKBStreamRequest) this.converter.fromMessage(message);
+        UniProtKBDownloadRequest request =
+                (UniProtKBDownloadRequest) this.converter.fromMessage(message);
         String jobId = downloadJob.getId();
-        String contentType =
-                message.getMessageProperties().getHeader(UniProtKBDownloadController.CONTENT_TYPE);
-
+        MediaType contentType = UniProtMediaType.valueOf(request.getContentType());
         Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
         if (Files.notExists(idsFile)) {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
@@ -138,13 +139,14 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private String getAndWriteResult(
-            UniProtKBStreamRequest request, Path idsFile, String jobId, String contentType) {
+            DownloadRequest request, Path idsFile, String jobId, MediaType contentType) {
         try {
             Stream<String> ids = streamIds(request);
             saveIdsInTempFile(idsFile, ids);
-            MediaType mediaType = UniProtMediaType.valueOf(contentType);
             StoreRequest storeRequest = service.buildStoreRequest(request);
-            String resultFile = downloadResultWriter.writeResult(request, idsFile, jobId, mediaType, storeRequest);
+            String resultFile =
+                    downloadResultWriter.writeResult(
+                            request, idsFile, jobId, contentType, storeRequest);
             return resultFile;
         } catch (IOException ex) {
             log.error(ex.getMessage());
@@ -167,7 +169,7 @@ public class UniProtKBMessageListener implements MessageListener {
         Files.write(filePath, source, StandardOpenOption.CREATE);
     }
 
-    Stream<String> streamIds(UniProtKBStreamRequest request) {
+    Stream<String> streamIds(DownloadRequest request) {
         return service.streamIds(request);
     }
 
@@ -175,7 +177,8 @@ public class UniProtKBMessageListener implements MessageListener {
         updateDownloadJob(message, downloadJob, jobStatus, null);
     }
 
-    private void updateDownloadJob(Message message, DownloadJob downloadJob, JobStatus jobStatus, String resultFile) {
+    private void updateDownloadJob(
+            Message message, DownloadJob downloadJob, JobStatus jobStatus, String resultFile) {
         if (Objects.nonNull(downloadJob)) {
             LocalDateTime now = LocalDateTime.now();
             downloadJob.setUpdated(now);
@@ -279,13 +282,19 @@ public class UniProtKBMessageListener implements MessageListener {
 
     @Override
     public String toString() {
-        return "UniProtKBMessageListener{" +
-                "converter=" + converter.hashCode() +
-                ", service=" + service.hashCode() +
-                ", downloadConfigProperties=" + downloadConfigProperties.hashCode() +
-                ", downloadResultWriter=" + downloadResultWriter.hashCode() +
-                ", jobRepository=" + jobRepository.hashCode() +
-                ", rabbitTemplate=" + rabbitTemplate.hashCode() +
-                '}';
+        return "UniProtKBMessageListener{"
+                + "converter="
+                + converter.hashCode()
+                + ", service="
+                + service.hashCode()
+                + ", downloadConfigProperties="
+                + downloadConfigProperties.hashCode()
+                + ", downloadResultWriter="
+                + downloadResultWriter.hashCode()
+                + ", jobRepository="
+                + jobRepository.hashCode()
+                + ", rabbitTemplate="
+                + rabbitTemplate.hashCode()
+                + '}';
     }
 }

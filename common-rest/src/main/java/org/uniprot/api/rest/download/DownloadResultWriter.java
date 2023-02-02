@@ -5,12 +5,12 @@ import java.nio.file.Path;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
-import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.DownloadRequest;
 
 public interface DownloadResultWriter {
 
     String writeResult(
-            StreamRequest request,
+            DownloadRequest request,
             Path idFile,
             String jobId,
             MediaType contentType,

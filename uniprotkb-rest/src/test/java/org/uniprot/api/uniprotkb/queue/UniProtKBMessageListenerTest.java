@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.queue;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.CONTENT_TYPE;
 import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
 import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
 
@@ -24,11 +23,12 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.http.MediaType;
 import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
 @ExtendWith({MockitoExtension.class})
@@ -46,18 +46,19 @@ public class UniProtKBMessageListenerTest {
 
     @Test
     void testOnMessage() throws IOException {
-        UniProtKBStreamRequest streamRequest = new UniProtKBStreamRequest();
-        streamRequest.setQuery("field:value");
+        UniProtKBDownloadRequest downloadRequest = new UniProtKBDownloadRequest();
+        downloadRequest.setQuery("field:value");
+        downloadRequest.setContentType(MediaType.APPLICATION_JSON.toString());
         String jobId = UUID.randomUUID().toString();
-        MessageBuilder builder = MessageBuilder.withBody(streamRequest.toString().getBytes());
+        MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
         // stub
         List<String> accessions = List.of("P12345", "P05067");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
-        when(this.converter.fromMessage(message)).thenReturn(streamRequest);
+        when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
-        when(this.service.streamIds(streamRequest)).thenReturn(accessions.stream());
+        when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
         this.uniProtKBMessageListener.setMaxRetryCount(3);
 
         this.uniProtKBMessageListener.onMessage(message);
@@ -75,20 +76,20 @@ public class UniProtKBMessageListenerTest {
 
     @Test
     void testOnMessageWithIOExceptionDuringWrite() throws IOException {
-        UniProtKBStreamRequest streamRequest = new UniProtKBStreamRequest();
-        streamRequest.setQuery("field2:value2");
+        UniProtKBDownloadRequest downloadRequest = new UniProtKBDownloadRequest();
+        downloadRequest.setQuery("field2:value2");
+        MediaType contentType = MediaType.APPLICATION_JSON;
+        downloadRequest.setContentType(contentType.toString());
         String jobId = UUID.randomUUID().toString();
-        MessageBuilder builder = MessageBuilder.withBody(streamRequest.toString().getBytes());
-        String contentType = "application/json";
-        Message message =
-                builder.setHeader("jobId", jobId).setHeader(CONTENT_TYPE, contentType).build();
+        MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
+        Message message = builder.setHeader("jobId", jobId).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
         // stub
         List<String> accessions = List.of("P12345", "P05067");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
-        when(this.converter.fromMessage(message)).thenReturn(streamRequest);
+        when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
-        when(this.service.streamIds(streamRequest)).thenReturn(accessions.stream());
+        when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
         Mockito.doThrow(new IOException("Forced IO Exception"))
                 .when(this.downloadResultWriter)
                 .writeResult(any(), any(), any(), any(), any());
@@ -103,10 +104,11 @@ public class UniProtKBMessageListenerTest {
 
     @Test
     void testOnMessageWhenMaxRetryReached() throws IOException {
-        UniProtKBStreamRequest streamRequest = new UniProtKBStreamRequest();
-        streamRequest.setQuery("field1:value1");
+        UniProtKBDownloadRequest downloadRequest = new UniProtKBDownloadRequest();
+        downloadRequest.setQuery("field1:value1");
+        downloadRequest.setContentType(MediaType.APPLICATION_JSON.toString());
         String jobId = UUID.randomUUID().toString();
-        MessageBuilder builder = MessageBuilder.withBody(streamRequest.toString().getBytes());
+        MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
         this.uniProtKBMessageListener.setMaxRetryCount(0);

@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -23,7 +22,6 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -34,7 +32,6 @@ import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
@@ -54,7 +51,9 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management")).withReuse(true);
     static GenericContainer<?> redisContainer =
-            new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379).withReuse(true);
+            new GenericContainer<>(DockerImageName.parse("redis:6-alpine"))
+                    .withExposedPorts(6379)
+                    .withReuse(true);
 
     @DynamicPropertySource
     public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
