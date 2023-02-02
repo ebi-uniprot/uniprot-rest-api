@@ -126,7 +126,7 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
                     constructDownloadRedirectUrl(
                             job.getResultFile(), servletRequest.getRequestURL().toString()));
         } else if (JobStatus.ERROR == job.getStatus()) {
-            ProblemPair error = new ProblemPair(0, job.getError());
+            ProblemPair error = new ProblemPair(EXCEPTION_CODE, job.getError());
             detailResponse.setErrors(List.of(error));
         }
 

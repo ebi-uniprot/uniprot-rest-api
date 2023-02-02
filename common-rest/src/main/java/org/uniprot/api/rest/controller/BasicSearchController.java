@@ -48,6 +48,7 @@ public abstract class BasicSearchController<T> {
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final MessageConverterContextFactory.Resource resource;
     private final Gatekeeper downloadGatekeeper;
+    public static final int EXCEPTION_CODE = 50;
 
     protected BasicSearchController(
             ApplicationEventPublisher eventPublisher,
@@ -302,7 +303,7 @@ public abstract class BasicSearchController<T> {
                                 .body(new JobStatusResponse(JobStatus.FINISHED));
                 break;
             default:
-                ProblemPair error = new ProblemPair(0, job.getError());
+                ProblemPair error = new ProblemPair(EXCEPTION_CODE, job.getError());
                 response =
                         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(new JobStatusResponse(List.of(error)));

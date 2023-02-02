@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.service.job;
 
 import static org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl.*;
+import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CODE;
 import static org.uniprot.store.search.SolrCollection.*;
 
 import java.io.IOException;
@@ -18,8 +19,6 @@ import org.uniprot.store.search.SolrCollection;
 
 public class SolrJobTask extends JobTask {
     private final IdMappingRepository repo;
-
-    private static final int EXCEPTION_CODE = 50;
 
     public SolrJobTask(
             IdMappingJob job, IdMappingJobCacheService cacheService, IdMappingRepository repo) {
