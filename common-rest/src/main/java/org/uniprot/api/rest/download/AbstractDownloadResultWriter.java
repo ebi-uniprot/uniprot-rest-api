@@ -85,6 +85,8 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             if (contentType.equals(RDF_MEDIA_TYPE)) {
                 Stream<String> rdfResponse = this.rdfStreamer.streamRDFXML(ids);
                 context.setEntityIds(rdfResponse);
+            } else if (contentType.equals(LIST_MEDIA_TYPE)) {
+                context.setEntityIds(ids);
             } else {
                 BatchStoreIterable<T> batchStoreIterable =
                         getBatchStoreIterable(ids.iterator(), storeRequest);
@@ -93,14 +95,8 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                 .flatMap(Collection::stream)
                                 .onClose(() -> log.debug("Finished streaming entries."));
 
-                if (contentType.equals(LIST_MEDIA_TYPE)) {
-                    Stream<String> accessions = entities.map(this::getEntityId);
-                    context.setEntityIds(accessions);
-                } else {
-                    context.setEntities(entities);
-                }
+                context.setEntities(entities);
             }
-
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, output, start, counter);
@@ -126,6 +122,4 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             Iterator<String> idsIterator, StoreRequest storeRequest);
 
     public abstract Type getType();
-
-    protected abstract String getEntityId(T entity);
 }

@@ -63,9 +63,4 @@ public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<
     public Type getType() {
         return type;
     }
-
-    @Override
-    protected String getEntityId(UniProtKBEntry entity) {
-        return entity.getPrimaryAccession().getValue();
-    }
 }
