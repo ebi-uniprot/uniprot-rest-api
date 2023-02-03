@@ -16,6 +16,8 @@ import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CO
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,8 +25,10 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
+import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -287,6 +291,38 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andExpect(jsonPath("$.errors[0].message", is(errMsg)));
     }
 
+    @Test
+    void runQueryWhichReturnsEmptyResult() throws Exception {
+        String query = "content:khansamatola";
+        MediaType contentType = MediaType.APPLICATION_JSON;
+        String jobId = callRunAPIAndVerify(query, null, contentType);
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        getAndVerifyDetails(jobId, contentType);
+        ResultActions resultActions = callGetJobStatus(jobId);
+        resultActions
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(redirectedUrlPattern("**/uniprotkb/download/results/" + jobId + ".json"))
+                .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
+                .andExpect(jsonPath("$.errors").doesNotExist());
+
+        // verify the ids file
+        Path idsFilePath = Path.of(this.idsFolder + "/" + jobId);
+        Assertions.assertTrue(Files.exists(idsFilePath));
+        List<String> ids = Files.readAllLines(idsFilePath);
+        Assertions.assertNotNull(ids);
+        Assertions.assertTrue(ids.isEmpty());
+        // verify result file
+        String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
+        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + fileExt);
+        Assertions.assertTrue(Files.exists(resultFilePath));
+        String resultsJson = Files.readString(resultFilePath);
+        List<String> results = JsonPath.read(resultsJson, "$.results");
+        Assertions.assertAll(() -> assertNotNull(results), () -> assertTrue(results.isEmpty()));
+    }
+
     protected JobStatus getJobStatus(String jobId) throws Exception {
         ResultActions response = callGetJobStatus(jobId);
         // then
@@ -336,8 +372,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     protected abstract String getDownloadAPIsBasePath();
 
     protected void getAndVerifyDetails(String jobId, MediaType contentType) throws Exception {
+        // when
         ResultActions response = callGetJobDetails(jobId);
-
         // then
         String expectedResult = jobId + "." + UniProtMediaType.getFileExtension(contentType);
         response.andDo(print())
