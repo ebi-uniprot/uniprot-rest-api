@@ -1,22 +1,16 @@
 package org.uniprot.api.rest.download.repository;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.Mockito.*;
-
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.uniprot.api.rest.download.configuration.RedisConfiguration;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.JobStatus;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 /**
  * @author sahmad
@@ -25,8 +19,8 @@ import java.util.Optional;
 @ExtendWith(SpringExtension.class)
 public class DownloadJobRepositoryTest {
 
-    @MockBean
-    private DownloadJobRepository jobRepository;
+    @MockBean private DownloadJobRepository jobRepository;
+
     @Test
     public void whenSavingJob_thenAvailableOnRetrieval() throws Exception {
         String jobId = "123456789";

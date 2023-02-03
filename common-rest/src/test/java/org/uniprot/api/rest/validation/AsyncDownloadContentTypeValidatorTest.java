@@ -1,22 +1,22 @@
 package org.uniprot.api.rest.validation;
 
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 /**
- * Unit Test class to validate the behaviour of {@link
- * ValidAsyncDownloadContentTypes}
+ * Unit Test class to validate the behaviour of {@link ValidAsyncDownloadContentTypes}
  *
  * @author sahmad
  */
@@ -86,7 +86,8 @@ class AsyncDownloadContentTypeValidatorTest {
         assertThat(validator.errorFields, contains(contentType));
     }
 
-    static class FakeContentTypeValidator extends ValidAsyncDownloadContentTypes.ContentTypesValidator {
+    static class FakeContentTypeValidator
+            extends ValidAsyncDownloadContentTypes.ContentTypesValidator {
         final List<String> errorFields = new ArrayList<>();
 
         final Collection<String> mockedValidContentTypes = new ArrayList<>();

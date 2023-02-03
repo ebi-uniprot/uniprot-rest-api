@@ -1,7 +1,29 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CODE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
@@ -23,29 +45,8 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CODE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDownloadIT {
@@ -88,7 +89,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void submitJobStarQueryMoreThanOnceShouldProcessOnlyOnceSuccess() throws Exception {
         String query = "*";
         MediaType contentType = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null,  contentType);
+        String jobId = callRunAPIAndVerify(query, null, null, contentType);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId, contentType);
@@ -116,14 +117,22 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
-        MatcherAssert.assertThat(ids, contains("P00010", "P00009", "P00008", "P00007", "P00006", "P00005", "P00004", "P00003", "P00002", "P00001"));
+        MatcherAssert.assertThat(
+                ids,
+                contains(
+                        "P00010", "P00009", "P00008", "P00007", "P00006", "P00005", "P00004",
+                        "P00003", "P00002", "P00001"));
         // verify result file
         String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
         Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + fileExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
         String resultsJson = Files.readString(resultFilePath);
         List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
-        MatcherAssert.assertThat(primaryAccessions, contains("P00010", "P00009", "P00008", "P00007", "P00006", "P00005", "P00004", "P00003", "P00002", "P00001"));
+        MatcherAssert.assertThat(
+                primaryAccessions,
+                contains(
+                        "P00010", "P00009", "P00008", "P00007", "P00006", "P00005", "P00004",
+                        "P00003", "P00002", "P00001"));
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
@@ -150,6 +159,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId, MediaType.APPLICATION_JSON);
     }
+
     @Test
     void submitJobUnsupportedContentTypeFailure() throws Exception {
         // when
@@ -162,7 +172,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", Matchers.contains("Invalid content type received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml].")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                Matchers.contains(
+                                        "Invalid content type received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml].")));
     }
 
     @Test
@@ -174,7 +188,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", contains("'random' is not a valid search field")));
+                .andExpect(
+                        jsonPath("$.messages.*", contains("'random' is not a valid search field")));
     }
 
     @Test
@@ -189,7 +204,12 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", containsInAnyOrder("Invalid fields parameter value 'else'","Invalid fields parameter value 'something'")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid fields parameter value 'else'",
+                                        "Invalid fields parameter value 'something'")));
     }
 
     @Test
@@ -203,7 +223,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.*", containsInAnyOrder("Invalid sort field 'something'")));
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder("Invalid sort field 'something'")));
     }
 
     @Test
@@ -298,8 +321,15 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         String query = "sample:query";
         String fields = "sample,fields";
         String sort = "sample sort";
-        DownloadJob job = builder.id(jobId).query(query).sort(sort).fields(fields).status(JobStatus.ERROR)
-                .error(errMsg).contentType(APPLICATION_JSON_VALUE).build();
+        DownloadJob job =
+                builder.id(jobId)
+                        .query(query)
+                        .sort(sort)
+                        .fields(fields)
+                        .status(JobStatus.ERROR)
+                        .error(errMsg)
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .build();
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
         await().until(() -> repo.existsById(jobId));
@@ -377,8 +407,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return response;
     }
 
-    protected String callRunAPIAndVerify(String query, String fields, String sort, MediaType contentType)
-            throws Exception {
+    protected String callRunAPIAndVerify(
+            String query, String fields, String sort, MediaType contentType) throws Exception {
 
         ResultActions response = callPostJobStatus(query, fields, sort, contentType);
 
@@ -393,14 +423,17 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return jobId;
     }
 
-    private ResultActions callPostJobStatus(String query, String fields, String sort, MediaType contentType) throws Exception {
+    private ResultActions callPostJobStatus(
+            String query, String fields, String sort, MediaType contentType) throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", query)
                         .param("fields", fields)
                         .param("sort", sort)
-                        .param("contentType", Objects.isNull(contentType) ? null : contentType.toString());
+                        .param(
+                                "contentType",
+                                Objects.isNull(contentType) ? null : contentType.toString());
         ResultActions response = this.mockMvc.perform(requestBuilder);
         return response;
     }

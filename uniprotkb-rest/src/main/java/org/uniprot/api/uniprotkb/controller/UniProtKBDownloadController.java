@@ -1,9 +1,17 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +34,10 @@ import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
  * @author sahmad
@@ -78,7 +80,7 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         String jobId = this.hashGenerator.generateHash(request);
         messageHeader.setHeader(JOB_ID, jobId);
 
-        if(Objects.isNull(request.getContentType())){
+        if (Objects.isNull(request.getContentType())) {
             request.setContentType(APPLICATION_JSON_VALUE);
         }
 
