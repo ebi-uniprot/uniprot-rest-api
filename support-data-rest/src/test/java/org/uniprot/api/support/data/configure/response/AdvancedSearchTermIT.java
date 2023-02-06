@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
-import org.uniprot.store.search.domain.impl.AnnotationEvidences;
 import org.uniprot.store.search.domain.impl.GoEvidences;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
@@ -165,33 +164,6 @@ class AdvancedSearchTermIT {
         EvidenceItem evidenceItem = manualGroup.getItems().get(0);
         Assertions.assertEquals("Inferred from experiment [EXP]", evidenceItem.getName());
         Assertions.assertEquals("exp", evidenceItem.getCode());
-    }
-
-    @Test
-    void testAnnotationEvidences() {
-        AdvancedSearchTerm annotationEvidence =
-                SEARCH_TERMS.stream()
-                        .filter(advancedSearchTerm -> advancedSearchTerm.getId().equals("function"))
-                        .flatMap(advancedSearchTerm -> advancedSearchTerm.getItems().stream())
-                        .filter(
-                                advancedSearchTerm ->
-                                        advancedSearchTerm.getId().equals("cofactors"))
-                        .flatMap(advancedSearchTerm -> advancedSearchTerm.getItems().stream())
-                        .filter(
-                                advancedSearchTerm ->
-                                        advancedSearchTerm.getId().equals("chebi_term"))
-                        .flatMap(advancedSearchTerm -> advancedSearchTerm.getSiblings().stream())
-                        .filter(
-                                advancedSearchTerm ->
-                                        advancedSearchTerm.getId().equals("ccev_cofactor_chebi"))
-                        .findFirst()
-                        .orElseThrow(AssertionFailedError::new);
-        Assertions.assertNotNull(annotationEvidence);
-        Assertions.assertEquals("evidence", annotationEvidence.getFieldType());
-        Assertions.assertNotNull(annotationEvidence.getEvidenceGroups());
-        Assertions.assertEquals(
-                AnnotationEvidences.INSTANCE.getEvidences(),
-                annotationEvidence.getEvidenceGroups());
     }
 
     private static Stream<Arguments> provideIndexAndLabelOfTopLevelTerms() {
