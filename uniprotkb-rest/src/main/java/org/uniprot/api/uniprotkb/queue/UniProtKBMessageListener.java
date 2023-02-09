@@ -29,6 +29,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.converter.StopStreamException;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
@@ -128,13 +129,15 @@ public class UniProtKBMessageListener implements MessageListener {
         String jobId = downloadJob.getId();
         MediaType contentType = UniProtMediaType.valueOf(request.getContentType());
         Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
-        if (Files.notExists(idsFile)) {
-            updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
-            String resultFile = getAndWriteResult(request, idsFile, jobId, contentType);
-            updateDownloadJob(message, downloadJob, JobStatus.FINISHED, resultFile);
-        } else {
+        String resultFileName = jobId + "." + UniProtMediaType.getFileExtension(contentType);
+        Path resultFile = Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
+        if (Files.exists(idsFile) && Files.exists(resultFile)) {
             log.info("The job {} is already processed", jobId);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED);
+        } else {
+            updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
+            getAndWriteResult(request, idsFile, jobId, contentType);
+            updateDownloadJob(message, downloadJob, JobStatus.FINISHED, resultFileName);
         }
     }
 
@@ -148,19 +151,30 @@ public class UniProtKBMessageListener implements MessageListener {
                     downloadResultWriter.writeResult(
                             request, idsFile, jobId, contentType, storeRequest);
             return resultFile;
+        } catch(StopStreamException sse){
+            log.warn("Unable to write file due to StopStreamException for job id {}", jobId);
+            log.error(sse.getMessage());
+            String resultFileName = jobId + "." + UniProtMediaType.getFileExtension(contentType);
+            Path resultFile = Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
+            deleteFile(resultFile, jobId);
+            throw new MessageListenerException(sse);
         } catch (IOException ex) {
             log.error(ex.getMessage());
             log.warn("Unable to write file due to IOException for job id {}", jobId);
-            try {
-                Files.delete(idsFile);
-            } catch (IOException e) {
-                log.warn(
-                        "Unable to delete file {} during IOException failure for job id {}",
-                        idsFile.toFile().getName(),
-                        jobId);
-                throw new MessageListenerException(e);
-            }
+            deleteFile(idsFile, jobId);
             throw new MessageListenerException(ex);
+        }
+    }
+
+    private static void deleteFile(Path file, String jobId) {
+        try {
+            Files.delete(file);
+        } catch (IOException e) {
+            log.warn(
+                    "Unable to delete file {} during IOException failure for job id {}",
+                    file.toFile().getName(),
+                    jobId);
+            throw new MessageListenerException(e);
         }
     }
 
