@@ -19,6 +19,8 @@
 
 		<jayway.version>2.4.0</jayway.version>
 		<redisson-version>3.17.4</redisson-version>
+		<testcontainers.version>1.17.6</testcontainers.version>
+		<jna.version>5.8.0</jna.version>
 		<embedded-redis.version>0.7.2</embedded-redis.version>
 	</properties>
 
@@ -178,7 +180,7 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>testcontainers</artifactId>
-			<version>1.17.6</version>
+			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 			<exclusions>
 				<exclusion>
@@ -190,19 +192,13 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>1.17.6</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>5.8.0</version>
+			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
