@@ -1,4 +1,8 @@
 variables:
+  DOCKER_TLS_CERTDIR: "" #disable TLS
+  DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_DRIVER: overlay2
+  REGISTRY_USER: uniprot/deployment
   MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.springframework.boot.test.autoconfigure.web.servlet=ERROR -Dorg.slf4j.simpleLogger.log.org.springframework.boot.test.context.SpringBootTestContextBootstrapper=ERROR -Dorg.slf4j.simpleLogger.log.org.springframework.test.context.transaction.TransactionContext=ERROR -Dorg.slf4j.simpleLogger.log.org.apache.zookeeper=ERROR -Dorg.slf4j.simpleLogger.log.org.uniprot.store.datastore.voldemort=ERROR -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=true"
   SONAR_PROPS: "-Dsonar.organization=ebi-uniprot -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true"
@@ -10,6 +14,10 @@ variables:
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   JACOCO_AGGREGATE_REPORT: "jacoco-aggregate-report/target/site/jacoco-aggregate/jacoco.xml"
 
+services:
+  - name: docker:dind
+    # explicitly disable tls to avoid docker startup interruption
+    command: ["--tls=false"]
 image: maven:3.6.3-jdk-11
 cache:
   key: "$CI_COMMIT_REF_SLUG"
