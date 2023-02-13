@@ -21,7 +21,6 @@
 		<redisson-version>3.17.4</redisson-version>
 		<testcontainers.version>1.17.6</testcontainers.version>
 		<jna.version>5.8.0</jna.version>
-		<embedded-redis.version>0.7.2</embedded-redis.version>
 	</properties>
 
 	<dependencies>
@@ -168,13 +167,6 @@
 			<artifactId>json-parser</artifactId>
 			<version>${uniprot-core.version}</version>
 			<type>test-jar</type>
-			<scope>test</scope>
-		</dependency>
-		<!-- Embedded Redis Server -->
-		<dependency>
-			<groupId>it.ozimov</groupId>
-			<artifactId>embedded-redis</artifactId>
-			<version>${embedded-redis.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

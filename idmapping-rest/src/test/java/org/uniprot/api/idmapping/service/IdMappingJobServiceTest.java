@@ -33,13 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.lifecycle.Startables;
-import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.controller.response.JobStatus;
@@ -60,21 +55,6 @@ import org.uniprot.api.idmapping.service.impl.IdMappingJobServiceImpl;
         classes = {IdMappingJobServiceImpl.class, TestConfig.class, DataStoreTestConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobServiceTest {
-    private static final String REDIS_IMAGE_VERSION = "redis:6-alpine";
-
-    static GenericContainer redisServer =
-            new GenericContainer(DockerImageName.parse(REDIS_IMAGE_VERSION))
-                    .withExposedPorts(6379)
-                    .withReuse(true);
-
-    @DynamicPropertySource
-    static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
-        Startables.deepStart(redisServer).join();
-        System.setProperty("idmapping.redis.host", redisServer.getHost());
-        System.setProperty("idmapping.redis.port", String.valueOf(redisServer.getFirstMappedPort()));
-        propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
-    }
-
     @Autowired private IdMappingJobServiceImpl jobService;
     @MockBean private IdMappingPIRService pirService;
     @Autowired private IdMappingJobCacheService cacheService;
