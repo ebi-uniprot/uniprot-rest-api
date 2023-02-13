@@ -100,6 +100,8 @@ public class UniProtKBMessageListenerTest {
         // verify the ids file is cleaned up during IOException
         Path idsFilePath = Path.of("target/" + jobId);
         Assertions.assertTrue(Files.notExists(idsFilePath));
+        Path resultFilePath = Path.of("target/" + jobId + ".json");
+        Assertions.assertTrue(Files.notExists(resultFilePath));
     }
 
     @Test

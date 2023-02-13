@@ -59,7 +59,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
         this.rdfStreamer = rdfStreamer;
     }
 
-    public String writeResult(
+    public void writeResult(
             DownloadRequest request,
             Path idFile,
             String jobId,
@@ -101,7 +101,6 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, output, start, counter);
         }
-        return resultFile;
     }
 
     private AbstractUUWHttpMessageConverter<T, T> getOutputWriter(

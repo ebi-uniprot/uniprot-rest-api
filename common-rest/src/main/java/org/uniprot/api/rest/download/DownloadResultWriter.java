@@ -9,7 +9,7 @@ import org.uniprot.api.rest.request.DownloadRequest;
 
 public interface DownloadResultWriter {
 
-    String writeResult(
+    void writeResult(
             DownloadRequest request,
             Path idFile,
             String jobId,
