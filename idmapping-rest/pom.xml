@@ -19,7 +19,8 @@
 
 		<jayway.version>2.4.0</jayway.version>
 		<redisson-version>3.17.4</redisson-version>
-		<embedded-redis.version>0.7.2</embedded-redis.version>
+		<testcontainers.version>1.17.6</testcontainers.version>
+		<jna.version>5.8.0</jna.version>
 	</properties>
 
 	<dependencies>
@@ -168,11 +169,28 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
-		<!-- Embedded Redis Server -->
 		<dependency>
-			<groupId>it.ozimov</groupId>
-			<artifactId>embedded-redis</artifactId>
-			<version>${embedded-redis.version}</version>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.java.dev.jna</groupId>
+					<artifactId>jna</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
