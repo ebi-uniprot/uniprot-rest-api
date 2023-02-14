@@ -226,6 +226,7 @@ public class UniProtEntryService
         if (filterIsoform) {
             addIsoformFilter(solrRequest);
         }
+        solrRequest.setLargeSolrStreamRestricted(uniProtRequest.isLargeSolrStreamRestricted());
         return solrRequest;
     }
 

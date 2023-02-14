@@ -33,7 +33,7 @@ public class RedisConfiguration {
 
     @Bean(destroyMethod = "shutdown")
     @Profile("asyncDownload & live")
-    public RedissonClient redisson(@Value("classpath:/redisson.yaml") Resource configFile)
+    public RedissonClient redisson(@Value("${download.redis.config.file}") Resource configFile)
             throws IOException {
         Config config = Config.fromYAML(configFile.getInputStream());
         RedissonClient client = Redisson.create(config);

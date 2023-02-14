@@ -84,6 +84,8 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
             request.setContentType(APPLICATION_JSON_VALUE);
         }
 
+        request.setLargeSolrStreamRestricted(false);
+
         this.messageService.sendMessage(request, messageHeader);
         return ResponseEntity.ok(new JobSubmitResponse(jobId));
     }
