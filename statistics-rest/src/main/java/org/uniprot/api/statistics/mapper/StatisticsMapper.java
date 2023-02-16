@@ -3,9 +3,7 @@ package org.uniprot.api.statistics.mapper;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
-import org.uniprot.api.statistics.model.StatisticAttribute;
-import org.uniprot.api.statistics.model.StatisticCategory;
-import org.uniprot.api.statistics.model.StatisticType;
+import org.uniprot.api.statistics.model.*;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -24,16 +22,6 @@ public class StatisticsMapper {
                 String.format("Statistic type %s is not recognized", statisticsEntryType));
     }
 
-    public StatisticAttribute map(UniprotkbStatisticsEntry entry) {
-        return StatisticAttribute.builder()
-                .name(entry.getAttributeName())
-                .count(entry.getValueCount())
-                .entryCount(entry.getEntryCount())
-                .description(entry.getDescription())
-                .statisticType(map(entry.getEntryType()))
-                .build();
-    }
-
     private StatisticType map(EntryType entryType) {
         switch (entryType) {
             case TREMBL:
@@ -45,17 +33,18 @@ public class StatisticsMapper {
                 String.format("Entry type %s is not recognized", entryType));
     }
 
-    public Collection<StatisticCategory> map(Collection<UniprotkbStatisticsEntry> entries) {
-        return entries.stream()
-                .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategoryId))
-                .entrySet()
-                .stream()
-                .map(entry -> map(entry.getKey().getCategory(), entry.getValue()))
-                .collect(Collectors.toList());
+    public StatisticAttribute map(UniprotkbStatisticsEntry entry) {
+        return StatisticAttributeImpl.builder()
+                .name(entry.getAttributeName())
+                .count(entry.getValueCount())
+                .entryCount(entry.getEntryCount())
+                .description(entry.getDescription())
+                .statisticType(map(entry.getEntryType()))
+                .build();
     }
 
     public StatisticCategory map(String category, Collection<UniprotkbStatisticsEntry> entries) {
-        return StatisticCategory.builder()
+        return StatisticCategoryImpl.builder()
                 .name(category)
                 .totalCount(
                         entries.stream()
