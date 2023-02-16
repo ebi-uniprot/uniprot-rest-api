@@ -1,6 +1,7 @@
 package org.uniprot.api.statistics.service;
 
 import org.springframework.stereotype.Service;
+import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.mapper.StatisticsMapper;
 import org.uniprot.api.statistics.model.StatisticAttribute;
 import org.uniprot.api.statistics.model.StatisticCategory;
@@ -8,7 +9,8 @@ import org.uniprot.api.statistics.model.StatisticType;
 import org.uniprot.api.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.statistics.repository.UniprotkbStatisticsEntryRepository;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisticService {
@@ -26,25 +28,21 @@ public class StatisticService {
         this.statisticsMapper = statisticsMapper;
     }
 
-    public Collection<StatisticCategory> findAllByVersionAndStatisticType(
-            String version, StatisticType statisticsType) {
-        return statisticsMapper.map(
-                statisticsEntryRepository.findAllByReleaseNameAndEntryType(
-                        version, statisticsMapper.map(statisticsType)));
+    public List<StatisticCategory> findAllByVersionAndStatisticType(String version, StatisticType statisticsType) {
+        return statisticsEntryRepository.findAllByReleaseNameAndEntryType(version, statisticsMapper.map(statisticsType))
+                .stream()
+                .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategoryId))
+                .entrySet().stream().map(entry -> statisticsMapper.map(entry.getKey().getCategory(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
-    public StatisticCategory findAllByVersionAndStatisticTypeAndCategory(
-            String version, StatisticType statisticsType, String category) {
-        return statisticsMapper.map(category, statisticsEntryRepository
-                .findAllByReleaseNameAndEntryTypeAndStatisticsCategoryId(
-                        version,
+    public StatisticCategory findAllByVersionAndStatisticTypeAndCategory(String version, StatisticType statisticsType, String category) {
+        return statisticsEntryRepository
+                .findAllByReleaseNameAndEntryTypeAndStatisticsCategoryId(version,
                         statisticsMapper.map(statisticsType),
-                        statisticsCategoryRepository
-                                .findByCategory(category)
-                                .orElseThrow(
-                                        () ->
-                                                new IllegalArgumentException(
-                                                        "Category " + category + " not found"))));
+                        statisticsCategoryRepository.findByCategory(category).orElseThrow(() -> new IllegalArgumentException("Category " + category + " not found")))
+                .stream()
+                .collect(Collectors.collectingAndThen(Collectors.toList(), list -> statisticsMapper.map(category, list)));
     }
 
     public StatisticAttribute findAllByVersionAndStatisticTypeAndCategoryAndAttribute(
@@ -53,14 +51,7 @@ public class StatisticService {
                 .findByReleaseNameAndEntryTypeAndStatisticsCategoryIdAndAttributeName(
                         version,
                         statisticsMapper.map(statisticsType),
-                        statisticsCategoryRepository
-                                .findByCategory(category)
-                                .orElseThrow(
-                                        () ->
-                                                new IllegalArgumentException(
-                                                        "Category " + category + " not found")),
-                        attribute)
-                .map(statisticsMapper::map).orElseThrow(() -> new IllegalArgumentException(
-                        "No matching record for Version" + version + " and Category " + category + " and attribute " + attribute));
+                        statisticsCategoryRepository.findByCategory(category).orElseThrow(() -> new IllegalArgumentException("Category " + category + " not found")), attribute)
+                .map(statisticsMapper::map).orElseThrow(() -> new IllegalArgumentException("No matching record for Version" + version + " and Category " + category + " and attribute " + attribute));
     }
 }
