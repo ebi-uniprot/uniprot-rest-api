@@ -74,6 +74,7 @@
 		<module>aa-rest</module>
 		<module>idmapping-rest</module>
 		<module>help-centre-rest</module>
+		<module>statistics-rest</module>
 		<module>jacoco-aggregate-report</module>
 	</modules>
 
