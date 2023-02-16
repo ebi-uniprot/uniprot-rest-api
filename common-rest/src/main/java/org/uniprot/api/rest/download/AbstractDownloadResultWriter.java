@@ -28,7 +28,6 @@ import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
@@ -66,8 +65,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             MediaType contentType,
             StoreRequest storeRequest)
             throws IOException {
-        String resultFile = jobId + "." + UniProtMediaType.getFileExtension(contentType);
-        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFile);
+        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), jobId);
         AbstractUUWHttpMessageConverter<T, T> outputWriter =
                 getOutputWriter(contentType, getType());
         try (Stream<String> ids = Files.lines(idFile);

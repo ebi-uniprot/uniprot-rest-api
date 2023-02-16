@@ -25,7 +25,6 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.solrstream.AbstractTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
-import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.core.util.Utils;
 
 /**

@@ -22,7 +22,6 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -63,8 +62,7 @@ public class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT 
                                 "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
                                 "P00007", "P00008", "P00009", "P00010")));
         // verify result file
-        String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + fileExt);
+        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
         Assertions.assertTrue(Files.exists(resultFilePath));
         String resultsJson = Files.readString(resultFilePath);
         List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");

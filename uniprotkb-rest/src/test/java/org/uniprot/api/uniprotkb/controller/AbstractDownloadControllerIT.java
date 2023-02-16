@@ -79,7 +79,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(redirectedUrlPattern("**/uniprotkb/download/results/" + jobId + ".json"))
+                .andExpect(redirectedUrlPattern("**/uniprotkb/download/results/" + jobId))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist());
         verifyIdsAndResultFiles(jobId, MediaType.APPLICATION_JSON);
@@ -124,7 +124,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         "P00003", "P00002", "P00001"));
         // verify result file
         String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + fileExt);
+        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
         Assertions.assertTrue(Files.exists(resultFilePath));
         String resultsJson = Files.readString(resultFilePath);
         List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
@@ -363,7 +363,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(redirectedUrlPattern("**/uniprotkb/download/results/" + jobId + ".json"))
+                .andExpect(redirectedUrlPattern("**/uniprotkb/download/results/" + jobId))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist());
 
@@ -374,8 +374,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         Assertions.assertNotNull(ids);
         Assertions.assertTrue(ids.isEmpty());
         // verify result file
-        String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + fileExt);
+        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
         Assertions.assertTrue(Files.exists(resultFilePath));
         String resultsJson = Files.readString(resultFilePath);
         List<String> results = JsonPath.read(resultsJson, "$.results");
@@ -444,12 +443,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         // when
         ResultActions response = callGetJobDetails(jobId);
         // then
-        String expectedResult = jobId + "." + UniProtMediaType.getFileExtension(contentType);
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.query", Matchers.notNullValue()))
-                .andExpect(jsonPath("$.redirectURL", Matchers.endsWith(expectedResult)))
+                .andExpect(jsonPath("$.redirectURL", Matchers.endsWith(jobId)))
                 .andExpect(jsonPath("$.errors").doesNotExist());
     }
 

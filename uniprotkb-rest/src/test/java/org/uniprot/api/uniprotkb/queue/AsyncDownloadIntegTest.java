@@ -175,6 +175,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         String query = "field:value";
         UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
         request.setQuery(query);
+        request.setLargeSolrStreamRestricted(false);
         request.setContentType(contentType.toString());
         String jobId = this.hashGenerator.generateHash(request);
         IllegalArgumentException ile =
@@ -206,6 +207,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
         request.setQuery(query);
         request.setContentType(contentType.toString());
+        request.setLargeSolrStreamRestricted(false);
         return request;
     }
 
@@ -299,8 +301,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
         // verify result file
-        String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + fileExt);
+        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
         Assertions.assertTrue(Files.exists(resultFilePath));
         String resultsJson = Files.readString(resultFilePath);
         Assertions.assertNotNull(resultsJson);
