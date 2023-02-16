@@ -128,8 +128,7 @@ public class UniProtKBMessageListener implements MessageListener {
         String jobId = downloadJob.getId();
         MediaType contentType = UniProtMediaType.valueOf(request.getContentType());
         Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
-        Path resultFile =
-                Paths.get(downloadConfigProperties.getResultFilesFolder(), jobId);
+        Path resultFile = Paths.get(downloadConfigProperties.getResultFilesFolder(), jobId);
         if (Files.exists(idsFile) && Files.exists(resultFile)) {
             log.info("The job {} is already processed", jobId);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED);

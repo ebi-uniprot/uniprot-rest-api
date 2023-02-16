@@ -61,6 +61,7 @@ public class RabbitMQConfig {
         return QueueBuilder.durable(rabbitMQConfigProperties.getQueueName())
                 .deadLetterExchange(rabbitMQConfigProperties.getExchangeName())
                 .deadLetterRoutingKey(rabbitMQConfigProperties.getRetryQueueName())
+                .ttl(rabbitMQConfigProperties.getTtlInMillis())
                 .quorum()
                 .build();
     }

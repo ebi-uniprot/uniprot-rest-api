@@ -39,4 +39,6 @@ public class RabbitMQConfigProperties {
     private String retryQueueName;
 
     private String rejectedQueueName;
+
+    private int ttlInMillis;
 }
