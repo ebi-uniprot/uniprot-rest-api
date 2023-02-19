@@ -1,0 +1,49 @@
+package org.uniprot.api.statistics.repository;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.uniprot.api.statistics.entity.StatisticsCategory;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.uniprot.api.statistics.repository.EntityGeneratorUtil.STATISTICS_CATEGORIES;
+
+@ExtendWith(SpringExtension.class)
+@DataJpaTest
+class StatisticsCategoryRepositoryIT {
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
+    private StatisticsCategoryRepository statisticsCategoryRepository;
+
+    @BeforeEach
+    void setUp() {
+        Arrays.stream(STATISTICS_CATEGORIES).forEach(entityManager::persist);
+    }
+
+    @Test
+    void findByCategory() {
+        Optional<StatisticsCategory> result = statisticsCategoryRepository.findByCategory("cat0");
+
+        assertTrue(result.isPresent());
+        assertThat(result.get(), equalTo(STATISTICS_CATEGORIES[0]));
+    }
+
+    @Test
+    void findByCategoryWhenNoMatch() {
+        Optional<StatisticsCategory> result = statisticsCategoryRepository.findByCategory("cat3");
+
+        assertFalse(result.isPresent());
+    }
+}
