@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.uniprot.api.statistics.repository.EntityGeneratorUtil.STATISTICS_CATEGORIES;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest

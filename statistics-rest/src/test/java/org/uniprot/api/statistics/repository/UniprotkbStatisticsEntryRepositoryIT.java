@@ -17,8 +17,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.uniprot.api.statistics.entity.EntryType.SWISSPROT;
-import static org.uniprot.api.statistics.repository.EntityGeneratorUtil.STATISTICS_CATEGORIES;
-import static org.uniprot.api.statistics.repository.EntityGeneratorUtil.STATISTICS_ENTRIES;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_ENTRIES;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest

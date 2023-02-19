@@ -1,4 +1,4 @@
-package org.uniprot.api.statistics.repository;
+package org.uniprot.api.statistics;
 
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.StatisticsCategory;
@@ -7,22 +7,22 @@ import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import static org.uniprot.api.statistics.entity.EntryType.SWISSPROT;
 import static org.uniprot.api.statistics.entity.EntryType.TREMBL;
 
-public class EntityGeneratorUtil {
-    private static final Long[] STAT_IDS = new Long[]{12L, 91L};
-    private static final String[] STAT_CATEGORIES_NAMES = new String[]{"cat0", "cat1"};
-    private static final String DB_TYPE = "dbType";
-    private static final Long[] ENTRY_IDS = new Long[]{34L, 411L, 999L, 1L};
-    private static final String[] ENTRY_NAMES = new String[]{"name0", "name1", "name2", "name3"};
-    private static final int[] STAT_CATEGORY_IDS = new int[]{0, 0, 1, 1};
-    private static final Long[] VALUE_COUNTS = new Long[]{3L, 27L, 9999L, 500L};
-    private static final Long[] ENTRY_COUNTS = new Long[]{31L, 25L, 188999L, 1098L};
-    private static final String[] DESCRIPTIONS = new String[]{"des0", "des1", "des2", "des3"};
-    private static final String[] RELEASES = new String[]{"rel0", "rel0", "rel1", "rel0"};
-    private static final EntryType[] ENTRY_TYPES =
+public class TestEntityGeneratorUtil {
+    public static final Long[] STAT_IDS = new Long[]{12L, 91L};
+    public static final String[] STAT_CATEGORIES_NAMES = new String[]{"cat0", "cat1"};
+    public static final String DB_TYPE = "dbType";
+    public static final Long[] ENTRY_IDS = new Long[]{34L, 411L, 999L, 1L};
+    public static final String[] ENTRY_NAMES = new String[]{"name0", "name1", "name2", "name3"};
+    public static final int[] STAT_CATEGORY_IDS = new int[]{0, 0, 1, 1};
+    public static final Long[] VALUE_COUNTS = new Long[]{3L, 27L, 9999L, 500L};
+    public static final Long[] ENTRY_COUNTS = new Long[]{31L, 25L, 188999L, 1098L};
+    public static final String[] DESCRIPTIONS = new String[]{"des0", "des1", "des2", "des3"};
+    public static final String[] RELEASES = new String[]{"rel0", "rel0", "rel1", "rel0"};
+    public static final EntryType[] ENTRY_TYPES =
             new EntryType[]{SWISSPROT, SWISSPROT, TREMBL, SWISSPROT};
-    static final StatisticsCategory[] STATISTICS_CATEGORIES =
+    public static final StatisticsCategory[] STATISTICS_CATEGORIES =
             new StatisticsCategory[]{createStatisticsCategory(0), createStatisticsCategory(1)};
-    static final UniprotkbStatisticsEntry[] STATISTICS_ENTRIES =
+    public static final UniprotkbStatisticsEntry[] STATISTICS_ENTRIES =
             new UniprotkbStatisticsEntry[]{
                     createStatisticsEntry(0),
                     createStatisticsEntry(1),
