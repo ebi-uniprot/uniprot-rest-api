@@ -5,6 +5,6 @@ import lombok.Value;
 import java.util.Collection;
 
 @Value
-public class StatisticResult<T>{
+public class StatisticResult<T> {
     Collection<T> results;
 }
