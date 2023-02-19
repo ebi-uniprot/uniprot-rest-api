@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum StatisticType {
     REVIEWED("reviewed"),
-    UNREVIWED("unreviewed");
+    UNREVIEWED("unreviewed");
 
     private final String value;
 
