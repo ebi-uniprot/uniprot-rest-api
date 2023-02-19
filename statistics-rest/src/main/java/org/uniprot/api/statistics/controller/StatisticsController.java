@@ -2,23 +2,18 @@ package org.uniprot.api.statistics.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.statistics.model.StatisticAttribute;
+import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.statistics.model.StatisticCategory;
 import org.uniprot.api.statistics.model.StatisticResult;
-import org.uniprot.api.statistics.model.StatisticType;
 import org.uniprot.api.statistics.service.StatisticService;
 
-import java.util.Collections;
+import java.util.Collection;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
 @Validated
-@RequestMapping("/statistics")
+@RequestMapping("/statistics/releases")
 public class StatisticsController {
     private final StatisticService statisticsService;
 
@@ -27,38 +22,16 @@ public class StatisticsController {
     }
 
     @GetMapping(
-            value = "/{version}/{statisticType}",
+            value = "/{release}/{statisticType}",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<StatisticResult<StatisticCategory>> getAllByVersion(@PathVariable String version, @PathVariable StatisticType statisticType) {
-        return ResponseEntity.ok()
-                .body(new StatisticResult<>(statisticsService.findAllByVersionAndStatisticType(version, statisticType)));
-    }
-
-    @GetMapping(
-            value = "/{version}/{statisticType}/{category}",
-            produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<StatisticResult<StatisticCategory>>
-    getAllByVersionAndStatisticTypeAndCategory(
-            @PathVariable String version,
-            @PathVariable StatisticType statisticType,
-            @PathVariable String category) {
+    public ResponseEntity<StatisticResult<StatisticCategory>> getAllByVersionAndCategoryIn(
+            @PathVariable String release,
+            @PathVariable String statisticType,
+            @RequestParam(required = false, defaultValue = "") Collection<String> categories) {
         return ResponseEntity.ok()
                 .body(
-                        new StatisticResult<>(Collections.singletonList(
-                                statisticsService.findAllByVersionAndStatisticTypeAndCategory(version, statisticType, category))));
-    }
-
-    @GetMapping(
-            value = "/{version}/{statisticType}/{category}/{attribute}",
-            produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<StatisticResult<StatisticAttribute>>
-    getAllByVersionAndStatisticTypeAndStatisticCategoryAndAttributeName(
-            @PathVariable String version,
-            @PathVariable StatisticType statisticType,
-            @PathVariable String category,
-            @PathVariable String attribute) {
-        return ResponseEntity.ok()
-                .body(new StatisticResult<>(Collections.singletonList(
-                        statisticsService.findAllByVersionAndStatisticTypeAndCategoryAndAttribute(version, statisticType, category, attribute))));
+                        new StatisticResult<>(
+                                statisticsService.findAllByVersionAndStatisticTypeAndCategoryIn(
+                                        release, statisticType, categories)));
     }
 }

@@ -11,23 +11,23 @@ import java.util.stream.Collectors;
 @Component
 public class StatisticsMapper {
 
-    public EntryType map(StatisticType statisticsEntryType) {
-        switch (statisticsEntryType) {
-            case TREMBL:
+    public EntryType map(String statisticType) {
+        switch (StatisticType.valueOf(statisticType.toUpperCase())) {
+            case UNREVIWED:
                 return EntryType.TREMBL;
-            case SWISSPROT:
+            case REVIEWED:
                 return EntryType.SWISSPROT;
         }
         throw new IllegalArgumentException(
-                String.format("Statistic type %s is not recognized", statisticsEntryType));
+                String.format("Statistic type %s is not recognized", statisticType));
     }
 
     private StatisticType map(EntryType entryType) {
         switch (entryType) {
             case TREMBL:
-                return StatisticType.TREMBL;
+                return StatisticType.UNREVIWED;
             case SWISSPROT:
-                return StatisticType.SWISSPROT;
+                return StatisticType.REVIEWED;
         }
         throw new IllegalArgumentException(
                 String.format("Entry type %s is not recognized", entryType));
@@ -43,25 +43,32 @@ public class StatisticsMapper {
                 .build();
     }
 
-    public StatisticCategory map(String category, Collection<UniprotkbStatisticsEntry> entries) {
-        return StatisticCategoryImpl.builder()
-                .name(category)
-                .totalCount(
-                        entries.stream()
-                                .mapToLong(
-                                        UniprotkbStatisticsEntry
-                                                ::getValueCount)
-                                .sum())
-                .totalEntryCount(
-                        entries.stream()
-                                .mapToLong(
-                                        UniprotkbStatisticsEntry
-                                                ::getEntryCount)
-                                .sum())
-                .attributes(
-                        entries.stream()
-                                .map(this::map)
-                                .collect(Collectors.toList()))
-                .build();
+    public Collection<StatisticCategory> map(Collection<UniprotkbStatisticsEntry> entries) {
+        return entries.stream()
+                .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategoryId))
+                .keySet()
+                .stream()
+                .map(
+                        entry ->
+                                StatisticCategoryImpl.builder()
+                                        .name(entry.getCategory())
+                                        .totalCount(
+                                                entries.stream()
+                                                        .mapToLong(
+                                                                UniprotkbStatisticsEntry
+                                                                        ::getValueCount)
+                                                        .sum())
+                                        .totalEntryCount(
+                                                entries.stream()
+                                                        .mapToLong(
+                                                                UniprotkbStatisticsEntry
+                                                                        ::getEntryCount)
+                                                        .sum())
+                                        .attributes(
+                                                entries.stream()
+                                                        .map(this::map)
+                                                        .collect(Collectors.toList()))
+                                        .build())
+                .collect(Collectors.toList());
     }
 }

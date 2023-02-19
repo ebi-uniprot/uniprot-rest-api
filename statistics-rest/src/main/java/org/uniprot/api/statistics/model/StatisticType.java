@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum StatisticType {
-    SWISSPROT("Swiss-Prot"),
-    TREMBL("TrEMBL");
+    REVIEWED("reviewed"),
+    UNREVIWED("unreviewed");
 
     private final String value;
 
