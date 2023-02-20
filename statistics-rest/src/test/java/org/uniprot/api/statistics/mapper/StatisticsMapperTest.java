@@ -1,21 +1,24 @@
 package org.uniprot.api.statistics.mapper;
 
-import org.junit.jupiter.api.BeforeEach;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_ENTRIES;
+
+import java.util.List;
+
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.model.StatisticAttribute;
+import org.uniprot.api.statistics.model.StatisticCategory;
 import org.uniprot.api.statistics.model.StatisticType;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_ENTRIES;
 
 class StatisticsMapperTest {
     private final StatisticsMapper statisticsMapper = new StatisticsMapper();
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void mapStatisticTypeToEntryType() {
@@ -49,14 +52,68 @@ class StatisticsMapperTest {
     void mapUniprotkbStatisticsEntryToStatisticAttribute() {
         UniprotkbStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
         StatisticAttribute statisticAttribute = statisticsMapper.map(statisticsEntry);
-        assertUniprotkbStatisticsEntryToStatisticAttributeMapping(statisticsEntry, statisticAttribute);
+        assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
+                statisticsEntry, statisticAttribute);
     }
 
-    private static void assertUniprotkbStatisticsEntryToStatisticAttributeMapping(UniprotkbStatisticsEntry expect, StatisticAttribute actual) {
+    private static void assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
+            UniprotkbStatisticsEntry expect, StatisticAttribute actual) {
         assertSame(expect.getAttributeName(), actual.getName());
-        assertSame(expect.getValueCount(), actual.getCount());
-        assertSame(expect.getEntryCount(), actual.getEntryCount());
+        assertEquals(expect.getValueCount(), actual.getCount());
+        assertEquals(expect.getEntryCount(), actual.getEntryCount());
         assertSame(expect.getDescription(), actual.getDescription());
         assertEquals(StatisticType.REVIEWED, actual.getStatisticType());
+    }
+
+    @Test
+    void mapStatisticsCategoryAndUniprotkbStatisticsEntriesToStatisticCategory() {
+        StatisticCategory result =
+                statisticsMapper.map(
+                        STATISTICS_CATEGORIES[0],
+                        List.of(
+                                STATISTICS_ENTRIES[0],
+                                STATISTICS_ENTRIES[1],
+                                STATISTICS_ENTRIES[3]));
+        assertSame(STATISTICS_CATEGORIES[0].getCategory(), result.getName());
+        assertEquals(
+                STATISTICS_ENTRIES[0].getValueCount()
+                        + STATISTICS_ENTRIES[1].getValueCount()
+                        + STATISTICS_ENTRIES[3].getValueCount(),
+                result.getTotalCount());
+        assertEquals(
+                STATISTICS_ENTRIES[0].getEntryCount()
+                        + STATISTICS_ENTRIES[1].getEntryCount()
+                        + STATISTICS_ENTRIES[3].getEntryCount(),
+                result.getTotalEntryCount());
+        assertThat(
+                result.getAttributes(),
+                containsInAnyOrder(
+                        new UniprotkbStatisticsEntryToStatisticAttributeMappingMatcher(
+                                STATISTICS_ENTRIES[0]),
+                        new UniprotkbStatisticsEntryToStatisticAttributeMappingMatcher(
+                                STATISTICS_ENTRIES[1]),
+                        new UniprotkbStatisticsEntryToStatisticAttributeMappingMatcher(
+                                STATISTICS_ENTRIES[3])));
+    }
+
+    private static class UniprotkbStatisticsEntryToStatisticAttributeMappingMatcher
+            extends TypeSafeMatcher<StatisticAttribute> {
+        private final UniprotkbStatisticsEntry statisticsEntry;
+
+        public UniprotkbStatisticsEntryToStatisticAttributeMappingMatcher(
+                UniprotkbStatisticsEntry statisticsEntry) {
+            this.statisticsEntry = statisticsEntry;
+        }
+
+        @Override
+        protected boolean matchesSafely(StatisticAttribute item) {
+            assertUniprotkbStatisticsEntryToStatisticAttributeMapping(statisticsEntry, item);
+            return true;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("Given entry is similar with ").appendValue(statisticsEntry);
+        }
     }
 }

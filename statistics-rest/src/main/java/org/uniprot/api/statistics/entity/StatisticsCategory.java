@@ -1,9 +1,9 @@
 package org.uniprot.api.statistics.entity;
 
-import lombok.Data;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import lombok.Data;
 
 @Data
 @Entity

@@ -1,16 +1,15 @@
 package org.uniprot.api.statistics.service;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.mapper.StatisticsMapper;
 import org.uniprot.api.statistics.model.StatisticCategory;
-import org.uniprot.api.statistics.model.StatisticCategoryImpl;
 import org.uniprot.api.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.statistics.repository.UniprotkbStatisticsEntryRepository;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class StatisticService {
@@ -54,25 +53,11 @@ public class StatisticService {
                                                                                                     + " not found")))
                                             .collect(Collectors.toList()));
         }
-        return entries.stream().collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategoryId))
-                .entrySet().stream().map(entry -> StatisticCategoryImpl.builder()
-                        .name(entry.getKey().getCategory())
-                        .totalCount(
-                                entry.getValue().stream()
-                                        .mapToLong(
-                                                UniprotkbStatisticsEntry
-                                                        ::getValueCount)
-                                        .sum())
-                        .totalEntryCount(
-                                entry.getValue().stream()
-                                        .mapToLong(
-                                                UniprotkbStatisticsEntry
-                                                        ::getEntryCount)
-                                        .sum())
-                        .attributes(
-                                entry.getValue().stream()
-                                        .map(statisticsMapper::map)
-                                        .collect(Collectors.toList()))
-                        .build()).collect(Collectors.toList());
+        return entries.stream()
+                .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategoryId))
+                .entrySet()
+                .stream()
+                .map(entry -> statisticsMapper.map(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 }
