@@ -1,15 +1,15 @@
 package org.uniprot.api.statistics.controller;
 
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
+import java.util.Collection;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.statistics.model.StatisticCategory;
 import org.uniprot.api.statistics.model.StatisticResult;
 import org.uniprot.api.statistics.service.StatisticService;
-
-import java.util.Collection;
-
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @RestController
 @Validated
