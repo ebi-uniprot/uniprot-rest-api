@@ -18,6 +18,7 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -31,29 +32,28 @@ class StatisticServiceTest {
     private static final String VERSION = "version";
     public static final String CATEGORY_0 = "cat0";
     public static final String CATEGORY_1 = "cat1";
-    @Mock private StatisticCategory statisticCategory0;
-    @Mock private StatisticCategory statisticCategory1;
-    @Mock private StatisticCategory statisticCategory2;
-    @Mock private StatisticsCategory statisticsCategory0;
-    @Mock private StatisticsCategory statisticsCategory1;
-    @Mock private UniprotkbStatisticsEntryRepository statisticsEntryRepository;
-    @Mock private StatisticsCategoryRepository statisticsCategoryRepository;
-    @Mock private StatisticsMapper statisticsMapper;
-    @InjectMocks private StatisticService statisticService;
+    @Mock
+    private StatisticCategory statisticCategory0;
+    @Mock
+    private StatisticCategory statisticCategory1;
+    @Mock
+    private StatisticCategory statisticCategory2;
+    @Mock
+    private StatisticsCategory statisticsCategory0;
+    @Mock
+    private StatisticsCategory statisticsCategory1;
+    @Mock
+    private UniprotkbStatisticsEntryRepository statisticsEntryRepository;
+    @Mock
+    private StatisticsCategoryRepository statisticsCategoryRepository;
+    @Mock
+    private StatisticsMapper statisticsMapper;
+    @InjectMocks
+    private StatisticService statisticService;
 
     @BeforeEach
     void setUp() {
         when(statisticsMapper.map(STATISTIC_TYPE)).thenReturn(ENTRY_TYPE);
-        when(statisticsMapper.map(
-                        eq(STATISTICS_CATEGORIES[0]),
-                        argThat(
-                                argument ->
-                                        matchWithEntries(
-                                                argument,
-                                                List.of(
-                                                        STATISTICS_ENTRIES[0],
-                                                        STATISTICS_ENTRIES[1])))))
-                .thenReturn(statisticCategory0);
     }
 
     private static boolean matchWithEntries(
@@ -67,11 +67,11 @@ class StatisticServiceTest {
     @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenEmptyListOfCategoriesPassed() {
         when(statisticsMapper.map(
-                        eq(STATISTICS_CATEGORIES[2]),
-                        argThat(
-                                argument ->
-                                        matchWithEntries(
-                                                argument, List.of(STATISTICS_ENTRIES[4])))))
+                eq(STATISTICS_CATEGORIES[2]),
+                argThat(
+                        argument ->
+                                matchWithEntries(
+                                        argument, List.of(STATISTICS_ENTRIES[4])))))
                 .thenReturn(statisticCategory2);
         when(statisticsEntryRepository.findAllByReleaseNameAndEntryType(VERSION, ENTRY_TYPE))
                 .thenReturn(
@@ -81,12 +81,14 @@ class StatisticServiceTest {
                                 STATISTICS_ENTRIES[3],
                                 STATISTICS_ENTRIES[4]));
         when(statisticsMapper.map(
-                        eq(STATISTICS_CATEGORIES[1]),
-                        argThat(
-                                argument ->
-                                        matchWithEntries(
-                                                argument, List.of(STATISTICS_ENTRIES[3])))))
+                eq(STATISTICS_CATEGORIES[1]),
+                argThat(
+                        argument ->
+                                matchWithEntries(
+                                        argument, List.of(STATISTICS_ENTRIES[3])))))
                 .thenReturn(statisticCategory1);
+        when(statisticsMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+                .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =
                 statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
@@ -104,20 +106,21 @@ class StatisticServiceTest {
         when(statisticsCategoryRepository.findByCategory(CATEGORY_1))
                 .thenReturn(Optional.of(statisticsCategory1));
         when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
-                        VERSION, ENTRY_TYPE, List.of(statisticsCategory0, statisticsCategory1)))
-                .thenAnswer(
-                        invocation ->
-                                List.of(
-                                        STATISTICS_ENTRIES[0],
-                                        STATISTICS_ENTRIES[1],
-                                        STATISTICS_ENTRIES[3]));
+                VERSION, ENTRY_TYPE, List.of(statisticsCategory0, statisticsCategory1)))
+                .thenReturn(
+                        List.of(
+                                STATISTICS_ENTRIES[0],
+                                STATISTICS_ENTRIES[1],
+                                STATISTICS_ENTRIES[3]));
         when(statisticsMapper.map(
-                        eq(STATISTICS_CATEGORIES[1]),
-                        argThat(
-                                argument ->
-                                        matchWithEntries(
-                                                argument, List.of(STATISTICS_ENTRIES[3])))))
+                eq(STATISTICS_CATEGORIES[1]),
+                argThat(
+                        argument ->
+                                matchWithEntries(
+                                        argument, List.of(STATISTICS_ENTRIES[3])))))
                 .thenReturn(statisticCategory1);
+        when(statisticsMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+                .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =
                 statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
@@ -131,13 +134,24 @@ class StatisticServiceTest {
         when(statisticsCategoryRepository.findByCategory(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
         when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
-                        VERSION, ENTRY_TYPE, List.of(statisticsCategory0)))
-                .thenAnswer(invocation -> List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
+                VERSION, ENTRY_TYPE, List.of(statisticsCategory0)))
+                .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
+        when(statisticsMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+                .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =
                 statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
                         VERSION, STATISTIC_TYPE, List.of(CATEGORY_0));
 
         assertThat(results, containsInAnyOrder(statisticCategory0));
+    }
+
+    @Test
+    void findAllByVersionAndStatisticTypeAndCategoryIn_whenWrongCategoryIsPassed() {
+        when(statisticsCategoryRepository.findByCategory(CATEGORY_0))
+                .thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
+                VERSION, STATISTIC_TYPE, List.of(CATEGORY_0)));
     }
 }
