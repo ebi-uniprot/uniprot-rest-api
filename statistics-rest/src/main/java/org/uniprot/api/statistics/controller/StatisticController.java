@@ -1,9 +1,5 @@
 package org.uniprot.api.statistics.controller;
 
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-
-import java.util.Collection;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -11,14 +7,18 @@ import org.uniprot.api.statistics.model.StatisticCategory;
 import org.uniprot.api.statistics.model.StatisticResult;
 import org.uniprot.api.statistics.service.StatisticService;
 
+import java.util.Collection;
+
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+
 @RestController
 @Validated
 @RequestMapping("/statistics/releases")
-public class StatisticsController {
-    private final StatisticService statisticsService;
+public class StatisticController {
+    private final StatisticService statisticService;
 
-    public StatisticsController(StatisticService statisticsService) {
-        this.statisticsService = statisticsService;
+    public StatisticController(StatisticService statisticService) {
+        this.statisticService = statisticService;
     }
 
     @GetMapping(
@@ -31,7 +31,7 @@ public class StatisticsController {
         return ResponseEntity.ok()
                 .body(
                         new StatisticResult<>(
-                                statisticsService.findAllByVersionAndStatisticTypeAndCategoryIn(
+                                statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
                                         release, statisticType, categories)));
     }
 }

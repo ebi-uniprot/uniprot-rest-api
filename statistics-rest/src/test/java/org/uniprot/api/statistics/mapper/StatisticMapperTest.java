@@ -17,41 +17,41 @@ import org.uniprot.api.statistics.model.StatisticAttribute;
 import org.uniprot.api.statistics.model.StatisticCategory;
 import org.uniprot.api.statistics.model.StatisticType;
 
-class StatisticsMapperTest {
-    private final StatisticsMapper statisticsMapper = new StatisticsMapper();
+class StatisticMapperTest {
+    private final StatisticMapper statisticMapper = new StatisticMapper();
 
     @Test
     void mapStatisticTypeToEntryType() {
-        EntryType result = statisticsMapper.map("reviewed");
+        EntryType result = statisticMapper.map("reviewed");
 
         assertEquals(EntryType.SWISSPROT, result);
     }
 
     @Test
     void mapStatisticTypeToEntryType_whenCaseMixed() {
-        EntryType result = statisticsMapper.map("UnrEvieweD");
+        EntryType result = statisticMapper.map("UnrEvieweD");
 
         assertEquals(EntryType.TREMBL, result);
     }
 
     @Test
     void mapStatisticTypeToEntryType_whenNoMatch() {
-        assertThrows(IllegalArgumentException.class, () -> statisticsMapper.map("NoMatch"));
+        assertThrows(IllegalArgumentException.class, () -> statisticMapper.map("NoMatch"));
     }
 
     @Test
     void mapEntryTypeToStatisticType() {
-        StatisticType result = statisticsMapper.map(EntryType.TREMBL);
+        StatisticType result = statisticMapper.map(EntryType.TREMBL);
         assertEquals(StatisticType.UNREVIEWED, result);
 
-        result = statisticsMapper.map(EntryType.SWISSPROT);
+        result = statisticMapper.map(EntryType.SWISSPROT);
         assertEquals(StatisticType.REVIEWED, result);
     }
 
     @Test
     void mapUniprotkbStatisticsEntryToStatisticAttribute() {
         UniprotkbStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
-        StatisticAttribute statisticAttribute = statisticsMapper.map(statisticsEntry);
+        StatisticAttribute statisticAttribute = statisticMapper.map(statisticsEntry);
         assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
                 statisticsEntry, statisticAttribute);
     }
@@ -68,7 +68,7 @@ class StatisticsMapperTest {
     @Test
     void mapStatisticsCategoryAndUniprotkbStatisticsEntriesToStatisticCategory() {
         StatisticCategory result =
-                statisticsMapper.map(
+                statisticMapper.map(
                         STATISTICS_CATEGORIES[0],
                         List.of(
                                 STATISTICS_ENTRIES[0],
