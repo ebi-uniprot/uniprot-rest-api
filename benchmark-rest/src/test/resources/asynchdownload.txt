@@ -1,0 +1,15 @@
+query=organism_id:9606 AND reviewed:true
+query=organism_id:9606 AND reviewed:false
+query=organism_id:9606
+query=organism_id:39947
+query=APP
+query=P53
+query=proteins_with:2&contentType="text/plain;format=fasta"
+query=reviewed:true
+query=length:[801 TO *]
+query=length:[1 TO 200]
+query=length:[1 TO 300]
+query=reviewed:false AND existence:4
+query=reviewed:false
+query=reviewed:false AND existence:3
+query=taxonomy_id:201174

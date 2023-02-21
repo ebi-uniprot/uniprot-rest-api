@@ -91,7 +91,11 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                 Stream<T> entities =
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
                                 .flatMap(Collection::stream)
-                                .onClose(() -> log.debug("Finished streaming entries."));
+                                .onClose(
+                                        () ->
+                                                log.info(
+                                                        "Finished streaming entries for job {}",
+                                                        jobId));
 
                 context.setEntities(entities);
             }

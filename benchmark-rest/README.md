@@ -2,7 +2,7 @@
   - Below are two ways to run a simulation. You can pick one approach.
 #### Approach 1: Run simulation `AccessionRetrievalSimulation`
 ```
-mvn test -Pbenchmark -Dgatling.simulationClass=AccessionRetrievalSimulation
+mvn test -Pbenchmark -Dgatling.simulationClass=AsynchDownloadSimulation
 ```
 #### Approach 2: Run simulation `FiltersWithDownloadSimulation`
 ```

@@ -1,6 +1,5 @@
 package org.uniprot.api.rest.validation;
 
-import static java.util.Arrays.asList;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -52,7 +51,7 @@ public @interface ValidAsyncDownloadContentTypes {
         @Override
         public void initialize(ValidAsyncDownloadContentTypes constraintAnnotation) {
             try {
-                contentTypes = asList(constraintAnnotation.contentTypes());
+                contentTypes = List.of(constraintAnnotation.contentTypes());
                 contentTypesAsString = String.join(", ", contentTypes);
                 message = constraintAnnotation.message();
             } catch (Exception e) {

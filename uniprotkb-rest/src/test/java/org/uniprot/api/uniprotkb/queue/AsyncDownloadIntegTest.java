@@ -231,8 +231,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         assertEquals(isError, Objects.nonNull(optDownloadJob.get().getError()));
         if (optDownloadJob.get().getStatus() == JobStatus.FINISHED) {
             assertNotNull(optDownloadJob.get().getResultFile());
-            String ext = "." + UniProtMediaType.getFileExtension(contentType);
-            String expectedFile = jobId + ext;
+            String expectedFile = jobId;
             assertEquals(expectedFile, optDownloadJob.get().getResultFile());
         } else {
             assertNull(optDownloadJob.get().getResultFile());
