@@ -1,7 +1,6 @@
 package org.uniprot.api.statistics.controller;
 
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,10 +37,6 @@ class StatisticControllerTest {
     private StatisticService statisticService;
     @InjectMocks
     private StatisticController statisticController;
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void getAllByVersionAndCategoryIn() {
