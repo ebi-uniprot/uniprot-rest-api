@@ -129,7 +129,7 @@ class IdMappingConfigureControllerIT {
                                 contains(
                                         "https://www.ebi.ac.uk/chembldb/target/inspect/%id",
                                         "https://www.drugbank.ca/drugs/%id",
-                                        "http://www.guidetopharmacology.org/GRAC/ObjectDisplayForward?objectId=%id",
+                                        "https://www.guidetopharmacology.org/GRAC/ObjectDisplayForward?objectId=%id",
                                         "https://www.swisslipids.org/#/entity/%id/")))
                 .andExpect(
                         jsonPath(
