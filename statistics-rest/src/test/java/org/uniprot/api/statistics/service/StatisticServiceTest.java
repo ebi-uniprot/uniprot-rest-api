@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.StatisticsCategory;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
-import org.uniprot.api.statistics.mapper.StatisticsMapper;
+import org.uniprot.api.statistics.mapper.StatisticMapper;
 import org.uniprot.api.statistics.model.StatisticCategory;
 import org.uniprot.api.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.statistics.repository.UniprotkbStatisticsEntryRepository;
@@ -47,13 +47,13 @@ class StatisticServiceTest {
     @Mock
     private StatisticsCategoryRepository statisticsCategoryRepository;
     @Mock
-    private StatisticsMapper statisticsMapper;
+    private StatisticMapper statisticMapper;
     @InjectMocks
     private StatisticService statisticService;
 
     @BeforeEach
     void setUp() {
-        when(statisticsMapper.map(STATISTIC_TYPE)).thenReturn(ENTRY_TYPE);
+        when(statisticMapper.map(STATISTIC_TYPE)).thenReturn(ENTRY_TYPE);
     }
 
     private static boolean matchWithEntries(
@@ -66,7 +66,7 @@ class StatisticServiceTest {
 
     @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenEmptyListOfCategoriesPassed() {
-        when(statisticsMapper.map(
+        when(statisticMapper.map(
                 eq(STATISTICS_CATEGORIES[2]),
                 argThat(
                         argument ->
@@ -80,14 +80,14 @@ class StatisticServiceTest {
                                 STATISTICS_ENTRIES[1],
                                 STATISTICS_ENTRIES[3],
                                 STATISTICS_ENTRIES[4]));
-        when(statisticsMapper.map(
+        when(statisticMapper.map(
                 eq(STATISTICS_CATEGORIES[1]),
                 argThat(
                         argument ->
                                 matchWithEntries(
                                         argument, List.of(STATISTICS_ENTRIES[3])))))
                 .thenReturn(statisticCategory1);
-        when(statisticsMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+        when(statisticMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
                 .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =
@@ -112,14 +112,14 @@ class StatisticServiceTest {
                                 STATISTICS_ENTRIES[0],
                                 STATISTICS_ENTRIES[1],
                                 STATISTICS_ENTRIES[3]));
-        when(statisticsMapper.map(
+        when(statisticMapper.map(
                 eq(STATISTICS_CATEGORIES[1]),
                 argThat(
                         argument ->
                                 matchWithEntries(
                                         argument, List.of(STATISTICS_ENTRIES[3])))))
                 .thenReturn(statisticCategory1);
-        when(statisticsMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+        when(statisticMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
                 .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =
@@ -136,7 +136,7 @@ class StatisticServiceTest {
         when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
                 VERSION, ENTRY_TYPE, List.of(statisticsCategory0)))
                 .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
-        when(statisticsMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+        when(statisticMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
                 .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =

@@ -1,30 +1,30 @@
 package org.uniprot.api.statistics.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
-import org.uniprot.api.statistics.mapper.StatisticsMapper;
+import org.uniprot.api.statistics.mapper.StatisticMapper;
 import org.uniprot.api.statistics.model.StatisticCategory;
 import org.uniprot.api.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.statistics.repository.UniprotkbStatisticsEntryRepository;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisticService {
 
     private final UniprotkbStatisticsEntryRepository statisticsEntryRepository;
     private final StatisticsCategoryRepository statisticsCategoryRepository;
-    private final StatisticsMapper statisticsMapper;
+    private final StatisticMapper statisticMapper;
 
     public StatisticService(
             UniprotkbStatisticsEntryRepository uniprotkbStatisticsEntryRepository,
             StatisticsCategoryRepository statisticsCategoryRepository,
-            StatisticsMapper statisticsMapper) {
+            StatisticMapper statisticMapper) {
         this.statisticsEntryRepository = uniprotkbStatisticsEntryRepository;
         this.statisticsCategoryRepository = statisticsCategoryRepository;
-        this.statisticsMapper = statisticsMapper;
+        this.statisticMapper = statisticMapper;
     }
 
     public Collection<StatisticCategory> findAllByVersionAndStatisticTypeAndCategoryIn(
@@ -33,13 +33,13 @@ public class StatisticService {
         if (categories.isEmpty()) {
             entries =
                     statisticsEntryRepository.findAllByReleaseNameAndEntryType(
-                            version, statisticsMapper.map(statisticsType));
+                            version, statisticMapper.map(statisticsType));
         } else {
             entries =
                     statisticsEntryRepository
                             .findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
                                     version,
-                                    statisticsMapper.map(statisticsType),
+                                    statisticMapper.map(statisticsType),
                                     categories.stream()
                                             .map(
                                                     cat ->
@@ -57,7 +57,7 @@ public class StatisticService {
                 .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategoryId))
                 .entrySet()
                 .stream()
-                .map(entry -> statisticsMapper.map(entry.getKey(), entry.getValue()))
+                .map(entry -> statisticMapper.map(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 }

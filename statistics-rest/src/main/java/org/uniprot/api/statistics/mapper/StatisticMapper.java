@@ -10,7 +10,7 @@ import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.model.*;
 
 @Component
-public class StatisticsMapper {
+public class StatisticMapper {
 
     public EntryType map(String statisticType) {
         switch (StatisticType.valueOf(statisticType.toUpperCase())) {
