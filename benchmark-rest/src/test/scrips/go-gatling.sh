@@ -184,6 +184,18 @@ elif [ "$TEST_TYPE" == "stress-idmapping-uniref" ]; then
     PROFILE_PROPERTIES+=" -Da.s.idmapping.maxDuration=60"
     PROFILE_PROPERTIES+=" -Da.s.idmapping.successPercentGreaterThan=80"
     PROFILE_PROPERTIES+=" -Da.s.idmapping.percentile3.responseTime=500"
+elif [ "$TEST_TYPE" == "stress-async-download-kb" ]; then
+    echo "Stressing async download uniprotkb"
+    PROFILE_PROPERTIES+=" -Da.s.host=http://hx-rke-wp-webadmin-35-worker-9.caas.ebi.ac.uk:32007"
+    PROFILE_PROPERTIES+=" -Da.s.nginx.host=http://hx-rke-wp-webadmin-35-worker-9.caas.ebi.ac.uk:31210"
+    PROFILE_PROPERTIES+=" -Da.s.asynch.download.run.url=/uniprotkb/download/run"
+    PROFILE_PROPERTIES+=" -Da.s.asynch.download.status.url=/uniprotkb/download/status"
+    PROFILE_PROPERTIES+=" -Da.s.asynch.download.ids.url=/uniprotkb/download/ids"
+    PROFILE_PROPERTIES+=" -Da.s.asynch.download.results.url=/uniprotkb/download/results"
+    PROFILE_PROPERTIES+=" -Da.s.idmapping.scenario1.users=2"
+    PROFILE_PROPERTIES+=" -Da.s.asynch.download.query.list=/hps/software/users/martin/uniprot/uapi/git_repo/stress-tests/uniprot-api/testreq/asynchdownload1.txt"
+    PROFILE_PROPERTIES+=" -Da.s.idmapping.maxDuration=5"
+    PROFILE_PROPERTIES+=" -Da.s.idmapping.successPercentGreaterThan=90"
 fi
 
 export MAVEN_OPTS="$MEMORY -Djava.net.useSystemProxies=true -Dgatling.http.requestTimeout=7200000 -Dproperties.dir=/hps/software/users/martin/uniprot/uapi/git_repo/stress-tests/uniprot-api/conf $PROFILE_PROPERTIES"
