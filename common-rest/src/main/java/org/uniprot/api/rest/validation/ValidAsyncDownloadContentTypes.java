@@ -1,6 +1,5 @@
 package org.uniprot.api.rest.validation;
 
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
