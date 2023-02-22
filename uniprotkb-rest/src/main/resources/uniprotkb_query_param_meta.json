@@ -120,19 +120,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_sites",
-    "type": "String"
-  },
-  {
     "name": "ft_molecule_processing",
     "type": "String"
   },
   {
     "name": "ft_molecule_processing_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_molecule_processing",
     "type": "String"
   },
   {
@@ -144,19 +136,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_variants",
-    "type": "String"
-  },
-  {
     "name": "ft_positional",
     "type": "String"
   },
   {
     "name": "ft_positional_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_positional",
     "type": "String"
   },
   {
@@ -168,19 +152,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_secstruct",
-    "type": "String"
-  },
-  {
     "name": "ft_init_met",
     "type": "String"
   },
   {
     "name": "ft_init_met_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_init_met",
     "type": "String"
   },
   {
@@ -192,19 +168,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_signal",
-    "type": "String"
-  },
-  {
     "name": "ft_propep",
     "type": "String"
   },
   {
     "name": "ft_propep_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_propep",
     "type": "String"
   },
   {
@@ -216,19 +184,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_transit",
-    "type": "String"
-  },
-  {
     "name": "ft_chain",
     "type": "String"
   },
   {
     "name": "ft_chain_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_chain",
     "type": "String"
   },
   {
@@ -240,19 +200,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_peptide",
-    "type": "String"
-  },
-  {
     "name": "ft_topo_dom",
     "type": "String"
   },
   {
     "name": "ft_topo_dom_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_topo_dom",
     "type": "String"
   },
   {
@@ -264,19 +216,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_transmem",
-    "type": "String"
-  },
-  {
     "name": "ft_domain",
     "type": "String"
   },
   {
     "name": "ft_domain_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_domain",
     "type": "String"
   },
   {
@@ -288,19 +232,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_repeat",
-    "type": "String"
-  },
-  {
     "name": "ft_zn_fing",
     "type": "String"
   },
   {
     "name": "ft_zn_fing_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_zn_fing",
     "type": "String"
   },
   {
@@ -312,19 +248,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_dna_bind",
-    "type": "String"
-  },
-  {
     "name": "ft_region",
     "type": "String"
   },
   {
     "name": "ft_region_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_region",
     "type": "String"
   },
   {
@@ -336,19 +264,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_coiled",
-    "type": "String"
-  },
-  {
     "name": "ft_motif",
     "type": "String"
   },
   {
     "name": "ft_motif_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_motif",
     "type": "String"
   },
   {
@@ -360,19 +280,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_compbias",
-    "type": "String"
-  },
-  {
     "name": "ft_act_site",
     "type": "String"
   },
   {
     "name": "ft_act_site_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_act_site",
     "type": "String"
   },
   {
@@ -384,19 +296,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_binding",
-    "type": "String"
-  },
-  {
     "name": "ft_site",
     "type": "String"
   },
   {
     "name": "ft_site_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_site",
     "type": "String"
   },
   {
@@ -408,19 +312,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_non_std",
-    "type": "String"
-  },
-  {
     "name": "ft_mod_res",
     "type": "String"
   },
   {
     "name": "ft_mod_res_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_mod_res",
     "type": "String"
   },
   {
@@ -432,19 +328,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_lipid",
-    "type": "String"
-  },
-  {
     "name": "ft_carbohyd",
     "type": "String"
   },
   {
     "name": "ft_carbohyd_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_carbohyd",
     "type": "String"
   },
   {
@@ -456,19 +344,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_disulfid",
-    "type": "String"
-  },
-  {
     "name": "ft_crosslnk",
     "type": "String"
   },
   {
     "name": "ft_crosslnk_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_crosslnk",
     "type": "String"
   },
   {
@@ -480,19 +360,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_var_seq",
-    "type": "String"
-  },
-  {
     "name": "ft_variant",
     "type": "String"
   },
   {
     "name": "ft_variant_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_variant",
     "type": "String"
   },
   {
@@ -504,19 +376,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_mutagen",
-    "type": "String"
-  },
-  {
     "name": "ft_unsure",
     "type": "String"
   },
   {
     "name": "ft_unsure_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_unsure",
     "type": "String"
   },
   {
@@ -528,19 +392,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_conflict",
-    "type": "String"
-  },
-  {
     "name": "ft_non_cons",
     "type": "String"
   },
   {
     "name": "ft_non_cons_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_non_cons",
     "type": "String"
   },
   {
@@ -552,19 +408,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_non_ter",
-    "type": "String"
-  },
-  {
     "name": "ft_helix",
     "type": "String"
   },
   {
     "name": "ft_helix_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_helix",
     "type": "String"
   },
   {
@@ -576,10 +424,6 @@
     "type": "String"
   },
   {
-    "name": "ftlen_turn",
-    "type": "String"
-  },
-  {
     "name": "ft_strand",
     "type": "String"
   },
@@ -588,19 +432,11 @@
     "type": "String"
   },
   {
-    "name": "ftlen_strand",
-    "type": "String"
-  },
-  {
     "name": "ft_intramem",
     "type": "String"
   },
   {
     "name": "ft_intramem_exp",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_intramem",
     "type": "String"
   },
   {
