@@ -2,6 +2,7 @@
 set -x
 if [ $# -ne 2 ]; then
   echo "Simulation scala class name and LSF JOB TYPE(see TEST_TYPE in go-gatling)"
+  echo "e.g. ./submit-bsub-stress.sh IdMappingSimulation stress-idmapping-kb"
   exit 1
 fi
 
