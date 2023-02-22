@@ -69,6 +69,6 @@ class TsvMessageConverterTest {
                         "P00001\t"
                                 + "SITE sequence 1:2..8; /note=\"description value 123\"; "
                                 + "/evidence=\"ECO:0000269|PubMed:11389730\"\t"
-                                + "FUNCTION: [Isoform 4]: value. {ECO:0000256|PIRNR:PIRNR001360}."));
+                                + "FUNCTION: [Isoform 4]: value. {ECO:0000269|PIRNR:PIRNR001360}."));
     }
 }
