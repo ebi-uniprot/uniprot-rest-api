@@ -36,7 +36,7 @@ class AsynchDownloadSimulation extends Simulation {
       .feed(downloadFeeder)
 
   def getAsynchDownloadFlowRequest(feederBuilder: ChainBuilder, users: Integer): ChainBuilder = {
-    val queryRequestStr: String = host + "${url}&contentType=${contentType}"
+    val queryRequestStr: String = runUrl + "?${query}&contentType=${contentType}"
     val httpReqInfo: String = "POST /download/run"
 
     feederBuilder

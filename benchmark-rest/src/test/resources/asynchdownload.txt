@@ -1,15 +1,16 @@
-query=organism_id:9606 AND reviewed:true
-query=organism_id:9606 AND reviewed:false
-query=organism_id:9606
-query=organism_id:39947
-query=APP
-query=P53
-query=proteins_with:2&contentType="text/plain;format=fasta"
-query=reviewed:true
-query=length:[801 TO *]
-query=length:[1 TO 200]
-query=length:[1 TO 300]
-query=reviewed:false AND existence:4
-query=reviewed:false
-query=reviewed:false AND existence:3
+query#contentType
+query=organism_id:9606 AND reviewed:true#application/json
+query=organism_id:9606 AND reviewed:false#application/json
+query=organism_id:9606#application/json
+query=organism_id:39947#application/json
+query=APP#application/json
+query=P53#application/json
+query=proteins_with:2&contentType="text/plain;format=fasta"#application/json
+query=reviewed:true#application/json
+query=length:[801 TO *]#application/json
+query=length:[1 TO 200]#application/json
+query=length:[1 TO 300]#application/json
+query=reviewed:false AND existence:4#application/json
+query=reviewed:false#application/json
+query=reviewed:false AND existence:3#application/json
 query=taxonomy_id:201174
