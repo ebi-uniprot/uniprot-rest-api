@@ -1656,6 +1656,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.fragment = true;
             doc.precursor = true;
             doc.isIsoform = false;
+            doc.evidenceExperimental = true;
             doc.otherOrganism = "Search All";
             doc.organismHostIds.add(9606);
             doc.organismHostNames.add("Search All");
