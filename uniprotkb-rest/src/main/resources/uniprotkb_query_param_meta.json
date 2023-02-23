@@ -476,6 +476,10 @@
     "type": "String"
   },
   {
+    "name": "evidence_exp",
+    "type": "String"
+  },
+  {
     "name": "is_isoform",
     "type": "String"
   },
