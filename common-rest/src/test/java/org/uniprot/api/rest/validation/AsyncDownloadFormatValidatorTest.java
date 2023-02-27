@@ -113,8 +113,7 @@ class AsyncDownloadFormatValidatorTest {
         assertFalse(result);
     }
 
-    static class FakeFormatValidator
-            extends ValidAsyncDownloadFormats.FormatsValidator {
+    static class FakeFormatValidator extends ValidAsyncDownloadFormats.FormatsValidator {
         final List<String> errorFields = new ArrayList<>();
 
         final Collection<String> mockedValidFormats = new ArrayList<>();

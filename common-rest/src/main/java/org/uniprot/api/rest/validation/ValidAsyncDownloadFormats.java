@@ -37,10 +37,8 @@ public @interface ValidAsyncDownloadFormats {
 
     Class<? extends Payload>[] payload() default {};
 
-    class FormatsValidator
-            implements ConstraintValidator<ValidAsyncDownloadFormats, String> {
-        private static final Logger LOGGER =
-                LoggerFactory.getLogger(FormatsValidator.class);
+    class FormatsValidator implements ConstraintValidator<ValidAsyncDownloadFormats, String> {
+        private static final Logger LOGGER = LoggerFactory.getLogger(FormatsValidator.class);
 
         @Autowired private HttpServletRequest request;
 

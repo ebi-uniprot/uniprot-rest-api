@@ -192,10 +192,10 @@ elif [ "$TEST_TYPE" == "stress-async-download-kb" ]; then
     PROFILE_PROPERTIES+=" -Da.s.asynch.download.status.url=/uniprotkb/download/status"
     PROFILE_PROPERTIES+=" -Da.s.asynch.download.ids.url=/uniprotkb/download/ids"
     PROFILE_PROPERTIES+=" -Da.s.asynch.download.results.url=/uniprotkb/download/results"
-    PROFILE_PROPERTIES+=" -Da.s.idmapping.scenario1.users=2"
+    PROFILE_PROPERTIES+=" -Da.s.asynch.download.scenario1.users=2"
     PROFILE_PROPERTIES+=" -Da.s.asynch.download.query.list=/hps/software/users/martin/uniprot/uapi/git_repo/stress-tests/uniprot-api/testreq/asynchdownload1.txt"
-    PROFILE_PROPERTIES+=" -Da.s.idmapping.maxDuration=5"
-    PROFILE_PROPERTIES+=" -Da.s.idmapping.successPercentGreaterThan=90"
+    PROFILE_PROPERTIES+=" -Da.s.asynch.download.maxDuration=5"
+    PROFILE_PROPERTIES+=" -Da.s.asynch.download.successPercentGreaterThan=90"
 fi
 
 export MAVEN_OPTS="$MEMORY -Djava.net.useSystemProxies=true -Dgatling.http.requestTimeout=7200000 -Dproperties.dir=/hps/software/users/martin/uniprot/uapi/git_repo/stress-tests/uniprot-api/conf $PROFILE_PROPERTIES"
