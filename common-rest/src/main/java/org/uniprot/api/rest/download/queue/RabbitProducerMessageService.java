@@ -76,15 +76,15 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
         LocalDateTime now = LocalDateTime.now();
         jobBuilder.id(jobId).status(JobStatus.NEW);
-        String contentType =
-                Objects.nonNull(downloadRequest.getContentType())
-                        ? downloadRequest.getContentType().toString()
+        String format =
+                Objects.nonNull(downloadRequest.getFormat())
+                        ? downloadRequest.getFormat().toString()
                         : null;
         jobBuilder
                 .query(downloadRequest.getQuery())
                 .fields(downloadRequest.getFields())
                 .sort(downloadRequest.getSort())
-                .contentType(contentType)
+                .format(format)
                 .created(now)
                 .updated(now);
         this.jobRepository.save(jobBuilder.build());

@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,8 +61,6 @@ public class UniProtKBMessageListener implements MessageListener {
     @Value("${spring.amqp.rabbit.retryQueueName}")
     private String retryQueueName;
 
-    static AtomicInteger times = new AtomicInteger(0);
-
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
@@ -81,14 +78,11 @@ public class UniProtKBMessageListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
-        log.info(
-                this
-                        + " #################### times called "
-                        + times.incrementAndGet()); // TODO remove
         String jobId = null;
         DownloadJob downloadJob = null;
         try {
             jobId = message.getMessageProperties().getHeader("jobId");
+            log.info("Received job {} in listener", jobId);
             if (isMaxRetriedReached(message)) {
                 sendToUndeliveredQueue(jobId, message);
                 log.error(
@@ -103,8 +97,11 @@ public class UniProtKBMessageListener implements MessageListener {
             downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
 
             processMessage(message, downloadJob);
-
-            log.info("Message with jobId {} processed successfully", jobId);
+            // get the fresh object from redis
+            downloadJob = this.jobRepository.findById(jobId).get();
+            if (downloadJob.getStatus() == JobStatus.FINISHED) {
+                log.info("Message with jobId {} processed successfully", jobId);
+            }
         } catch (Exception ex) {
             if (getRetryCountByBroker(message) <= this.maxRetryCount) {
                 log.error("Download job id {} failed with error {}", jobId, ex.getStackTrace());
@@ -126,17 +123,28 @@ public class UniProtKBMessageListener implements MessageListener {
         UniProtKBDownloadRequest request =
                 (UniProtKBDownloadRequest) this.converter.fromMessage(message);
         String jobId = downloadJob.getId();
-        MediaType contentType = UniProtMediaType.valueOf(request.getContentType());
+        MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
         Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
         Path resultFile = Paths.get(downloadConfigProperties.getResultFilesFolder(), jobId);
-        if (Files.exists(idsFile) && Files.exists(resultFile)) {
-            log.info("The job {} is already processed", jobId);
-            updateDownloadJob(message, downloadJob, JobStatus.FINISHED);
+        // run the job if it has errored out
+        if (isJobSeenBefore(downloadJob, idsFile, resultFile)) {
+            if (downloadJob.getStatus() == JobStatus.RUNNING) {
+                log.warn("The job {} is running by other thread", jobId);
+            } else {
+                log.info("The job {} is already processed", jobId);
+                updateDownloadJob(message, downloadJob, JobStatus.FINISHED);
+            }
         } else {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
             writeResult(request, idsFile, jobId, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
         }
+    }
+
+    private static boolean isJobSeenBefore(DownloadJob downloadJob, Path idsFile, Path resultFile) {
+        return Files.exists(idsFile)
+                && Files.exists(resultFile)
+                && downloadJob.getStatus() != JobStatus.ERROR;
     }
 
     private void writeResult(
@@ -192,7 +200,8 @@ public class UniProtKBMessageListener implements MessageListener {
                 Math.max(
                         Objects.nonNull(retryCountHandledError) ? retryCountHandledError : 0,
                         retryCountUnhandledError);
-        log.info("#################### retryCount " + retryCount);
+        String jobId = message.getMessageProperties().getHeader("jobId");
+        log.info("retryCount for job {} is {}", jobId, retryCount);
         return retryCount;
     }
 

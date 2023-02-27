@@ -80,8 +80,8 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         String jobId = this.hashGenerator.generateHash(request);
         messageHeader.setHeader(JOB_ID, jobId);
 
-        if (Objects.isNull(request.getContentType())) {
-            request.setContentType(APPLICATION_JSON_VALUE);
+        if (Objects.isNull(request.getFormat())) {
+            request.setFormat(APPLICATION_JSON_VALUE);
         }
 
         request.setLargeSolrStreamRestricted(false);
@@ -120,7 +120,7 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
         detailResponse.setQuery(job.getQuery());
         detailResponse.setFields(job.getFields());
         detailResponse.setSort(job.getSort());
-        detailResponse.setContentType(job.getContentType());
+        detailResponse.setFormat(job.getFormat());
         if (JobStatus.FINISHED == job.getStatus()) {
             detailResponse.setRedirectURL(
                     constructDownloadRedirectUrl(

@@ -17,6 +17,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -24,38 +25,38 @@ import org.uniprot.core.util.Utils;
  *
  * @author Edd
  */
-@Constraint(validatedBy = ValidAsyncDownloadContentTypes.ContentTypesValidator.class)
+@Constraint(validatedBy = ValidAsyncDownloadFormats.FormatsValidator.class)
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidAsyncDownloadContentTypes {
-    String[] contentTypes();
+public @interface ValidAsyncDownloadFormats {
+    String[] formats();
 
-    String message() default "{search.invalid.contentType}";
+    String message() default "{search.invalid.format}";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 
-    class ContentTypesValidator
-            implements ConstraintValidator<ValidAsyncDownloadContentTypes, String> {
+    class FormatsValidator
+            implements ConstraintValidator<ValidAsyncDownloadFormats, String> {
         private static final Logger LOGGER =
-                LoggerFactory.getLogger(ValidAsyncDownloadContentTypes.ContentTypesValidator.class);
+                LoggerFactory.getLogger(FormatsValidator.class);
 
         @Autowired private HttpServletRequest request;
 
-        private List<String> contentTypes;
-        private String contentTypesAsString;
+        private List<String> formats;
+        private String formatsAsString;
         private String message;
 
         @Override
-        public void initialize(ValidAsyncDownloadContentTypes constraintAnnotation) {
+        public void initialize(ValidAsyncDownloadFormats constraintAnnotation) {
             try {
-                contentTypes = List.of(constraintAnnotation.contentTypes());
-                contentTypesAsString = String.join(", ", contentTypes);
+                formats = List.of(constraintAnnotation.formats());
+                formatsAsString = String.join(", ", formats);
                 message = constraintAnnotation.message();
             } catch (Exception e) {
-                LOGGER.error("Exception while initialising ValidAsyncDownloadContentTypes", e);
-                contentTypes = List.of();
+                LOGGER.error("Exception while initialising ValidAsyncDownloadFormats", e);
+                formats = List.of();
             }
         }
 
@@ -65,8 +66,14 @@ public @interface ValidAsyncDownloadContentTypes {
             if (Utils.notNullNotEmpty(value)) {
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;
-                if (!getContentTypes().contains(value)) {
-                    buildUnsupportedContentTypeErrorMessage(value, contextImpl);
+                String type;
+                try {
+                    type = UniProtMediaType.getMediaTypeForFileExtension(value).toString();
+                } catch (IllegalArgumentException ile) {
+                    type = "";
+                }
+                if (!getFormats().contains(value) && !getFormats().contains(type)) {
+                    buildUnsupportedFormatErrorMessage(value, contextImpl);
                     isValid = false;
                 }
 
@@ -78,14 +85,14 @@ public @interface ValidAsyncDownloadContentTypes {
             return isValid;
         }
 
-        Collection<String> getContentTypes() {
-            return contentTypes;
+        Collection<String> getFormats() {
+            return formats;
         }
 
-        void buildUnsupportedContentTypeErrorMessage(
-                String contentType, ConstraintValidatorContextImpl contextImpl) {
-            contextImpl.addMessageParameter("0", contentType);
-            contextImpl.addMessageParameter("1", contentTypesAsString);
+        void buildUnsupportedFormatErrorMessage(
+                String format, ConstraintValidatorContextImpl contextImpl) {
+            contextImpl.addMessageParameter("0", format);
+            contextImpl.addMessageParameter("1", formatsAsString);
             contextImpl.buildConstraintViolationWithTemplate(message).addConstraintViolation();
         }
     }

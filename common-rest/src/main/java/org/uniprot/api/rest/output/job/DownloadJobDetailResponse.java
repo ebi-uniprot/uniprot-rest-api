@@ -23,7 +23,7 @@ public class DownloadJobDetailResponse implements StreamRequest {
     private String fields;
     private String sort;
 
-    private String contentType;
+    private String format;
 
     @Override
     public String getDownload() {

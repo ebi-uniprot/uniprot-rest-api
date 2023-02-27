@@ -42,5 +42,5 @@ public class DownloadJob implements Serializable {
     private String sort;
     private String resultFile;
 
-    private String contentType;
+    private String format;
 }

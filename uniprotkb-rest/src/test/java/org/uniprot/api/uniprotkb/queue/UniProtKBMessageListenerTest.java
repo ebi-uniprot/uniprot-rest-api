@@ -48,7 +48,7 @@ public class UniProtKBMessageListenerTest {
     void testOnMessage() throws IOException {
         UniProtKBDownloadRequest downloadRequest = new UniProtKBDownloadRequest();
         downloadRequest.setQuery("field:value");
-        downloadRequest.setContentType(MediaType.APPLICATION_JSON.toString());
+        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
@@ -78,8 +78,8 @@ public class UniProtKBMessageListenerTest {
     void testOnMessageWithIOExceptionDuringWrite() throws IOException {
         UniProtKBDownloadRequest downloadRequest = new UniProtKBDownloadRequest();
         downloadRequest.setQuery("field2:value2");
-        MediaType contentType = MediaType.APPLICATION_JSON;
-        downloadRequest.setContentType(contentType.toString());
+        MediaType format = MediaType.APPLICATION_JSON;
+        downloadRequest.setFormat(format.toString());
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
@@ -108,7 +108,7 @@ public class UniProtKBMessageListenerTest {
     void testOnMessageWhenMaxRetryReached() throws IOException {
         UniProtKBDownloadRequest downloadRequest = new UniProtKBDownloadRequest();
         downloadRequest.setQuery("field1:value1");
-        downloadRequest.setContentType(MediaType.APPLICATION_JSON.toString());
+        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();

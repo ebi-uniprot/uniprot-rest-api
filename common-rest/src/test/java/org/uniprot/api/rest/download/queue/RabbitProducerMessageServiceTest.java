@@ -85,6 +85,6 @@ class RabbitProducerMessageServiceTest {
         private String fields;
         private String sort;
         private String download;
-        private String contentType;
+        private String format;
     }
 }

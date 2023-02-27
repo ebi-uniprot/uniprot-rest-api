@@ -41,4 +41,6 @@ public class RabbitMQConfigProperties {
     private String rejectedQueueName;
 
     private int ttlInMillis;
+
+    private int prefetchCount;
 }

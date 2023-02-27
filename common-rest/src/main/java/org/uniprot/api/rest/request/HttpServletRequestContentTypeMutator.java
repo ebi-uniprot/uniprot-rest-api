@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -67,8 +68,10 @@ public class HttpServletRequestContentTypeMutator {
     }
 
     public void mutate(MutableHttpServletRequest request) {
-        mutateAcceptHeader(request);
-        mutateAcceptEncodingHeader(request);
+        if (!RequestMethod.POST.name().equals(request.getMethod())) {
+            mutateAcceptHeader(request);
+            mutateAcceptEncodingHeader(request);
+        }
     }
 
     private void mutateAcceptHeader(MutableHttpServletRequest request) {

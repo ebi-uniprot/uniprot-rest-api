@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.util.ErrorHandler;
 
 /**
  * @author sahmad
@@ -22,18 +21,18 @@ public class QueueConsumerConfig {
     public MessageListenerContainer messageListenerContainer(
             ConnectionFactory connectionFactory,
             @Qualifier("Consumer") MessageListener messageListener,
-            RabbitMQConfigProperties rabbitMQConfigProperties,
-            @Qualifier("ConsumerErrorHandler") ErrorHandler errorHandler) {
+            RabbitMQConfigProperties rabbitMQConfigProperties) {
 
         SimpleMessageListenerContainer simpleMessageListenerContainer =
                 new SimpleMessageListenerContainer();
         simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
         simpleMessageListenerContainer.setQueueNames(rabbitMQConfigProperties.getQueueName());
         simpleMessageListenerContainer.setMessageListener(messageListener);
-        simpleMessageListenerContainer.setErrorHandler(errorHandler);
         simpleMessageListenerContainer.setConcurrentConsumers(
                 rabbitMQConfigProperties.getConcurrentConsumers());
         simpleMessageListenerContainer.setDefaultRequeueRejected(false);
+        simpleMessageListenerContainer.setPrefetchCount(
+                rabbitMQConfigProperties.getPrefetchCount());
         return simpleMessageListenerContainer;
     }
 }

@@ -56,8 +56,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
 
     @Test
     void submitJobWithoutQueryFailure() throws Exception {
-        MediaType contentType = MediaType.APPLICATION_JSON;
-        ResultActions resultActions = callPostJobStatus(null, null, null, contentType);
+        MediaType format = MediaType.APPLICATION_JSON;
+        ResultActions resultActions = callPostJobStatus(null, null, null, format.toString());
         resultActions
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -69,11 +69,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     @Test
     void submitJobWithStarQuerySuccess() throws Exception {
         String query = "*:*";
-        MediaType contentType = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, contentType);
+        MediaType format = MediaType.APPLICATION_JSON;
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
-        getAndVerifyDetails(jobId, contentType);
+        getAndVerifyDetails(jobId);
         ResultActions resultActions = callGetJobStatus(jobId);
         resultActions
                 .andDo(log())
@@ -88,27 +88,27 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     @Test
     void submitJobStarQueryMoreThanOnceShouldProcessOnlyOnceSuccess() throws Exception {
         String query = "*";
-        MediaType contentType = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, contentType);
+        MediaType format = MediaType.APPLICATION_JSON;
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
-        getAndVerifyDetails(jobId, contentType);
+        getAndVerifyDetails(jobId);
         Optional<DownloadJob> optJob1 = getDownloadJobRepository().findById(jobId);
-        String newJobId = callRunAPIAndVerify(query, null, null, contentType);
+        String newJobId = callRunAPIAndVerify(query, null, null, format.toString());
         assertNotNull(newJobId);
         assertEquals(jobId, newJobId);
         Optional<DownloadJob> optJob2 = getDownloadJobRepository().findById(jobId);
         assertAll(() -> assertTrue(optJob1.isPresent()), () -> assertTrue(optJob2.isPresent()));
         assertEquals(optJob1.get(), optJob2.get());
-        verifyIdsAndResultFiles(jobId, contentType);
+        verifyIdsAndResultFiles(jobId, format);
     }
 
     @Test
     void submitJobWithSort() throws Exception {
-        MediaType contentType = MediaType.APPLICATION_JSON;
+        MediaType format = MediaType.APPLICATION_JSON;
         String query = "content:*";
         String sort = "accession desc";
-        String jobId = callRunAPIAndVerify(query, null, sort, contentType);
+        String jobId = callRunAPIAndVerify(query, null, sort, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         // then
@@ -123,7 +123,6 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         "P00010", "P00009", "P00008", "P00007", "P00006", "P00005", "P00004",
                         "P00003", "P00002", "P00001"));
         // verify result file
-        String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
         Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
         Assertions.assertTrue(Files.exists(resultFilePath));
         String resultsJson = Files.readString(resultFilePath);
@@ -135,21 +134,22 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         "P00003", "P00002", "P00001"));
     }
 
-    @ParameterizedTest(name = "[{index}] contentType {0}")
-    @MethodSource("getSupportedContentTypes")
-    void submitJobAllContentType(MediaType contentType) throws Exception {
+    @ParameterizedTest(name = "[{index}] format {0}")
+    @MethodSource("getSupportedFormats")
+    void submitJobAllFormat(String format) throws Exception {
         // when
+
         String query = "content:*";
         String fields = "accession,rhea";
-        String jobId = callRunAPIAndVerify(query, fields, null, contentType);
+        String jobId = callRunAPIAndVerify(query, fields, null, format);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
-        getAndVerifyDetails(jobId, contentType);
+        getAndVerifyDetails(jobId);
     }
 
     @Test
-    void submitJobWithoutContentTypeDefaultsToJson() throws Exception {
+    void submitJobWithoutFormatDefaultsToJson() throws Exception {
         // when
         String query = "content:*";
         String fields = "accession";
@@ -157,16 +157,16 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
-        getAndVerifyDetails(jobId, MediaType.APPLICATION_JSON);
+        getAndVerifyDetails(jobId);
     }
 
     @Test
-    void submitJobUnsupportedContentTypeFailure() throws Exception {
+    void submitJobUnsupportedFormatFailure() throws Exception {
         // when
-        MediaType contentType = UniProtMediaType.valueOf(XLS_MEDIA_TYPE_VALUE);
+        MediaType format = UniProtMediaType.valueOf(XLS_MEDIA_TYPE_VALUE);
         String query = "content:*";
         String fields = "accession,rhea";
-        ResultActions response = callPostJobStatus(query, fields, null, contentType);
+        ResultActions response = callPostJobStatus(query, fields, null, format.toString());
 
         // then
         response.andDo(log())
@@ -176,14 +176,14 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         jsonPath(
                                 "$.messages.*",
                                 Matchers.contains(
-                                        "Invalid content type received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml].")));
+                                        "Invalid format received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml].")));
     }
 
     @Test
     void submitJobWithBadQuery() throws Exception {
-        MediaType contentType = MediaType.APPLICATION_JSON;
+        MediaType format = MediaType.APPLICATION_JSON;
         String query = "random:field";
-        ResultActions response = callPostJobStatus(query, null, null, contentType);
+        ResultActions response = callPostJobStatus(query, null, null, format.toString());
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -194,11 +194,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
 
     @Test
     void submitJobWithBadField() throws Exception {
-        MediaType contentType = MediaType.APPLICATION_JSON;
+        MediaType format = MediaType.APPLICATION_JSON;
         String query = "content:*";
         String fields = "something,else";
 
-        ResultActions response = callPostJobStatus(query, fields, null, contentType);
+        ResultActions response = callPostJobStatus(query, fields, null, format.toString());
 
         // then
         response.andDo(log())
@@ -214,11 +214,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
 
     @Test
     void submitJobWithBadSort() throws Exception {
-        MediaType contentType = MediaType.APPLICATION_JSON;
+        MediaType format = MediaType.APPLICATION_JSON;
         String query = "content:*";
         String sort = "something desc";
 
-        ResultActions response = callPostJobStatus(query, null, sort, contentType);
+        ResultActions response = callPostJobStatus(query, null, sort, format.toString());
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -328,7 +328,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         .fields(fields)
                         .status(JobStatus.ERROR)
                         .error(errMsg)
-                        .contentType(APPLICATION_JSON_VALUE)
+                        .format(APPLICATION_JSON_VALUE)
                         .build();
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
@@ -343,7 +343,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andExpect(jsonPath("$.query", is(query)))
                 .andExpect(jsonPath("$.fields", is(fields)))
                 .andExpect(jsonPath("$.sort", is(sort)))
-                .andExpect(jsonPath("$.contentType", is(APPLICATION_JSON_VALUE)))
+                .andExpect(jsonPath("$.format", is(APPLICATION_JSON_VALUE)))
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.length()", is(1)))
                 .andExpect(jsonPath("$.errors[0].code", is(EXCEPTION_CODE)))
@@ -353,11 +353,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     @Test
     void runQueryWhichReturnsEmptyResult() throws Exception {
         String query = "content:khansamatola";
-        MediaType contentType = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, contentType);
+        MediaType format = MediaType.APPLICATION_JSON;
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
-        getAndVerifyDetails(jobId, contentType);
+        getAndVerifyDetails(jobId);
         ResultActions resultActions = callGetJobStatus(jobId);
         resultActions
                 .andDo(log())
@@ -406,10 +406,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return response;
     }
 
-    protected String callRunAPIAndVerify(
-            String query, String fields, String sort, MediaType contentType) throws Exception {
+    protected String callRunAPIAndVerify(String query, String fields, String sort, String format)
+            throws Exception {
 
-        ResultActions response = callPostJobStatus(query, fields, sort, contentType);
+        ResultActions response = callPostJobStatus(query, fields, sort, format);
 
         // then
         response.andDo(log())
@@ -422,24 +422,22 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return jobId;
     }
 
-    private ResultActions callPostJobStatus(
-            String query, String fields, String sort, MediaType contentType) throws Exception {
+    private ResultActions callPostJobStatus(String query, String fields, String sort, String format)
+            throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", query)
                         .param("fields", fields)
                         .param("sort", sort)
-                        .param(
-                                "contentType",
-                                Objects.isNull(contentType) ? null : contentType.toString());
+                        .param("format", Objects.isNull(format) ? null : format);
         ResultActions response = this.mockMvc.perform(requestBuilder);
         return response;
     }
 
     protected abstract String getDownloadAPIsBasePath();
 
-    protected void getAndVerifyDetails(String jobId, MediaType contentType) throws Exception {
+    protected void getAndVerifyDetails(String jobId) throws Exception {
         // when
         ResultActions response = callGetJobDetails(jobId);
         // then
@@ -460,19 +458,21 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return response;
     }
 
-    protected abstract void verifyIdsAndResultFiles(String jobId, MediaType contentType)
+    protected abstract void verifyIdsAndResultFiles(String jobId, MediaType format)
             throws IOException;
 
-    private Stream<Arguments> getSupportedContentTypes() {
+    private Stream<Arguments> getSupportedFormats() {
         return List.of(
-                        UniProtMediaType.valueOf(TSV_MEDIA_TYPE_VALUE),
-                        UniProtMediaType.valueOf(FF_MEDIA_TYPE_VALUE),
-                        UniProtMediaType.valueOf(LIST_MEDIA_TYPE_VALUE),
-                        UniProtMediaType.valueOf(APPLICATION_XML_VALUE),
-                        UniProtMediaType.valueOf(APPLICATION_JSON_VALUE),
-                        UniProtMediaType.valueOf(FASTA_MEDIA_TYPE_VALUE),
-                        UniProtMediaType.valueOf(GFF_MEDIA_TYPE_VALUE),
-                        UniProtMediaType.valueOf(RDF_MEDIA_TYPE_VALUE))
+                        "xml",
+                        "json",
+                        TSV_MEDIA_TYPE_VALUE,
+                        FF_MEDIA_TYPE_VALUE,
+                        LIST_MEDIA_TYPE_VALUE,
+                        APPLICATION_XML_VALUE,
+                        APPLICATION_JSON_VALUE,
+                        FASTA_MEDIA_TYPE_VALUE,
+                        GFF_MEDIA_TYPE_VALUE,
+                        RDF_MEDIA_TYPE_VALUE)
                 .stream()
                 .map(Arguments::of);
     }

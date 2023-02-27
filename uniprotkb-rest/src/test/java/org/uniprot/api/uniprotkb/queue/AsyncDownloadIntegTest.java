@@ -43,7 +43,6 @@ import org.uniprot.api.rest.download.model.HashGenerator;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.AbstractUniProtKBDownloadIT;
@@ -103,18 +102,18 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     @Test
     void sendAndProcessDownloadMessageSuccessfully() throws IOException {
         String query = "content:*";
-        MediaType contentType = MediaType.APPLICATION_JSON;
-        UniProtKBDownloadRequest request = createDownloadRequest(query, contentType);
+        MediaType format = MediaType.APPLICATION_JSON;
+        UniProtKBDownloadRequest request = createDownloadRequest(query, format);
         String jobId = this.hashGenerator.generateHash(request);
-        sendMessage(request, jobId, contentType);
+        sendMessage(request, jobId, format);
         // Producer
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
         // redis entry created
         await().until(jobCreatedInRedis(jobId));
         await().until(jobFinished(jobId));
         verifyMessageListener(1, 0, 1);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false, contentType);
-        verifyIdsAndResultFiles(jobId, contentType);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false, format);
+        verifyIdsAndResultFiles(jobId, format);
     }
 
     @Test
@@ -124,59 +123,59 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
                 .when(this.messageConverter)
                 .fromMessage(any());
         String query = "reviewed:true";
-        MediaType contentType = MediaType.APPLICATION_JSON;
-        UniProtKBDownloadRequest request = createDownloadRequest(query, contentType);
+        MediaType format = MediaType.APPLICATION_JSON;
+        UniProtKBDownloadRequest request = createDownloadRequest(query, format);
         String jobId = this.hashGenerator.generateHash(request);
-        sendMessage(request, jobId, contentType);
+        sendMessage(request, jobId, format);
         // Producer
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().until(jobErrored(jobId));
         // verify  redis
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true, contentType);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true, format);
         // after certain delay the job should be reprocessed
         await().until(jobFinished(jobId));
         verifyMessageListener(2, 1, 1);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true, contentType);
-        verifyIdsAndResultFiles(jobId, contentType);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true, format);
+        verifyIdsAndResultFiles(jobId, format);
     }
 
     @Test
     void sendAndProcessMessageFailAfterMaximumRetry() throws IOException {
         String query = "accession:P12345";
-        MediaType contentType = MediaType.APPLICATION_JSON;
-        UniProtKBDownloadRequest request = createDownloadRequest(query, contentType);
+        MediaType format = MediaType.APPLICATION_JSON;
+        UniProtKBDownloadRequest request = createDownloadRequest(query, format);
         String jobId = this.hashGenerator.generateHash(request);
         when(this.uniProtKBMessageListener.streamIds(request))
                 .thenThrow(
                         new MessageListenerException(
                                 "Forced exception in streamIds to test max retry"));
         // send request to queue
-        sendMessage(request, jobId, contentType);
+        sendMessage(request, jobId, format);
         // Producer
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().until(jobErrored(jobId));
         await().until(jobRetriedMaximumTimes(jobId));
         // verify  redis
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true, contentType);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true, format);
         // after certain delay the job should be reprocessed
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
         //        verifyMessageListener(3, 3, 3);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true, contentType);
-        verifyIdsAndResultFilesDoNotExist(jobId, contentType);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true, format);
+        verifyIdsAndResultFilesDoNotExist(jobId, format);
     }
 
     @Test
     void sendAndProcessMessageWithUnhandledExceptionShouldBeDiscarded()
             throws InterruptedException, IOException {
         // when
-        MediaType contentType = MediaType.APPLICATION_JSON;
+        MediaType format = MediaType.APPLICATION_JSON;
         String query = "field:value";
         UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
         request.setQuery(query);
         request.setLargeSolrStreamRestricted(false);
-        request.setContentType(contentType.toString());
+        request.setFormat(format.toString());
         String jobId = this.hashGenerator.generateHash(request);
         IllegalArgumentException ile =
                 new IllegalArgumentException(
@@ -185,28 +184,27 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         doThrow(new MessageListenerException("Forcing to throw unexpected exception"))
                 .when(this.uniProtKBMessageListener)
                 .dummyMethodForTesting(jobId, JobStatus.ERROR);
-        sendMessage(request, jobId, contentType);
+        sendMessage(request, jobId, format);
         verify(this.messageService, never()).logAlreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().until(jobErrored(jobId));
         await().until(getJobRetriedCount(jobId), Matchers.equalTo(2));
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
         //        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true, contentType);
-        verifyIdsAndResultFilesDoNotExist(jobId, contentType);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true, format);
+        verifyIdsAndResultFilesDoNotExist(jobId, format);
     }
 
-    private void sendMessage(
-            UniProtKBDownloadRequest request, String jobId, MediaType contentType) {
+    private void sendMessage(UniProtKBDownloadRequest request, String jobId, MediaType format) {
         MessageProperties messageHeader = new MessageProperties();
         messageHeader.setHeader(JOB_ID, jobId);
         this.messageService.sendMessage(request, messageHeader);
     }
 
-    private UniProtKBDownloadRequest createDownloadRequest(String query, MediaType contentType) {
+    private UniProtKBDownloadRequest createDownloadRequest(String query, MediaType format) {
         UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
         request.setQuery(query);
-        request.setContentType(contentType.toString());
+        request.setFormat(format.toString());
         request.setLargeSolrStreamRestricted(false);
         return request;
     }
@@ -217,7 +215,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
             List<JobStatus> statuses,
             int retryCount,
             boolean isError,
-            MediaType contentType) {
+            MediaType format) {
         Optional<DownloadJob> optDownloadJob = this.downloadJobRepository.findById(jobId);
         assertTrue(optDownloadJob.isPresent());
         System.out.println(optDownloadJob.get());
@@ -293,7 +291,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         return () -> (Integer) amqpAdmin.getQueueProperties(queueName).get("QUEUE_MESSAGE_COUNT");
     }
 
-    private void verifyIdsAndResultFiles(String jobId, MediaType contentType) throws IOException {
+    private void verifyIdsAndResultFiles(String jobId, MediaType format) throws IOException {
         // verify the ids file
         Path idsFilePath = Path.of(this.idsFolder + "/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
@@ -308,14 +306,13 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         Assertions.assertNotNull(primaryAccessions);
     }
 
-    private void verifyIdsAndResultFilesDoNotExist(String jobId, MediaType contentType)
+    private void verifyIdsAndResultFilesDoNotExist(String jobId, MediaType format)
             throws IOException {
         // verify the ids file
         Path idsFilePath = Paths.get(this.idsFolder, jobId);
         Assertions.assertTrue(Files.notExists(idsFilePath));
         // verify result file
-        String fileExt = "." + UniProtMediaType.getFileExtension(contentType);
-        Path resultFilePath = Paths.get(this.resultFolder, jobId + fileExt);
+        Path resultFilePath = Paths.get(this.resultFolder, jobId);
         Assertions.assertTrue(Files.notExists(resultFilePath));
     }
 
