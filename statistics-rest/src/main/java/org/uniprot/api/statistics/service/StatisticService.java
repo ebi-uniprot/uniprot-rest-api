@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.mapper.StatisticMapper;
 import org.uniprot.api.statistics.model.StatisticCategory;
+import org.uniprot.api.statistics.model.StatisticCategoryImpl;
 import org.uniprot.api.statistics.model.StatisticType;
 import org.uniprot.api.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.statistics.repository.UniprotkbStatisticsEntryRepository;
@@ -59,7 +60,17 @@ public class StatisticService {
                 .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategoryId))
                 .entrySet()
                 .stream()
-                .map(entry -> statisticMapper.map(entry.getKey(), entry.getValue()))
+                .map(entry -> StatisticCategoryImpl.builder()
+                        .name(entry.getKey().getCategory())
+                        .totalCount(
+                                entry.getValue().stream().mapToLong(UniprotkbStatisticsEntry::getValueCount).sum())
+                        .totalEntryCount(
+                                entry.getValue().stream().mapToLong(UniprotkbStatisticsEntry::getEntryCount).sum())
+                        .attributes(
+                                entry.getValue().stream()
+                                        .map(statisticMapper::map)
+                                        .collect(Collectors.toList()))
+                        .build())
                 .collect(Collectors.toList());
     }
 

@@ -3,13 +3,12 @@ package org.uniprot.api.statistics.mapper;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.statistics.StatisticAttributeFacetConfig;
 import org.uniprot.api.statistics.entity.EntryType;
-import org.uniprot.api.statistics.entity.StatisticsCategory;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
-import org.uniprot.api.statistics.model.*;
+import org.uniprot.api.statistics.model.StatisticAttribute;
+import org.uniprot.api.statistics.model.StatisticAttributeImpl;
+import org.uniprot.api.statistics.model.StatisticType;
 
-import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class StatisticMapper {
@@ -41,7 +40,8 @@ public class StatisticMapper {
                 String.format("Entry type %s is not recognized", entryType));
     }
 
-    public StatisticAttribute map(UniprotkbStatisticsEntry entry, String category) {
+    public StatisticAttribute map(UniprotkbStatisticsEntry entry) {
+        System.out.println();
         return StatisticAttributeImpl.builder()
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
@@ -52,33 +52,13 @@ public class StatisticMapper {
                         Optional.ofNullable(
                                         statisticAttributeFacetConfig
                                                 .getAttributes()
-                                                .get(category.toLowerCase()))
+                                                .get(entry.getStatisticsCategoryId().getCategory().toLowerCase()))
                                 .map(
                                         facetProperty ->
                                                 facetProperty
                                                         .getValue()
                                                         .get(entry.getAttributeName().toLowerCase()))
                                 .orElse(null))
-                .build();
-    }
-
-    public StatisticCategory map(
-            StatisticsCategory category, Collection<UniprotkbStatisticsEntry> entries) {
-        return StatisticCategoryImpl.builder()
-                .name(category.getCategory())
-                .totalCount(
-                        entries.stream().mapToLong(UniprotkbStatisticsEntry::getValueCount).sum())
-                .totalEntryCount(
-                        entries.stream().mapToLong(UniprotkbStatisticsEntry::getEntryCount).sum())
-                .attributes(
-                        entries.stream()
-                                .map(
-                                        entry ->
-                                                map(
-                                                        entry,
-                                                        entry.getStatisticsCategoryId()
-                                                                .getCategory()))
-                                .collect(Collectors.toList()))
                 .build();
     }
 }
