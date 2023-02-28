@@ -52,7 +52,7 @@ public class StatisticMapper {
                         Optional.ofNullable(
                                         statisticAttributeFacetConfig
                                                 .getAttributes()
-                                                .get(entry.getStatisticsCategoryId().getCategory().toLowerCase()))
+                                                .get(entry.getStatisticsCategory().getCategory().toLowerCase()))
                                 .map(
                                         facetProperty ->
                                                 facetProperty

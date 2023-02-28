@@ -1,11 +1,11 @@
 package org.uniprot.api.statistics;
 
-import static org.uniprot.api.statistics.entity.EntryType.SWISSPROT;
-import static org.uniprot.api.statistics.entity.EntryType.TREMBL;
-
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.StatisticsCategory;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
+
+import static org.uniprot.api.statistics.entity.EntryType.SWISSPROT;
+import static org.uniprot.api.statistics.entity.EntryType.TREMBL;
 
 public class TestEntityGeneratorUtil {
     public static final Long[] STAT_IDS = new Long[] {12L, 91L, 55888L};
@@ -41,7 +41,7 @@ public class TestEntityGeneratorUtil {
         UniprotkbStatisticsEntry uniprotkbStatisticsEntry = new UniprotkbStatisticsEntry();
         uniprotkbStatisticsEntry.setId(ENTRY_IDS[index]);
         uniprotkbStatisticsEntry.setAttributeName(ENTRY_NAMES[index]);
-        uniprotkbStatisticsEntry.setStatisticsCategoryId(
+        uniprotkbStatisticsEntry.setStatisticsCategory(
                 STATISTICS_CATEGORIES[STAT_CATEGORY_IDS[index]]);
         uniprotkbStatisticsEntry.setValueCount(VALUE_COUNTS[index]);
         uniprotkbStatisticsEntry.setEntryCount(ENTRY_COUNTS[index]);

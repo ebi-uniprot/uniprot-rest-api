@@ -113,7 +113,7 @@ class StatisticServiceTest {
                 .thenReturn(Optional.of(statisticsCategory0));
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_1))
                 .thenReturn(Optional.of(statisticsCategory1));
-        when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
+        when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
                 VERSION, ENTRY_TYPE, List.of(statisticsCategory0, statisticsCategory1)))
                 .thenReturn(
                         List.of(
@@ -132,7 +132,7 @@ class StatisticServiceTest {
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenSingleCategoryIsPassed() {
         when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
-        when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
+        when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
                 VERSION, ENTRY_TYPE, List.of(statisticsCategory0)))
                 .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
 
