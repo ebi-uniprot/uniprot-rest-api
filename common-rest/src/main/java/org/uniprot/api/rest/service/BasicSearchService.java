@@ -3,8 +3,10 @@ package org.uniprot.api.rest.service;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,6 +28,7 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
@@ -43,6 +46,7 @@ public abstract class BasicSearchService<D extends Document, R> {
     protected final AbstractSolrSortClause solrSortClause;
     protected final SolrQueryConfig queryBoosts;
     protected final FacetConfig facetConfig;
+    private static final Pattern CLEAN_QUERY_REGEX = Pattern.compile("(?:^\\()|(?:\\)$)");
 
     // If this property is not set then it is set to empty and later it is set to
     // DEFAULT_SOLR_BATCH_SIZE
@@ -141,6 +145,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         }
         builder.rows(request.getSize());
         builder.totalRows(request.getSize());
+
         return builder.build();
     }
 
@@ -190,15 +195,27 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         String requestedQuery = request.getQuery();
 
-        requestBuilder.query(
+        String query =
                 UniProtQueryProcessor.newInstance(getQueryProcessorConfig())
-                        .processQuery(requestedQuery));
+                        .processQuery(requestedQuery);
+        requestBuilder.query(query);
 
         if (solrSortClause != null) {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
         }
 
         requestBuilder.queryConfig(queryBoosts);
+
+        Optional<String> optimisedQueryField = validateOptimisableField(query);
+        if (optimisedQueryField.isPresent()) {
+            String queryFields = optimisedQueryField.get();
+            if (queryBoosts.getExtraOptmisableQueryFields() != null) {
+                queryFields = queryFields + " " + queryBoosts.getExtraOptmisableQueryFields();
+            }
+            requestBuilder.queryField(queryFields);
+        } else {
+            requestBuilder.queryField(queryBoosts.getQueryFields());
+        }
 
         return requestBuilder;
     }
@@ -245,5 +262,16 @@ public abstract class BasicSearchService<D extends Document, R> {
                     LEADING_WILDCARD_IGNORED.getCode(), LEADING_WILDCARD_IGNORED.getMessage());
         }
         return null;
+    }
+
+    private Optional<String> validateOptimisableField(String query) {
+        String cleanQuery = CLEAN_QUERY_REGEX.matcher(query.strip()).replaceAll("");
+        return getQueryProcessorConfig().getOptimisableFields().stream()
+                .filter(
+                        f ->
+                                Utils.notNullNotEmpty(f.getValidRegex())
+                                        && cleanQuery.matches(f.getValidRegex()))
+                .map(SearchFieldItem::getFieldName)
+                .findFirst();
     }
 }

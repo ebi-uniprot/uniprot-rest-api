@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,6 +65,10 @@ public class UniProtEntryService
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
     private final RDFStreamer uniProtRDFStreamer;
+
+    private static final Pattern ACCESSION_REGEX =
+            Pattern.compile(
+                    "([O,P,Q][0-9][A-Z|0-9]{3}[0-9]|[A-N,R-Z]([0-9][A-Z][A-Z|0-9]{2}){1,2}[0-9])(-\\d+)*");
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -258,6 +263,8 @@ public class UniProtEntryService
         } else if (needToAddActiveFilter(uniProtRequest)) {
             uniProtRequest.setQuery(
                     uniProtRequest.getQuery() + " AND " + getQueryFieldName("active") + ":" + true);
+        } else if (ACCESSION_REGEX.matcher(uniProtRequest.getQuery().toUpperCase()).matches()) {
+            uniProtRequest.setQuery(uniProtRequest.getQuery().toUpperCase());
         }
 
         // fill the common params from the basic service class
