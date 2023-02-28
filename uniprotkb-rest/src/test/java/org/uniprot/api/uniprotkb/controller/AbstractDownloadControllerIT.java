@@ -48,10 +48,10 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.FileType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import org.uniprot.api.rest.output.context.FileType;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDownloadIT {
@@ -129,7 +129,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         "P00003", "P00002", "P00001"));
         // verify result file
 
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
+        Path resultFilePath =
+                Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));
         Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
@@ -382,7 +383,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         Assertions.assertNotNull(ids);
         Assertions.assertTrue(ids.isEmpty());
         // verify result file
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
+        Path resultFilePath =
+                Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));
         Path unzippedFilePath = Path.of(this.resultFolder + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFilePath);

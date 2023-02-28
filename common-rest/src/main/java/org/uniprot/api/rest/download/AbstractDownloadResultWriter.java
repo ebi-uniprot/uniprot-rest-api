@@ -68,7 +68,8 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             StoreRequest storeRequest)
             throws IOException {
         String fileNameWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
+        Path resultPath =
+                Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
         AbstractUUWHttpMessageConverter<T, T> outputWriter =
                 getOutputWriter(contentType, getType());
         try (Stream<String> ids = Files.lines(idFile);
@@ -78,7 +79,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                 StandardOpenOption.WRITE,
                                 StandardOpenOption.CREATE,
                                 StandardOpenOption.TRUNCATE_EXISTING);
-             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
+                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
