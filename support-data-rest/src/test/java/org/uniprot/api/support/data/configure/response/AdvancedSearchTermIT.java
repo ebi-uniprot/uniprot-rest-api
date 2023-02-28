@@ -33,7 +33,6 @@ class AdvancedSearchTermIT {
                         "Organism [OS]",
                         "Taxonomy [OC]",
                         "Virus host",
-                        "Experimental Evidence",
                         "Protein Existence [PE]",
                         "Function",
                         "Subcellular location",
