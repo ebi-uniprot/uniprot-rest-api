@@ -64,7 +64,7 @@ class AsynchDownloadSimulation extends Simulation {
             .check(status.is(200)))
         }.doIfEquals("${jobStatus}", "FINISHED") {
           exec(http(s"GET /results/JOB_ID")
-            .get(resultsUrl + "/${jobId}.gz")
+            .get(resultsUrl + "/${jobId}" + ".gz")
             .check(status.is(200)))
         }
       }
