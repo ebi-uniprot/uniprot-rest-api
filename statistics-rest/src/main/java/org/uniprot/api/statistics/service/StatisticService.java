@@ -39,7 +39,7 @@ public class StatisticService {
         } else {
             entries =
                     statisticsEntryRepository
-                            .findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
+                            .findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
                                     version,
                                     statisticMapper.map(getStatisticType(statisticType)),
                                     categories.stream()
@@ -57,7 +57,7 @@ public class StatisticService {
                                             .collect(Collectors.toList()));
         }
         return entries.stream()
-                .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategoryId))
+                .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategory))
                 .entrySet()
                 .stream()
                 .map(entry -> StatisticCategoryImpl.builder()
