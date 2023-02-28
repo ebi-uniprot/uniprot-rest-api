@@ -1,14 +1,5 @@
 package org.uniprot.api.statistics.repository;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
-
-import java.util.Arrays;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +8,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.statistics.entity.StatisticsCategory;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -32,7 +32,17 @@ class StatisticsCategoryRepositoryIT {
 
     @Test
     void findByCategory() {
-        Optional<StatisticsCategory> result = statisticsCategoryRepository.findByCategory("cat0");
+        Optional<StatisticsCategory> result =
+                statisticsCategoryRepository.findByCategoryIgnoreCase("cat0");
+
+        assertTrue(result.isPresent());
+        assertThat(result.get(), equalTo(STATISTICS_CATEGORIES[0]));
+    }
+
+    @Test
+    void findByCategory_whenCaseIsDiff() {
+        Optional<StatisticsCategory> result =
+                statisticsCategoryRepository.findByCategoryIgnoreCase("CaT0");
 
         assertTrue(result.isPresent());
         assertThat(result.get(), equalTo(STATISTICS_CATEGORIES[0]));
@@ -40,7 +50,8 @@ class StatisticsCategoryRepositoryIT {
 
     @Test
     void findByCategoryWhenNoMatch() {
-        Optional<StatisticsCategory> result = statisticsCategoryRepository.findByCategory("cat3");
+        Optional<StatisticsCategory> result =
+                statisticsCategoryRepository.findByCategoryIgnoreCase("cat3");
 
         assertFalse(result.isPresent());
     }

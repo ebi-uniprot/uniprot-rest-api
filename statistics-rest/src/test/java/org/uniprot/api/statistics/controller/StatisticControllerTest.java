@@ -1,6 +1,5 @@
 package org.uniprot.api.statistics.controller;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,40 +26,47 @@ class StatisticControllerTest {
     public static final List<String> CATEGORIES_0 = List.of(CATEGORY_0, CATEGORY_1);
     public static final List<String> CATEGORIES_1 = List.of(CATEGORY_0);
     public static final List<String> CATEGORIES_2 = Collections.emptyList();
-    @Mock
-    private Collection<StatisticCategory> results0;
-    @Mock
-    private Collection<StatisticCategory> results1;
-    @Mock
-    private Collection<StatisticCategory> results2;
-    @Mock
-    private StatisticService statisticService;
-    @InjectMocks
-    private StatisticController statisticController;
+    @Mock private Collection<StatisticCategory> results0;
+    @Mock private Collection<StatisticCategory> results1;
+    @Mock private Collection<StatisticCategory> results2;
+    @Mock private StatisticService statisticService;
+    @InjectMocks private StatisticController statisticController;
 
     @Test
     void getAllByVersionAndCategoryIn() {
-        when(statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(RELEASE, STATISTIC_TYPE, CATEGORIES_0)).thenReturn(results0);
+        when(statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
+                        RELEASE, STATISTIC_TYPE, CATEGORIES_0))
+                .thenReturn(results0);
 
-        ResponseEntity<StatisticResult<StatisticCategory>> result = statisticController.getAllByVersionAndCategoryIn(RELEASE, STATISTIC_TYPE, CATEGORIES_0);
+        ResponseEntity<StatisticResult<StatisticCategory>> result =
+                statisticController.getAllByVersionAndTypeAndCategoryIn(
+                        RELEASE, STATISTIC_TYPE, CATEGORIES_0);
 
         assertSame(results0, result.getBody().getResults());
     }
 
     @Test
     void getAllByVersionAndCategoryIn_whenSingleCategoryPassed() {
-        when(statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(RELEASE, STATISTIC_TYPE, CATEGORIES_1)).thenReturn(results1);
+        when(statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
+                        RELEASE, STATISTIC_TYPE, CATEGORIES_1))
+                .thenReturn(results1);
 
-        ResponseEntity<StatisticResult<StatisticCategory>> result = statisticController.getAllByVersionAndCategoryIn(RELEASE, STATISTIC_TYPE, CATEGORIES_1);
+        ResponseEntity<StatisticResult<StatisticCategory>> result =
+                statisticController.getAllByVersionAndTypeAndCategoryIn(
+                        RELEASE, STATISTIC_TYPE, CATEGORIES_1);
 
         assertSame(results1, result.getBody().getResults());
     }
 
     @Test
     void getAllByVersionAndCategoryIn_whenEmptyCategoryCollectionPassed() {
-        when(statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(RELEASE, STATISTIC_TYPE, CATEGORIES_2)).thenReturn(results2);
+        when(statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
+                        RELEASE, STATISTIC_TYPE, CATEGORIES_2))
+                .thenReturn(results2);
 
-        ResponseEntity<StatisticResult<StatisticCategory>> result = statisticController.getAllByVersionAndCategoryIn(RELEASE, STATISTIC_TYPE, CATEGORIES_2);
+        ResponseEntity<StatisticResult<StatisticCategory>> result =
+                statisticController.getAllByVersionAndTypeAndCategoryIn(
+                        RELEASE, STATISTIC_TYPE, CATEGORIES_2);
 
         assertSame(results2, result.getBody().getResults());
     }

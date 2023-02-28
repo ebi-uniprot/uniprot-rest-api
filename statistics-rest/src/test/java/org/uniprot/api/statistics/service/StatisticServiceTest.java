@@ -11,6 +11,7 @@ import org.uniprot.api.statistics.entity.StatisticsCategory;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.mapper.StatisticMapper;
 import org.uniprot.api.statistics.model.StatisticCategory;
+import org.uniprot.api.statistics.model.StatisticType;
 import org.uniprot.api.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.statistics.repository.UniprotkbStatisticsEntryRepository;
 
@@ -21,39 +22,32 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
 import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_ENTRIES;
 
 @ExtendWith(MockitoExtension.class)
 class StatisticServiceTest {
-    private static final String STATISTIC_TYPE = "statType";
+    private static final String STATISTIC_TYPE = "reviewed";
     private static final EntryType ENTRY_TYPE = EntryType.SWISSPROT;
+    private static final StatisticType STATISTIC_TYPE_ENUM = StatisticType.REVIEWED;
     private static final String VERSION = "version";
     public static final String CATEGORY_0 = "cat0";
     public static final String CATEGORY_1 = "cat1";
-    @Mock
-    private StatisticCategory statisticCategory0;
-    @Mock
-    private StatisticCategory statisticCategory1;
-    @Mock
-    private StatisticCategory statisticCategory2;
-    @Mock
-    private StatisticsCategory statisticsCategory0;
-    @Mock
-    private StatisticsCategory statisticsCategory1;
-    @Mock
-    private UniprotkbStatisticsEntryRepository statisticsEntryRepository;
-    @Mock
-    private StatisticsCategoryRepository statisticsCategoryRepository;
-    @Mock
-    private StatisticMapper statisticMapper;
-    @InjectMocks
-    private StatisticService statisticService;
+    @Mock private StatisticCategory statisticCategory0;
+    @Mock private StatisticCategory statisticCategory1;
+    @Mock private StatisticCategory statisticCategory2;
+    @Mock private StatisticsCategory statisticsCategory0;
+    @Mock private StatisticsCategory statisticsCategory1;
+    @Mock private UniprotkbStatisticsEntryRepository statisticsEntryRepository;
+    @Mock private StatisticsCategoryRepository statisticsCategoryRepository;
+    @Mock private StatisticMapper statisticMapper;
+    @InjectMocks private StatisticService statisticService;
 
     @BeforeEach
     void setUp() {
-        when(statisticMapper.map(STATISTIC_TYPE)).thenReturn(ENTRY_TYPE);
+        lenient().when(statisticMapper.map(STATISTIC_TYPE_ENUM)).thenReturn(ENTRY_TYPE);
     }
 
     private static boolean matchWithEntries(
@@ -67,11 +61,11 @@ class StatisticServiceTest {
     @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenEmptyListOfCategoriesPassed() {
         when(statisticMapper.map(
-                eq(STATISTICS_CATEGORIES[2]),
-                argThat(
-                        argument ->
-                                matchWithEntries(
-                                        argument, List.of(STATISTICS_ENTRIES[4])))))
+                        eq(STATISTICS_CATEGORIES[2]),
+                        argThat(
+                                argument ->
+                                        matchWithEntries(
+                                                argument, List.of(STATISTICS_ENTRIES[4])))))
                 .thenReturn(statisticCategory2);
         when(statisticsEntryRepository.findAllByReleaseNameAndEntryType(VERSION, ENTRY_TYPE))
                 .thenReturn(
@@ -81,13 +75,21 @@ class StatisticServiceTest {
                                 STATISTICS_ENTRIES[3],
                                 STATISTICS_ENTRIES[4]));
         when(statisticMapper.map(
-                eq(STATISTICS_CATEGORIES[1]),
-                argThat(
-                        argument ->
-                                matchWithEntries(
-                                        argument, List.of(STATISTICS_ENTRIES[3])))))
+                        eq(STATISTICS_CATEGORIES[1]),
+                        argThat(
+                                argument ->
+                                        matchWithEntries(
+                                                argument, List.of(STATISTICS_ENTRIES[3])))))
                 .thenReturn(statisticCategory1);
-        when(statisticMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+        when(statisticMapper.map(
+                        eq(STATISTICS_CATEGORIES[0]),
+                        argThat(
+                                argument ->
+                                        matchWithEntries(
+                                                argument,
+                                                List.of(
+                                                        STATISTICS_ENTRIES[0],
+                                                        STATISTICS_ENTRIES[1])))))
                 .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =
@@ -101,25 +103,33 @@ class StatisticServiceTest {
 
     @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn() {
-        when(statisticsCategoryRepository.findByCategory(CATEGORY_0))
+        when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
-        when(statisticsCategoryRepository.findByCategory(CATEGORY_1))
+        when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_1))
                 .thenReturn(Optional.of(statisticsCategory1));
         when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
-                VERSION, ENTRY_TYPE, List.of(statisticsCategory0, statisticsCategory1)))
+                        VERSION, ENTRY_TYPE, List.of(statisticsCategory0, statisticsCategory1)))
                 .thenReturn(
                         List.of(
                                 STATISTICS_ENTRIES[0],
                                 STATISTICS_ENTRIES[1],
                                 STATISTICS_ENTRIES[3]));
         when(statisticMapper.map(
-                eq(STATISTICS_CATEGORIES[1]),
-                argThat(
-                        argument ->
-                                matchWithEntries(
-                                        argument, List.of(STATISTICS_ENTRIES[3])))))
+                        eq(STATISTICS_CATEGORIES[1]),
+                        argThat(
+                                argument ->
+                                        matchWithEntries(
+                                                argument, List.of(STATISTICS_ENTRIES[3])))))
                 .thenReturn(statisticCategory1);
-        when(statisticMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+        when(statisticMapper.map(
+                        eq(STATISTICS_CATEGORIES[0]),
+                        argThat(
+                                argument ->
+                                        matchWithEntries(
+                                                argument,
+                                                List.of(
+                                                        STATISTICS_ENTRIES[0],
+                                                        STATISTICS_ENTRIES[1])))))
                 .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =
@@ -131,12 +141,20 @@ class StatisticServiceTest {
 
     @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenSingleCategoryIsPassed() {
-        when(statisticsCategoryRepository.findByCategory(CATEGORY_0))
+        when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.of(statisticsCategory0));
         when(statisticsEntryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
-                VERSION, ENTRY_TYPE, List.of(statisticsCategory0)))
+                        VERSION, ENTRY_TYPE, List.of(statisticsCategory0)))
                 .thenReturn(List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1]));
-        when(statisticMapper.map(eq(STATISTICS_CATEGORIES[0]), argThat(argument -> matchWithEntries(argument, List.of(STATISTICS_ENTRIES[0], STATISTICS_ENTRIES[1])))))
+        when(statisticMapper.map(
+                        eq(STATISTICS_CATEGORIES[0]),
+                        argThat(
+                                argument ->
+                                        matchWithEntries(
+                                                argument,
+                                                List.of(
+                                                        STATISTICS_ENTRIES[0],
+                                                        STATISTICS_ENTRIES[1])))))
                 .thenReturn(statisticCategory0);
 
         Collection<StatisticCategory> results =
@@ -148,10 +166,22 @@ class StatisticServiceTest {
 
     @Test
     void findAllByVersionAndStatisticTypeAndCategoryIn_whenWrongCategoryIsPassed() {
-        when(statisticsCategoryRepository.findByCategory(CATEGORY_0))
+        when(statisticsCategoryRepository.findByCategoryIgnoreCase(CATEGORY_0))
                 .thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
-                VERSION, STATISTIC_TYPE, List.of(CATEGORY_0)));
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
+                                VERSION, STATISTIC_TYPE, List.of(CATEGORY_0)));
+    }
+
+    @Test
+    void findAllByVersionAndStatisticTypeAndCategoryIn_whenWrongStatisticTypeIsPassed() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
+                                VERSION, "noExistingType", List.of(CATEGORY_0)));
     }
 }

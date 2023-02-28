@@ -1,19 +1,26 @@
 package org.uniprot.api.statistics.mapper;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
+import org.uniprot.api.statistics.StatisticAttributeFacetConfig;
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.StatisticsCategory;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.model.*;
 
+import java.util.Collection;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Component
 public class StatisticMapper {
+    private final StatisticAttributeFacetConfig statisticAttributeFacetConfig;
 
-    public EntryType map(String statisticType) {
-        switch (StatisticType.valueOf(statisticType.toUpperCase())) {
+    public StatisticMapper(StatisticAttributeFacetConfig statisticAttributeFacetConfig) {
+        this.statisticAttributeFacetConfig = statisticAttributeFacetConfig;
+    }
+
+    public EntryType map(StatisticType statisticType) {
+        switch (statisticType) {
             case UNREVIEWED:
                 return EntryType.TREMBL;
             case REVIEWED:
@@ -34,13 +41,24 @@ public class StatisticMapper {
                 String.format("Entry type %s is not recognized", entryType));
     }
 
-    public StatisticAttribute map(UniprotkbStatisticsEntry entry) {
+    public StatisticAttribute map(UniprotkbStatisticsEntry entry, String category) {
         return StatisticAttributeImpl.builder()
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
                 .entryCount(entry.getEntryCount())
                 .description(entry.getDescription())
                 .statisticType(map(entry.getEntryType()))
+                .label(
+                        Optional.ofNullable(
+                                        statisticAttributeFacetConfig
+                                                .getAttributes()
+                                                .get(category.toLowerCase()))
+                                .map(
+                                        facetProperty ->
+                                                facetProperty
+                                                        .getValue()
+                                                        .get(entry.getAttributeName().toLowerCase()))
+                                .orElse(null))
                 .build();
     }
 
@@ -52,7 +70,15 @@ public class StatisticMapper {
                         entries.stream().mapToLong(UniprotkbStatisticsEntry::getValueCount).sum())
                 .totalEntryCount(
                         entries.stream().mapToLong(UniprotkbStatisticsEntry::getEntryCount).sum())
-                .attributes(entries.stream().map(this::map).collect(Collectors.toList()))
+                .attributes(
+                        entries.stream()
+                                .map(
+                                        entry ->
+                                                map(
+                                                        entry,
+                                                        entry.getStatisticsCategoryId()
+                                                                .getCategory()))
+                                .collect(Collectors.toList()))
                 .build();
     }
 }

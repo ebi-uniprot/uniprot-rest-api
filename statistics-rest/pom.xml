@@ -19,6 +19,9 @@
 		<logback.version>1.2.3</logback.version>
 		<jayway.version>2.4.0</jayway.version>
 		<javax.mail.version>1.6.2</javax.mail.version>
+		<testcontainers.postgres.version>1.17.3</testcontainers.postgres.version>
+		<testcontainers.version>1.17.6</testcontainers.version>
+		<jna.version>5.8.0</jna.version>
 	</properties>
 
 	<dependencies>
@@ -37,28 +40,6 @@
 					<artifactId>solr-core</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.uniprot</groupId>
-			<artifactId>core-domain</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.uniprot</groupId>
-			<artifactId>common-rest</artifactId>
-			<version>${project.parent.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.solr</groupId>
-					<artifactId>solr-solrj</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.solr</groupId>
-					<artifactId>solr-core</artifactId>
-				</exclusion>
-			</exclusions>
-			<type>test-jar</type>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- spring dependencies -->
@@ -110,6 +91,36 @@
 			<artifactId>json-parser</artifactId>
 			<version>${uniprot-core.version}</version>
 			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${testcontainers.postgres.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.java.dev.jna</groupId>
+					<artifactId>jna</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

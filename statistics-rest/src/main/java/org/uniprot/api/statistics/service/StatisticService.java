@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.mapper.StatisticMapper;
 import org.uniprot.api.statistics.model.StatisticCategory;
+import org.uniprot.api.statistics.model.StatisticType;
 import org.uniprot.api.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.statistics.repository.UniprotkbStatisticsEntryRepository;
 
@@ -28,29 +29,30 @@ public class StatisticService {
     }
 
     public Collection<StatisticCategory> findAllByVersionAndStatisticTypeAndCategoryIn(
-            String version, String statisticsType, Collection<String> categories) {
+            String version, String statisticType, Collection<String> categories) {
         List<UniprotkbStatisticsEntry> entries;
         if (categories.isEmpty()) {
             entries =
                     statisticsEntryRepository.findAllByReleaseNameAndEntryType(
-                            version, statisticMapper.map(statisticsType));
+                            version, statisticMapper.map(getStatisticType(statisticType)));
         } else {
             entries =
                     statisticsEntryRepository
                             .findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn(
                                     version,
-                                    statisticMapper.map(statisticsType),
+                                    statisticMapper.map(getStatisticType(statisticType)),
                                     categories.stream()
                                             .map(
                                                     cat ->
                                                             statisticsCategoryRepository
-                                                                    .findByCategory(cat)
+                                                                    .findByCategoryIgnoreCase(cat)
                                                                     .orElseThrow(
                                                                             () ->
                                                                                     new IllegalArgumentException(
-                                                                                            "Category "
-                                                                                                    + categories
-                                                                                                    + " not found")))
+                                                                                            String
+                                                                                                    .format(
+                                                                                                            "Invalid Statistic Category: %s",
+                                                                                                            cat))))
                                             .collect(Collectors.toList()));
         }
         return entries.stream()
@@ -59,5 +61,14 @@ public class StatisticService {
                 .stream()
                 .map(entry -> statisticMapper.map(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    private static StatisticType getStatisticType(String statisticType) {
+        try {
+            return StatisticType.valueOf(statisticType.toUpperCase());
+        } catch (Exception e) {
+            throw new IllegalArgumentException(
+                    String.format("Invalid Statistic Type: %s", statisticType));
+        }
     }
 }
