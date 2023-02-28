@@ -1,12 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +26,7 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -62,9 +67,14 @@ public class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT 
                                 "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
                                 "P00007", "P00008", "P00009", "P00010")));
         // verify result file
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
+        String fileWithExt = jobId + FileType.GZIP.getExtension();
+        Path resultFilePath = Path.of(this.resultFolder + "/" + fileWithExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
-        String resultsJson = Files.readString(resultFilePath);
+        // uncompress the gz file
+        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFile);
+        Assertions.assertTrue(Files.exists(unzippedFile));
+        String resultsJson = Files.readString(unzippedFile);
         List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
         Assertions.assertTrue(
                 List.of(

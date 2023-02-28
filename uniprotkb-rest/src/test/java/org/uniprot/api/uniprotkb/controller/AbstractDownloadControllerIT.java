@@ -14,7 +14,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CODE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +51,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import org.uniprot.api.rest.output.context.FileType;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDownloadIT {
@@ -123,9 +128,12 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         "P00010", "P00009", "P00008", "P00007", "P00006", "P00005", "P00004",
                         "P00003", "P00002", "P00001"));
         // verify result file
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
+
+        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));
-        String resultsJson = Files.readString(resultFilePath);
+        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFile);
+        String resultsJson = Files.readString(unzippedFile);
         List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
         MatcherAssert.assertThat(
                 primaryAccessions,
@@ -374,9 +382,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         Assertions.assertNotNull(ids);
         Assertions.assertTrue(ids.isEmpty());
         // verify result file
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
+        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));
-        String resultsJson = Files.readString(resultFilePath);
+        Path unzippedFilePath = Path.of(this.resultFolder + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFilePath);
+        String resultsJson = Files.readString(unzippedFilePath);
         List<String> results = JsonPath.read(resultsJson, "$.results");
         Assertions.assertAll(() -> assertNotNull(results), () -> assertTrue(results.isEmpty()));
     }
@@ -391,6 +401,20 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         String status = MAPPER.readTree(responseAsString).get("jobStatus").asText();
         assertNotNull(status, "status should not be null");
         return JobStatus.valueOf(status);
+    }
+
+    protected void uncompressFile(Path zippedFile, Path unzippedFile) throws IOException {
+        InputStream fin = Files.newInputStream(zippedFile);
+        BufferedInputStream in = new BufferedInputStream(fin);
+        OutputStream out = Files.newOutputStream(unzippedFile);
+        GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
+        final byte[] buffer = new byte[1024];
+        int n = 0;
+        while (-1 != (n = gzIn.read(buffer))) {
+            out.write(buffer, 0, n);
+        }
+        out.close();
+        gzIn.close();
     }
 
     private Callable<JobStatus> jobProcessed(String jobId) {

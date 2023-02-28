@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import java.util.zip.GZIPOutputStream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +29,7 @@ import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
@@ -65,7 +67,8 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             MediaType contentType,
             StoreRequest storeRequest)
             throws IOException {
-        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), jobId);
+        String fileNameWithExt = jobId + FileType.GZIP.getExtension();
+        Path resultPath = Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
         AbstractUUWHttpMessageConverter<T, T> outputWriter =
                 getOutputWriter(contentType, getType());
         try (Stream<String> ids = Files.lines(idFile);
@@ -74,7 +77,8 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                 resultPath,
                                 StandardOpenOption.WRITE,
                                 StandardOpenOption.CREATE,
-                                StandardOpenOption.TRUNCATE_EXISTING)) {
+                                StandardOpenOption.TRUNCATE_EXISTING);
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
@@ -101,7 +105,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             }
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
-            outputWriter.writeContents(context, output, start, counter);
+            outputWriter.writeContents(context, gzipOutputStream, start, counter);
         }
     }
 
