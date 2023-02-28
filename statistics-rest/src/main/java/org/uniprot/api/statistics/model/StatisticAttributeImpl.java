@@ -11,9 +11,6 @@ public class StatisticAttributeImpl implements StatisticAttribute {
     String name;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    String searchField;
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     String label;
 
     long count;

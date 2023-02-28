@@ -24,7 +24,7 @@ public class StatisticController {
     @GetMapping(
             value = "/{release}/{statisticType}",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<StatisticResult<StatisticCategory>> getAllByVersionAndCategoryIn(
+    public ResponseEntity<StatisticResult<StatisticCategory>> getAllByVersionAndTypeAndCategoryIn(
             @PathVariable String release,
             @PathVariable String statisticType,
             @RequestParam(required = false, defaultValue = "") Collection<String> categories) {

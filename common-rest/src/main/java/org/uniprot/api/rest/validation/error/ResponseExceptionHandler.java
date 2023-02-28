@@ -1,25 +1,5 @@
 package org.uniprot.api.rest.validation.error;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
-import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.addDebugError;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.getBadRequestResponseEntity;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.getContentTypeFromRequest;
-import static org.uniprot.core.util.Utils.nullOrEmpty;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
 import org.apache.catalina.connector.ClientAbortException;
 import org.owasp.encoder.Encode;
 import org.slf4j.Logger;
@@ -44,6 +24,23 @@ import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.rest.output.converter.StopStreamException;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
+import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 /**
  * Captures exceptions raised by the application, and handles them in a tailored way.
@@ -313,5 +310,12 @@ public class ResponseExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .contentType(getContentTypeFromRequest(request))
                 .body(error);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorInfo> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(getContentTypeFromRequest(request))
+                .body(new ErrorInfo(request.getRequestURL().toString(), List.of(ex.getMessage())));
     }
 }
