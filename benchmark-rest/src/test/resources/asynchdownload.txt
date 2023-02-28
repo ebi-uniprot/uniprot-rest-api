@@ -1,4 +1,4 @@
-query#contentType
+query#format
 query=organism_id:9606 AND reviewed:true#application/json
 query=organism_id:9606 AND reviewed:false#application/json
 query=organism_id:9606#application/json
@@ -13,4 +13,4 @@ query=length:[1 TO 300]#application/json
 query=reviewed:false AND existence:4#application/json
 query=reviewed:false#application/json
 query=reviewed:false AND existence:3#application/json
-query=taxonomy_id:201174
+query=taxonomy_id:201174#application/json

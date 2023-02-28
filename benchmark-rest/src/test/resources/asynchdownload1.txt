@@ -1,4 +1,4 @@
-query#contentType
+query#format
 query=A0A0C5B5G6#application/json
 query=A0A1B0GTW7#application/json
 query=A0JNW5#application/json
@@ -18,4 +18,4 @@ query=P17814#application/json
 query=P25765#application/json
 query=P29618#application/json
 query=P49027#application/json
-query=Q01401
+query=Q01401#application/json
