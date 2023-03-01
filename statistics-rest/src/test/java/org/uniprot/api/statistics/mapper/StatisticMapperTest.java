@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
-import org.uniprot.api.statistics.StatisticAttributeFacetConfig;
+import org.uniprot.api.statistics.StatisticAttributeConfig;
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.model.StatisticAttribute;
@@ -27,7 +27,7 @@ class StatisticMapperTest {
     private static final Map<String, FacetProperty> FACET_MAP = new HashMap<>();
     public static final String LABEL_0 = "label0";
     @Mock
-    private StatisticAttributeFacetConfig statisticAttributeFacetConfig;
+    private StatisticAttributeConfig statisticAttributeConfig;
     @InjectMocks
     private StatisticMapper statisticMapper;
 
@@ -65,7 +65,7 @@ class StatisticMapperTest {
 
     @Test
     void mapUniprotkbStatisticsEntryToStatisticAttribute() {
-        when(statisticAttributeFacetConfig.getAttributes()).thenReturn(FACET_MAP);
+        when(statisticAttributeConfig.getAttributes()).thenReturn(FACET_MAP);
         UniprotkbStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
         StatisticAttribute statisticAttribute =

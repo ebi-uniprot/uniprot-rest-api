@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_ENTRIES;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.*;
 
 @ExtendWith(MockitoExtension.class)
 class StatisticServiceTest {
@@ -68,18 +68,24 @@ class StatisticServiceTest {
                 .totalCount(STATISTICS_ENTRIES[0].getValueCount() + STATISTICS_ENTRIES[1].getValueCount())
                 .totalEntryCount(STATISTICS_ENTRIES[0].getEntryCount() + STATISTICS_ENTRIES[1].getEntryCount())
                 .attributes(List.of(statisticAttribute0, statisticAttribute1))
+                .label(LABELS[0])
+                .searchField(SEARCH_FIELDS[0])
                 .build();
         statisticCategory1 = StatisticCategoryImpl.builder()
                 .name(CATEGORY_1)
                 .totalCount(STATISTICS_ENTRIES[3].getValueCount())
                 .totalEntryCount(STATISTICS_ENTRIES[3].getEntryCount())
                 .attributes(List.of(statisticAttribute3))
+                .label(LABELS[1])
+                .searchField(SEARCH_FIELDS[1])
                 .build();
         statisticCategory2 = StatisticCategoryImpl.builder()
                 .name(CATEGORY_2)
                 .totalCount(STATISTICS_ENTRIES[4].getValueCount())
                 .totalEntryCount(STATISTICS_ENTRIES[4].getEntryCount())
                 .attributes(List.of(statisticAttribute4))
+                .label(LABELS[2])
+                .searchField(SEARCH_FIELDS[2])
                 .build();
         lenient().when(statisticMapper.map(STATISTIC_TYPE_ENUM)).thenReturn(ENTRY_TYPE);
         lenient().when(statisticMapper.map(STATISTICS_ENTRIES[0])).thenReturn(statisticAttribute0);

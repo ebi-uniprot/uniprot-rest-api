@@ -17,6 +17,8 @@ public class TestEntityGeneratorUtil {
     public static final int[] STAT_CATEGORY_IDS = new int[] {0, 0, 1, 1, 2};
     public static final Long[] VALUE_COUNTS = new Long[] {3L, 27L, 9999L, 500L, 87L};
     public static final Long[] ENTRY_COUNTS = new Long[] {31L, 25L, 188999L, 1098L, 510L};
+    public static final String[] LABELS = new String[] {"label0", "label1", "label2"};
+    public static final String[] SEARCH_FIELDS = new String[] {"sf0", "sf1", "sf2"};
     public static final String[] DESCRIPTIONS =
             new String[] {"des0", "des1", "des2", "des3", "des4"};
     public static final String[] RELEASES = new String[] {"rel0", "rel0", "rel1", "rel0", "rel0"};
@@ -56,6 +58,8 @@ public class TestEntityGeneratorUtil {
         statisticsCategory.setId(STAT_IDS[index]);
         statisticsCategory.setCategory(STAT_CATEGORIES_NAMES[index]);
         statisticsCategory.setDbType(DB_TYPE);
+        statisticsCategory.setLabel(LABELS[index]);
+        statisticsCategory.setSearchField(SEARCH_FIELDS[index]);
         return statisticsCategory;
     }
 }

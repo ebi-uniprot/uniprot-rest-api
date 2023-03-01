@@ -5,7 +5,9 @@ CREATE TABLE statistics_category
 (
     id       SERIAL PRIMARY KEY,
     category varchar(128) NOT NULL,
-    db_type  varchar(64) NULL
+    db_type  varchar(64) NULL,
+    label  varchar(64) NULL,
+    search_field  varchar(64) NULL
 );
 
 
@@ -26,12 +28,12 @@ CREATE TABLE uniprotkb_statistics_entry
 ALTER TABLE uniprotkb_statistics_entry
     ADD CONSTRAINT uniprotkb_statistics_entry_fk FOREIGN KEY (statistics_category_id) REFERENCES statistics_category (id);
 
-INSERT INTO statistics_category (id, category, db_type)
-VALUES (39, 'EUKARYOTA', 'UNIPROTKB');
-INSERT INTO statistics_category (id, category, db_type)
-VALUES (45, 'SEQUENCE_AMINO_ACID', 'UNIPROTKB');
-INSERT INTO statistics_category (id, category, db_type)
-VALUES (52, 'TOP_ORGANISM', 'UNIPROTKB');
+INSERT INTO statistics_category (id, category, db_type, label, search_field)
+VALUES (39, 'EUKARYOTA', 'UNIPROTKB', 'Eukaryota', 'sf Eukaryota');
+INSERT INTO statistics_category (id, category, db_type, label, search_field)
+VALUES (45, 'SEQUENCE_AMINO_ACID', 'UNIPROTKB', 'Sequence Amino Acid', 'sf Sequence Amino Acid');
+INSERT INTO statistics_category (id, category, db_type, label, search_field)
+VALUES (52, 'TOP_ORGANISM', 'UNIPROTKB', 'Top Organism', 'sf Organism');
 
 
 INSERT INTO uniprotkb_statistics_entry (id, attribute_name, statistics_category_id, value_count, entry_count,
