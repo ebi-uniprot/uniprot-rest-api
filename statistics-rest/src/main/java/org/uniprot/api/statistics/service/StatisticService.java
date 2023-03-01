@@ -66,6 +66,8 @@ public class StatisticService {
                                 entry.getValue().stream().mapToLong(UniprotkbStatisticsEntry::getValueCount).sum())
                         .totalEntryCount(
                                 entry.getValue().stream().mapToLong(UniprotkbStatisticsEntry::getEntryCount).sum())
+                        .label(entry.getKey().getLabel())
+                        .searchField(entry.getKey().getSearchField())
                         .attributes(
                                 entry.getValue().stream()
                                         .map(statisticMapper::map)

@@ -15,9 +15,9 @@ import java.util.Map;
 @Component
 @Getter
 @Setter
-@PropertySource({"classpath:statistics.facet.properties"})
-@ConfigurationProperties(prefix = "facet")
-public class StatisticAttributeFacetConfig extends FacetConfig {
+@PropertySource({"classpath:statistics.properties"})
+@ConfigurationProperties(prefix = "statistics")
+public class StatisticAttributeConfig extends FacetConfig {
 
     private Map<String, FacetProperty> attributes = new HashMap<>();
 

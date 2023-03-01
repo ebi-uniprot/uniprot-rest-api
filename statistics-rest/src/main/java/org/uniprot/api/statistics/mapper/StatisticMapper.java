@@ -1,7 +1,7 @@
 package org.uniprot.api.statistics.mapper;
 
 import org.springframework.stereotype.Component;
-import org.uniprot.api.statistics.StatisticAttributeFacetConfig;
+import org.uniprot.api.statistics.StatisticAttributeConfig;
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.model.StatisticAttribute;
@@ -12,10 +12,10 @@ import java.util.Optional;
 
 @Component
 public class StatisticMapper {
-    private final StatisticAttributeFacetConfig statisticAttributeFacetConfig;
+    private final StatisticAttributeConfig statisticAttributeConfig;
 
-    public StatisticMapper(StatisticAttributeFacetConfig statisticAttributeFacetConfig) {
-        this.statisticAttributeFacetConfig = statisticAttributeFacetConfig;
+    public StatisticMapper(StatisticAttributeConfig statisticAttributeConfig) {
+        this.statisticAttributeConfig = statisticAttributeConfig;
     }
 
     public EntryType map(StatisticType statisticType) {
@@ -50,7 +50,7 @@ public class StatisticMapper {
                 .statisticType(map(entry.getEntryType()))
                 .label(
                         Optional.ofNullable(
-                                        statisticAttributeFacetConfig
+                                        statisticAttributeConfig
                                                 .getAttributes()
                                                 .get(entry.getStatisticsCategory().getCategory().toLowerCase()))
                                 .map(
