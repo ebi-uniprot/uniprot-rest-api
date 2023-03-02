@@ -1662,6 +1662,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.fragment = true;
             doc.precursor = true;
             doc.isIsoform = false;
+            doc.evidenceExperimental = true;
             doc.otherOrganism = "Search All";
             doc.organismHostIds.add(9606);
             doc.organismHostNames.add("Search All");
@@ -1671,39 +1672,55 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.rcStrain.add("Search All");
             doc.rcTissue.add("Search All");
             doc.subcellLocationNote.add("Search All");
+            doc.commentMap.put("cc_scl_note_exp", Collections.singleton("Search All"));
             doc.subcellLocationNoteEv.add("Search All");
             doc.subcellLocationTerm.add("Search All");
+            doc.commentMap.put("cc_scl_term_exp", Collections.singleton("Search All"));
             doc.subcellLocationTermEv.add("Search All");
             doc.ap.add("Search All");
+            doc.commentMap.put("cc_ap_exp", Collections.singleton("Search All"));
             doc.apEv.add("Search All");
             doc.apAi.add("Search All");
+            doc.commentMap.put("cc_ap_ai_exp", Collections.singleton("Search All"));
             doc.apAiEv.add("Search All");
             doc.apApu.add("Search All");
+            doc.commentMap.put("cc_ap_apu_exp", Collections.singleton("Search All"));
             doc.apApuEv.add("Search All");
             doc.apAs.add("Search All");
+            doc.commentMap.put("cc_ap_as_exp", Collections.singleton("Search All"));
             doc.apAsEv.add("Search All");
             doc.apRf.add("Search All");
+            doc.commentMap.put("cc_ap_rf_exp", Collections.singleton("Search All"));
             doc.apRfEv.add("Search All");
             doc.bpcp.add("Search All");
+            doc.commentMap.put("cc_bpcp_exp", Collections.singleton("Search All"));
             doc.bpcpEv.add("Search All");
             doc.bpcpAbsorption.add("Search All");
+            doc.commentMap.put("cc_bpcp_absorption_exp", Collections.singleton("Search All"));
             doc.bpcpAbsorptionEv.add("Search All");
             doc.bpcpKinetics.add("Search All");
+            doc.commentMap.put("cc_bpcp_kinetics_exp", Collections.singleton("Search All"));
             doc.bpcpKineticsEv.add("Search All");
             doc.bpcpPhDependence.add("Search All");
+            doc.commentMap.put("cc_bpcp_ph_dependence_exp", Collections.singleton("Search All"));
             doc.bpcpPhDependenceEv.add("Search All");
             doc.bpcpRedoxPotential.add("Search All");
+            doc.commentMap.put("cc_bpcp_redox_potential_exp", Collections.singleton("Search All"));
             doc.bpcpRedoxPotentialEv.add("Search All");
             doc.bpcpTempDependence.add("Search All");
+            doc.commentMap.put("cc_bpcp_temp_dependence_exp", Collections.singleton("Search All"));
             doc.bpcpTempDependenceEv.add("Search All");
             doc.inchikey.add("Search All");
             doc.rheaIds.add("Search All");
             doc.chebi.add("Search All");
             doc.cofactorChebi.add("Search All");
+            doc.commentMap.put("cc_cofactor_chebi_exp", Collections.singleton("Search All"));
             doc.cofactorChebiEv.add("Search All");
             doc.cofactorNote.add("Search All");
+            doc.commentMap.put("cc_cofactor_note_exp", Collections.singleton("Search All"));
             doc.cofactorNoteEv.add("Search All");
             doc.seqCaution.add("Search All");
+            doc.commentMap.put("cc_sc_exp", Collections.singleton("Search All"));
             doc.seqCautionEv.add("Search All");
             doc.seqCautionFrameshift.add("Search All");
             doc.seqCautionErInit.add("Search All");
@@ -1711,6 +1728,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.seqCautionErTerm.add("Search All");
             doc.seqCautionErTran.add("Search All");
             doc.seqCautionMisc.add("Search All");
+            doc.commentMap.put("cc_sc_misc_exp", Collections.singleton("Search All"));
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
             doc.uniparc = "UPI0000000001";
@@ -1733,6 +1751,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 String typeName = type.getName().toLowerCase();
                                 doc.featuresMap.put(
                                         "ft_" + typeName, Collections.singleton("Search All"));
+                                doc.featuresMap.put(
+                                        "ft_" + typeName + "_exp",
+                                        Collections.singleton("Search All"));
                                 doc.featureEvidenceMap.put(
                                         "ftev_" + typeName, Collections.singleton("Search All"));
                                 doc.featureLengthMap.put(
@@ -1745,6 +1766,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                             type -> {
                                 doc.featuresMap.put(
                                         "ft_" + type, Collections.singleton("Search All"));
+                                doc.featuresMap.put(
+                                        "ft_" + type + "_exp", Collections.singleton("Search All"));
                                 doc.featureEvidenceMap.put(
                                         "ftev_" + type, Collections.singleton("Search All"));
                                 doc.featureLengthMap.put(
@@ -1757,6 +1780,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 String typeName = type.name().toLowerCase();
                                 doc.commentMap.put(
                                         "cc_" + typeName, Collections.singleton("Search All"));
+                                doc.commentMap.put(
+                                        "cc_" + typeName + "_exp",
+                                        Collections.singleton("Search All"));
                                 doc.commentEvMap.put(
                                         "ccev_" + typeName, Collections.singleton("Search All"));
                             });
