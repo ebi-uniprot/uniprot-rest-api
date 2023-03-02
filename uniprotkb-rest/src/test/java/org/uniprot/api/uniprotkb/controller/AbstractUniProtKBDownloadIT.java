@@ -55,11 +55,9 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControllerIT {
 
     static RabbitMQContainer rabbitMQContainer =
-            new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management")).withReuse(true);
+            new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
     static GenericContainer<?> redisContainer =
-            new GenericContainer<>(DockerImageName.parse("redis:6-alpine"))
-                    .withExposedPorts(6379)
-                    .withReuse(true);
+            new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
 
     @DynamicPropertySource
     public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
@@ -142,13 +140,15 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     }
 
     @AfterAll
-    public void cleanUpData() throws IOException {
+    public void cleanUpData() throws Exception {
         cleanUpFolder(this.idsFolder);
         cleanUpFolder(this.resultFolder);
         getDownloadJobRepository().deleteAll();
         this.amqpAdmin.purgeQueue(rejectedQueue, true);
         this.amqpAdmin.purgeQueue(downloadQueue, true);
         this.amqpAdmin.purgeQueue(retryQueue, true);
+        rabbitMQContainer.stop();
+        redisContainer.stop();
     }
 
     protected abstract DownloadJobRepository getDownloadJobRepository();

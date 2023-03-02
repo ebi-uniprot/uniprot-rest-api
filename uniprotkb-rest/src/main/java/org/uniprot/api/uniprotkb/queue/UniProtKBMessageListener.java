@@ -152,8 +152,10 @@ public class UniProtKBMessageListener implements MessageListener {
         try {
             Stream<String> ids = streamIds(request);
             saveIdsInTempFile(idsFile, ids);
+            log.info("Solr ids saved for job {}", jobId);
             StoreRequest storeRequest = service.buildStoreRequest(request);
             downloadResultWriter.writeResult(request, idsFile, jobId, contentType, storeRequest);
+            log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
             logMessageAndDeleteFile(ex, jobId, contentType);
             throw new MessageListenerException(ex);

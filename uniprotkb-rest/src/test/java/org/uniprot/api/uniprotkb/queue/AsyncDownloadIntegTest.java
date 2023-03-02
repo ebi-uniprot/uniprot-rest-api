@@ -70,7 +70,6 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest({UniProtKBDownloadController.class})
 @AutoConfigureWebClient
-@Disabled
 public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
@@ -102,7 +101,7 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
 
     @Test
     void sendAndProcessDownloadMessageSuccessfully() throws IOException {
-        String query = "content:*";
+        String query = "content:P";
         MediaType format = MediaType.APPLICATION_JSON;
         UniProtKBDownloadRequest request = createDownloadRequest(query, format);
         String jobId = this.hashGenerator.generateHash(request);

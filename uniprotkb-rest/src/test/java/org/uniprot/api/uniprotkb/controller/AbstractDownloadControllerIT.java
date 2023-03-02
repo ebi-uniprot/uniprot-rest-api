@@ -14,10 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CODE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -27,7 +24,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
@@ -96,7 +92,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         MediaType format = MediaType.APPLICATION_JSON;
         String jobId = callRunAPIAndVerify(query, null, null, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        await().atMost(20, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         Optional<DownloadJob> optJob1 = getDownloadJobRepository().findById(jobId);
         String newJobId = callRunAPIAndVerify(query, null, null, format.toString());

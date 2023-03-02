@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.MimeType;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -44,6 +43,7 @@ public class HttpServletRequestContentTypeMutator {
                     .collect(Collectors.toSet());
     private static final Pattern BROWSER_PATTERN =
             Pattern.compile("Mozilla|AppleWebKit|Edg|OPR|Chrome|Vivaldi");
+    public static final String DOWNLOAD_RUN_SUFFIX = "/download/run";
     final Map<String, Collection<MediaType>> resourcePath2MediaTypes = new HashMap<>();
     final List<String> resourcePath2MediaTypesKeys = new ArrayList<>();
 
@@ -68,7 +68,7 @@ public class HttpServletRequestContentTypeMutator {
     }
 
     public void mutate(MutableHttpServletRequest request) {
-        if (!RequestMethod.POST.name().equals(request.getMethod())) {
+        if (!request.getRequestURI().endsWith(DOWNLOAD_RUN_SUFFIX)) {
             mutateAcceptHeader(request);
             mutateAcceptEncodingHeader(request);
         }
