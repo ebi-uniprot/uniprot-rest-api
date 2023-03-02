@@ -43,6 +43,7 @@ import org.uniprot.api.rest.download.model.HashGenerator;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.AbstractUniProtKBDownloadIT;
@@ -298,9 +299,14 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
         // verify result file
-        Path resultFilePath = Path.of(this.resultFolder + "/" + jobId);
+        String fileName = jobId + FileType.GZIP.getExtension();
+        Path resultFilePath = Path.of(this.resultFolder + "/" + fileName);
         Assertions.assertTrue(Files.exists(resultFilePath));
-        String resultsJson = Files.readString(resultFilePath);
+        // uncompress the gz file
+        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFile);
+        Assertions.assertTrue(Files.exists(unzippedFile));
+        String resultsJson = Files.readString(unzippedFile);
         Assertions.assertNotNull(resultsJson);
         List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
         Assertions.assertNotNull(primaryAccessions);
