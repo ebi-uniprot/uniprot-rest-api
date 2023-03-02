@@ -314,16 +314,17 @@ class HttpServletRequestContentTypeMutatorTest {
     }
 
     @Test
-    void postRequestWithExtensionIgnored() {
+    void downloadRequestWithFormatIgnored() {
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         String entityPath = "/a/b/ENTITY";
-        String uri = entityPath + ".fasta";
+        String uri = entityPath + "/download/run";
         String host = "http://localhost";
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(host + uri));
         when(httpRequest.getRequestURI()).thenReturn(uri);
         when(httpRequest.getServletPath()).thenReturn(uri);
         when(httpRequest.getContextPath()).thenReturn("");
         when(httpRequest.getMethod()).thenReturn("POST");
+        when(httpRequest.getParameter(FORMAT)).thenReturn("fasta");
         MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
 
         requestContentTypeMutator.mutate(mutableRequest);
