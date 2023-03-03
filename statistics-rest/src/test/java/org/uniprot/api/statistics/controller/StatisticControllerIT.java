@@ -1,11 +1,9 @@
 package org.uniprot.api.statistics.controller;
 
-import com.github.dockerjava.zerodep.shaded.org.apache.hc.core5.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,7 +47,7 @@ class StatisticControllerIT {
                 .andExpect(
                         content()
                                 .json(
-                                        "{\"results\":[{\"name\":\"SEQUENCE_AMINO_ACID\",\"searchField\":\"sf Sequence Amino Acid\",\"label\":\"Sequence Amino Acid\",\"totalCount\":329,\"totalEntryCount\":254,\"attributes\":[{\"name\":\"AMINO_ACID_U\",\"count\":329,\"entryCount\":254,\"description\":null,\"statisticType\":\"REVIEWED\"}]},{\"name\":\"TOP_ORGANISM\",\"searchField\":\"sf Organism\",\"label\":\"Top Organism\",\"totalCount\":716,\"totalEntryCount\":716,\"attributes\":[{\"name\":\"Salmonella paratyphi B (strain ATCC BAA-1250 / SPB7)\",\"count\":716,\"entryCount\":716,\"description\":null,\"statisticType\":\"REVIEWED\"}]},{\"name\":\"EUKARYOTA\",\"searchField\":\"sf Eukaryota\",\"label\":\"Eukaryota\",\"totalCount\":44817,\"totalEntryCount\":44817,\"attributes\":[{\"name\":\"Fungi\",\"count\":35360,\"entryCount\":35360,\"description\":null,\"statisticType\":\"REVIEWED\"},{\"name\":\"Insecta\",\"count\":9457,\"entryCount\":9457,\"description\":null,\"statisticType\":\"REVIEWED\"}]}]}"));
+                                        "{\"results\":[{\"categoryName\":\"SEQUENCE_AMINO_ACID\",\"searchField\":\"sf Sequence Amino Acid\",\"label\":\"Sequence Amino Acid\",\"totalCount\":329,\"items\":[{\"name\":\"AMINO_ACID_U\",\"count\":329,\"entryCount\":254}]},{\"categoryName\":\"TOP_ORGANISM\",\"searchField\":\"sf Organism\",\"label\":\"Top Organism\",\"totalCount\":716,\"items\":[{\"name\":\"Salmonella paratyphi B (strain ATCC BAA-1250 / SPB7)\",\"count\":716,\"entryCount\":716}]},{\"categoryName\":\"EUKARYOTA\",\"searchField\":\"sf Eukaryota\",\"label\":\"Eukaryota\",\"totalCount\":44817,\"items\":[{\"name\":\"Fungi\",\"count\":35360,\"entryCount\":35360},{\"name\":\"Insecta\",\"count\":9457,\"entryCount\":9457}]}]}"));
     }
 
     @Test
@@ -61,7 +59,7 @@ class StatisticControllerIT {
                 .andExpect(
                         content()
                                 .json(
-                                        "{\"results\":[{\"name\":\"EUKARYOTA\",\"searchField\":\"sf Eukaryota\",\"label\":\"Eukaryota\",\"totalCount\":44817,\"totalEntryCount\":44817,\"attributes\":[{\"name\":\"Fungi\",\"count\":35360,\"entryCount\":35360,\"description\":null,\"statisticType\":\"REVIEWED\"},{\"name\":\"Insecta\",\"count\":9457,\"entryCount\":9457,\"description\":null,\"statisticType\":\"REVIEWED\"}]}]}"));
+                                        "{\"results\":[{\"categoryName\":\"EUKARYOTA\",\"searchField\":\"sf Eukaryota\",\"label\":\"Eukaryota\",\"totalCount\":44817,\"items\":[{\"name\":\"Fungi\",\"count\":35360,\"entryCount\":35360},{\"name\":\"Insecta\",\"count\":9457,\"entryCount\":9457}]}]}"));
     }
 
     @Test
@@ -75,7 +73,7 @@ class StatisticControllerIT {
                 .andExpect(
                         content()
                                 .json(
-                                        "{\"results\":[{\"name\":\"TOP_ORGANISM\",\"searchField\":\"sf Organism\",\"label\":\"Top Organism\",\"totalCount\":716,\"totalEntryCount\":716,\"attributes\":[{\"name\":\"Salmonella paratyphi B (strain ATCC BAA-1250 / SPB7)\",\"count\":716,\"entryCount\":716,\"description\":null,\"statisticType\":\"REVIEWED\"}]},{\"name\":\"EUKARYOTA\",\"searchField\":\"sf Eukaryota\",\"label\":\"Eukaryota\",\"totalCount\":44817,\"totalEntryCount\":44817,\"attributes\":[{\"name\":\"Fungi\",\"count\":35360,\"entryCount\":35360,\"description\":null,\"statisticType\":\"REVIEWED\"},{\"name\":\"Insecta\",\"count\":9457,\"entryCount\":9457,\"description\":null,\"statisticType\":\"REVIEWED\"}]}]}"));
+                                        "{\"results\":[{\"categoryName\":\"TOP_ORGANISM\",\"searchField\":\"sf Organism\",\"label\":\"Top Organism\",\"totalCount\":716,\"items\":[{\"name\":\"Salmonella paratyphi B (strain ATCC BAA-1250 / SPB7)\",\"count\":716,\"entryCount\":716}]},{\"categoryName\":\"EUKARYOTA\",\"searchField\":\"sf Eukaryota\",\"label\":\"Eukaryota\",\"totalCount\":44817,\"items\":[{\"name\":\"Fungi\",\"count\":35360,\"entryCount\":35360},{\"name\":\"Insecta\",\"count\":9457,\"entryCount\":9457}]}]}"));
     }
 
     @Test
@@ -83,8 +81,7 @@ class StatisticControllerIT {
             throws Exception {
         this.mockMvc
                 .perform(
-                        get("/statistics/releases/2021_03/wrongStatType?categories=EUKARYOTA,TOP_ORGANISM")
-                                .header(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON))
+                        get("/statistics/releases/2021_03/wrongStatType?categories=EUKARYOTA,TOP_ORGANISM"))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsStringIgnoringCase("Statistic Type")));
@@ -95,8 +92,7 @@ class StatisticControllerIT {
             throws Exception {
         this.mockMvc
                 .perform(
-                        get("/statistics/releases/2021_03/reviewed?categories=EUKARYOTA,wrongCategory")
-                                .header(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON))
+                        get("/statistics/releases/2021_03/reviewed?categories=EUKARYOTA,wrongCategory"))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsStringIgnoringCase("Statistic Category")));
