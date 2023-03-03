@@ -72,6 +72,7 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                             .query(request.getQuery())
                             .filterQueries(request.getFilterQueries())
                             .queryConfig(request.getQueryConfig())
+                            .queryField(request.getQueryField())
                             .rows(0)
                             .build();
             try {

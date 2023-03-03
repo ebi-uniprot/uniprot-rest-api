@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.request;
 
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -33,7 +35,10 @@ public class UniProtKBRequestUtil {
             String query,
             boolean isIncludeIsoform) {
 
-        String cleanQuery = CLEAN_QUERY_REGEX.matcher(query.toString().strip()).replaceAll("");
+        String cleanQuery = "";
+        if (notNullNotEmpty(query)) {
+            cleanQuery = CLEAN_QUERY_REGEX.matcher(query.toString().strip()).replaceAll("");
+        }
 
         // We don't add is_isoform:false filter if query verifies accession regex and has dash
         if (ACCESSION_REGEX.matcher(cleanQuery).matches() && cleanQuery.contains(DASH)) {
