@@ -3,8 +3,8 @@ package org.uniprot.api.statistics.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.uniprot.api.statistics.model.StatisticCategory;
-import org.uniprot.api.statistics.model.StatisticResult;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticCategory;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticResult;
 import org.uniprot.api.statistics.service.StatisticService;
 
 import java.util.Collection;
@@ -24,13 +24,13 @@ public class StatisticController {
     @GetMapping(
             value = "/{release}/{statisticType}",
             produces = {APPLICATION_JSON_VALUE})
-    public ResponseEntity<StatisticResult<StatisticCategory>> getAllByVersionAndTypeAndCategoryIn(
+    public ResponseEntity<StatisticModuleStatisticResult<StatisticModuleStatisticCategory>> getAllByVersionAndTypeAndCategoryIn(
             @PathVariable String release,
             @PathVariable String statisticType,
             @RequestParam(required = false, defaultValue = "") Collection<String> categories) {
         return ResponseEntity.ok()
                 .body(
-                        new StatisticResult<>(
+                        new StatisticModuleStatisticResult<>(
                                 statisticService.findAllByVersionAndStatisticTypeAndCategoryIn(
                                         release, statisticType, categories)));
     }

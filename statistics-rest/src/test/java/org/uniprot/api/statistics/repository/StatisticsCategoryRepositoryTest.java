@@ -6,7 +6,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.statistics.entity.StatisticsCategory;
 
 import java.util.Arrays;
@@ -20,10 +23,13 @@ import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATE
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-class StatisticsCategoryRepositoryIT {
-    @Autowired private TestEntityManager entityManager;
+@Import({HttpCommonHeaderConfig.class, RequestMappingHandlerMapping.class})
+class StatisticsCategoryRepositoryTest {
+    @Autowired
+    private TestEntityManager entityManager;
 
-    @Autowired private StatisticsCategoryRepository statisticsCategoryRepository;
+    @Autowired
+    private StatisticsCategoryRepository statisticsCategoryRepository;
 
     @BeforeEach
     void setUp() {

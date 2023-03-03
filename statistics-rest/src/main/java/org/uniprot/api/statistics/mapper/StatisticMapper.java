@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import org.uniprot.api.statistics.StatisticAttributeConfig;
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
-import org.uniprot.api.statistics.model.StatisticAttribute;
-import org.uniprot.api.statistics.model.StatisticAttributeImpl;
-import org.uniprot.api.statistics.model.StatisticType;
+import org.uniprot.api.statistics.model.StatisticsModuleStatisticAttribute;
+import org.uniprot.api.statistics.model.StatisticsModuleStatisticAttributeImpl;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticType;
 
 import java.util.Optional;
 
@@ -18,36 +18,35 @@ public class StatisticMapper {
         this.statisticAttributeConfig = statisticAttributeConfig;
     }
 
-    public EntryType map(StatisticType statisticType) {
-        switch (statisticType) {
+    public EntryType map(StatisticModuleStatisticType statisticModuleStatisticType) {
+        switch (statisticModuleStatisticType) {
             case UNREVIEWED:
                 return EntryType.TREMBL;
             case REVIEWED:
                 return EntryType.SWISSPROT;
         }
         throw new IllegalArgumentException(
-                String.format("Statistic type %s is not recognized", statisticType));
+                String.format("Statistic type %s is not recognized", statisticModuleStatisticType));
     }
 
-    public StatisticType map(EntryType entryType) {
+    public StatisticModuleStatisticType map(EntryType entryType) {
         switch (entryType) {
             case TREMBL:
-                return StatisticType.UNREVIEWED;
+                return StatisticModuleStatisticType.UNREVIEWED;
             case SWISSPROT:
-                return StatisticType.REVIEWED;
+                return StatisticModuleStatisticType.REVIEWED;
         }
         throw new IllegalArgumentException(
                 String.format("Entry type %s is not recognized", entryType));
     }
 
-    public StatisticAttribute map(UniprotkbStatisticsEntry entry) {
+    public StatisticsModuleStatisticAttribute map(UniprotkbStatisticsEntry entry) {
         System.out.println();
-        return StatisticAttributeImpl.builder()
+        return StatisticsModuleStatisticAttributeImpl.builder()
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
                 .entryCount(entry.getEntryCount())
                 .description(entry.getDescription())
-                .statisticType(map(entry.getEntryType()))
                 .label(
                         Optional.ofNullable(
                                         statisticAttributeConfig

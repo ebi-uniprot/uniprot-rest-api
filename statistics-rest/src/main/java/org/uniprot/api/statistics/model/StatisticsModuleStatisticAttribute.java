@@ -1,6 +1,6 @@
 package org.uniprot.api.statistics.model;
 
-public interface StatisticAttribute {
+public interface StatisticsModuleStatisticAttribute {
     String getName();
 
     String getLabel();
@@ -10,6 +10,4 @@ public interface StatisticAttribute {
     long getEntryCount();
 
     String getDescription();
-
-    StatisticType getStatisticType();
 }

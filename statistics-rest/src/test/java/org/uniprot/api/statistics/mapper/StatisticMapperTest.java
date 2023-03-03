@@ -10,8 +10,8 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.statistics.StatisticAttributeConfig;
 import org.uniprot.api.statistics.entity.EntryType;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
-import org.uniprot.api.statistics.model.StatisticAttribute;
-import org.uniprot.api.statistics.model.StatisticType;
+import org.uniprot.api.statistics.model.StatisticsModuleStatisticAttribute;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,25 +42,25 @@ class StatisticMapperTest {
 
     @Test
     void mapStatisticTypeToEntryType() {
-        EntryType result = statisticMapper.map(StatisticType.REVIEWED);
+        EntryType result = statisticMapper.map(StatisticModuleStatisticType.REVIEWED);
 
         assertEquals(EntryType.SWISSPROT, result);
     }
 
     @Test
     void mapStatisticTypeToEntryType_whenCaseMixed() {
-        EntryType result = statisticMapper.map(StatisticType.UNREVIEWED);
+        EntryType result = statisticMapper.map(StatisticModuleStatisticType.UNREVIEWED);
 
         assertEquals(EntryType.TREMBL, result);
     }
 
     @Test
     void mapEntryTypeToStatisticType() {
-        StatisticType result = statisticMapper.map(EntryType.TREMBL);
-        assertEquals(StatisticType.UNREVIEWED, result);
+        StatisticModuleStatisticType result = statisticMapper.map(EntryType.TREMBL);
+        assertEquals(StatisticModuleStatisticType.UNREVIEWED, result);
 
         result = statisticMapper.map(EntryType.SWISSPROT);
-        assertEquals(StatisticType.REVIEWED, result);
+        assertEquals(StatisticModuleStatisticType.REVIEWED, result);
     }
 
     @Test
@@ -68,29 +68,28 @@ class StatisticMapperTest {
         when(statisticAttributeConfig.getAttributes()).thenReturn(FACET_MAP);
         UniprotkbStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
-        StatisticAttribute statisticAttribute =
+        StatisticsModuleStatisticAttribute statisticsModuleStatisticAttribute =
                 statisticMapper.map(statisticsEntry);
         assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
-                statisticsEntry, statisticAttribute, LABEL_0);
+                statisticsEntry, statisticsModuleStatisticAttribute, LABEL_0);
     }
 
     @Test
     void mapUniprotkbStatisticsEntryToStatisticAttributeWhenLabelNotExist() {
         UniprotkbStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
-        StatisticAttribute statisticAttribute =
+        StatisticsModuleStatisticAttribute statisticsModuleStatisticAttribute =
                 statisticMapper.map(statisticsEntry);
         assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
-                statisticsEntry, statisticAttribute, null);
+                statisticsEntry, statisticsModuleStatisticAttribute, null);
     }
 
     private static void assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
-            UniprotkbStatisticsEntry expect, StatisticAttribute actual, String label) {
+            UniprotkbStatisticsEntry expect, StatisticsModuleStatisticAttribute actual, String label) {
         assertSame(expect.getAttributeName(), actual.getName());
         assertEquals(expect.getValueCount(), actual.getCount());
         assertEquals(expect.getEntryCount(), actual.getEntryCount());
         assertSame(expect.getDescription(), actual.getDescription());
-        assertEquals(StatisticType.REVIEWED, actual.getStatisticType());
         assertSame(label, actual.getLabel());
     }
 

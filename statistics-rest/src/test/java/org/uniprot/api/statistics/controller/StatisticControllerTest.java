@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import org.uniprot.api.statistics.model.StatisticCategory;
-import org.uniprot.api.statistics.model.StatisticResult;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticCategory;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticResult;
 import org.uniprot.api.statistics.service.StatisticService;
 
 import java.util.Collection;
@@ -26,9 +26,9 @@ class StatisticControllerTest {
     public static final List<String> CATEGORIES_0 = List.of(CATEGORY_0, CATEGORY_1);
     public static final List<String> CATEGORIES_1 = List.of(CATEGORY_0);
     public static final List<String> CATEGORIES_2 = Collections.emptyList();
-    @Mock private Collection<StatisticCategory> results0;
-    @Mock private Collection<StatisticCategory> results1;
-    @Mock private Collection<StatisticCategory> results2;
+    @Mock private Collection<StatisticModuleStatisticCategory> results0;
+    @Mock private Collection<StatisticModuleStatisticCategory> results1;
+    @Mock private Collection<StatisticModuleStatisticCategory> results2;
     @Mock private StatisticService statisticService;
     @InjectMocks private StatisticController statisticController;
 
@@ -38,7 +38,7 @@ class StatisticControllerTest {
                         RELEASE, STATISTIC_TYPE, CATEGORIES_0))
                 .thenReturn(results0);
 
-        ResponseEntity<StatisticResult<StatisticCategory>> result =
+        ResponseEntity<StatisticModuleStatisticResult<StatisticModuleStatisticCategory>> result =
                 statisticController.getAllByVersionAndTypeAndCategoryIn(
                         RELEASE, STATISTIC_TYPE, CATEGORIES_0);
 
@@ -51,7 +51,7 @@ class StatisticControllerTest {
                         RELEASE, STATISTIC_TYPE, CATEGORIES_1))
                 .thenReturn(results1);
 
-        ResponseEntity<StatisticResult<StatisticCategory>> result =
+        ResponseEntity<StatisticModuleStatisticResult<StatisticModuleStatisticCategory>> result =
                 statisticController.getAllByVersionAndTypeAndCategoryIn(
                         RELEASE, STATISTIC_TYPE, CATEGORIES_1);
 
@@ -64,7 +64,7 @@ class StatisticControllerTest {
                         RELEASE, STATISTIC_TYPE, CATEGORIES_2))
                 .thenReturn(results2);
 
-        ResponseEntity<StatisticResult<StatisticCategory>> result =
+        ResponseEntity<StatisticModuleStatisticResult<StatisticModuleStatisticCategory>> result =
                 statisticController.getAllByVersionAndTypeAndCategoryIn(
                         RELEASE, STATISTIC_TYPE, CATEGORIES_2);
 

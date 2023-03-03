@@ -3,9 +3,9 @@ package org.uniprot.api.statistics.service;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 import org.uniprot.api.statistics.mapper.StatisticMapper;
-import org.uniprot.api.statistics.model.StatisticCategory;
-import org.uniprot.api.statistics.model.StatisticCategoryImpl;
-import org.uniprot.api.statistics.model.StatisticType;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticCategory;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticCategoryImpl;
+import org.uniprot.api.statistics.model.StatisticModuleStatisticType;
 import org.uniprot.api.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.statistics.repository.UniprotkbStatisticsEntryRepository;
 
@@ -29,7 +29,7 @@ public class StatisticService {
         this.statisticMapper = statisticMapper;
     }
 
-    public Collection<StatisticCategory> findAllByVersionAndStatisticTypeAndCategoryIn(
+    public Collection<StatisticModuleStatisticCategory> findAllByVersionAndStatisticTypeAndCategoryIn(
             String version, String statisticType, Collection<String> categories) {
         List<UniprotkbStatisticsEntry> entries;
         if (categories.isEmpty()) {
@@ -60,15 +60,13 @@ public class StatisticService {
                 .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategory))
                 .entrySet()
                 .stream()
-                .map(entry -> StatisticCategoryImpl.builder()
-                        .name(entry.getKey().getCategory())
+                .map(entry -> StatisticModuleStatisticCategoryImpl.builder()
+                        .categoryName(entry.getKey().getCategory())
                         .totalCount(
                                 entry.getValue().stream().mapToLong(UniprotkbStatisticsEntry::getValueCount).sum())
-                        .totalEntryCount(
-                                entry.getValue().stream().mapToLong(UniprotkbStatisticsEntry::getEntryCount).sum())
                         .label(entry.getKey().getLabel())
                         .searchField(entry.getKey().getSearchField())
-                        .attributes(
+                        .items(
                                 entry.getValue().stream()
                                         .map(statisticMapper::map)
                                         .collect(Collectors.toList()))
@@ -76,9 +74,9 @@ public class StatisticService {
                 .collect(Collectors.toList());
     }
 
-    private static StatisticType getStatisticType(String statisticType) {
+    private static StatisticModuleStatisticType getStatisticType(String statisticType) {
         try {
-            return StatisticType.valueOf(statisticType.toUpperCase());
+            return StatisticModuleStatisticType.valueOf(statisticType.toUpperCase());
         } catch (Exception e) {
             throw new IllegalArgumentException(
                     String.format("Invalid Statistic Type: %s", statisticType));
