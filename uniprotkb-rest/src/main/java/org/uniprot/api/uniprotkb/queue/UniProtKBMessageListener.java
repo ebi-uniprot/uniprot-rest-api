@@ -301,22 +301,4 @@ public class UniProtKBMessageListener implements MessageListener {
             throw new MessageListenerException(e);
         }
     }
-
-    @Override
-    public String toString() {
-        return "UniProtKBMessageListener{"
-                + "converter="
-                + converter.hashCode()
-                + ", service="
-                + service.hashCode()
-                + ", downloadConfigProperties="
-                + downloadConfigProperties.hashCode()
-                + ", downloadResultWriter="
-                + downloadResultWriter.hashCode()
-                + ", jobRepository="
-                + jobRepository.hashCode()
-                + ", rabbitTemplate="
-                + rabbitTemplate.hashCode()
-                + '}';
-    }
 }

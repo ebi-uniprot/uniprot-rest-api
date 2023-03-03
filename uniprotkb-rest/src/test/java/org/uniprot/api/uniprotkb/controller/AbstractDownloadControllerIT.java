@@ -1,29 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CODE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
@@ -46,8 +24,29 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CODE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDownloadIT {
@@ -387,6 +386,59 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         String resultsJson = Files.readString(unzippedFilePath);
         List<String> results = JsonPath.read(resultsJson, "$.results");
         Assertions.assertAll(() -> assertNotNull(results), () -> assertTrue(results.isEmpty()));
+    }
+
+    @Test
+    void runJobWithFieldsJsonAndVerify() throws Exception {
+        // when
+        String query = "content:FGFR";
+        String fields = "accession,id,gene_names";
+        String jobId = callRunAPIAndVerify(query, fields, null, "json");
+        // then
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        getAndVerifyDetails(jobId);
+        String fileWithExt = jobId + FileType.GZIP.getExtension();
+        Path resultFilePath = Path.of(this.resultFolder + "/" + fileWithExt);
+        Assertions.assertTrue(Files.exists(resultFilePath));
+        // uncompress the gz file
+        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFile);
+        Assertions.assertTrue(Files.exists(unzippedFile));
+        String resultsJson = Files.readString(unzippedFile);
+        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
+        Assertions.assertEquals(10, primaryAccessions.size());
+        List<String> uniProtkbIds = JsonPath.read(resultsJson, "$.results.*.uniProtkbId");
+        Assertions.assertEquals(10, uniProtkbIds.size());
+        List<String> genes = JsonPath.read(resultsJson, "$.results.*.genes");
+        Assertions.assertEquals(10, genes.size());
+        List<String> comments = JsonPath.read(resultsJson, "$.results.*.comments");
+        Assertions.assertEquals(0, comments.size());
+        List<String> organisms = JsonPath.read(resultsJson, "$.results.*.organism");
+        Assertions.assertEquals(0, organisms.size());
+    }
+
+    @Test
+    void runJobWithFieldsTSVAndVerify() throws Exception {
+        // when
+        String query = "content:FGFR";
+        String fields = "accession,id,gene_names";
+        String jobId = callRunAPIAndVerify(query, fields, null, "tsv");
+        // then
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        getAndVerifyDetails(jobId);
+        String fileWithExt = jobId + FileType.GZIP.getExtension();
+        Path resultFilePath = Path.of(this.resultFolder + "/" + fileWithExt);
+        Assertions.assertTrue(Files.exists(resultFilePath));
+        // uncompress the gz file
+        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFile);
+        Assertions.assertTrue(Files.exists(unzippedFile));
+        String tsvString = Files.readString(unzippedFile);
+        String[] rows = tsvString.split("\n");
+        Assertions.assertEquals(11, rows.length);
+        Assertions.assertEquals("Entry\tEntry Name\tGene Names", rows[0]);
     }
 
     protected JobStatus getJobStatus(String jobId) throws Exception {
