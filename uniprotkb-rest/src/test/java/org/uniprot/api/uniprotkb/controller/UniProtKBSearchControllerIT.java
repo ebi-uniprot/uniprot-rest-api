@@ -70,7 +70,6 @@ import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.core.uniprotkb.UniProtKBAccession;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.UniProtKBId;
@@ -1563,13 +1562,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         // given
         UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.ACC);
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
-        UniProtKBAccession accession = entry.getPrimaryAccession();
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.ACCANDGENE);
-        // set the same uniprot id as canonical
-        UniProtKBEntryBuilder eb = UniProtKBEntryBuilder.from(entry);
-        eb.primaryAccession(accession);
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, eb.build());
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
 
         // when
         ResultActions response =
@@ -1581,8 +1576,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.genes[0].geneName.value", contains("B3GAT1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("B3GAT1")));
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results[0].primaryAccession", is("Q9P2W7")))
+                .andExpect(jsonPath("$.results[1].primaryAccession", is("B3GAT1")))
+                .andExpect(jsonPath("$.results[0].genes[0].geneName.value", is("B3GAT1")));
     }
 
     @Override
