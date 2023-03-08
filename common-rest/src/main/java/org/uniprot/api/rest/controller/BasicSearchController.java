@@ -26,7 +26,6 @@ import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -293,14 +292,8 @@ public abstract class BasicSearchController<T> {
         switch (job.getStatus()) {
             case NEW:
             case RUNNING:
-                response = ResponseEntity.ok(new JobStatusResponse(job.getStatus()));
-                break;
             case FINISHED:
-                String redirectUrl = constructDownloadRedirectUrl(job.getResultFile(), url);
-                response =
-                        ResponseEntity.status(HttpStatus.SEE_OTHER)
-                                .header(HttpHeaders.LOCATION, redirectUrl)
-                                .body(new JobStatusResponse(JobStatus.FINISHED));
+                response = ResponseEntity.ok(new JobStatusResponse(job.getStatus()));
                 break;
             default:
                 ProblemPair error = new ProblemPair(EXCEPTION_CODE, job.getError());
