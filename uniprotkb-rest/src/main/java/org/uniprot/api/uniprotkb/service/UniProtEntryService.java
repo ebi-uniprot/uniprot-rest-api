@@ -48,6 +48,7 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 @Service
 @Import(UniProtSolrQueryConfig.class)
@@ -67,8 +68,7 @@ public class UniProtEntryService
     private final RDFStreamer uniProtRDFStreamer;
 
     private static final Pattern ACCESSION_REGEX =
-            Pattern.compile(
-                    "([O,P,Q][0-9][A-Z|0-9]{3}[0-9]|[A-N,R-Z]([0-9][A-Z][A-Z|0-9]{2}){1,2}[0-9])(-\\d+)*");
+            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX_ISOFORM);
 
     public UniProtEntryService(
             UniprotQueryRepository repository,

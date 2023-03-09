@@ -17,6 +17,7 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * This class does the following:
@@ -41,7 +42,8 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 public class UniProtQueryProcessor implements QueryProcessor {
     public static final String IMPOSSIBLE_FIELD = "NOT_REAL_FIELD";
     public static final String UNIPROTKB_ACCESSION_FIELD = "accession";
-    private static final Pattern CLEAN_QUERY_REGEX = Pattern.compile("(?:^\\()|(?:\\)$)");
+    private static final Pattern CLEAN_QUERY_REGEX =
+            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);;
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
     private final QueryNodeProcessorPipeline queryProcessorPipeline;
     private final List<SearchFieldItem> optimisableFields;
