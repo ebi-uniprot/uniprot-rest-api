@@ -32,6 +32,7 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * @param <D> the type of the input to the class. a type of Document
@@ -46,7 +47,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     protected final AbstractSolrSortClause solrSortClause;
     protected final SolrQueryConfig queryBoosts;
     protected final FacetConfig facetConfig;
-    private static final Pattern CLEAN_QUERY_REGEX = Pattern.compile("(?:^\\()|(?:\\)$)");
+    private static final Pattern CLEAN_QUERY_REGEX =
+            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
     // If this property is not set then it is set to empty and later it is set to
     // DEFAULT_SOLR_BATCH_SIZE
@@ -204,20 +206,24 @@ public abstract class BasicSearchService<D extends Document, R> {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
         }
 
+        requestBuilder.queryField(getQueryFields(query));
         requestBuilder.queryConfig(queryBoosts);
 
+        return requestBuilder;
+    }
+
+    private String getQueryFields(String query) {
+        String queryFields = "";
         Optional<String> optimisedQueryField = validateOptimisableField(query);
         if (optimisedQueryField.isPresent()) {
-            String queryFields = optimisedQueryField.get();
+            queryFields = optimisedQueryField.get();
             if (queryBoosts.getExtraOptmisableQueryFields() != null) {
                 queryFields = queryFields + " " + queryBoosts.getExtraOptmisableQueryFields();
             }
-            requestBuilder.queryField(queryFields);
         } else {
-            requestBuilder.queryField(queryBoosts.getQueryFields());
+            queryFields = queryBoosts.getQueryFields();
         }
-
-        return requestBuilder;
+        return queryFields;
     }
 
     private boolean isSizeLessOrEqualToSolrBatchSize(Integer requestedSize) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.uniprot.store.search.SolrQueryUtil;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * @author sahmad
@@ -22,11 +23,11 @@ public class UniProtKBRequestUtil {
      *
      * @return true if we need to add isoform filter query
      */
-    private static final Pattern CLEAN_QUERY_REGEX = Pattern.compile("(?:^\\()|(?:\\)$)");
+    private static final Pattern CLEAN_QUERY_REGEX =
+            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
     private static final Pattern ACCESSION_REGEX =
-            Pattern.compile(
-                    "([O,P,Q][0-9][A-Z|0-9]{3}[0-9]|[A-N,R-Z]([0-9][A-Z][A-Z|0-9]{2}){1,2}[0-9])(-\\d+)*");
+            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX_ISOFORM);
     private static final String DASH = "-";
 
     public static boolean needsToFilterIsoform(
@@ -35,16 +36,9 @@ public class UniProtKBRequestUtil {
             String query,
             boolean isIncludeIsoform) {
 
-        String cleanQuery = "";
-        if (notNullNotEmpty(query)) {
-            cleanQuery = CLEAN_QUERY_REGEX.matcher(query.toString().strip()).replaceAll("");
-        }
-
-        // We don't add is_isoform:false filter if query verifies accession regex and has dash
-        if (ACCESSION_REGEX.matcher(cleanQuery).matches() && cleanQuery.contains(DASH)) {
+        if (queryVerifiesAccessionRegexAndHasDash(query)) {
             return false;
         }
-
         boolean hasIdFieldTerms =
                 SolrQueryUtil.hasFieldTerms(query, accessionIdField, isIsoformField);
 
@@ -59,5 +53,17 @@ public class UniProtKBRequestUtil {
         } else {
             return false;
         }
+    }
+
+    private static boolean queryVerifiesAccessionRegexAndHasDash(String query) {
+        boolean response = false;
+        if (notNullNotEmpty(query)) {
+            query = CLEAN_QUERY_REGEX.matcher(query.strip()).replaceAll("");
+            // We don't add is_isoform:false filter if query verifies accession regex and has dash
+            if (ACCESSION_REGEX.matcher(query).matches() && query.contains(DASH)) {
+                response = true;
+            }
+        }
+        return response;
     }
 }

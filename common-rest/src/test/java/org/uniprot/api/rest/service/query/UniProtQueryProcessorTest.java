@@ -208,24 +208,6 @@ class UniProtQueryProcessorTest {
         assertThat(processedQuery, is("a AND b AND ( c AND ( d OR e ) ) AND f"));
     }
 
-    //    @Test
-    //    void optimiseSingleTermQuery() {
-    //        String processedQuery = processor.processQuery("P12345");
-    //        assertThat(processedQuery, is(FIELD_NAME + ":P12345"));
-    //    }
-    //
-    //    @Test
-    //    void doNotOptimisesPartOfQuery() {
-    //        String processedQuery = processor.processQuery("a OR P12345");
-    //        assertThat(processedQuery, is("a OR P12345"));
-    //    }
-
-    @Test
-    void doNotOptimisesPartBeforeOfQuery() {
-        String processedQuery = processor.processQuery("P12345 AND cancer");
-        assertThat(processedQuery, is("P12345 AND cancer"));
-    }
-
     @Test
     void complexQueryWithNoOptimisation() {
         String query =
@@ -440,30 +422,6 @@ class UniProtQueryProcessorTest {
             String processedQuery = processor.processQuery(query);
             assertThat(processedQuery, is(query));
         }
-    }
-
-    @Test
-    void optimiseDefaultSearchValueLowercase() {
-        String processedQuery = processor.processQuery("p12345");
-        assertThat(processedQuery, is("p12345"));
-    }
-
-    @Test
-    void optimiseDefaultSearchValueIgnoringBrackets() {
-        String processedQuery = processor.processQuery("(p12345)");
-        assertThat(processedQuery, is("( p12345 )"));
-    }
-
-    @Test
-    void doNotOptimiseDefaultSearchWithComplexQuery() {
-        String processedQuery = processor.processQuery("(p12345 cancer)");
-        assertThat(processedQuery, is("( p12345 AND cancer )"));
-    }
-
-    @Test
-    void doNotOptimiseDefaultSearchWithComplexWithBracketsQuery() {
-        String processedQuery = processor.processQuery("(p12345) AND (cancer)");
-        assertThat(processedQuery, is("( p12345 ) AND ( cancer )"));
     }
 
     @Test

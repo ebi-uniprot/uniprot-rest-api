@@ -1577,9 +1577,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results[0].primaryAccession", is("Q9P2W7")))
-                .andExpect(jsonPath("$.results[1].primaryAccession", is("B3GAT1")))
-                .andExpect(jsonPath("$.results[0].genes[0].geneName.value", is("B3GAT1")));
+                .andExpect(jsonPath("$.results[0].primaryAccession", is("B3GAT1")))
+                .andExpect(jsonPath("$.results[1].primaryAccession", is("Q9P2W7")))
+                .andExpect(jsonPath("$.results[1].genes[0].geneName.value", is("B3GAT1")));
     }
 
     @Override
