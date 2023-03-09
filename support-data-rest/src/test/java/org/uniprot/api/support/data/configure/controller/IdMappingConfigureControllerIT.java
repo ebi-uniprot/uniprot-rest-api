@@ -75,14 +75,14 @@ class IdMappingConfigureControllerIT {
                         jsonPath(
                                 "$.groups.[?(@.groupName=='UniProt')].items.*.uriLink",
                                 contains(
-                                        "https://www.uniprot.org/uniprot/%id",
-                                        "https://www.uniprot.org/uniprot/%id",
-                                        "https://www.uniprot.org/uniprot/%id",
+                                        "https://www.uniprot.org/uniprot/%id/entry",
+                                        "https://www.uniprot.org/uniprot/%id/entry",
+                                        "https://www.uniprot.org/uniprot/%id/entry",
+                                        "https://www.uniprot.org/uniparc/%id/entry",
+                                        "https://www.uniprot.org/uniref/%id/entry",
+                                        "https://www.uniprot.org/uniref/%id/entry",
+                                        "https://www.uniprot.org/uniref/%id/entry",
                                         null,
-                                        "https://www.uniprot.org/uniref/%id",
-                                        "https://www.uniprot.org/uniref/%id",
-                                        "https://www.uniprot.org/uniref/%id",
-                                        "https://proteininformationresource.org/cgi-bin/nbrfget?uid=%id",
                                         null)))
                 .andExpect(
                         jsonPath(
