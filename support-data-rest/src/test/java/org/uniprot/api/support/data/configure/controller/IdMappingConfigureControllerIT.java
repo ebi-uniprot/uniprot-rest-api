@@ -79,9 +79,9 @@ class IdMappingConfigureControllerIT {
                                         "https://www.uniprot.org/uniprot/%id/entry",
                                         "https://www.uniprot.org/uniprot/%id/entry",
                                         "https://www.uniprot.org/uniparc/%id/entry",
-                                        "https://www.uniprot.org/uniref/%id/entry",
-                                        "https://www.uniprot.org/uniref/%id/entry",
-                                        "https://www.uniprot.org/uniref/%id/entry",
+                                        "https://www.uniprot.org/uniref/%id",
+                                        "https://www.uniprot.org/uniref/%id",
+                                        "https://www.uniprot.org/uniref/%id",
                                         null,
                                         null)))
                 .andExpect(
