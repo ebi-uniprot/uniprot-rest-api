@@ -20,8 +20,6 @@
 		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
 		<micrometer-registry-prometheus.version>1.6.6</micrometer-registry-prometheus.version>
 		<redisson-spring-data-version>3.17.7</redisson-spring-data-version>
-		<!-- <redisson-spring-data-version>2.15.2</redisson-spring-data-version> -->
-		<embedded-redis.version>0.7.3</embedded-redis.version>
 	</properties>
 
 	<dependencies>
@@ -195,13 +193,11 @@
 			<artifactId>encoder</artifactId>
 			<version>1.2.2</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.redisson</groupId>
 			<artifactId>redisson-spring-data-27</artifactId>
 			<version>${redisson-spring-data-version}</version>
 		</dependency>
-
 		<!-- Tests -->
 		<dependency>
 			<groupId>io.github.hakky54</groupId>
