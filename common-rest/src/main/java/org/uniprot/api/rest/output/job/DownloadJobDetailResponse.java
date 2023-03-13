@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.Data;
 
 import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.rest.request.StreamRequest;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -15,18 +14,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class DownloadJobDetailResponse implements StreamRequest {
+public class DownloadJobDetailResponse {
     private String redirectURL;
     private List<ProblemPair> warnings;
     private List<ProblemPair> errors;
     private String query;
     private String fields;
     private String sort;
-
     private String format;
-
-    @Override
-    public String getDownload() {
-        return null;
-    }
 }

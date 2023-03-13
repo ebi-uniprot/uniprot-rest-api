@@ -6,23 +6,19 @@ import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.controller.BasicDownloadController;
 import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
-import org.uniprot.api.rest.download.model.HashGenerator;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -30,7 +26,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
-import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
@@ -45,14 +40,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  */
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
-public class UniProtKBDownloadController extends BasicSearchController<UniProtKBEntry> {
+public class UniProtKBDownloadController extends BasicDownloadController<UniProtKBEntry> {
     static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;
     private final DownloadJobRepository jobRepository;
-    private final HashGenerator<DownloadRequest> hashGenerator;
-    public static final String JOB_ID = "jobId";
-
-    private static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT";
 
     public UniProtKBDownloadController(
             ProducerMessageService messageService,
@@ -69,24 +60,12 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
                 downloadGatekeeper);
         this.messageService = messageService;
         this.jobRepository = jobRepository;
-        this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<JobSubmitResponse> submitJob(
-            @Valid @ModelAttribute UniProtKBDownloadRequest request,
-            HttpServletRequest httpRequest) {
-        MessageProperties messageHeader = new MessageProperties();
-        String jobId = this.hashGenerator.generateHash(request);
-        messageHeader.setHeader(JOB_ID, jobId);
-
-        if (Objects.isNull(request.getFormat())) {
-            request.setFormat(APPLICATION_JSON_VALUE);
-        }
-
-        request.setLargeSolrStreamRestricted(false);
-
-        this.messageService.sendMessage(request, messageHeader);
+            @Valid @ModelAttribute UniProtKBDownloadRequest request) {
+        String jobId = this.messageService.sendMessage(request);
         return ResponseEntity.ok(new JobSubmitResponse(jobId));
     }
 
@@ -103,10 +82,10 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
                                     schema = @Schema(implementation = JobStatus.class))
                         })
             })
-    public ResponseEntity<JobStatusResponse> getJobStatus(
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
-        DownloadJob job = getAsyncDownloadJob(this.jobRepository, jobId);
-        return createAsyncDownloadStatus(job, servletRequest.getRequestURL().toString());
+    public ResponseEntity<JobStatusResponse> getJobStatus(@PathVariable String jobId) {
+        Optional<DownloadJob> optJob = jobRepository.findById(jobId);
+        DownloadJob job = getAsyncDownloadJob(optJob, jobId);
+        return getAsyncDownloadStatus(job);
     }
 
     @GetMapping(
@@ -114,7 +93,9 @@ public class UniProtKBDownloadController extends BasicSearchController<UniProtKB
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
             @PathVariable String jobId, HttpServletRequest servletRequest) {
-        DownloadJob job = getAsyncDownloadJob(this.jobRepository, jobId);
+
+        Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
+        DownloadJob job = getAsyncDownloadJob(optJob, jobId);
 
         DownloadJobDetailResponse detailResponse = new DownloadJobDetailResponse();
         detailResponse.setQuery(job.getQuery());

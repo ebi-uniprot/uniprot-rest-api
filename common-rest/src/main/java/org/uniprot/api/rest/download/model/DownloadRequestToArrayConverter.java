@@ -18,7 +18,7 @@ public class DownloadRequestToArrayConverter implements Function<DownloadRequest
         }
 
         if (Objects.nonNull(request.getFormat())) {
-            builder.append(request.getFormat().toString().toLowerCase());
+            builder.append(request.getFormat().toLowerCase());
         }
         return builder.toString().toCharArray();
     }

@@ -312,26 +312,4 @@ class HttpServletRequestContentTypeMutatorTest {
                 mutableRequest.getHeader(HttpHeaders.ACCEPT_ENCODING),
                 is(FileType.GZIP.getFileType()));
     }
-
-    @Test
-    void downloadRequestWithFormatIgnored() {
-        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
-        String entityPath = "/a/b/ENTITY";
-        String uri = entityPath + "/download/run";
-        String host = "http://localhost";
-        when(httpRequest.getRequestURL()).thenReturn(new StringBuffer(host + uri));
-        when(httpRequest.getRequestURI()).thenReturn(uri);
-        when(httpRequest.getServletPath()).thenReturn(uri);
-        when(httpRequest.getContextPath()).thenReturn("");
-        when(httpRequest.getMethod()).thenReturn("POST");
-        when(httpRequest.getParameter(FORMAT)).thenReturn("fasta");
-        MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(httpRequest);
-
-        requestContentTypeMutator.mutate(mutableRequest);
-
-        assertThat(mutableRequest.getHeader(ACCEPT), is(nullValue()));
-        assertThat(mutableRequest.getRequestURL().toString(), is(host + uri));
-        assertThat(mutableRequest.getRequestURI(), is(uri));
-        assertThat(mutableRequest.getServletPath(), is(uri));
-    }
 }

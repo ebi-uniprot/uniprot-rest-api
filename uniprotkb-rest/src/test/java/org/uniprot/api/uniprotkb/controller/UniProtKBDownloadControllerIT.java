@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -20,7 +20,7 @@ public class QueueConsumerConfig {
     @Bean
     public MessageListenerContainer messageListenerContainer(
             ConnectionFactory connectionFactory,
-            @Qualifier("Consumer") MessageListener messageListener,
+            @Qualifier("DownloadListener") MessageListener messageListener,
             RabbitMQConfigProperties rabbitMQConfigProperties) {
 
         SimpleMessageListenerContainer simpleMessageListenerContainer =

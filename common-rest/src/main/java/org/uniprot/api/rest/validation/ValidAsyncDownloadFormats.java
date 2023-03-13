@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 import java.util.Collection;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -16,7 +15,6 @@ import javax.validation.Payload;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.util.Utils;
 
@@ -39,8 +37,6 @@ public @interface ValidAsyncDownloadFormats {
 
     class FormatsValidator implements ConstraintValidator<ValidAsyncDownloadFormats, String> {
         private static final Logger LOGGER = LoggerFactory.getLogger(FormatsValidator.class);
-
-        @Autowired private HttpServletRequest request;
 
         private List<String> formats;
         private String formatsAsString;

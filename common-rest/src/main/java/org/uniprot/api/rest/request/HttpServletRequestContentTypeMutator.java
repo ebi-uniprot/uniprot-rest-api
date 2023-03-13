@@ -35,15 +35,14 @@ import org.uniprot.core.util.Utils;
 public class HttpServletRequestContentTypeMutator {
     public static final String ERROR_MESSAGE_ATTRIBUTE =
             "org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.errorMessageAttribute";
-    static final String FORMAT = "format";
-    static final String COMPRESSED = "compressed";
+    public static final String FORMAT = "format";
+    public static final String COMPRESSED = "compressed";
     private static final Set<String> VALID_EXTENSIONS =
             UniProtMediaType.ALL_TYPES.stream()
                     .map(UniProtMediaType::getFileExtension)
                     .collect(Collectors.toSet());
     private static final Pattern BROWSER_PATTERN =
             Pattern.compile("Mozilla|AppleWebKit|Edg|OPR|Chrome|Vivaldi");
-    public static final String DOWNLOAD_RUN_SUFFIX = "/download/run";
     final Map<String, Collection<MediaType>> resourcePath2MediaTypes = new HashMap<>();
     final List<String> resourcePath2MediaTypesKeys = new ArrayList<>();
 
@@ -68,10 +67,8 @@ public class HttpServletRequestContentTypeMutator {
     }
 
     public void mutate(MutableHttpServletRequest request) {
-        if (!request.getRequestURI().endsWith(DOWNLOAD_RUN_SUFFIX)) {
-            mutateAcceptHeader(request);
-            mutateAcceptEncodingHeader(request);
-        }
+        mutateAcceptHeader(request);
+        mutateAcceptEncodingHeader(request);
     }
 
     private void mutateAcceptHeader(MutableHttpServletRequest request) {

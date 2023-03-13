@@ -1,6 +1,5 @@
 package org.uniprot.api.rest.download.queue;
 
-import org.springframework.amqp.core.MessageProperties;
 import org.uniprot.api.rest.request.DownloadRequest;
 
 /**
@@ -8,7 +7,7 @@ import org.uniprot.api.rest.request.DownloadRequest;
  * @created 22/11/2022
  */
 public interface ProducerMessageService {
-    void sendMessage(DownloadRequest downloadRequest, MessageProperties messageHeader);
+    String sendMessage(DownloadRequest downloadRequest);
 
-    void logAlreadyProcessed(String jobId);
+    void alreadyProcessed(String jobId);
 }

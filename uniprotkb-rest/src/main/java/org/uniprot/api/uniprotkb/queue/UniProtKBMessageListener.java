@@ -37,7 +37,7 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
  * @created 22/11/2022
  */
 @Profile({"live", "asyncDownload"})
-@Service("Consumer")
+@Service("DownloadListener")
 @Slf4j
 public class UniProtKBMessageListener implements MessageListener {
 

@@ -17,12 +17,12 @@ import org.uniprot.api.rest.download.model.JobStatus;
  * @created 22/12/2022
  */
 @ExtendWith(SpringExtension.class)
-public class DownloadJobRepositoryTest {
+class DownloadJobRepositoryTest {
 
     @MockBean private DownloadJobRepository jobRepository;
 
     @Test
-    public void whenSavingJob_thenAvailableOnRetrieval() throws Exception {
+    void whenSavingJob_thenAvailableOnRetrieval() throws Exception {
         String jobId = "123456789";
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
         jobBuilder.id(jobId).query("test query").fields("field1,field2,field3");

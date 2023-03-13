@@ -4,7 +4,7 @@ import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.b
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.JOB_ID;
+import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,9 +17,11 @@ import java.util.concurrent.Callable;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,12 +41,12 @@ import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
-import org.uniprot.api.rest.download.model.HashGenerator;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.HashGenerator;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.AbstractUniProtKBDownloadIT;
 import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
@@ -70,7 +72,7 @@ import com.jayway.jsonpath.JsonPath;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest({UniProtKBDownloadController.class})
 @AutoConfigureWebClient
-public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
+public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
@@ -80,14 +82,14 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
             solrClient; // this is NOT inmemory solr cluster client, see CloudSolrClient in parent
     // class
 
-    @SpyBean @Autowired
+    @SpyBean
     private DownloadJobRepository
             downloadJobRepository; // RedisRepository with inMemory redis server
 
-    @SpyBean @Autowired private UniProtKBMessageListener uniProtKBMessageListener;
-    @SpyBean @Autowired private ProducerMessageService messageService;
+    @SpyBean private UniProtKBMessageListener uniProtKBMessageListener;
+    @SpyBean private ProducerMessageService messageService;
 
-    @SpyBean @Autowired private MessageConverter messageConverter;
+    @SpyBean private MessageConverter messageConverter;
 
     private HashGenerator<DownloadRequest> hashGenerator;
 
@@ -96,7 +98,8 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
 
     @BeforeAll
     void init() {
-        this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), "SALT_STR");
+        this.hashGenerator =
+                new HashGenerator<>(new DownloadRequestToArrayConverter(), "UNIPROT_DOWNLOAD_SALT");
     }
 
     @Test
@@ -104,10 +107,9 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         String query = "content:P";
         MediaType format = MediaType.APPLICATION_JSON;
         UniProtKBDownloadRequest request = createDownloadRequest(query, format);
-        String jobId = this.hashGenerator.generateHash(request);
-        sendMessage(request, jobId, format);
+        String jobId = this.messageService.sendMessage(request);
         // Producer
-        verify(this.messageService, never()).logAlreadyProcessed(jobId);
+        verify(this.messageService, never()).alreadyProcessed(jobId);
         // redis entry created
         await().until(jobCreatedInRedis(jobId));
         await().until(jobFinished(jobId));
@@ -125,10 +127,9 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         String query = "reviewed:true";
         MediaType format = MediaType.APPLICATION_JSON;
         UniProtKBDownloadRequest request = createDownloadRequest(query, format);
-        String jobId = this.hashGenerator.generateHash(request);
-        sendMessage(request, jobId, format);
+        String jobId = this.messageService.sendMessage(request);
         // Producer
-        verify(this.messageService, never()).logAlreadyProcessed(jobId);
+        verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().until(jobErrored(jobId));
         // verify  redis
@@ -145,15 +146,14 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         String query = "accession:P12345";
         MediaType format = MediaType.APPLICATION_JSON;
         UniProtKBDownloadRequest request = createDownloadRequest(query, format);
-        String jobId = this.hashGenerator.generateHash(request);
         when(this.uniProtKBMessageListener.streamIds(request))
                 .thenThrow(
                         new MessageListenerException(
                                 "Forced exception in streamIds to test max retry"));
         // send request to queue
-        sendMessage(request, jobId, format);
+        String jobId = this.messageService.sendMessage(request);
         // Producer
-        verify(this.messageService, never()).logAlreadyProcessed(jobId);
+        verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().until(jobErrored(jobId));
         await().until(jobRetriedMaximumTimes(jobId));
@@ -184,8 +184,8 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         doThrow(new MessageListenerException("Forcing to throw unexpected exception"))
                 .when(this.uniProtKBMessageListener)
                 .dummyMethodForTesting(jobId, JobStatus.ERROR);
-        sendMessage(request, jobId, format);
-        verify(this.messageService, never()).logAlreadyProcessed(jobId);
+        this.messageService.sendMessage(request);
+        verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().until(jobErrored(jobId));
         await().until(getJobRetriedCount(jobId), Matchers.equalTo(2));
@@ -193,12 +193,6 @@ public class AsyncDownloadIntegTest extends AbstractUniProtKBDownloadIT {
         //        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true, format);
         verifyIdsAndResultFilesDoNotExist(jobId, format);
-    }
-
-    private void sendMessage(UniProtKBDownloadRequest request, String jobId, MediaType format) {
-        MessageProperties messageHeader = new MessageProperties();
-        messageHeader.setHeader(JOB_ID, jobId);
-        this.messageService.sendMessage(request, messageHeader);
     }
 
     private UniProtKBDownloadRequest createDownloadRequest(String query, MediaType format) {

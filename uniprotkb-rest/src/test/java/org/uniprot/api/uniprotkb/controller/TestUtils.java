@@ -1,17 +1,17 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.uniprot.core.flatfile.parser.SupportingDataMap;
 import org.uniprot.core.flatfile.parser.impl.SupportingDataMapImpl;
 import org.uniprot.core.flatfile.parser.impl.entry.EntryObjectConverter;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 /** Contains utility methods that aid in testing */
-final class TestUtils {
+public final class TestUtils {
     private static final SupportingDataMap dataMap =
             new SupportingDataMapImpl("keywlist.txt", "humdisease.txt", null, null);
     private static final EntryObjectConverter entryObjectConverter =
@@ -42,35 +42,17 @@ final class TestUtils {
         return sb.toString();
     }
 
-    /**
-     * Creates a flatfile like line which contains multiple elements within it. <br>
-     * Examples of such lines:
-     *
-     * <ul>
-     *   <li>Keywords KW
-     *   <li>Organism classification (OC)
-     * </ul>
-     *
-     * @param lineStart the starting string of the line
-     * @param separator the string character that separates the elements
-     * @param lineTerminator indicates that all of the elements have been inserted
-     * @param elements the elements to populate the line
-     * @return the populated line
-     */
-    public static String createMultiElementFFLine(
-            String lineStart, String separator, String lineTerminator, String... elements) {
-        StringBuilder line = new StringBuilder(lineStart);
-
-        if (elements.length > 0) {
-            for (String element : elements) {
-                line.append(element).append(separator).append(" ");
-            }
-
-            line.replace(line.length() - 2, line.length(), lineTerminator);
-        } else {
-            line.append(".");
+    public static void uncompressFile(Path zippedFile, Path unzippedFile) throws IOException {
+        InputStream fin = Files.newInputStream(zippedFile);
+        BufferedInputStream in = new BufferedInputStream(fin);
+        OutputStream out = Files.newOutputStream(unzippedFile);
+        GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
+        final byte[] buffer = new byte[1024];
+        int n = 0;
+        while (-1 != (n = gzIn.read(buffer))) {
+            out.write(buffer, 0, n);
         }
-
-        return line.toString();
+        out.close();
+        gzIn.close();
     }
 }

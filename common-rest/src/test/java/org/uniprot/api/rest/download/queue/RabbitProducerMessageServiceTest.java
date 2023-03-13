@@ -48,7 +48,7 @@ class RabbitProducerMessageServiceTest {
                 .thenReturn(new Message(new byte[] {}, messageHeader));
         when(jobRepository.existsById(any())).thenReturn(false);
         when(jobRepository.save(any(DownloadJob.class))).thenReturn(downloadJob);
-        service.sendMessage(downloadRequest, messageHeader);
+        service.sendMessage(downloadRequest);
         verify(converter, times(1))
                 .toMessage(any(DownloadRequest.class), any(MessageProperties.class));
         verify(rabbitTemplate, times(1)).send(any(Message.class));
@@ -58,7 +58,7 @@ class RabbitProducerMessageServiceTest {
     @Test
     void sendMessageWithJobExists() {
         when(jobRepository.existsById(any())).thenReturn(true);
-        service.sendMessage(downloadRequest, messageHeader);
+        service.sendMessage(downloadRequest);
         verify(converter, times(0)).toMessage(downloadRequest, messageHeader);
         verify(rabbitTemplate, times(0)).send(any());
         verify(jobRepository, times(0)).save(any(DownloadJob.class));
@@ -69,10 +69,11 @@ class RabbitProducerMessageServiceTest {
         when(jobRepository.existsById(any())).thenReturn(false);
         doThrow(AmqpException.class).when(rabbitTemplate).send(any());
         try {
-            service.sendMessage(downloadRequest, messageHeader);
+            service.sendMessage(downloadRequest);
             fail("Expected AmqpException to be thrown");
         } catch (AmqpException e) {
-            verify(converter, times(1)).toMessage(downloadRequest, messageHeader);
+            verify(converter, times(1))
+                    .toMessage(any(DownloadRequest.class), any(MessageProperties.class));
             verify(rabbitTemplate, times(1)).send(any());
             verify(jobRepository, times(1)).save(any(DownloadJob.class));
             verify(jobRepository, times(1)).deleteById(any());
@@ -81,10 +82,11 @@ class RabbitProducerMessageServiceTest {
 
     @Data
     class FakeDownloadRequest implements DownloadRequest {
-        private String query;
+        private String query = "dummy";
         private String fields;
         private String sort;
         private String download;
         private String format;
+        private boolean isLargeSolrStreamRestricted;
     }
 }

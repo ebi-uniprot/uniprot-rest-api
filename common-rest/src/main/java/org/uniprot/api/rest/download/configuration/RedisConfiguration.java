@@ -36,8 +36,7 @@ public class RedisConfiguration {
     public RedissonClient redisson(@Value("${download.redis.config.file}") Resource configFile)
             throws IOException {
         Config config = Config.fromYAML(configFile.getInputStream());
-        RedissonClient client = Redisson.create(config);
-        return client;
+        return Redisson.create(config);
     }
 
     @Bean

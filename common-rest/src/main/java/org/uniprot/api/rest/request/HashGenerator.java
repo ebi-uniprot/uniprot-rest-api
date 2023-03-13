@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.download.model;
+package org.uniprot.api.rest.request;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -21,7 +21,7 @@ public class HashGenerator<T> {
     private static final int KEY_LENGTH = 160;
     private final byte[] saltBytes;
 
-    private Function<T, char[]> requestToArrayConverter;
+    private final Function<T, char[]> requestToArrayConverter;
 
     public HashGenerator(Function<T, char[]> requestToArrayConverter, String salt) {
         this.requestToArrayConverter = requestToArrayConverter;

@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.download.queue;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -13,9 +15,11 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.HashGenerator;
 
 /**
  * Common for all, UniProtKB, UniParc and UniRef
@@ -31,6 +35,11 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     private final RabbitTemplate rabbitTemplate;
     private final MessageConverter converter;
     private final DownloadJobRepository jobRepository;
+    private final HashGenerator<DownloadRequest> hashGenerator;
+
+    private static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT";
+
+    private static final String JOB_ID = "jobId";
 
     public RabbitProducerMessageService(
             MessageConverter converter,
@@ -39,20 +48,34 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         this.rabbitTemplate = rabbitTemplate;
         this.converter = converter;
         this.jobRepository = downloadJobRepository;
+        this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
     }
 
     @Override
-    public void sendMessage(DownloadRequest downloadRequest, MessageProperties messageHeader) {
-        String jobId = messageHeader.getHeader("jobId");
+    public String sendMessage(DownloadRequest downloadRequest) {
+
+        MessageProperties messageHeader = new MessageProperties();
+        String jobId = this.hashGenerator.generateHash(downloadRequest);
+        messageHeader.setHeader(JOB_ID, jobId);
+
+        if (Objects.isNull(downloadRequest.getFormat())) {
+            downloadRequest.setFormat(APPLICATION_JSON_VALUE);
+        }
+
+        downloadRequest.setLargeSolrStreamRestricted(false);
+
         if (!this.jobRepository.existsById(jobId)) {
             doSendMessage(downloadRequest, messageHeader, jobId);
             log.info("Message with jobId {} ready to be processed", jobId);
         } else {
-            logAlreadyProcessed(jobId);
+            alreadyProcessed(jobId);
         }
+
+        return jobId;
     }
 
-    public void logAlreadyProcessed(String jobId) {
+    @Override
+    public void alreadyProcessed(String jobId) {
         log.info("Job is already processed {}", jobId);
     }
 
@@ -76,15 +99,11 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
         LocalDateTime now = LocalDateTime.now();
         jobBuilder.id(jobId).status(JobStatus.NEW);
-        String format =
-                Objects.nonNull(downloadRequest.getFormat())
-                        ? downloadRequest.getFormat().toString()
-                        : null;
         jobBuilder
                 .query(downloadRequest.getQuery())
                 .fields(downloadRequest.getFields())
                 .sort(downloadRequest.getSort())
-                .format(format)
+                .format(downloadRequest.getFormat())
                 .created(now)
                 .updated(now);
         this.jobRepository.save(jobBuilder.build());

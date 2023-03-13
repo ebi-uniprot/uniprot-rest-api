@@ -1,8 +1,12 @@
 #! /bin/bash
-set -x
+set -e
 if [ $# -ne 2 ]; then
   echo "Simulation scala class name and LSF JOB TYPE(see TEST_TYPE in go-gatling)"
-  echo "e.g. ./submit-bsub-stress.sh IdMappingSimulation stress-idmapping-kb"
+  echo "Few examples: "
+  echo "1. ./submit-bsub-stress.sh IdMappingSimulation stress-idmapping-kb"
+  echo "2. ./submit-bsub-stress.sh URLRetrievalSimulation replay-9-May-2022-crash"
+  echo "3. ./submit-bsub-stress.sh RampingURLRetrievalSimulation rampUpAndDown-uniprot-website"
+  echo "4. ./submit-bsub-stress.sh IdMappingSimulation stress-idmapping"
   exit 1
 fi
 

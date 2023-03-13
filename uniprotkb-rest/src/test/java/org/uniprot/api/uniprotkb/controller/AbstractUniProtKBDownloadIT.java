@@ -1,20 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -65,7 +61,7 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         assertTrue(rabbitMQContainer.isRunning());
         assertTrue(redisContainer.isRunning());
         propertyRegistry.add("spring.amqp.rabbit.port", rabbitMQContainer::getFirstMappedPort);
-        propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getContainerIpAddress);
+        propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getHost);
         System.setProperty("uniprot.redis.host", redisContainer.getHost());
         System.setProperty(
                 "uniprot.redis.port", String.valueOf(redisContainer.getFirstMappedPort()));
@@ -185,19 +181,5 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
 
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
         storeClient.saveEntry(uniProtKBEntry);
-    }
-
-    protected void uncompressFile(Path zippedFile, Path unzippedFile) throws IOException {
-        InputStream fin = Files.newInputStream(zippedFile);
-        BufferedInputStream in = new BufferedInputStream(fin);
-        OutputStream out = Files.newOutputStream(unzippedFile);
-        GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
-        final byte[] buffer = new byte[1024];
-        int n = 0;
-        while (-1 != (n = gzIn.read(buffer))) {
-            out.write(buffer, 0, n);
-        }
-        out.close();
-        gzIn.close();
     }
 }

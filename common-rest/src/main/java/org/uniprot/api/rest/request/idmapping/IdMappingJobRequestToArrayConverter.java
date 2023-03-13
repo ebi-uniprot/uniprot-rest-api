@@ -1,10 +1,9 @@
-package org.uniprot.api.idmapping.controller.request;
+package org.uniprot.api.rest.request.idmapping;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 import org.uniprot.core.util.Utils;
 
 public class IdMappingJobRequestToArrayConverter implements Function<IdMappingJobRequest, char[]> {
@@ -14,7 +13,7 @@ public class IdMappingJobRequestToArrayConverter implements Function<IdMappingJo
         builder.append(request.getFrom().strip().toLowerCase());
         builder.append(request.getTo().strip().toLowerCase());
         builder.append(
-                List.of(request.getIds().strip().split(",")).stream()
+                Stream.of(request.getIds().strip().split(","))
                         .map(String::toLowerCase)
                         .map(String::strip)
                         .collect(Collectors.joining(",")));

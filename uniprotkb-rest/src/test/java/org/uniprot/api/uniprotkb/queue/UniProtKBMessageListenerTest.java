@@ -112,7 +112,6 @@ public class UniProtKBMessageListenerTest {
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
         this.uniProtKBMessageListener.setMaxRetryCount(0);
         Assertions.assertDoesNotThrow(() -> this.uniProtKBMessageListener.onMessage(message));
     }

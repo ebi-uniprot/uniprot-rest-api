@@ -1,12 +1,11 @@
-package org.uniprot.api.idmapping.service;
+package org.uniprot.api.rest.request;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
 import org.junit.jupiter.api.*;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequestToArrayConverter;
-import org.uniprot.api.rest.download.model.HashGenerator;
 import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequestToArrayConverter;
 
 /**
  * @author sahmad
@@ -19,7 +18,7 @@ class HashGeneratorTest {
 
     @BeforeAll
     void testSetup() {
-        generator = new HashGenerator(new IdMappingJobRequestToArrayConverter(), SALT_STR);
+        generator = new HashGenerator<>(new IdMappingJobRequestToArrayConverter(), SALT_STR);
     }
 
     @Test
