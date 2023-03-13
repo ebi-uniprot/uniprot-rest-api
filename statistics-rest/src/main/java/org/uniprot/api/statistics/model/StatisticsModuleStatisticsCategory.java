@@ -2,7 +2,7 @@ package org.uniprot.api.statistics.model;
 
 import java.util.List;
 
-public interface StatisticModuleStatisticCategory {
+public interface StatisticsModuleStatisticsCategory {
     String getCategoryName();
 
     String getSearchField();
@@ -11,5 +11,5 @@ public interface StatisticModuleStatisticCategory {
 
     long getTotalCount();
 
-    List<StatisticsModuleStatisticAttribute> getItems();
+    List<StatisticsModuleStatisticsAttribute> getItems();
 }

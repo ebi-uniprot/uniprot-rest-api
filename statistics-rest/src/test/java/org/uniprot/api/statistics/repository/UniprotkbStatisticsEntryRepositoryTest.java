@@ -1,5 +1,16 @@
 package org.uniprot.api.statistics.repository;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
+import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_ENTRIES;
+import static org.uniprot.api.statistics.entity.EntryType.SWISSPROT;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,26 +23,13 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.statistics.entity.UniprotkbStatisticsEntry;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_CATEGORIES;
-import static org.uniprot.api.statistics.TestEntityGeneratorUtil.STATISTICS_ENTRIES;
-import static org.uniprot.api.statistics.entity.EntryType.SWISSPROT;
-
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @Import({HttpCommonHeaderConfig.class, RequestMappingHandlerMapping.class})
 class UniprotkbStatisticsEntryRepositoryTest {
-    @Autowired
-    private TestEntityManager entityManager;
+    @Autowired private TestEntityManager entityManager;
 
-    @Autowired
-    private UniprotkbStatisticsEntryRepository entryRepository;
+    @Autowired private UniprotkbStatisticsEntryRepository entryRepository;
 
     @BeforeEach
     void setUp() {

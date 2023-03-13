@@ -1,6 +1,6 @@
 package org.uniprot.api.statistics.model;
 
-public interface StatisticsModuleStatisticAttribute {
+public interface StatisticsModuleStatisticsAttribute {
     String getName();
 
     String getLabel();
