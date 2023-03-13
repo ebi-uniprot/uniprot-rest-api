@@ -74,13 +74,13 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     @Value("${download.resultFilesFolder}")
     protected String resultFolder;
 
-    @Value("${spring.amqp.rabbit.queueName}")
+    @Value("${async.download.queueName}")
     protected String downloadQueue;
 
-    @Value("${spring.amqp.rabbit.retryQueueName}")
+    @Value("${async.download.retryQueueName}")
     protected String retryQueue;
 
-    @Value(("${spring.amqp.rabbit.rejectedQueueName}"))
+    @Value(("${async.download.rejectedQueueName}"))
     protected String rejectedQueue;
 
     private static final UniProtKBEntry TEMPLATE_ENTRY =

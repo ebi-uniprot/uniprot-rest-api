@@ -52,13 +52,13 @@ public class UniProtKBMessageListener implements MessageListener {
 
     private final RabbitTemplate rabbitTemplate;
 
-    @Value("${spring.amqp.rabbit.rejectedQueueName}")
+    @Value("${async.download.rejectedQueueName}")
     private String rejectedQueueName;
 
-    @Value("${spring.amqp.rabbit.retryMaxCount}")
+    @Value("${async.download.retryMaxCount}")
     private Integer maxRetryCount;
 
-    @Value("${spring.amqp.rabbit.retryQueueName}")
+    @Value("${async.download.retryQueueName}")
     private String retryQueueName;
 
     public UniProtKBMessageListener(

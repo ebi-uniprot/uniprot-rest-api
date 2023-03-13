@@ -93,7 +93,7 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
 
     private HashGenerator<DownloadRequest> hashGenerator;
 
-    @Value("${spring.amqp.rabbit.retryMaxCount}")
+    @Value("${async.download.retryMaxCount}")
     private int maxRetry;
 
     @BeforeAll

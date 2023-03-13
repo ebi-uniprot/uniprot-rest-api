@@ -19,12 +19,12 @@ public class MessageProducerConfig {
     @Bean
     public RabbitTemplate rabbitTemplate(
             ConnectionFactory connectionFactory,
-            RabbitMQConfigProperties rabbitMQConfigProperties,
+            AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps,
             MessageConverter jsonMessageConverter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(jsonMessageConverter);
-        template.setExchange(rabbitMQConfigProperties.getExchangeName());
-        template.setRoutingKey(rabbitMQConfigProperties.getRoutingKey());
+        template.setExchange(asyncDownloadQConfigProps.getExchangeName());
+        template.setRoutingKey(asyncDownloadQConfigProps.getRoutingKey());
         return template;
     }
 

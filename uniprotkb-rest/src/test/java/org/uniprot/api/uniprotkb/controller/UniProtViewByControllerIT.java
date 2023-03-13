@@ -19,7 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.uniprot.api.AsyncDownloadMocks;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.service.*;
 

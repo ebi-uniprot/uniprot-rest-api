@@ -25,8 +25,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.uniprot.api.AsyncDownloadMocks;
 import org.uniprot.api.rest.app.FakeRESTApp;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 
 /**
  * Check that a REST app that picks up an {@link HttpCommonHeaderConfig} will show explicitly the

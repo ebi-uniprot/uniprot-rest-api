@@ -1,4 +1,4 @@
-package org.uniprot.api;
+package org.uniprot.api.rest.download;
 
 import static org.mockito.Mockito.mock;
 

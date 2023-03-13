@@ -1,13 +1,6 @@
 package org.uniprot.api.rest.download.queue;
 
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.core.ExchangeBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -31,6 +24,11 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps() {
+        return new AsyncDownloadQueueConfigProperties();
+    }
+
+    @Bean
     public ConnectionFactory connectionFactory(RabbitMQConfigProperties rabbitMQConfigProperties) {
         CachingConnectionFactory connectionFactory =
                 new CachingConnectionFactory(rabbitMQConfigProperties.getHost());
@@ -41,9 +39,9 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Exchange downloadExchange(RabbitMQConfigProperties rabbitMQConfigProperties) {
-        return ExchangeBuilder.directExchange(rabbitMQConfigProperties.getExchangeName())
-                .durable(rabbitMQConfigProperties.isDurable())
+    public Exchange downloadExchange(AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+        return ExchangeBuilder.directExchange(asyncDownloadQConfigProps.getExchangeName())
+                .durable(asyncDownloadQConfigProps.isDurable())
                 .build();
     }
 
@@ -57,29 +55,29 @@ public class RabbitMQConfig {
      * Else the message is sent to UQ.
      */
     @Bean
-    public Queue downloadQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
-        return QueueBuilder.durable(rabbitMQConfigProperties.getQueueName())
-                .deadLetterExchange(rabbitMQConfigProperties.getExchangeName())
-                .deadLetterRoutingKey(rabbitMQConfigProperties.getRetryQueueName())
-                .ttl(rabbitMQConfigProperties.getTtlInMillis())
+    public Queue downloadQueue(AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+        return QueueBuilder.durable(asyncDownloadQConfigProps.getQueueName())
+                .deadLetterExchange(asyncDownloadQConfigProps.getExchangeName())
+                .deadLetterRoutingKey(asyncDownloadQConfigProps.getRetryQueueName())
+                .ttl(asyncDownloadQConfigProps.getTtlInMillis())
                 .quorum()
                 .build();
     }
 
     @Bean
-    Queue retryQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
-        return QueueBuilder.durable(rabbitMQConfigProperties.getRetryQueueName())
-                .ttl(rabbitMQConfigProperties.getRetryDelayInMillis())
-                .deadLetterExchange(rabbitMQConfigProperties.getExchangeName())
-                .deadLetterRoutingKey(rabbitMQConfigProperties.getRoutingKey())
+    Queue retryQueue(AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+        return QueueBuilder.durable(asyncDownloadQConfigProps.getRetryQueueName())
+                .ttl(asyncDownloadQConfigProps.getRetryDelayInMillis())
+                .deadLetterExchange(asyncDownloadQConfigProps.getExchangeName())
+                .deadLetterRoutingKey(asyncDownloadQConfigProps.getRoutingKey())
                 .quorum()
                 .build();
     }
 
     // queue where failed messages after maximum retries will end up
     @Bean
-    Queue undeliveredQueue(RabbitMQConfigProperties rabbitMQConfigProperties) {
-        return QueueBuilder.durable(rabbitMQConfigProperties.getRejectedQueueName())
+    Queue undeliveredQueue(AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+        return QueueBuilder.durable(asyncDownloadQConfigProps.getRejectedQueueName())
                 .quorum()
                 .build();
     }
@@ -88,10 +86,10 @@ public class RabbitMQConfig {
     public Binding downloadBinding(
             Queue downloadQueue,
             Exchange downloadExchange,
-            RabbitMQConfigProperties rabbitMQConfigProperties) {
+            AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return BindingBuilder.bind(downloadQueue)
                 .to((DirectExchange) downloadExchange)
-                .with(rabbitMQConfigProperties.getRoutingKey());
+                .with(asyncDownloadQConfigProps.getRoutingKey());
     }
 
     @Bean

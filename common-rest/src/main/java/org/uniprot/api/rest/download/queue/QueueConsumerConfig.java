@@ -21,18 +21,18 @@ public class QueueConsumerConfig {
     public MessageListenerContainer messageListenerContainer(
             ConnectionFactory connectionFactory,
             @Qualifier("DownloadListener") MessageListener messageListener,
-            RabbitMQConfigProperties rabbitMQConfigProperties) {
+            AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
 
         SimpleMessageListenerContainer simpleMessageListenerContainer =
                 new SimpleMessageListenerContainer();
         simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
-        simpleMessageListenerContainer.setQueueNames(rabbitMQConfigProperties.getQueueName());
+        simpleMessageListenerContainer.setQueueNames(asyncDownloadQConfigProps.getQueueName());
         simpleMessageListenerContainer.setMessageListener(messageListener);
         simpleMessageListenerContainer.setConcurrentConsumers(
-                rabbitMQConfigProperties.getConcurrentConsumers());
+                asyncDownloadQConfigProps.getConcurrentConsumers());
         simpleMessageListenerContainer.setDefaultRequeueRejected(false);
         simpleMessageListenerContainer.setPrefetchCount(
-                rabbitMQConfigProperties.getPrefetchCount());
+                asyncDownloadQConfigProps.getPrefetchCount());
         return simpleMessageListenerContainer;
     }
 }

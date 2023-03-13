@@ -14,9 +14,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.uniprot.api.AsyncDownloadMocks;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.proteome.controller.DataStoreTestConfig;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})

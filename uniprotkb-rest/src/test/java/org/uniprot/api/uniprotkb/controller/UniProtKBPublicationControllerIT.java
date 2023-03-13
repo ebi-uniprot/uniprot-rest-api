@@ -33,7 +33,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.uniprot.api.AsyncDownloadMocks;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.UniProtKBObjectsForTests;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
