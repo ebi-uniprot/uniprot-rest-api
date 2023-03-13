@@ -4,7 +4,6 @@ import static org.uniprot.store.search.SolrQueryUtil.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * This class does the following:
@@ -42,8 +40,6 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
 public class UniProtQueryProcessor implements QueryProcessor {
     public static final String IMPOSSIBLE_FIELD = "NOT_REAL_FIELD";
     public static final String UNIPROTKB_ACCESSION_FIELD = "accession";
-    private static final Pattern CLEAN_QUERY_REGEX =
-            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);;
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
     private final QueryNodeProcessorPipeline queryProcessorPipeline;
     private final List<SearchFieldItem> optimisableFields;

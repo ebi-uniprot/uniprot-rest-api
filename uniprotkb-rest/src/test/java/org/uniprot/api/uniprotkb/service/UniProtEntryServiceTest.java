@@ -1,10 +1,11 @@
 package org.uniprot.api.uniprotkb.service;
 
 import static java.util.Collections.*;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,11 +26,12 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
+import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /** @author tibrahim */
-// @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
 public class UniProtEntryServiceTest {
 
@@ -67,31 +69,70 @@ public class UniProtEntryServiceTest {
 
     @Test
     void changeLowercaseAccessionToUppercase() {
-        SearchFieldItem accessionSearchField = new SearchFieldItem();
-        SearchFieldItem isoFormSearchField = new SearchFieldItem();
-        UniProtKBSearchRequest request = new UniProtKBSearchRequest();
+        mockSolrRequest();
+        UniProtKBSearchRequest verifyValidSearchRequest = new UniProtKBSearchRequest();
+        verifyValidSearchRequest.setQuery("p12345");
+        verifyValidSearchRequest.setSize(10);
+        SolrRequest verifyValidSolrRequest =
+                entryService.createSearchSolrRequest(verifyValidSearchRequest);
+        assertNotNull(verifyValidSolrRequest);
+        assertEquals("P12345", verifyValidSolrRequest.getQuery());
+    }
 
-        request.setQuery("p12345");
-        request.setSize(10);
+    @Test
+    void changeQueryToUpperCaseOnlyIfItIsAccession() {
+        mockSolrRequest();
+        UniProtKBSearchRequest verifyFailingRequest = new UniProtKBSearchRequest();
+        verifyFailingRequest.setQuery("hexdecimalString134");
+        verifyFailingRequest.setSize(10);
+        SolrRequest verifyFailingSolrRequestCase =
+                entryService.createSearchSolrRequest(verifyFailingRequest);
+        assertNotNull(verifyFailingSolrRequestCase);
+        assertEquals("hexdecimalString134", verifyFailingSolrRequestCase.getQuery());
+    }
 
-        accessionSearchField.setFieldName("accession_id");
-        isoFormSearchField.setFieldName("is_isoform");
+    @Test
+    void verifyQueryHasAccessionRegexAndHasDash() {
+        mockSolrRequest();
+        UniProtKBSearchRequest verifyValidSearchRequest = new UniProtKBSearchRequest();
+        verifyValidSearchRequest.setQuery("p12345-1");
+        verifyValidSearchRequest.setSize(10);
+        SolrRequest verifyValidSolrRequest =
+                entryService.createSearchSolrRequest(verifyValidSearchRequest);
+        assertNotNull(verifyValidSolrRequest);
+        assertTrue(verifyValidSolrRequest.getFilterQueries().isEmpty());
+    }
 
-        Mockito.when(uniProtKBQueryProcessorConfig.getLeadingWildcardFields())
-                .thenReturn(EMPTY_SET);
+    @Test
+    void addIsoFormFalseFilterOnlyIfQueryHasNoAccessionValue() {
+        mockSolrRequest();
+        UniProtKBSearchRequest verifyFailingRequest = new UniProtKBSearchRequest();
+        verifyFailingRequest.setQuery("accession:hexdecimalString134");
+        verifyFailingRequest.setSize(10);
+        SolrRequest verifyFailingSolrRequestCase =
+                entryService.createSearchSolrRequest(verifyFailingRequest);
+        assertNotNull(verifyFailingSolrRequestCase);
+        assertTrue(!verifyFailingSolrRequestCase.getFilterQueries().isEmpty());
+    }
+
+    private void mockSolrRequest() {
+        SearchFieldConfig searchFieldConfig =
+                SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
+        SearchFieldItem accessionIdSearchField =
+                searchFieldConfig.getSearchFieldItemByName("accession_id");
+        SearchFieldItem isoFormSearchField =
+                searchFieldConfig.getSearchFieldItemByName("is_isoform");
+        SearchFieldItem accessionSearchField =
+                searchFieldConfig.getSearchFieldItemByName("accession");
+
         Mockito.when(uniProtKBQueryProcessorConfig.getOptimisableFields())
-                .thenReturn(Collections.emptyList());
+                .thenReturn(List.of(accessionSearchField));
         Mockito.when(uniProtKBQueryProcessorConfig.getSearchFieldsNames()).thenReturn(EMPTY_SET);
         Mockito.when(uniProtKBQueryProcessorConfig.getLeadingWildcardFields())
                 .thenReturn(EMPTY_SET);
-        Mockito.when(uniProtKBSolrQueryConf.getQueryFields()).thenReturn("");
         Mockito.when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("accession_id"))
-                .thenReturn(accessionSearchField);
+                .thenReturn(accessionIdSearchField);
         Mockito.when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("is_isoform"))
                 .thenReturn(isoFormSearchField);
-
-        SolrRequest solrRequest = entryService.createSearchSolrRequest(request);
-        assertNotNull(solrRequest);
-        assertEquals("P12345", solrRequest.getQuery());
     }
 }
