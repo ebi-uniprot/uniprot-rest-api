@@ -74,7 +74,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
-			<artifactId>statistics-rest</artifactId>
 			<version>${uniprot-core.version}</version>
 			<scope>compile</scope>
 		</dependency>
