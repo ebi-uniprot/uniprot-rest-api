@@ -1,13 +1,15 @@
 package org.uniprot.api.statistics.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Value;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Value
 @Builder
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class StatisticsModuleStatisticAttributeImpl implements StatisticsModuleStatisticAttribute {
+public class StatisticsModuleStatisticsAttributeImpl
+        implements StatisticsModuleStatisticsAttribute {
     String name;
     String label;
     long count;

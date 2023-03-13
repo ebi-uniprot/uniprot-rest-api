@@ -3,11 +3,11 @@ DROP TABLE IF EXISTS uniprotkb_statistics_entry;
 DROP TABLE IF EXISTS statistics_category;
 CREATE TABLE statistics_category
 (
-    id       SERIAL PRIMARY KEY,
-    category varchar(128) NOT NULL,
-    db_type  varchar(64) NULL,
-    label  varchar(64) NULL,
-    search_field  varchar(64) NULL
+    id           SERIAL PRIMARY KEY,
+    category     varchar(128) NOT NULL,
+    db_type      varchar(64) NULL,
+    label        varchar(64) NULL,
+    search_field varchar(64) NULL
 );
 
 
