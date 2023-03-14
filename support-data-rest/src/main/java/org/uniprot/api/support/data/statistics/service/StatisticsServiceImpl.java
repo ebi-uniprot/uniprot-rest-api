@@ -9,7 +9,7 @@ import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsC
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsCategoryImpl;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
-import org.uniprot.api.support.data.statistics.repository.UniprotkbStatisticsEntryRepository;
+import org.uniprot.api.support.data.statistics.repository.UniprotKBStatisticsEntryRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -19,12 +19,12 @@ import java.util.stream.Collectors;
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
 
-    private final UniprotkbStatisticsEntryRepository statisticsEntryRepository;
+    private final UniprotKBStatisticsEntryRepository statisticsEntryRepository;
     private final StatisticsCategoryRepository statisticsCategoryRepository;
     private final StatisticsMapper statisticsMapper;
 
     public StatisticsServiceImpl(
-            UniprotkbStatisticsEntryRepository uniprotkbStatisticsEntryRepository,
+            UniprotKBStatisticsEntryRepository uniprotkbStatisticsEntryRepository,
             StatisticsCategoryRepository statisticsCategoryRepository,
             StatisticsMapper statisticsMapper) {
         this.statisticsEntryRepository = uniprotkbStatisticsEntryRepository;

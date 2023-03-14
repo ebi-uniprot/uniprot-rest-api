@@ -31,7 +31,7 @@ import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
 class UniprotKBStatisticsEntryRepositoryTest {
     @Autowired private TestEntityManager entityManager;
 
-    @Autowired private UniprotkbStatisticsEntryRepository entryRepository;
+    @Autowired private UniprotKBStatisticsEntryRepository entryRepository;
 
     @BeforeEach
     void setUp() {

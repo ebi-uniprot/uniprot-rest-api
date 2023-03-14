@@ -23,7 +23,7 @@ import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsC
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsCategoryImpl;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
-import org.uniprot.api.support.data.statistics.repository.UniprotkbStatisticsEntryRepository;
+import org.uniprot.api.support.data.statistics.repository.UniprotKBStatisticsEntryRepository;
 
 @ExtendWith(MockitoExtension.class)
 class StatisticsServiceTest {
@@ -41,7 +41,7 @@ class StatisticsServiceTest {
     @Mock private StatisticsModuleStatisticsAttribute statisticsModuleStatisticsAttribute4;
     @Mock private StatisticsCategory statisticsCategory0;
     @Mock private StatisticsCategory statisticsCategory1;
-    @Mock private UniprotkbStatisticsEntryRepository statisticsEntryRepository;
+    @Mock private UniprotKBStatisticsEntryRepository statisticsEntryRepository;
     @Mock private StatisticsCategoryRepository statisticsCategoryRepository;
     @Mock private StatisticsMapper statisticsMapper;
     @InjectMocks private StatisticsServiceImpl statisticsService;
