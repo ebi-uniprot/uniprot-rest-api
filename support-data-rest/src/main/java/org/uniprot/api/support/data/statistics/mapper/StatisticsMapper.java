@@ -1,14 +1,14 @@
 package org.uniprot.api.support.data.statistics.mapper;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Component;
 import org.uniprot.api.support.data.statistics.StatisticsAttributeConfig;
 import org.uniprot.api.support.data.statistics.entity.EntryType;
-import org.uniprot.api.support.data.statistics.entity.UniprotkbStatisticsEntry;
+import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttribute;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttributeImpl;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
+
+import java.util.Optional;
 
 @Component
 public class StatisticsMapper {
@@ -41,28 +41,31 @@ public class StatisticsMapper {
                 String.format("Entry type %s is not recognized", entryType));
     }
 
-    public StatisticsModuleStatisticsAttribute map(UniprotkbStatisticsEntry entry) {
+    public StatisticsModuleStatisticsAttribute map(UniprotKBStatisticsEntry entry) {
         return StatisticsModuleStatisticsAttributeImpl.builder()
                 .name(entry.getAttributeName())
                 .count(entry.getValueCount())
                 .entryCount(entry.getEntryCount())
                 .description(entry.getDescription())
-                .label(
-                        Optional.ofNullable(
-                                        statisticsAttributeConfig
-                                                .getAttributes()
-                                                .get(
-                                                        entry.getStatisticsCategory()
-                                                                .getCategory()
-                                                                .toLowerCase()))
-                                .map(
-                                        facetProperty ->
-                                                facetProperty
-                                                        .getValue()
-                                                        .get(
-                                                                entry.getAttributeName()
-                                                                        .toLowerCase()))
-                                .orElse(null))
+                .label(getLabel(entry))
                 .build();
+    }
+
+    private String getLabel(UniprotKBStatisticsEntry entry) {
+        return Optional.ofNullable(
+                        statisticsAttributeConfig
+                                .getAttributes()
+                                .get(
+                                        entry.getStatisticsCategory()
+                                                .getCategory()
+                                                .toLowerCase()))
+                .map(
+                        facetProperty ->
+                                facetProperty
+                                        .getValue()
+                                        .get(
+                                                entry.getAttributeName()
+                                                        .toLowerCase()))
+                .orElse(null);
     }
 }

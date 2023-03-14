@@ -22,13 +22,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
-import org.uniprot.api.support.data.statistics.entity.UniprotkbStatisticsEntry;
+import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @Import({HttpCommonHeaderConfig.class, RequestMappingHandlerMapping.class})
 @ActiveProfiles(profiles = "offline")
-class UniprotkbStatisticsEntryRepositoryTest {
+class UniprotKBStatisticsEntryRepositoryTest {
     @Autowired private TestEntityManager entityManager;
 
     @Autowired private UniprotkbStatisticsEntryRepository entryRepository;
@@ -41,7 +41,7 @@ class UniprotkbStatisticsEntryRepositoryTest {
 
     @Test
     void findAllByReleaseNameAndEntryType() {
-        List<UniprotkbStatisticsEntry> results =
+        List<UniprotKBStatisticsEntry> results =
                 entryRepository.findAllByReleaseNameAndEntryType("rel0", SWISSPROT);
 
         assertThat(
@@ -55,7 +55,7 @@ class UniprotkbStatisticsEntryRepositoryTest {
 
     @Test
     void findAllByReleaseNameAndEntryType_whenNoMatch() {
-        List<UniprotkbStatisticsEntry> results =
+        List<UniprotKBStatisticsEntry> results =
                 entryRepository.findAllByReleaseNameAndEntryType("rel1", SWISSPROT);
 
         assertThat(results, empty());
@@ -63,7 +63,7 @@ class UniprotkbStatisticsEntryRepositoryTest {
 
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn() {
-        List<UniprotkbStatisticsEntry> results =
+        List<UniprotKBStatisticsEntry> results =
                 entryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
                         "rel0",
                         SWISSPROT,
@@ -77,7 +77,7 @@ class UniprotkbStatisticsEntryRepositoryTest {
 
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn_whenSingleCategoryPassed() {
-        List<UniprotkbStatisticsEntry> results =
+        List<UniprotKBStatisticsEntry> results =
                 entryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
                         "rel0", SWISSPROT, List.of(STATISTICS_CATEGORIES[0]));
 
@@ -86,7 +86,7 @@ class UniprotkbStatisticsEntryRepositoryTest {
 
     @Test
     void findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIdIn_whenNoCategoryPassed() {
-        List<UniprotkbStatisticsEntry> results =
+        List<UniprotKBStatisticsEntry> results =
                 entryRepository.findAllByReleaseNameAndEntryTypeAndStatisticsCategoryIn(
                         "rel0", SWISSPROT, Collections.emptyList());
 
