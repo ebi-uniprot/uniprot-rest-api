@@ -1,19 +1,20 @@
 package org.uniprot.api.support.data.statistics.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
-import org.uniprot.api.support.data.statistics.entity.UniprotkbStatisticsEntry;
+import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
 import org.uniprot.api.support.data.statistics.mapper.StatisticsMapper;
+import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttribute;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsCategory;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsCategoryImpl;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniprotkbStatisticsEntryRepository;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
@@ -34,7 +35,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public List<StatisticsModuleStatisticsCategory> findAllByVersionAndStatisticTypeAndCategoryIn(
             String version, String statisticType, Set<String> categories) {
-        List<UniprotkbStatisticsEntry> entries;
+        List<UniprotKBStatisticsEntry> entries;
         if (categories.isEmpty()) {
             entries =
                     statisticsEntryRepository.findAllByReleaseNameAndEntryType(
@@ -48,7 +49,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                                     getCategories(categories));
         }
         return entries.stream()
-                .collect(Collectors.groupingBy(UniprotkbStatisticsEntry::getStatisticsCategory))
+                .collect(Collectors.groupingBy(UniprotKBStatisticsEntry::getStatisticsCategory))
                 .entrySet()
                 .stream()
                 .map(this::buildStatisticsModuleStatisticsCategory)
@@ -56,20 +57,26 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     private StatisticsModuleStatisticsCategoryImpl buildStatisticsModuleStatisticsCategory(
-            Map.Entry<StatisticsCategory, List<UniprotkbStatisticsEntry>> entry) {
+            Map.Entry<StatisticsCategory, List<UniprotKBStatisticsEntry>> entry) {
         return StatisticsModuleStatisticsCategoryImpl.builder()
                 .categoryName(entry.getKey().getCategory())
-                .totalCount(
-                        entry.getValue().stream()
-                                .mapToLong(UniprotkbStatisticsEntry::getValueCount)
-                                .sum())
+                .totalCount(getTotalCount(entry))
                 .label(entry.getKey().getLabel())
                 .searchField(entry.getKey().getSearchField())
-                .items(
-                        entry.getValue().stream()
-                                .map(statisticsMapper::map)
-                                .collect(Collectors.toList()))
+                .items(getItems(entry))
                 .build();
+    }
+
+    private List<StatisticsModuleStatisticsAttribute> getItems(Map.Entry<StatisticsCategory, List<UniprotKBStatisticsEntry>> entry) {
+        return entry.getValue().stream()
+                .map(statisticsMapper::map)
+                .collect(Collectors.toList());
+    }
+
+    private static long getTotalCount(Map.Entry<StatisticsCategory, List<UniprotKBStatisticsEntry>> entry) {
+        return entry.getValue().stream()
+                .mapToLong(UniprotKBStatisticsEntry::getValueCount)
+                .sum();
     }
 
     private Set<StatisticsCategory> getCategories(Set<String> categories) {

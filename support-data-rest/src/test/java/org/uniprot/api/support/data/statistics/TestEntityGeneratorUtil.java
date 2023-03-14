@@ -5,7 +5,7 @@ import static org.uniprot.api.support.data.statistics.entity.EntryType.TREMBL;
 
 import org.uniprot.api.support.data.statistics.entity.EntryType;
 import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
-import org.uniprot.api.support.data.statistics.entity.UniprotkbStatisticsEntry;
+import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
 
 public class TestEntityGeneratorUtil {
 
@@ -40,8 +40,8 @@ public class TestEntityGeneratorUtil {
                 createStatisticsCategory(1),
                 createStatisticsCategory(2)
             };
-    public static final UniprotkbStatisticsEntry[] STATISTICS_ENTRIES =
-            new UniprotkbStatisticsEntry[] {
+    public static final UniprotKBStatisticsEntry[] STATISTICS_ENTRIES =
+            new UniprotKBStatisticsEntry[] {
                 createStatisticsEntry(0),
                 createStatisticsEntry(1),
                 createStatisticsEntry(2),
@@ -49,8 +49,8 @@ public class TestEntityGeneratorUtil {
                 createStatisticsEntry(4)
             };
 
-    private static UniprotkbStatisticsEntry createStatisticsEntry(int index) {
-        UniprotkbStatisticsEntry uniprotkbStatisticsEntry = new UniprotkbStatisticsEntry();
+    private static UniprotKBStatisticsEntry createStatisticsEntry(int index) {
+        UniprotKBStatisticsEntry uniprotkbStatisticsEntry = new UniprotKBStatisticsEntry();
         uniprotkbStatisticsEntry.setId(ENTRY_IDS[index]);
         uniprotkbStatisticsEntry.setAttributeName(ENTRY_NAMES[index]);
         uniprotkbStatisticsEntry.setStatisticsCategory(

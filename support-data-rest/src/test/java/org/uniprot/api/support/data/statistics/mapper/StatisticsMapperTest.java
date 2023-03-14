@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.support.data.statistics.StatisticsAttributeConfig;
 import org.uniprot.api.support.data.statistics.entity.EntryType;
-import org.uniprot.api.support.data.statistics.entity.UniprotkbStatisticsEntry;
+import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttribute;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
 
@@ -62,7 +62,7 @@ class StatisticsMapperTest {
     @Test
     void mapUniprotkbStatisticsEntryToStatisticAttribute() {
         when(statisticsAttributeConfig.getAttributes()).thenReturn(FACET_MAP);
-        UniprotkbStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
+        UniprotKBStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
         StatisticsModuleStatisticsAttribute statisticsModuleStatisticsAttribute =
                 statisticsMapper.map(statisticsEntry);
@@ -72,7 +72,7 @@ class StatisticsMapperTest {
 
     @Test
     void mapUniprotkbStatisticsEntryToStatisticAttributeWhenLabelNotExist() {
-        UniprotkbStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
+        UniprotKBStatisticsEntry statisticsEntry = STATISTICS_ENTRIES[0];
 
         StatisticsModuleStatisticsAttribute statisticsModuleStatisticsAttribute =
                 statisticsMapper.map(statisticsEntry);
@@ -81,7 +81,7 @@ class StatisticsMapperTest {
     }
 
     private static void assertUniprotkbStatisticsEntryToStatisticAttributeMapping(
-            UniprotkbStatisticsEntry expect,
+            UniprotKBStatisticsEntry expect,
             StatisticsModuleStatisticsAttribute actual,
             String label) {
         assertSame(expect.getAttributeName(), actual.getName());
