@@ -223,7 +223,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
-			<artifactId>uniprot-indexer</artifactId>
+			<artifactId>spark-indexer</artifactId>
 			<version>${uniprot-store.version}</version>
 			<scope>test</scope>
 		</dependency>

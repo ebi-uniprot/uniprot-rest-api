@@ -46,7 +46,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -89,19 +88,15 @@ import org.uniprot.core.uniprotkb.description.impl.ProteinNameBuilder;
 import org.uniprot.core.uniprotkb.feature.FeatureCategory;
 import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.cv.chebi.ChebiRepo;
-import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.go.GORepo;
+import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
 import org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker;
-import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
-import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
@@ -109,6 +104,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -142,18 +138,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
     @Autowired private UniProtKBFacetConfig facetConfig;
 
+    private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
+
     @BeforeAll
     void initUniprotKbDataStore() {
         DataStoreManager dsm = getStoreManager();
         dsm.addDocConverter(
-                DataStoreManager.StoreType.UNIPROT,
-                new UniProtEntryConverter(
-                        TaxonomyRepoMocker.getTaxonomyRepo(),
-                        Mockito.mock(GORepo.class),
-                        PathwayRepoMocker.getPathwayRepo(),
-                        Mockito.mock(ChebiRepo.class),
-                        Mockito.mock(ECRepo.class),
-                        new HashMap<>()));
+                DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(new HashMap<>()));
         dsm.addDocConverter(
                 DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
         dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
@@ -1637,15 +1628,25 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
+        UniProtEntryConverter converter = new UniProtEntryConverter(new HashMap<>());
         UniProtKBEntry entry =
                 UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL); // P21802
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        UniProtDocument document = converter.convert(entry);
+        UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP); // Q8DIA7
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        document = converter.convert(entry);
+        UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM); // P21802-2
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        document = converter.convert(entry);
+        UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
 
         if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext)
                 || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)
