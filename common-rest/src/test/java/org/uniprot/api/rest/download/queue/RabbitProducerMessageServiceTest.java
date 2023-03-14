@@ -20,12 +20,14 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.HashGenerator;
 
 @ExtendWith(MockitoExtension.class)
 class RabbitProducerMessageServiceTest {
     @Mock private MessageConverter converter;
     @Mock private RabbitTemplate rabbitTemplate;
     @Mock private DownloadJobRepository jobRepository;
+    @Mock private HashGenerator<DownloadRequest> hashGenerator;
     private RabbitProducerMessageService service;
     private DownloadRequest downloadRequest;
     private MessageProperties messageHeader;
@@ -33,7 +35,9 @@ class RabbitProducerMessageServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new RabbitProducerMessageService(converter, rabbitTemplate, jobRepository);
+        service =
+                new RabbitProducerMessageService(
+                        converter, rabbitTemplate, jobRepository, hashGenerator);
         downloadRequest = new FakeDownloadRequest();
         messageHeader = new MessageProperties();
         messageHeader.setHeader("jobId", "jobId");

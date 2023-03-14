@@ -22,6 +22,7 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
@@ -107,7 +108,8 @@ public class UniProtKBDownloadController extends BasicDownloadController<UniProt
                     constructDownloadRedirectUrl(
                             job.getResultFile(), servletRequest.getRequestURL().toString()));
         } else if (JobStatus.ERROR == job.getStatus()) {
-            ProblemPair error = new ProblemPair(EXCEPTION_CODE, job.getError());
+            ProblemPair error =
+                    new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), job.getError());
             detailResponse.setErrors(List.of(error));
         }
 

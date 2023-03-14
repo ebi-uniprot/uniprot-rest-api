@@ -18,7 +18,8 @@ public enum PredefinedAPIStatus {
 
     LEADING_WILDCARD_IGNORED(
             41,
-            "Leading wildcard (*, ?) was removed for this search. Please check the help page for more information on using wildcards on queries.");
+            "Leading wildcard (*, ?) was removed for this search. Please check the help page for more information on using wildcards on queries."),
+    SERVER_ERROR(50, "Internal server error");
 
     private final String message;
     private final int code;

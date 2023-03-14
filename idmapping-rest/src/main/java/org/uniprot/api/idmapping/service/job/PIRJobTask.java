@@ -8,10 +8,10 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
+import org.uniprot.api.rest.output.PredefinedAPIStatus;
 
 @Slf4j
 public class PIRJobTask extends JobTask {
-    private static final int REST_EXCEPTION_CODE = 50;
     private final IdMappingPIRService pirService;
 
     public PIRJobTask(
@@ -28,7 +28,10 @@ public class PIRJobTask extends JobTask {
             return pirService.mapIds(job.getIdMappingRequest(), job.getJobId());
         } catch (RestClientException restException) {
             return IdMappingResult.builder()
-                    .error(new ProblemPair(REST_EXCEPTION_CODE, restException.getMessage()))
+                    .error(
+                            new ProblemPair(
+                                    PredefinedAPIStatus.SERVER_ERROR.getCode(),
+                                    restException.getMessage()))
                     .build();
         } catch (Exception ex) {
             log.error(
@@ -36,7 +39,10 @@ public class PIRJobTask extends JobTask {
                     job.getJobId(),
                     ex.getCause());
             return IdMappingResult.builder()
-                    .error(new ProblemPair(REST_EXCEPTION_CODE, "Internal server error."))
+                    .error(
+                            new ProblemPair(
+                                    PredefinedAPIStatus.SERVER_ERROR.getCode(),
+                                    "Internal server error."))
                     .build();
         }
     }

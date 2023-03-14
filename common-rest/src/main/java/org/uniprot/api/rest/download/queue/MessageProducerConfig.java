@@ -4,9 +4,13 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
+import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.HashGenerator;
 
 /**
  * @author sahmad
@@ -15,6 +19,9 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @Profile({"asyncDownload"})
 public class MessageProducerConfig {
+
+    @Value("${async.download.hash.salt}")
+    private String hashSalt;
 
     @Bean
     public RabbitTemplate rabbitTemplate(
@@ -33,5 +40,10 @@ public class MessageProducerConfig {
         Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
         converter.setCreateMessageIds(true);
         return converter;
+    }
+
+    @Bean
+    public HashGenerator<DownloadRequest> hashGenerator() {
+        return new HashGenerator<>(new DownloadRequestToArrayConverter(), this.hashSalt);
     }
 }

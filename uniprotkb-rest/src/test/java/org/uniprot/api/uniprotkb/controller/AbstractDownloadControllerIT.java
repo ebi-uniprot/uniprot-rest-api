@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.controller.BasicSearchController.EXCEPTION_CODE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
 
@@ -44,6 +43,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 
@@ -59,7 +59,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     @Test
     void submitJobWithoutQueryFailure() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
-        ResultActions resultActions = callPostJobStatus(null, null, null, format.toString());
+        ResultActions resultActions = callPostJobStatus(null, null, null, format.toString(), false);
         resultActions
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -72,7 +72,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void submitJobWithStarQuerySuccess() throws Exception {
         String query = "*:*";
         MediaType format = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
@@ -90,12 +90,12 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void submitJobStarQueryMoreThanOnceShouldProcessOnlyOnceSuccess() throws Exception {
         String query = "*";
         MediaType format = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().atMost(20, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         Optional<DownloadJob> optJob1 = getDownloadJobRepository().findById(jobId);
-        String newJobId = callRunAPIAndVerify(query, null, null, format.toString());
+        String newJobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
         assertNotNull(newJobId);
         assertEquals(jobId, newJobId);
         Optional<DownloadJob> optJob2 = getDownloadJobRepository().findById(jobId);
@@ -109,7 +109,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "content:*";
         String sort = "accession desc";
-        String jobId = callRunAPIAndVerify(query, null, sort, format.toString());
+        String jobId = callRunAPIAndVerify(query, null, sort, format.toString(), false);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         // then
@@ -146,7 +146,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
 
         String query = "content:*";
         String fields = "accession,rhea";
-        String jobId = callRunAPIAndVerify(query, fields, null, format);
+        String jobId = callRunAPIAndVerify(query, fields, null, format, false);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
@@ -158,7 +158,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         // when
         String query = "content:*";
         String fields = "accession";
-        String jobId = callRunAPIAndVerify(query, fields, null, null);
+        String jobId = callRunAPIAndVerify(query, fields, null, null, false);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
@@ -171,7 +171,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         MediaType format = UniProtMediaType.valueOf(XLS_MEDIA_TYPE_VALUE);
         String query = "content:*";
         String fields = "accession,rhea";
-        ResultActions response = callPostJobStatus(query, fields, null, format.toString());
+        ResultActions response = callPostJobStatus(query, fields, null, format.toString(), false);
 
         // then
         response.andDo(log())
@@ -188,7 +188,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void submitJobWithBadQuery() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "random:field";
-        ResultActions response = callPostJobStatus(query, null, null, format.toString());
+        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false);
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -203,7 +203,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         String query = "content:*";
         String fields = "something,else";
 
-        ResultActions response = callPostJobStatus(query, fields, null, format.toString());
+        ResultActions response = callPostJobStatus(query, fields, null, format.toString(), false);
 
         // then
         response.andDo(log())
@@ -223,7 +223,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         String query = "content:*";
         String sort = "something desc";
 
-        ResultActions response = callPostJobStatus(query, null, sort, format.toString());
+        ResultActions response = callPostJobStatus(query, null, sort, format.toString(), false);
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -253,7 +253,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.ERROR.toString())))
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.length()", is(1)))
-                .andExpect(jsonPath("$.errors[0].code", is(EXCEPTION_CODE)))
+                .andExpect(
+                        jsonPath(
+                                "$.errors[0].code", is(PredefinedAPIStatus.SERVER_ERROR.getCode())))
                 .andExpect(jsonPath("$.errors[0].message", is(errMsg)));
     }
 
@@ -351,7 +353,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andExpect(jsonPath("$.format", is(APPLICATION_JSON_VALUE)))
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.length()", is(1)))
-                .andExpect(jsonPath("$.errors[0].code", is(EXCEPTION_CODE)))
+                .andExpect(
+                        jsonPath(
+                                "$.errors[0].code", is(PredefinedAPIStatus.SERVER_ERROR.getCode())))
                 .andExpect(jsonPath("$.errors[0].message", is(errMsg)));
     }
 
@@ -359,7 +363,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void runQueryWhichReturnsEmptyResult() throws Exception {
         String query = "content:khansamatola";
         MediaType format = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
@@ -393,7 +397,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         // when
         String query = "content:FGFR";
         String fields = "accession,id,gene_names";
-        String jobId = callRunAPIAndVerify(query, fields, null, "json");
+        String jobId = callRunAPIAndVerify(query, fields, null, "json", false);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
@@ -423,7 +427,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         // when
         String query = "content:FGFR";
         String fields = "accession,id,gene_names";
-        String jobId = callRunAPIAndVerify(query, fields, null, "tsv");
+        String jobId = callRunAPIAndVerify(query, fields, null, "tsv", false);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
@@ -439,6 +443,56 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         String[] rows = tsvString.split("\n");
         Assertions.assertEquals(11, rows.length);
         Assertions.assertEquals("Entry\tEntry Name\tGene Names", rows[0]);
+    }
+
+    @Test
+    void submitJobWithTaxonomyReturnField() throws Exception {
+        // when
+        String query = "content:*";
+        String fields = "accession,lineage";
+        String jobId = callRunAPIAndVerify(query, fields, null, null, false);
+        // then
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        getAndVerifyDetails(jobId);
+        // verify result file
+        Path resultFilePath =
+                Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
+        Assertions.assertTrue(Files.exists(resultFilePath));
+        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFile);
+        Assertions.assertTrue(Files.exists(unzippedFile));
+        String resultsJson = Files.readString(unzippedFile);
+        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
+        Assertions.assertEquals(10, primaryAccessions.size());
+        List<String> lineages = JsonPath.read(resultsJson, "$.results.*.lineages");
+        Assertions.assertFalse(lineages.isEmpty());
+        Assertions.assertEquals(10, lineages.size());
+    }
+
+    @Test
+    void submitJobWithIncludeIsoformFlag() throws Exception {
+        // when
+        String query = "content:*";
+        String fields = "accession";
+        String jobId = callRunAPIAndVerify(query, fields, null, null, true);
+        // then
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        getAndVerifyDetails(jobId);
+        // verify result file
+        Path resultFilePath =
+                Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
+        Assertions.assertTrue(Files.exists(resultFilePath));
+        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        uncompressFile(resultFilePath, unzippedFile);
+        Assertions.assertTrue(Files.exists(unzippedFile));
+        String resultsJson = Files.readString(unzippedFile);
+        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
+        Assertions.assertEquals(12, primaryAccessions.size());
+        Assertions.assertTrue(primaryAccessions.contains("P00001"));
+        Assertions.assertTrue(primaryAccessions.contains("P00011-2"));
+        Assertions.assertTrue(primaryAccessions.contains("P00012-2"));
     }
 
     protected JobStatus getJobStatus(String jobId) throws Exception {
@@ -466,10 +520,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return response;
     }
 
-    protected String callRunAPIAndVerify(String query, String fields, String sort, String format)
+    protected String callRunAPIAndVerify(
+            String query, String fields, String sort, String format, boolean includeIsoform)
             throws Exception {
 
-        ResultActions response = callPostJobStatus(query, fields, sort, format);
+        ResultActions response = callPostJobStatus(query, fields, sort, format, includeIsoform);
 
         // then
         response.andDo(log())
@@ -482,7 +537,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return jobId;
     }
 
-    private ResultActions callPostJobStatus(String query, String fields, String sort, String format)
+    private ResultActions callPostJobStatus(
+            String query, String fields, String sort, String format, boolean includeIsoform)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
@@ -490,7 +546,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         .param("query", query)
                         .param("fields", fields)
                         .param("sort", sort)
-                        .param("format", Objects.isNull(format) ? null : format);
+                        .param("format", Objects.isNull(format) ? null : format)
+                        .param("includeIsoform", String.valueOf(includeIsoform));
         ResultActions response = this.mockMvc.perform(requestBuilder);
         return response;
     }

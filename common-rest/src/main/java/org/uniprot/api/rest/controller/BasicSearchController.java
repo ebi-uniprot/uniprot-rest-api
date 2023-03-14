@@ -41,7 +41,6 @@ public abstract class BasicSearchController<T> {
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final MessageConverterContextFactory.Resource resource;
     private final Gatekeeper downloadGatekeeper;
-    public static final int EXCEPTION_CODE = 50;
 
     protected BasicSearchController(
             ApplicationEventPublisher eventPublisher,

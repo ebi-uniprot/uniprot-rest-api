@@ -18,7 +18,6 @@ import java.util.concurrent.Callable;
 import org.apache.solr.client.solrj.SolrClient;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +39,6 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -91,16 +89,10 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
 
     @SpyBean private MessageConverter messageConverter;
 
-    private HashGenerator<DownloadRequest> hashGenerator;
+    @Autowired private HashGenerator<DownloadRequest> hashGenerator;
 
     @Value("${async.download.retryMaxCount}")
     private int maxRetry;
-
-    @BeforeAll
-    void init() {
-        this.hashGenerator =
-                new HashGenerator<>(new DownloadRequestToArrayConverter(), "UNIPROT_DOWNLOAD_SALT");
-    }
 
     @Test
     void sendAndProcessDownloadMessageSuccessfully() throws IOException {

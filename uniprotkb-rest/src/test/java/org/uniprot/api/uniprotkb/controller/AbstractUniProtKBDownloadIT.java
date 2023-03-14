@@ -34,6 +34,11 @@ import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
+import org.uniprot.core.taxonomy.TaxonomyEntry;
+import org.uniprot.core.taxonomy.TaxonomyRank;
+import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
@@ -45,6 +50,7 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -168,6 +174,7 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         saveEntry(11, "-2");
         saveEntry(12, "-2");
         cloudSolrClient.commit(SolrCollection.uniprot.name());
+        saveTaxonomyEntry(9606L);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
 
@@ -181,5 +188,27 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
 
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
         storeClient.saveEntry(uniProtKBEntry);
+    }
+
+    private void saveTaxonomyEntry(long taxId) throws Exception {
+        TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
+        TaxonomyEntry taxonomyEntry =
+                entryBuilder
+                        .taxonId(taxId)
+                        .rank(TaxonomyRank.SPECIES)
+                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 1).build())
+                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 2).build())
+                        .build();
+        byte[] taxonomyObj =
+                TaxonomyJsonConfig.getInstance()
+                        .getFullObjectMapper()
+                        .writeValueAsBytes(taxonomyEntry);
+
+        TaxonomyDocument.TaxonomyDocumentBuilder docBuilder =
+                TaxonomyDocument.builder()
+                        .taxId(taxId)
+                        .id(String.valueOf(taxId))
+                        .taxonomyObj(taxonomyObj);
+        cloudSolrClient.addBean(SolrCollection.taxonomy.name(), docBuilder.build());
     }
 }

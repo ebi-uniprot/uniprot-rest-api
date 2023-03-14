@@ -11,6 +11,7 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 
@@ -39,7 +40,8 @@ public abstract class BasicDownloadController<T> extends BasicSearchController<T
                 response = ResponseEntity.ok(new JobStatusResponse(job.getStatus()));
                 break;
             default:
-                ProblemPair error = new ProblemPair(EXCEPTION_CODE, job.getError());
+                ProblemPair error =
+                        new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), job.getError());
                 response =
                         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(new JobStatusResponse(List.of(error)));

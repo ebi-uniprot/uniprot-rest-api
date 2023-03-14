@@ -15,7 +15,6 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.DownloadRequestToArrayConverter;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -36,19 +35,17 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     private final MessageConverter converter;
     private final DownloadJobRepository jobRepository;
     private final HashGenerator<DownloadRequest> hashGenerator;
-
-    private static final String SALT_STR = "UNIPROT_DOWNLOAD_SALT";
-
     private static final String JOB_ID = "jobId";
 
     public RabbitProducerMessageService(
             MessageConverter converter,
             RabbitTemplate rabbitTemplate,
-            DownloadJobRepository downloadJobRepository) {
+            DownloadJobRepository downloadJobRepository,
+            HashGenerator<DownloadRequest> hashGenerator) {
         this.rabbitTemplate = rabbitTemplate;
         this.converter = converter;
         this.jobRepository = downloadJobRepository;
-        this.hashGenerator = new HashGenerator<>(new DownloadRequestToArrayConverter(), SALT_STR);
+        this.hashGenerator = hashGenerator;
     }
 
     @Override
