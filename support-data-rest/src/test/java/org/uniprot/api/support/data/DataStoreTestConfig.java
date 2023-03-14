@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
-import org.uniprot.api.support.data.statistics.repository.UniprotkbStatisticsEntryRepository;
+import org.uniprot.api.support.data.statistics.repository.UniprotKBStatisticsEntryRepository;
 
 @TestConfiguration
 public class DataStoreTestConfig {
@@ -32,8 +32,8 @@ public class DataStoreTestConfig {
 
     @Bean("testUniprotkbStatisticsEntryRepository")
     @Profile("offline")
-    public UniprotkbStatisticsEntryRepository uniprotkbStatisticsEntryRepository() {
-        return mock(UniprotkbStatisticsEntryRepository.class);
+    public UniprotKBStatisticsEntryRepository uniprotkbStatisticsEntryRepository() {
+        return mock(UniprotKBStatisticsEntryRepository.class);
     }
 
     @Bean("testStatisticsCategoryRepository")
