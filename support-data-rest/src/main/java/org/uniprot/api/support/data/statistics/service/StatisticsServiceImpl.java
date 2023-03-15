@@ -67,16 +67,14 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .build();
     }
 
-    private List<StatisticsModuleStatisticsAttribute> getItems(Map.Entry<StatisticsCategory, List<UniprotKBStatisticsEntry>> entry) {
-        return entry.getValue().stream()
-                .map(statisticsMapper::map)
-                .collect(Collectors.toList());
+    private List<StatisticsModuleStatisticsAttribute> getItems(
+            Map.Entry<StatisticsCategory, List<UniprotKBStatisticsEntry>> entry) {
+        return entry.getValue().stream().map(statisticsMapper::map).collect(Collectors.toList());
     }
 
-    private static long getTotalCount(Map.Entry<StatisticsCategory, List<UniprotKBStatisticsEntry>> entry) {
-        return entry.getValue().stream()
-                .mapToLong(UniprotKBStatisticsEntry::getValueCount)
-                .sum();
+    private static long getTotalCount(
+            Map.Entry<StatisticsCategory, List<UniprotKBStatisticsEntry>> entry) {
+        return entry.getValue().stream().mapToLong(UniprotKBStatisticsEntry::getValueCount).sum();
     }
 
     private Set<StatisticsCategory> getCategories(Set<String> categories) {

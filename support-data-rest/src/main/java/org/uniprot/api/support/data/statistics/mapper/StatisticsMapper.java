@@ -55,17 +55,12 @@ public class StatisticsMapper {
         return Optional.ofNullable(
                         statisticsAttributeConfig
                                 .getAttributes()
-                                .get(
-                                        entry.getStatisticsCategory()
-                                                .getCategory()
-                                                .toLowerCase()))
+                                .get(entry.getStatisticsCategory().getCategory().toLowerCase()))
                 .map(
                         facetProperty ->
                                 facetProperty
                                         .getValue()
-                                        .get(
-                                                entry.getAttributeName()
-                                                        .toLowerCase()))
+                                        .get(entry.getAttributeName().toLowerCase()))
                 .orElse(null);
     }
 }
