@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
@@ -39,18 +38,13 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.flatfile.writer.LineType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.cv.chebi.ChebiRepo;
-import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
-import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "offline")
@@ -108,14 +102,7 @@ class SearchByDateIT {
                 "solrClient",
                 storeManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
 
-        UniProtEntryConverter uniProtEntryConverter =
-                new UniProtEntryConverter(
-                        TaxonomyRepoMocker.getTaxonomyRepo(),
-                        Mockito.mock(GORepo.class),
-                        PathwayRepoMocker.getPathwayRepo(),
-                        Mockito.mock(ChebiRepo.class),
-                        Mockito.mock(ECRepo.class),
-                        new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>());
 
         storeManager.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
 

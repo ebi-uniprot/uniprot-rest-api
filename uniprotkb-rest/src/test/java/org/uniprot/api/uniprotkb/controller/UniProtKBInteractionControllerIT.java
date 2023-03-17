@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,17 +42,12 @@ import org.uniprot.core.uniprotkb.comment.impl.InteractantBuilder;
 import org.uniprot.core.uniprotkb.comment.impl.InteractionBuilder;
 import org.uniprot.core.uniprotkb.comment.impl.InteractionCommentBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.cv.chebi.ChebiRepo;
-import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
-import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 /**
  * Created 06/05/2020
@@ -84,14 +78,7 @@ class UniProtKBInteractionControllerIT {
 
     @BeforeAll
     void initUniprotKbDataStore() {
-        UniProtEntryConverter uniProtEntryConverter =
-                new UniProtEntryConverter(
-                        TaxonomyRepoMocker.getTaxonomyRepo(),
-                        Mockito.mock(GORepo.class),
-                        PathwayRepoMocker.getPathwayRepo(),
-                        Mockito.mock(ChebiRepo.class),
-                        Mockito.mock(ECRepo.class),
-                        new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>());
 
         STORE_MANAGER.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
         STORE_MANAGER.addDocConverter(

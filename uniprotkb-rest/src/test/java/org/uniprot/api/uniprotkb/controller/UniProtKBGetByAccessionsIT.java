@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.mock;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
@@ -10,19 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -49,17 +42,14 @@ import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.GeneBuilder;
 import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.cv.chebi.ChebiRepo;
-import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.go.GORepo;
+import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
-import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 /**
  * @author lgonzales
@@ -80,13 +70,9 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
     private final UniProtEntryConverter documentConverter =
-            new UniProtEntryConverter(
-                    TaxonomyRepoMocker.getTaxonomyRepo(),
-                    Mockito.mock(GORepo.class),
-                    PathwayRepoMocker.getPathwayRepo(),
-                    mock(ChebiRepo.class),
-                    mock(ECRepo.class),
-                    new HashMap<>());
+            new UniProtEntryConverter(new HashMap<>());
+
+    private final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
 
     private static final String TEST_IDS =
             "p00003,P00002,P00001,P00007,P00006,P00005,P00004,P00008,P00010,P00009";
@@ -136,9 +122,12 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
 
-            UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
+            UniProtDocument document = documentConverter.convert(uniProtKBEntry);
+            document =
+                    UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(
+                            taxonomyRepo, document);
 
-            cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);
+            cloudSolrClient.addBean(SolrCollection.uniprot.name(), document);
             storeClient.saveEntry(uniProtKBEntry);
             prefix--;
         }

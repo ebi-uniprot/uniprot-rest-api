@@ -27,21 +27,6 @@ public final class TestUtils {
         return TestUtils.class.getResourceAsStream(resourcePath);
     }
 
-    public static String convertInputStreamToString(InputStream stream) throws IOException {
-        StringBuilder sb = new StringBuilder();
-
-        try (InputStreamReader isr = new InputStreamReader(stream);
-                BufferedReader br = new BufferedReader(isr)) {
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-        }
-
-        return sb.toString();
-    }
-
     public static void uncompressFile(Path zippedFile, Path unzippedFile) throws IOException {
         InputStream fin = Files.newInputStream(zippedFile);
         BufferedInputStream in = new BufferedInputStream(fin);

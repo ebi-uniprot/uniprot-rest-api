@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -50,19 +49,14 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.cv.chebi.ChebiRepo;
-import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
 import org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker;
-import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
-import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -142,14 +136,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     }
 
     void initUniprotKbDataStore() {
-        UniProtEntryConverter uniProtEntryConverter =
-                new UniProtEntryConverter(
-                        TaxonomyRepoMocker.getTaxonomyRepo(),
-                        Mockito.mock(GORepo.class),
-                        PathwayRepoMocker.getPathwayRepo(),
-                        Mockito.mock(ChebiRepo.class),
-                        Mockito.mock(ECRepo.class),
-                        new HashMap<>());
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>());
 
         DataStoreManager dsm = getStoreManager();
         dsm.addDocConverter(DataStoreManager.StoreType.UNIPROT, uniProtEntryConverter);
