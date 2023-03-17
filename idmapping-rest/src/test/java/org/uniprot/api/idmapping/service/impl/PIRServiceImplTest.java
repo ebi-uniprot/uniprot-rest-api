@@ -18,9 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 class PIRServiceImplTest {

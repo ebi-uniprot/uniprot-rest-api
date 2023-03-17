@@ -5,9 +5,9 @@ import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUti
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 
 /**

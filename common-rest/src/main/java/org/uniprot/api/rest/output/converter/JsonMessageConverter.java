@@ -76,7 +76,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             FilterProvider filterProvider = getFieldsFilterProvider(fieldList);
             filterMapper.setFilterProvider(filterProvider);
             TL_FILTER_MAPPER.set(filterMapper);
-            setEntitySeparator(",");
+            setEntitySeparator(",\n");
         }
 
         JsonGenerator generator =

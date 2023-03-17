@@ -226,6 +226,7 @@ public class UniProtEntryService
         if (filterIsoform) {
             addIsoformFilter(solrRequest);
         }
+        solrRequest.setLargeSolrStreamRestricted(uniProtRequest.isLargeSolrStreamRestricted());
         return solrRequest;
     }
 
@@ -295,7 +296,7 @@ public class UniProtEntryService
         solrRequest.setFilterQueries(queries);
     }
 
-    private StoreRequest buildStoreRequest(BasicRequest request) {
+    public StoreRequest buildStoreRequest(BasicRequest request) {
         List<ReturnField> fieldList =
                 OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
         StoreRequest.StoreRequestBuilder storeRequest = StoreRequest.builder();

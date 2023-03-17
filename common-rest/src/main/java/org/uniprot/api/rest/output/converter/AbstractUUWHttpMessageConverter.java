@@ -132,7 +132,7 @@ public abstract class AbstractUUWHttpMessageConverter<C, T>
 
     protected abstract Stream<T> entitiesToWrite(MessageConverterContext<C> context);
 
-    protected void writeContents(
+    public void writeContents(
             MessageConverterContext<C> context,
             OutputStream outputStream,
             Instant start,

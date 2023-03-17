@@ -18,7 +18,9 @@
 		<logback.version>1.2.3</logback.version>
 		<commons-codec.version>1.11</commons-codec.version>
 		<jayway.version>2.4.0</jayway.version>
-
+		<testcontainers.version>1.17.6</testcontainers.version>
+		<dev.jna.version>5.8.0</dev.jna.version>
+		<awaitility.version>4.2.0</awaitility.version>
 	</properties>
 
 	<repositories>
@@ -227,6 +229,49 @@
 			<version>${uniprot-store.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<version>${awaitility.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.java.dev.jna</groupId>
+					<artifactId>jna</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>rabbitmq</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>${dev.jna.version}</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

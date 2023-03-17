@@ -32,6 +32,8 @@ public class SolrRequest {
     // Total rows requested by user
     private int totalRows;
 
+    private boolean largeSolrStreamRestricted = true;
+
     @Singular private List<String> termFields = new ArrayList<>();
     @Singular private List<String> filterQueries = new ArrayList<>();
     @Singular private List<String> facets = new ArrayList<>();

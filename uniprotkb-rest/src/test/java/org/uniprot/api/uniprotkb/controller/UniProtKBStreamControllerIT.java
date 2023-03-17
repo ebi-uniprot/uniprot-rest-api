@@ -54,6 +54,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -84,7 +85,12 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest({UniProtKBController.class})
 @ContextConfiguration(
-        classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
+        classes = {
+            DataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class,
+            ErrorHandlerConfig.class
+        })
 @ExtendWith(
         value = {
             SpringExtension.class,

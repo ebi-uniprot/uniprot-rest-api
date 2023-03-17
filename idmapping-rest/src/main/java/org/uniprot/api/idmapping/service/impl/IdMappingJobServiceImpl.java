@@ -12,19 +12,20 @@ import org.uniprot.api.idmapping.controller.IdMappingJobController;
 import org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController;
 import org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController;
 import org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
-import org.uniprot.api.idmapping.controller.response.JobSubmitResponse;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.repository.IdMappingRepository;
-import org.uniprot.api.idmapping.service.HashGenerator;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.idmapping.service.IdMappingPIRService;
 import org.uniprot.api.idmapping.service.job.JobTask;
 import org.uniprot.api.idmapping.service.job.PIRJobTask;
 import org.uniprot.api.idmapping.service.job.SolrJobTask;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
+import org.uniprot.api.rest.request.HashGenerator;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequestToArrayConverter;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
@@ -60,11 +61,13 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
     private final IdMappingJobCacheService cacheService;
     private final IdMappingPIRService pirService;
     private final ThreadPoolTaskExecutor jobTaskExecutor;
-    private final HashGenerator hashGenerator;
+    private final HashGenerator<IdMappingJobRequest> hashGenerator;
     private final IdMappingRepository idMappingRepository;
 
     @Value("${id.mapping.max.to.ids.enrich.count:#{null}}") // value to 100k
     private Integer maxIdMappingToIdsCountEnriched;
+
+    private static final String SALT_STR = "UNIPROT_IDMAPPING_SALT";
 
     public IdMappingJobServiceImpl(
             IdMappingJobCacheService cacheService,
@@ -74,7 +77,8 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
         this.cacheService = cacheService;
         this.pirService = pirService;
         this.jobTaskExecutor = jobTaskExecutor;
-        this.hashGenerator = new HashGenerator();
+        this.hashGenerator =
+                new HashGenerator<>(new IdMappingJobRequestToArrayConverter(), SALT_STR);
         this.idMappingRepository = idMappingRepository;
     }
 

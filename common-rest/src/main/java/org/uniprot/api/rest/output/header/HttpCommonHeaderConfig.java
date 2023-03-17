@@ -37,6 +37,8 @@ public class HttpCommonHeaderConfig {
     static final String ALLOW_ALL_ORIGINS = "*";
     public static final String X_TOTAL_RESULTS = "X-Total-Results";
 
+    public static final String DOWNLOAD_RUN_SUFFIX = "/download/run";
+
     static final String PUBLIC_MAX_AGE = "public, max-age=";
     static final String NO_CACHE = "no-cache";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
@@ -69,7 +71,8 @@ public class HttpCommonHeaderConfig {
                     HttpServletRequest request, HttpServletResponse response, FilterChain chain)
                     throws ServletException, IOException {
                 MutableHttpServletRequest mutableRequest = new MutableHttpServletRequest(request);
-                requestContentTypeMutator.mutate(mutableRequest);
+
+                mutateRequestIfNeeded(mutableRequest);
 
                 response.addHeader(ACCESS_CONTROL_ALLOW_ORIGIN, ALLOW_ALL_ORIGINS);
                 response.addHeader(
@@ -89,6 +92,12 @@ public class HttpCommonHeaderConfig {
                 chain.doFilter(mutableRequest, response);
             }
         };
+    }
+
+    void mutateRequestIfNeeded(MutableHttpServletRequest mutableRequest) {
+        if (!mutableRequest.getRequestURI().endsWith(DOWNLOAD_RUN_SUFFIX)) {
+            requestContentTypeMutator.mutate(mutableRequest);
+        }
     }
 
     /**

@@ -17,4 +17,5 @@ mvn gatling:test -Dgatling.simulationClass=FiltersWithDownloadSimulation
 1. A class which extends Simulation base class
 2. Common http Configuration
 3. Scenario creation where we define what this scenario will do. The core of the testing.
-4. Simulation setup where we configure the number of concurrent users and assert the response time and or success rate. 
+4. Simulation setup where we configure the number of concurrent users and assert the response time and or success rate.
+

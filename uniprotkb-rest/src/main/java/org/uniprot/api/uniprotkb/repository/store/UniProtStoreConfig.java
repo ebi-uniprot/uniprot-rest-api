@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.repository.store;
 
 import java.util.Collections;
 
-import org.apache.http.client.HttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -59,7 +58,7 @@ public class UniProtStoreConfig {
 
     @Bean
     public FacetTupleStreamTemplate facetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+            RepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())
                 .zookeeperHost(configProperties.getZkHost())

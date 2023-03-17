@@ -34,10 +34,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.ControllerITUtils;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 /**
  * @author sahmad

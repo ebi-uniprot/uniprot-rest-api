@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.cache.Cache;
 import org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean;
 import org.springframework.cache.support.SimpleCacheManager;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 class RedisCacheMappingJobServiceTest {
     private Cache fakeCache;

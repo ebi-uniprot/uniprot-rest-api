@@ -2,6 +2,7 @@ package org.uniprot.api.common.repository.stream.store.uniprotkb;
 
 import static org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchStoreIterableUtil.*;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.jodah.failsafe.RetryPolicy;
@@ -23,6 +24,18 @@ public class UniProtKBBatchStoreIterable extends BatchStoreIterable<UniProtKBEnt
             TaxonomyLineageService taxonomyLineageService,
             boolean addLineage) {
         super(sourceIterable, storeClient, retryPolicy, batchSize);
+        this.taxonomyLineageService = taxonomyLineageService;
+        this.addLineage = addLineage;
+    }
+
+    public UniProtKBBatchStoreIterable(
+            Iterator<String> sourceIterator,
+            UniProtStoreClient<UniProtKBEntry> storeClient,
+            RetryPolicy<Object> retryPolicy,
+            int batchSize,
+            TaxonomyLineageService taxonomyLineageService,
+            boolean addLineage) {
+        super(sourceIterator, storeClient, retryPolicy, batchSize);
         this.taxonomyLineageService = taxonomyLineageService;
         this.addLineage = addLineage;
     }

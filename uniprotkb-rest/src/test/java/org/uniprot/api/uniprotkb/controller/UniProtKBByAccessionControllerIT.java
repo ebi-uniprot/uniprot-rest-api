@@ -40,6 +40,7 @@ import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -60,7 +61,8 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** @author lgonzales */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
+@ContextConfiguration(
+        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniProtKBController.class)

@@ -26,9 +26,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpServerErrorException;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 class PIRResponseConverterTest {
     private PIRResponseConverter converter;

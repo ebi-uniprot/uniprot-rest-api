@@ -41,6 +41,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.core.uniprotkb.ProteinExistence;
@@ -58,7 +59,8 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
  * @since 2019-07-26
  */
 @Slf4j
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
+@ContextConfiguration(
+        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniProtKBPublicationController.class)
 @AutoConfigureWebClient

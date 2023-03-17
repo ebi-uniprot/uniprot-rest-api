@@ -38,6 +38,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 
@@ -51,6 +52,7 @@ import org.uniprot.api.support.data.SupportDataRestApplication;
         classes = {
             SuggesterControllerWithServerErrorsIT.OtherConfig.class,
             DataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
             SupportDataRestApplication.class
         })
 @WebAppConfiguration

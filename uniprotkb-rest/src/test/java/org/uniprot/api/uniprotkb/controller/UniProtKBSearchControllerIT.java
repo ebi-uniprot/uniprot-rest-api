@@ -67,6 +67,7 @@ import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
@@ -109,7 +110,12 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(
-        classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
+        classes = {
+            DataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class,
+            ErrorHandlerConfig.class
+        })
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniProtKBController.class)

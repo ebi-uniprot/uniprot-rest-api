@@ -51,12 +51,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

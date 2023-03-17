@@ -52,7 +52,9 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
         StreamFactory streamFactory =
                 getStreamFactory(streamConfig.getZkHost(), streamConfig.getCollection());
 
-        validateResponse(request);
+        if (request.isLargeSolrStreamRestricted()) { // skip validation for download
+            validateResponse(request);
+        }
 
         TupleStreamBuilder streamBuilder =
                 TupleStreamBuilder.builder()
