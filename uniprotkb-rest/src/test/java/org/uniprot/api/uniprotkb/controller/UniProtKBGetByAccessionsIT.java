@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -131,6 +132,16 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
             storeClient.saveEntry(uniProtKBEntry);
             prefix--;
         }
+        UniProtKBEntry uniProtKBEntry =
+                UniProtKBEntryBuilder.from(UniProtEntryMocker.create(UniProtEntryMocker.Type.TR))
+                        .build();
+        UniProtDocument document = documentConverter.convert(uniProtKBEntry);
+        document =
+                UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(
+                        taxonomyRepo, document);
+        cloudSolrClient.addBean(SolrCollection.uniprot.name(), document);
+        storeClient.saveEntry(uniProtKBEntry);
+
         cloudSolrClient.commit(SolrCollection.uniprot.name());
     }
 
@@ -154,6 +165,29 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.results.size()", is(10)))
                 .andExpect(getReverseSortedIdResultMatcher())
+                .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
+    @Tag("TRM-28917")
+    void getByIdsCanonicalIsoformForTremblEntriesSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(
+                                                org.apache.http.HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON)
+                                        .param(getRequestParamName(), "F1Q0X3-1")
+                                        .param("size", "10"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results[0].primaryAccession", is("F1Q0X3")))
+                .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.facets").doesNotExist());
     }
 

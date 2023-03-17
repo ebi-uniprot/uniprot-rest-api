@@ -52,7 +52,8 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 @Import(UniProtSolrQueryConfig.class)
 public class UniProtEntryService
         extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
-    public static final String ACCESSION = "accession_id";
+    public static final String ACCESSION_ID = "accession_id";
+    public static final String ACCESSION = "accession";
     public static final String PROTEIN_ID = "id";
     public static final String IS_ISOFORM = "is_isoform";
     public static final String CANONICAL_ISOFORM = "-1";
@@ -118,7 +119,7 @@ public class UniProtEntryService
 
     @Override
     protected SearchFieldItem getIdField() {
-        return searchFieldConfig.getSearchFieldItemByName(ACCESSION);
+        return searchFieldConfig.getSearchFieldItemByName(ACCESSION_ID);
     }
 
     @Override
@@ -162,7 +163,7 @@ public class UniProtEntryService
 
     private SolrRequest buildSolrRequest(String accession) {
         return SolrRequest.builder()
-                .query(ACCESSION + ":" + accession)
+                .query(ACCESSION_ID + ":" + accession)
                 .rows(NumberUtils.INTEGER_ONE)
                 .build();
     }
@@ -219,7 +220,7 @@ public class UniProtEntryService
         SolrRequest solrRequest = super.createDownloadSolrRequest(request);
         boolean filterIsoform =
                 UniProtKBRequestUtil.needsToFilterIsoform(
-                        getQueryFieldName(ACCESSION),
+                        getQueryFieldName(ACCESSION_ID),
                         getQueryFieldName("is_isoform"),
                         uniProtRequest.getQuery(),
                         uniProtRequest.isIncludeIsoform());
@@ -245,6 +246,13 @@ public class UniProtEntryService
     @Override
     protected String getSolrIdField() {
         return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+                .getSearchFieldItemByName(ACCESSION_ID)
+                .getFieldName();
+    }
+
+    @Override
+    protected String getTermsQueryField() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
                 .getSearchFieldItemByName(ACCESSION)
                 .getFieldName();
     }
@@ -268,7 +276,7 @@ public class UniProtEntryService
         solrRequest.setQueryConfig(solrQueryConfig);
         boolean filterIsoform =
                 UniProtKBRequestUtil.needsToFilterIsoform(
-                        getQueryFieldName(ACCESSION),
+                        getQueryFieldName(ACCESSION_ID),
                         getQueryFieldName("is_isoform"),
                         solrRequest.getQuery(),
                         uniProtRequest.isIncludeIsoform());
