@@ -100,7 +100,7 @@ public class UniProtKBMessageListener implements MessageListener {
             processMessage(message, downloadJob);
             // get the fresh object from redis
             optDownloadJob = this.jobRepository.findById(jobId);
-            if(optDownloadJob.isPresent()) {
+            if (optDownloadJob.isPresent()) {
                 downloadJob = optDownloadJob.get();
                 if (downloadJob.getStatus() == JobStatus.FINISHED) {
                     log.info("Message with jobId {} processed successfully", jobId);
