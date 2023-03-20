@@ -26,7 +26,7 @@ public class UniProtKBRequestUtil {
     private static final Pattern CLEAN_QUERY_REGEX =
             Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
-    private static final Pattern ACCESSION_REGEX =
+    private static final Pattern ACCESSION_REGEX_ISOFORM =
             Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX_ISOFORM);
     private static final String DASH = "-";
 
@@ -60,7 +60,8 @@ public class UniProtKBRequestUtil {
         if (notNullNotEmpty(query)) {
             query = CLEAN_QUERY_REGEX.matcher(query.strip()).replaceAll("");
             // We don't add is_isoform:false filter if query verifies accession regex and has dash
-            if (ACCESSION_REGEX.matcher(query).matches() && query.contains(DASH)) {
+            if (ACCESSION_REGEX_ISOFORM.matcher(query.toUpperCase()).matches()
+                    && query.contains(DASH)) {
                 response = true;
             }
         }

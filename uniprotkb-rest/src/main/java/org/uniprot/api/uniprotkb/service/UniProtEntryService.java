@@ -67,8 +67,11 @@ public class UniProtEntryService
     private final ReturnFieldConfig returnFieldConfig;
     private final RDFStreamer uniProtRDFStreamer;
 
-    private static final Pattern ACCESSION_REGEX =
+    private static final Pattern ACCESSION_REGEX_ISOFORM =
             Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX_ISOFORM);
+
+    private static final Pattern CLEAN_QUERY_REGEX =
+            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -257,14 +260,15 @@ public class UniProtEntryService
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
 
         UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
+        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
 
         if (isSearchAll(uniProtRequest)) {
             uniProtRequest.setQuery(getQueryFieldName("active") + ":" + true);
         } else if (needToAddActiveFilter(uniProtRequest)) {
             uniProtRequest.setQuery(
                     uniProtRequest.getQuery() + " AND " + getQueryFieldName("active") + ":" + true);
-        } else if (ACCESSION_REGEX.matcher(uniProtRequest.getQuery().toUpperCase()).matches()) {
-            uniProtRequest.setQuery(uniProtRequest.getQuery().toUpperCase());
+        } else if (ACCESSION_REGEX_ISOFORM.matcher(cleanQuery.toUpperCase()).matches()) {
+            uniProtRequest.setQuery(cleanQuery.toUpperCase());
         }
 
         // fill the common params from the basic service class

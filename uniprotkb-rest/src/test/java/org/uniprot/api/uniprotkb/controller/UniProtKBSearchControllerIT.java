@@ -1406,7 +1406,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=p21802-2")
+                                get(SEARCH_RESOURCE + "?query=(p21802-2)")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -1545,7 +1545,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=p21802")
+                                get(SEARCH_RESOURCE + "?query=(p21802)")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
