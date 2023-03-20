@@ -193,8 +193,9 @@ class SolrRequestConverterTest {
                                             .addBoost("field1:value3^3")
                                             .boostFunctions("f1,f2")
                                             .highlightFields("h1,h2")
-                                            .queryFields("field1,field2")
+                                            .queryFields("field1 field2")
                                             .build())
+                            .queryField("field1 field2")
                             .build();
 
             // when
@@ -316,7 +317,8 @@ class SolrRequestConverterTest {
                     SolrRequest.builder()
                             .query("value1")
                             .queryConfig(
-                                    SolrQueryConfig.builder().queryFields("field1,field2").build())
+                                    SolrQueryConfig.builder().queryFields("field1 field2").build())
+                            .queryField("field1 field2")
                             .build();
 
             // when

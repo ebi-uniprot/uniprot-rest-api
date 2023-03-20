@@ -166,6 +166,7 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         return SolrRequest.builder()
                 .query(query)
                 .queryConfig(literatureSolrQueryConf)
+                .queryField(literatureSolrQueryConf.getQueryFields())
                 .sort(SolrQuery.SortClause.asc(idFieldName))
                 .defaultQueryOperator(QueryOperator.OR)
                 .rows(100)
