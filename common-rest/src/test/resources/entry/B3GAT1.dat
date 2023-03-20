@@ -2,7 +2,7 @@ ID   B3GAT1_9LECA            Unreviewed;       277 AA.
 AC   B3GAT1;
 DT   22-JUL-2008, integrated into UniProtKB/TrEMBL.
 DT   22-JUL-2008, sequence version 1.
-DT   14-DEC-2022, entry version 49.
+DT   22-FEB-2023, entry version 50.
 DE   RecName: Full=glyceraldehyde-3-phosphate dehydrogenase (phosphorylating) {ECO:0000256|ARBA:ARBA00013119};
 DE            EC=1.2.1.12 {ECO:0000256|ARBA:ARBA00013119};
 DE   Flags: Fragment;
@@ -30,23 +30,27 @@ DR   UniPathway; UPA00109; UER00184.
 DR   GO; GO:0004365; F:glyceraldehyde-3-phosphate dehydrogenase (NAD+) (phosphorylating) activity; IEA:UniProtKB-EC.
 DR   GO; GO:0051287; F:NAD binding; IEA:InterPro.
 DR   GO; GO:0006096; P:glycolytic process; IEA:UniProtKB-UniPathway.
+DR   Gene3D; 3.40.50.720; NAD(P)-binding Rossmann-like Domain; 1.
 DR   InterPro; IPR020831; GlycerAld/Erythrose_P_DH.
 DR   InterPro; IPR020830; GlycerAld_3-P_DH_AS.
 DR   InterPro; IPR020829; GlycerAld_3-P_DH_cat.
 DR   InterPro; IPR020828; GlycerAld_3-P_DH_NAD(P)-bd.
 DR   InterPro; IPR036291; NAD(P)-bd_dom_sf.
 DR   PANTHER; PTHR10836; GLYCERALDEHYDE 3-PHOSPHATE DEHYDROGENASE; 1.
+DR   PANTHER; PTHR10836:SF76; GLYCERALDEHYDE-3-PHOSPHATE DEHYDROGENASE-RELATED; 1.
 DR   Pfam; PF02800; Gp_dh_C; 1.
 DR   Pfam; PF00044; Gp_dh_N; 1.
 DR   PRINTS; PR00078; G3PDHDRGNASE.
 DR   SMART; SM00846; Gp_dh_N; 1.
+DR   SUPFAM; SSF55347; Glyceraldehyde-3-phosphate dehydrogenase-like, C-terminal domain; 1.
 DR   SUPFAM; SSF51735; NAD(P)-binding Rossmann-fold domains; 1.
 DR   PROSITE; PS00071; GAPDH; 1.
 PE   3: Inferred from homology;
 KW   Glycolysis {ECO:0000256|ARBA:ARBA00023152};
 KW   Oxidoreductase {ECO:0000256|ARBA:ARBA00023002}.
 FT   DOMAIN          1..130
-FT                   /note="Gp_dh_N"
+FT                   /note="Glyceraldehyde 3-phosphate dehydrogenase NAD(P)
+FT                   binding"
 FT                   /evidence="ECO:0000259|SMART:SM00846"
 FT   NON_TER         1
 FT                   /evidence="ECO:0000313|EMBL:ACD99833.1"

@@ -2,7 +2,7 @@ ID   B3GA1_HUMAN             Reviewed;         334 AA.
 AC   Q9P2W7; B7Z5Z8; Q96FS7;
 DT   01-JUN-2001, integrated into UniProtKB/Swiss-Prot.
 DT   22-JUL-2008, sequence version 2.
-DT   14-DEC-2022, entry version 197.
+DT   22-FEB-2023, entry version 198.
 DE   RecName: Full=Galactosylgalactosylxylosylprotein 3-beta-glucuronosyltransferase 1 {ECO:0000305};
 DE            EC=2.4.1.135 {ECO:0000250|UniProtKB:O35789};
 DE   AltName: Full=Beta-1,3-glucuronyltransferase 1;
@@ -170,6 +170,7 @@ DR   DrugBank; DB01694; D-tartaric acid.
 DR   DrugBank; DB03435; Uridine-5'-Diphosphate.
 DR   CAZy; GT43; Glycosyltransferase Family 43.
 DR   GlyConnect; 1254; 1 N-Linked glycan (1 site).
+DR   GlyCosmos; Q9P2W7; 3 sites, 1 glycan.
 DR   GlyGen; Q9P2W7; 3 sites, 1 N-linked glycan (1 site).
 DR   iPTMnet; Q9P2W7; -.
 DR   PhosphoSitePlus; Q9P2W7; -.
@@ -180,7 +181,7 @@ DR   MassIVE; Q9P2W7; -.
 DR   PaxDb; Q9P2W7; -.
 DR   PeptideAtlas; Q9P2W7; -.
 DR   ProteomicsDB; 83905; -.
-DR   Antibodypedia; 3739; 1556 antibodies from 45 providers.
+DR   Antibodypedia; 3739; 1574 antibodies from 46 providers.
 DR   DNASU; 27087; -.
 DR   Ensembl; ENST00000312527.9; ENSP00000307875.4; ENSG00000109956.13. [Q9P2W7-1]
 DR   Ensembl; ENST00000392580.5; ENSP00000376359.1; ENSG00000109956.13. [Q9P2W7-1]
@@ -205,7 +206,7 @@ DR   GeneTree; ENSGT00940000157165; -.
 DR   HOGENOM; CLU_045177_1_0_1; -.
 DR   InParanoid; Q9P2W7; -.
 DR   OMA; DSREYCM; -.
-DR   OrthoDB; 901158at2759; -.
+DR   OrthoDB; 5321308at2759; -.
 DR   PhylomeDB; Q9P2W7; -.
 DR   TreeFam; TF313522; -.
 DR   BioCyc; MetaCyc:HS03272-MON; -.
@@ -214,7 +215,7 @@ DR   PathwayCommons; Q9P2W7; -.
 DR   Reactome; R-HSA-1971475; A tetrasaccharide linker sequence is required for GAG synthesis.
 DR   SignaLink; Q9P2W7; -.
 DR   UniPathway; UPA00378; -.
-DR   BioGRID-ORCS; 27087; 9 hits in 1068 CRISPR screens.
+DR   BioGRID-ORCS; 27087; 10 hits in 1147 CRISPR screens.
 DR   ChiTaRS; B3GAT1; human.
 DR   EvolutionaryTrace; Q9P2W7; -.
 DR   GeneWiki; B3GAT1; -.
@@ -238,9 +239,9 @@ DR   GO; GO:0006024; P:glycosaminoglycan biosynthetic process; IEA:Ensembl.
 DR   GO; GO:0006486; P:protein glycosylation; IEA:UniProtKB-UniPathway.
 DR   GO; GO:0008542; P:visual learning; IEA:Ensembl.
 DR   CDD; cd00218; GlcAT-I; 1.
-DR   Gene3D; 3.90.550.10; -; 1.
 DR   InterPro; IPR005027; Glyco_trans_43.
 DR   InterPro; IPR029044; Nucleotide-diphossugar_trans.
+DR   PANTHER; PTHR10896:SF21; GALACTOSYLGALACTOSYLXYLOSYLPROTEIN 3-BETA-GLUCURONOSYLTRANSFERASE 1; 1.
 DR   PANTHER; PTHR10896; GALACTOSYLGALACTOSYLXYLOSYLPROTEIN 3-BETA-GLUCURONOSYLTRANSFERASE BETA-1,3-GLUCURONYLTRANSFERASE; 1.
 DR   Pfam; PF03360; Glyco_transf_43; 1.
 DR   SUPFAM; SSF53448; Nucleotide-diphospho-sugar transferases; 1.
