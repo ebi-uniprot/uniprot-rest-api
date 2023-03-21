@@ -1,15 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
@@ -46,7 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -68,6 +58,7 @@ import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
@@ -89,19 +80,15 @@ import org.uniprot.core.uniprotkb.description.impl.ProteinNameBuilder;
 import org.uniprot.core.uniprotkb.feature.FeatureCategory;
 import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.cv.chebi.ChebiRepo;
-import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.go.GORepo;
+import org.uniprot.cv.taxonomy.TaxonomyRepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
 import org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker;
-import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
-import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
@@ -109,11 +96,17 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(
-        classes = {DataStoreTestConfig.class, UniProtKBREST.class, ErrorHandlerConfig.class})
+        classes = {
+            DataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class,
+            ErrorHandlerConfig.class
+        })
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniProtKBController.class)
@@ -142,18 +135,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
     @Autowired private UniProtKBFacetConfig facetConfig;
 
+    private static final TaxonomyRepo taxonomyRepo = TaxonomyRepoMocker.getTaxonomyRepo();
+
     @BeforeAll
     void initUniprotKbDataStore() {
         DataStoreManager dsm = getStoreManager();
         dsm.addDocConverter(
-                DataStoreManager.StoreType.UNIPROT,
-                new UniProtEntryConverter(
-                        TaxonomyRepoMocker.getTaxonomyRepo(),
-                        Mockito.mock(GORepo.class),
-                        PathwayRepoMocker.getPathwayRepo(),
-                        Mockito.mock(ChebiRepo.class),
-                        Mockito.mock(ECRepo.class),
-                        new HashMap<>()));
+                DataStoreManager.StoreType.UNIPROT, new UniProtEntryConverter(new HashMap<>()));
         dsm.addDocConverter(
                 DataStoreManager.StoreType.INACTIVE_UNIPROT, new InactiveEntryConverter());
         dsm.addSolrClient(DataStoreManager.StoreType.INACTIVE_UNIPROT, SolrCollection.uniprot);
@@ -1415,7 +1403,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=p21802-2")
+                                get(SEARCH_RESOURCE + "?query=(p21802-2)")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -1519,6 +1507,78 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(jsonPath("$.results[0].features[0].type", is("Natural variant")));
     }
 
+    @Test
+    void searchGeneNameWithLeadingWildcardSuccess() throws Exception {
+        // given
+        UniProtKBEntry canonicalEntry =
+                UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, canonicalEntry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=gene:*GFR2")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.uniProtkbId",
+                                contains(canonicalEntry.getUniProtkbId().getValue())))
+                .andExpect(jsonPath("$.results.*.genes[0].geneName.value", contains("FGFR2")))
+                .andExpect(jsonPath("$.warnings").doesNotExist());
+    }
+
+    @Test
+    void defaultSearchWithLowercaseAccessionLetter() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=(p21802)")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+    }
+
+    //    TRM-28310
+    @Test
+    void searchDefaultSearchForAccessionAndGene() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.ACC);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.ACCANDGENE);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE + "?query=b3gat1")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(2)))
+                .andExpect(jsonPath("$.results[0].primaryAccession", is("B3GAT1")))
+                .andExpect(jsonPath("$.results[1].primaryAccession", is("Q9P2W7")))
+                .andExpect(jsonPath("$.results[1].genes[0].geneName.value", is("B3GAT1")));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
@@ -1591,15 +1651,25 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
     @Override
     protected void saveEntry(SaveScenario saveContext) {
+        UniProtEntryConverter converter = new UniProtEntryConverter(new HashMap<>());
         UniProtKBEntry entry =
                 UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL); // P21802
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        UniProtDocument document = converter.convert(entry);
+        UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP); // Q8DIA7
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        document = converter.convert(entry);
+        UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
 
         entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM); // P21802-2
-        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+        document = converter.convert(entry);
+        UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, document);
+        getStoreManager().saveToStore(DataStoreManager.StoreType.UNIPROT, entry);
 
         if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext)
                 || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)
@@ -1610,6 +1680,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.fragment = true;
             doc.precursor = true;
             doc.isIsoform = false;
+            doc.evidenceExperimental = true;
             doc.otherOrganism = "Search All";
             doc.organismHostIds.add(9606);
             doc.organismHostNames.add("Search All");
@@ -1619,39 +1690,55 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.rcStrain.add("Search All");
             doc.rcTissue.add("Search All");
             doc.subcellLocationNote.add("Search All");
+            doc.commentMap.put("cc_scl_note_exp", Collections.singleton("Search All"));
             doc.subcellLocationNoteEv.add("Search All");
             doc.subcellLocationTerm.add("Search All");
+            doc.commentMap.put("cc_scl_term_exp", Collections.singleton("Search All"));
             doc.subcellLocationTermEv.add("Search All");
             doc.ap.add("Search All");
+            doc.commentMap.put("cc_ap_exp", Collections.singleton("Search All"));
             doc.apEv.add("Search All");
             doc.apAi.add("Search All");
+            doc.commentMap.put("cc_ap_ai_exp", Collections.singleton("Search All"));
             doc.apAiEv.add("Search All");
             doc.apApu.add("Search All");
+            doc.commentMap.put("cc_ap_apu_exp", Collections.singleton("Search All"));
             doc.apApuEv.add("Search All");
             doc.apAs.add("Search All");
+            doc.commentMap.put("cc_ap_as_exp", Collections.singleton("Search All"));
             doc.apAsEv.add("Search All");
             doc.apRf.add("Search All");
+            doc.commentMap.put("cc_ap_rf_exp", Collections.singleton("Search All"));
             doc.apRfEv.add("Search All");
             doc.bpcp.add("Search All");
+            doc.commentMap.put("cc_bpcp_exp", Collections.singleton("Search All"));
             doc.bpcpEv.add("Search All");
             doc.bpcpAbsorption.add("Search All");
+            doc.commentMap.put("cc_bpcp_absorption_exp", Collections.singleton("Search All"));
             doc.bpcpAbsorptionEv.add("Search All");
             doc.bpcpKinetics.add("Search All");
+            doc.commentMap.put("cc_bpcp_kinetics_exp", Collections.singleton("Search All"));
             doc.bpcpKineticsEv.add("Search All");
             doc.bpcpPhDependence.add("Search All");
+            doc.commentMap.put("cc_bpcp_ph_dependence_exp", Collections.singleton("Search All"));
             doc.bpcpPhDependenceEv.add("Search All");
             doc.bpcpRedoxPotential.add("Search All");
+            doc.commentMap.put("cc_bpcp_redox_potential_exp", Collections.singleton("Search All"));
             doc.bpcpRedoxPotentialEv.add("Search All");
             doc.bpcpTempDependence.add("Search All");
+            doc.commentMap.put("cc_bpcp_temp_dependence_exp", Collections.singleton("Search All"));
             doc.bpcpTempDependenceEv.add("Search All");
             doc.inchikey.add("Search All");
             doc.rheaIds.add("Search All");
             doc.chebi.add("Search All");
             doc.cofactorChebi.add("Search All");
+            doc.commentMap.put("cc_cofactor_chebi_exp", Collections.singleton("Search All"));
             doc.cofactorChebiEv.add("Search All");
             doc.cofactorNote.add("Search All");
+            doc.commentMap.put("cc_cofactor_note_exp", Collections.singleton("Search All"));
             doc.cofactorNoteEv.add("Search All");
             doc.seqCaution.add("Search All");
+            doc.commentMap.put("cc_sc_exp", Collections.singleton("Search All"));
             doc.seqCautionEv.add("Search All");
             doc.seqCautionFrameshift.add("Search All");
             doc.seqCautionErInit.add("Search All");
@@ -1659,6 +1746,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             doc.seqCautionErTerm.add("Search All");
             doc.seqCautionErTran.add("Search All");
             doc.seqCautionMisc.add("Search All");
+            doc.commentMap.put("cc_sc_misc_exp", Collections.singleton("Search All"));
             doc.seqCautionMiscEv.add("Search All");
             doc.proteomes.add("UP000000000");
             doc.uniparc = "UPI0000000001";
@@ -1681,6 +1769,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 String typeName = type.getName().toLowerCase();
                                 doc.featuresMap.put(
                                         "ft_" + typeName, Collections.singleton("Search All"));
+                                doc.featuresMap.put(
+                                        "ft_" + typeName + "_exp",
+                                        Collections.singleton("Search All"));
                                 doc.featureEvidenceMap.put(
                                         "ftev_" + typeName, Collections.singleton("Search All"));
                                 doc.featureLengthMap.put(
@@ -1693,6 +1784,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                             type -> {
                                 doc.featuresMap.put(
                                         "ft_" + type, Collections.singleton("Search All"));
+                                doc.featuresMap.put(
+                                        "ft_" + type + "_exp", Collections.singleton("Search All"));
                                 doc.featureEvidenceMap.put(
                                         "ftev_" + type, Collections.singleton("Search All"));
                                 doc.featureLengthMap.put(
@@ -1705,6 +1798,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                 String typeName = type.name().toLowerCase();
                                 doc.commentMap.put(
                                         "cc_" + typeName, Collections.singleton("Search All"));
+                                doc.commentMap.put(
+                                        "cc_" + typeName + "_exp",
+                                        Collections.singleton("Search All"));
                                 doc.commentEvMap.put(
                                         "ccev_" + typeName, Collections.singleton("Search All"));
                             });
@@ -1850,7 +1946,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             + "OR reviewed:INVALID OR organism_id:invalid OR virus_host_id:invalid OR taxonomy_id:invalid "
                                             + "OR is_isoform:invalid OR structure_3d:invalid OR active:invalid OR proteome:INVALID"
                                             + "OR uniparc:invalid OR uniref_cluster_50:invalid OR uniref_cluster_90:invalid "
-                                            + "OR uniref_cluster_100:invalid"))
+                                            + "OR uniref_cluster_100:invalid OR fragment:INVALID OR precursor:INVALID"))
                     .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -1860,6 +1956,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             "The 'proteome' filter value has invalid format. It should match the regular expression UP[0-9]{9}",
                                             "The 'is_isoform' filter value can only be true or false",
                                             "The 'reviewed' filter value can only be true or false",
+                                            "The 'fragment' filter value can only be true or false",
+                                            "The 'precursor' filter value can only be true or false",
                                             "The 'active' parameter can only be true or false",
                                             "The 'organism_id' filter value should be a number",
                                             "The 'structure_3d' filter value can only be true or false",

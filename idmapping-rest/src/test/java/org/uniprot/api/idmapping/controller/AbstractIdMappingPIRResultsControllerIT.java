@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.LIMIT_EXCEED_ERROR;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -21,9 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 /**
  * @author sahmad
@@ -82,8 +82,8 @@ public abstract class AbstractIdMappingPIRResultsControllerIT {
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid request received. "
-                                                + LIMIT_EXCEED_ERROR.getMessage()
-                                                + this.maxToIdsAllowed)));
+                                                + LIMIT_EXCEED_ERROR.getErrorMessage(
+                                                        this.maxToIdsAllowed))));
         ;
     }
 

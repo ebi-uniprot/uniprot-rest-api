@@ -35,8 +35,8 @@ import org.uniprot.core.util.Utils;
 public class HttpServletRequestContentTypeMutator {
     public static final String ERROR_MESSAGE_ATTRIBUTE =
             "org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.errorMessageAttribute";
-    static final String FORMAT = "format";
-    static final String COMPRESSED = "compressed";
+    public static final String FORMAT = "format";
+    public static final String COMPRESSED = "compressed";
     private static final Set<String> VALID_EXTENSIONS =
             UniProtMediaType.ALL_TYPES.stream()
                     .map(UniProtMediaType::getFileExtension)

@@ -21,8 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.LIMIT_EXCEED_ERROR;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -51,12 +51,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -518,8 +518,8 @@ class IdMappingJobControllerIT {
                         .warning(
                                 new ProblemPair(
                                         ENRICHMENT_WARNING.getCode(),
-                                        ENRICHMENT_WARNING.getMessage()
-                                                + this.maxAllowedIdsToEnrich))
+                                        ENRICHMENT_WARNING.getErrorMessage(
+                                                this.maxAllowedIdsToEnrich)))
                         .build();
 
         IdMappingJob job =
@@ -546,7 +546,7 @@ class IdMappingJobControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.warnings[0].message",
-                                is(ENRICHMENT_WARNING.getMessage() + this.maxAllowedIdsToEnrich)))
+                                is(ENRICHMENT_WARNING.getErrorMessage(this.maxAllowedIdsToEnrich))))
                 .andExpect(jsonPath("$.warnings[0].code", is(ENRICHMENT_WARNING.getCode())));
     }
 
@@ -623,7 +623,7 @@ class IdMappingJobControllerIT {
                         .error(
                                 new ProblemPair(
                                         LIMIT_EXCEED_ERROR.getCode(),
-                                        LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds))
+                                        LIMIT_EXCEED_ERROR.getErrorMessage(this.maxAllowedToIds)))
                         .build();
         IdMappingJob job =
                 IdMappingJob.builder()
@@ -655,7 +655,7 @@ class IdMappingJobControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.errors[0].message",
-                                is(LIMIT_EXCEED_ERROR.getMessage() + this.maxAllowedToIds)));
+                                is(LIMIT_EXCEED_ERROR.getErrorMessage(this.maxAllowedToIds))));
     }
 
     @Test

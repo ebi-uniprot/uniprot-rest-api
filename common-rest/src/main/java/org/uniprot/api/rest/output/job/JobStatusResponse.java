@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.controller.response;
+package org.uniprot.api.rest.output.job;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import org.uniprot.api.common.repository.search.ProblemPair;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

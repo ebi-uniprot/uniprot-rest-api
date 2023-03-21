@@ -75,14 +75,14 @@ class IdMappingConfigureControllerIT {
                         jsonPath(
                                 "$.groups.[?(@.groupName=='UniProt')].items.*.uriLink",
                                 contains(
-                                        "https://www.uniprot.org/uniprot/%id",
-                                        "https://www.uniprot.org/uniprot/%id",
-                                        "https://www.uniprot.org/uniprot/%id",
+                                        "https://www.uniprot.org/uniprot/%id/entry",
+                                        "https://www.uniprot.org/uniprot/%id/entry",
+                                        "https://www.uniprot.org/uniprot/%id/entry",
+                                        "https://www.uniprot.org/uniparc/%id/entry",
+                                        "https://www.uniprot.org/uniref/%id",
+                                        "https://www.uniprot.org/uniref/%id",
+                                        "https://www.uniprot.org/uniref/%id",
                                         null,
-                                        "https://www.uniprot.org/uniref/%id",
-                                        "https://www.uniprot.org/uniref/%id",
-                                        "https://www.uniprot.org/uniref/%id",
-                                        "https://proteininformationresource.org/cgi-bin/nbrfget?uid=%id",
                                         null)))
                 .andExpect(
                         jsonPath(
@@ -129,7 +129,7 @@ class IdMappingConfigureControllerIT {
                                 contains(
                                         "https://www.ebi.ac.uk/chembldb/target/inspect/%id",
                                         "https://www.drugbank.ca/drugs/%id",
-                                        "http://www.guidetopharmacology.org/GRAC/ObjectDisplayForward?objectId=%id",
+                                        "https://www.guidetopharmacology.org/GRAC/ObjectDisplayForward?objectId=%id",
                                         "https://www.swisslipids.org/#/entity/%id/")))
                 .andExpect(
                         jsonPath(
@@ -162,7 +162,7 @@ class IdMappingConfigureControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Organism-specific databases')].items.*",
-                                iterableWithSize(31)))
+                                iterableWithSize(32)))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Phylogenomic databases')].items.*",
@@ -189,12 +189,12 @@ class IdMappingConfigureControllerIT {
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==4)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==5)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==6)]", iterableWithSize(1)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(91)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId==7)]", iterableWithSize(92)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId>=8)]", iterableWithSize(0)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.ruleId<=0)]", iterableWithSize(0)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(97)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.from==true)]", iterableWithSize(98)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.from==false)]", iterableWithSize(2)))
-                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(98)))
+                .andExpect(jsonPath("$.groups.*.items.[?(@.to==true)]", iterableWithSize(99)))
                 .andExpect(jsonPath("$.groups.*.items.[?(@.to==false)]", iterableWithSize(1)))
                 .andExpect(jsonPath("$.rules.length()", is(7)))
                 .andExpect(jsonPath("$.rules.[?(@.taxonId==false)]", iterableWithSize(6)))

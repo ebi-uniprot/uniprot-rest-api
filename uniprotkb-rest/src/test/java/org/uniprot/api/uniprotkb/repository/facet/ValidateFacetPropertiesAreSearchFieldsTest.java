@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -27,7 +28,8 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 @ActiveProfiles(profiles = "offline")
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
-@SpringBootTest(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
+@SpringBootTest(
+        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
 class ValidateFacetPropertiesAreSearchFieldsTest {
     @Autowired private UniProtKBFacetConfig config;
     private SearchFieldConfig searchFieldConfig =

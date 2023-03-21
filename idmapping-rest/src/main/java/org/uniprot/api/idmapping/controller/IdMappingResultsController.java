@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.LIMIT_EXCEED_ERROR;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.LIMIT_EXCEED_ERROR;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.IDMAPPING_PIR;
 
@@ -185,7 +185,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
         if (Utils.notNullNotEmpty(result.getMappedIds())
                 && result.getMappedIds().size() > this.maxIdMappingToIdsCount) {
             throw new InvalidRequestException(
-                    LIMIT_EXCEED_ERROR.getMessage() + this.maxIdMappingToIdsCount);
+                    LIMIT_EXCEED_ERROR.getErrorMessage(this.maxIdMappingToIdsCount));
         }
     }
 }

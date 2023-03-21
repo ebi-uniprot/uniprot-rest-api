@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH;
 import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH;
 import static org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
@@ -61,11 +61,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -166,8 +166,8 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid request received. "
-                                                + ENRICHMENT_WARNING.getMessage()
-                                                + this.maxToIdsEnrichAllowed)));
+                                                + ENRICHMENT_WARNING.getErrorMessage(
+                                                        this.maxToIdsEnrichAllowed))));
     }
 
     // ---------------------------------------------------------------------------------

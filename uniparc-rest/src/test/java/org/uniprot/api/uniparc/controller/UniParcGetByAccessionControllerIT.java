@@ -65,7 +65,7 @@ class UniParcGetByAccessionControllerIT extends AbstractGetSingleUniParcByIdTest
         protected GetIdParameter validIdParameter() {
             GetIdParameter.GetIdParameterBuilder idParam = GetIdParameter.builder().id(ACCESSION);
             idParam.resultMatcher(jsonPath("$.uniParcId", equalTo(UNIPARC_ID)));
-            idParam.resultMatcher(jsonPath("$.uniParcCrossReferences", iterableWithSize(5)));
+            idParam.resultMatcher(jsonPath("$.uniParcCrossReferences", iterableWithSize(6)));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].id", hasItem(ACCESSION)));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].id", notNullValue()));
             idParam.resultMatcher(jsonPath("$.uniParcCrossReferences[*].version", notNullValue()));

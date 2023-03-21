@@ -14,6 +14,7 @@ import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdSt
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageServiceImpl;
@@ -72,8 +73,7 @@ class ResultsConfigTest {
         SolrRequestConverter converter = Mockito.mock(SolrRequestConverter.class);
         StreamerConfigProperties configProps = config.resultsConfigProperties();
 
-        TupleStreamTemplate result =
-                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+        TupleStreamTemplate result = config.tupleStreamTemplate(configProps, solrClient, converter);
         assertNotNull(result);
     }
 
@@ -94,7 +94,7 @@ class ResultsConfigTest {
         StreamerConfigProperties configProps = config.resultsConfigProperties();
         configProps.setStoreFetchRetryDelayMillis(10);
         TupleStreamTemplate tupleStreamTemplate =
-                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+                config.tupleStreamTemplate(configProps, solrClient, converter);
         RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         StreamerConfigProperties streamConfig = config.resultsConfigProperties();
         TupleStreamDocumentIdStream documentIdStream =
@@ -106,7 +106,7 @@ class ResultsConfigTest {
     }
 
     @Test
-    void testUniProtEntryStoreStreamer() {
+    void testUniProtEntryStoreStreamerConfig() {
         ResultsConfig config = new ResultsConfig();
 
         HttpClient httpClient = Mockito.mock(HttpClient.class);
@@ -117,17 +117,27 @@ class ResultsConfigTest {
         StreamerConfigProperties configProps = config.resultsConfigProperties();
         configProps.setStoreFetchRetryDelayMillis(10);
         TupleStreamTemplate tupleStreamTemplate =
-                config.tupleStreamTemplate(configProps, httpClient, solrClient, converter);
+                config.tupleStreamTemplate(configProps, solrClient, converter);
         UniProtKBStoreClient uniprotClient = new UniProtKBStoreClient(null);
         TupleStreamDocumentIdStream documentIdStream =
                 config.documentIdStream(tupleStreamTemplate, configProps);
+        StoreStreamerConfig<UniProtKBEntry> result =
+                config.storeStreamerConfig(
+                        uniprotClient, tupleStreamTemplate, configProps, documentIdStream);
+        assertNotNull(result);
+    }
+
+    @Test
+    void testUniProtEntryStoreStreamer() {
+        ResultsConfig config = new ResultsConfig();
+
+        TaxonomyLineageService taxonomyLineageService =
+                Mockito.mock(TaxonomyLineageServiceImpl.class);
+        StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig =
+                Mockito.mock(StoreStreamerConfig.class);
+
         StoreStreamer<UniProtKBEntry> result =
-                config.uniProtEntryStoreStreamer(
-                        uniprotClient,
-                        tupleStreamTemplate,
-                        configProps,
-                        documentIdStream,
-                        taxonomyLineageService);
+                config.uniProtEntryStoreStreamer(storeStreamerConfig, taxonomyLineageService);
         assertNotNull(result);
     }
 }

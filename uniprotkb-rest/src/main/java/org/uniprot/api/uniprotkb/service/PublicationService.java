@@ -16,6 +16,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryOperator;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -98,8 +99,11 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
                 content.stream()
                         .map(e -> publicationConverter.apply(e, pubmedLiteratureEntryMap))
                         .filter(Objects::nonNull);
-
-        return QueryResult.of(converted, results.getPage(), results.getFacets());
+        Set<ProblemPair> warnings =
+                getWarnings(
+                        request.getQuery(),
+                        literatureQueryProcessorConfig.getLeadingWildcardFields());
+        return QueryResult.of(converted, results.getPage(), results.getFacets(), null, warnings);
     }
 
     public QueryResult<PublicationEntry> getPublicationsByUniProtAccession(
@@ -162,6 +166,7 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         return SolrRequest.builder()
                 .query(query)
                 .queryConfig(literatureSolrQueryConf)
+                .queryField(literatureSolrQueryConf.getQueryFields())
                 .sort(SolrQuery.SortClause.asc(idFieldName))
                 .defaultQueryOperator(QueryOperator.OR)
                 .rows(100)

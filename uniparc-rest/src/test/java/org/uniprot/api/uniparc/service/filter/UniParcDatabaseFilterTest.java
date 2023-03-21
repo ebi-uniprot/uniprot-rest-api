@@ -41,7 +41,7 @@ class UniParcDatabaseFilterTest {
     void testFilterByDatabases() {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
-        Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
+        Assertions.assertEquals(3, this.uniParcEntry.getUniParcCrossReferences().size());
         List<String> dbFilter = Collections.singletonList("UniProtKB/TrEMBL".toLowerCase());
         // filter by db
         UniParcEntry filteredEntry = uniParcDatabaseFilter.apply(this.uniParcEntry, dbFilter);
@@ -68,7 +68,7 @@ class UniParcDatabaseFilterTest {
     void testFilterByMatchingNonMatchingDatabases() {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
-        Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
+        Assertions.assertEquals(3, this.uniParcEntry.getUniParcCrossReferences().size());
         List<String> dbFilter =
                 Arrays.asList("RandomDB", UniParcDatabase.SWISSPROT.getDisplayName().toLowerCase());
         // filter by db
@@ -87,7 +87,7 @@ class UniParcDatabaseFilterTest {
     void testFilterByNonMatchingDatabases() {
         verifyUniParcEntry(uniParcEntry);
         List<UniParcCrossReference> xrefs = uniParcEntry.getUniParcCrossReferences();
-        Assertions.assertEquals(2, this.uniParcEntry.getUniParcCrossReferences().size());
+        Assertions.assertEquals(3, this.uniParcEntry.getUniParcCrossReferences().size());
         List<String> dbFilter = Collections.singletonList("RandomDB");
         // filter by db
         UniParcEntry filteredEntry = uniParcDatabaseFilter.apply(this.uniParcEntry, dbFilter);

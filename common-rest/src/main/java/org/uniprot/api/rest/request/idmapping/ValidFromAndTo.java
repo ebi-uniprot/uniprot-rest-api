@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.controller.request;
+package org.uniprot.api.rest.request.idmapping;
 
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.*;
 

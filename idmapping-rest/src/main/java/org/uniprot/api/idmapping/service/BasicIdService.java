@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.service;
 
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.FACET_WARNING;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,8 +111,8 @@ public abstract class BasicIdService<T, U> {
                 warnings.add(
                         new ProblemPair(
                                 FACET_WARNING.getCode(),
-                                FACET_WARNING.getMessage()
-                                        + this.maxIdMappingToIdsCountWithFacets));
+                                FACET_WARNING.getErrorMessage(
+                                        this.maxIdMappingToIdsCountWithFacets)));
             }
 
             SolrStreamFacetResponse solrStreamResponse =
@@ -356,7 +356,7 @@ public abstract class BasicIdService<T, U> {
     public void validateMappedIdsEnrichmentLimit(List<IdMappingStringPair> mappedIds) {
         if (mappedIds.size() > this.maxIdMappingToIdsCountEnriched) {
             throw new InvalidRequestException(
-                    ENRICHMENT_WARNING.getMessage() + this.maxIdMappingToIdsCountEnriched);
+                    ENRICHMENT_WARNING.getErrorMessage(this.maxIdMappingToIdsCountEnriched));
         }
     }
 

@@ -116,11 +116,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_sites",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_sites",
+    "name": "ft_sites_exp",
     "type": "String"
   },
   {
@@ -128,11 +124,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_molecule_processing",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_molecule_processing",
+    "name": "ft_molecule_processing_exp",
     "type": "String"
   },
   {
@@ -140,11 +132,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_variants",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_variants",
+    "name": "ft_variants_exp",
     "type": "String"
   },
   {
@@ -152,11 +140,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_positional",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_positional",
+    "name": "ft_positional_exp",
     "type": "String"
   },
   {
@@ -164,11 +148,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_secstruct",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_secstruct",
+    "name": "ft_secstruct_exp",
     "type": "String"
   },
   {
@@ -176,11 +156,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_init_met",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_init_met",
+    "name": "ft_init_met_exp",
     "type": "String"
   },
   {
@@ -188,11 +164,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_signal",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_signal",
+    "name": "ft_signal_exp",
     "type": "String"
   },
   {
@@ -200,11 +172,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_propep",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_propep",
+    "name": "ft_propep_exp",
     "type": "String"
   },
   {
@@ -212,11 +180,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_transit",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_transit",
+    "name": "ft_transit_exp",
     "type": "String"
   },
   {
@@ -224,11 +188,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_chain",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_chain",
+    "name": "ft_chain_exp",
     "type": "String"
   },
   {
@@ -236,11 +196,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_peptide",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_peptide",
+    "name": "ft_peptide_exp",
     "type": "String"
   },
   {
@@ -248,11 +204,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_topo_dom",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_topo_dom",
+    "name": "ft_topo_dom_exp",
     "type": "String"
   },
   {
@@ -260,11 +212,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_transmem",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_transmem",
+    "name": "ft_transmem_exp",
     "type": "String"
   },
   {
@@ -272,11 +220,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_domain",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_domain",
+    "name": "ft_domain_exp",
     "type": "String"
   },
   {
@@ -284,11 +228,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_repeat",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_repeat",
+    "name": "ft_repeat_exp",
     "type": "String"
   },
   {
@@ -296,11 +236,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_zn_fing",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_zn_fing",
+    "name": "ft_zn_fing_exp",
     "type": "String"
   },
   {
@@ -308,11 +244,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_dna_bind",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_dna_bind",
+    "name": "ft_dna_bind_exp",
     "type": "String"
   },
   {
@@ -320,11 +252,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_region",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_region",
+    "name": "ft_region_exp",
     "type": "String"
   },
   {
@@ -332,11 +260,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_coiled",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_coiled",
+    "name": "ft_coiled_exp",
     "type": "String"
   },
   {
@@ -344,11 +268,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_motif",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_motif",
+    "name": "ft_motif_exp",
     "type": "String"
   },
   {
@@ -356,11 +276,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_compbias",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_compbias",
+    "name": "ft_compbias_exp",
     "type": "String"
   },
   {
@@ -368,11 +284,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_act_site",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_act_site",
+    "name": "ft_act_site_exp",
     "type": "String"
   },
   {
@@ -380,11 +292,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_binding",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_binding",
+    "name": "ft_binding_exp",
     "type": "String"
   },
   {
@@ -392,11 +300,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_site",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_site",
+    "name": "ft_site_exp",
     "type": "String"
   },
   {
@@ -404,11 +308,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_non_std",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_non_std",
+    "name": "ft_non_std_exp",
     "type": "String"
   },
   {
@@ -416,11 +316,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_mod_res",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_mod_res",
+    "name": "ft_mod_res_exp",
     "type": "String"
   },
   {
@@ -428,11 +324,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_lipid",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_lipid",
+    "name": "ft_lipid_exp",
     "type": "String"
   },
   {
@@ -440,11 +332,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_carbohyd",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_carbohyd",
+    "name": "ft_carbohyd_exp",
     "type": "String"
   },
   {
@@ -452,11 +340,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_disulfid",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_disulfid",
+    "name": "ft_disulfid_exp",
     "type": "String"
   },
   {
@@ -464,11 +348,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_crosslnk",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_crosslnk",
+    "name": "ft_crosslnk_exp",
     "type": "String"
   },
   {
@@ -476,11 +356,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_var_seq",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_var_seq",
+    "name": "ft_var_seq_exp",
     "type": "String"
   },
   {
@@ -488,11 +364,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_variant",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_variant",
+    "name": "ft_variant_exp",
     "type": "String"
   },
   {
@@ -500,11 +372,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_mutagen",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_mutagen",
+    "name": "ft_mutagen_exp",
     "type": "String"
   },
   {
@@ -512,11 +380,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_unsure",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_unsure",
+    "name": "ft_unsure_exp",
     "type": "String"
   },
   {
@@ -524,11 +388,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_conflict",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_conflict",
+    "name": "ft_conflict_exp",
     "type": "String"
   },
   {
@@ -536,11 +396,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_non_cons",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_non_cons",
+    "name": "ft_non_cons_exp",
     "type": "String"
   },
   {
@@ -548,11 +404,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_non_ter",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_non_ter",
+    "name": "ft_non_ter_exp",
     "type": "String"
   },
   {
@@ -560,11 +412,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_helix",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_helix",
+    "name": "ft_helix_exp",
     "type": "String"
   },
   {
@@ -572,11 +420,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_turn",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_turn",
+    "name": "ft_turn_exp",
     "type": "String"
   },
   {
@@ -584,11 +428,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_strand",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_strand",
+    "name": "ft_strand_exp",
     "type": "String"
   },
   {
@@ -596,11 +436,7 @@
     "type": "String"
   },
   {
-    "name": "ftev_intramem",
-    "type": "String"
-  },
-  {
-    "name": "ftlen_intramem",
+    "name": "ft_intramem_exp",
     "type": "String"
   },
   {
@@ -637,6 +473,10 @@
   },
   {
     "name": "existence",
+    "type": "String"
+  },
+  {
+    "name": "evidence_exp",
     "type": "String"
   },
   {
@@ -692,11 +532,11 @@
     "type": "String"
   },
   {
-    "name": "ccev_scl_term",
+    "name": "cc_scl_term_exp",
     "type": "String"
   },
   {
-    "name": "ccev_scl_note",
+    "name": "cc_scl_note_exp",
     "type": "String"
   },
   {
@@ -720,23 +560,23 @@
     "type": "String"
   },
   {
-    "name": "ccev_ap",
+    "name": "cc_ap_exp",
     "type": "String"
   },
   {
-    "name": "ccev_ap_apu",
+    "name": "cc_ap_apu_exp",
     "type": "String"
   },
   {
-    "name": "ccev_ap_as",
+    "name": "cc_ap_as_exp",
     "type": "String"
   },
   {
-    "name": "ccev_ap_ai",
+    "name": "cc_ap_ai_exp",
     "type": "String"
   },
   {
-    "name": "ccev_ap_rf",
+    "name": "cc_ap_rf_exp",
     "type": "String"
   },
   {
@@ -764,27 +604,27 @@
     "type": "String"
   },
   {
-    "name": "ccev_bpcp",
+    "name": "cc_bpcp_exp",
     "type": "String"
   },
   {
-    "name": "ccev_bpcp_absorption",
+    "name": "cc_bpcp_absorption_exp",
     "type": "String"
   },
   {
-    "name": "ccev_bpcp_kinetics",
+    "name": "cc_bpcp_kinetics_exp",
     "type": "String"
   },
   {
-    "name": "ccev_bpcp_ph_dependence",
+    "name": "cc_bpcp_ph_dependence_exp",
     "type": "String"
   },
   {
-    "name": "ccev_bpcp_redox_potential",
+    "name": "cc_bpcp_redox_potential_exp",
     "type": "String"
   },
   {
-    "name": "ccev_bpcp_temp_dependence",
+    "name": "cc_bpcp_temp_dependence_exp",
     "type": "String"
   },
   {
@@ -808,11 +648,11 @@
     "type": "String"
   },
   {
-    "name": "ccev_cofactor_chebi",
+    "name": "cc_cofactor_chebi_exp",
     "type": "String"
   },
   {
-    "name": "ccev_cofactor_note",
+    "name": "cc_cofactor_note_exp",
     "type": "String"
   },
   {
@@ -844,11 +684,11 @@
     "type": "String"
   },
   {
-    "name": "ccev_sc",
+    "name": "cc_sc_exp",
     "type": "String"
   },
   {
-    "name": "ccev_sc_misc",
+    "name": "cc_sc_misc_exp",
     "type": "String"
   },
   {
@@ -856,7 +696,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_function",
+    "name": "cc_function_exp",
     "type": "String"
   },
   {
@@ -864,7 +704,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_catalytic_activity",
+    "name": "cc_catalytic_activity_exp",
     "type": "String"
   },
   {
@@ -872,7 +712,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_cofactor",
+    "name": "cc_cofactor_exp",
     "type": "String"
   },
   {
@@ -880,7 +720,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_activity_regulation",
+    "name": "cc_activity_regulation_exp",
     "type": "String"
   },
   {
@@ -888,7 +728,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_biophysicochemical_properties",
+    "name": "cc_biophysicochemical_properties_exp",
     "type": "String"
   },
   {
@@ -896,7 +736,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_pathway",
+    "name": "cc_pathway_exp",
     "type": "String"
   },
   {
@@ -904,7 +744,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_subunit",
+    "name": "cc_subunit_exp",
     "type": "String"
   },
   {
@@ -912,7 +752,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_interaction",
+    "name": "cc_interaction_exp",
     "type": "String"
   },
   {
@@ -920,7 +760,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_subcellular_location",
+    "name": "cc_subcellular_location_exp",
     "type": "String"
   },
   {
@@ -928,7 +768,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_alternative_products",
+    "name": "cc_alternative_products_exp",
     "type": "String"
   },
   {
@@ -936,7 +776,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_tissue_specificity",
+    "name": "cc_tissue_specificity_exp",
     "type": "String"
   },
   {
@@ -944,7 +784,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_developmental_stage",
+    "name": "cc_developmental_stage_exp",
     "type": "String"
   },
   {
@@ -952,7 +792,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_induction",
+    "name": "cc_induction_exp",
     "type": "String"
   },
   {
@@ -960,7 +800,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_domain",
+    "name": "cc_domain_exp",
     "type": "String"
   },
   {
@@ -968,7 +808,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_ptm",
+    "name": "cc_ptm_exp",
     "type": "String"
   },
   {
@@ -976,7 +816,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_rna_editing",
+    "name": "cc_rna_editing_exp",
     "type": "String"
   },
   {
@@ -984,7 +824,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_mass_spectrometry",
+    "name": "cc_mass_spectrometry_exp",
     "type": "String"
   },
   {
@@ -992,7 +832,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_polymorphism",
+    "name": "cc_polymorphism_exp",
     "type": "String"
   },
   {
@@ -1000,7 +840,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_disease",
+    "name": "cc_disease_exp",
     "type": "String"
   },
   {
@@ -1008,7 +848,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_disruption_phenotype",
+    "name": "cc_disruption_phenotype_exp",
     "type": "String"
   },
   {
@@ -1016,7 +856,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_allergen",
+    "name": "cc_allergen_exp",
     "type": "String"
   },
   {
@@ -1024,7 +864,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_toxic_dose",
+    "name": "cc_toxic_dose_exp",
     "type": "String"
   },
   {
@@ -1032,7 +872,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_biotechnology",
+    "name": "cc_biotechnology_exp",
     "type": "String"
   },
   {
@@ -1040,7 +880,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_pharmaceutical",
+    "name": "cc_pharmaceutical_exp",
     "type": "String"
   },
   {
@@ -1048,7 +888,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_miscellaneous",
+    "name": "cc_miscellaneous_exp",
     "type": "String"
   },
   {
@@ -1056,7 +896,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_similarity",
+    "name": "cc_similarity_exp",
     "type": "String"
   },
   {
@@ -1064,7 +904,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_caution",
+    "name": "cc_caution_exp",
     "type": "String"
   },
   {
@@ -1072,7 +912,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_sequence_caution",
+    "name": "cc_sequence_caution_exp",
     "type": "String"
   },
   {
@@ -1080,7 +920,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_webresource",
+    "name": "cc_webresource_exp",
     "type": "String"
   },
   {
@@ -1088,7 +928,7 @@
     "type": "String"
   },
   {
-    "name": "ccev_unknown",
+    "name": "cc_unknown_exp",
     "type": "String"
   },
   {

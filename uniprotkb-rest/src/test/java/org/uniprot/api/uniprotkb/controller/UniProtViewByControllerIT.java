@@ -16,13 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.service.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtViewByController.class)
+@ContextConfiguration(classes = {AsyncDownloadMocks.class})
 @AutoConfigureWebClient
 class UniProtViewByControllerIT {
     @Autowired private MockMvc mockMvc;

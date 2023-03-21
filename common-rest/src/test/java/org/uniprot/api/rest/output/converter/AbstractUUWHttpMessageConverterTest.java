@@ -338,7 +338,7 @@ class AbstractUUWHttpMessageConverterTest {
         }
 
         @Override
-        protected void writeContents(
+        public void writeContents(
                 MessageConverterContext<Character> context,
                 OutputStream outputStream,
                 Instant start,

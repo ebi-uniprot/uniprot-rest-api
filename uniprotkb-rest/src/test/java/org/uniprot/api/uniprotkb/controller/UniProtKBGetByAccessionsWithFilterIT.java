@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.mock;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -43,29 +41,26 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.core.uniprotkb.ProteinExistence;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.cv.chebi.ChebiRepo;
-import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.go.GORepo;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
-import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 /**
  * @author sahmad
  * @since 2019-07-26
  */
 @Slf4j
-@ContextConfiguration(classes = {DataStoreTestConfig.class, UniProtKBREST.class})
+@ContextConfiguration(
+        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniProtKBPublicationController.class)
 @AutoConfigureWebClient
@@ -84,13 +79,7 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
     private final UniProtEntryConverter documentConverter =
-            new UniProtEntryConverter(
-                    TaxonomyRepoMocker.getTaxonomyRepo(),
-                    Mockito.mock(GORepo.class),
-                    PathwayRepoMocker.getPathwayRepo(),
-                    mock(ChebiRepo.class),
-                    mock(ECRepo.class),
-                    new HashMap<>());
+            new UniProtEntryConverter(new HashMap<>());
 
     @Autowired private UniProtStoreClient<UniProtKBEntry> storeClient;
 
@@ -112,20 +101,22 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                 entryBuilder.entryType(UniProtKBEntryType.TREMBL);
             }
 
+            int annotationScore;
             if (i % 2 == 0) {
                 entryBuilder.proteinExistence(ProteinExistence.PROTEIN_LEVEL);
-                entryBuilder.annotationScore(2);
+                annotationScore = 2;
             } else if (i % 3 == 0) {
                 entryBuilder.proteinExistence(ProteinExistence.TRANSCRIPT_LEVEL);
-                entryBuilder.annotationScore(3);
+                annotationScore = 3;
             } else {
                 entryBuilder.proteinExistence(ProteinExistence.HOMOLOGY);
-                entryBuilder.annotationScore(4);
+                annotationScore = 4;
             }
 
             UniProtKBEntry uniProtKBEntry = entryBuilder.build();
 
             UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
+            convert.score = annotationScore;
             convert.seqLength = i * 35;
             convert.modelOrganism = modelOrganism.get(i - 10);
             cloudSolrClient.addBean(SolrCollection.uniprot.name(), convert);

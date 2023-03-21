@@ -72,7 +72,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(jsonPath("$.results", notNullValue()))
                 .andExpect(jsonPath("$.results", iterableWithSize(1)))
                 .andExpect(jsonPath("$.results[0].uniParcId", equalTo(UNIPARC_ID)))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
                 .andExpect(jsonPath("$.results[0].uniParcCrossReferences[*].id", notNullValue()))
                 .andExpect(
                         jsonPath("$.results[0].uniParcCrossReferences[*].version", notNullValue()))
@@ -149,7 +149,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 contains("UPI0000083C01", "UPI0000083C02")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
                 .andExpect(
                         jsonPath(
                                 "$.results[0].uniParcCrossReferences[*].proteomeId",
@@ -178,7 +178,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                         jsonPath(
                                 "$.results.*.uniParcId",
                                 contains("UPI0000083C03", "UPI0000083C04")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
                 .andExpect(
                         jsonPath(
                                 "$.results[0].uniParcCrossReferences[*].proteomeId",
@@ -203,7 +203,7 @@ class UniParcGetByProteomeIdIT extends AbstractGetMultipleUniParcByIdTest {
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", is(1)))
                 .andExpect(jsonPath("$.results.*.uniParcId", contains("UPI0000083C05")))
-                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(5)))
+                .andExpect(jsonPath("$.results[0].uniParcCrossReferences", iterableWithSize(6)))
                 .andExpect(
                         jsonPath(
                                 "$.results[0].uniParcCrossReferences[*].proteomeId",

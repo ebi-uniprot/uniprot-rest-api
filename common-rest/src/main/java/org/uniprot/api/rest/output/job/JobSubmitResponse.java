@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.controller.response;
+package org.uniprot.api.rest.output.job;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

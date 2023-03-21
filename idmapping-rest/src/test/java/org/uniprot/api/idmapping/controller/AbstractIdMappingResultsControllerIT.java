@@ -37,10 +37,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -365,7 +365,7 @@ abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBas
                         jsonPath(
                                 "$.warnings[0].message",
                                 is(
-                                        "Filters are not supported for mapping results with IDs more than 10")));
+                                        "Filters are not supported for mapping results with more than 10 IDs")));
     }
 
     private Stream<Arguments> getAllSearchFields() {

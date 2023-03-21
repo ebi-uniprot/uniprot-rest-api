@@ -25,4 +25,6 @@ public class UniProtKBStreamRequest extends UniProtKBBasicRequest implements Str
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.uniprot.invalid.download}")
     private String download;
+
+    private boolean isLargeSolrStreamRestricted = true;
 }

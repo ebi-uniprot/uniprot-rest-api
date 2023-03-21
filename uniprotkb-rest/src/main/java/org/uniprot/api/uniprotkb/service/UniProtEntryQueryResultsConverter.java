@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import net.jodah.failsafe.Failsafe;
@@ -13,6 +14,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
@@ -55,7 +57,9 @@ class UniProtEntryQueryResultsConverter {
     }
 
     QueryResult<UniProtKBEntry> convertQueryResult(
-            QueryResult<UniProtDocument> results, List<ReturnField> filters) {
+            QueryResult<UniProtDocument> results,
+            List<ReturnField> filters,
+            Set<ProblemPair> warnings) {
         Stream<UniProtKBEntry> upEntries =
                 results.getContent()
                         .map(doc -> convertDoc(doc, filters))
@@ -67,7 +71,8 @@ class UniProtEntryQueryResultsConverter {
                 results.getFacets(),
                 results.getMatchedFields(),
                 null,
-                results.getSuggestions());
+                results.getSuggestions(),
+                warnings);
     }
 
     Optional<UniProtKBEntry> convertDoc(UniProtDocument doc, List<ReturnField> filters) {

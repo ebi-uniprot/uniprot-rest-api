@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.idmapping.controller.response.JobStatus;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.rest.download.model.JobStatus;
 
 class IdMappingJobCacheServiceTest {
     private static final String NEW_JOB_IN_CACHE = "new job";

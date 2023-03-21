@@ -9,9 +9,13 @@ public abstract class BatchIterable<T> implements Iterable<Collection<T>> {
     private final Iterator<String> sourceIterator;
     private final int batchSize;
 
-    public BatchIterable(Iterable<String> sourceIterable, int batchSize) {
+    public BatchIterable(Iterator<String> sourceIterator, int batchSize) {
         this.batchSize = batchSize;
-        this.sourceIterator = sourceIterable.iterator();
+        this.sourceIterator = sourceIterator;
+    }
+
+    public BatchIterable(Iterable<String> sourceIterable, int batchSize) {
+        this(sourceIterable.iterator(), batchSize);
     }
 
     @Override

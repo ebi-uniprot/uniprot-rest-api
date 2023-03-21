@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.controller.response;
+package org.uniprot.api.rest.download.model;
 
 /**
  * Created 23/02/2021

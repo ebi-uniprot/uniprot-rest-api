@@ -1,0 +1,65 @@
+ID   B3GAT1_9LECA            Unreviewed;       277 AA.
+AC   B3GAT1;
+DT   22-JUL-2008, integrated into UniProtKB/TrEMBL.
+DT   22-JUL-2008, sequence version 1.
+DT   22-FEB-2023, entry version 50.
+DE   RecName: Full=glyceraldehyde-3-phosphate dehydrogenase (phosphorylating) {ECO:0000256|ARBA:ARBA00013119};
+DE            EC=1.2.1.12 {ECO:0000256|ARBA:ARBA00013119};
+DE   Flags: Fragment;
+OS   Parmotrema subrigidum.
+OC   Eukaryota; Fungi; Dikarya; Ascomycota; Pezizomycotina; Lecanoromycetes;
+OC   OSLEUM clade; Lecanoromycetidae; Lecanorales; Lecanorineae; Parmeliaceae;
+OC   Parmotrema.
+OX   NCBI_TaxID=526737 {ECO:0000313|EMBL:ACD99833.1};
+RN   [1] {ECO:0000313|EMBL:ACD99833.1}
+RP   NUCLEOTIDE SEQUENCE.
+RC   STRAIN=NC-sub-K+_12210 {ECO:0000313|EMBL:ACD99833.1};
+RA   Widhelm T.J., Egan R.S., Livshultz T.;
+RL   Submitted (APR-2008) to the EMBL/GenBank/DDBJ databases.
+CC   -!- PATHWAY: Carbohydrate degradation; glycolysis; pyruvate from D-
+CC       glyceraldehyde 3-phosphate: step 1/5. {ECO:0000256|ARBA:ARBA00004869}.
+CC   -!- SUBUNIT: Homotetramer. {ECO:0000256|ARBA:ARBA00011881}.
+CC   -!- SIMILARITY: Belongs to the glyceraldehyde-3-phosphate dehydrogenase
+CC       family. {ECO:0000256|ARBA:ARBA00007406, ECO:0000256|RuleBase:RU000397}.
+CC   ---------------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see https://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution (CC BY 4.0) License
+CC   ---------------------------------------------------------------------------
+DR   EMBL; EU665293; ACD99833.1; -; Genomic_DNA.
+DR   UniPathway; UPA00109; UER00184.
+DR   GO; GO:0004365; F:glyceraldehyde-3-phosphate dehydrogenase (NAD+) (phosphorylating) activity; IEA:UniProtKB-EC.
+DR   GO; GO:0051287; F:NAD binding; IEA:InterPro.
+DR   GO; GO:0006096; P:glycolytic process; IEA:UniProtKB-UniPathway.
+DR   Gene3D; 3.40.50.720; NAD(P)-binding Rossmann-like Domain; 1.
+DR   InterPro; IPR020831; GlycerAld/Erythrose_P_DH.
+DR   InterPro; IPR020830; GlycerAld_3-P_DH_AS.
+DR   InterPro; IPR020829; GlycerAld_3-P_DH_cat.
+DR   InterPro; IPR020828; GlycerAld_3-P_DH_NAD(P)-bd.
+DR   InterPro; IPR036291; NAD(P)-bd_dom_sf.
+DR   PANTHER; PTHR10836; GLYCERALDEHYDE 3-PHOSPHATE DEHYDROGENASE; 1.
+DR   PANTHER; PTHR10836:SF76; GLYCERALDEHYDE-3-PHOSPHATE DEHYDROGENASE-RELATED; 1.
+DR   Pfam; PF02800; Gp_dh_C; 1.
+DR   Pfam; PF00044; Gp_dh_N; 1.
+DR   PRINTS; PR00078; G3PDHDRGNASE.
+DR   SMART; SM00846; Gp_dh_N; 1.
+DR   SUPFAM; SSF55347; Glyceraldehyde-3-phosphate dehydrogenase-like, C-terminal domain; 1.
+DR   SUPFAM; SSF51735; NAD(P)-binding Rossmann-fold domains; 1.
+DR   PROSITE; PS00071; GAPDH; 1.
+PE   3: Inferred from homology;
+KW   Glycolysis {ECO:0000256|ARBA:ARBA00023152};
+KW   Oxidoreductase {ECO:0000256|ARBA:ARBA00023002}.
+FT   DOMAIN          1..130
+FT                   /note="Glyceraldehyde 3-phosphate dehydrogenase NAD(P)
+FT                   binding"
+FT                   /evidence="ECO:0000259|SMART:SM00846"
+FT   NON_TER         1
+FT                   /evidence="ECO:0000313|EMBL:ACD99833.1"
+FT   NON_TER         277
+FT                   /evidence="ECO:0000313|EMBL:ACD99833.1"
+SQ   SEQUENCE   277 AA;  29722 MW;  82EC67BE14418BA8 CRC64;
+     VXXGDVKVXA VNXPFIEPHY AAYMLKYDSQ HGQFKGTIEV KGSDLVVNGQ TVKFYTEKDP
+     GNIPWKDTGA YYIVESTGVF TTTEKAKAHL KGGAKKVVIS APSADAAMFV MGVNEKEYKS
+     DIEIISNASC TTNCLAPLAK VMHDNFTIIE GLMTTIHSYT ATQKTVDGPS AKDWRGGRTA
+     AQNIIPSSTG AAKAVGKVIP SLNGKLTGMS MRVPTSNVSV VDLTCRLEKS VTYDQIKETM
+     KKASEGPLKG IMSYSXDALV STDXNGDNXS CXFDAXX
+//

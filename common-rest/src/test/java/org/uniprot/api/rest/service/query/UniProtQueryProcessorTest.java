@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import nl.altindag.log.LogCaptor;
 
@@ -28,6 +29,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
@@ -42,7 +46,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  * @author Edd
  */
 class UniProtQueryProcessorTest {
-    private static final String FIELD_NAME = "acc";
+    private static final String FIELD_NAME = "accession";
     private UniProtQueryProcessor processor;
     private UniProtQueryProcessorConfig config;
 
@@ -57,6 +61,7 @@ class UniProtQueryProcessorTest {
                                         searchFieldWithValidRegex(FIELD_NAME, "(?i)^P[0-9]+$")))
                         .whiteListFields(whitelistFields)
                         .searchFieldsNames(Set.of("field"))
+                        .leadingWildcardFields(Set.of("gene", "protein_name"))
                         .build();
         processor = UniProtQueryProcessor.newInstance(config);
     }
@@ -140,9 +145,9 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
-    void optimiseWhitelistFieldQueryAndDefaultSearchValue() {
-        String processedQuery = processor.processQuery("GO:1234567 OR P12345");
-        assertThat(processedQuery, is("GO\\:1234567 OR " + FIELD_NAME + ":P12345"));
+    void optimiseWhitelistFieldQueryValue() {
+        String processedQuery = processor.processQuery("GO:1234567");
+        assertThat(processedQuery, is("GO\\:1234567"));
     }
 
     @Test
@@ -204,22 +209,6 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
-    void optimisesPartOfQuery() {
-        String processedQuery = processor.processQuery("a OR P12345");
-        assertThat(processedQuery, is("a OR " + FIELD_NAME + ":P12345"));
-    }
-
-    @Test
-    void complexQueryWithOptimisation() {
-        String ACC = "P12345";
-        String pre = "a OR ( b AND ( +c:something AND -d:something ) AND ( ";
-        String post = " OR range:[1 TO 2] OR range:[1 TO *] OR range:[* TO 1] ) )";
-        String query = pre + ACC + post;
-        String processedQuery = processor.processQuery(query);
-        assertThat(processedQuery, is(pre + FIELD_NAME + ":" + ACC + post));
-    }
-
-    @Test
     void complexQueryWithNoOptimisation() {
         String query =
                 "a OR ( b AND ( +c:something AND -d:something ) AND ( "
@@ -247,7 +236,7 @@ class UniProtQueryProcessorTest {
     void handleUnderscoreDefaultSearch() {
         String query = "VAR_99999";
         String processedQuery = processor.processQuery(query);
-        assertThat(processedQuery, is("\"VAR 99999\""));
+        assertThat(processedQuery, is("\"VAR_99999\""));
     }
 
     @Test
@@ -272,7 +261,7 @@ class UniProtQueryProcessorTest {
                 .when(mockPipeline)
                 .process(any(QueryNode.class));
 
-        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline);
+        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline, null);
         String query = "anything";
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is(query));
@@ -286,7 +275,7 @@ class UniProtQueryProcessorTest {
                 .when(mockPipeline)
                 .process(any(QueryNode.class));
 
-        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline);
+        UniProtQueryProcessor processor = new UniProtQueryProcessor(mockPipeline, null);
         String query = "anything";
         String processedQuery = processor.processQuery(query);
         assertThat(processedQuery, is(query));
@@ -338,7 +327,7 @@ class UniProtQueryProcessorTest {
     void handlesLeadingWildcardExpression() {
         String query = "a:*thing";
         String processedQuery = processor.processQuery(query);
-        assertThat(processedQuery, is(query));
+        assertThat(processedQuery, is("a:thing"));
     }
 
     @Test
@@ -436,12 +425,6 @@ class UniProtQueryProcessorTest {
     }
 
     @Test
-    void optimiseDefaultSearchValueLowercase() {
-        String processedQuery = processor.processQuery("GO:1234567 OR p12345");
-        assertThat(processedQuery, is("GO\\:1234567 OR " + FIELD_NAME + ":P12345"));
-    }
-
-    @Test
     void changeLowercaseAccessionToUppercase() {
         String processedQuery = processor.processQuery("GO:1234567 OR accession:p12345");
         assertThat(processedQuery, is("GO\\:1234567 OR " + "accession:P12345"));
@@ -451,5 +434,47 @@ class UniProtQueryProcessorTest {
     void uppercaseAccessionUnchanged() {
         String processedQuery = processor.processQuery("GO:1234567 OR accession:P12345");
         assertThat(processedQuery, is("GO\\:1234567 OR " + "accession:P12345"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getQueryWithLeadingWildcard")
+    void testWithLeadingWildcardRemoved(String inputQuery, String expectedQuery) {
+        String processedQuery = processor.processQuery(inputQuery);
+        assertThat(processedQuery, is(expectedQuery));
+    }
+
+    private static Stream<Arguments> getQueryWithLeadingWildcard() {
+        return Stream.of(
+                Arguments.of("*quick brown fox", "quick AND brown AND fox"),
+                Arguments.of("*quick brown* *fox", "quick AND brown* AND fox"),
+                Arguments.of("*quick * brown fox", "quick AND * AND brown AND fox"),
+                Arguments.of("*quick brown* ***fox", "quick AND brown* AND fox"),
+                Arguments.of("otherfield:*quick brown fox", "otherfield:quick AND brown AND fox"),
+                Arguments.of("*quick AND field:*text", "quick AND field:text"),
+                Arguments.of(
+                        "*quick brown fox AND field:*text",
+                        "quick AND brown AND ( fox AND field:text )"),
+                Arguments.of("*quick AND field:*text AND *brown", "quick AND field:text AND brown"),
+                Arguments.of(
+                        "*quick brown fox OR field:*text",
+                        "quick AND brown AND ( fox OR field:text )"),
+                Arguments.of("* AND field:*text*", "* AND field:text*"),
+                Arguments.of("? AND field:?text?", "? AND field:text?"),
+                Arguments.of("? AND field:???text?", "? AND field:text?"),
+                Arguments.of("\"*quick brown fox\"", "\"*quick brown fox\""));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getQueryWithSupportedLeadingWildcard")
+    void testWithLeadingWildcard(String inputQuery, String expectedQuery) {
+        String processedQuery = processor.processQuery(inputQuery);
+        assertThat(processedQuery, is(expectedQuery));
+    }
+
+    private static Stream<Arguments> getQueryWithSupportedLeadingWildcard() {
+        return Stream.of(
+                Arguments.of("gene:*CIROP AND field:*text", "gene:*CIROP AND field:text"),
+                Arguments.of("protein_name:*CLRN2 AND *text", "protein_name:*CLRN2 AND text"),
+                Arguments.of("protein_name:?CLRN2 AND ?text", "protein_name:?CLRN2 AND text"));
     }
 }

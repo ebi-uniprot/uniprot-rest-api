@@ -121,7 +121,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         // when
         saveEntry();
         Integer size = 3;
-        Integer total = 5;
+        Integer total = 6;
         ResultActions response =
                 getMockMvc()
                         .perform(
@@ -132,7 +132,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "6"))
                 .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(size)));
 
@@ -153,7 +153,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
+                .andExpect(header().string(X_TOTAL_RESULTS, "6"))
                 .andExpect(header().string(HttpHeaders.LINK, nullValue()))
                 .andExpect(jsonPath("$.results.size()", Matchers.is(total - size)));
     }
@@ -241,12 +241,12 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results", iterableWithSize(4)))
+                .andExpect(jsonPath("$.results", iterableWithSize(5)))
                 .andExpect(jsonPath("$.results[*].id", notNullValue()))
                 .andExpect(jsonPath("$.results[*].id", hasItem(ACCESSION)))
                 .andExpect(jsonPath("$.results[*].database", notNullValue()))
                 .andExpect(jsonPath("$.results[*].organism", notNullValue()))
-                .andExpect(jsonPath("$.results[*].active", contains(true, true, true, true)));
+                .andExpect(jsonPath("$.results[*].active", contains(true, true, true, true, true)));
     }
 
     static class UniParcGetIdParameterResolver extends AbstractGetIdParameterResolver {
@@ -255,7 +255,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(UNIPARC_ID)
-                    .resultMatcher(jsonPath("$.results.size()", is(5)))
+                    .resultMatcher(jsonPath("$.results.size()", is(6)))
                     .build();
         }
 
@@ -316,7 +316,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.results.size()", is(5)))
+                                    .resultMatcher(jsonPath("$.results.size()", is(6)))
                                     .resultMatcher(jsonPath("$.results.*.database").exists())
                                     .resultMatcher(jsonPath("$.results.*.id").exists())
                                     .build())
@@ -334,6 +334,7 @@ class UniParcDatabaseControllerIT extends AbstractGetSingleUniParcByIdTest {
                                                             containsString(
                                                                     "UniProtKB/Swiss-Prot\tP10001\t7\tName 7787\t2017-05-17\t2017-02-27\tYes\n"
                                                                             + "UniProtKB/TrEMBL\tP12301\t7\tName 9606\t2017-02-12\t2017-04-23\tYes\n"
+                                                                            + "RefSeq\tWP_168893201\t7\t\t2017-02-12\t2017-04-23\tYes\n"
                                                                             + "EMBL\tembl1\t7\t\t2017-02-12\t2017-04-23\tYes\n"
                                                                             + "UNIMES\tunimes1\t7\t\t2017-02-12\t2017-04-23\tNo\n"
                                                                             + "VectorBase\tcommon-vector\t7\t\t2017-02-12\t2017-04-23\tYes")))

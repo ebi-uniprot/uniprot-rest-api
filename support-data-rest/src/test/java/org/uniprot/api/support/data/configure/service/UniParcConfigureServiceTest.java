@@ -63,7 +63,7 @@ class UniParcConfigureServiceTest {
         List<UniParcDatabaseDetail> result = service.getAllUniParcDatabaseDetails();
 
         assertNotNull(result);
-        assertEquals(39, result.size());
+        assertEquals(41, result.size());
 
         UniParcDatabaseDetail database = result.get(0);
         assertEquals("EG_BACTERIA", database.getName());

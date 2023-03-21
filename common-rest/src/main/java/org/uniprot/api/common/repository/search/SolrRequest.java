@@ -24,13 +24,19 @@ public class SolrRequest {
 
     private FacetConfig facetConfig;
     private String termQuery;
+    // TODO: check it to replace it with required config
     private SolrQueryConfig queryConfig;
+
+    private String queryField;
+
     private String defaultField;
     // Batch size of rows in solr request. In case of search api request rows and totalRows will be
     // same.
     private int rows;
     // Total rows requested by user
     private int totalRows;
+
+    private boolean largeSolrStreamRestricted = true;
 
     @Singular private List<String> termFields = new ArrayList<>();
     @Singular private List<String> filterQueries = new ArrayList<>();

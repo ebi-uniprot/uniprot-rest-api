@@ -29,7 +29,6 @@ import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEnt
  */
 @TestConfiguration
 public class DataStoreTestConfig {
-
     @Bean
     @Profile("offline")
     public HttpClient httpClient() {

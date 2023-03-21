@@ -23,6 +23,7 @@ import org.uniprot.api.unisave.repository.domain.AccessionStatusInfo;
 import org.uniprot.api.unisave.repository.domain.Entry;
 import org.uniprot.api.unisave.request.UniSaveRequest;
 import org.uniprot.api.unisave.service.UniSaveService;
+import org.uniprot.api.unisave.util.DateConvertUtils;
 import org.uniprot.core.util.Utils;
 
 @Service
@@ -233,6 +234,7 @@ public class UniSaveServiceImpl implements UniSaveService {
 
     private List<AccessionEvent> entryStatusInfoToEvents(AccessionStatusInfo statusInfo) {
         return statusInfo.getEvents().stream()
+                .filter(this::isEventDateOnOrBeforeCurrentReleaseDate)
                 .map(
                         event ->
                                 AccessionEvent.builder()
@@ -323,6 +325,19 @@ public class UniSaveServiceImpl implements UniSaveService {
         LocalDate date = LocalDate.parse(entry.getFirstReleaseDate(), RELEASE_DATE_FORMATTER);
         updateLatestReleaseCache();
         return date.compareTo(LatestReleaseCache.currentDate) <= 0;
+    }
+
+    private boolean isEventDateOnOrBeforeCurrentReleaseDate(
+            org.uniprot.api.unisave.repository.domain.AccessionEvent event) {
+        boolean result = false;
+        if (event.getEventRelease() != null && event.getEventRelease().getReleaseDate() != null) {
+            LocalDate date =
+                    DateConvertUtils.convertToLocalDateViaInstant(
+                            event.getEventRelease().getReleaseDate());
+            updateLatestReleaseCache();
+            result = date.compareTo(LatestReleaseCache.currentDate) <= 0;
+        }
+        return result;
     }
 
     private boolean isPlaceToInsertCopyright(String[] lines, int index) {

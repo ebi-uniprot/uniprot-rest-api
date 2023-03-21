@@ -1,7 +1,5 @@
 package org.uniprot.api.idmapping.controller.utils;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -34,21 +32,16 @@ import org.uniprot.core.uniprotkb.feature.UniProtKBFeature;
 import org.uniprot.core.uniprotkb.feature.UniprotKBFeatureType;
 import org.uniprot.core.uniprotkb.impl.*;
 import org.uniprot.core.uniprotkb.xdb.UniProtKBCrossReference;
-import org.uniprot.cv.chebi.ChebiRepo;
-import org.uniprot.cv.ec.ECRepo;
-import org.uniprot.cv.go.GORepo;
 import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 import org.uniprot.store.datastore.UniProtStoreClient;
-import org.uniprot.store.indexer.uniprot.mockers.PathwayRepoMocker;
-import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
-import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.domain.EvidenceGroup;
 import org.uniprot.store.search.domain.EvidenceItem;
 import org.uniprot.store.search.domain.impl.GoEvidences;
+import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 /**
  * @author lgonzales
@@ -66,13 +59,7 @@ public class IdMappingUniProtKBITUtils {
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
 
     private static final UniProtEntryConverter documentConverter =
-            new UniProtEntryConverter(
-                    TaxonomyRepoMocker.getTaxonomyRepo(),
-                    mock(GORepo.class),
-                    PathwayRepoMocker.getPathwayRepo(),
-                    mock(ChebiRepo.class),
-                    mock(ECRepo.class),
-                    new HashMap<>());
+            new UniProtEntryConverter(new HashMap<>());
 
     public static String getUniProtKbFieldValueForValidatedField(String searchField) {
         String value = "";
@@ -199,6 +186,13 @@ public class IdMappingUniProtKBITUtils {
 
         UniProtDocument doc = documentConverter.convert(uniProtKBEntry);
         doc.otherOrganism = "otherValue";
+        doc.modelOrganism = 9606;
+        doc.organismTaxId = 9606;
+        doc.taxLineageIds = List.of(9606);
+        doc.organismTaxon = List.of("Human");
+        doc.organismName = List.of("Human");
+        doc.organismHostIds = List.of(9606);
+        doc.organismHostNames = List.of("Human");
         doc.unirefCluster50 = "UniRef50_P00001";
         doc.unirefCluster90 = "UniRef90_P00001";
         doc.unirefCluster100 = "UniRef100_P00001";
@@ -212,10 +206,15 @@ public class IdMappingUniProtKBITUtils {
         }
         doc.proteomes.add("UP000000000");
         doc.apApu.add("Search All");
+        doc.commentMap.put("cc_ap_apu_exp", Collections.singleton("Search All"));
         doc.apApuEv.add("Search All");
         doc.apAsEv.add("Search All");
+        doc.commentMap.put("cc_ap_as_exp", Collections.singleton("Search All"));
         doc.apRf.add("Search All");
+        doc.commentMap.put("cc_ap_rf_exp", Collections.singleton("Search All"));
         doc.apRfEv.add("Search All");
+        doc.commentMap.put("cc_sequence_caution_exp", Collections.singleton("Search All"));
+        doc.commentMap.put("cc_sc_misc_exp", Collections.singleton("Search All"));
         doc.seqCautionFrameshift.add("Search All");
         doc.seqCautionErTerm.add("Search All");
         doc.seqCautionErTran.add("Search All");
@@ -239,14 +238,13 @@ public class IdMappingUniProtKBITUtils {
                 code ->
                         doc.goWithEvidenceMaps.put(
                                 "go_" + code, Collections.singleton("Search All")));
-        Arrays.stream(CommentType.values())
-                .forEach(
-                        type -> {
-                            String typeName = type.name().toLowerCase();
-                            doc.commentEvMap.put(
-                                    "ccev_" + typeName, Collections.singleton("Search All"));
-                        });
         doc.commentMap.put("cc_unknown", Collections.singleton("Search All"));
+        doc.commentMap.put("cc_unknown_exp", Collections.singleton("Search All"));
+        doc.commentMap.put("cc_cofactor_exp", Collections.singleton("Search All"));
+        doc.commentMap.put("cc_interaction_exp", Collections.singleton("Search All"));
+        doc.commentMap.put("cc_subcellular_location_exp", Collections.singleton("Search All"));
+        doc.commentMap.put("cc_alternative_products_exp", Collections.singleton("Search All"));
+        doc.commentMap.put("cc_webresource_exp", Collections.singleton("Search All"));
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), doc);
         cloudSolrClient.commit(SolrCollection.uniprot.name());
     }

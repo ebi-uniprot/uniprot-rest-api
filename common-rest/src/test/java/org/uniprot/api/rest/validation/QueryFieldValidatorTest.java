@@ -112,7 +112,7 @@ class QueryFieldValidatorTest {
                 validator.isValid(
                         "((organism_id:9606) OR "
                                 + "(gene:\"CDC7\") OR "
-                                + "((cc_bpcp_kinetics:\"value\" AND ccev_bpcp_kinetics:\"value\")))",
+                                + "(cc_bpcp_kinetics:\"value\"))",
                         null);
         assertTrue(result);
     }
@@ -127,7 +127,7 @@ class QueryFieldValidatorTest {
                 validator.isValid(
                         "(((organism_id:9606) OR (organism_id:1234)) AND "
                                 + "(gene:\"CDC7\") AND "
-                                + "((cc_bpcp_kinetics:1234 AND ccev_bpcp_kinetics:\"the value\")))",
+                                + "(cc_bpcp_kinetics:1234))",
                         null);
         assertTrue(result);
     }
@@ -230,6 +230,28 @@ class QueryFieldValidatorTest {
         assertFalse(result);
         assertEquals(1, validator.getErrorFields(ErrorType.VALUE).size());
         assertEquals("taxonomy_id", validator.getErrorFields(ErrorType.VALUE).get(0));
+    }
+
+    @Test
+    void isValidWithForwardSlashReturnTrue() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("a/b//c", null);
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidInvalidFieldWithForwardSlashReturnFalse() {
+        ValidSolrQueryFields validSolrQueryFields = getMockedValidSolrQueryFields();
+        FakeQueryFieldValidator validator = new FakeQueryFieldValidator();
+        validator.initialize(validSolrQueryFields);
+
+        boolean result = validator.isValid("invalid:a//b/c", null);
+        assertFalse(result);
+        assertEquals(1, validator.getErrorFields(ErrorType.FIELD).size());
+        assertEquals("invalid", validator.getErrorFields(ErrorType.FIELD).get(0));
     }
 
     private ValidSolrQueryFields getMockedValidSolrQueryFields() {

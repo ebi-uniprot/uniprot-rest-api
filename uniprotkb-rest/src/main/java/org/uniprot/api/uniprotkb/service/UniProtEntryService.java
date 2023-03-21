@@ -3,6 +3,8 @@ package org.uniprot.api.uniprotkb.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
@@ -45,6 +48,7 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 @Service
 @Import(UniProtSolrQueryConfig.class)
@@ -62,6 +66,12 @@ public class UniProtEntryService
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
     private final RDFStreamer uniProtRDFStreamer;
+
+    private static final Pattern ACCESSION_REGEX_ISOFORM =
+            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX_ISOFORM);
+
+    private static final Pattern CLEAN_QUERY_REGEX =
+            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -102,7 +112,11 @@ public class UniProtEntryService
         QueryResult<UniProtDocument> results =
                 repository.searchPage(solrRequest, request.getCursor());
         List<ReturnField> fields = OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
-        return resultsConverter.convertQueryResult(results, fields);
+        Set<ProblemPair> warnings =
+                getWarnings(
+                        request.getQuery(),
+                        this.uniProtQueryProcessorConfig.getLeadingWildcardFields());
+        return resultsConverter.convertQueryResult(results, fields, warnings);
     }
 
     @Override
@@ -203,8 +217,7 @@ public class UniProtEntryService
     }
 
     public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
-        SolrRequest solrRequest =
-                createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
+        SolrRequest solrRequest = createDownloadSolrRequest(streamRequest);
         return this.uniProtRDFStreamer.idsToRDFStoreStream(solrRequest);
     }
 
@@ -221,6 +234,7 @@ public class UniProtEntryService
         if (filterIsoform) {
             addIsoformFilter(solrRequest);
         }
+        solrRequest.setLargeSolrStreamRestricted(uniProtRequest.isLargeSolrStreamRestricted());
         return solrRequest;
     }
 
@@ -247,12 +261,15 @@ public class UniProtEntryService
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
 
         UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
+        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
 
         if (isSearchAll(uniProtRequest)) {
             uniProtRequest.setQuery(getQueryFieldName("active") + ":" + true);
         } else if (needToAddActiveFilter(uniProtRequest)) {
             uniProtRequest.setQuery(
                     uniProtRequest.getQuery() + " AND " + getQueryFieldName("active") + ":" + true);
+        } else if (ACCESSION_REGEX_ISOFORM.matcher(cleanQuery.toUpperCase()).matches()) {
+            uniProtRequest.setQuery(cleanQuery.toUpperCase());
         }
 
         // fill the common params from the basic service class
@@ -290,7 +307,7 @@ public class UniProtEntryService
         solrRequest.setFilterQueries(queries);
     }
 
-    private StoreRequest buildStoreRequest(BasicRequest request) {
+    public StoreRequest buildStoreRequest(BasicRequest request) {
         List<ReturnField> fieldList =
                 OutputFieldsParser.parse(request.getFields(), returnFieldConfig);
         StoreRequest.StoreRequestBuilder storeRequest = StoreRequest.builder();

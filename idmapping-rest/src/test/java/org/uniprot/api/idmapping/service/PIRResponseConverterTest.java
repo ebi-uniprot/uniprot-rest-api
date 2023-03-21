@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.uniprot.api.idmapping.model.PredefinedIdMappingStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.idmapping.service.PIRResponseConverter.isValidIdPattern;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.UNIPROTKB_STR;
 
@@ -26,9 +26,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpServerErrorException;
-import org.uniprot.api.idmapping.controller.request.IdMappingJobRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 class PIRResponseConverterTest {
     private PIRResponseConverter converter;
@@ -329,7 +329,7 @@ class PIRResponseConverterTest {
         assertFalse(result.getWarnings().isEmpty());
         assertEquals(1, result.getWarnings().size());
         assertEquals(
-                ENRICHMENT_WARNING.getMessage() + maxCountForDataEnrich,
+                ENRICHMENT_WARNING.getErrorMessage(maxCountForDataEnrich),
                 result.getWarnings().get(0).getMessage());
         assertThat(result.getUnmappedIds(), is(emptyList()));
     }
@@ -365,7 +365,7 @@ class PIRResponseConverterTest {
         assertThat(result.getUnmappedIds(), is(emptyList()));
         assertEquals(1, result.getErrors().size());
         assertEquals(
-                "Id Mapping API is not supported for mapping results with \"mapped to\" IDs more than 4",
+                "Id Mapping API is not supported for mapping results with more than 4 \"mapped to\" IDs",
                 result.getErrors().get(0).getMessage());
         assertEquals(40, result.getErrors().get(0).getCode());
     }

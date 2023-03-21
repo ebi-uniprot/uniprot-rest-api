@@ -37,7 +37,8 @@ public class UniProtSolrQueryConfig {
     @Bean
     public UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig(
             WhitelistFieldConfig whiteListFieldConfig,
-            SearchFieldConfig uniProtKBSearchFieldConfig) {
+            SearchFieldConfig uniProtKBSearchFieldConfig,
+            SolrQueryConfig uniProtKBSolrQueryConf) {
         Map<String, String> uniprotWhiteListFields =
                 whiteListFieldConfig
                         .getField()
@@ -49,6 +50,7 @@ public class UniProtSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(uniProtKBSearchFieldConfig))
                 .whiteListFields(uniprotWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .leadingWildcardFields(uniProtKBSolrQueryConf.getLeadingWildcardFields())
                 .build();
     }
 

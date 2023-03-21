@@ -14,12 +14,11 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.repository.IdMappingRepository;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.store.search.SolrCollection;
 
 public class SolrJobTask extends JobTask {
     private final IdMappingRepository repo;
-
-    private static final int EXCEPTION_CODE = 50;
 
     public SolrJobTask(
             IdMappingJob job, IdMappingJobCacheService cacheService, IdMappingRepository repo) {
@@ -43,7 +42,10 @@ public class SolrJobTask extends JobTask {
         }
 
         return IdMappingResult.builder()
-                .error(new ProblemPair(EXCEPTION_CODE, "unsupported collection"))
+                .error(
+                        new ProblemPair(
+                                PredefinedAPIStatus.SERVER_ERROR.getCode(),
+                                "unsupported collection"))
                 .build();
     }
 
@@ -54,7 +56,10 @@ public class SolrJobTask extends JobTask {
             mappedIdsFromSolr = repo.getAllMappingIds(collection, inputJobIds);
         } catch (SolrServerException | IOException e) {
             return IdMappingResult.builder()
-                    .error(new ProblemPair(EXCEPTION_CODE, "Mapping request got failed"))
+                    .error(
+                            new ProblemPair(
+                                    PredefinedAPIStatus.SERVER_ERROR.getCode(),
+                                    "Mapping request got failed"))
                     .build();
         }
 

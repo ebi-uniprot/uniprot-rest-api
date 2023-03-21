@@ -65,7 +65,6 @@ public class ResultsConfig {
     @Bean
     public TupleStreamTemplate tupleStreamTemplate(
             StreamerConfigProperties configProperties,
-            HttpClient httpClient,
             @Qualifier("uniProtKBSolrClient") SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
@@ -77,26 +76,31 @@ public class ResultsConfig {
 
     @Bean
     public StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer(
+            StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
+            TaxonomyLineageService taxonomyLineageService) {
+        return new UniProtKBStoreStreamer(storeStreamerConfig, taxonomyLineageService);
+    }
+
+    @Bean
+    public StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig(
             UniProtKBStoreClient uniProtClient,
             TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("streamConfig") StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream,
-            TaxonomyLineageService taxonomyLineageService) {
+            TupleStreamDocumentIdStream documentIdStream) {
+
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
                         .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
 
-        StoreStreamerConfig<UniProtKBEntry> config =
-                StoreStreamerConfig.<UniProtKBEntry>builder()
-                        .streamConfig(streamConfig)
-                        .storeClient(uniProtClient)
-                        .tupleStreamTemplate(tupleStreamTemplate)
-                        .storeFetchRetryPolicy(storeRetryPolicy)
-                        .documentIdStream(documentIdStream)
-                        .build();
-        return new UniProtKBStoreStreamer(config, taxonomyLineageService);
+        return StoreStreamerConfig.<UniProtKBEntry>builder()
+                .streamConfig(streamConfig)
+                .storeClient(uniProtClient)
+                .tupleStreamTemplate(tupleStreamTemplate)
+                .storeFetchRetryPolicy(storeRetryPolicy)
+                .documentIdStream(documentIdStream)
+                .build();
     }
 
     @Bean(name = "streamConfig")

@@ -52,7 +52,9 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
         StreamFactory streamFactory =
                 getStreamFactory(streamConfig.getZkHost(), streamConfig.getCollection());
 
-        validateResponse(request);
+        if (request.isLargeSolrStreamRestricted()) { // skip validation for download
+            validateResponse(request);
+        }
 
         TupleStreamBuilder streamBuilder =
                 TupleStreamBuilder.builder()
@@ -72,6 +74,7 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
                             .query(request.getQuery())
                             .filterQueries(request.getFilterQueries())
                             .queryConfig(request.getQueryConfig())
+                            .queryField(request.getQueryField())
                             .rows(0)
                             .build();
             try {
