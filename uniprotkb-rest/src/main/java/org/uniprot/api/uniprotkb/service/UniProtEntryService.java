@@ -68,7 +68,7 @@ public class UniProtEntryService
     private final RDFStreamer uniProtRDFStreamer;
 
     private static final Pattern ACCESSION_REGEX_ISOFORM =
-            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX_ISOFORM);
+            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
 
     private static final Pattern CLEAN_QUERY_REGEX =
             Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
