@@ -37,6 +37,7 @@ public abstract class BasicDownloadController<T> extends BasicSearchController<T
             case NEW:
             case RUNNING:
             case FINISHED:
+            case UNFINISHED:
                 response = ResponseEntity.ok(new JobStatusResponse(job.getStatus()));
                 break;
             default:

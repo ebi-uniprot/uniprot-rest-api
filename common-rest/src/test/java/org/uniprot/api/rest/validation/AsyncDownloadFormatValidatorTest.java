@@ -113,6 +113,32 @@ class AsyncDownloadFormatValidatorTest {
         assertFalse(result);
     }
 
+    @Test
+    void isValidWithShortH5Format() {
+        HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
+        String contentType = "h5";
+        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
+                .thenReturn(contentType);
+
+        FakeFormatValidator validator = new FakeFormatValidator();
+        validator.mockedValidFormats.add(UniProtMediaType.HDF5_MEDIA_TYPE_VALUE);
+        boolean result = validator.isValid(contentType, null);
+        assertTrue(result);
+    }
+
+    @Test
+    void isValidWithFullH5Format() {
+        HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
+        String contentType = "application/x-hdf5";
+        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
+                .thenReturn(contentType);
+
+        FakeFormatValidator validator = new FakeFormatValidator();
+        validator.mockedValidFormats.add(UniProtMediaType.HDF5_MEDIA_TYPE_VALUE);
+        boolean result = validator.isValid(contentType, null);
+        assertTrue(result);
+    }
+
     static class FakeFormatValidator extends ValidAsyncDownloadFormats.FormatsValidator {
         final List<String> errorFields = new ArrayList<>();
 
