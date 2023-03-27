@@ -26,7 +26,8 @@ public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements 
                 APPLICATION_XML_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                HDF5_MEDIA_TYPE_VALUE
             })
     private String format;
 

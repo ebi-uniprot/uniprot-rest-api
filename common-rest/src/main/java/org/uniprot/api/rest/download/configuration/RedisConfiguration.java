@@ -16,7 +16,6 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.uniprot.api.rest.download.model.DownloadJob;
 
 /**
- *
  * @author sahmad
  * @created 22/12/2022
  */

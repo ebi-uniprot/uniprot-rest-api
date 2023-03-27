@@ -8,6 +8,7 @@ package org.uniprot.api.rest.download.model;
 public enum JobStatus {
     NEW,
     RUNNING,
+    UNFINISHED,
     FINISHED,
     ERROR
 }

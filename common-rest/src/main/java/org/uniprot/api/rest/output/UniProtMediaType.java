@@ -31,6 +31,9 @@ public class UniProtMediaType {
     public static final MediaType OBO_MEDIA_TYPE = valueOf(OBO_MEDIA_TYPE_VALUE);
     public static final String RDF_MEDIA_TYPE_VALUE = "application/rdf+xml";
     public static final MediaType RDF_MEDIA_TYPE = valueOf(RDF_MEDIA_TYPE_VALUE);
+
+    public static final String HDF5_MEDIA_TYPE_VALUE = "application/x-hdf5";
+    public static final MediaType HDF5_MEDIA_TYPE = valueOf(HDF5_MEDIA_TYPE_VALUE);
     public static final String MARKDOWN_MEDIA_TYPE_VALUE = TEXT_MARKDOWN_VALUE;
     public static final MediaType MARKDOWN_MEDIA_TYPE = MediaType.TEXT_MARKDOWN;
     public static final String UNKNOWN_MEDIA_TYPE_VALUE = "unknown" + "/unknown";
@@ -47,6 +50,7 @@ public class UniProtMediaType {
                     MARKDOWN_MEDIA_TYPE,
                     OBO_MEDIA_TYPE,
                     RDF_MEDIA_TYPE,
+                    HDF5_MEDIA_TYPE,
                     MediaType.APPLICATION_JSON,
                     MediaType.APPLICATION_XML);
 
@@ -58,6 +62,7 @@ public class UniProtMediaType {
         mediaTypeExtensionMap.put(XLS_MEDIA_TYPE, "xlsx");
         mediaTypeExtensionMap.put(RDF_MEDIA_TYPE, "rdf");
         mediaTypeExtensionMap.put(MARKDOWN_MEDIA_TYPE, "md");
+        mediaTypeExtensionMap.put(HDF5_MEDIA_TYPE, "h5");
 
         ALL_TYPES.forEach(
                 mediaType -> {

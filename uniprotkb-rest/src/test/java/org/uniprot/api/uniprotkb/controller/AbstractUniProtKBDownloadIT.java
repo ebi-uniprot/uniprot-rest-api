@@ -89,6 +89,9 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     @Value(("${async.download.rejectedQueueName}"))
     protected String rejectedQueue;
 
+    @Value(("${async.download.embeddings.queueName}"))
+    protected String embeddingsQueue;
+
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
     private final UniProtEntryConverter documentConverter =
