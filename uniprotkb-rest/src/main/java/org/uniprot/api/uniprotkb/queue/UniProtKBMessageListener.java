@@ -1,7 +1,5 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import static org.uniprot.api.rest.download.queue.RabbitProducerMessageService.JOB_ID;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -338,7 +336,7 @@ public class UniProtKBMessageListener implements MessageListener {
                 "Sending h5 message to embeddings queue for further processing for jobId {}",
                 jobId);
         MessageProperties msgProps = new MessageProperties();
-        msgProps.setHeader(JOB_ID, jobId);
+        msgProps.setHeader(JOB_ID_HEADER, jobId);
         Message message = new Message(new byte[] {}, msgProps);
         this.rabbitTemplate.send(
                 this.embeddingsQueueConfigProps.getExchangeName(),

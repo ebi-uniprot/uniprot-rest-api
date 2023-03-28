@@ -4,7 +4,7 @@ import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.b
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
 import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ import org.uniprot.store.search.SolrCollection;
 
 import com.jayway.jsonpath.JsonPath;
 
-@ActiveProfiles(profiles = {"offline", "asyncDownload"})
+@ActiveProfiles(profiles = {"offline", "asyncDownload", "integration"})
 @EnableConfigurationProperties
 @PropertySource("classpath:application.properties")
 @ContextConfiguration(
@@ -70,7 +70,8 @@ import com.jayway.jsonpath.JsonPath;
             UniProtKBREST.class,
             UniProtStoreConfig.class,
             AsyncDownloadTestConfig.class,
-            RedisConfiguration.class
+            RedisConfiguration.class,
+            EmbeddingsTestConsumer.class
         })
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -214,9 +215,10 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // after certain delay the job should be reprocessed from kb side
         await().until(jobUnfinished(jobId));
         verifyRedisEntry(query, jobId, List.of(JobStatus.UNFINISHED), 1, true);
-        await().until(
-                        getMessageCountInQueue(this.embeddingsQueue),
-                        Matchers.greaterThanOrEqualTo(1));
+        // then job should be picked by embeddings consumers and set to Running again
+        //        await().until(jobRunning(jobId));
+        // the job should be completed after sometime by embeddings consumer
+        await().until(jobFinished(jobId));
         // verify ids file generated from solr
         verifyIdsFile(jobId);
         // verify result file doesn't exist yet
@@ -290,6 +292,13 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
                 this.downloadJobRepository.existsById(jobId)
                         && this.downloadJobRepository.findById(jobId).get().getStatus()
                                 == JobStatus.UNFINISHED;
+    }
+
+    private Callable<Boolean> jobRunning(String jobId) {
+        return () ->
+                this.downloadJobRepository.existsById(jobId)
+                        && this.downloadJobRepository.findById(jobId).get().getStatus()
+                                == JobStatus.RUNNING;
     }
 
     private Callable<Boolean> jobRetriedMaximumTimes(String jobId) {
