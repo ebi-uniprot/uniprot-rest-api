@@ -18,4 +18,6 @@ public class EmbeddingsQueueConfigProperties {
     private String deadLetterQueue;
 
     private int prefetchCount;
+
+    private int ttlInMillis;
 }
