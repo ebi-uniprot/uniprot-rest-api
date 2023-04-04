@@ -24,6 +24,7 @@ public class EmbeddingsRabbitMQConfig {
     @Bean
     public Queue embeddingsQueue(EmbeddingsQueueConfigProperties queueConfigProperties) {
         return QueueBuilder.durable(queueConfigProperties.getQueueName())
+                .ttl(queueConfigProperties.getTtlInMillis())
                 .deadLetterExchange(queueConfigProperties.getExchangeName())
                 .deadLetterRoutingKey(queueConfigProperties.getDeadLetterQueue())
                 .quorum()
