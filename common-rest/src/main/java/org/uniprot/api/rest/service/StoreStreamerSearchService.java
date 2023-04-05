@@ -20,10 +20,13 @@ import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.Document;
+
+import static org.uniprot.api.rest.request.UniProtKBRequestUtil.*;
 
 public abstract class StoreStreamerSearchService<D extends Document, R>
         extends BasicSearchService<D, R> {
@@ -161,6 +164,6 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     }
 
     private boolean hasIsoformIds(List<String> ids) {
-        return ids.stream().anyMatch(id -> id.contains("-"));
+        return ids.stream().anyMatch(id -> id.contains(DASH));
     }
 }

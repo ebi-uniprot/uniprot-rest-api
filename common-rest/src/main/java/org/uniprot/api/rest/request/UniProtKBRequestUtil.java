@@ -28,7 +28,7 @@ public class UniProtKBRequestUtil {
 
     private static final Pattern ACCESSION_REGEX_ISOFORM =
             Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
-    private static final String DASH = "-";
+    public static final String DASH = "-";
 
     public static boolean needsToFilterIsoform(
             String accessionIdField,
