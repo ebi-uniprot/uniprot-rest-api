@@ -87,22 +87,6 @@ public class SolrStreamFacetRequest {
             SolrQueryConfig solrQueryConfig,
             UniProtDataType uniProtDataType,
             String solrIdField,
-            List<String> ids,
-            SearchRequest searchRequest) {
-        return createSolrStreamFacetRequest(
-                solrQueryConfig,
-                uniProtDataType,
-                solrIdField,
-                solrIdField,
-                ids,
-                searchRequest,
-                false);
-    }
-
-    public static SolrStreamFacetRequest createSolrStreamFacetRequest(
-            SolrQueryConfig solrQueryConfig,
-            UniProtDataType uniProtDataType,
-            String solrIdField,
             String termsQueryField,
             List<String> ids,
             SearchRequest searchRequest,

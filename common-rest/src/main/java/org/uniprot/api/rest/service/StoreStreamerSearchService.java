@@ -20,10 +20,13 @@ import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.Document;
+
+import static org.uniprot.api.rest.request.UniProtKBRequestUtil.*;
 
 public abstract class StoreStreamerSearchService<D extends Document, R>
         extends BasicSearchService<D, R> {
@@ -80,15 +83,16 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     }
 
     public QueryResult<R> getByIds(IdsSearchRequest idsRequest) {
+        boolean hasIsoformIds = hasIsoformIds(idsRequest.getIdList());
         SolrStreamFacetResponse solrStreamResponse =
-                solrStreamNeeded(idsRequest)
-                        ? searchBySolrStream(idsRequest)
+                solrStreamNeeded(idsRequest, hasIsoformIds)
+                        ? searchBySolrStream(idsRequest, hasIsoformIds)
                         : new SolrStreamFacetResponse();
 
         // use the ids returned by solr stream if query filter is passed or sort field is passed
         // otherwise use the passed ids
         List<String> ids =
-                needSolrReturnedAccessions(idsRequest)
+                needSolrReturnedAccessions(idsRequest, hasIsoformIds)
                         ? solrStreamResponse.getIds()
                         : idsRequest.getIdList();
         // default page size to number of ids passed
@@ -125,28 +129,41 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
     protected abstract String getSolrIdField();
 
-    private SolrStreamFacetResponse searchBySolrStream(IdsSearchRequest idsRequest) {
+    protected String getTermsQueryField() {
+        return getSolrIdField();
+    }
+
+    private SolrStreamFacetResponse searchBySolrStream(
+            IdsSearchRequest idsRequest, boolean includeIsoform) {
         SolrStreamFacetRequest solrStreamRequest =
                 SolrStreamFacetRequest.createSolrStreamFacetRequest(
                         this.solrQueryConfig,
                         getUniProtDataType(),
                         getSolrIdField(),
+                        getTermsQueryField(),
                         idsRequest.getIdList(),
-                        idsRequest);
+                        idsRequest,
+                        includeIsoform);
         TupleStream tupleStream = this.tupleStreamTemplate.create(solrStreamRequest, facetConfig);
         return this.tupleStreamConverter.convert(tupleStream, idsRequest.getFacetList());
     }
 
-    private boolean solrStreamNeeded(IdsSearchRequest idsRequest) {
+    private boolean solrStreamNeeded(IdsSearchRequest idsRequest, boolean hasIsoformIds) {
         return (Utils.nullOrEmpty(idsRequest.getCursor())
                         && Utils.notNullNotEmpty(idsRequest.getFacetList())
                         && !idsRequest.isDownload())
                 || Utils.notNullNotEmpty(idsRequest.getQuery())
-                || Utils.notNullNotEmpty(idsRequest.getSort());
+                || Utils.notNullNotEmpty(idsRequest.getSort())
+                || hasIsoformIds;
     }
 
-    private boolean needSolrReturnedAccessions(IdsSearchRequest idsRequest) {
+    private boolean needSolrReturnedAccessions(IdsSearchRequest idsRequest, boolean hasIsoformIds) {
         return Utils.notNullNotEmpty(idsRequest.getQuery())
-                || Utils.notNullNotEmpty(idsRequest.getSort());
+                || Utils.notNullNotEmpty(idsRequest.getSort())
+                || hasIsoformIds;
+    }
+
+    private boolean hasIsoformIds(List<String> ids) {
+        return ids.stream().anyMatch(id -> id.contains(DASH));
     }
 }
