@@ -43,6 +43,7 @@ public class UniProtKBMessageListener implements MessageListener {
 
     static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
+    public static final String JOB_ID_HEADER = "jobId";
 
     private final MessageConverter converter;
     private final UniProtEntryService service;
@@ -81,7 +82,7 @@ public class UniProtKBMessageListener implements MessageListener {
         String jobId = null;
         DownloadJob downloadJob = null;
         try {
-            jobId = message.getMessageProperties().getHeader("jobId");
+            jobId = message.getMessageProperties().getHeader(JOB_ID_HEADER);
             log.info("Received job {} in listener", jobId);
             if (isMaxRetriedReached(message)) {
                 sendToUndeliveredQueue(jobId, message);
@@ -98,9 +99,12 @@ public class UniProtKBMessageListener implements MessageListener {
 
             processMessage(message, downloadJob);
             // get the fresh object from redis
-            downloadJob = this.jobRepository.findById(jobId).get();
-            if (downloadJob.getStatus() == JobStatus.FINISHED) {
-                log.info("Message with jobId {} processed successfully", jobId);
+            optDownloadJob = this.jobRepository.findById(jobId);
+            if(optDownloadJob.isPresent()) {
+                downloadJob = optDownloadJob.get();
+                if (downloadJob.getStatus() == JobStatus.FINISHED) {
+                    log.info("Message with jobId {} processed successfully", jobId);
+                }
             }
         } catch (Exception ex) {
             if (getRetryCountByBroker(message) <= this.maxRetryCount) {
@@ -202,7 +206,7 @@ public class UniProtKBMessageListener implements MessageListener {
                 Math.max(
                         Objects.nonNull(retryCountHandledError) ? retryCountHandledError : 0,
                         retryCountUnhandledError);
-        String jobId = message.getMessageProperties().getHeader("jobId");
+        String jobId = message.getMessageProperties().getHeader(JOB_ID_HEADER);
         log.info("retryCount for job {} is {}", jobId, retryCount);
         return retryCount;
     }
@@ -218,7 +222,7 @@ public class UniProtKBMessageListener implements MessageListener {
         }
 
         if (retriedByBroker > 0) {
-            String jobId = message.getMessageProperties().getHeader("jobId");
+            String jobId = message.getMessageProperties().getHeader(JOB_ID_HEADER);
             log.error(
                     "This x-death retry count {} should be null, something unexpected has happened during processing of job {}",
                     retriedByBroker,

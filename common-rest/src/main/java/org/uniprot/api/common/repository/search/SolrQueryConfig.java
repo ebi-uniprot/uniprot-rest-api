@@ -28,6 +28,9 @@ public class SolrQueryConfig {
     private String queryFields;
 
     @Setter(AccessLevel.NONE)
+    private String extraOptmisableQueryFields;
+
+    @Setter(AccessLevel.NONE)
     private Set<String> stopWords;
 
     @Setter(AccessLevel.NONE)
@@ -71,6 +74,15 @@ public class SolrQueryConfig {
                     Arrays.stream(leadingWildcardFields.split(","))
                             .map(String::trim)
                             .collect(Collectors.toSet());
+            return this;
+        }
+
+        public SolrQueryConfigBuilder extraOptmisableQueryFields(
+                String extraOptmisableQueryFields) {
+            this.extraOptmisableQueryFields =
+                    Arrays.stream(extraOptmisableQueryFields.split(","))
+                            .map(String::trim)
+                            .collect(Collectors.joining(" "));
             return this;
         }
     }
