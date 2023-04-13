@@ -157,8 +157,13 @@ public class UniProtKBMessageListener implements MessageListener {
     }
 
     private void processH5Message(UniProtKBDownloadRequest request, Path idsFile, String jobId) {
-        writeSolrResult(request, idsFile, jobId);
-        sendMessageToEmbeddingsQueue(jobId);
+        try {
+            writeSolrResult(request, idsFile, jobId);
+            sendMessageToEmbeddingsQueue(jobId);
+        } catch (Exception ex) {
+            logMessageAndDeleteFile(ex, jobId);
+            throw new MessageListenerException(ex);
+        }
     }
 
     private static boolean isJobSeenBefore(DownloadJob downloadJob, Path idsFile, Path resultFile) {
@@ -180,15 +185,11 @@ public class UniProtKBMessageListener implements MessageListener {
         }
     }
 
-    private void writeSolrResult(DownloadRequest request, Path idsFile, String jobId) {
-        try {
-            Stream<String> ids = streamIds(request);
-            saveIdsInTempFile(idsFile, ids);
-            log.info("Solr ids saved for job {}", jobId);
-        } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId);
-            throw new MessageListenerException(ex);
-        }
+    private void writeSolrResult(DownloadRequest request, Path idsFile, String jobId)
+            throws IOException {
+        Stream<String> ids = streamIds(request);
+        saveIdsInTempFile(idsFile, ids);
+        log.info("Solr ids saved for job {}", jobId);
     }
 
     private void saveIdsInTempFile(Path filePath, Stream<String> ids) throws IOException {
