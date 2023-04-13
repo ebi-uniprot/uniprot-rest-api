@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -23,6 +24,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     private final UniProtQueryProcessorConfig diseaseQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final RDFStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<DiseaseDocument> documentIdStream;
 
     public DiseaseService(
             DiseaseRepository diseaseRepository,
@@ -31,6 +33,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
             SolrQueryConfig diseaseSolrQueryConf,
             UniProtQueryProcessorConfig diseaseQueryProcessorConfig,
             SearchFieldConfig diseaseSearchFieldConfig,
+            DefaultDocumentIdStream<DiseaseDocument> documentIdStream,
             @Qualifier("diseaseRDFStreamer") RDFStreamer rdfStreamer) {
 
         super(
@@ -42,6 +45,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
         this.diseaseQueryProcessorConfig = diseaseQueryProcessorConfig;
         this.searchFieldConfig = diseaseSearchFieldConfig;
         this.rdfStreamer = rdfStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -52,6 +56,11 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     @Override
     protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return diseaseQueryProcessorConfig;
+    }
+
+    @Override
+    protected DefaultDocumentIdStream<DiseaseDocument> getDocumentIdStream() {
+        return documentIdStream;
     }
 
     @Override

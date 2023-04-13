@@ -1,26 +1,13 @@
 package org.uniprot.api.rest.service;
 
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
-
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.*;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -33,6 +20,16 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
 
 /**
  * @param <D> the type of the input to the class. a type of Document
@@ -240,8 +237,13 @@ public abstract class BasicSearchService<D extends Document, R> {
                         .rows(getDefaultBatchSize())
                         .totalRows(Integer.MAX_VALUE)
                         .build();
-        return getRDFStreamer().idsToRDFStoreStream(solrRequest);
+        return getRDFStreamer().streamRDFXML(getDocumentIdStream().fetchIds(solrRequest).collect(Collectors.toList()).stream());
     }
+
+    protected DefaultDocumentIdStream<D> getDocumentIdStream() {
+        throw new UnsupportedOperationException("Override this method");
+    }
+
 
     public String getRDFXml(String id) {
         return getRDFStreamer().streamRDFXML(Stream.of(id)).collect(Collectors.joining());

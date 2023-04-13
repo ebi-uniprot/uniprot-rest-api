@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -24,6 +25,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
     private final UniProtQueryProcessorConfig crossRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final RDFStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<CrossRefDocument> documentIdStream;
 
     public CrossRefService(
             CrossRefRepository crossRefRepository,
@@ -33,6 +35,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
             SolrQueryConfig crossRefSolrQueryConf,
             UniProtQueryProcessorConfig crossRefQueryProcessorConfig,
             SearchFieldConfig crossRefSearchFieldConfig,
+            DefaultDocumentIdStream<CrossRefDocument> documentIdStream,
             @Qualifier("xrefRDFStreamer") RDFStreamer xrefRDFStreamer) {
         super(
                 crossRefRepository,
@@ -43,6 +46,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
         this.crossRefQueryProcessorConfig = crossRefQueryProcessorConfig;
         this.searchFieldConfig = crossRefSearchFieldConfig;
         this.rdfStreamer = xrefRDFStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -53,6 +57,11 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
     @Override
     protected UniProtQueryProcessorConfig getQueryProcessorConfig() {
         return crossRefQueryProcessorConfig;
+    }
+
+    @Override
+    protected DefaultDocumentIdStream<CrossRefDocument> getDocumentIdStream() {
+        return documentIdStream;
     }
 
     @Override
