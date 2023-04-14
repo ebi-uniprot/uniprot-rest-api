@@ -33,7 +33,8 @@ class UniProtMediaTypeTest {
         RDF_MEDIA_TYPE_VALUE + ",rdf",
         MARKDOWN_MEDIA_TYPE_VALUE + ",md",
         APPLICATION_XML_VALUE + ",xml",
-        APPLICATION_JSON_VALUE + ",json"
+        APPLICATION_JSON_VALUE + ",json",
+        HDF5_MEDIA_TYPE_VALUE + ",h5"
     })
     void checkMediaTypeFileExtensionRoundTrip(String mediaTypeStr, String extension) {
         MediaType mediaType = valueOf(mediaTypeStr);
