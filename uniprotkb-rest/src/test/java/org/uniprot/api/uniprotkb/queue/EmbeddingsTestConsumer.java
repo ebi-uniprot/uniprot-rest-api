@@ -17,8 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.queue.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 
 @TestConfiguration
 @Slf4j

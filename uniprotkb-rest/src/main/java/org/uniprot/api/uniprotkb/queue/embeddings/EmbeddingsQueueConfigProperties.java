@@ -1,4 +1,4 @@
-package org.uniprot.api.rest.download.queue;
+package org.uniprot.api.uniprotkb.queue.embeddings;
 
 import lombok.Data;
 
