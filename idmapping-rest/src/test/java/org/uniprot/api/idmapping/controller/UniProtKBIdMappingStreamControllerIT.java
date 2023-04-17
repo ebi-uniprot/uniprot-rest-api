@@ -8,7 +8,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 
@@ -468,5 +467,28 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                                 .string(
                                         containsString(
                                                 "Invalid request received. Unable to compute fasta subsequence for IDs: Q00002,Q00003. Expected format is accession[begin-end], for example:Q00001[10-20]")));
+    }
+
+    @Test
+    void testIdMappingWithSubSequenceRepeatedAccessionValid() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR,
+                                UNIPROTKB_STR,
+                                "Q00001[10-20],Q00001[20-30],Q00002[20-30]");
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param("subsequence", "true"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString(">tr|Q00001|10-20\nLVVVTMATLSL\n")))
+                .andExpect(content().string(containsString(">tr|Q00001|20-30\nLARPSFSLVED\n")))
+                .andExpect(content().string(containsString(">sp|Q00002|20-30\nLARPSFSLVED")));
     }
 }
