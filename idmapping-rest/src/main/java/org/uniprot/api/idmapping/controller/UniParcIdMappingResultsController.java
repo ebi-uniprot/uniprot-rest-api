@@ -53,6 +53,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "/"
                         + UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH)
 public class UniParcIdMappingResultsController extends BasicSearchController<UniParcEntryPair> {
+    private static final String TYPE = "uniparc";
     public static final String UNIPARC_ID_MAPPING_PATH = "uniparc";
     private final UniParcIdService idService;
     private final IdMappingJobCacheService cacheService;
@@ -182,11 +183,12 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
         IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
         this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
             Supplier<Stream<String>> result =
                     () ->
                             this.idService.streamRDF(
-                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
+                                    streamRequest, idMappingResult, cachedJobResult.getJobId(), TYPE, acceptedCustomType.get());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniParcEntryPair>> result =

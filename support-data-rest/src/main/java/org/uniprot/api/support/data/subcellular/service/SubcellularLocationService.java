@@ -1,9 +1,9 @@
 package org.uniprot.api.support.data.subcellular.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -28,6 +28,7 @@ public class SubcellularLocationService
     private final UniProtQueryProcessorConfig subcellQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final RDFStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<SubcellularLocationDocument> documentIdStream;
 
     public SubcellularLocationService(
             SubcellularLocationRepository repository,
@@ -36,7 +37,8 @@ public class SubcellularLocationService
             SolrQueryConfig subcellSolrQueryConf,
             UniProtQueryProcessorConfig subcellQueryProcessorConfig,
             SearchFieldConfig subcellSearchFieldConfig,
-            @Qualifier("locationRDFStreamer") RDFStreamer rdfStreamer) {
+            DefaultDocumentIdStream<SubcellularLocationDocument> documentIdStream,
+            RDFStreamer supportDataRdfXmlStreamer) {
         super(
                 repository,
                 subcellularLocationEntryConverter,
@@ -45,7 +47,8 @@ public class SubcellularLocationService
                 null);
         this.subcellQueryProcessorConfig = subcellQueryProcessorConfig;
         this.searchFieldConfig = subcellSearchFieldConfig;
-        this.rdfStreamer = rdfStreamer;
+        this.documentIdStream = documentIdStream;
+        this.rdfStreamer = supportDataRdfXmlStreamer;
     }
 
     @Override
@@ -61,5 +64,10 @@ public class SubcellularLocationService
     @Override
     protected RDFStreamer getRDFStreamer() {
         return this.rdfStreamer;
+    }
+
+    @Override
+    protected DefaultDocumentIdStream<SubcellularLocationDocument> getDocumentIdStream() {
+        return this.documentIdStream    ;
     }
 }

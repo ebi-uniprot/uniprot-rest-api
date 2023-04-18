@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.stream.rdf.RDFXMLStreamer;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -33,8 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
@@ -48,10 +45,9 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
                 "The human diseases in which proteins are involved are "
                         + "described in UniProtKB entries with a controlled vocabulary.")
 public class DiseaseController extends BasicSearchController<DiseaseEntry> {
+    private static final String TYPE = "diseases";
     @Autowired private DiseaseService diseaseService;
     public static final String ACCESSION_REGEX = "DI-(\\d{5})";
-    @Autowired
-    private RDFXMLStreamer rdfxmlStreamer;
 
     protected DiseaseController(
             ApplicationEventPublisher eventPublisher,
@@ -90,7 +86,9 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<DiseaseEntry>> getByAccession(
             @Parameter(description = "disease id to find")
@@ -106,8 +104,9 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        if (isRDFAccept(request)) {
-            String result = this.rdfxmlStreamer.stream(Stream.of(id),"diseases","rdf").collect(Collectors.joining());
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
+            String result = this.diseaseService.getRDFXml(id, TYPE, acceptedCustomType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
 
@@ -179,16 +178,19 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> stream(
             @Valid @ModelAttribute DiseaseStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
             return super.streamRDF(
-                    () -> diseaseService.streamRDF(streamRequest),
+                    () -> diseaseService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
                     streamRequest,
                     contentType,
                     request);

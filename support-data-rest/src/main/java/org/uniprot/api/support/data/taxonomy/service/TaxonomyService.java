@@ -1,10 +1,10 @@
 package org.uniprot.api.support.data.taxonomy.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
@@ -29,6 +29,7 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
     private final UniProtQueryProcessorConfig taxonomyQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
     private final RDFStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<TaxonomyDocument> documentIdStream;
 
     public TaxonomyService(
             TaxonomyRepository repository,
@@ -38,12 +39,14 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
             SolrQueryConfig taxonomySolrQueryConf,
             UniProtQueryProcessorConfig taxonomyQueryProcessorConfig,
             SearchFieldConfig taxonomySearchFieldConfig,
-            @Qualifier("taxonomyRDFStreamer") RDFStreamer rdfStreamer) {
+            RDFStreamer supportDataRdfXmlStreamer,
+            DefaultDocumentIdStream<TaxonomyDocument> documentIdStream) {
 
         super(repository, converter, taxonomySortClause, taxonomySolrQueryConf, facetConfig);
         this.taxonomyQueryProcessorConfig = taxonomyQueryProcessorConfig;
         this.searchFieldConfig = taxonomySearchFieldConfig;
-        this.rdfStreamer = rdfStreamer;
+        this.rdfStreamer = supportDataRdfXmlStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -83,5 +86,10 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
     @Override
     protected RDFStreamer getRDFStreamer() {
         return this.rdfStreamer;
+    }
+
+    @Override
+    protected DefaultDocumentIdStream<TaxonomyDocument> getDocumentIdStream() {
+        return this.documentIdStream;
     }
 }

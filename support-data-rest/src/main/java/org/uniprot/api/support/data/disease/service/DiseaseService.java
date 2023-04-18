@@ -1,6 +1,5 @@
 package org.uniprot.api.support.data.disease.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -34,7 +33,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
             UniProtQueryProcessorConfig diseaseQueryProcessorConfig,
             SearchFieldConfig diseaseSearchFieldConfig,
             DefaultDocumentIdStream<DiseaseDocument> documentIdStream,
-            @Qualifier("diseaseRDFStreamer") RDFStreamer rdfStreamer) {
+            RDFStreamer supportDataRdfXmlStreamer) {
 
         super(
                 diseaseRepository,
@@ -44,7 +43,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 null);
         this.diseaseQueryProcessorConfig = diseaseQueryProcessorConfig;
         this.searchFieldConfig = diseaseSearchFieldConfig;
-        this.rdfStreamer = rdfStreamer;
+        this.rdfStreamer = supportDataRdfXmlStreamer;
         this.documentIdStream = documentIdStream;
     }
 
@@ -65,6 +64,6 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
 
     @Override
     protected RDFStreamer getRDFStreamer() {
-        return this.rdfStreamer;
+        return rdfStreamer;
     }
 }

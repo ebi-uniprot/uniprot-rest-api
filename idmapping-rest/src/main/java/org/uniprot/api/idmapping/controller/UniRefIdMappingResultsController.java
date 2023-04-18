@@ -1,17 +1,11 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
-
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -32,12 +26,16 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
 /**
  * @author lgonzales
@@ -51,6 +49,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "/"
                         + UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH)
 public class UniRefIdMappingResultsController extends BasicSearchController<UniRefEntryPair> {
+    private static final String TYPE = "uniref";
     public static final String UNIREF_ID_MAPPING_PATH = "uniref";
     private final UniRefIdService idService;
     private final IdMappingJobCacheService cacheService;
@@ -163,11 +162,12 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
         IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
         this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
             Supplier<Stream<String>> result =
                     () ->
                             this.idService.streamRDF(
-                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
+                                    streamRequest, idMappingResult, cachedJobResult.getJobId(), TYPE, acceptedCustomType.get());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniRefEntryPair>> result =

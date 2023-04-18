@@ -1,14 +1,6 @@
 package org.uniprot.api.idmapping.service.impl;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import net.jodah.failsafe.RetryPolicy;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -40,6 +32,13 @@ import org.uniprot.store.config.returnfield.model.ReturnField;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 /**
  * @author sahmad
  * @created 16/02/2021
@@ -70,7 +69,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
             UniprotKBMappingRepository repository,
             UniProtKBFacetConfig facetConfig,
-            RDFStreamer uniProtKBRDFStreamer,
+            RDFStreamer idMappingRdfXmlStreamer,
             UniProtStoreClient<UniProtKBEntry> storeClient,
             SolrQueryConfig uniProtKBSolrQueryConf,
             TaxonomyLineageService lineageService) {
@@ -78,7 +77,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 storeStreamer,
                 tupleStream,
                 facetConfig,
-                uniProtKBRDFStreamer,
+                idMappingRdfXmlStreamer,
                 uniProtKBSolrQueryConf);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;

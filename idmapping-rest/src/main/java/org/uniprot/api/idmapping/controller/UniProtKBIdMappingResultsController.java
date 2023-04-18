@@ -57,6 +57,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "/"
                         + UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH)
 public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKBEntryPair> {
+    private static final String TYPE = "uniprotkb";
     public static final String UNIPROTKB_ID_MAPPING_PATH = "uniprotkb";
     private final UniProtKBIdService idService;
     private final IdMappingJobCacheService cacheService;
@@ -199,11 +200,12 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
         IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
         this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
             Supplier<Stream<String>> result =
                     () ->
                             this.idService.streamRDF(
-                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
+                                    streamRequest, idMappingResult, cachedJobResult.getJobId(), TYPE, acceptedCustomType.get());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniProtKBEntryPair>> result =

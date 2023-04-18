@@ -1,6 +1,5 @@
 package org.uniprot.api.support.data.crossref.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -36,7 +35,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
             UniProtQueryProcessorConfig crossRefQueryProcessorConfig,
             SearchFieldConfig crossRefSearchFieldConfig,
             DefaultDocumentIdStream<CrossRefDocument> documentIdStream,
-            @Qualifier("xrefRDFStreamer") RDFStreamer xrefRDFStreamer) {
+            RDFStreamer supportDataRdfXmlStreamer) {
         super(
                 crossRefRepository,
                 toCrossRefEntryConverter,
@@ -45,8 +44,8 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
                 crossRefFacetConfig);
         this.crossRefQueryProcessorConfig = crossRefQueryProcessorConfig;
         this.searchFieldConfig = crossRefSearchFieldConfig;
-        this.rdfStreamer = xrefRDFStreamer;
         this.documentIdStream = documentIdStream;
+        this.rdfStreamer = supportDataRdfXmlStreamer;
     }
 
     @Override

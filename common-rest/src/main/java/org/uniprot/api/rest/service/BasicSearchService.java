@@ -231,22 +231,22 @@ public abstract class BasicSearchService<D extends Document, R> {
         return this.solrBatchSize == null ? DEFAULT_SOLR_BATCH_SIZE : this.solrBatchSize;
     }
 
-    public Stream<String> streamRDF(StreamRequest streamRequest) {
+    public Stream<String> streamRDF(StreamRequest streamRequest, String type, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, queryBoosts)
                         .rows(getDefaultBatchSize())
                         .totalRows(Integer.MAX_VALUE)
                         .build();
-        return getRDFStreamer().streamRDFXML(getDocumentIdStream().fetchIds(solrRequest).collect(Collectors.toList()).stream());
+        Stream<String> idStream = getDocumentIdStream().fetchIds(solrRequest);
+        return getRDFStreamer().stream(idStream, type, format);
     }
 
     protected DefaultDocumentIdStream<D> getDocumentIdStream() {
         throw new UnsupportedOperationException("Override this method");
     }
 
-
-    public String getRDFXml(String id) {
-        return getRDFStreamer().streamRDFXML(Stream.of(id)).collect(Collectors.joining());
+    public String getRDFXml(String id, String type, String format) {
+        return getRDFStreamer().stream(Stream.of(id), type, format).collect(Collectors.joining());
     }
 
     protected RDFStreamer getRDFStreamer() {

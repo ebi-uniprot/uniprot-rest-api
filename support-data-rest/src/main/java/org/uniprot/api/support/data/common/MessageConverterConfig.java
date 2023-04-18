@@ -1,7 +1,5 @@
 package org.uniprot.api.support.data.common;
 
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -31,6 +29,8 @@ import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import java.util.List;
 
 @Configuration
 public class MessageConverterConfig {
@@ -185,6 +185,8 @@ public class MessageConverterConfig {
                                 downloadGatekeeper);
                 converters.add(index++, xrefJsonConverter);
                 converters.add(index, new RDFMessageConverter(downloadGatekeeper));
+                converters.add(index, new TTLMessageConverter(downloadGatekeeper));
+                converters.add(index, new NTMessageConverter(downloadGatekeeper));
             }
         };
     }

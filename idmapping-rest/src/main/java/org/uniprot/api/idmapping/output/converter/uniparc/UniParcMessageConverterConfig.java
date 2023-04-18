@@ -1,25 +1,17 @@
 package org.uniprot.api.idmapping.output.converter.uniparc;
 
-import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CONTEXT;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
-
-import java.util.List;
-
 import org.springframework.http.converter.HttpMessageConverter;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
-import org.uniprot.api.rest.output.converter.RDFMessageConverter;
-import org.uniprot.api.rest.output.converter.TsvMessageConverter;
-import org.uniprot.api.rest.output.converter.XlsMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.core.json.parser.uniparc.UniParcJsonConfig;
 import org.uniprot.core.parser.tsv.uniparc.UniParcEntryValueMapper;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+
+import java.util.List;
+
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 
 /**
  * @author sahmad
@@ -43,6 +35,8 @@ public class UniParcMessageConverterConfig {
                 currentIndex++, new UniParcEntryPairFastaMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new ListMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new RDFMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new TTLMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new NTMessageConverter(downloadGatekeeper));
         converters.add(
                 currentIndex++,
                 new TsvMessageConverter<>(

@@ -65,6 +65,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping(value = UNIPROTKB_RESOURCE)
 public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
+    private static final String TYPE = "uniprotkb";
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
 
@@ -201,8 +202,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         } else if (accessionOrId.contains(".")) {
             return redirectToUniSave(accessionOrId, request);
         } else {
-            if (isRDFAccept(request)) {
-                String rdf = entryService.getRDFXml(accessionOrId);
+            Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+            if (acceptedCustomType.isPresent()) {
+                String rdf = entryService.getRDFXml(accessionOrId, TYPE, acceptedCustomType.get());
                 return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
             } else {
                 UniProtKBEntry entry = entryService.findByUniqueId(accessionOrId, fields);
@@ -267,9 +269,10 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
 
         MediaType contentType = getAcceptHeader(request);
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
             return super.streamRDF(
-                    () -> entryService.streamRDF(streamRequest),
+                    () -> entryService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
                     streamRequest,
                     contentType,
                     request);

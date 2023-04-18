@@ -14,7 +14,8 @@ import java.time.temporal.ChronoUnit;
 public class RDFStreamConfig {
     private RDFStreamConfig() {}
 
-    public static RetryPolicy<Object> rdfRetryPolicy(RDFXMLStreamerConfigProperties rdfConfigProps) {
+    public static RetryPolicy<Object> rdfRetryPolicy(
+            RDFXMLStreamerConfigProperties rdfConfigProps) {
         int rdfRetryDelay = rdfConfigProps.getRetryDelayMillis();
         int maxRdfRetryDelay = rdfRetryDelay * 8;
         return new RetryPolicy<>()

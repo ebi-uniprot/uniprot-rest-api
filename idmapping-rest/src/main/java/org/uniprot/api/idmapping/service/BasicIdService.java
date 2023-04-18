@@ -1,20 +1,8 @@
 package org.uniprot.api.idmapping.service;
 
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -38,6 +26,17 @@ import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
 
 /**
  * @author sahmad
@@ -158,7 +157,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     public Stream<String> streamRDF(
-            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId) {
+            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId, String type, String format) {
         List<IdMappingStringPair> fromToPairs =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);
         // get unique entry ids
@@ -167,7 +166,7 @@ public abstract class BasicIdService<T, U> {
                 .filter(ft -> !entryIds.contains(ft.getTo()))
                 .forEach(ft -> entryIds.add(ft.getTo()));
 
-        return this.rdfStreamer.streamRDFXML(entryIds.stream());
+        return this.rdfStreamer.stream(entryIds.stream(), type, format);
     }
 
     protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);

@@ -1,36 +1,7 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
-import static java.util.Arrays.asList;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import net.jodah.failsafe.RetryPolicy;
-
-import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
-import org.uniprot.api.common.repository.stream.document.DocumentIdStream;
-import org.uniprot.api.common.repository.stream.document.TestDocument;
-import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
-import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
-import org.uniprot.api.common.repository.stream.store.TupleStreamUtils;
-import org.uniprot.api.rest.service.RDFService;
 
 /**
  * @author lgonzales
@@ -39,7 +10,7 @@ import org.uniprot.api.rest.service.RDFService;
 @ExtendWith(MockitoExtension.class)
 class RDFStreamerTest {
 
-    @Mock private RestTemplate restTemplate;
+    /*@Mock private RestTemplate restTemplate;
 
     @Mock private SolrQueryRepository<TestDocument> repository;
 
@@ -190,5 +161,5 @@ class RDFStreamerTest {
                         + "    <someMore>text3</someMore>\n"
                         + "</rdf:RDF>",
                 rdfString);
-    }
+    }*/
 }

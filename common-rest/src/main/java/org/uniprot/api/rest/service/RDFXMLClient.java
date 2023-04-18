@@ -1,7 +1,6 @@
 package org.uniprot.api.rest.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
@@ -9,7 +8,6 @@ import java.net.URI;
 import java.util.*;
 
 @Slf4j
-@Component
 public class RDFXMLClient {
     private final TagProvider tagProvider;
     private final RestTemplate restTemplate;
@@ -25,7 +23,7 @@ public class RDFXMLClient {
         log.debug("RDF call for accessions : {}", allAccessions);
         String rdfXML = getEntriesByAccessions(allAccessions, type, format);
         if (Objects.nonNull(rdfXML)) {
-            String rdfResponse = convertRDFForStreaming(rdfXML,format);
+            String rdfResponse = convertRDFForStreaming(rdfXML, format);
             return Collections.singletonList(rdfResponse);
         } else {
             return Collections.emptyList();
@@ -33,7 +31,8 @@ public class RDFXMLClient {
     }
 
     public Optional<String> getEntry(String id, String type, String format) {
-        return Optional.ofNullable(getEntriesByAccessions(Collections.singletonList(id), type, format));
+        return Optional.ofNullable(
+                getEntriesByAccessions(Collections.singletonList(id), type, format));
     }
 
     private String getEntriesByAccessions(List<String> accessions, String type, String format) {
@@ -66,14 +65,13 @@ public class RDFXMLClient {
      * beginning of stream and RDF_CLOSE_TAG will be added in the end of the stream. see
      * Stream.concat in StoreStreamer
      *
-     * @param rdfXML
+     * @param body
      * @param format
      * @return
      */
-    private String convertRDFForStreaming(String rdfXML, String format) {
-        String startingTag = tagProvider.getStartingTag(format);
-        int endIndexOfOwlOntology = rdfXML.indexOf(startingTag) + startingTag.length();
-        int indexOfCloseTag = rdfXML.indexOf(tagProvider.getClosingTag(format));
-        return rdfXML.substring(endIndexOfOwlOntology, indexOfCloseTag);
+    private String convertRDFForStreaming(String body, String format) {
+        int startingPosition = tagProvider.getStartingPosition(body,format);
+        int indexOfCloseTag = tagProvider.getEndingPosition(body,format);
+        return body.substring(startingPosition, indexOfCloseTag);
     }
 }

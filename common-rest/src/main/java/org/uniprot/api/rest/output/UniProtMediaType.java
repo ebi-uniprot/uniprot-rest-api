@@ -31,9 +31,12 @@ public class UniProtMediaType {
     public static final MediaType OBO_MEDIA_TYPE = valueOf(OBO_MEDIA_TYPE_VALUE);
     public static final String RDF_MEDIA_TYPE_VALUE = "application/rdf+xml";
     public static final MediaType RDF_MEDIA_TYPE = valueOf(RDF_MEDIA_TYPE_VALUE);
-
     public static final String HDF5_MEDIA_TYPE_VALUE = "application/x-hdf5";
     public static final MediaType HDF5_MEDIA_TYPE = valueOf(HDF5_MEDIA_TYPE_VALUE);
+    public static final String TTL_MEDIA_TYPE_VALUE = "application/ttl+xml";
+    public static final MediaType TTL_MEDIA_TYPE = valueOf(TTL_MEDIA_TYPE_VALUE);
+    public static final String NT_MEDIA_TYPE_VALUE = "application/nt+xml";
+    public static final MediaType NT_MEDIA_TYPE = valueOf(NT_MEDIA_TYPE_VALUE);
     public static final String MARKDOWN_MEDIA_TYPE_VALUE = TEXT_MARKDOWN_VALUE;
     public static final MediaType MARKDOWN_MEDIA_TYPE = MediaType.TEXT_MARKDOWN;
     public static final String UNKNOWN_MEDIA_TYPE_VALUE = "unknown" + "/unknown";

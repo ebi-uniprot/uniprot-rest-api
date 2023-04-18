@@ -1,11 +1,5 @@
 package org.uniprot.api.uniref.service;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -14,6 +8,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -34,6 +29,12 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * @author jluo
  * @date: 20 Aug 2019
@@ -47,7 +48,9 @@ public class UniRefEntryLightService
     public static final String UNIREF_ID = "id";
     private final UniProtQueryProcessorConfig uniRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final RDFStreamer uniRefRDFStreamer;
+    private final RDFStreamer rdfStreamer;
+
+    private final TupleStreamDocumentIdStream documentIdStream;
 
     @Autowired
     public UniRefEntryLightService(
@@ -59,8 +62,8 @@ public class UniRefEntryLightService
             SolrQueryConfig uniRefSolrQueryConf,
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
-            RDFStreamer uniRefRDFStreamer,
-            FacetTupleStreamTemplate facetTupleStreamTemplate) {
+            RDFStreamer idMappingRdfXmlStreamer,
+            FacetTupleStreamTemplate facetTupleStreamTemplate, TupleStreamDocumentIdStream documentIdStream) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -72,7 +75,8 @@ public class UniRefEntryLightService
         this.uniRefQueryProcessorConfig = uniRefQueryProcessorConfig;
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.solrQueryConfig = uniRefSolrQueryConf;
-        this.uniRefRDFStreamer = uniRefRDFStreamer;
+        this.rdfStreamer = idMappingRdfXmlStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -147,10 +151,10 @@ public class UniRefEntryLightService
                 .getFieldName();
     }
 
-    public Stream<String> streamRDF(UniRefStreamRequest streamRequest) {
+    public Stream<String> streamRDF(UniRefStreamRequest streamRequest, String type, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        return this.uniRefRDFStreamer.idsToRDFStoreStream(solrRequest);
+        return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), type, format);
     }
 
     @Override
@@ -165,7 +169,7 @@ public class UniRefEntryLightService
 
     @Override
     protected RDFStreamer getRDFStreamer() {
-        return this.uniRefRDFStreamer;
+        return this.rdfStreamer;
     }
 
     private UniRefEntryLight cleanMemberId(UniRefEntryLight entry) {
@@ -202,7 +206,7 @@ public class UniRefEntryLightService
      * This method remove MemberIdType from member list and return just memberId
      *
      * @param members List of members that are stored in Voldemort with format:
-     *     "memberId,MemberIdType"
+     *                "memberId,MemberIdType"
      * @return List of return clean member with the format "memberId"
      */
     private List<String> removeMemberTypeFromMemberId(List<String> members) {

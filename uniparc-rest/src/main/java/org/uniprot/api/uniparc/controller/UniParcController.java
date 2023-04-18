@@ -51,6 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/uniparc")
 public class UniParcController extends BasicSearchController<UniParcEntry> {
+    private static final String TYPE = "uniparc";
 
     private final UniParcQueryService queryService;
     private static final int PREVIEW_SIZE = 10;
@@ -152,8 +153,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
-            String result = queryService.getRDFXml(getByUniParcIdRequest.getUpi());
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
+            String result = queryService.getRDFXml(getByUniParcIdRequest.getUpi(), TYPE, acceptedCustomType.get());
             return super.getEntityResponseRDF(result, contentType, request);
         }
 
@@ -206,9 +208,10 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
             return super.streamRDF(
-                    () -> queryService.streamRDF(streamRequest),
+                    () -> queryService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
                     streamRequest,
                     contentType,
                     request);

@@ -57,7 +57,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/uniref")
 public class UniRefEntryLightController extends BasicSearchController<UniRefEntryLight> {
-
+    private static final String TYPE = "uniref";
     private static final int PREVIEW_SIZE = 10;
     private final UniRefEntryLightService service;
 
@@ -127,8 +127,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        if (isRDFAccept(request)) {
-            String rdf = service.getRDFXml(id);
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
+            String rdf = service.getRDFXml(id, TYPE, acceptedCustomType.get());
             return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntryLight entryResult = service.findByUniqueId(id, fields);
@@ -236,9 +237,10 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
+        if (acceptedCustomType.isPresent()) {
             return super.streamRDF(
-                    () -> service.streamRDF(streamRequest), streamRequest, contentType, request);
+                    () -> service.streamRDF(streamRequest, TYPE, acceptedCustomType.get()), streamRequest, contentType, request);
         } else {
             return super.stream(
                     () -> service.stream(streamRequest), streamRequest, contentType, request);

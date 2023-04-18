@@ -1,9 +1,9 @@
 package org.uniprot.api.support.data.keyword.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -21,6 +21,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
     private final UniProtQueryProcessorConfig keywordQueryProcessorConfig;
     private final SearchFieldConfig fieldConfig;
     private final RDFStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<KeywordDocument> documentIdStream;
 
     public KeywordService(
             KeywordRepository repository,
@@ -30,7 +31,8 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             UniProtQueryProcessorConfig keywordQueryProcessorConfig,
             KeywordFacetConfig facetConfig,
             SearchFieldConfig keywordSearchFieldConfig,
-            @Qualifier("keywordRDFStreamer") RDFStreamer rdfStreamer) {
+            DefaultDocumentIdStream<KeywordDocument> documentIdStream,
+            RDFStreamer supportDataRdfXmlStreamer) {
         super(
                 repository,
                 keywordEntryConverter,
@@ -39,7 +41,8 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
                 facetConfig);
         this.keywordQueryProcessorConfig = keywordQueryProcessorConfig;
         this.fieldConfig = keywordSearchFieldConfig;
-        this.rdfStreamer = rdfStreamer;
+        this.rdfStreamer = supportDataRdfXmlStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -55,5 +58,10 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
     @Override
     protected RDFStreamer getRDFStreamer() {
         return this.rdfStreamer;
+    }
+
+    @Override
+    protected DefaultDocumentIdStream<KeywordDocument> getDocumentIdStream() {
+        return this.documentIdStream;
     }
 }

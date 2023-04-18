@@ -1,19 +1,15 @@
 package org.uniprot.api.idmapping.output.converter.uniref;
 
-import java.util.List;
-
 import org.springframework.http.converter.HttpMessageConverter;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.output.converter.EntryPairValueMapper;
-import org.uniprot.api.rest.output.converter.JsonMessageConverter;
-import org.uniprot.api.rest.output.converter.ListMessageConverter;
-import org.uniprot.api.rest.output.converter.RDFMessageConverter;
-import org.uniprot.api.rest.output.converter.TsvMessageConverter;
-import org.uniprot.api.rest.output.converter.XlsMessageConverter;
+import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
 import org.uniprot.core.parser.tsv.uniref.UniRefEntryLightValueMapper;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+
+import java.util.List;
 
 /**
  * @author sahmad
@@ -37,6 +33,8 @@ public class UniRefMessageConverterConfig {
         converters.add(currentIndex++, new UniRefEntryFastaMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new ListMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new RDFMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new TTLMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new NTMessageConverter(downloadGatekeeper));
         converters.add(
                 currentIndex++,
                 new TsvMessageConverter<>(
