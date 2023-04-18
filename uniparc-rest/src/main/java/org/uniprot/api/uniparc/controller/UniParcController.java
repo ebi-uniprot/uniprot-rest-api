@@ -129,7 +129,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 FASTA_MEDIA_TYPE_VALUE,
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE
+                XLS_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve an UniParc entry by upi.",
@@ -172,7 +174,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream a UniParc sequence entry (or entries) by a SOLR query.",

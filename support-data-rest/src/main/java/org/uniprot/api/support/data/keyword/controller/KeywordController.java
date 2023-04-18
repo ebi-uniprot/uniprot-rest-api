@@ -74,7 +74,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                OBO_MEDIA_TYPE_VALUE
+                OBO_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get Keyword by keywordId.",
@@ -158,7 +160,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download Keywords by given Lucene search query.",

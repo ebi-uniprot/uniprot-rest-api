@@ -155,7 +155,9 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.",

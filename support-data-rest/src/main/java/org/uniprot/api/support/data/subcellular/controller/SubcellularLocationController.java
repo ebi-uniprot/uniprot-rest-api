@@ -96,7 +96,9 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> getById(
             @Parameter(description = "Subcellular location id to find")
@@ -190,7 +192,9 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>> stream(
             @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,

@@ -89,7 +89,9 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getById(
             @Parameter(description = "Taxon id to find")
@@ -213,7 +215,9 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
             @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,

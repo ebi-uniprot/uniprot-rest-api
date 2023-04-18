@@ -93,7 +93,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> getByLiteratureId(
             @Parameter(description = "Citation id to find")
@@ -182,7 +184,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> stream(
             @Valid @ModelAttribute LiteratureStreamRequest streamRequest,

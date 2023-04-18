@@ -156,7 +156,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get UniProtKB entry by an accession.",
@@ -231,7 +233,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download a UniProtKB protein entry (or entries) retrieved by a SOLR query.",

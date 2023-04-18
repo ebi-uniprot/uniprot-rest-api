@@ -139,7 +139,9 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream a UniParc sequence entry (or entries) by a submitted job id.",
