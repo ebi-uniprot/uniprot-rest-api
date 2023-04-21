@@ -30,6 +30,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -91,7 +93,8 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired UniProtStoreClient<UniRefEntryLight> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
-    @Autowired private RestTemplate restTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate restTemplate;
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
 
@@ -109,6 +112,10 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
         when(solrClient.query(anyString(), any())).thenReturn(response);
+    }
+
+    @BeforeEach
+    void setUp() {
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }

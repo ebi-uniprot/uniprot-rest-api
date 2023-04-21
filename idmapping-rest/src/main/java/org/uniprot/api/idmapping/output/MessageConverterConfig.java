@@ -1,26 +1,8 @@
 package org.uniprot.api.idmapping.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.idmapping.output.converter.uniparc.UniParcMessageConverterConfig.appendUniParcConverters;
-import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMessageConverterConfig.appendUniProtKBConverters;
-import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.GFF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
-import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +22,17 @@ import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.idmapping.output.converter.uniparc.UniParcMessageConverterConfig.appendUniParcConverters;
+import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMessageConverterConfig.appendUniProtKBConverters;
+import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
 
 /**
  * Created 21/08/18
@@ -147,7 +139,9 @@ public class MessageConverterConfig {
                         kbContext(FF_MEDIA_TYPE),
                         kbContext(GFF_MEDIA_TYPE),
                         kbContext(LIST_MEDIA_TYPE),
-                        kbContext(RDF_MEDIA_TYPE))
+                        kbContext(RDF_MEDIA_TYPE),
+                        kbContext(TTL_MEDIA_TYPE),
+                        kbContext(NT_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -166,7 +160,9 @@ public class MessageConverterConfig {
                         uniParcContext(XLS_MEDIA_TYPE),
                         uniParcContext(APPLICATION_XML),
                         uniParcContext(LIST_MEDIA_TYPE),
-                        uniParcContext(RDF_MEDIA_TYPE))
+                        uniParcContext(RDF_MEDIA_TYPE),
+                        uniParcContext(TTL_MEDIA_TYPE),
+                        uniParcContext(NT_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -184,7 +180,9 @@ public class MessageConverterConfig {
                         uniRefContext(TSV_MEDIA_TYPE),
                         uniRefContext(XLS_MEDIA_TYPE),
                         uniRefContext(LIST_MEDIA_TYPE),
-                        uniRefContext(RDF_MEDIA_TYPE))
+                        uniRefContext(RDF_MEDIA_TYPE),
+                        uniRefContext(TTL_MEDIA_TYPE),
+                        uniRefContext(NT_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

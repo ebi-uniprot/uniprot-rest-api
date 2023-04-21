@@ -38,8 +38,7 @@ public class RDFXMLClient {
     private String getEntriesByAccessions(List<String> accessions, String type, String format) {
         String commaSeparatedIds = String.join(",", accessions);
 
-        DefaultUriBuilderFactory handler =
-                (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
+        DefaultUriBuilderFactory handler = (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
 
         URI requestUri = handler.builder().build(type, format, commaSeparatedIds);
 

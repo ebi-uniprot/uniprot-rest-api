@@ -1,21 +1,11 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.*;
-
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,7 +24,9 @@ import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
-import org.uniprot.core.uniref.*;
+import org.uniprot.core.uniref.UniRefEntry;
+import org.uniprot.core.uniref.UniRefEntryLight;
+import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
@@ -42,6 +34,17 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 /**
  * @author lgonzales
@@ -65,7 +68,8 @@ class UniRefLightGetIdControllerIT {
 
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
-    @Autowired private RestTemplate restTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate restTemplate;
 
     private static final String ID_LIGHT_PREFIX_PATH = "/uniref/";
 
@@ -88,6 +92,10 @@ class UniRefLightGetIdControllerIT {
                 "solrClient",
                 storeManager.getSolrClient(DataStoreManager.StoreType.UNIREF_LIGHT));
         saveEntry();
+    }
+
+    @BeforeEach
+    void setUp() {
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }

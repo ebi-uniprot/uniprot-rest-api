@@ -57,20 +57,20 @@ public class RDFStreamer {
     private static class BatchRDFXMLStoreIterable extends BatchIterable<String> {
         private final String type;
         private final String format;
-        private final RDFXMLClient RDFXMLClient;
+        private final RDFXMLClient rdfxmlClient;
         private final RetryPolicy<Object> retryPolicy;
 
         BatchRDFXMLStoreIterable(
                 String type,
                 String format,
                 Iterable<String> sourceIterable,
-                RDFXMLClient RDFXMLClient,
+                RDFXMLClient rdfxmlClient,
                 RetryPolicy<Object> retryPolicy,
                 int batchSize) {
             super(sourceIterable, batchSize);
             this.type = type;
             this.format = format;
-            this.RDFXMLClient = RDFXMLClient;
+            this.rdfxmlClient = rdfxmlClient;
             this.retryPolicy = retryPolicy;
         }
 
@@ -83,7 +83,7 @@ public class RDFStreamer {
                                             "Call to RDF server failed for accessions {} with error {}",
                                             batch,
                                             throwable.getFailure().getMessage()))
-                    .get(() -> RDFXMLClient.getEntries(batch, type, format));
+                    .get(() -> rdfxmlClient.getEntries(batch, type, format));
         }
     }
 }

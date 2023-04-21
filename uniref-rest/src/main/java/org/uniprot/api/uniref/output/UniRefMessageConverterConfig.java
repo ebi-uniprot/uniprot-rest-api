@@ -125,7 +125,9 @@ public class UniRefMessageConverterConfig {
                         uniRefLightContext(FASTA_MEDIA_TYPE),
                         uniRefLightContext(TSV_MEDIA_TYPE),
                         uniRefLightContext(XLS_MEDIA_TYPE),
-                        uniRefLightContext(RDF_MEDIA_TYPE))
+                        uniRefLightContext(RDF_MEDIA_TYPE),
+                        uniRefLightContext(TTL_MEDIA_TYPE),
+                        uniRefLightContext(NT_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -155,7 +157,9 @@ public class UniRefMessageConverterConfig {
                         uniRefContext(FASTA_MEDIA_TYPE),
                         uniRefContext(TSV_MEDIA_TYPE),
                         uniRefContext(XLS_MEDIA_TYPE),
-                        uniRefContext(RDF_MEDIA_TYPE))
+                        uniRefContext(RDF_MEDIA_TYPE),
+                        uniRefContext(TTL_MEDIA_TYPE),
+                        uniRefContext(NT_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

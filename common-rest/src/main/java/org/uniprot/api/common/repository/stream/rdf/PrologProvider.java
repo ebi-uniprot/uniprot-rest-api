@@ -1,6 +1,7 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
 import org.springframework.stereotype.Component;
+import org.uniprot.api.rest.service.NTPrologs;
 import org.uniprot.api.rest.service.RDFPrologs;
 import org.uniprot.api.rest.service.TTLPrologs;
 
@@ -27,7 +28,7 @@ public class PrologProvider {
             case TTL:
                 return getForTtl(type);
             case NT:
-                return "";
+                return NTPrologs.NT_COMMON_PROLOG;
         }
         throw new IllegalArgumentException(String.format("Unsupported format %s", format));
     }

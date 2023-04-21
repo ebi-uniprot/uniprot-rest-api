@@ -105,6 +105,8 @@ public class MessageConverterConfig {
         asList(
                         context(LIST_MEDIA_TYPE),
                         context(RDF_MEDIA_TYPE),
+                        context(TTL_MEDIA_TYPE),
+                        context(NT_MEDIA_TYPE),
                         context(FF_MEDIA_TYPE),
                         context(APPLICATION_XML),
                         context(APPLICATION_JSON),

@@ -115,7 +115,9 @@ public class MessageConverterConfig {
                         uniParcContext(FASTA_MEDIA_TYPE),
                         uniParcContext(TSV_MEDIA_TYPE),
                         uniParcContext(XLS_MEDIA_TYPE),
-                        uniParcContext(RDF_MEDIA_TYPE))
+                        uniParcContext(RDF_MEDIA_TYPE),
+                        uniParcContext(TTL_MEDIA_TYPE),
+                        uniParcContext(NT_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

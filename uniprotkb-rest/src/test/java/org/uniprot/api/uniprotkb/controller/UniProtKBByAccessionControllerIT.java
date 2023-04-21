@@ -1,20 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,9 +8,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,7 +28,9 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.NTPrologs;
 import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.TTLPrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
@@ -58,7 +46,22 @@ import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
 
 /** @author lgonzales */
 @ContextConfiguration(
@@ -83,8 +86,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     private UniProtKBStoreClient storeClient;
 
-    @Autowired
-    @Qualifier("rdfRestTemplate")
+    @MockBean(name = "idMappingRdfRestTemplate")
     private RestTemplate restTemplate;
 
     public Stream<Arguments> fetchingInactiveEntriesWithFileExtension() {
@@ -105,7 +107,11 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 Arguments.of(
                         getFileExtension(FASTA_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
                 Arguments.of(
-                        getFileExtension(RDF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"));
+                        getFileExtension(RDF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"),
+                Arguments.of(
+                        getFileExtension(TTL_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"),
+                Arguments.of(
+                        getFileExtension(NT_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"));
     }
 
     @Override
@@ -318,7 +324,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         }
         redirectedURL += "?from=" + inactiveAcc;
 
-        if (mediaType.equals(RDF_MEDIA_TYPE)) {
+        if (Set.of(RDF_MEDIA_TYPE, TTL_MEDIA_TYPE, NT_MEDIA_TYPE).contains(mediaType)) {
             resultActions
                     .andExpect(status().is(HttpStatus.OK.value()))
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()));
@@ -757,6 +763,38 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                                             + "    <anotherSample>text2</anotherSample>\n"
                                                                             + "    <someMore>text3</someMore>\n"
                                                                             + "</rdf:RDF>")))
+                                    .build()).contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            startsWith(
+                                                                    TTLPrologs.UNIPROT_RDF_PROLOG)))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "    <sample>text</sample>\n"
+                                                                            + "    <anotherSample>text2</anotherSample>\n"
+                                                                            + "    <someMore>text3</someMore>\n"
+                                                                            + "</rdf:RDF>")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            startsWith(NTPrologs.NT_COMMON_PROLOG)))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "    <sample>text</sample>\n"
+                                                                            + "    <anotherSample>text2</anotherSample>\n"
+                                                                            + "    <someMore>text3</someMore>\n"
+                                                                            + "</rdf:RDF>")))
                                     .build())
                     .build();
         }
@@ -838,6 +876,16 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(is(emptyOrNullString()))))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(TTL_MEDIA_TYPE)
+                                    .resultMatcher(content().string(not(is(emptyOrNullString()))))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(NT_MEDIA_TYPE)
                                     .resultMatcher(content().string(not(is(emptyOrNullString()))))
                                     .build())
                     .build();

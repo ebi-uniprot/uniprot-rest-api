@@ -1,26 +1,9 @@
 package org.uniprot.api.uniparc.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPARC_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
-
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,10 +16,20 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.service.NTPrologs;
 import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.TTLPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 
 /**
  * @author jluo
@@ -58,7 +51,8 @@ import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
             UniParcGetIdControllerIT.UniParcGetIdContentTypeParamResolver.class
         })
 public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
-    @Autowired private RestTemplate restTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate restTemplate;
 
     @Override
     protected String getIdPathValue() {
@@ -70,8 +64,8 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
         return "/uniparc/{upi}";
     }
 
-    @BeforeAll
-    void init() {
+    @BeforeEach
+    void setUp() {
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
@@ -191,6 +185,39 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            startsWith(
+                                                                    TTLPrologs.UNIPARC_RDF_PROLOG)))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "    <sample>text</sample>\n"
+                                                                            + "    <anotherSample>text2</anotherSample>\n"
+                                                                            + "    <someMore>text3</someMore>\n"
+                                                                            + "</rdf:RDF>")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            startsWith(NTPrologs.NT_COMMON_PROLOG)))
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "    <sample>text</sample>\n"
+                                                                            + "    <anotherSample>text2</anotherSample>\n"
+                                                                            + "    <someMore>text3</someMore>\n"
+                                                                            + "</rdf:RDF>")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString(UNIPARC_ID)))
                                     .build())
@@ -229,6 +256,24 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'upi' value has invalid format. It should be a valid UniParc UPI")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

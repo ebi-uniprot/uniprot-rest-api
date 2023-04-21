@@ -1,15 +1,14 @@
 package org.uniprot.api.rest.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.TEXT_MARKDOWN_VALUE;
+import com.google.common.collect.HashBiMap;
+import org.springframework.http.MediaType;
 
 import java.util.Collection;
 import java.util.Objects;
 
-import org.springframework.http.MediaType;
-
-import com.google.common.collect.HashBiMap;
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.TEXT_MARKDOWN_VALUE;
 
 public class UniProtMediaType {
     public static final String DEFAULT_MEDIA_TYPE_VALUE = APPLICATION_JSON_VALUE;
@@ -54,6 +53,8 @@ public class UniProtMediaType {
                     OBO_MEDIA_TYPE,
                     RDF_MEDIA_TYPE,
                     HDF5_MEDIA_TYPE,
+                    TTL_MEDIA_TYPE,
+                    NT_MEDIA_TYPE,
                     MediaType.APPLICATION_JSON,
                     MediaType.APPLICATION_XML);
 
@@ -64,6 +65,8 @@ public class UniProtMediaType {
         mediaTypeExtensionMap.put(FF_MEDIA_TYPE, "txt");
         mediaTypeExtensionMap.put(XLS_MEDIA_TYPE, "xlsx");
         mediaTypeExtensionMap.put(RDF_MEDIA_TYPE, "rdf");
+        mediaTypeExtensionMap.put(TTL_MEDIA_TYPE, "ttl");
+        mediaTypeExtensionMap.put(NT_MEDIA_TYPE, "nt");
         mediaTypeExtensionMap.put(MARKDOWN_MEDIA_TYPE, "md");
         mediaTypeExtensionMap.put(HDF5_MEDIA_TYPE, "h5");
 

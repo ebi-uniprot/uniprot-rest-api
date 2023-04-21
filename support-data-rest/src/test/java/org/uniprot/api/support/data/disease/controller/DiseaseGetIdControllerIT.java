@@ -1,25 +1,10 @@
 package org.uniprot.api.support.data.disease.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,7 +35,16 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -63,8 +57,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
         })
 public class DiseaseGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
 
-    @Autowired
-    @Qualifier("diseaseRDFRestTemplate")
+    @MockBean(name="supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final String ACCESSION = "DI-04860";
@@ -311,6 +304,18 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.TTL_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.NT_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
@@ -397,6 +402,23 @@ public class DiseaseGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The disease id value has invalid format")))
+                                    .build()).contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The disease id value has invalid format")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

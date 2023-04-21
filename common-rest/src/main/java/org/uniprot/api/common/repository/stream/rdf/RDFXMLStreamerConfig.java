@@ -26,25 +26,17 @@ public class RDFXMLStreamerConfig {
     }
 
     @Bean
-    public RDFStreamer supportDataRdfXmlStreamer(RDFXMLStreamerConfigProperties supportDataRDFXMLStreamerConfigProperties) {
+    public RDFStreamer supportDataRdfXmlStreamer(RDFXMLStreamerConfigProperties supportDataRDFXMLStreamerConfigProperties, RestTemplate supportDataRdfRestTemplate) {
         return new RDFStreamer(
                 supportDataRDFXMLStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                new RDFXMLClient(tagProvider, getRestTemplate(supportDataRDFXMLStreamerConfigProperties)),
+                new RDFXMLClient(tagProvider, supportDataRdfRestTemplate),
                 getRdfFetchRetryPolicy(supportDataRDFXMLStreamerConfigProperties));
     }
 
-    private static RetryPolicy<Object> getRdfFetchRetryPolicy(RDFXMLStreamerConfigProperties properties) {
-        return properties.getRetryDelayMillis() > 0 ? RDFStreamConfig.rdfRetryPolicy(properties) : null;
-    }
-
     @Bean
-    public RDFStreamer idMappingRdfXmlStreamer(RDFXMLStreamerConfigProperties idMappingRDFXMLStreamerConfigProperties) {
-        return new RDFStreamer(
-                idMappingRDFXMLStreamerConfigProperties.getBatchSize(),
-                prologProvider,
-                new RDFXMLClient(tagProvider, getRestTemplate(idMappingRDFXMLStreamerConfigProperties)),
-                getRdfFetchRetryPolicy(idMappingRDFXMLStreamerConfigProperties));
+    public RestTemplate supportDataRdfRestTemplate(RDFXMLStreamerConfigProperties supportDataRDFXMLStreamerConfigProperties) {
+        return getRestTemplate(supportDataRDFXMLStreamerConfigProperties);
     }
 
     private RestTemplate getRestTemplate(RDFXMLStreamerConfigProperties properties) {
@@ -55,6 +47,24 @@ public class RDFXMLStreamerConfig {
             restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(properties.getRequestUrl()));
         }
         return restTemplate;
+    }
+
+    private static RetryPolicy<Object> getRdfFetchRetryPolicy(RDFXMLStreamerConfigProperties properties) {
+        return properties.getRetryDelayMillis() > 0 ? RDFStreamConfig.rdfRetryPolicy(properties) : null;
+    }
+
+    @Bean
+    public RDFStreamer idMappingRdfXmlStreamer(RDFXMLStreamerConfigProperties idMappingRDFXMLStreamerConfigProperties, RestTemplate idMappingRdfRestTemplate) {
+        return new RDFStreamer(
+                idMappingRDFXMLStreamerConfigProperties.getBatchSize(),
+                prologProvider,
+                new RDFXMLClient(tagProvider, idMappingRdfRestTemplate),
+                getRdfFetchRetryPolicy(idMappingRDFXMLStreamerConfigProperties));
+    }
+
+    @Bean
+    public RestTemplate idMappingRdfRestTemplate(RDFXMLStreamerConfigProperties idMappingRDFXMLStreamerConfigProperties) {
+        return getRestTemplate(idMappingRDFXMLStreamerConfigProperties);
     }
 
     @Bean

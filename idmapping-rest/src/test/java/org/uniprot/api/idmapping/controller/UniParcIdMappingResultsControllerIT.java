@@ -1,31 +1,14 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
-
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,6 +34,20 @@ import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
+
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.saveEntries;
 
 /**
  * @author lgonzales
@@ -83,7 +80,8 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
 
     @Autowired private JobOperation uniParcIdMappingJobOp;
 
-    @Autowired private RestTemplate uniParcRestTemplate;
+    @MockBean(name="idMappingRdfRestTemplate")
+    private RestTemplate uniParcRestTemplate;
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
@@ -132,11 +130,13 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
-        when(uniParcRestTemplate.getUriTemplateHandler())
-                .thenReturn(new DefaultUriBuilderFactory());
-        when(uniParcRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-
         saveEntries(cloudSolrClient, storeClient);
+    }
+
+    @BeforeEach
+    void setUp() {
+        when(uniParcRestTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
+        when(uniParcRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     @Test

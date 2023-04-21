@@ -1,15 +1,10 @@
 package org.uniprot.api.support.data.keyword.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.nio.ByteBuffer;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,7 +31,11 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.nio.ByteBuffer;
+
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -49,8 +48,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
         })
 public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
 
-    @Autowired
-    @Qualifier("keywordRDFRestTemplate")
+    @MockBean(name="supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final String KEYWORD_ACCESSION = "KW-0005";
@@ -234,6 +232,18 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.TTL_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.NT_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
@@ -291,6 +301,23 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The keyword id value has invalid format")))
+                                    .build()).contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The keyword id value has invalid format")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

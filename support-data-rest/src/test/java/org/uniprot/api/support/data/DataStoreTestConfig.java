@@ -1,7 +1,5 @@
 package org.uniprot.api.support.data;
 
-import static org.mockito.Mockito.mock;
-
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
@@ -12,6 +10,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+
+import static org.mockito.Mockito.mock;
 
 @TestConfiguration
 public class DataStoreTestConfig {

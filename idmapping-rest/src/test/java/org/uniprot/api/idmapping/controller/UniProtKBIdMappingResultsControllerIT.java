@@ -1,29 +1,9 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_AC_ID_STR;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
-
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -62,6 +43,22 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.io.IOException;
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
 /**
  * @author sahmad
@@ -97,7 +94,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @Autowired private MockMvc mockMvc;
 
-    @Autowired private RestTemplate uniProtKBRestTemplate;
+    @MockBean(name="idMappingRdfRestTemplate") private RestTemplate uniProtKBRestTemplate;
 
     @Autowired private TaxonomyLineageRepository taxRepository;
 
@@ -148,11 +145,6 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
-
-        when(uniProtKBRestTemplate.getUriTemplateHandler())
-                .thenReturn(new DefaultUriBuilderFactory());
-        when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-
         for (int i = 1; i <= this.maxFromIdsAllowed; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
@@ -165,6 +157,13 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         TaxonomyDocument taxonomyDocument = createTaxonomyEntry(9606L);
         cloudSolrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
+    }
+
+    @BeforeEach
+    void setUp() {
+        when(uniProtKBRestTemplate.getUriTemplateHandler())
+                .thenReturn(new DefaultUriBuilderFactory());
+        when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     @Test

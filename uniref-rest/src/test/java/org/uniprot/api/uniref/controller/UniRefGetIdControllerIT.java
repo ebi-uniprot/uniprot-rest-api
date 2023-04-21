@@ -1,32 +1,13 @@
 package org.uniprot.api.uniref.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.Matchers.emptyOrNullString;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.startsWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIREF_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIREF_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntryMembers;
-
-import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -59,6 +40,18 @@ import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 import org.uniprot.store.search.SolrCollection;
 
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntryMembers;
+
 @ContextConfiguration(
         classes = {
             DataStoreTestConfig.class,
@@ -84,7 +77,8 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
-    @Autowired private RestTemplate restTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate restTemplate;
 
     @Override
     protected DataStoreManager.StoreType getStoreType() {
@@ -114,6 +108,10 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .addDocConverter(
                         DataStoreManager.StoreType.UNIREF_LIGHT,
                         new UniRefDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo()));
+    }
+
+    @BeforeEach
+    void setUp() {
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
@@ -319,6 +317,24 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                                             containsString(
                                                                     "<sample>text</sample>")))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<sample>text</sample>")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "<sample>text</sample>")))
+                                    .build())
                     .build();
         }
 
@@ -378,6 +394,24 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The 'id' value has invalid format. It should be a valid UniRef Cluster id")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
