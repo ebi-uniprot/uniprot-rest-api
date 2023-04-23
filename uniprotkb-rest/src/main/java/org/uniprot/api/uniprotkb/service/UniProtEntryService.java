@@ -85,7 +85,7 @@ public class UniProtEntryService
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
             TupleStreamDocumentIdStream documentIdStream,
-            RDFStreamer idMappingRdfXmlStreamer) {
+            RDFStreamer uniprotRdfXmlStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -101,7 +101,7 @@ public class UniProtEntryService
         this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.rdfStreamer = idMappingRdfXmlStreamer;
+        this.rdfStreamer = uniprotRdfXmlStreamer;
         this.documentIdStream = documentIdStream;
     }
 

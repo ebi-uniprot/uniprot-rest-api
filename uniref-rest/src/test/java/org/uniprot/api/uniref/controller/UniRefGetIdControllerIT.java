@@ -77,7 +77,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
 
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
-    @MockBean(name = "idMappingRdfRestTemplate")
+    @MockBean(name = "unirefRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Override

@@ -68,7 +68,7 @@ class UniRefLightGetIdControllerIT {
 
     @Autowired private UniRefLightStoreClient lightStoreClient;
 
-    @MockBean(name = "idMappingRdfRestTemplate")
+    @MockBean(name = "unirefRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final String ID_LIGHT_PREFIX_PATH = "/uniref/";

@@ -67,7 +67,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SolrQueryConfig uniParcSolrQueryConf,
             UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
-            RDFStreamer idMappingRdfXmlStreamer,
+            RDFStreamer uniparcRdfXmlStreamer,
             FacetTupleStreamTemplate facetTupleStreamTemplate, TupleStreamDocumentIdStream documentIdStream) {
 
         super(
@@ -83,7 +83,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
         this.solrQueryConfig = uniParcSolrQueryConf;
-        this.rdfStreamer = idMappingRdfXmlStreamer;
+        this.rdfStreamer = uniparcRdfXmlStreamer;
         this.documentIdStream = documentIdStream;
     }
 

@@ -86,7 +86,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     private UniProtKBStoreClient storeClient;
 
-    @MockBean(name = "idMappingRdfRestTemplate")
+    @MockBean(name = "uniprotRdfRestTemplate")
     private RestTemplate restTemplate;
 
     public Stream<Arguments> fetchingInactiveEntriesWithFileExtension() {

@@ -26,7 +26,7 @@ public class UniRefEntryService {
     @Autowired
     public UniRefEntryService(
             UniRefEntryStoreRepository entryStoreRepository,
-            @Qualifier("idMappingRdfRestTemplate") RestTemplate restTemplate,
+            @Qualifier("unirefRdfRestTemplate") RestTemplate restTemplate,
             TagProvider tagProvider) {
         this.entryStoreRepository = entryStoreRepository;
         this.rdfxmlClient = new RDFXMLClient(tagProvider, restTemplate);

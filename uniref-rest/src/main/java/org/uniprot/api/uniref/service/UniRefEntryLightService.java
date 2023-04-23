@@ -62,7 +62,7 @@ public class UniRefEntryLightService
             SolrQueryConfig uniRefSolrQueryConf,
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
-            RDFStreamer idMappingRdfXmlStreamer,
+            RDFStreamer unirefRdfXmlStreamer,
             FacetTupleStreamTemplate facetTupleStreamTemplate, TupleStreamDocumentIdStream documentIdStream) {
         super(
                 repository,
@@ -75,7 +75,7 @@ public class UniRefEntryLightService
         this.uniRefQueryProcessorConfig = uniRefQueryProcessorConfig;
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.solrQueryConfig = uniRefSolrQueryConf;
-        this.rdfStreamer = idMappingRdfXmlStreamer;
+        this.rdfStreamer = unirefRdfXmlStreamer;
         this.documentIdStream = documentIdStream;
     }
 

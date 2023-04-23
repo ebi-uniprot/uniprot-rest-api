@@ -98,7 +98,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired UniProtStoreClient<UniParcEntry> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
-    @MockBean(name = "idMappingRdfRestTemplate")
+    @MockBean(name = "uniparcRdfRestTemplate")
     private RestTemplate restTemplate;
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;

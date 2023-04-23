@@ -15,7 +15,7 @@ public class RDFStreamConfig {
     private RDFStreamConfig() {}
 
     public static RetryPolicy<Object> rdfRetryPolicy(
-            RDFXMLStreamerConfigProperties rdfConfigProps) {
+            RDFStreamerConfigProperties rdfConfigProps) {
         int rdfRetryDelay = rdfConfigProps.getRetryDelayMillis();
         int maxRdfRetryDelay = rdfRetryDelay * 8;
         return new RetryPolicy<>()

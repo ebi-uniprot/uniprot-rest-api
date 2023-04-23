@@ -51,7 +51,7 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
             UniParcGetIdControllerIT.UniParcGetIdContentTypeParamResolver.class
         })
 public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
-    @MockBean(name = "idMappingRdfRestTemplate")
+    @MockBean(name = "uniparcRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Override
