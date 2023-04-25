@@ -152,7 +152,9 @@ public class PIRResponseConverter {
             mappedIds.replaceAll(
                     (key, values) -> {
                         String firstValue = new ArrayList<>(values).get(0);
-                        return (firstValue.contains(".")) ? Set.of(firstValue) : values;
+                        return (firstValue.contains("."))
+                                ? Set.of(firstValue.substring(0, firstValue.indexOf(".")))
+                                : values;
                     });
         }
         return mappedIds;
