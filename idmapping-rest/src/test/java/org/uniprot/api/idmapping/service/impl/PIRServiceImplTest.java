@@ -105,8 +105,8 @@ class PIRServiceImplTest {
         IdMappingResult idMappingResult = pirService.mapIds(request, "dummyJobId");
         assertThat(
                 idMappingResult.getMappedIds(),
-                contains(new IdMappingStringPair("P00001.1", "P00001")));
-        assertThat(idMappingResult.getUnmappedIds(), contains("P00002.2"));
+                contains(new IdMappingStringPair("P00001", "P00001")));
+        assertThat(idMappingResult.getUnmappedIds(), contains("P00002"));
     }
 
     @Test
@@ -170,7 +170,7 @@ class PIRServiceImplTest {
         IdMappingResult idMappingResult = pirService.mapIds(request, "dummyJobId");
         assertThat(
                 idMappingResult.getMappedIds(),
-                contains(new IdMappingStringPair("P00001.1", "P00001")));
+                contains(new IdMappingStringPair("P00001", "P00001")));
         assertThat(idMappingResult.getUnmappedIds(), is(empty()));
     }
 

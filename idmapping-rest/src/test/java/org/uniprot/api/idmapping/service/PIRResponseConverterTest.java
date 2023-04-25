@@ -240,7 +240,7 @@ class PIRResponseConverterTest {
                         new IdMappingStringPair("P00001[10-20]", "P00001"),
                         new IdMappingStringPair("P00002[20-30]", "P00002"),
                         new IdMappingStringPair("P00002[20-30]", "Q00002")));
-        assertThat(result.getUnmappedIds(), contains("P00003.3", "P00004"));
+        assertThat(result.getUnmappedIds(), contains("P00003", "P00004"));
         assertThat(result.getWarnings(), is(emptyList()));
     }
 
@@ -274,10 +274,10 @@ class PIRResponseConverterTest {
         assertThat(
                 result.getMappedIds(),
                 contains(
-                        new IdMappingStringPair("P00001.1", "P00001"),
-                        new IdMappingStringPair("P00002.2", "P00002"),
-                        new IdMappingStringPair("P00002.2", "Q00002")));
-        assertThat(result.getUnmappedIds(), contains("P00003.3", "P00004.4"));
+                        new IdMappingStringPair("P00001", "P00001"),
+                        new IdMappingStringPair("P00002", "P00002"),
+                        new IdMappingStringPair("P00002", "Q00002")));
+        assertThat(result.getUnmappedIds(), contains("P00003", "P00004"));
         assertThat(result.getWarnings(), is(emptyList()));
     }
 
@@ -420,7 +420,7 @@ class PIRResponseConverterTest {
         request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
         Map<String, Set<String>> mappedIds = converter.getMappedRequestIds(request);
-        assertEquals(Set.of("P12345.6"), mappedIds.get("P12345"));
+        assertEquals(Set.of("P12345"), mappedIds.get("P12345"));
     }
 
     @Test
