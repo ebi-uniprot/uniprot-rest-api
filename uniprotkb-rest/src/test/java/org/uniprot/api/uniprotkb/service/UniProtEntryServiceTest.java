@@ -1,5 +1,12 @@
 package org.uniprot.api.uniprotkb.service;
 
+import static java.util.Collections.EMPTY_SET;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,45 +32,23 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
-import java.util.List;
-
-import static java.util.Collections.EMPTY_SET;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-/**
- * @author tibrahim
- */
+/** @author tibrahim */
 @ExtendWith(MockitoExtension.class)
 public class UniProtEntryServiceTest {
 
-    @Mock
-    private UniprotQueryRepository repository;
-    @Mock
-    private UniProtKBFacetConfig uniprotKBFacetConfig;
-    @Mock
-    private UniProtTermsConfig uniProtTermsConfig;
-    @Mock
-    private UniProtSolrSortClause uniProtSolrSortClause;
-    @Mock
-    private SolrQueryConfig uniProtKBSolrQueryConf;
-    @Mock
-    private UniProtKBStoreClient entryStore;
-    @Mock
-    private StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer;
-    @Mock
-    private TaxonomyLineageService taxService;
-    @Mock
-    private FacetTupleStreamTemplate facetTupleStreamTemplate;
-    @Mock
-    private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
-    @Mock
-    private SearchFieldConfig uniProtKBSearchFieldConfig;
-    @Mock
-    private RDFStreamer uniProtRDFStreamer;
-    @Mock
-    private TupleStreamDocumentIdStream documentIdStream;
+    @Mock private UniprotQueryRepository repository;
+    @Mock private UniProtKBFacetConfig uniprotKBFacetConfig;
+    @Mock private UniProtTermsConfig uniProtTermsConfig;
+    @Mock private UniProtSolrSortClause uniProtSolrSortClause;
+    @Mock private SolrQueryConfig uniProtKBSolrQueryConf;
+    @Mock private UniProtKBStoreClient entryStore;
+    @Mock private StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer;
+    @Mock private TaxonomyLineageService taxService;
+    @Mock private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
+    @Mock private SearchFieldConfig uniProtKBSearchFieldConfig;
+    @Mock private RDFStreamer uniProtRDFStreamer;
+    @Mock private TupleStreamDocumentIdStream documentIdStream;
     private UniProtEntryService entryService;
 
     @BeforeEach

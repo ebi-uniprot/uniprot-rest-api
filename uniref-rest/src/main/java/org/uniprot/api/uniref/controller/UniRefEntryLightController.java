@@ -244,7 +244,10 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
         Optional<String> acceptedCustomType = getAcceptedCustomType(request);
         if (acceptedCustomType.isPresent()) {
             return super.streamRDF(
-                    () -> service.streamRDF(streamRequest, TYPE, acceptedCustomType.get()), streamRequest, contentType, request);
+                    () -> service.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    streamRequest,
+                    contentType,
+                    request);
         } else {
             return super.stream(
                     () -> service.stream(streamRequest), streamRequest, contentType, request);

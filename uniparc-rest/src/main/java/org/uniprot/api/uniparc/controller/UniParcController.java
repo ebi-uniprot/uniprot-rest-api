@@ -157,7 +157,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         MediaType contentType = getAcceptHeader(request);
         Optional<String> acceptedCustomType = getAcceptedCustomType(request);
         if (acceptedCustomType.isPresent()) {
-            String result = queryService.getRDFXml(getByUniParcIdRequest.getUpi(), TYPE, acceptedCustomType.get());
+            String result =
+                    queryService.getRDFXml(
+                            getByUniParcIdRequest.getUpi(), TYPE, acceptedCustomType.get());
             return super.getEntityResponseRDF(result, contentType, request);
         }
 

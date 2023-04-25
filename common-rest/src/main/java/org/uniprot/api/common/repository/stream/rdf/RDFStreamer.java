@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.uniprot.api.common.repository.stream.common.BatchIterable;
-import org.uniprot.api.rest.service.RDFXMLClient;
+import org.uniprot.api.rest.service.RDFClient;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,17 +15,17 @@ import java.util.stream.StreamSupport;
 public class RDFStreamer {
     private final int batchSize;
     private final PrologProvider prologProvider;
-    private final RDFXMLClient RDFXMLClient;
+    private final RDFClient RDFClient;
     private final RetryPolicy<Object> rdfFetchRetryPolicy;
 
     public RDFStreamer(
             int batchSize,
             PrologProvider prologProvider,
-            RDFXMLClient RDFXMLClient,
+            RDFClient RDFClient,
             RetryPolicy<Object> rdfFetchRetryPolicy) {
         this.batchSize = batchSize;
         this.prologProvider = prologProvider;
-        this.RDFXMLClient = RDFXMLClient;
+        this.RDFClient = RDFClient;
         this.rdfFetchRetryPolicy = rdfFetchRetryPolicy;
     }
 
@@ -35,7 +35,7 @@ public class RDFStreamer {
                         type,
                         format,
                         entryIds::iterator,
-                        RDFXMLClient,
+                        RDFClient,
                         rdfFetchRetryPolicy,
                         batchSize);
 
@@ -57,20 +57,20 @@ public class RDFStreamer {
     private static class BatchRDFXMLStoreIterable extends BatchIterable<String> {
         private final String type;
         private final String format;
-        private final RDFXMLClient rdfxmlClient;
+        private final RDFClient RDFClient;
         private final RetryPolicy<Object> retryPolicy;
 
         BatchRDFXMLStoreIterable(
                 String type,
                 String format,
                 Iterable<String> sourceIterable,
-                RDFXMLClient rdfxmlClient,
+                RDFClient RDFClient,
                 RetryPolicy<Object> retryPolicy,
                 int batchSize) {
             super(sourceIterable, batchSize);
             this.type = type;
             this.format = format;
-            this.rdfxmlClient = rdfxmlClient;
+            this.RDFClient = RDFClient;
             this.retryPolicy = retryPolicy;
         }
 
@@ -83,7 +83,7 @@ public class RDFStreamer {
                                             "Call to RDF server failed for accessions {} with error {}",
                                             batch,
                                             throwable.getFailure().getMessage()))
-                    .get(() -> rdfxmlClient.getEntries(batch, type, format));
+                    .get(() -> RDFClient.getEntries(batch, type, format));
         }
     }
 }

@@ -204,7 +204,9 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
         Optional<String> acceptedCustomType = getAcceptedCustomType(request);
         if (acceptedCustomType.isPresent()) {
             return super.streamRDF(
-                    () -> subcellularLocationService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    () ->
+                            subcellularLocationService.streamRDF(
+                                    streamRequest, TYPE, acceptedCustomType.get()),
                     streamRequest,
                     contentType,
                     request);

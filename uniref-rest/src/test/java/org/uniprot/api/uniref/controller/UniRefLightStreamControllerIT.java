@@ -93,8 +93,10 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     @Autowired UniProtStoreClient<UniRefEntryLight> storeClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private SolrClient solrClient;
+
     @MockBean(name = "unirefRdfRestTemplate")
     private RestTemplate restTemplate;
+
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
 

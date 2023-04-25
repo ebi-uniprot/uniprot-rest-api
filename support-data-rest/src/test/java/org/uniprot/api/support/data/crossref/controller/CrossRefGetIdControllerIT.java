@@ -1,5 +1,9 @@
 package org.uniprot.api.support.data.crossref.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,18 +33,14 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.dbxref.CrossRefDocument;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(CrossRefController.class)
 @ExtendWith(
         value = {
-                SpringExtension.class,
-                CrossRefGetIdControllerIT.CrossRefGetIdParameterResolver.class,
-                CrossRefGetIdControllerIT.CrossRefGetIdContentTypeParamResolver.class
+            SpringExtension.class,
+            CrossRefGetIdControllerIT.CrossRefGetIdParameterResolver.class,
+            CrossRefGetIdControllerIT.CrossRefGetIdContentTypeParamResolver.class
         })
 public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
 
@@ -48,7 +48,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     @Autowired private CrossRefRepository repository;
 
-    @MockBean(name="supportDataRdfRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Override

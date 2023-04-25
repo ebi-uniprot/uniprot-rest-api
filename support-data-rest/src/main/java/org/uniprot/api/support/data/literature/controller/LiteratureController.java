@@ -197,7 +197,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
         Optional<String> acceptedCustomType = getAcceptedCustomType(request);
         if (acceptedCustomType.isPresent()) {
             return super.streamRDF(
-                    () -> literatureService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    () ->
+                            literatureService.streamRDF(
+                                    streamRequest, TYPE, acceptedCustomType.get()),
                     streamRequest,
                     contentType,
                     request);

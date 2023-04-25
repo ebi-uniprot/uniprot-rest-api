@@ -62,8 +62,9 @@ public class UniRefEntryLightService
             SolrQueryConfig uniRefSolrQueryConf,
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
-            RDFStreamer unirefRdfXmlStreamer,
-            FacetTupleStreamTemplate facetTupleStreamTemplate, TupleStreamDocumentIdStream documentIdStream) {
+            RDFStreamer unirefRdfStreamer,
+            FacetTupleStreamTemplate facetTupleStreamTemplate,
+            TupleStreamDocumentIdStream documentIdStream) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -75,7 +76,7 @@ public class UniRefEntryLightService
         this.uniRefQueryProcessorConfig = uniRefQueryProcessorConfig;
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.solrQueryConfig = uniRefSolrQueryConf;
-        this.rdfStreamer = unirefRdfXmlStreamer;
+        this.rdfStreamer = unirefRdfStreamer;
         this.documentIdStream = documentIdStream;
     }
 
@@ -206,7 +207,7 @@ public class UniRefEntryLightService
      * This method remove MemberIdType from member list and return just memberId
      *
      * @param members List of members that are stored in Voldemort with format:
-     *                "memberId,MemberIdType"
+     *     "memberId,MemberIdType"
      * @return List of return clean member with the format "memberId"
      */
     private List<String> removeMemberTypeFromMemberId(List<String> members) {

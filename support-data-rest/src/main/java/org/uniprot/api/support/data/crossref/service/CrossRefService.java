@@ -35,7 +35,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
             UniProtQueryProcessorConfig crossRefQueryProcessorConfig,
             SearchFieldConfig crossRefSearchFieldConfig,
             DefaultDocumentIdStream<CrossRefDocument> documentIdStream,
-            RDFStreamer supportDataRdfXmlStreamer) {
+            RDFStreamer supportDataRdfStreamer) {
         super(
                 crossRefRepository,
                 toCrossRefEntryConverter,
@@ -45,7 +45,7 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
         this.crossRefQueryProcessorConfig = crossRefQueryProcessorConfig;
         this.searchFieldConfig = crossRefSearchFieldConfig;
         this.documentIdStream = documentIdStream;
-        this.rdfStreamer = supportDataRdfXmlStreamer;
+        this.rdfStreamer = supportDataRdfStreamer;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.output;
+package org.uniprot.api.support.data.common;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,42 +13,49 @@ import org.uniprot.api.common.repository.stream.rdf.RDFStreamConfig;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
-import org.uniprot.api.rest.service.RDFXMLClient;
+import org.uniprot.api.rest.service.RDFClient;
 import org.uniprot.api.rest.service.TagProvider;
 
 import java.util.Collections;
 
 @Configuration
-public class UniProtStreamConfig {
+public class SupportDataRDFStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagProvider tagProvider;
 
-    public UniProtStreamConfig(PrologProvider prologProvider, TagProvider tagProvider) {
+    public SupportDataRDFStreamerConfig(PrologProvider prologProvider, TagProvider tagProvider) {
         this.prologProvider = prologProvider;
         this.tagProvider = tagProvider;
     }
 
     @Bean
-    public RDFStreamer uniprotRdfXmlStreamer(RDFStreamerConfigProperties uniprotRDFStreamerConfigProperties, RestTemplate uniprotRdfRestTemplate) {
+    public RDFStreamer supportDataRdfStreamer(
+            RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties,
+            RestTemplate supportDataRdfRestTemplate) {
         return new RDFStreamer(
-                uniprotRDFStreamerConfigProperties.getBatchSize(),
+                supportDataRDFStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                new RDFXMLClient(tagProvider, uniprotRdfRestTemplate),
-                RDFStreamConfig.rdfRetryPolicy(uniprotRDFStreamerConfigProperties));
+                new RDFClient(tagProvider, supportDataRdfRestTemplate),
+                RDFStreamConfig.rdfRetryPolicy(supportDataRDFStreamerConfigProperties));
     }
 
     @Bean
-    public RestTemplate uniprotRdfRestTemplate(RDFStreamerConfigProperties uniprotRDFStreamerConfigProperties) {
-        ClientHttpRequestFactory factory = new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
+    public RestTemplate supportDataRdfRestTemplate(
+            RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties) {
+        ClientHttpRequestFactory factory =
+                new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
-        restTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
-        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(uniprotRDFStreamerConfigProperties.getRequestUrl()));
+        restTemplate.setInterceptors(
+                Collections.singletonList(new RequestResponseLoggingInterceptor()));
+        restTemplate.setUriTemplateHandler(
+                new DefaultUriBuilderFactory(
+                        supportDataRDFStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "uniprot.rdf.streamer")
-    public RDFStreamerConfigProperties uniprotRDFStreamerConfigProperties() {
+    @ConfigurationProperties(prefix = "support.data.rdf.streamer")
+    public RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties() {
         return new RDFStreamerConfigProperties();
     }
 }

@@ -1,5 +1,28 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH;
+import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH;
+import static org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -29,29 +52,6 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.controller.UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH;
-import static org.uniprot.api.idmapping.controller.UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH;
-import static org.uniprot.api.idmapping.controller.UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH;
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 
 /**
  * @author lgonzales

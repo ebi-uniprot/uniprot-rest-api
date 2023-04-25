@@ -1,6 +1,11 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +49,7 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author lgonzales
@@ -64,7 +65,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
             LiteratureGetIdControllerIT.LiteratureGetIdContentTypeParamResolver.class
         })
 class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
-    @MockBean(name="supportDataRdfRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final long PUBMED_ID = 100L;
@@ -376,7 +377,8 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
                                                     .string(
                                                             containsString(
                                                                     "The citation id has invalid format")))
-                                    .build()).contentTypeParam(
+                                    .build())
+                    .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
                                     .resultMatcher(

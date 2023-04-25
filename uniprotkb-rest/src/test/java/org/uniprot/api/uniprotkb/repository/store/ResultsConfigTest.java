@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.Test;
@@ -15,9 +18,6 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageS
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageServiceImpl;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ResultsConfigTest {
 

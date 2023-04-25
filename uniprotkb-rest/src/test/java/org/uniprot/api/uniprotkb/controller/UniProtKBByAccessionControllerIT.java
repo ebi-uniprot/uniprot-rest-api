@@ -46,6 +46,11 @@ import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.*;
@@ -56,12 +61,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
 
 /** @author lgonzales */
 @ContextConfiguration(
@@ -763,7 +762,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                                             + "    <anotherSample>text2</anotherSample>\n"
                                                                             + "    <someMore>text3</someMore>\n"
                                                                             + "</rdf:RDF>")))
-                                    .build()).contentTypeParam(
+                                    .build())
+                    .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
                                     .resultMatcher(
@@ -785,8 +785,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .contentType(UniProtMediaType.NT_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
-                                                    .string(
-                                                            startsWith(NTPrologs.NT_COMMON_PROLOG)))
+                                                    .string(startsWith(NTPrologs.NT_COMMON_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(

@@ -1,5 +1,13 @@
 package org.uniprot.api.uniparc.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,14 +30,6 @@ import org.uniprot.api.rest.service.TTLPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
-
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 
 /**
  * @author jluo
@@ -205,8 +205,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .contentType(UniProtMediaType.NT_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
-                                                    .string(
-                                                            startsWith(NTPrologs.NT_COMMON_PROLOG)))
+                                                    .string(startsWith(NTPrologs.NT_COMMON_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(

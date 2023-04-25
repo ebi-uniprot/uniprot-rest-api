@@ -1,5 +1,9 @@
 package org.uniprot.api.idmapping.output.converter.uniprotkb;
 
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+
+import java.util.List;
+
 import org.springframework.http.converter.HttpMessageConverter;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
@@ -8,10 +12,6 @@ import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
 import org.uniprot.core.parser.tsv.uniprot.UniProtKBEntryValueMapper;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
-
-import java.util.List;
-
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 
 /**
  * @author sahmad

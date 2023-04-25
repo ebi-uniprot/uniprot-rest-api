@@ -85,7 +85,7 @@ public class UniProtEntryService
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
             TupleStreamDocumentIdStream documentIdStream,
-            RDFStreamer uniprotRdfXmlStreamer) {
+            RDFStreamer uniprotRdfStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -101,7 +101,7 @@ public class UniProtEntryService
         this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.rdfStreamer = uniprotRdfXmlStreamer;
+        this.rdfStreamer = uniprotRdfStreamer;
         this.documentIdStream = documentIdStream;
     }
 
@@ -217,7 +217,8 @@ public class UniProtEntryService
         }
     }
 
-    public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest, String type, String format) {
+    public Stream<String> streamRDF(
+            UniProtKBStreamRequest streamRequest, String type, String format) {
         SolrRequest solrRequest = createDownloadSolrRequest(streamRequest);
         return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), type, format);
     }

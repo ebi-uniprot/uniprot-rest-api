@@ -1,5 +1,16 @@
 package org.uniprot.api.rest.controller;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.*;
+
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,17 +26,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.output.UniProtMediaType;
-
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.*;
 
 /**
  * @author sahmad
@@ -67,8 +67,8 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(
                         header().string(
-                                HttpHeaders.CONTENT_TYPE,
-                                UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE))
                 .andExpect(
                         content()
                                 .string(

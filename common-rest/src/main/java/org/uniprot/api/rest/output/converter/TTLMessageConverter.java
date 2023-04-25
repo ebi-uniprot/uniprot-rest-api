@@ -1,10 +1,10 @@
 package org.uniprot.api.rest.output.converter;
 
-import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.rest.output.UniProtMediaType;
-
 import java.io.IOException;
 import java.io.OutputStream;
+
+import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.rest.output.UniProtMediaType;
 
 public class TTLMessageConverter extends AbstractEntityIdHttpMessageConverter<String> {
     public TTLMessageConverter() {

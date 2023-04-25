@@ -8,13 +8,13 @@ import java.net.URI;
 import java.util.*;
 
 @Slf4j
-public class RDFXMLClient {
+public class RDFClient {
     private final TagProvider tagProvider;
     private final RestTemplate restTemplate;
 
-    public RDFXMLClient(TagProvider tagProvider, RestTemplate rdfXmlTemplate) {
+    public RDFClient(TagProvider tagProvider, RestTemplate restTemplate) {
         this.tagProvider = tagProvider;
-        this.restTemplate = rdfXmlTemplate;
+        this.restTemplate = restTemplate;
     }
 
     public List<String> getEntries(Iterable<String> accessions, String type, String format) {
@@ -38,7 +38,8 @@ public class RDFXMLClient {
     private String getEntriesByAccessions(List<String> accessions, String type, String format) {
         String commaSeparatedIds = String.join(",", accessions);
 
-        DefaultUriBuilderFactory handler = (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
+        DefaultUriBuilderFactory handler =
+                (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
 
         URI requestUri = handler.builder().build(type, format, commaSeparatedIds);
 
@@ -69,8 +70,8 @@ public class RDFXMLClient {
      * @return
      */
     private String convertRDFForStreaming(String body, String format) {
-        int startingPosition = tagProvider.getStartingPosition(body,format);
-        int indexOfCloseTag = tagProvider.getEndingPosition(body,format);
+        int startingPosition = tagProvider.getStartingPosition(body, format);
+        int indexOfCloseTag = tagProvider.getEndingPosition(body, format);
         return body.substring(startingPosition, indexOfCloseTag);
     }
 }

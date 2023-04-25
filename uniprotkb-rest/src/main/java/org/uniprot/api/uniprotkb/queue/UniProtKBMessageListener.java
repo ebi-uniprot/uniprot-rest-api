@@ -1,6 +1,17 @@
 package org.uniprot.api.uniprotkb.queue;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -22,16 +33,6 @@ import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -176,7 +177,8 @@ public class UniProtKBMessageListener implements MessageListener {
         try {
             writeSolrResult(request, idsFile, jobId);
             StoreRequest storeRequest = service.buildStoreRequest(request);
-            downloadResultWriter.writeResult(request, idsFile, jobId, contentType, storeRequest, TYPE);
+            downloadResultWriter.writeResult(
+                    request, idsFile, jobId, contentType, storeRequest, TYPE);
             log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
             logMessageAndDeleteFile(ex, jobId);

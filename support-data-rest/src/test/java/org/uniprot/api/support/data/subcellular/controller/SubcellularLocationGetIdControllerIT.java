@@ -1,6 +1,9 @@
 package org.uniprot.api.support.data.subcellular.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,9 +33,7 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @ActiveProfiles(profiles = "offline")
@@ -47,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SubcellularLocationGetIdControllerIT
         extends AbstractGetByIdWithTypeExtensionControllerIT {
 
-    @MockBean(name="supportDataRdfRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final String SUBCELL_ACCESSION = "SL-0005";
@@ -330,7 +331,8 @@ public class SubcellularLocationGetIdControllerIT
                                                     .string(
                                                             containsString(
                                                                     "The subcellular location id value has invalid format")))
-                                    .build()).contentTypeParam(
+                                    .build())
+                    .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
                                     .resultMatcher(

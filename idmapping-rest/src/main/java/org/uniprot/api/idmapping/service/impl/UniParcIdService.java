@@ -43,10 +43,15 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryP
             @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig,
             @Qualifier("uniParcStoreRetryPolicy") RetryPolicy<Object> storeFetchRetryPolicy,
             UniParcFacetConfig facetConfig,
-            RDFStreamer idMappingRdfXmlStreamer,
+            RDFStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniParcEntry> storeClient,
             SolrQueryConfig uniParcSolrQueryConf) {
-        super(storeStreamer, tupleStream, facetConfig, idMappingRdfXmlStreamer, uniParcSolrQueryConf);
+        super(
+                storeStreamer,
+                tupleStream,
+                facetConfig,
+                idMappingRdfStreamer,
+                uniParcSolrQueryConf);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;

@@ -80,9 +80,12 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             })
     @GetMapping(
             value = "/{id}",
-            produces = {APPLICATION_JSON_VALUE, RDF_MEDIA_TYPE_VALUE,
-                    TTL_MEDIA_TYPE_VALUE,
-                    NT_MEDIA_TYPE_VALUE})
+            produces = {
+                APPLICATION_JSON_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
+            })
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> findByAccession(
             @Parameter(description = "cross-references database id to find")
                     @PathVariable("id")
@@ -153,9 +156,12 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             })
     @GetMapping(
             value = "/stream",
-            produces = {APPLICATION_JSON_VALUE, RDF_MEDIA_TYPE_VALUE,
-                    TTL_MEDIA_TYPE_VALUE,
-                    NT_MEDIA_TYPE_VALUE})
+            produces = {
+                APPLICATION_JSON_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
+            })
     public DeferredResult<ResponseEntity<MessageConverterContext<CrossRefEntry>>> stream(
             @Valid @ModelAttribute CrossRefStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)

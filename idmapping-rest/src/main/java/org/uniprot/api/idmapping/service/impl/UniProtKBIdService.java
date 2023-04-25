@@ -69,7 +69,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
             UniprotKBMappingRepository repository,
             UniProtKBFacetConfig facetConfig,
-            RDFStreamer idMappingRdfXmlStreamer,
+            RDFStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniProtKBEntry> storeClient,
             SolrQueryConfig uniProtKBSolrQueryConf,
             TaxonomyLineageService lineageService) {
@@ -77,7 +77,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 storeStreamer,
                 tupleStream,
                 facetConfig,
-                idMappingRdfXmlStreamer,
+                idMappingRdfStreamer,
                 uniProtKBSolrQueryConf);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;

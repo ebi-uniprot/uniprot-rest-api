@@ -38,7 +38,7 @@ public class SubcellularLocationService
             UniProtQueryProcessorConfig subcellQueryProcessorConfig,
             SearchFieldConfig subcellSearchFieldConfig,
             DefaultDocumentIdStream<SubcellularLocationDocument> documentIdStream,
-            RDFStreamer supportDataRdfXmlStreamer) {
+            RDFStreamer supportDataRdfStreamer) {
         super(
                 repository,
                 subcellularLocationEntryConverter,
@@ -48,7 +48,7 @@ public class SubcellularLocationService
         this.subcellQueryProcessorConfig = subcellQueryProcessorConfig;
         this.searchFieldConfig = subcellSearchFieldConfig;
         this.documentIdStream = documentIdStream;
-        this.rdfStreamer = supportDataRdfXmlStreamer;
+        this.rdfStreamer = supportDataRdfStreamer;
     }
 
     @Override
@@ -68,6 +68,6 @@ public class SubcellularLocationService
 
     @Override
     protected DefaultDocumentIdStream<SubcellularLocationDocument> getDocumentIdStream() {
-        return this.documentIdStream    ;
+        return this.documentIdStream;
     }
 }

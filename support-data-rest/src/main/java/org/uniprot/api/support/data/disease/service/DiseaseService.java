@@ -33,7 +33,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
             UniProtQueryProcessorConfig diseaseQueryProcessorConfig,
             SearchFieldConfig diseaseSearchFieldConfig,
             DefaultDocumentIdStream<DiseaseDocument> documentIdStream,
-            RDFStreamer supportDataRdfXmlStreamer) {
+            RDFStreamer supportDataRdfStreamer) {
 
         super(
                 diseaseRepository,
@@ -43,7 +43,7 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 null);
         this.diseaseQueryProcessorConfig = diseaseQueryProcessorConfig;
         this.searchFieldConfig = diseaseSearchFieldConfig;
-        this.rdfStreamer = supportDataRdfXmlStreamer;
+        this.rdfStreamer = supportDataRdfStreamer;
         this.documentIdStream = documentIdStream;
     }
 

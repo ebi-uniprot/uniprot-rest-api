@@ -1,10 +1,16 @@
 package org.uniprot.api.uniref.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -22,15 +28,11 @@ import org.uniprot.api.uniref.service.UniRefEntryService;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author jluo
@@ -60,35 +62,35 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
     @GetMapping(
             value = "/{id}",
             produces = {
-                    TSV_MEDIA_TYPE_VALUE,
-                    FASTA_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE,
-                    APPLICATION_XML_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE,
-                    RDF_MEDIA_TYPE_VALUE,
-                    TTL_MEDIA_TYPE_VALUE,
-                    NT_MEDIA_TYPE_VALUE
+                TSV_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE,
+                APPLICATION_XML_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TTL_MEDIA_TYPE_VALUE,
+                NT_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve an UniRef cluster by id.",
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = UniRefEntry.class)),
-                                    @Content(
-                                            mediaType = APPLICATION_XML_VALUE,
-                                            schema = @Schema(implementation = Entry.class)),
-                                    @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = TTL_MEDIA_TYPE_VALUE),
-                                    @Content(mediaType = NT_MEDIA_TYPE_VALUE)
-                            })
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = UniRefEntry.class)),
+                            @Content(
+                                    mediaType = APPLICATION_XML_VALUE,
+                                    schema = @Schema(implementation = Entry.class)),
+                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = TTL_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = NT_MEDIA_TYPE_VALUE)
+                        })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntry>> getById(
             @Valid @ModelAttribute UniRefIdRequest idRequest,

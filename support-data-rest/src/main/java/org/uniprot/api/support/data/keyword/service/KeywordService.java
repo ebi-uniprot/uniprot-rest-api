@@ -32,7 +32,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             KeywordFacetConfig facetConfig,
             SearchFieldConfig keywordSearchFieldConfig,
             DefaultDocumentIdStream<KeywordDocument> documentIdStream,
-            RDFStreamer supportDataRdfXmlStreamer) {
+            RDFStreamer supportDataRdfStreamer) {
         super(
                 repository,
                 keywordEntryConverter,
@@ -41,7 +41,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
                 facetConfig);
         this.keywordQueryProcessorConfig = keywordQueryProcessorConfig;
         this.fieldConfig = keywordSearchFieldConfig;
-        this.rdfStreamer = supportDataRdfXmlStreamer;
+        this.rdfStreamer = supportDataRdfStreamer;
         this.documentIdStream = documentIdStream;
     }
 

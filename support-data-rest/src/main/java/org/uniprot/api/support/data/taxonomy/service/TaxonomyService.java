@@ -39,13 +39,13 @@ public class TaxonomyService extends BasicSearchService<TaxonomyDocument, Taxono
             SolrQueryConfig taxonomySolrQueryConf,
             UniProtQueryProcessorConfig taxonomyQueryProcessorConfig,
             SearchFieldConfig taxonomySearchFieldConfig,
-            RDFStreamer supportDataRdfXmlStreamer,
+            RDFStreamer supportDataRdfStreamer,
             DefaultDocumentIdStream<TaxonomyDocument> documentIdStream) {
 
         super(repository, converter, taxonomySortClause, taxonomySolrQueryConf, facetConfig);
         this.taxonomyQueryProcessorConfig = taxonomyQueryProcessorConfig;
         this.searchFieldConfig = taxonomySearchFieldConfig;
-        this.rdfStreamer = supportDataRdfXmlStreamer;
+        this.rdfStreamer = supportDataRdfStreamer;
         this.documentIdStream = documentIdStream;
     }
 

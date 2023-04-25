@@ -39,7 +39,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             UniProtQueryProcessorConfig literatureQueryProcessorConfig,
             SearchFieldConfig literatureSearchFieldConfig,
             DefaultDocumentIdStream<LiteratureDocument> documentIdStream,
-            RDFStreamer supportDataRdfXmlStreamer) {
+            RDFStreamer supportDataRdfStreamer) {
         super(
                 repository,
                 entryConverter,
@@ -48,7 +48,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
                 facetConfig);
         this.literatureQueryProcessorConfig = literatureQueryProcessorConfig;
         this.searchFieldConfig = literatureSearchFieldConfig;
-        this.rdfStreamer = supportDataRdfXmlStreamer;
+        this.rdfStreamer = supportDataRdfStreamer;
         this.documentIdStream = documentIdStream;
     }
 

@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.common;
+package org.uniprot.api.idmapping.service.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,42 +13,48 @@ import org.uniprot.api.common.repository.stream.rdf.RDFStreamConfig;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
-import org.uniprot.api.rest.service.RDFXMLClient;
+import org.uniprot.api.rest.service.RDFClient;
 import org.uniprot.api.rest.service.TagProvider;
 
 import java.util.Collections;
 
 @Configuration
-public class SupportDataStreamConfig {
+public class IdMappingRDFStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagProvider tagProvider;
 
-    public SupportDataStreamConfig(PrologProvider prologProvider, TagProvider tagProvider) {
+    public IdMappingRDFStreamerConfig(PrologProvider prologProvider, TagProvider tagProvider) {
         this.prologProvider = prologProvider;
         this.tagProvider = tagProvider;
     }
 
     @Bean
-    public RDFStreamer supportDataRdfXmlStreamer(RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties, RestTemplate supportDataRdfRestTemplate) {
+    public RDFStreamer idMappingRdfStreamer(
+            RDFStreamerConfigProperties idMappingRDFStreamerConfigProperties,
+            RestTemplate idMappingRdfRestTemplate) {
         return new RDFStreamer(
-                supportDataRDFStreamerConfigProperties.getBatchSize(),
+                idMappingRDFStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                new RDFXMLClient(tagProvider, supportDataRdfRestTemplate),
-                RDFStreamConfig.rdfRetryPolicy(supportDataRDFStreamerConfigProperties));
+                new RDFClient(tagProvider, idMappingRdfRestTemplate),
+                RDFStreamConfig.rdfRetryPolicy(idMappingRDFStreamerConfigProperties));
     }
 
     @Bean
-    public RestTemplate supportDataRdfRestTemplate(RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties) {
-        ClientHttpRequestFactory factory = new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
+    public RestTemplate idMappingRdfRestTemplate(
+            RDFStreamerConfigProperties idMappingRDFStreamerConfigProperties) {
+        ClientHttpRequestFactory factory =
+                new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
-        restTemplate.setInterceptors(Collections.singletonList(new RequestResponseLoggingInterceptor()));
-        restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(supportDataRDFStreamerConfigProperties.getRequestUrl()));
+        restTemplate.setInterceptors(
+                Collections.singletonList(new RequestResponseLoggingInterceptor()));
+        restTemplate.setUriTemplateHandler(
+                new DefaultUriBuilderFactory(idMappingRDFStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "support.data.rdf.streamer")
-    public RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties() {
+    @ConfigurationProperties(prefix = "id.mapping.rdf.streamer")
+    public RDFStreamerConfigProperties idMappingRDFStreamerConfigProperties() {
         return new RDFStreamerConfigProperties();
     }
 }

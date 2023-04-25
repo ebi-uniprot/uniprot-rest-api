@@ -67,8 +67,9 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SolrQueryConfig uniParcSolrQueryConf,
             UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
-            RDFStreamer uniparcRdfXmlStreamer,
-            FacetTupleStreamTemplate facetTupleStreamTemplate, TupleStreamDocumentIdStream documentIdStream) {
+            RDFStreamer uniparcRdfStreamer,
+            FacetTupleStreamTemplate facetTupleStreamTemplate,
+            TupleStreamDocumentIdStream documentIdStream) {
 
         super(
                 repository,
@@ -83,7 +84,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
         this.solrQueryConfig = uniParcSolrQueryConf;
-        this.rdfStreamer = uniparcRdfXmlStreamer;
+        this.rdfStreamer = uniparcRdfStreamer;
         this.documentIdStream = documentIdStream;
     }
 
@@ -131,7 +132,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return QueryResult.of(filtered, results.getPage(), results.getFacets());
     }
 
-    public Stream<String> streamRDF(UniParcStreamRequest streamRequest, String type, String format) {
+    public Stream<String> streamRDF(
+            UniParcStreamRequest streamRequest, String type, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
         return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), type, format);

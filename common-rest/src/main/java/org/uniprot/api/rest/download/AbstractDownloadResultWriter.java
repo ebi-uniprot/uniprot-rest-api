@@ -1,19 +1,7 @@
 package org.uniprot.api.rest.download;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
-import org.uniprot.api.common.repository.stream.store.StoreRequest;
-import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
-import org.uniprot.api.rest.request.DownloadRequest;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,8 +19,21 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPOutputStream;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import org.uniprot.api.rest.request.DownloadRequest;
 
 @Slf4j
 public abstract class AbstractDownloadResultWriter<T> implements DownloadResultWriter {
@@ -65,7 +66,8 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             Path idFile,
             String jobId,
             MediaType contentType,
-            StoreRequest storeRequest, String type)
+            StoreRequest storeRequest,
+            String type)
             throws IOException {
         String fileNameWithExt = jobId + FileType.GZIP.getExtension();
         Path resultPath =

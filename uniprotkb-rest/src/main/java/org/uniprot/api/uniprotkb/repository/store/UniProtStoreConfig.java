@@ -1,6 +1,5 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

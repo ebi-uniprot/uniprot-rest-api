@@ -134,7 +134,8 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         saveEntry(uniProtKBEntry);
 
         uniProtKBEntry =
-                UniProtKBEntryBuilder.from(UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM))
+                UniProtKBEntryBuilder.from(
+                                UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM))
                         .build();
         saveEntry(uniProtKBEntry);
 

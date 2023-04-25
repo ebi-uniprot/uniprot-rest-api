@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.output.converter.uniref;
 
+import java.util.List;
+
 import org.springframework.http.converter.HttpMessageConverter;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
@@ -8,8 +10,6 @@ import org.uniprot.api.rest.output.converter.*;
 import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
 import org.uniprot.core.parser.tsv.uniref.UniRefEntryLightValueMapper;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
-
-import java.util.List;
 
 /**
  * @author sahmad
