@@ -15,17 +15,17 @@ import java.util.stream.StreamSupport;
 public class RDFStreamer {
     private final int batchSize;
     private final PrologProvider prologProvider;
-    private final RDFClient RDFClient;
+    private final RDFClient rdfClient;
     private final RetryPolicy<Object> rdfFetchRetryPolicy;
 
     public RDFStreamer(
             int batchSize,
             PrologProvider prologProvider,
-            RDFClient RDFClient,
+            RDFClient rdfClient,
             RetryPolicy<Object> rdfFetchRetryPolicy) {
         this.batchSize = batchSize;
         this.prologProvider = prologProvider;
-        this.RDFClient = RDFClient;
+        this.rdfClient = rdfClient;
         this.rdfFetchRetryPolicy = rdfFetchRetryPolicy;
     }
 
@@ -35,7 +35,7 @@ public class RDFStreamer {
                         type,
                         format,
                         entryIds::iterator,
-                        RDFClient,
+                        rdfClient,
                         rdfFetchRetryPolicy,
                         batchSize);
 
@@ -57,20 +57,20 @@ public class RDFStreamer {
     private static class BatchRDFXMLStoreIterable extends BatchIterable<String> {
         private final String type;
         private final String format;
-        private final RDFClient RDFClient;
+        private final RDFClient rdfClient;
         private final RetryPolicy<Object> retryPolicy;
 
         BatchRDFXMLStoreIterable(
                 String type,
                 String format,
                 Iterable<String> sourceIterable,
-                RDFClient RDFClient,
+                RDFClient rdfClient,
                 RetryPolicy<Object> retryPolicy,
                 int batchSize) {
             super(sourceIterable, batchSize);
             this.type = type;
             this.format = format;
-            this.RDFClient = RDFClient;
+            this.rdfClient = rdfClient;
             this.retryPolicy = retryPolicy;
         }
 
@@ -83,7 +83,7 @@ public class RDFStreamer {
                                             "Call to RDF server failed for accessions {} with error {}",
                                             batch,
                                             throwable.getFailure().getMessage()))
-                    .get(() -> RDFClient.getEntries(batch, type, format));
+                    .get(() -> rdfClient.getEntries(batch, type, format));
         }
     }
 }
