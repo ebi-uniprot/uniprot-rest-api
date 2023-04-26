@@ -8,12 +8,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamConfig;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
-import org.uniprot.api.rest.service.RDFClient;
 import org.uniprot.api.rest.service.TagProvider;
 
 import java.util.Collections;
@@ -31,12 +27,17 @@ public class UniRefRDFStreamerConfig {
     @Bean
     public RDFStreamer unirefRdfStreamer(
             RDFStreamerConfigProperties unirefRDFStreamerConfigProperties,
-            RestTemplate unirefRdfRestTemplate) {
+            RDFServiceFactory unirefRdfServiceFactory) {
         return new RDFStreamer(
                 unirefRDFStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                new RDFClient(tagProvider, unirefRdfRestTemplate),
+                unirefRdfServiceFactory,
                 RDFStreamConfig.rdfRetryPolicy(unirefRDFStreamerConfigProperties));
+    }
+
+    @Bean
+    public RDFServiceFactory unirefRdfServiceFactory(RestTemplate unirefRdfRestTemplate) {
+        return new RDFServiceFactory(unirefRdfRestTemplate, tagProvider);
     }
 
     @Bean
@@ -48,7 +49,8 @@ public class UniRefRDFStreamerConfig {
         restTemplate.setInterceptors(
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
-                new DefaultUriBuilderFactory(unirefRDFStreamerConfigProperties.getRequestUrl()));
+                new DefaultUriBuilderFactory(
+                        unirefRDFStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 

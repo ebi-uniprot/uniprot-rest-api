@@ -1,66 +1,63 @@
 package org.uniprot.api.rest.service;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.store.datastore.common.StoreService;
 
-public class RDFService<T> implements StoreService<T> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RDFService.class);
-    public static final String RDF_CLOSE_TAG = "</rdf:RDF>";
-    private static final String OWL_CLOSE_TAG = "</owl:Ontology>";
-    private Class<T> clazz;
-    private RestTemplate restTemplate;
+import java.net.URI;
+import java.util.*;
 
-    public RDFService(RestTemplate restTemplate, Class<T> clazz) {
+@Slf4j
+public class RDFService<T> implements StoreService<T> {
+    private final TagProvider tagProvider;
+    private final RestTemplate restTemplate;
+    private final Class<T> clazz;
+    @Getter
+    private final String type;
+    @Getter
+    private final String format;
+
+    public RDFService(TagProvider tagProvider, RestTemplate restTemplate, Class<T> clazz, String type, String format) {
+        this.tagProvider = tagProvider;
         this.restTemplate = restTemplate;
         this.clazz = clazz;
+        this.type = type;
+        this.format = format;
     }
 
     @Override
     public List<T> getEntries(Iterable<String> accessions) {
         List<String> allAccessions = new ArrayList<>();
-        accessions.forEach(acc -> allAccessions.add(acc));
-        LOGGER.debug("RDF call for accessions : {}", allAccessions);
-        T rdfXML = getEntriesByAccessions(allAccessions);
+        accessions.forEach(allAccessions::add);
+        log.debug("RDF call for accessions : {}", allAccessions);
+        T rdfXML = getEntriesByAccessions(allAccessions, type, format);
+
         if (Objects.nonNull(rdfXML)) {
             T rdfResponse = convertRDFForStreaming(rdfXML);
-            return Arrays.asList(rdfResponse);
+            return Collections.singletonList(rdfResponse);
         } else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
     @Override
     public String getStoreName() {
-        return "RDF Store";
+        return String.format("%s %s Store", type, format);
     }
 
     @Override
     public Optional<T> getEntry(String id) {
-        return Optional.ofNullable(getEntriesByAccessions(Arrays.asList(id)));
+        return Optional.ofNullable(getEntriesByAccessions(Collections.singletonList(id), type, format));
     }
 
-    private T getEntriesByAccessions(List<String> accessions) {
-        String commaSeparatedIds = accessions.stream().collect(Collectors.joining(","));
+    private T getEntriesByAccessions(List<String> accessions, String type, String format) {
+        String commaSeparatedIds = String.join(",", accessions);
+        DefaultUriBuilderFactory handler = (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
+        URI requestUri = handler.builder().build(type, format, commaSeparatedIds);
 
-        DefaultUriBuilderFactory handler =
-                (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
-
-        URI requestUri = handler.builder().build(commaSeparatedIds);
-
-        T rdfXML = restTemplate.getForObject(requestUri, this.clazz);
-
-        return rdfXML;
+        return restTemplate.getForObject(requestUri, this.clazz);
     }
 
     /**
@@ -82,17 +79,16 @@ public class RDFService<T> implements StoreService<T> {
      * beginning of stream and RDF_CLOSE_TAG will be added in the end of the stream. see
      * Stream.concat in StoreStreamer
      *
-     * @param rdfXML
+     * @param body
      * @return
      */
-    private T convertRDFForStreaming(T rdfXML) {
-        T rdfResponse = rdfXML;
+    private T convertRDFForStreaming(T body) {
+        T rdfResponse = body;
         if (this.clazz == String.class) {
-            int indexOfCloseTag = ((String) rdfXML).indexOf(RDF_CLOSE_TAG);
-            int endIndexOfOwlOntology =
-                    ((String) rdfXML).indexOf(OWL_CLOSE_TAG) + OWL_CLOSE_TAG.length();
-            // get everything between "</owl:Ontology>" and "</rdf:RDF>"
-            rdfResponse = (T) ((String) rdfXML).substring(endIndexOfOwlOntology, indexOfCloseTag);
+            String bodyString = (String) body;
+            int startingPosition = tagProvider.getStartingPosition(bodyString, format);
+            int indexOfCloseTag = tagProvider.getEndingPosition(bodyString, format);
+            rdfResponse = (T) bodyString.substring(startingPosition, indexOfCloseTag);
         }
         return rdfResponse;
     }

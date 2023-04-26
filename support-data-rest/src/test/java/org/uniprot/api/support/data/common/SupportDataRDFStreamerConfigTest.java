@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
+import org.uniprot.api.common.repository.stream.rdf.RDFServiceFactory;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.rest.service.TagProvider;
@@ -16,8 +17,12 @@ class SupportDataRDFStreamerConfigTest {
     private PrologProvider prologProvider;
     @Mock
     private TagProvider tagProvider;
-    private SupportDataRDFStreamerConfig supportDataRDFStreamerConfig;
+    @Mock
+    private RestTemplate restTemplate;
+    @Mock
+    private RDFServiceFactory rdfServiceFactory;
     private RDFStreamerConfigProperties properties;
+    private SupportDataRDFStreamerConfig supportDataRDFStreamerConfig;
 
     @BeforeEach
     void setUp() {
@@ -31,9 +36,14 @@ class SupportDataRDFStreamerConfigTest {
 
     @Test
     void supportDataRdfStreamer() {
-        RestTemplate restTemplate = new RestTemplate();
-        RDFStreamer rdfStreamer = supportDataRDFStreamerConfig.supportDataRdfStreamer(properties, restTemplate);
+        RDFStreamer rdfStreamer = supportDataRDFStreamerConfig.supportDataRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
+    }
+
+    @Test
+    void supportDataRdfServiceFactory() {
+        RDFServiceFactory rdfServiceFactory = supportDataRDFStreamerConfig.supportDataRdfServiceFactory(restTemplate);
+        assertNotNull(rdfServiceFactory);
     }
 
     @Test

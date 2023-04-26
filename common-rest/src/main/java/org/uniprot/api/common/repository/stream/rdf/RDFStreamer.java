@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 import org.uniprot.api.common.repository.stream.common.BatchIterable;
-import org.uniprot.api.rest.service.RDFClient;
+import org.uniprot.api.rest.service.RDFService;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,27 +15,25 @@ import java.util.stream.StreamSupport;
 public class RDFStreamer {
     private final int batchSize;
     private final PrologProvider prologProvider;
-    private final RDFClient rdfClient;
+    private final RDFServiceFactory rdfServiceFactory;
     private final RetryPolicy<Object> rdfFetchRetryPolicy;
 
     public RDFStreamer(
             int batchSize,
             PrologProvider prologProvider,
-            RDFClient rdfClient,
+            RDFServiceFactory rdfServiceFactory,
             RetryPolicy<Object> rdfFetchRetryPolicy) {
         this.batchSize = batchSize;
         this.prologProvider = prologProvider;
-        this.rdfClient = rdfClient;
+        this.rdfServiceFactory = rdfServiceFactory;
         this.rdfFetchRetryPolicy = rdfFetchRetryPolicy;
     }
 
     public Stream<String> stream(Stream<String> entryIds, String type, String format) {
         BatchRDFXMLStoreIterable batchRDFXMLStoreIterable =
                 new BatchRDFXMLStoreIterable(
-                        type,
-                        format,
                         entryIds::iterator,
-                        rdfClient,
+                        rdfServiceFactory.getRdfService(type, format),
                         rdfFetchRetryPolicy,
                         batchSize);
 
@@ -55,22 +53,16 @@ public class RDFStreamer {
 
     // iterable for RDF streaming
     private static class BatchRDFXMLStoreIterable extends BatchIterable<String> {
-        private final String type;
-        private final String format;
-        private final RDFClient rdfClient;
+        private final RDFService<String> rdfService;
         private final RetryPolicy<Object> retryPolicy;
 
         BatchRDFXMLStoreIterable(
-                String type,
-                String format,
                 Iterable<String> sourceIterable,
-                RDFClient rdfClient,
+                RDFService<String> rdfService,
                 RetryPolicy<Object> retryPolicy,
                 int batchSize) {
             super(sourceIterable, batchSize);
-            this.type = type;
-            this.format = format;
-            this.rdfClient = rdfClient;
+            this.rdfService = rdfService;
             this.retryPolicy = retryPolicy;
         }
 
@@ -83,7 +75,7 @@ public class RDFStreamer {
                                             "Call to RDF server failed for accessions {} with error {}",
                                             batch,
                                             throwable.getFailure().getMessage()))
-                    .get(() -> rdfClient.getEntries(batch, type, format));
+                    .get(() -> rdfService.getEntries(batch));
         }
     }
 }

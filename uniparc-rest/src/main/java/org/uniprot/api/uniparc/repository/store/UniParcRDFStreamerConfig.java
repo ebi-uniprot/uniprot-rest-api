@@ -8,12 +8,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamConfig;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
-import org.uniprot.api.rest.service.RDFClient;
 import org.uniprot.api.rest.service.TagProvider;
 
 import java.util.Collections;
@@ -31,12 +27,17 @@ public class UniParcRDFStreamerConfig {
     @Bean
     public RDFStreamer uniparcRdfStreamer(
             RDFStreamerConfigProperties uniparcRDFStreamerConfigProperties,
-            RestTemplate uniparcRdfRestTemplate) {
+            RDFServiceFactory uniparcRdfServiceFactory) {
         return new RDFStreamer(
                 uniparcRDFStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                new RDFClient(tagProvider, uniparcRdfRestTemplate),
+                uniparcRdfServiceFactory,
                 RDFStreamConfig.rdfRetryPolicy(uniparcRDFStreamerConfigProperties));
+    }
+
+    @Bean
+    public RDFServiceFactory uniparcRdfServiceFactory(RestTemplate uniparcRdfRestTemplate) {
+        return new RDFServiceFactory(uniparcRdfRestTemplate, tagProvider);
     }
 
     @Bean
@@ -48,7 +49,8 @@ public class UniParcRDFStreamerConfig {
         restTemplate.setInterceptors(
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
-                new DefaultUriBuilderFactory(uniparcRDFStreamerConfigProperties.getRequestUrl()));
+                new DefaultUriBuilderFactory(
+                        uniparcRDFStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 

@@ -5,19 +5,24 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
+import org.uniprot.api.common.repository.stream.rdf.RDFServiceFactory;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.rest.service.TagProvider;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class IdMappingRDFStreamerConfigTest {
     @Mock
     private PrologProvider prologProvider;
     @Mock
     private TagProvider tagProvider;
-    private IdMappingRDFStreamerConfig idMappingRDFStreamerConfig;
+    @Mock
+    private RestTemplate restTemplate;
+    @Mock
+    private RDFServiceFactory rdfServiceFactory;
     private RDFStreamerConfigProperties properties;
+    private IdMappingRDFStreamerConfig idMappingRDFStreamerConfig;
 
     @BeforeEach
     void setUp() {
@@ -30,9 +35,14 @@ class IdMappingRDFStreamerConfigTest {
     }
 
     @Test
+    void supportDataRdfServiceFactory() {
+        RDFServiceFactory rdfServiceFactory = idMappingRDFStreamerConfig.idMappingRdfServiceFactory(restTemplate);
+        assertNotNull(rdfServiceFactory);
+    }
+
+    @Test
     void idMappingRdfStreamer() {
-        RestTemplate restTemplate = new RestTemplate();
-        RDFStreamer rdfStreamer = idMappingRDFStreamerConfig.idMappingRdfStreamer(properties, restTemplate);
+        RDFStreamer rdfStreamer = idMappingRDFStreamerConfig.idMappingRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
     }
 

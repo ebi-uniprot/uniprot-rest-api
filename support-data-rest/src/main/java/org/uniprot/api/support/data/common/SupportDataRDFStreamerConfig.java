@@ -8,12 +8,8 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamConfig;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
-import org.uniprot.api.rest.service.RDFClient;
 import org.uniprot.api.rest.service.TagProvider;
 
 import java.util.Collections;
@@ -31,12 +27,17 @@ public class SupportDataRDFStreamerConfig {
     @Bean
     public RDFStreamer supportDataRdfStreamer(
             RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties,
-            RestTemplate supportDataRdfRestTemplate) {
+            RDFServiceFactory supportDataRdfServiceFactory) {
         return new RDFStreamer(
                 supportDataRDFStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                new RDFClient(tagProvider, supportDataRdfRestTemplate),
+                supportDataRdfServiceFactory,
                 RDFStreamConfig.rdfRetryPolicy(supportDataRDFStreamerConfigProperties));
+    }
+
+    @Bean
+    public RDFServiceFactory supportDataRdfServiceFactory(RestTemplate supportDataRdfRestTemplate) {
+        return new RDFServiceFactory(supportDataRdfRestTemplate, tagProvider);
     }
 
     @Bean
