@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.validation.error;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -312,5 +313,20 @@ class ResponseExceptionHandlerTest {
         assertEquals(1, errorMessage.getMessages().size());
 
         assertEquals("Resource not found", errorMessage.getMessages().get(0));
+    }
+
+    @Test
+    void handleIllegalArgumentException() {
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
+        String message = "message describing error";
+        IllegalArgumentException error = new IllegalArgumentException(message);
+
+        ResponseEntity<ErrorInfo> responseEntity =
+                errorHandler.handleIllegalArgumentException(error, request);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertThat(responseEntity.getBody().getMessages(), contains(message));
     }
 }

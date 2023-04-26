@@ -5,9 +5,7 @@ import static java.util.Collections.singletonList;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
 import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.addDebugError;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.getBadRequestResponseEntity;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.getContentTypeFromRequest;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
 import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 import java.util.ArrayList;
@@ -313,5 +311,13 @@ public class ResponseExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .contentType(getContentTypeFromRequest(request))
                 .body(error);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorInfo> handleIllegalArgumentException(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(getContentTypeFromRequest(request))
+                .body(new ErrorInfo(request.getRequestURL().toString(), List.of(ex.getMessage())));
     }
 }
