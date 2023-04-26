@@ -1,17 +1,14 @@
 package org.uniprot.api.uniref.service;
 
-import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.rest.service.RDFClient;
-import org.uniprot.api.rest.service.TagProvider;
+import org.uniprot.api.common.repository.stream.rdf.RDFServiceFactory;
 import org.uniprot.api.uniref.repository.store.UniRefEntryStoreRepository;
 import org.uniprot.core.uniref.UniRefEntry;
+
+import java.util.Objects;
 
 /**
  * @author lgonzales
@@ -21,15 +18,14 @@ import org.uniprot.core.uniref.UniRefEntry;
 public class UniRefEntryService {
 
     private final UniRefEntryStoreRepository entryStoreRepository;
-    private final RDFClient RDFClient;
+    private final RDFServiceFactory rdfServiceFactory;
 
     @Autowired
     public UniRefEntryService(
             UniRefEntryStoreRepository entryStoreRepository,
-            @Qualifier("unirefRdfRestTemplate") RestTemplate restTemplate,
-            TagProvider tagProvider) {
+            RDFServiceFactory rdfServiceFactory) {
         this.entryStoreRepository = entryStoreRepository;
-        this.RDFClient = new RDFClient(tagProvider, restTemplate);
+        this.rdfServiceFactory = rdfServiceFactory;
     }
 
     public UniRefEntry getEntity(String clusterId) {
@@ -47,7 +43,7 @@ public class UniRefEntryService {
         ResourceNotFoundException nfe =
                 new ResourceNotFoundException(
                         "Unable to get UniRefEntry from store. ClusterId:" + id);
-        String rdf = this.RDFClient.getEntry(id, type, format).orElseThrow(() -> nfe);
+        String rdf = this.rdfServiceFactory.getRdfService(type, format).getEntry(id).orElseThrow(() -> nfe);
         if (Objects.isNull(rdf)) {
             throw nfe;
         }
