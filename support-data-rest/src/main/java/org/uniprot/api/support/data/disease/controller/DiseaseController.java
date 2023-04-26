@@ -104,9 +104,9 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
-            String result = this.diseaseService.getRDFXml(id, TYPE, acceptedCustomType.get());
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
+            String result = this.diseaseService.getRDFXml(id, TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
 
@@ -187,10 +187,10 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> diseaseService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    () -> diseaseService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

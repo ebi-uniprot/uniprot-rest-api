@@ -107,9 +107,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
-            String result = this.keywordService.getRDFXml(id, TYPE, acceptedCustomType.get());
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
+            String result = this.keywordService.getRDFXml(id, TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
         KeywordEntry keywordEntry = this.keywordService.findByUniqueId(id);
@@ -187,10 +187,10 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> stream(
             @Valid @ModelAttribute KeywordStreamRequest streamRequest, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> keywordService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    () -> keywordService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

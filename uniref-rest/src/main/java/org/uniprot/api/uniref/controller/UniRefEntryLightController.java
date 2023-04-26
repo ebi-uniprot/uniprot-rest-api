@@ -129,9 +129,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
-            String rdf = service.getRDFXml(id, TYPE, acceptedCustomType.get());
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
+            String rdf = service.getRDFXml(id, TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntryLight entryResult = service.findByUniqueId(id, fields);
@@ -241,10 +241,10 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> service.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    () -> service.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

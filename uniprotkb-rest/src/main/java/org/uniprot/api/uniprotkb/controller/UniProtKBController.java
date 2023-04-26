@@ -204,9 +204,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         } else if (accessionOrId.contains(".")) {
             return redirectToUniSave(accessionOrId, request);
         } else {
-            Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-            if (acceptedCustomType.isPresent()) {
-                String rdf = entryService.getRDFXml(accessionOrId, TYPE, acceptedCustomType.get());
+            Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+            if (acceptedRDFContentType.isPresent()) {
+                String rdf = entryService.getRDFXml(accessionOrId, TYPE, acceptedRDFContentType.get());
                 return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
             } else {
                 UniProtKBEntry entry = entryService.findByUniqueId(accessionOrId, fields);
@@ -273,10 +273,10 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
 
         MediaType contentType = getAcceptHeader(request);
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> entryService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    () -> entryService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

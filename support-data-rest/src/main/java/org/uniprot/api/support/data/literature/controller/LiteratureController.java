@@ -110,12 +110,12 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             if (citationId.startsWith("CI") || citationId.startsWith("IND")) {
                 throw new ResourceNotFoundException("Unable to find citation " + citationId);
             }
-            String result = this.literatureService.getRDFXml(citationId, TYPE, acceptedCustomType.get());
+            String result = this.literatureService.getRDFXml(citationId, TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(citationId);
@@ -194,12 +194,12 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                     MediaType contentType,
             HttpServletRequest request) {
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
                     () ->
                             literatureService.streamRDF(
-                                    streamRequest, TYPE, acceptedCustomType.get()),
+                                    streamRequest, TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

@@ -114,9 +114,9 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                     String fields,
             HttpServletRequest request) {
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
-            String result = this.subcellularLocationService.getRDFXml(id, TYPE, acceptedCustomType.get());
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
+            String result = this.subcellularLocationService.getRDFXml(id, TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
 
@@ -201,12 +201,12 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
                     () ->
                             subcellularLocationService.streamRDF(
-                                    streamRequest, TYPE, acceptedCustomType.get()),
+                                    streamRequest, TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

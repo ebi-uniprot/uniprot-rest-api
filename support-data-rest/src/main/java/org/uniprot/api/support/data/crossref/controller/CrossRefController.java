@@ -100,9 +100,9 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
-            String result = this.crossRefService.getRDFXml(id, TYPE, acceptedCustomType.get());
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
+            String result = this.crossRefService.getRDFXml(id, TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
 
@@ -167,10 +167,10 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> crossRefService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    () -> crossRefService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

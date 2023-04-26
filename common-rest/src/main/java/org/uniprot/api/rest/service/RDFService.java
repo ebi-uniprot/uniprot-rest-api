@@ -28,9 +28,9 @@ public class RDFService<T> implements StoreService<T> {
     }
 
     @Override
-    public List<T> getEntries(Iterable<String> accessions) {
+    public List<T> getEntries(Iterable<String> ids) {
         List<String> allAccessions = new ArrayList<>();
-        accessions.forEach(allAccessions::add);
+        ids.forEach(allAccessions::add);
         log.debug("RDF call for accessions : {}", allAccessions);
         T rdfXML = getEntriesByAccessions(allAccessions, type, format);
 

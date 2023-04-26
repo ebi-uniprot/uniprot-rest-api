@@ -166,8 +166,8 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
         IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
         this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             Supplier<Stream<String>> result =
                     () ->
                             this.idService.streamRDF(
@@ -175,7 +175,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                                     idMappingResult,
                                     cachedJobResult.getJobId(),
                                     TYPE,
-                                    acceptedCustomType.get());
+                                    acceptedRDFContentType.get());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniRefEntryPair>> result =

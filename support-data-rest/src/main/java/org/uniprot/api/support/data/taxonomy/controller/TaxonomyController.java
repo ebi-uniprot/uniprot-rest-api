@@ -107,9 +107,9 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
-            String result = this.taxonomyService.getRDFXml(taxonId, TYPE, acceptedCustomType.get());
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
+            String result = this.taxonomyService.getRDFXml(taxonId, TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
         TaxonomyEntry taxonomyEntry = this.taxonomyService.findById(Long.parseLong(taxonId));
@@ -224,10 +224,10 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Optional<String> acceptedCustomType = getAcceptedCustomType(request);
-        if (acceptedCustomType.isPresent()) {
+        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
+        if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> taxonomyService.streamRDF(streamRequest, TYPE, acceptedCustomType.get()),
+                    () -> taxonomyService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);
