@@ -50,7 +50,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 @RequestMapping("/citations")
 @Validated
 public class LiteratureController extends BasicSearchController<LiteratureEntry> {
-    private static final String TYPE = "citations";
+    private static final String DATA_TYPE = "citations";
 
     private final LiteratureService literatureService;
     private static final String LITERATURE_ID_REGEX = "^[0-9]+$|CI-\\w{1,13}$|IND[0-9]+$";
@@ -94,8 +94,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> getByLiteratureId(
             @Parameter(description = "Citation id to find")
@@ -115,7 +115,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             if (citationId.startsWith("CI") || citationId.startsWith("IND")) {
                 throw new ResourceNotFoundException("Unable to find citation " + citationId);
             }
-            String result = this.literatureService.getRDFXml(citationId, TYPE, acceptedRDFContentType.get());
+            String result = this.literatureService.getRDFXml(citationId, DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(citationId);
@@ -185,8 +185,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> stream(
             @Valid @ModelAttribute LiteratureStreamRequest streamRequest,
@@ -199,7 +199,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             return super.streamRDF(
                     () ->
                             literatureService.streamRDF(
-                                    streamRequest, TYPE, acceptedRDFContentType.get()),
+                                    streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

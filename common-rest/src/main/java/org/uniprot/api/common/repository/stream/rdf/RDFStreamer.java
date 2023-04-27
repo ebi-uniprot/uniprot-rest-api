@@ -29,11 +29,11 @@ public class RDFStreamer {
         this.rdfFetchRetryPolicy = rdfFetchRetryPolicy;
     }
 
-    public Stream<String> stream(Stream<String> entryIds, String type, String format) {
+    public Stream<String> stream(Stream<String> entryIds, String dataType, String format) {
         BatchRDFXMLStoreIterable batchRDFXMLStoreIterable =
                 new BatchRDFXMLStoreIterable(
                         entryIds::iterator,
-                        rdfServiceFactory.getRdfService(type, format),
+                        rdfServiceFactory.getRdfService(dataType, format),
                         rdfFetchRetryPolicy,
                         batchSize);
 
@@ -47,7 +47,7 @@ public class RDFStreamer {
 
         // prepend rdf prolog then rdf data and then append closing rdf tag
         return Stream.concat(
-                Stream.of(prologProvider.getProLog(type, format)),
+                Stream.of(prologProvider.getProLog(dataType, format)),
                 Stream.concat(rdfStringStream, Stream.of(prologProvider.getClosingTag(format))));
     }
 

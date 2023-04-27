@@ -42,7 +42,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/uniref")
 public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
-    private static final String TYPE = "uniref";
+    private static final String DATA_TYPE = "uniref";
     private final UniRefEntryService entryService;
 
     @Autowired
@@ -69,8 +69,8 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve an UniRef cluster by id.",
@@ -88,8 +88,8 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = TTL_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = NT_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = TURTLE_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = N_TRIPLES_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntry>> getById(
@@ -98,7 +98,7 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
             HttpServletResponse response) {
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
-            String rdf = entryService.getRDFXml(idRequest.getId(), TYPE, acceptedRDFContentType.get());
+            String rdf = entryService.getRDFXml(idRequest.getId(), DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntry entryResult = entryService.getEntity(idRequest.getId());

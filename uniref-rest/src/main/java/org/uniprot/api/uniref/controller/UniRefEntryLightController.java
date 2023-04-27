@@ -57,7 +57,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/uniref")
 public class UniRefEntryLightController extends BasicSearchController<UniRefEntryLight> {
-    private static final String TYPE = "uniref";
+    private static final String DATA_TYPE = "uniref";
     private static final int PREVIEW_SIZE = 10;
     private final UniRefEntryLightService service;
 
@@ -90,8 +90,8 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve a light object of UniRef cluster by id.",
@@ -131,7 +131,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             HttpServletRequest request) {
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
-            String rdf = service.getRDFXml(id, TYPE, acceptedRDFContentType.get());
+            String rdf = service.getRDFXml(id, DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntryLight entryResult = service.findByUniqueId(id, fields);
@@ -201,8 +201,8 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.",
@@ -244,7 +244,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> service.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
+                    () -> service.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

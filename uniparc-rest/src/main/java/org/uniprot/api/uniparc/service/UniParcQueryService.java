@@ -133,10 +133,10 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     public Stream<String> streamRDF(
-            UniParcStreamRequest streamRequest, String type, String format) {
+            UniParcStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), type, format);
+        return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), dataType, format);
     }
 
     @Override

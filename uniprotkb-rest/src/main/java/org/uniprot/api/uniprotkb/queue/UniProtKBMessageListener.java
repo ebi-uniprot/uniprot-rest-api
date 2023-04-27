@@ -1,17 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
@@ -34,6 +23,16 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * @author sahmad
  * @created 22/11/2022
@@ -42,7 +41,7 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 @Service("DownloadListener")
 @Slf4j
 public class UniProtKBMessageListener implements MessageListener {
-    private static final String TYPE = "uniprotkb";
+    private static final String DATA_TYPE = "uniprotkb";
     static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
     public static final String JOB_ID_HEADER = "jobId";
@@ -178,7 +177,7 @@ public class UniProtKBMessageListener implements MessageListener {
             writeSolrResult(request, idsFile, jobId);
             StoreRequest storeRequest = service.buildStoreRequest(request);
             downloadResultWriter.writeResult(
-                    request, idsFile, jobId, contentType, storeRequest, TYPE);
+                    request, idsFile, jobId, contentType, storeRequest, DATA_TYPE);
             log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
             logMessageAndDeleteFile(ex, jobId);

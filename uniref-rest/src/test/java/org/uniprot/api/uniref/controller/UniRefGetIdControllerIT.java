@@ -319,7 +319,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -328,7 +328,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -402,7 +402,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -411,7 +411,7 @@ class UniRefGetIdControllerIT extends AbstractGetByIdControllerIT {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

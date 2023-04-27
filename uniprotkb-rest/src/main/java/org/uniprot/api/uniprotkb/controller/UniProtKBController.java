@@ -65,7 +65,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping(value = UNIPROTKB_RESOURCE)
 public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
-    private static final String TYPE = "uniprotkb";
+    private static final String DATA_TYPE = "uniprotkb";
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
 
@@ -157,8 +157,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get UniProtKB entry by an accession.",
@@ -206,7 +206,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         } else {
             Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
             if (acceptedRDFContentType.isPresent()) {
-                String rdf = entryService.getRDFXml(accessionOrId, TYPE, acceptedRDFContentType.get());
+                String rdf = entryService.getRDFXml(accessionOrId, DATA_TYPE, acceptedRDFContentType.get());
                 return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
             } else {
                 UniProtKBEntry entry = entryService.findByUniqueId(accessionOrId, fields);
@@ -234,8 +234,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download a UniProtKB protein entry (or entries) retrieved by a SOLR query.",
@@ -276,7 +276,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> entryService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
+                    () -> entryService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

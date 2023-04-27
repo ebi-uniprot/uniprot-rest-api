@@ -511,7 +511,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIPROT_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RDFPrologs.UNIPROT_PROLOG)))
                 .andExpect(
                         content()
                                 .string(

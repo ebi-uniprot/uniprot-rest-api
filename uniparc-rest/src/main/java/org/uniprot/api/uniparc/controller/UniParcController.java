@@ -51,7 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/uniparc")
 public class UniParcController extends BasicSearchController<UniParcEntry> {
-    private static final String TYPE = "uniparc";
+    private static final String DATA_TYPE = "uniparc";
 
     private final UniParcQueryService queryService;
     private static final int PREVIEW_SIZE = 10;
@@ -130,8 +130,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve an UniParc entry by upi.",
@@ -159,7 +159,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         if (acceptedRDFContentType.isPresent()) {
             String result =
                     queryService.getRDFXml(
-                            getByUniParcIdRequest.getUpi(), TYPE, acceptedRDFContentType.get());
+                            getByUniParcIdRequest.getUpi(), DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, contentType, request);
         }
 
@@ -177,8 +177,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream a UniParc sequence entry (or entries) by a SOLR query.",
@@ -217,7 +217,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> queryService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
+                    () -> queryService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

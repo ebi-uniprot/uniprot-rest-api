@@ -74,8 +74,8 @@ public class MessageConverterConfig {
                 converters.add(0, uniparcJsonConverter);
                 converters.add(1, new UniParcXmlMessageConverter("", downloadGatekeeper));
                 converters.add(new RDFMessageConverter(downloadGatekeeper));
-                converters.add(new TTLMessageConverter(downloadGatekeeper));
-                converters.add(new NTMessageConverter(downloadGatekeeper));
+                converters.add(new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(new NTriplesMessageConverter(downloadGatekeeper));
                 // ####################### UniParcCrossReference ###################
                 ReturnFieldConfig uniParcCrossRefReturnField =
                         ReturnFieldConfigFactory.getReturnFieldConfig(
@@ -116,8 +116,8 @@ public class MessageConverterConfig {
                         uniParcContext(TSV_MEDIA_TYPE),
                         uniParcContext(XLS_MEDIA_TYPE),
                         uniParcContext(RDF_MEDIA_TYPE),
-                        uniParcContext(TTL_MEDIA_TYPE),
-                        uniParcContext(NT_MEDIA_TYPE))
+                        uniParcContext(TURTLE_MEDIA_TYPE),
+                        uniParcContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

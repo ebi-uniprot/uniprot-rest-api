@@ -57,7 +57,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "/"
                         + UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH)
 public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKBEntryPair> {
-    private static final String TYPE = "uniprotkb";
+    private static final String DATA_TYPE = "uniprotkb";
     public static final String UNIPROTKB_ID_MAPPING_PATH = "uniprotkb";
     private final UniProtKBIdService idService;
     private final IdMappingJobCacheService cacheService;
@@ -156,8 +156,8 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.",
@@ -210,7 +210,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                                     streamRequest,
                                     idMappingResult,
                                     cachedJobResult.getJobId(),
-                                    TYPE,
+                                    DATA_TYPE,
                                     acceptedRDFContentType.get());
             return super.streamRDF(result, streamRequest, contentType, request);
         } else {

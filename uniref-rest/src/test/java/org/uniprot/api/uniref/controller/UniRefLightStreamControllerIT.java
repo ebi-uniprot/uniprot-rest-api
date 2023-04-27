@@ -137,7 +137,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIREF_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RDFPrologs.UNIREF_PROLOG)))
                 .andExpect(
                         content()
                                 .string(

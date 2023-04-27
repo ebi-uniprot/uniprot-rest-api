@@ -24,9 +24,9 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.NTPrologs;
+import org.uniprot.api.rest.service.NTriplesPrologs;
 import org.uniprot.api.rest.service.RDFPrologs;
-import org.uniprot.api.rest.service.TTLPrologs;
+import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
 import org.uniprot.api.uniparc.repository.store.UniParcStreamConfig;
@@ -173,7 +173,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             startsWith(
-                                                                    RDFPrologs.UNIPARC_RDF_PROLOG)))
+                                                                    RDFPrologs.UNIPARC_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -185,12 +185,12 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             startsWith(
-                                                                    TTLPrologs.UNIPARC_RDF_PROLOG)))
+                                                                    TurtlePrologs.UNIPARC_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -202,10 +202,10 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
-                                                    .string(startsWith(NTPrologs.NT_COMMON_PROLOG)))
+                                                    .string(startsWith(NTriplesPrologs.N_TRIPLES_COMMON_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -263,7 +263,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -272,7 +272,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

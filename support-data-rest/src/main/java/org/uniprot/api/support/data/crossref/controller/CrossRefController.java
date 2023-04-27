@@ -50,7 +50,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
                         + "The databases are categorized for easy user perusal and understanding of how the "
                         + "different databases relate to both UniProtKB and to each other")
 public class CrossRefController extends BasicSearchController<CrossRefEntry> {
-    private static final String TYPE = "databases";
+    private static final String DATA_TYPE = "databases";
     @Autowired private CrossRefService crossRefService;
     private static final String ACCESSION_REGEX = "DB-(\\d{4})";
 
@@ -83,8 +83,8 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             produces = {
                 APPLICATION_JSON_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> findByAccession(
             @Parameter(description = "cross-references database id to find")
@@ -102,7 +102,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
 
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
-            String result = this.crossRefService.getRDFXml(id, TYPE, acceptedRDFContentType.get());
+            String result = this.crossRefService.getRDFXml(id, DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
 
@@ -159,8 +159,8 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             produces = {
                 APPLICATION_JSON_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<CrossRefEntry>>> stream(
             @Valid @ModelAttribute CrossRefStreamRequest streamRequest,
@@ -170,7 +170,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> crossRefService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
+                    () -> crossRefService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

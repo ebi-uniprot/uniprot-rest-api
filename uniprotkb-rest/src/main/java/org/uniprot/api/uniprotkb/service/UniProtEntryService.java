@@ -218,9 +218,9 @@ public class UniProtEntryService
     }
 
     public Stream<String> streamRDF(
-            UniProtKBStreamRequest streamRequest, String type, String format) {
+            UniProtKBStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest = createDownloadSolrRequest(streamRequest);
-        return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), type, format);
+        return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), dataType, format);
     }
 
     @Override

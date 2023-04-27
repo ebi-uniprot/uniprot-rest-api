@@ -41,7 +41,7 @@ public abstract class BasicSearchController<T> {
     private final MessageConverterContextFactory.Resource resource;
     private final Gatekeeper downloadGatekeeper;
     private final Map<MediaType, String> supportedMediaTypes =
-            Map.of(RDF_MEDIA_TYPE, "rdf", TTL_MEDIA_TYPE, "ttl", NT_MEDIA_TYPE, "nt");
+            Map.of(RDF_MEDIA_TYPE, "rdf", TURTLE_MEDIA_TYPE, "ttl", N_TRIPLES_MEDIA_TYPE, "nt");
 
     protected BasicSearchController(
             ApplicationEventPublisher eventPublisher,

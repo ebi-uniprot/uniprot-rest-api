@@ -1,8 +1,8 @@
 package org.uniprot.api.rest.service;
 
-public class TTLPrologs {
+public class TurtlePrologs {
 
-    public static final String UNIPROT_RDF_PROLOG =
+    public static final String UNIPROT_PROLOG =
             "@base <http://purl.uniprot.org/uniprot/> .\n"
                     + "@prefix annotation: <http://purl.uniprot.org/annotation/> .\n"
                     + "@prefix citation: <http://purl.uniprot.org/citations/> .\n"
@@ -27,7 +27,7 @@ public class TTLPrologs {
                     + "@prefix tissue: <http://purl.uniprot.org/tissues/> .\n"
                     + "@prefix up: <http://purl.uniprot.org/core/> .\n"
                     + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .";
-    public static final String UNIREF_RDF_PROLOG =
+    public static final String UNIREF_PROLOG =
             "@base <http://purl.uniprot.org/uniref/> .\n"
                     + "@prefix isoform: <http://purl.uniprot.org/isoforms/> .\n"
                     + "@prefix owl: <http://www.w3.org/2002/07/owl#> .\n"
@@ -39,7 +39,7 @@ public class TTLPrologs {
                     + "@prefix uniref: <http://purl.uniprot.org/uniref/> .\n"
                     + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .";
 
-    public static final String UNIPARC_RDF_PROLOG =
+    public static final String UNIPARC_PROLOG =
             "@base <http://purl.uniprot.org/uniparc/> .\n"
                     + "@prefix dcterms: <http://purl.org/dc/terms/> .\n"
                     + "@prefix embl-cds: <http://purl.uniprot.org/embl-cds/> .\n"
@@ -121,5 +121,5 @@ public class TTLPrologs {
                     + "@prefix up: <http://purl.uniprot.org/core/> .\n"
                     + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .";
 
-    private TTLPrologs() {}
+    private TurtlePrologs() {}
 }

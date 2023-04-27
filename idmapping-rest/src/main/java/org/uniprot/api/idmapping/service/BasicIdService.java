@@ -157,7 +157,7 @@ public abstract class BasicIdService<T, U> {
     }
 
     public Stream<String> streamRDF(
-            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId, String type, String format) {
+            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId, String dataType, String format) {
         List<IdMappingStringPair> fromToPairs =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);
         // get unique entry ids
@@ -166,7 +166,7 @@ public abstract class BasicIdService<T, U> {
                 .filter(ft -> !entryIds.contains(ft.getTo()))
                 .forEach(ft -> entryIds.add(ft.getTo()));
 
-        return this.rdfStreamer.stream(entryIds.stream(), type, format);
+        return this.rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);

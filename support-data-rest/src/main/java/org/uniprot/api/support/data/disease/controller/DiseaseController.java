@@ -45,7 +45,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
                 "The human diseases in which proteins are involved are "
                         + "described in UniProtKB entries with a controlled vocabulary.")
 public class DiseaseController extends BasicSearchController<DiseaseEntry> {
-    private static final String TYPE = "diseases";
+    private static final String DATA_TYPE = "diseases";
     @Autowired private DiseaseService diseaseService;
     public static final String ACCESSION_REGEX = "DI-(\\d{5})";
 
@@ -87,8 +87,8 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<DiseaseEntry>> getByAccession(
             @Parameter(description = "disease id to find")
@@ -106,7 +106,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
 
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
-            String result = this.diseaseService.getRDFXml(id, TYPE, acceptedRDFContentType.get());
+            String result = this.diseaseService.getRDFXml(id, DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
 
@@ -179,8 +179,8 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> stream(
             @Valid @ModelAttribute DiseaseStreamRequest streamRequest,
@@ -190,7 +190,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> diseaseService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
+                    () -> diseaseService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

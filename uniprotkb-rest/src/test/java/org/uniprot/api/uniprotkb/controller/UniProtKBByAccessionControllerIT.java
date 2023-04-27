@@ -28,9 +28,9 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.NTPrologs;
+import org.uniprot.api.rest.service.NTriplesPrologs;
 import org.uniprot.api.rest.service.RDFPrologs;
-import org.uniprot.api.rest.service.TTLPrologs;
+import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
@@ -108,9 +108,9 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 Arguments.of(
                         getFileExtension(RDF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"),
                 Arguments.of(
-                        getFileExtension(TTL_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"),
+                        getFileExtension(TURTLE_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"),
                 Arguments.of(
-                        getFileExtension(NT_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"));
+                        getFileExtension(N_TRIPLES_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"));
     }
 
     @Override
@@ -323,7 +323,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         }
         redirectedURL += "?from=" + inactiveAcc;
 
-        if (Set.of(RDF_MEDIA_TYPE, TTL_MEDIA_TYPE, NT_MEDIA_TYPE).contains(mediaType)) {
+        if (Set.of(RDF_MEDIA_TYPE, TURTLE_MEDIA_TYPE, N_TRIPLES_MEDIA_TYPE).contains(mediaType)) {
             resultActions
                     .andExpect(status().is(HttpStatus.OK.value()))
                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()));
@@ -577,7 +577,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     @Override
     protected String getRDFProlog() {
-        return RDFPrologs.UNIPROT_RDF_PROLOG;
+        return RDFPrologs.UNIPROT_PROLOG;
     }
 
     @Override
@@ -765,12 +765,12 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
                                                             startsWith(
-                                                                    TTLPrologs.UNIPROT_RDF_PROLOG)))
+                                                                    TurtlePrologs.UNIPROT_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -782,10 +782,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
-                                                    .string(startsWith(NTPrologs.NT_COMMON_PROLOG)))
+                                                    .string(startsWith(NTriplesPrologs.N_TRIPLES_COMMON_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -879,12 +879,12 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(TTL_MEDIA_TYPE)
+                                    .contentType(TURTLE_MEDIA_TYPE)
                                     .resultMatcher(content().string(not(is(emptyOrNullString()))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(NT_MEDIA_TYPE)
+                                    .contentType(N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(content().string(not(is(emptyOrNullString()))))
                                     .build())
                     .build();

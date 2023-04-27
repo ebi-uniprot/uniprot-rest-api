@@ -69,8 +69,8 @@ public class MessageConverterConfig {
                 converters.add(index++, new UniProtKBFastaMessageConverter(downloadGatekeeper));
                 converters.add(index++, new ListMessageConverter(downloadGatekeeper));
                 converters.add(index++, new RDFMessageConverter(downloadGatekeeper));
-                converters.add(index++, new TTLMessageConverter(downloadGatekeeper));
-                converters.add(index++, new NTMessageConverter(downloadGatekeeper));
+                converters.add(index++, new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(index++, new NTriplesMessageConverter(downloadGatekeeper));
                 converters.add(index++, new UniProtKBGffMessageConverter(downloadGatekeeper));
                 converters.add(
                         index++,
@@ -105,8 +105,8 @@ public class MessageConverterConfig {
         asList(
                         context(LIST_MEDIA_TYPE),
                         context(RDF_MEDIA_TYPE),
-                        context(TTL_MEDIA_TYPE),
-                        context(NT_MEDIA_TYPE),
+                        context(TURTLE_MEDIA_TYPE),
+                        context(N_TRIPLES_MEDIA_TYPE),
                         context(FF_MEDIA_TYPE),
                         context(APPLICATION_XML),
                         context(APPLICATION_JSON),

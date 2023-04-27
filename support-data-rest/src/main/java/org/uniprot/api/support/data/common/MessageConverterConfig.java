@@ -185,8 +185,8 @@ public class MessageConverterConfig {
                                 downloadGatekeeper);
                 converters.add(index++, xrefJsonConverter);
                 converters.add(index, new RDFMessageConverter(downloadGatekeeper));
-                converters.add(index, new TTLMessageConverter(downloadGatekeeper));
-                converters.add(index, new NTMessageConverter(downloadGatekeeper));
+                converters.add(index, new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(index, new NTriplesMessageConverter(downloadGatekeeper));
             }
         };
     }

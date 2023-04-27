@@ -8,7 +8,7 @@ import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
 import org.uniprot.api.common.repository.stream.rdf.RDFServiceFactory;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
-import org.uniprot.api.rest.service.TagProvider;
+import org.uniprot.api.rest.service.TagPositionProvider;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -16,7 +16,7 @@ class UniParcRDFStreamerConfigTest {
     @Mock
     private PrologProvider prologProvider;
     @Mock
-    private TagProvider tagProvider;
+    private TagPositionProvider tagPositionProvider;
     @Mock
     private RestTemplate restTemplate;
     @Mock
@@ -26,7 +26,7 @@ class UniParcRDFStreamerConfigTest {
 
     @BeforeEach
     void setUp() {
-        uniparcRDFStreamerConfig = new UniParcRDFStreamerConfig(prologProvider, tagProvider);
+        uniparcRDFStreamerConfig = new UniParcRDFStreamerConfig(prologProvider, tagPositionProvider);
         properties = new RDFStreamerConfigProperties();
         properties.setRequestUrl("http://localhost");
         properties.setBatchSize(25);

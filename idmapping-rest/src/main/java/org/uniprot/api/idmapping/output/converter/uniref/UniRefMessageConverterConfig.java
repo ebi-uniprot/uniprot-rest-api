@@ -33,8 +33,8 @@ public class UniRefMessageConverterConfig {
         converters.add(currentIndex++, new UniRefEntryFastaMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new ListMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new RDFMessageConverter(downloadGatekeeper));
-        converters.add(currentIndex++, new TTLMessageConverter(downloadGatekeeper));
-        converters.add(currentIndex++, new NTMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new TurtleMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new NTriplesMessageConverter(downloadGatekeeper));
         converters.add(
                 currentIndex++,
                 new TsvMessageConverter<>(

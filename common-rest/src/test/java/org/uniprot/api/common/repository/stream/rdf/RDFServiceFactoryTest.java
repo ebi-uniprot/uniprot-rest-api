@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.rest.service.RDFService;
-import org.uniprot.api.rest.service.TagProvider;
+import org.uniprot.api.rest.service.TagPositionProvider;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -16,18 +16,18 @@ class RDFServiceFactoryTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
-    private TagProvider tagProvider;
+    private TagPositionProvider tagPositionProvider;
     private RDFServiceFactory rdfServiceFactory;
 
     @BeforeEach
     void setUp() {
-        rdfServiceFactory = new RDFServiceFactory(restTemplate, tagProvider);
+        rdfServiceFactory = new RDFServiceFactory(restTemplate, tagPositionProvider);
     }
 
     @Test
     void getRdfService_whenNotExist() {
         RDFService<String> rdfService = rdfServiceFactory.getRdfService(TYPE, FORMAT);
-        assertSame(TYPE, rdfService.getType());
+        assertSame(TYPE, rdfService.getDataType());
         assertSame(FORMAT, rdfService.getFormat());
     }
 

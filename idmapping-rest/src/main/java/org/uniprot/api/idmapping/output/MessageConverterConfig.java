@@ -142,8 +142,8 @@ public class MessageConverterConfig {
                         kbContext(GFF_MEDIA_TYPE),
                         kbContext(LIST_MEDIA_TYPE),
                         kbContext(RDF_MEDIA_TYPE),
-                        kbContext(TTL_MEDIA_TYPE),
-                        kbContext(NT_MEDIA_TYPE))
+                        kbContext(TURTLE_MEDIA_TYPE),
+                        kbContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -163,8 +163,8 @@ public class MessageConverterConfig {
                         uniParcContext(APPLICATION_XML),
                         uniParcContext(LIST_MEDIA_TYPE),
                         uniParcContext(RDF_MEDIA_TYPE),
-                        uniParcContext(TTL_MEDIA_TYPE),
-                        uniParcContext(NT_MEDIA_TYPE))
+                        uniParcContext(TURTLE_MEDIA_TYPE),
+                        uniParcContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -183,8 +183,8 @@ public class MessageConverterConfig {
                         uniRefContext(XLS_MEDIA_TYPE),
                         uniRefContext(LIST_MEDIA_TYPE),
                         uniRefContext(RDF_MEDIA_TYPE),
-                        uniRefContext(TTL_MEDIA_TYPE),
-                        uniRefContext(NT_MEDIA_TYPE))
+                        uniRefContext(TURTLE_MEDIA_TYPE),
+                        uniRefContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

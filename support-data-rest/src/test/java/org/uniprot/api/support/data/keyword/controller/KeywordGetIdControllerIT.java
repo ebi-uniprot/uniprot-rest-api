@@ -233,15 +233,15 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().contentType(UniProtMediaType.TTL_MEDIA_TYPE))
+                                            content().contentType(UniProtMediaType.TURTLE_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().contentType(UniProtMediaType.NT_MEDIA_TYPE))
+                                            content().contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
@@ -310,7 +310,7 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TTL_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -319,7 +319,7 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.NT_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

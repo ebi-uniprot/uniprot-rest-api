@@ -1,16 +1,16 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
 import org.springframework.stereotype.Component;
-import org.uniprot.api.rest.service.NTPrologs;
+import org.uniprot.api.rest.service.NTriplesPrologs;
 import org.uniprot.api.rest.service.RDFPrologs;
-import org.uniprot.api.rest.service.TTLPrologs;
+import org.uniprot.api.rest.service.TurtlePrologs;
 
 @Component
 public class PrologProvider {
 
     public static final String RDF = "rdf";
-    public static final String TTL = "ttl";
-    public static final String NT = "nt";
+    public static final String TURTLE = "ttl";
+    public static final String N_TRIPLES = "nt";
     public static final String UNIPROT = "uniprotkb";
     public static final String UNIREF = "uniref";
     public static final String UNIPARC = "uniparc";
@@ -21,26 +21,27 @@ public class PrologProvider {
     public static final String SUBCELLULAR = "locations";
     public static final String TAXONOMY = "taxonomy";
 
-    public String getProLog(String type, String format) {
+    public String getProLog(String dataType, String format) {
         switch (format) {
             case RDF:
-                return getForRdf(type);
-            case TTL:
-                return getForTtl(type);
-            case NT:
-                return NTPrologs.NT_COMMON_PROLOG;
+                return getForRDF(dataType);
+            case TURTLE:
+                return getForTurtle(dataType);
+            case N_TRIPLES:
+                return NTriplesPrologs.N_TRIPLES_COMMON_PROLOG;
+            default:
+                throw new IllegalArgumentException(String.format("Unsupported format %s", format));
         }
-        throw new IllegalArgumentException(String.format("Unsupported format %s", format));
     }
 
-    private String getForRdf(String type) {
-        switch (type) {
+    private String getForRDF(String dataType) {
+        switch (dataType) {
             case UNIPROT:
-                return RDFPrologs.UNIPROT_RDF_PROLOG;
+                return RDFPrologs.UNIPROT_PROLOG;
             case UNIREF:
-                return RDFPrologs.UNIREF_RDF_PROLOG;
+                return RDFPrologs.UNIREF_PROLOG;
             case UNIPARC:
-                return RDFPrologs.UNIPARC_RDF_PROLOG;
+                return RDFPrologs.UNIPARC_PROLOG;
             case XREF:
                 return RDFPrologs.XREF_PROLOG;
             case DISEASE:
@@ -53,42 +54,45 @@ public class PrologProvider {
                 return RDFPrologs.SUBCELLULAR_LOCATION_PROLOG;
             case TAXONOMY:
                 return RDFPrologs.TAXONOMY_PROLOG;
+            default:
+                throw new IllegalArgumentException(String.format("Invalid type %s", dataType));
         }
-        throw new IllegalArgumentException(String.format("Invalid type %s", type));
     }
 
-    private String getForTtl(String type) {
-        switch (type) {
+    private String getForTurtle(String dataType) {
+        switch (dataType) {
             case UNIPROT:
-                return TTLPrologs.UNIPROT_RDF_PROLOG;
+                return TurtlePrologs.UNIPROT_PROLOG;
             case UNIREF:
-                return TTLPrologs.UNIREF_RDF_PROLOG;
+                return TurtlePrologs.UNIREF_PROLOG;
             case UNIPARC:
-                return TTLPrologs.UNIPARC_RDF_PROLOG;
+                return TurtlePrologs.UNIPARC_PROLOG;
             case XREF:
-                return TTLPrologs.XREF_PROLOG;
+                return TurtlePrologs.XREF_PROLOG;
             case DISEASE:
-                return TTLPrologs.DISEASE_PROLOG;
+                return TurtlePrologs.DISEASE_PROLOG;
             case KEYWORD:
-                return TTLPrologs.KEYWORD_PROLOG;
+                return TurtlePrologs.KEYWORD_PROLOG;
             case LITERATURE:
-                return TTLPrologs.LITERATURE_PROLOG;
+                return TurtlePrologs.LITERATURE_PROLOG;
             case SUBCELLULAR:
-                return TTLPrologs.SUBCELLULAR_LOCATION_PROLOG;
+                return TurtlePrologs.SUBCELLULAR_LOCATION_PROLOG;
             case TAXONOMY:
-                return TTLPrologs.TAXONOMY_PROLOG;
+                return TurtlePrologs.TAXONOMY_PROLOG;
+            default:
+                throw new IllegalArgumentException(String.format("Invalid type %s", dataType));
         }
-        throw new IllegalArgumentException(String.format("Invalid type %s", type));
     }
 
     public String getClosingTag(String format) {
         switch (format) {
             case RDF:
                 return "</rdf:RDF>";
-            case TTL:
-            case NT:
+            case TURTLE:
+            case N_TRIPLES:
                 return "";
+            default:
+                throw new IllegalArgumentException(String.format("Unsupported format %s", format));
         }
-        throw new IllegalArgumentException(String.format("Unsupported format %s", format));
     }
 }

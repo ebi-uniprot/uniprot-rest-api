@@ -1,17 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.embedded.JettyConfig;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
@@ -27,6 +16,16 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.store.search.SolrCollection;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Stream;
 
 /**
  * @author lgonzales
@@ -49,7 +48,7 @@ public abstract class AbstractStreamControllerIT {
                     + "    <someMore>text3</someMore>\n"
                     + "</rdf:RDF>";
 
-    public static final String SAMPLE_TTL =
+    public static final String SAMPLE_TURTLE =
             "@base <http://purl.uniprot.org/database/> .\n"
                     + "@prefix dcterms: <http://purl.org/dc/terms/> .\n"
                     + "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n"
@@ -68,7 +67,7 @@ public abstract class AbstractStreamControllerIT {
                     + "  rdfs:seeAlso <https://web.expasy.org/abcd> ;\n"
                     + "  <http://purl.uniprot.org/core/urlTemplate> \"https://web.expasy.org/cgi-bin/abcd/search_abcd.pl?input=%u\" .";
 
-    public static final String SAMPLE_NT =
+    public static final String SAMPLE_N_TRIPLES =
             "<http://purl.uniprot.org/database/ABCD> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/Database> .\n"
                     + "<http://purl.uniprot.org/database/ABCD> <http://purl.uniprot.org/core/abbreviation> \"ABCD\" .\n"
                     + "<http://purl.uniprot.org/database/ABCD> <http://purl.org/dc/terms/identifier> \"236\" .\n"

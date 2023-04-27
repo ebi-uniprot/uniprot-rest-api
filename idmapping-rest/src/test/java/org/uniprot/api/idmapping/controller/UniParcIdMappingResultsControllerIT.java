@@ -195,7 +195,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIPARC_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RDFPrologs.UNIPARC_PROLOG)))
                 .andExpect(
                         content()
                                 .string(

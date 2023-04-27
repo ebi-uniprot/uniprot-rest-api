@@ -49,7 +49,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 @RequestMapping("/locations")
 @Validated
 public class SubcellularLocationController extends BasicSearchController<SubcellularLocationEntry> {
-    private static final String TYPE = "locations";
+    private static final String DATA_TYPE = "locations";
     private final SubcellularLocationService subcellularLocationService;
     private static final String SUBCELLULAR_LOCATION_ID_REGEX = "^SL-[0-9]{4}";
 
@@ -97,8 +97,8 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> getById(
             @Parameter(description = "Subcellular location id to find")
@@ -116,7 +116,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
 
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
-            String result = this.subcellularLocationService.getRDFXml(id, TYPE, acceptedRDFContentType.get());
+            String result = this.subcellularLocationService.getRDFXml(id, DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
 
@@ -193,8 +193,8 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>> stream(
             @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,
@@ -206,7 +206,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             return super.streamRDF(
                     () ->
                             subcellularLocationService.streamRDF(
-                                    streamRequest, TYPE, acceptedRDFContentType.get()),
+                                    streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

@@ -45,7 +45,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 @RequestMapping("/keywords")
 @Validated
 public class KeywordController extends BasicSearchController<KeywordEntry> {
-    private static final String TYPE = "keywords";
+    private static final String DATA_TYPE = "keywords";
     private final KeywordService keywordService;
     private static final String KEYWORD_ID_REGEX = "^KW-[0-9]{4}";
 
@@ -75,8 +75,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get Keyword by keywordId.",
@@ -109,7 +109,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
 
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
-            String result = this.keywordService.getRDFXml(id, TYPE, acceptedRDFContentType.get());
+            String result = this.keywordService.getRDFXml(id, DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
         KeywordEntry keywordEntry = this.keywordService.findByUniqueId(id);
@@ -161,8 +161,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download Keywords by given Lucene search query.",
@@ -190,7 +190,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> keywordService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
+                    () -> keywordService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

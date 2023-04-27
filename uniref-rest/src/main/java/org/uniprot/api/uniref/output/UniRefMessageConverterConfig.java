@@ -57,8 +57,8 @@ public class UniRefMessageConverterConfig {
                 converters.add(new UniRefLightFastaMessageConverter(downloadGatekeeper));
                 converters.add(new UniRefFastaMessageConverter(downloadGatekeeper));
                 converters.add(new RDFMessageConverter(downloadGatekeeper));
-                converters.add(new TTLMessageConverter(downloadGatekeeper));
-                converters.add(new NTMessageConverter(downloadGatekeeper));
+                converters.add(new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(new NTriplesMessageConverter(downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniRefEntryLight.class,
@@ -127,8 +127,8 @@ public class UniRefMessageConverterConfig {
                         uniRefLightContext(TSV_MEDIA_TYPE),
                         uniRefLightContext(XLS_MEDIA_TYPE),
                         uniRefLightContext(RDF_MEDIA_TYPE),
-                        uniRefLightContext(TTL_MEDIA_TYPE),
-                        uniRefLightContext(NT_MEDIA_TYPE))
+                        uniRefLightContext(TURTLE_MEDIA_TYPE),
+                        uniRefLightContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -159,8 +159,8 @@ public class UniRefMessageConverterConfig {
                         uniRefContext(TSV_MEDIA_TYPE),
                         uniRefContext(XLS_MEDIA_TYPE),
                         uniRefContext(RDF_MEDIA_TYPE),
-                        uniRefContext(TTL_MEDIA_TYPE),
-                        uniRefContext(NT_MEDIA_TYPE))
+                        uniRefContext(TURTLE_MEDIA_TYPE),
+                        uniRefContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

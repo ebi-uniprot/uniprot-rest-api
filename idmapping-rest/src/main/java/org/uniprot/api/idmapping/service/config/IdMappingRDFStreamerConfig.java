@@ -10,18 +10,18 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
-import org.uniprot.api.rest.service.TagProvider;
+import org.uniprot.api.rest.service.TagPositionProvider;
 
 import java.util.Collections;
 
 @Configuration
 public class IdMappingRDFStreamerConfig {
     private final PrologProvider prologProvider;
-    private final TagProvider tagProvider;
+    private final TagPositionProvider tagPositionProvider;
 
-    public IdMappingRDFStreamerConfig(PrologProvider prologProvider, TagProvider tagProvider) {
+    public IdMappingRDFStreamerConfig(PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
         this.prologProvider = prologProvider;
-        this.tagProvider = tagProvider;
+        this.tagPositionProvider = tagPositionProvider;
     }
 
     @Bean
@@ -37,7 +37,7 @@ public class IdMappingRDFStreamerConfig {
 
     @Bean
     public RDFServiceFactory idMappingRdfServiceFactory(RestTemplate idMappingRdfRestTemplate) {
-        return new RDFServiceFactory(idMappingRdfRestTemplate, tagProvider);
+        return new RDFServiceFactory(idMappingRdfRestTemplate, tagPositionProvider);
     }
 
     @Bean

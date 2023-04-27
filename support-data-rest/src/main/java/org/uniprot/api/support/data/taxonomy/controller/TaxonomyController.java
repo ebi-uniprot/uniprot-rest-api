@@ -47,7 +47,7 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 @RequestMapping("/taxonomy")
 @Validated
 public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
-    private static final String TYPE = "taxonomy";
+    private static final String DATA_TYPE = "taxonomy";
     private final TaxonomyService taxonomyService;
     private static final String TAXONOMY_ID_REGEX = "^[0-9]+$";
 
@@ -90,8 +90,8 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getById(
             @Parameter(description = "Taxon id to find")
@@ -109,7 +109,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
 
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
-            String result = this.taxonomyService.getRDFXml(taxonId, TYPE, acceptedRDFContentType.get());
+            String result = this.taxonomyService.getRDFXml(taxonId, DATA_TYPE, acceptedRDFContentType.get());
             return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
         }
         TaxonomyEntry taxonomyEntry = this.taxonomyService.findById(Long.parseLong(taxonId));
@@ -216,8 +216,8 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                TTL_MEDIA_TYPE_VALUE,
-                NT_MEDIA_TYPE_VALUE
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
             @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,
@@ -227,7 +227,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
         Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
         if (acceptedRDFContentType.isPresent()) {
             return super.streamRDF(
-                    () -> taxonomyService.streamRDF(streamRequest, TYPE, acceptedRDFContentType.get()),
+                    () -> taxonomyService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
                     streamRequest,
                     contentType,
                     request);

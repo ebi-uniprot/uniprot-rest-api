@@ -152,10 +152,11 @@ public class UniRefEntryLightService
                 .getFieldName();
     }
 
-    public Stream<String> streamRDF(UniRefStreamRequest streamRequest, String type, String format) {
+    public Stream<String> streamRDF(UniRefStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), type, format);
+        List<String> entryIds = documentIdStream.fetchIds(solrRequest).collect(Collectors.toList());
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     @Override
@@ -207,7 +208,7 @@ public class UniRefEntryLightService
      * This method remove MemberIdType from member list and return just memberId
      *
      * @param members List of members that are stored in Voldemort with format:
-     *     "memberId,MemberIdType"
+     *                "memberId,MemberIdType"
      * @return List of return clean member with the format "memberId"
      */
     private List<String> removeMemberTypeFromMemberId(List<String> members) {
