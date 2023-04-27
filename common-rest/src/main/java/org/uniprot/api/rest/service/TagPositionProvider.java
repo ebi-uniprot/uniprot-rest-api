@@ -41,7 +41,9 @@ public class TagPositionProvider {
     }
 
     /**
-     * Example: <p>End Tag </rdf:RDF> Logic- Convert RDF/XML response for streaming so that it is transmitted
+     * Example:
+     *
+     * <p>End Tag </rdf:RDF> Logic- Convert RDF/XML response for streaming so that it is transmitted
      * as one big xml string. In the every batch, pass everything between RDF_PROLOG and
      * RDF_CLOSE_TAG(both exclusive) in any of the responses . The RDF_PROLOG will be added in the
      * beginning of stream and RDF_CLOSE_TAG will be added in the end of the stream. see

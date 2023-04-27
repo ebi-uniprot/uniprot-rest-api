@@ -1,6 +1,17 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,16 +23,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.service.RdfService;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
 /**
  * @author lgonzales
  * @since 28/01/2021
@@ -31,7 +32,8 @@ class RdfStreamerTest {
     public static final List<String> IDS = List.of("a", "b");
     private static final String DATA_TYPE = "dataType";
     private static final String FORMAT = "format";
-    private static final String RDF_PROLOG = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<rdf:RDF>\n";
+    private static final String RDF_PROLOG =
+            "<?xml version='1.0' encoding='UTF-8'?>\n" + "<rdf:RDF>\n";
     private static final String SAMPLE_RDF =
             "<?xml version='1.0' encoding='UTF-8'?>\n"
                     + "<rdf:RDF>\n"
@@ -45,23 +47,21 @@ class RdfStreamerTest {
     private static final int BATCH_SIZE = 2;
     private static final String RDF_CLOSE_TAG = "</rdf:RDF>";
     private static final RetryPolicy<Object> RETRY_POLICY = new RetryPolicy<>().withMaxRetries(3);
-    private static final String EMPTY_RESPONSE = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<rdf:RDF>\n" + "</rdf:RDF>";
-    @Mock
-    private PrologProvider prologProvider;
-    @Mock
-    private RdfServiceFactory rdfServiceFactory;
-    @Mock
-    private RdfService<String> rdfService;
-    @Mock
-    private RestTemplate restTemplate;
-    @Mock
-    private TagPositionProvider tagPositionProvider;
+    private static final String EMPTY_RESPONSE =
+            "<?xml version='1.0' encoding='UTF-8'?>\n" + "<rdf:RDF>\n" + "</rdf:RDF>";
+    @Mock private PrologProvider prologProvider;
+    @Mock private RdfServiceFactory rdfServiceFactory;
+    @Mock private RdfService<String> rdfService;
+    @Mock private RestTemplate restTemplate;
+    @Mock private TagPositionProvider tagPositionProvider;
     RdfStreamer rdfStreamer;
 
     @BeforeEach
     void setUp() {
         rdfStreamer = new RdfStreamer(BATCH_SIZE, prologProvider, rdfServiceFactory, RETRY_POLICY);
-        rdfService = new RdfService<>(tagPositionProvider, restTemplate, String.class, DATA_TYPE, FORMAT);
+        rdfService =
+                new RdfService<>(
+                        tagPositionProvider, restTemplate, String.class, DATA_TYPE, FORMAT);
         when(rdfServiceFactory.getRdfService(DATA_TYPE, FORMAT)).thenReturn(rdfService);
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
@@ -93,7 +93,8 @@ class RdfStreamerTest {
         when(tagPositionProvider.getStartingPosition(any(), eq(FORMAT))).thenReturn(169);
         when(tagPositionProvider.getEndingPosition(any(), eq(FORMAT))).thenReturn(267);
 
-        Stream<String> rdfStream = rdfStreamer.stream(Stream.of("a", "b", "c", "d", "e"), DATA_TYPE, FORMAT);
+        Stream<String> rdfStream =
+                rdfStreamer.stream(Stream.of("a", "b", "c", "d", "e"), DATA_TYPE, FORMAT);
 
         String rdfString = rdfStream.collect(Collectors.joining());
         // 3 batches
@@ -102,12 +103,12 @@ class RdfStreamerTest {
                         + "<rdf:RDF>\n"
                         + "    <sample>text</sample>\n"
                         + "    <anotherSample>text2</anotherSample>\n"
-                        + "    <someMore>text3</someMore>" +
-                        "\n"
+                        + "    <someMore>text3</someMore>"
+                        + "\n"
                         + "    <sample>text</sample>\n"
                         + "    <anotherSample>text2</anotherSample>\n"
-                        + "    <someMore>text3</someMore>" +
-                        "\n"
+                        + "    <someMore>text3</someMore>"
+                        + "\n"
                         + "    <sample>text</sample>\n"
                         + "    <anotherSample>text2</anotherSample>\n"
                         + "    <someMore>text3</someMore>\n"

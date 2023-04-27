@@ -1,5 +1,7 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -7,16 +9,12 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.rest.service.RdfService;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-
 class RdfServiceFactoryTest {
 
     public static final String TYPE = "type";
     public static final String FORMAT = "format";
-    @Mock
-    private RestTemplate restTemplate;
-    @Mock
-    private TagPositionProvider tagPositionProvider;
+    @Mock private RestTemplate restTemplate;
+    @Mock private TagPositionProvider tagPositionProvider;
     private RdfServiceFactory rdfServiceFactory;
 
     @BeforeEach

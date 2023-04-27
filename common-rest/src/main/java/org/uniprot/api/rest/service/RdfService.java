@@ -1,25 +1,29 @@
 package org.uniprot.api.rest.service;
 
+import java.net.URI;
+import java.util.*;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.store.datastore.common.StoreService;
-
-import java.net.URI;
-import java.util.*;
 
 @Slf4j
 public class RdfService<T> implements StoreService<T> {
     private final TagPositionProvider tagPositionProvider;
     private final RestTemplate restTemplate;
     private final Class<T> clazz;
-    @Getter
-    private final String dataType;
-    @Getter
-    private final String format;
+    @Getter private final String dataType;
+    @Getter private final String format;
 
-    public RdfService(TagPositionProvider tagPositionProvider, RestTemplate restTemplate, Class<T> clazz, String dataType, String format) {
+    public RdfService(
+            TagPositionProvider tagPositionProvider,
+            RestTemplate restTemplate,
+            Class<T> clazz,
+            String dataType,
+            String format) {
         this.tagPositionProvider = tagPositionProvider;
         this.restTemplate = restTemplate;
         this.clazz = clazz;
@@ -49,12 +53,14 @@ public class RdfService<T> implements StoreService<T> {
 
     @Override
     public Optional<T> getEntry(String id) {
-        return Optional.ofNullable(getEntriesByAccessions(Collections.singletonList(id), dataType, format));
+        return Optional.ofNullable(
+                getEntriesByAccessions(Collections.singletonList(id), dataType, format));
     }
 
     private T getEntriesByAccessions(List<String> accessions, String dataType, String format) {
         String commaSeparatedIds = String.join(",", accessions);
-        DefaultUriBuilderFactory handler = (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
+        DefaultUriBuilderFactory handler =
+                (DefaultUriBuilderFactory) restTemplate.getUriTemplateHandler();
         URI requestUri = handler.builder().build(dataType, format, commaSeparatedIds);
 
         return restTemplate.getForObject(requestUri, this.clazz);

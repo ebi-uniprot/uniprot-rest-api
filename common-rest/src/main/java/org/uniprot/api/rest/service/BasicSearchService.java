@@ -246,7 +246,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     }
 
     public String getRdf(String id, String dataType, String format) {
-        return getRdfStreamer().stream(Stream.of(id), dataType, format).collect(Collectors.joining());
+        return getRdfStreamer().stream(Stream.of(id), dataType, format)
+                .collect(Collectors.joining());
     }
 
     protected RdfStreamer getRdfStreamer() {
