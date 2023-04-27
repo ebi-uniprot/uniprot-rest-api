@@ -204,10 +204,10 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         } else if (accessionOrId.contains(".")) {
             return redirectToUniSave(accessionOrId, request);
         } else {
-            Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-            if (acceptedRDFContentType.isPresent()) {
-                String rdf = entryService.getRDFXml(accessionOrId, DATA_TYPE, acceptedRDFContentType.get());
-                return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
+            Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+            if (acceptedRdfContentType.isPresent()) {
+                String rdf = entryService.getRdf(accessionOrId, DATA_TYPE, acceptedRdfContentType.get());
+                return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
             } else {
                 UniProtKBEntry entry = entryService.findByUniqueId(accessionOrId, fields);
                 return super.getEntityResponse(entry, fields, request);
@@ -273,10 +273,10 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
 
         MediaType contentType = getAcceptHeader(request);
 
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            return super.streamRDF(
-                    () -> entryService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () -> entryService.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

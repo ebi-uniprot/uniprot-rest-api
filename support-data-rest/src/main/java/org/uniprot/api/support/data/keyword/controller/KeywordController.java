@@ -107,10 +107,10 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            String result = this.keywordService.getRDFXml(id, DATA_TYPE, acceptedRDFContentType.get());
-            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String result = this.keywordService.getRdf(id, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
         KeywordEntry keywordEntry = this.keywordService.findByUniqueId(id);
         return super.getEntityResponse(keywordEntry, fields, request);
@@ -187,10 +187,10 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> stream(
             @Valid @ModelAttribute KeywordStreamRequest streamRequest, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            return super.streamRDF(
-                    () -> keywordService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () -> keywordService.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

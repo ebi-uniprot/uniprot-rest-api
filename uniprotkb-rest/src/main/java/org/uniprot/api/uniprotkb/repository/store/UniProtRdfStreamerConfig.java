@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.repository.store;
+package org.uniprot.api.uniprotkb.repository.store;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,34 +15,34 @@ import org.uniprot.api.rest.service.TagPositionProvider;
 import java.util.Collections;
 
 @Configuration
-public class UniParcRDFStreamerConfig {
+public class UniProtRdfStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagPositionProvider tagPositionProvider;
 
-    public UniParcRDFStreamerConfig(PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
+    public UniProtRdfStreamerConfig(PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
         this.prologProvider = prologProvider;
         this.tagPositionProvider = tagPositionProvider;
     }
 
     @Bean
-    public RDFStreamer uniparcRdfStreamer(
-            RDFStreamerConfigProperties uniparcRDFStreamerConfigProperties,
-            RDFServiceFactory uniparcRdfServiceFactory) {
-        return new RDFStreamer(
-                uniparcRDFStreamerConfigProperties.getBatchSize(),
+    public RdfStreamer uniProtRdfStreamer(
+            RdfStreamerConfigProperties uniProtRdfStreamerConfigProperties,
+            RdfServiceFactory uniProtRdfServiceFactory) {
+        return new RdfStreamer(
+                uniProtRdfStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                uniparcRdfServiceFactory,
-                RDFStreamConfig.rdfRetryPolicy(uniparcRDFStreamerConfigProperties));
+                uniProtRdfServiceFactory,
+                RdfStreamConfig.rdfRetryPolicy(uniProtRdfStreamerConfigProperties));
     }
 
     @Bean
-    public RDFServiceFactory uniparcRdfServiceFactory(RestTemplate uniparcRdfRestTemplate) {
-        return new RDFServiceFactory(uniparcRdfRestTemplate, tagPositionProvider);
+    public RdfServiceFactory uniProtRdfServiceFactory(RestTemplate uniProtRdfRestTemplate) {
+        return new RdfServiceFactory(uniProtRdfRestTemplate, tagPositionProvider);
     }
 
     @Bean
-    public RestTemplate uniparcRdfRestTemplate(
-            RDFStreamerConfigProperties uniparcRDFStreamerConfigProperties) {
+    public RestTemplate uniProtRdfRestTemplate(
+            RdfStreamerConfigProperties uniProtRdfStreamerConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
@@ -50,13 +50,13 @@ public class UniParcRDFStreamerConfig {
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
                 new DefaultUriBuilderFactory(
-                        uniparcRDFStreamerConfigProperties.getRequestUrl()));
+                        uniProtRdfStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "uniparc.rdf.streamer")
-    public RDFStreamerConfigProperties uniparcRDFStreamerConfigProperties() {
-        return new RDFStreamerConfigProperties();
+    @ConfigurationProperties(prefix = "uniprot.rdf.streamer")
+    public RdfStreamerConfigProperties uniProtRdfStreamerConfigProperties() {
+        return new RdfStreamerConfigProperties();
     }
 }

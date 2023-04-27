@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
@@ -43,14 +43,14 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
     protected final StoreStreamerConfig<T> storeStreamerConfig;
     private final DownloadConfigProperties downloadConfigProperties;
     private final MessageConverterContextFactory.Resource resource;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
 
     public AbstractDownloadResultWriter(
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<T> converterContextFactory,
             StoreStreamerConfig<T> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RDFStreamer rdfStreamer,
+            RdfStreamer rdfStreamer,
             MessageConverterContextFactory.Resource resource) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;

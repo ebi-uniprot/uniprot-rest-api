@@ -1,19 +1,5 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.saveEntries;
-
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,11 +29,25 @@ import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
+
+import java.util.List;
+
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.saveEntries;
 
 /**
  * @author lgonzales
@@ -180,7 +180,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
     }
 
     @Test
-    void streamRDFCanReturnSuccess() throws Exception {
+    void streamRdfCanReturnSuccess() throws Exception {
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ;
@@ -195,7 +195,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIPARC_PROLOG)))
+                .andExpect(content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
                 .andExpect(
                         content()
                                 .string(

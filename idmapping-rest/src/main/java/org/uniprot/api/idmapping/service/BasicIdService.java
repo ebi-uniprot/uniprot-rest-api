@@ -16,7 +16,7 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -47,7 +47,7 @@ public abstract class BasicIdService<T, U> {
     protected final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
     private final SolrQueryConfig queryConfig;
     private final FacetConfig facetConfig;
 
@@ -72,7 +72,7 @@ public abstract class BasicIdService<T, U> {
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
-            RDFStreamer rdfStreamer,
+            RdfStreamer rdfStreamer,
             SolrQueryConfig queryConfig) {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
@@ -156,7 +156,7 @@ public abstract class BasicIdService<T, U> {
         return streamEntries(mappedIds, streamRequest.getFields());
     }
 
-    public Stream<String> streamRDF(
+    public Stream<String> streamRdf(
             StreamRequest streamRequest, IdMappingResult mappingResult, String jobId, String dataType, String format) {
         List<IdMappingStringPair> fromToPairs =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);

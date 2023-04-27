@@ -34,7 +34,7 @@ public class UniParcMessageConverterConfig {
         converters.add(
                 currentIndex++, new UniParcEntryPairFastaMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new ListMessageConverter(downloadGatekeeper));
-        converters.add(currentIndex++, new RDFMessageConverter(downloadGatekeeper));
+        converters.add(currentIndex++, new RdfMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new TurtleMessageConverter(downloadGatekeeper));
         converters.add(currentIndex++, new NTriplesMessageConverter(downloadGatekeeper));
         converters.add(

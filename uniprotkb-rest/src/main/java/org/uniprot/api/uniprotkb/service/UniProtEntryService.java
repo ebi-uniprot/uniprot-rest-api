@@ -12,7 +12,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
@@ -63,7 +63,7 @@ public class UniProtEntryService
     private final UniprotQueryRepository repository;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
     private final TupleStreamDocumentIdStream documentIdStream;
 
     private static final Pattern ACCESSION_REGEX_ISOFORM =
@@ -85,7 +85,7 @@ public class UniProtEntryService
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
             TupleStreamDocumentIdStream documentIdStream,
-            RDFStreamer uniprotRdfStreamer) {
+            RdfStreamer uniProtRdfStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -101,7 +101,7 @@ public class UniProtEntryService
         this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.rdfStreamer = uniprotRdfStreamer;
+        this.rdfStreamer = uniProtRdfStreamer;
         this.documentIdStream = documentIdStream;
     }
 
@@ -217,7 +217,7 @@ public class UniProtEntryService
         }
     }
 
-    public Stream<String> streamRDF(
+    public Stream<String> streamRdf(
             UniProtKBStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest = createDownloadSolrRequest(streamRequest);
         return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), dataType, format);
@@ -306,7 +306,7 @@ public class UniProtEntryService
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
+    protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
     }
 

@@ -7,7 +7,7 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
@@ -69,7 +69,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
             UniprotKBMappingRepository repository,
             UniProtKBFacetConfig facetConfig,
-            RDFStreamer idMappingRdfStreamer,
+            RdfStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniProtKBEntry> storeClient,
             SolrQueryConfig uniProtKBSolrQueryConf,
             TaxonomyLineageService lineageService) {

@@ -155,12 +155,12 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
             String result =
-                    queryService.getRDFXml(
-                            getByUniParcIdRequest.getUpi(), DATA_TYPE, acceptedRDFContentType.get());
-            return super.getEntityResponseRDF(result, contentType, request);
+                    queryService.getRdf(
+                            getByUniParcIdRequest.getUpi(), DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(result, contentType, request);
         }
 
         UniParcEntry entry = queryService.getByUniParcId(getByUniParcIdRequest);
@@ -214,10 +214,10 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            return super.streamRDF(
-                    () -> queryService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () -> queryService.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

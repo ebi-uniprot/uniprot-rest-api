@@ -96,10 +96,10 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
             @Valid @ModelAttribute UniRefIdRequest idRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            String rdf = entryService.getRDFXml(idRequest.getId(), DATA_TYPE, acceptedRDFContentType.get());
-            return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String rdf = entryService.getRdf(idRequest.getId(), DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntry entryResult = entryService.getEntity(idRequest.getId());
             return super.getEntityResponse(entryResult, idRequest.getFields(), request);

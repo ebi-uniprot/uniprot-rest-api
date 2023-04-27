@@ -3,7 +3,7 @@ package org.uniprot.api.common.repository.stream.rdf;
 import lombok.Data;
 
 @Data
-public class RDFStreamerConfigProperties {
+public class RdfStreamerConfigProperties {
     private String requestUrl;
     private int batchSize; // number of accessions per RDF rest request
     private int maxRetries;

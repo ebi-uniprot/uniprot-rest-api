@@ -36,7 +36,7 @@ public class UniProtKBMessageConverterConfig {
         converters.add(
                 currentIdx++, new UniProtKBEntryPairFastaMessageConverter(downloadGatekeeper));
         converters.add(currentIdx++, new ListMessageConverter(downloadGatekeeper));
-        converters.add(currentIdx++, new RDFMessageConverter(downloadGatekeeper));
+        converters.add(currentIdx++, new RdfMessageConverter(downloadGatekeeper));
         converters.add(currentIdx++, new TurtleMessageConverter(downloadGatekeeper));
         converters.add(currentIdx++, new NTriplesMessageConverter(downloadGatekeeper));
         converters.add(currentIdx++, new UniProtKBEntryPairGFFMessageConverter(downloadGatekeeper));

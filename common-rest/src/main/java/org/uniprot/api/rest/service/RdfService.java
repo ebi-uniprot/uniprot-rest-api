@@ -10,7 +10,7 @@ import java.net.URI;
 import java.util.*;
 
 @Slf4j
-public class RDFService<T> implements StoreService<T> {
+public class RdfService<T> implements StoreService<T> {
     private final TagPositionProvider tagPositionProvider;
     private final RestTemplate restTemplate;
     private final Class<T> clazz;
@@ -19,7 +19,7 @@ public class RDFService<T> implements StoreService<T> {
     @Getter
     private final String format;
 
-    public RDFService(TagPositionProvider tagPositionProvider, RestTemplate restTemplate, Class<T> clazz, String dataType, String format) {
+    public RdfService(TagPositionProvider tagPositionProvider, RestTemplate restTemplate, Class<T> clazz, String dataType, String format) {
         this.tagPositionProvider = tagPositionProvider;
         this.restTemplate = restTemplate;
         this.clazz = clazz;
@@ -35,7 +35,7 @@ public class RDFService<T> implements StoreService<T> {
         T rdfXML = getEntriesByAccessions(allAccessions, dataType, format);
 
         if (Objects.nonNull(rdfXML)) {
-            T rdfResponse = convertRDFForStreaming(rdfXML);
+            T rdfResponse = convertRdfForStreaming(rdfXML);
             return Collections.singletonList(rdfResponse);
         } else {
             return Collections.emptyList();
@@ -60,7 +60,7 @@ public class RDFService<T> implements StoreService<T> {
         return restTemplate.getForObject(requestUri, this.clazz);
     }
 
-    private T convertRDFForStreaming(T body) {
+    private T convertRdfForStreaming(T body) {
         T rdfResponse = body;
         if (this.clazz == String.class) {
             String bodyString = (String) body;

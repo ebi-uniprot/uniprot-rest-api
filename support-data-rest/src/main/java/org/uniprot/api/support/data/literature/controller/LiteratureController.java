@@ -110,13 +110,13 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
             if (citationId.startsWith("CI") || citationId.startsWith("IND")) {
                 throw new ResourceNotFoundException("Unable to find citation " + citationId);
             }
-            String result = this.literatureService.getRDFXml(citationId, DATA_TYPE, acceptedRDFContentType.get());
-            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+            String result = this.literatureService.getRdf(citationId, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(citationId);
         return super.getEntityResponse(literatureEntry, fields, request);
@@ -194,12 +194,12 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                     MediaType contentType,
             HttpServletRequest request) {
 
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            return super.streamRDF(
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
                     () ->
-                            literatureService.streamRDF(
-                                    streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
+                            literatureService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

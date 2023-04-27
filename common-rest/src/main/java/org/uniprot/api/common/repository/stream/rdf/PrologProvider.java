@@ -2,7 +2,7 @@ package org.uniprot.api.common.repository.stream.rdf;
 
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.service.NTriplesPrologs;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.service.TurtlePrologs;
 
 @Component
@@ -24,7 +24,7 @@ public class PrologProvider {
     public String getProLog(String dataType, String format) {
         switch (format) {
             case RDF:
-                return getForRDF(dataType);
+                return getForRdf(dataType);
             case TURTLE:
                 return getForTurtle(dataType);
             case N_TRIPLES:
@@ -34,26 +34,26 @@ public class PrologProvider {
         }
     }
 
-    private String getForRDF(String dataType) {
+    private String getForRdf(String dataType) {
         switch (dataType) {
             case UNIPROT:
-                return RDFPrologs.UNIPROT_PROLOG;
+                return RdfPrologs.UNIPROT_PROLOG;
             case UNIREF:
-                return RDFPrologs.UNIREF_PROLOG;
+                return RdfPrologs.UNIREF_PROLOG;
             case UNIPARC:
-                return RDFPrologs.UNIPARC_PROLOG;
+                return RdfPrologs.UNIPARC_PROLOG;
             case XREF:
-                return RDFPrologs.XREF_PROLOG;
+                return RdfPrologs.XREF_PROLOG;
             case DISEASE:
-                return RDFPrologs.DISEASE_PROLOG;
+                return RdfPrologs.DISEASE_PROLOG;
             case KEYWORD:
-                return RDFPrologs.KEYWORD_PROLOG;
+                return RdfPrologs.KEYWORD_PROLOG;
             case LITERATURE:
-                return RDFPrologs.LITERATURE_PROLOG;
+                return RdfPrologs.LITERATURE_PROLOG;
             case SUBCELLULAR:
-                return RDFPrologs.SUBCELLULAR_LOCATION_PROLOG;
+                return RdfPrologs.SUBCELLULAR_LOCATION_PROLOG;
             case TAXONOMY:
-                return RDFPrologs.TAXONOMY_PROLOG;
+                return RdfPrologs.TAXONOMY_PROLOG;
             default:
                 throw new IllegalArgumentException(String.format("Invalid type %s", dataType));
         }

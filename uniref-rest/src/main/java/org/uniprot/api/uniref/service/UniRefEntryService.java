@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.stream.rdf.RDFServiceFactory;
+import org.uniprot.api.common.repository.stream.rdf.RdfServiceFactory;
 import org.uniprot.api.uniref.repository.store.UniRefEntryStoreRepository;
 import org.uniprot.core.uniref.UniRefEntry;
 
@@ -18,12 +18,12 @@ import java.util.Objects;
 public class UniRefEntryService {
 
     private final UniRefEntryStoreRepository entryStoreRepository;
-    private final RDFServiceFactory rdfServiceFactory;
+    private final RdfServiceFactory rdfServiceFactory;
 
     @Autowired
     public UniRefEntryService(
             UniRefEntryStoreRepository entryStoreRepository,
-            RDFServiceFactory rdfServiceFactory) {
+            RdfServiceFactory rdfServiceFactory) {
         this.entryStoreRepository = entryStoreRepository;
         this.rdfServiceFactory = rdfServiceFactory;
     }
@@ -39,7 +39,7 @@ public class UniRefEntryService {
         }
     }
 
-    public String getRDFXml(String id, String type, String format) {
+    public String getRdf(String id, String type, String format) {
         ResourceNotFoundException nfe =
                 new ResourceNotFoundException(
                         "Unable to get UniRefEntry from store. ClusterId:" + id);

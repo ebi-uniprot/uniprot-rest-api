@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -43,7 +43,7 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
             @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig,
             @Qualifier("uniRefStoreRetryPolicy") RetryPolicy<Object> storeFetchRetryPolicy,
             UniRefFacetConfig facetConfig,
-            RDFStreamer idMappingRdfStreamer,
+            RdfStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniRefEntryLight> storeClient,
             SolrQueryConfig uniRefSolrQueryConf) {
         super(

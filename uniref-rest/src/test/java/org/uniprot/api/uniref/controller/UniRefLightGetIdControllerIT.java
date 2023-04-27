@@ -331,7 +331,7 @@ class UniRefLightGetIdControllerIT {
     }
 
     @Test
-    void contentTypeRDFSuccessRequest() throws Exception {
+    void contentTypeRdfSuccessRequest() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(ID_LIGHT_PREFIX_PATH + ID + ID_LIGHT_SUFIX_PATH)

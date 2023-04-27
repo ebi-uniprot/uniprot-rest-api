@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.support.data.common.SolrDocumentRDFIdConverter;
+import org.uniprot.api.support.data.common.SolrDocumentRdfIdConverter;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
@@ -24,7 +24,7 @@ public class LiteratureStreamConfig {
             LiteratureRepository repository) {
         return DefaultDocumentIdStream.<LiteratureDocument>builder()
                 .repository(repository)
-                .documentToId(document -> new SolrDocumentRDFIdConverter().apply(document))
+                .documentToId(document -> new SolrDocumentRdfIdConverter().apply(document))
                 .build();
     }
 }

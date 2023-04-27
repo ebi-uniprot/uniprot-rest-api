@@ -11,13 +11,13 @@ import org.junit.jupiter.api.Test;
  * @author lgonzales
  * @since 2020-04-03
  */
-class RDFMessageConverterTest {
+class RdfMessageConverterTest {
 
     @Test
     void canWriteEntity() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        RDFMessageConverter rdfMessageConverter = new RDFMessageConverter();
+        RdfMessageConverter rdfMessageConverter = new RdfMessageConverter();
         rdfMessageConverter.writeEntity("entity", outputStream);
 
         String result = outputStream.toString("UTF-8");

@@ -184,7 +184,7 @@ public class MessageConverterConfig {
                                         UniProtDataType.CROSSREF),
                                 downloadGatekeeper);
                 converters.add(index++, xrefJsonConverter);
-                converters.add(index, new RDFMessageConverter(downloadGatekeeper));
+                converters.add(index, new RdfMessageConverter(downloadGatekeeper));
                 converters.add(index, new TurtleMessageConverter(downloadGatekeeper));
                 converters.add(index, new NTriplesMessageConverter(downloadGatekeeper));
             }

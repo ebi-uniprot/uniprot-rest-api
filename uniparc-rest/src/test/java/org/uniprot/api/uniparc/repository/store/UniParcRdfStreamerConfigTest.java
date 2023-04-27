@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
-import org.uniprot.api.common.repository.stream.rdf.RDFServiceFactory;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.rdf.RdfServiceFactory;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamerConfigProperties;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class UniParcRDFStreamerConfigTest {
+class UniParcRdfStreamerConfigTest {
     @Mock
     private PrologProvider prologProvider;
     @Mock
@@ -20,14 +20,14 @@ class UniParcRDFStreamerConfigTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
-    private RDFServiceFactory rdfServiceFactory;
-    private RDFStreamerConfigProperties properties;
-    private UniParcRDFStreamerConfig uniparcRDFStreamerConfig;
+    private RdfServiceFactory rdfServiceFactory;
+    private RdfStreamerConfigProperties properties;
+    private UniParcRdfStreamerConfig uniparcRdfStreamerConfig;
 
     @BeforeEach
     void setUp() {
-        uniparcRDFStreamerConfig = new UniParcRDFStreamerConfig(prologProvider, tagPositionProvider);
-        properties = new RDFStreamerConfigProperties();
+        uniparcRdfStreamerConfig = new UniParcRdfStreamerConfig(prologProvider, tagPositionProvider);
+        properties = new RdfStreamerConfigProperties();
         properties.setRequestUrl("http://localhost");
         properties.setBatchSize(25);
         properties.setMaxRetries(2);
@@ -36,19 +36,19 @@ class UniParcRDFStreamerConfigTest {
 
     @Test
     void uniparcRdfStreamer() {
-        RDFStreamer rdfStreamer = uniparcRDFStreamerConfig.uniparcRdfStreamer(properties, rdfServiceFactory);
+        RdfStreamer rdfStreamer = uniparcRdfStreamerConfig.uniparcRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
     }
 
     @Test
     void uniparcRdfServiceFactory() {
-        RDFServiceFactory rdfServiceFactory = uniparcRDFStreamerConfig.uniparcRdfServiceFactory(restTemplate);
+        RdfServiceFactory rdfServiceFactory = uniparcRdfStreamerConfig.uniparcRdfServiceFactory(restTemplate);
         assertNotNull(rdfServiceFactory);
     }
 
     @Test
     void uniparcRdfRestTemplate() {
-        RestTemplate template = uniparcRDFStreamerConfig.uniparcRdfRestTemplate(properties);
+        RestTemplate template = uniparcRdfStreamerConfig.uniparcRdfRestTemplate(properties);
         assertNotNull(template);
     }
 }

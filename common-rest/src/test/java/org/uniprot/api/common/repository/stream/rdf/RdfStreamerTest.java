@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.uniprot.api.rest.service.RDFService;
+import org.uniprot.api.rest.service.RdfService;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
 import java.util.List;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
  * @since 28/01/2021
  */
 @ExtendWith(MockitoExtension.class)
-class RDFStreamerTest {
+class RdfStreamerTest {
     public static final List<String> IDS = List.of("a", "b");
     private static final String DATA_TYPE = "dataType";
     private static final String FORMAT = "format";
@@ -49,19 +49,19 @@ class RDFStreamerTest {
     @Mock
     private PrologProvider prologProvider;
     @Mock
-    private RDFServiceFactory rdfServiceFactory;
+    private RdfServiceFactory rdfServiceFactory;
     @Mock
-    private RDFService<String> rdfService;
+    private RdfService<String> rdfService;
     @Mock
     private RestTemplate restTemplate;
     @Mock
     private TagPositionProvider tagPositionProvider;
-    RDFStreamer rdfStreamer;
+    RdfStreamer rdfStreamer;
 
     @BeforeEach
     void setUp() {
-        rdfStreamer = new RDFStreamer(BATCH_SIZE, prologProvider, rdfServiceFactory, RETRY_POLICY);
-        rdfService = new RDFService<>(tagPositionProvider, restTemplate, String.class, DATA_TYPE, FORMAT);
+        rdfStreamer = new RdfStreamer(BATCH_SIZE, prologProvider, rdfServiceFactory, RETRY_POLICY);
+        rdfService = new RdfService<>(tagPositionProvider, restTemplate, String.class, DATA_TYPE, FORMAT);
         when(rdfServiceFactory.getRdfService(DATA_TYPE, FORMAT)).thenReturn(rdfService);
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);

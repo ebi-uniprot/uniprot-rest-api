@@ -129,10 +129,10 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            String rdf = service.getRDFXml(id, DATA_TYPE, acceptedRDFContentType.get());
-            return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String rdf = service.getRdf(id, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntryLight entryResult = service.findByUniqueId(id, fields);
             return super.getEntityResponse(entryResult, fields, request);
@@ -241,10 +241,10 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            return super.streamRDF(
-                    () -> service.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () -> service.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

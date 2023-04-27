@@ -31,9 +31,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
+import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.subcellular.repository.SubcellularLocationRepository;
@@ -54,7 +54,7 @@ import org.uniprot.store.search.document.subcell.SubcellularLocationDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(SubcellularLocationController.class)
 @ExtendWith(value = {SpringExtension.class})
-class SubcellularLocationStreamControllerIT extends AbstractRDFStreamControllerIT {
+class SubcellularLocationStreamControllerIT extends AbstractRdfStreamControllerIT {
     @Autowired private SubcellularLocationRepository repository;
 
     @MockBean(name = "supportDataRdfRestTemplate")
@@ -436,7 +436,7 @@ class SubcellularLocationStreamControllerIT extends AbstractRDFStreamControllerI
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.SUBCELLULAR_LOCATION_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.SUBCELLULAR_LOCATION_PROLOG;
     }
 }

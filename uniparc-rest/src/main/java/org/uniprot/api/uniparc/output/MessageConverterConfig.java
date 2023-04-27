@@ -73,7 +73,7 @@ public class MessageConverterConfig {
                                 downloadGatekeeper);
                 converters.add(0, uniparcJsonConverter);
                 converters.add(1, new UniParcXmlMessageConverter("", downloadGatekeeper));
-                converters.add(new RDFMessageConverter(downloadGatekeeper));
+                converters.add(new RdfMessageConverter(downloadGatekeeper));
                 converters.add(new TurtleMessageConverter(downloadGatekeeper));
                 converters.add(new NTriplesMessageConverter(downloadGatekeeper));
                 // ####################### UniParcCrossReference ###################

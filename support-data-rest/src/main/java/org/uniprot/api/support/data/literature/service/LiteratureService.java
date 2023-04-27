@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -27,7 +27,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     public static final String LITERATURE_ID_FIELD = "id";
     private final UniProtQueryProcessorConfig literatureQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
     private final DefaultDocumentIdStream<LiteratureDocument> documentIdStream;
 
     public LiteratureService(
@@ -39,7 +39,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             UniProtQueryProcessorConfig literatureQueryProcessorConfig,
             SearchFieldConfig literatureSearchFieldConfig,
             DefaultDocumentIdStream<LiteratureDocument> documentIdStream,
-            RDFStreamer supportDataRdfStreamer) {
+            RdfStreamer supportDataRdfStreamer) {
         super(
                 repository,
                 entryConverter,
@@ -63,7 +63,7 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
+    protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
     }
 

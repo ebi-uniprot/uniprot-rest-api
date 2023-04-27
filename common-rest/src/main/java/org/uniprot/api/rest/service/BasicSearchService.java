@@ -8,7 +8,7 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.*;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -231,25 +231,25 @@ public abstract class BasicSearchService<D extends Document, R> {
         return this.solrBatchSize == null ? DEFAULT_SOLR_BATCH_SIZE : this.solrBatchSize;
     }
 
-    public Stream<String> streamRDF(StreamRequest streamRequest, String dataType, String format) {
+    public Stream<String> streamRdf(StreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, queryBoosts)
                         .rows(getDefaultBatchSize())
                         .totalRows(Integer.MAX_VALUE)
                         .build();
         Stream<String> idStream = getDocumentIdStream().fetchIds(solrRequest);
-        return getRDFStreamer().stream(idStream, dataType, format);
+        return getRdfStreamer().stream(idStream, dataType, format);
     }
 
     protected DefaultDocumentIdStream<D> getDocumentIdStream() {
         throw new UnsupportedOperationException("Override this method");
     }
 
-    public String getRDFXml(String id, String dataType, String format) {
-        return getRDFStreamer().stream(Stream.of(id), dataType, format).collect(Collectors.joining());
+    public String getRdf(String id, String dataType, String format) {
+        return getRdfStreamer().stream(Stream.of(id), dataType, format).collect(Collectors.joining());
     }
 
-    protected RDFStreamer getRDFStreamer() {
+    protected RdfStreamer getRdfStreamer() {
         throw new UnsupportedOperationException("Override this method");
     }
 

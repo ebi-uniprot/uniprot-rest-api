@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.support.data.common.SolrDocumentRDFIdConverter;
+import org.uniprot.api.support.data.common.SolrDocumentRdfIdConverter;
 import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
 import org.uniprot.store.search.document.disease.DiseaseDocument;
 
@@ -25,7 +25,7 @@ public class DiseaseStreamConfig {
             DiseaseRepository repository) {
         return DefaultDocumentIdStream.<DiseaseDocument>builder()
                 .repository(repository)
-                .documentToId(doc -> new SolrDocumentRDFIdConverter().apply(doc))
+                .documentToId(doc -> new SolrDocumentRdfIdConverter().apply(doc))
                 .build();
     }
 }

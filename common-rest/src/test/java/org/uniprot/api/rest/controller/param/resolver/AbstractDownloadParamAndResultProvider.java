@@ -1,11 +1,5 @@
 package org.uniprot.api.rest.controller.param.resolver;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -15,6 +9,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.uniprot.api.rest.controller.param.DownloadParamAndResult;
 import org.uniprot.api.rest.output.UniProtMediaType;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /** class to provide common query param and result matcher */
 public abstract class AbstractDownloadParamAndResultProvider implements Extension {
@@ -125,7 +125,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
                 break;
             case UniProtMediaType.TSV_MEDIA_TYPE_VALUE:
                 resultMatchers =
-                        getTSVResultMatchers(
+                        getTsvResultMatchers(
                                 entryCount,
                                 sortFieldName,
                                 sortOrder,
@@ -145,7 +145,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
                 break;
             case UniProtMediaType.XLS_MEDIA_TYPE_VALUE:
                 resultMatchers =
-                        getXLSResultMatchers(
+                        getXlsResultMatchers(
                                 entryCount,
                                 sortFieldName,
                                 sortOrder,
@@ -155,7 +155,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
                 break;
             case UniProtMediaType.RDF_MEDIA_TYPE_VALUE:
                 resultMatchers =
-                        getRDFResultMatchers(
+                        getRdfResultMatchers(
                                 entryCount,
                                 sortFieldName,
                                 sortOrder,
@@ -165,7 +165,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
                 break;
             case UniProtMediaType.FF_MEDIA_TYPE_VALUE:
                 resultMatchers =
-                        getFFResultMatchers(
+                        getFfResultMatchers(
                                 entryCount,
                                 sortFieldName,
                                 sortOrder,
@@ -175,7 +175,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
                 break;
             case MediaType.APPLICATION_XML_VALUE:
                 resultMatchers =
-                        getXMLResultMatchers(
+                        getXmlResultMatchers(
                                 entryCount,
                                 sortFieldName,
                                 sortOrder,
@@ -205,7 +205,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
                 break;
             case UniProtMediaType.OBO_MEDIA_TYPE_VALUE:
                 resultMatchers =
-                        getOBOResultMatchers(
+                        getOboResultMatchers(
                                 entryCount,
                                 sortFieldName,
                                 sortOrder,
@@ -254,7 +254,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
             List<String> requestedFields,
             List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getXMLResultMatchers(
+    protected abstract List<ResultMatcher> getXmlResultMatchers(
             Integer entryCount,
             String sortFieldName,
             String sortOrder,
@@ -262,7 +262,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
             List<String> requestedFields,
             List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getOBOResultMatchers(
+    protected abstract List<ResultMatcher> getOboResultMatchers(
             Integer entryCount,
             String sortFieldName,
             String sortOrder,
@@ -270,7 +270,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
             List<String> requestedFields,
             List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getFFResultMatchers(
+    protected abstract List<ResultMatcher> getFfResultMatchers(
             Integer entryCount,
             String sortFieldName,
             String sortOrder,
@@ -278,7 +278,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
             List<String> requestedFields,
             List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getRDFResultMatchers(
+    protected abstract List<ResultMatcher> getRdfResultMatchers(
             Integer entryCount,
             String sortFieldName,
             String sortOrder,
@@ -286,7 +286,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
             List<String> requestedFields,
             List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getXLSResultMatchers(
+    protected abstract List<ResultMatcher> getXlsResultMatchers(
             Integer entryCount,
             String sortFieldName,
             String sortOrder,
@@ -302,7 +302,7 @@ public abstract class AbstractDownloadParamAndResultProvider implements Extensio
             List<String> requestedFields,
             List<String> expectedFields);
 
-    protected abstract List<ResultMatcher> getTSVResultMatchers(
+    protected abstract List<ResultMatcher> getTsvResultMatchers(
             Integer entryCount,
             String sortFieldName,
             String sortOrder,

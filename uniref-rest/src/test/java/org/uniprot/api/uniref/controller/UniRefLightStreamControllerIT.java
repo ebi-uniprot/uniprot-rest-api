@@ -55,7 +55,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
@@ -123,7 +123,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     }
 
     @Test
-    void streamRDFCanReturnSuccess() throws Exception {
+    void streamRdfCanReturnSuccess() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
@@ -137,7 +137,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIREF_PROLOG)))
+                .andExpect(content().string(startsWith(RdfPrologs.UNIREF_PROLOG)))
                 .andExpect(
                         content()
                                 .string(

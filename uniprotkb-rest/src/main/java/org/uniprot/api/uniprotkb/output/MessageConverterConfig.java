@@ -68,7 +68,7 @@ public class MessageConverterConfig {
                 converters.add(index++, new UniProtKBFlatFileMessageConverter(downloadGatekeeper));
                 converters.add(index++, new UniProtKBFastaMessageConverter(downloadGatekeeper));
                 converters.add(index++, new ListMessageConverter(downloadGatekeeper));
-                converters.add(index++, new RDFMessageConverter(downloadGatekeeper));
+                converters.add(index++, new RdfMessageConverter(downloadGatekeeper));
                 converters.add(index++, new TurtleMessageConverter(downloadGatekeeper));
                 converters.add(index++, new NTriplesMessageConverter(downloadGatekeeper));
                 converters.add(index++, new UniProtKBGffMessageConverter(downloadGatekeeper));

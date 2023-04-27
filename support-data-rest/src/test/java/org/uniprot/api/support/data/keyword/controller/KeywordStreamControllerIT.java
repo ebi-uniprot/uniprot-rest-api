@@ -30,9 +30,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
+import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
@@ -53,7 +53,7 @@ import org.uniprot.store.search.document.keyword.KeywordDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(KeywordController.class)
 @ExtendWith(value = {SpringExtension.class})
-class KeywordStreamControllerIT extends AbstractRDFStreamControllerIT {
+class KeywordStreamControllerIT extends AbstractRdfStreamControllerIT {
     @Autowired private KeywordRepository repository;
 
     @MockBean(name = "supportDataRdfRestTemplate")
@@ -422,8 +422,8 @@ class KeywordStreamControllerIT extends AbstractRDFStreamControllerIT {
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.KEYWORD_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.KEYWORD_PROLOG;
     }
 
     private String getNextAccession() {

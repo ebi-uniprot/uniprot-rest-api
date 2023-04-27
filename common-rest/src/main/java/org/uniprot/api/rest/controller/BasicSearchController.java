@@ -106,7 +106,7 @@ public abstract class BasicSearchController<T> {
         return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
     }
 
-    protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRDF(
+    protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRdf(
             String entity, MediaType contentType, HttpServletRequest request) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFileType(getBestFileTypeFromRequest(request));
@@ -191,7 +191,7 @@ public abstract class BasicSearchController<T> {
         return getDeferredResultResponseEntity(contextSupplier, request);
     }
 
-    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> streamRDF(
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> streamRdf(
             Supplier<Stream<String>> rdfStreamSupplier,
             StreamRequest streamRequest,
             MediaType contentType,
@@ -267,12 +267,7 @@ public abstract class BasicSearchController<T> {
         return FileType.bestFileTypeMatch(encoding);
     }
 
-    protected boolean isRDFAccept(HttpServletRequest request) {
-        MediaType contentType = getAcceptHeader(request);
-        return contentType.equals(RDF_MEDIA_TYPE);
-    }
-
-    protected Optional<String> getAcceptedRDFContentType(HttpServletRequest request) {
+    protected Optional<String> getAcceptedRdfContentType(HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
         if (supportedMediaTypes.containsKey(contentType)) {
             return Optional.of(supportedMediaTypes.get(contentType));

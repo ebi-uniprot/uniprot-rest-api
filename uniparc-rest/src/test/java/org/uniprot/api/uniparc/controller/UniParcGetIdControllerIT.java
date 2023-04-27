@@ -25,7 +25,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.NTriplesPrologs;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniparc.UniParcRestApplication;
@@ -173,7 +173,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                             content()
                                                     .string(
                                                             startsWith(
-                                                                    RDFPrologs.UNIPARC_PROLOG)))
+                                                                    RdfPrologs.UNIPARC_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(

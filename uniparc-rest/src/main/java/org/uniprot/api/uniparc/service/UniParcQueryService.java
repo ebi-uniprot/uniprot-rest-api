@@ -10,7 +10,7 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
@@ -54,7 +54,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     private final UniParcQueryRepository repository;
     private final UniParcQueryResultConverter entryConverter;
     private final SolrQueryConfig solrQueryConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
     private final TupleStreamDocumentIdStream documentIdStream;
 
     @Autowired
@@ -67,7 +67,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SolrQueryConfig uniParcSolrQueryConf,
             UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
-            RDFStreamer uniparcRdfStreamer,
+            RdfStreamer uniparcRdfStreamer,
             FacetTupleStreamTemplate facetTupleStreamTemplate,
             TupleStreamDocumentIdStream documentIdStream) {
 
@@ -132,7 +132,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         return QueryResult.of(filtered, results.getPage(), results.getFacets());
     }
 
-    public Stream<String> streamRDF(
+    public Stream<String> streamRdf(
             UniParcStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
@@ -195,7 +195,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
+    protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
     }
 

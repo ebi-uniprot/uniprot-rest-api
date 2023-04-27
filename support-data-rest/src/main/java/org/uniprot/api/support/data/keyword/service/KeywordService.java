@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.keyword.repository.KeywordFacetConfig;
@@ -20,7 +20,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
     public static final String KEYWORD_ID_FIELD = "keyword_id";
     private final UniProtQueryProcessorConfig keywordQueryProcessorConfig;
     private final SearchFieldConfig fieldConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
     private final DefaultDocumentIdStream<KeywordDocument> documentIdStream;
 
     public KeywordService(
@@ -32,7 +32,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
             KeywordFacetConfig facetConfig,
             SearchFieldConfig keywordSearchFieldConfig,
             DefaultDocumentIdStream<KeywordDocument> documentIdStream,
-            RDFStreamer supportDataRdfStreamer) {
+            RdfStreamer supportDataRdfStreamer) {
         super(
                 repository,
                 keywordEntryConverter,
@@ -56,7 +56,7 @@ public class KeywordService extends BasicSearchService<KeywordDocument, KeywordE
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
+    protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
     }
 

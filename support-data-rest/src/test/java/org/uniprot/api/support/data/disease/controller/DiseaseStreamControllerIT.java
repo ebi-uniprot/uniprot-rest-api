@@ -32,9 +32,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
+import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.disease.DiseaseSolrDocumentHelper;
@@ -56,7 +56,7 @@ import org.uniprot.store.search.document.disease.DiseaseDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(DiseaseController.class)
 @ExtendWith(value = {SpringExtension.class})
-class DiseaseStreamControllerIT extends AbstractRDFStreamControllerIT {
+class DiseaseStreamControllerIT extends AbstractRdfStreamControllerIT {
     @Autowired private DiseaseRepository repository;
 
     @MockBean(name = "supportDataRdfRestTemplate")
@@ -420,7 +420,7 @@ class DiseaseStreamControllerIT extends AbstractRDFStreamControllerIT {
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.DISEASE_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.DISEASE_PROLOG;
     }
 }

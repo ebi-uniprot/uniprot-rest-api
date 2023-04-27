@@ -4,7 +4,7 @@ package org.uniprot.api.rest.service;
  * @author sahmad
  * @created 01/02/2021 This file keeps the RDF response prefix for each data type
  */
-public class RDFPrologs {
+public class RdfPrologs {
 
     public static final String UNIPROT_PROLOG =
             "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -67,5 +67,5 @@ public class RDFPrologs {
                     + "<owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
                     + "</owl:Ontology>";
 
-    private RDFPrologs() {}
+    private RdfPrologs() {}
 }

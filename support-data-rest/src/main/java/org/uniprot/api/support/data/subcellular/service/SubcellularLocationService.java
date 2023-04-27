@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.subcellular.repository.SubcellularLocationRepository;
@@ -27,7 +27,7 @@ public class SubcellularLocationService
     public static final String SUBCELL_ID_FIELD = "id";
     private final UniProtQueryProcessorConfig subcellQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
     private final DefaultDocumentIdStream<SubcellularLocationDocument> documentIdStream;
 
     public SubcellularLocationService(
@@ -38,7 +38,7 @@ public class SubcellularLocationService
             UniProtQueryProcessorConfig subcellQueryProcessorConfig,
             SearchFieldConfig subcellSearchFieldConfig,
             DefaultDocumentIdStream<SubcellularLocationDocument> documentIdStream,
-            RDFStreamer supportDataRdfStreamer) {
+            RdfStreamer supportDataRdfStreamer) {
         super(
                 repository,
                 subcellularLocationEntryConverter,
@@ -62,7 +62,7 @@ public class SubcellularLocationService
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
+    protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
     }
 

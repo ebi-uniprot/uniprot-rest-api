@@ -30,9 +30,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
+import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
@@ -55,7 +55,7 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(TaxonomyController.class)
 @ExtendWith(value = {SpringExtension.class})
-class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
+class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
     private static final String INACTIVE_ID = "9999";
     @Autowired private TaxonomyRepository repository;
 
@@ -385,7 +385,7 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.TAXONOMY_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.TAXONOMY_PROLOG;
     }
 }

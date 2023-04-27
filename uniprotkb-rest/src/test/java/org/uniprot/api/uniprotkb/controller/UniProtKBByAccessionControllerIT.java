@@ -29,7 +29,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterReso
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.NTriplesPrologs;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -85,7 +85,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     private UniProtKBStoreClient storeClient;
 
-    @MockBean(name = "uniprotRdfRestTemplate")
+    @MockBean(name = "uniProtRdfRestTemplate")
     private RestTemplate restTemplate;
 
     public Stream<Arguments> fetchingInactiveEntriesWithFileExtension() {
@@ -576,8 +576,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.UNIPROT_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.UNIPROT_PROLOG;
     }
 
     @Override

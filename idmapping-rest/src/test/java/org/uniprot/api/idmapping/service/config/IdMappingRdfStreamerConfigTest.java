@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
-import org.uniprot.api.common.repository.stream.rdf.RDFServiceFactory;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.rdf.RdfServiceFactory;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamerConfigProperties;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class IdMappingRDFStreamerConfigTest {
+class IdMappingRdfStreamerConfigTest {
     @Mock
     private PrologProvider prologProvider;
     @Mock
@@ -20,14 +20,14 @@ class IdMappingRDFStreamerConfigTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
-    private RDFServiceFactory rdfServiceFactory;
-    private RDFStreamerConfigProperties properties;
-    private IdMappingRDFStreamerConfig idMappingRDFStreamerConfig;
+    private RdfServiceFactory rdfServiceFactory;
+    private RdfStreamerConfigProperties properties;
+    private IdMappingRdfStreamerConfig idMappingRdfStreamerConfig;
 
     @BeforeEach
     void setUp() {
-        idMappingRDFStreamerConfig = new IdMappingRDFStreamerConfig(prologProvider, tagPositionProvider);
-        properties = new RDFStreamerConfigProperties();
+        idMappingRdfStreamerConfig = new IdMappingRdfStreamerConfig(prologProvider, tagPositionProvider);
+        properties = new RdfStreamerConfigProperties();
         properties.setRequestUrl("http://localhost");
         properties.setBatchSize(25);
         properties.setMaxRetries(2);
@@ -36,19 +36,19 @@ class IdMappingRDFStreamerConfigTest {
 
     @Test
     void supportDataRdfServiceFactory() {
-        RDFServiceFactory rdfServiceFactory = idMappingRDFStreamerConfig.idMappingRdfServiceFactory(restTemplate);
+        RdfServiceFactory rdfServiceFactory = idMappingRdfStreamerConfig.idMappingRdfServiceFactory(restTemplate);
         assertNotNull(rdfServiceFactory);
     }
 
     @Test
     void idMappingRdfStreamer() {
-        RDFStreamer rdfStreamer = idMappingRDFStreamerConfig.idMappingRdfStreamer(properties, rdfServiceFactory);
+        RdfStreamer rdfStreamer = idMappingRdfStreamerConfig.idMappingRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
     }
 
     @Test
     void idMappingRdfRestTemplate() {
-        RestTemplate template = idMappingRDFStreamerConfig.idMappingRdfRestTemplate(properties);
+        RestTemplate template = idMappingRdfStreamerConfig.idMappingRdfRestTemplate(properties);
         assertNotNull(template);
     }
 }

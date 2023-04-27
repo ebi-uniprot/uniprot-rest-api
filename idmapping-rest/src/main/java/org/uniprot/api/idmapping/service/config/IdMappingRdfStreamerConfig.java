@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.common;
+package org.uniprot.api.idmapping.service.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,48 +15,47 @@ import org.uniprot.api.rest.service.TagPositionProvider;
 import java.util.Collections;
 
 @Configuration
-public class SupportDataRDFStreamerConfig {
+public class IdMappingRdfStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagPositionProvider tagPositionProvider;
 
-    public SupportDataRDFStreamerConfig(PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
+    public IdMappingRdfStreamerConfig(PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
         this.prologProvider = prologProvider;
         this.tagPositionProvider = tagPositionProvider;
     }
 
     @Bean
-    public RDFStreamer supportDataRdfStreamer(
-            RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties,
-            RDFServiceFactory supportDataRdfServiceFactory) {
-        return new RDFStreamer(
-                supportDataRDFStreamerConfigProperties.getBatchSize(),
+    public RdfStreamer idMappingRdfStreamer(
+            RdfStreamerConfigProperties idMappingRdfStreamerConfigProperties,
+            RdfServiceFactory idMappingRdfServiceFactory) {
+        return new RdfStreamer(
+                idMappingRdfStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                supportDataRdfServiceFactory,
-                RDFStreamConfig.rdfRetryPolicy(supportDataRDFStreamerConfigProperties));
+                idMappingRdfServiceFactory,
+                RdfStreamConfig.rdfRetryPolicy(idMappingRdfStreamerConfigProperties));
     }
 
     @Bean
-    public RDFServiceFactory supportDataRdfServiceFactory(RestTemplate supportDataRdfRestTemplate) {
-        return new RDFServiceFactory(supportDataRdfRestTemplate, tagPositionProvider);
+    public RdfServiceFactory idMappingRdfServiceFactory(RestTemplate idMappingRdfRestTemplate) {
+        return new RdfServiceFactory(idMappingRdfRestTemplate, tagPositionProvider);
     }
 
     @Bean
-    public RestTemplate supportDataRdfRestTemplate(
-            RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties) {
+    public RestTemplate idMappingRdfRestTemplate(
+            RdfStreamerConfigProperties idMappingRdfStreamerConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.setInterceptors(
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
-                new DefaultUriBuilderFactory(
-                        supportDataRDFStreamerConfigProperties.getRequestUrl()));
+                new DefaultUriBuilderFactory(idMappingRdfStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "support.data.rdf.streamer")
-    public RDFStreamerConfigProperties supportDataRDFStreamerConfigProperties() {
-        return new RDFStreamerConfigProperties();
+    @ConfigurationProperties(prefix = "id.mapping.rdf.streamer")
+    public RdfStreamerConfigProperties idMappingRdfStreamerConfigProperties() {
+        return new RdfStreamerConfigProperties();
     }
 }

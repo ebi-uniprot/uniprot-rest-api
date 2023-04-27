@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
-import org.uniprot.api.common.repository.stream.rdf.RDFServiceFactory;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.rdf.RdfServiceFactory;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamerConfigProperties;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class SupportDataRDFStreamerConfigTest {
+class SupportDataRdfStreamerConfigTest {
     @Mock
     private PrologProvider prologProvider;
     @Mock
@@ -20,14 +20,14 @@ class SupportDataRDFStreamerConfigTest {
     @Mock
     private RestTemplate restTemplate;
     @Mock
-    private RDFServiceFactory rdfServiceFactory;
-    private RDFStreamerConfigProperties properties;
-    private SupportDataRDFStreamerConfig supportDataRDFStreamerConfig;
+    private RdfServiceFactory rdfServiceFactory;
+    private RdfStreamerConfigProperties properties;
+    private SupportDataRdfStreamerConfig supportDataRdfStreamerConfig;
 
     @BeforeEach
     void setUp() {
-        supportDataRDFStreamerConfig = new SupportDataRDFStreamerConfig(prologProvider, tagPositionProvider);
-        properties = new RDFStreamerConfigProperties();
+        supportDataRdfStreamerConfig = new SupportDataRdfStreamerConfig(prologProvider, tagPositionProvider);
+        properties = new RdfStreamerConfigProperties();
         properties.setRequestUrl("http://localhost");
         properties.setBatchSize(25);
         properties.setMaxRetries(2);
@@ -36,19 +36,19 @@ class SupportDataRDFStreamerConfigTest {
 
     @Test
     void supportDataRdfStreamer() {
-        RDFStreamer rdfStreamer = supportDataRDFStreamerConfig.supportDataRdfStreamer(properties, rdfServiceFactory);
+        RdfStreamer rdfStreamer = supportDataRdfStreamerConfig.supportDataRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
     }
 
     @Test
     void supportDataRdfServiceFactory() {
-        RDFServiceFactory rdfServiceFactory = supportDataRDFStreamerConfig.supportDataRdfServiceFactory(restTemplate);
+        RdfServiceFactory rdfServiceFactory = supportDataRdfStreamerConfig.supportDataRdfServiceFactory(restTemplate);
         assertNotNull(rdfServiceFactory);
     }
 
     @Test
     void supportDataRdfRestTemplate() {
-        RestTemplate template = supportDataRDFStreamerConfig.supportDataRdfRestTemplate(properties);
+        RestTemplate template = supportDataRdfStreamerConfig.supportDataRdfRestTemplate(properties);
         assertNotNull(template);
     }
 }

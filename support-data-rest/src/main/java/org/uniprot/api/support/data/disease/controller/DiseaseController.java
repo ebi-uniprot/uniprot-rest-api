@@ -104,10 +104,10 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            String result = this.diseaseService.getRDFXml(id, DATA_TYPE, acceptedRDFContentType.get());
-            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String result = this.diseaseService.getRdf(id, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
 
         DiseaseEntry disease = this.diseaseService.findByUniqueId(id);
@@ -187,10 +187,10 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        Optional<String> acceptedRDFContentType = getAcceptedRDFContentType(request);
-        if (acceptedRDFContentType.isPresent()) {
-            return super.streamRDF(
-                    () -> diseaseService.streamRDF(streamRequest, DATA_TYPE, acceptedRDFContentType.get()),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () -> diseaseService.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

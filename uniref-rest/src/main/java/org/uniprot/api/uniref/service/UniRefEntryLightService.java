@@ -9,7 +9,7 @@ import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -48,7 +48,7 @@ public class UniRefEntryLightService
     public static final String UNIREF_ID = "id";
     private final UniProtQueryProcessorConfig uniRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
 
     private final TupleStreamDocumentIdStream documentIdStream;
 
@@ -62,7 +62,7 @@ public class UniRefEntryLightService
             SolrQueryConfig uniRefSolrQueryConf,
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
-            RDFStreamer unirefRdfStreamer,
+            RdfStreamer unirefRdfStreamer,
             FacetTupleStreamTemplate facetTupleStreamTemplate,
             TupleStreamDocumentIdStream documentIdStream) {
         super(
@@ -152,7 +152,7 @@ public class UniRefEntryLightService
                 .getFieldName();
     }
 
-    public Stream<String> streamRDF(UniRefStreamRequest streamRequest, String dataType, String format) {
+    public Stream<String> streamRdf(UniRefStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
         List<String> entryIds = documentIdStream.fetchIds(solrRequest).collect(Collectors.toList());
@@ -170,7 +170,7 @@ public class UniRefEntryLightService
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
+    protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
     }
 

@@ -32,9 +32,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
+import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
@@ -55,7 +55,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(LiteratureController.class)
 @ExtendWith(value = {SpringExtension.class})
-class LiteratureStreamControllerIT extends AbstractRDFStreamControllerIT {
+class LiteratureStreamControllerIT extends AbstractRdfStreamControllerIT {
     @Autowired private LiteratureRepository repository;
 
     @MockBean(name = "supportDataRdfRestTemplate")
@@ -373,7 +373,7 @@ class LiteratureStreamControllerIT extends AbstractRDFStreamControllerIT {
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.LITERATURE_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.LITERATURE_PROLOG;
     }
 }
