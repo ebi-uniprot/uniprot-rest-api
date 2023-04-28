@@ -1,17 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Properties;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.embedded.JettyConfig;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
@@ -27,6 +16,16 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.store.search.SolrCollection;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Stream;
 
 /**
  * @author lgonzales
@@ -48,35 +47,6 @@ public abstract class AbstractStreamControllerIT {
                     + "    <anotherSample>text2</anotherSample>\n"
                     + "    <someMore>text3</someMore>\n"
                     + "</rdf:RDF>";
-
-    public static final String SAMPLE_TURTLE =
-            "@base <http://purl.uniprot.org/database/> .\n"
-                    + "@prefix dcterms: <http://purl.org/dc/terms/> .\n"
-                    + "@prefix foaf: <http://xmlns.com/foaf/0.1/> .\n"
-                    + "@prefix journal: <http://purl.uniprot.org/journals/> .\n"
-                    + "@prefix owl: <http://www.w3.org/2002/07/owl#> .\n"
-                    + "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
-                    + "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n"
-                    + "@prefix skos: <http://www.w3.org/2004/02/skos/core#> .\n"
-                    + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
-                    + "<ABCD> rdf:type <http://purl.uniprot.org/core/Database> ;\n"
-                    + "  <http://purl.uniprot.org/core/abbreviation> \"ABCD\" ;\n"
-                    + "  dcterms:identifier \"236\" ;\n"
-                    + "  <http://purl.uniprot.org/core/category> \"Protocols and materials databases\" ;\n"
-                    + "  rdfs:label \"ABCD curated depository of sequenced antibodies\" ;\n"
-                    + "  <http://purl.uniprot.org/core/linkIsExplicit> true ;\n"
-                    + "  rdfs:seeAlso <https://web.expasy.org/abcd> ;\n"
-                    + "  <http://purl.uniprot.org/core/urlTemplate> \"https://web.expasy.org/cgi-bin/abcd/search_abcd.pl?input=%u\" .";
-
-    public static final String SAMPLE_N_TRIPLES =
-            "<http://purl.uniprot.org/database/ABCD> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/Database> .\n"
-                    + "<http://purl.uniprot.org/database/ABCD> <http://purl.uniprot.org/core/abbreviation> \"ABCD\" .\n"
-                    + "<http://purl.uniprot.org/database/ABCD> <http://purl.org/dc/terms/identifier> \"236\" .\n"
-                    + "<http://purl.uniprot.org/database/ABCD> <http://purl.uniprot.org/core/category> \"Protocols and materials databases\" .\n"
-                    + "<http://purl.uniprot.org/database/ABCD> <http://www.w3.org/2000/01/rdf-schema#label> \"ABCD curated depository of sequenced antibodies\" .\n"
-                    + "<http://purl.uniprot.org/database/ABCD> <http://purl.uniprot.org/core/linkIsExplicit> \"true\"^^<http://www.w3.org/2001/XMLSchema#boolean> .\n"
-                    + "<http://purl.uniprot.org/database/ABCD> <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://web.expasy.org/abcd> .\n"
-                    + "<http://purl.uniprot.org/database/ABCD> <http://purl.uniprot.org/core/urlTemplate> \"https://web.expasy.org/cgi-bin/abcd/search_abcd.pl?input=%u\" .";
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
