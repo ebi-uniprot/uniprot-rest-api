@@ -149,7 +149,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         if ("h5".equals(format) || "application/x-hdf5".equals(format)) {
-            await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.UNFINISHED));
+            await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.RUNNING));
         } else {
             await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
             getAndVerifyDetails(jobId);
@@ -504,7 +504,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         MediaType format = HDF5_MEDIA_TYPE;
         String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(jobProcessed(jobId), equalTo(JobStatus.UNFINISHED));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.RUNNING));
         verifyIdsFile(jobId);
         // result file should not exist yet
         String fileWithExt = jobId + FileType.GZIP.getExtension();
@@ -529,7 +529,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     }
 
     @NotNull
-    private ResultActions callGetJobStatus(String jobId) throws Exception {
+    protected ResultActions callGetJobStatus(String jobId) throws Exception {
         String jobStatusUrl = getDownloadAPIsBasePath() + "/status/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
                 get(jobStatusUrl, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);

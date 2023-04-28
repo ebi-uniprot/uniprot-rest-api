@@ -8,7 +8,8 @@ package org.uniprot.api.rest.download.model;
 public enum JobStatus {
     NEW,
     RUNNING,
-    UNFINISHED,
+    PROCESSING, // while AA embedding consumer is running
+    UNFINISHED, // rest code sets before handing over to AA embedding consumer
     FINISHED,
     ERROR
 }

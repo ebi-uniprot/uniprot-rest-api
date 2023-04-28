@@ -33,7 +33,7 @@ public class EmbeddingsTestConsumer {
             if (optAsyncJob.isPresent()) {
                 log.info("Processing of embedding job " + jobId);
                 DownloadJob asyncJob = optAsyncJob.get();
-                asyncJob.setStatus(JobStatus.RUNNING);
+                asyncJob.setStatus(JobStatus.PROCESSING);
                 asyncJob.setUpdated(LocalDateTime.now());
                 try {
                     Thread.sleep(300); // mimicking while waiting to be picked by aa consumer
