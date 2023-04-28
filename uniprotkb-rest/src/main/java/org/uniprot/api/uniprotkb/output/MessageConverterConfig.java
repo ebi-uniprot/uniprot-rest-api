@@ -88,6 +88,8 @@ public class MessageConverterConfig {
                                 downloadGatekeeper));
                 converters.add(index++, new ErrorMessageConverter());
                 converters.add(index++, new ErrorMessageXlsConverter());
+                converters.add(index++, new ErrorMessageTurtleConverter());
+                converters.add(index++, new ErrorMessageNTriplesConverter());
                 converters.add(index++, new UniProtKBXmlMessageConverter(downloadGatekeeper));
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages

@@ -220,7 +220,8 @@ public class UniProtEntryService
     public Stream<String> streamRdf(
             UniProtKBStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest = createDownloadSolrRequest(streamRequest);
-        return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), dataType, format);
+        List<String> entryIds = documentIdStream.fetchIds(solrRequest).collect(Collectors.toList());
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     @Override

@@ -1,6 +1,13 @@
 package org.uniprot.api.idmapping.service.impl;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -17,12 +24,6 @@ import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.datastore.UniProtStoreClient;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * @author sahmad
@@ -46,12 +47,7 @@ public class UniParcIdService extends BasicIdService<UniParcEntry, UniParcEntryP
             RdfStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniParcEntry> storeClient,
             SolrQueryConfig uniParcSolrQueryConf) {
-        super(
-                storeStreamer,
-                tupleStream,
-                facetConfig,
-                idMappingRdfStreamer,
-                uniParcSolrQueryConf);
+        super(storeStreamer, tupleStream, facetConfig, idMappingRdfStreamer, uniParcSolrQueryConf);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;

@@ -1,27 +1,18 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -52,6 +43,17 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControllerIT {
@@ -114,8 +116,7 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     @Autowired
     private UniProtStoreClient<UniProtKBEntry> storeClient; // in memory voldemort store client
 
-    @Autowired
-    @Qualifier("rdfRestTemplate")
+    @MockBean(name = "uniProtRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @BeforeAll
@@ -135,6 +136,10 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         when(solrClient.query(anyString(), any())).thenReturn(response);
 
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
+    }
+
+    @BeforeEach
+    void setUp() {
         when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }

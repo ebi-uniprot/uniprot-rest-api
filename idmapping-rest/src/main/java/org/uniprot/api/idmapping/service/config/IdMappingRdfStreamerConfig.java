@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.service.config;
 
+import java.util.Collections;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +14,13 @@ import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
-import java.util.Collections;
-
 @Configuration
 public class IdMappingRdfStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagPositionProvider tagPositionProvider;
 
-    public IdMappingRdfStreamerConfig(PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
+    public IdMappingRdfStreamerConfig(
+            PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
         this.prologProvider = prologProvider;
         this.tagPositionProvider = tagPositionProvider;
     }

@@ -46,12 +46,7 @@ public class UniRefIdService extends BasicIdService<UniRefEntryLight, UniRefEntr
             RdfStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniRefEntryLight> storeClient,
             SolrQueryConfig uniRefSolrQueryConf) {
-        super(
-                storeStreamer,
-                tupleStream,
-                facetConfig,
-                idMappingRdfStreamer,
-                uniRefSolrQueryConf);
+        super(storeStreamer, tupleStream, facetConfig, idMappingRdfStreamer, uniRefSolrQueryConf);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
         this.storeFetchRetryPolicy = storeFetchRetryPolicy;

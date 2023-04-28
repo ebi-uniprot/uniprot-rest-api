@@ -136,7 +136,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             UniParcStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        return rdfStreamer.stream(documentIdStream.fetchIds(solrRequest), dataType, format);
+        List<String> entryIds = documentIdStream.fetchIds(solrRequest).collect(Collectors.toList());
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     @Override

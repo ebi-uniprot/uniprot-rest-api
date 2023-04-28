@@ -157,7 +157,11 @@ public abstract class BasicIdService<T, U> {
     }
 
     public Stream<String> streamRdf(
-            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId, String dataType, String format) {
+            StreamRequest streamRequest,
+            IdMappingResult mappingResult,
+            String jobId,
+            String dataType,
+            String format) {
         List<IdMappingStringPair> fromToPairs =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);
         // get unique entry ids

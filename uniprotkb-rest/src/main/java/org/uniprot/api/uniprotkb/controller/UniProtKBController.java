@@ -157,8 +157,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get UniProtKB entry by an accession.",
@@ -177,7 +177,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = GFF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = TURTLE_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = N_TRIPLES_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccession(
@@ -234,8 +236,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download a UniProtKB protein entry (or entries) retrieved by a SOLR query.",

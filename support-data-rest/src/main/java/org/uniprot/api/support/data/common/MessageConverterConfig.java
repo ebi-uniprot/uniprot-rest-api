@@ -1,7 +1,5 @@
 package org.uniprot.api.support.data.common;
 
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -32,6 +30,8 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
+import java.util.List;
+
 @Configuration
 public class MessageConverterConfig {
     @Bean
@@ -43,6 +43,8 @@ public class MessageConverterConfig {
 
                 converters.add(index++, new ErrorMessageConverter());
                 converters.add(index++, new ErrorMessageXlsConverter());
+                converters.add(index++, new ErrorMessageTurtleConverter());
+                converters.add(index++, new ErrorMessageNTriplesConverter());
                 converters.add(index++, new ListMessageConverter(downloadGatekeeper));
 
                 ReturnFieldConfig litReturnConfig =

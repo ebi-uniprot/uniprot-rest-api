@@ -45,6 +45,8 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXlsConverter());
+                converters.add(new ErrorMessageTurtleConverter());
+                converters.add(new ErrorMessageNTriplesConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter(downloadGatekeeper));
 

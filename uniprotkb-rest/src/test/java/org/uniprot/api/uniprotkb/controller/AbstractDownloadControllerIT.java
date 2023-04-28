@@ -1,29 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
@@ -47,8 +25,29 @@ import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDownloadIT {
@@ -184,7 +183,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         jsonPath(
                                 "$.messages.*",
                                 Matchers.contains(
-                                        "Invalid format received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml, application/x-hdf5].")));
+                                        "Invalid format received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml, text/turtle, application/n-triples, application/x-hdf5].")));
     }
 
     @Test
@@ -608,6 +607,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         FASTA_MEDIA_TYPE_VALUE,
                         GFF_MEDIA_TYPE_VALUE,
                         RDF_MEDIA_TYPE_VALUE,
+                        TURTLE_MEDIA_TYPE_VALUE,
+                        N_TRIPLES_MEDIA_TYPE_VALUE,
                         HDF5_MEDIA_TYPE_VALUE,
                         "h5")
                 .stream()

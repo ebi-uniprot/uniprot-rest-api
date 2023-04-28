@@ -1,5 +1,19 @@
 package org.uniprot.api.idmapping.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.saveEntries;
+
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,20 +48,6 @@ import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
-
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.saveEntries;
 
 /**
  * @author lgonzales
