@@ -2,49 +2,44 @@ package org.uniprot.api.common.repository.stream.rdf;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.common.BatchIterable;
-import org.uniprot.api.common.repository.stream.document.DocumentIdStream;
-import org.uniprot.api.rest.service.RDFService;
+import org.uniprot.api.rest.service.RdfService;
 
-/**
- * @author sahmad
- * @created 26/01/2021
- */
 @Slf4j
-@Builder
-public class RDFStreamer {
-    private final RDFService<String> rdfService;
-    private final RetryPolicy<Object> rdfFetchRetryPolicy; // retry policy for RDF rest call
-    private final String rdfProlog; // rdf prefix
-    private final int rdfBatchSize; // number of accession in rdf rest request
-    private final DocumentIdStream idStream;
+public class RdfStreamer {
+    private final int batchSize;
+    private final PrologProvider prologProvider;
+    private final RdfServiceFactory rdfServiceFactory;
+    private final RetryPolicy<Object> rdfFetchRetryPolicy;
 
-    protected Stream<String> fetchIds(SolrRequest solrRequest) {
-        return idStream.fetchIds(solrRequest);
+    public RdfStreamer(
+            int batchSize,
+            PrologProvider prologProvider,
+            RdfServiceFactory rdfServiceFactory,
+            RetryPolicy<Object> rdfFetchRetryPolicy) {
+        this.batchSize = batchSize;
+        this.prologProvider = prologProvider;
+        this.rdfServiceFactory = rdfServiceFactory;
+        this.rdfFetchRetryPolicy = rdfFetchRetryPolicy;
     }
 
-    public Stream<String> idsToRDFStoreStream(SolrRequest solrRequest) {
-        List<String> entryIds = fetchIds(solrRequest).collect(Collectors.toList());
-        return streamRDFXML(entryIds.stream());
-    }
-
-    public Stream<String> streamRDFXML(Stream<String> entryIds) {
-        RDFStreamer.BatchRDFStoreIterable batchRDFStoreIterable =
-                new RDFStreamer.BatchRDFStoreIterable(
-                        entryIds::iterator, rdfService, rdfFetchRetryPolicy, rdfBatchSize);
+    public Stream<String> stream(Stream<String> entryIds, String dataType, String format) {
+        BatchRdfXmlStoreIterable batchRDFXMLStoreIterable =
+                new BatchRdfXmlStoreIterable(
+                        entryIds::iterator,
+                        rdfServiceFactory.getRdfService(dataType, format),
+                        rdfFetchRetryPolicy,
+                        batchSize);
 
         Stream<String> rdfStringStream =
-                StreamSupport.stream(batchRDFStoreIterable.spliterator(), false)
+                StreamSupport.stream(batchRDFXMLStoreIterable.spliterator(), false)
                         .flatMap(Collection::stream)
                         .onClose(
                                 () ->
@@ -53,18 +48,18 @@ public class RDFStreamer {
 
         // prepend rdf prolog then rdf data and then append closing rdf tag
         return Stream.concat(
-                Stream.of(rdfProlog),
-                Stream.concat(rdfStringStream, Stream.of(RDFService.RDF_CLOSE_TAG)));
+                Stream.of(prologProvider.getProLog(dataType, format)),
+                Stream.concat(rdfStringStream, Stream.of(prologProvider.getClosingTag(format))));
     }
 
     // iterable for RDF streaming
-    private static class BatchRDFStoreIterable extends BatchIterable<String> {
-        private final RDFService<String> rdfService;
+    private static class BatchRdfXmlStoreIterable extends BatchIterable<String> {
+        private final RdfService<String> rdfService;
         private final RetryPolicy<Object> retryPolicy;
 
-        BatchRDFStoreIterable(
+        BatchRdfXmlStoreIterable(
                 Iterable<String> sourceIterable,
-                RDFService<String> rdfService,
+                RdfService<String> rdfService,
                 RetryPolicy<Object> retryPolicy,
                 int batchSize) {
             super(sourceIterable, batchSize);

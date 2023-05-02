@@ -1,16 +1,14 @@
 package org.uniprot.api.uniref.service;
 
-import java.util.Objects;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.rest.service.RDFService;
+import org.uniprot.api.common.repository.stream.rdf.RdfServiceFactory;
 import org.uniprot.api.uniref.repository.store.UniRefEntryStoreRepository;
 import org.uniprot.core.uniref.UniRefEntry;
+
+import java.util.Objects;
 
 /**
  * @author lgonzales
@@ -20,14 +18,14 @@ import org.uniprot.core.uniref.UniRefEntry;
 public class UniRefEntryService {
 
     private final UniRefEntryStoreRepository entryStoreRepository;
-    private final RDFService<String> rdfService;
+    private final RdfServiceFactory rdfServiceFactory;
 
     @Autowired
     public UniRefEntryService(
             UniRefEntryStoreRepository entryStoreRepository,
-            @Qualifier("rdfRestTemplate") RestTemplate restTemplate) {
+            RdfServiceFactory rdfServiceFactory) {
         this.entryStoreRepository = entryStoreRepository;
-        this.rdfService = new RDFService<>(restTemplate, String.class);
+        this.rdfServiceFactory = rdfServiceFactory;
     }
 
     public UniRefEntry getEntity(String clusterId) {
@@ -41,11 +39,11 @@ public class UniRefEntryService {
         }
     }
 
-    public String getRDFXml(String id) {
+    public String getRdf(String id, String type, String format) {
         ResourceNotFoundException nfe =
                 new ResourceNotFoundException(
                         "Unable to get UniRefEntry from store. ClusterId:" + id);
-        String rdf = this.rdfService.getEntry(id).orElseThrow(() -> nfe);
+        String rdf = this.rdfServiceFactory.getRdfService(type, format).getEntry(id).orElseThrow(() -> nfe);
         if (Objects.isNull(rdf)) {
             throw nfe;
         }

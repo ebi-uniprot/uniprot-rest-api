@@ -1,6 +1,6 @@
 package org.uniprot.api.uniprotkb.service;
 
-import static java.util.Collections.*;
+import static java.util.Collections.EMPTY_SET;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,7 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
@@ -46,7 +47,8 @@ public class UniProtEntryServiceTest {
     @Mock private FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Mock private UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig;
     @Mock private SearchFieldConfig uniProtKBSearchFieldConfig;
-    @Mock private RDFStreamer uniProtRDFStreamer;
+    @Mock private RdfStreamer uniProtRdfStreamer;
+    @Mock private TupleStreamDocumentIdStream documentIdStream;
     private UniProtEntryService entryService;
 
     @BeforeEach
@@ -64,7 +66,8 @@ public class UniProtEntryServiceTest {
                         facetTupleStreamTemplate,
                         uniProtKBQueryProcessorConfig,
                         uniProtKBSearchFieldConfig,
-                        uniProtRDFStreamer);
+                        documentIdStream,
+                        uniProtRdfStreamer);
     }
 
     @Test

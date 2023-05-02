@@ -1,0 +1,54 @@
+package org.uniprot.api.uniparc.repository.store;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.web.client.RestTemplate;
+import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
+import org.uniprot.api.common.repository.stream.rdf.RdfServiceFactory;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamerConfigProperties;
+import org.uniprot.api.rest.service.TagPositionProvider;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class UniParcRdfStreamerConfigTest {
+    @Mock
+    private PrologProvider prologProvider;
+    @Mock
+    private TagPositionProvider tagPositionProvider;
+    @Mock
+    private RestTemplate restTemplate;
+    @Mock
+    private RdfServiceFactory rdfServiceFactory;
+    private RdfStreamerConfigProperties properties;
+    private UniParcRdfStreamerConfig uniparcRdfStreamerConfig;
+
+    @BeforeEach
+    void setUp() {
+        uniparcRdfStreamerConfig = new UniParcRdfStreamerConfig(prologProvider, tagPositionProvider);
+        properties = new RdfStreamerConfigProperties();
+        properties.setRequestUrl("http://localhost");
+        properties.setBatchSize(25);
+        properties.setMaxRetries(2);
+        properties.setRetryDelayMillis(100);
+    }
+
+    @Test
+    void uniparcRdfStreamer() {
+        RdfStreamer rdfStreamer = uniparcRdfStreamerConfig.uniparcRdfStreamer(properties, rdfServiceFactory);
+        assertNotNull(rdfStreamer);
+    }
+
+    @Test
+    void uniparcRdfServiceFactory() {
+        RdfServiceFactory rdfServiceFactory = uniparcRdfStreamerConfig.uniparcRdfServiceFactory(restTemplate);
+        assertNotNull(rdfServiceFactory);
+    }
+
+    @Test
+    void uniparcRdfRestTemplate() {
+        RestTemplate template = uniparcRdfStreamerConfig.uniparcRdfRestTemplate(properties);
+        assertNotNull(template);
+    }
+}

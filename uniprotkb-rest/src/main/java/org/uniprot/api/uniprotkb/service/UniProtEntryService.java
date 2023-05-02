@@ -1,13 +1,5 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -19,16 +11,13 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
-import org.uniprot.api.rest.request.BasicRequest;
-import org.uniprot.api.rest.request.IdsSearchRequest;
-import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.rest.request.UniProtKBRequestUtil;
+import org.uniprot.api.rest.request.*;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniProtSolrQueryConfig;
@@ -50,6 +39,14 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Service
 @Import(UniProtSolrQueryConfig.class)
 public class UniProtEntryService
@@ -66,7 +63,8 @@ public class UniProtEntryService
     private final UniprotQueryRepository repository;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
-    private final RDFStreamer uniProtRDFStreamer;
+    private final RdfStreamer rdfStreamer;
+    private final TupleStreamDocumentIdStream documentIdStream;
 
     private static final Pattern ACCESSION_REGEX_ISOFORM =
             Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
@@ -86,7 +84,8 @@ public class UniProtEntryService
             FacetTupleStreamTemplate facetTupleStreamTemplate,
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
-            RDFStreamer uniProtRDFStreamer) {
+            TupleStreamDocumentIdStream documentIdStream,
+            RdfStreamer uniProtRdfStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -102,7 +101,8 @@ public class UniProtEntryService
         this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.uniProtRDFStreamer = uniProtRDFStreamer;
+        this.rdfStreamer = uniProtRdfStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -217,9 +217,11 @@ public class UniProtEntryService
         }
     }
 
-    public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
+    public Stream<String> streamRdf(
+            UniProtKBStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest = createDownloadSolrRequest(streamRequest);
-        return this.uniProtRDFStreamer.idsToRDFStoreStream(solrRequest);
+        List<String> entryIds = documentIdStream.fetchIds(solrRequest).collect(Collectors.toList());
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     @Override
@@ -305,8 +307,8 @@ public class UniProtEntryService
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
-        return this.uniProtRDFStreamer;
+    protected RdfStreamer getRdfStreamer() {
+        return this.rdfStreamer;
     }
 
     private void addIsoformFilter(SolrRequest solrRequest) {

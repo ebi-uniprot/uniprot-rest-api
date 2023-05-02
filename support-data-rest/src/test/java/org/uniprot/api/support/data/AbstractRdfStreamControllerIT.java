@@ -1,16 +1,5 @@
 package org.uniprot.api.support.data;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -23,20 +12,29 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.controller.AbstractSolrStreamControllerIT;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 /**
  * @author sahmad
  * @created 02/02/2021
  */
-public abstract class AbstractRDFStreamControllerIT extends AbstractSolrStreamControllerIT {
+public abstract class AbstractRdfStreamControllerIT extends AbstractSolrStreamControllerIT {
 
     protected abstract RestTemplate getRestTemple();
 
     protected abstract String getSearchAccession();
 
-    protected abstract String getRDFProlog();
+    protected abstract String getRdfProlog();
 
     @Test
-    void idSuccessRDFContentType() throws Exception {
+    void idSuccessRdfContentType() throws Exception {
         when(getRestTemple().getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(getRestTemple().getForObject(any(), any())).thenReturn(SAMPLE_RDF);
         // when
@@ -60,7 +58,7 @@ public abstract class AbstractRDFStreamControllerIT extends AbstractSolrStreamCo
                         content()
                                 .string(
                                         equalTo(
-                                                getRDFProlog()
+                                                getRdfProlog()
                                                         + "\n\n"
                                                         + "    <sample>text</sample>\n"
                                                         + "    <anotherSample>text2</anotherSample>\n"
@@ -70,7 +68,7 @@ public abstract class AbstractRDFStreamControllerIT extends AbstractSolrStreamCo
     }
 
     @Test
-    void idBadRequestRDFContentType() throws Exception {
+    void idBadRequestRdfContentType() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getStreamPath()).header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE_VALUE);

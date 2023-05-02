@@ -92,7 +92,7 @@ public class UniProtKBMessageListenerTest {
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
         Mockito.doThrow(new IOException("Forced IO Exception"))
                 .when(this.downloadResultWriter)
-                .writeResult(any(), any(), any(), any(), any());
+                .writeResult(any(), any(), any(), any(), any(), any());
         this.uniProtKBMessageListener.setMaxRetryCount(3);
 
         this.uniProtKBMessageListener.onMessage(message);
