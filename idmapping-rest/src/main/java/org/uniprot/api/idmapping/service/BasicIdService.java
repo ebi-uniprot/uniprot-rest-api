@@ -1,20 +1,8 @@
 package org.uniprot.api.idmapping.service;
 
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -28,7 +16,7 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -39,6 +27,17 @@ import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
+
 /**
  * @author sahmad
  * @created 16/02/2021
@@ -48,7 +47,7 @@ public abstract class BasicIdService<T, U> {
     protected final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
     private final SolrQueryConfig queryConfig;
     private final FacetConfig facetConfig;
 
@@ -73,7 +72,7 @@ public abstract class BasicIdService<T, U> {
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
-            RDFStreamer rdfStreamer,
+            RdfStreamer rdfStreamer,
             SolrQueryConfig queryConfig) {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
@@ -157,8 +156,12 @@ public abstract class BasicIdService<T, U> {
         return streamEntries(mappedIds, streamRequest.getFields());
     }
 
-    public Stream<String> streamRDF(
-            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId) {
+    public Stream<String> streamRdf(
+            StreamRequest streamRequest,
+            IdMappingResult mappingResult,
+            String jobId,
+            String dataType,
+            String format) {
         List<IdMappingStringPair> fromToPairs =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);
         // get unique entry ids
@@ -167,7 +170,7 @@ public abstract class BasicIdService<T, U> {
                 .filter(ft -> !entryIds.contains(ft.getTo()))
                 .forEach(ft -> entryIds.add(ft.getTo()));
 
-        return this.rdfStreamer.streamRDFXML(entryIds.stream());
+        return this.rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);

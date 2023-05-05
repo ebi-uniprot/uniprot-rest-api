@@ -1,15 +1,7 @@
 package org.uniprot.api.uniprotkb.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -28,6 +20,13 @@ import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 /**
  * Created 21/08/18
@@ -69,7 +68,9 @@ public class MessageConverterConfig {
                 converters.add(index++, new UniProtKBFlatFileMessageConverter(downloadGatekeeper));
                 converters.add(index++, new UniProtKBFastaMessageConverter(downloadGatekeeper));
                 converters.add(index++, new ListMessageConverter(downloadGatekeeper));
-                converters.add(index++, new RDFMessageConverter(downloadGatekeeper));
+                converters.add(index++, new RdfMessageConverter(downloadGatekeeper));
+                converters.add(index++, new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(index++, new NTriplesMessageConverter(downloadGatekeeper));
                 converters.add(index++, new UniProtKBGffMessageConverter(downloadGatekeeper));
                 converters.add(
                         index++,
@@ -87,6 +88,8 @@ public class MessageConverterConfig {
                                 downloadGatekeeper));
                 converters.add(index++, new ErrorMessageConverter());
                 converters.add(index++, new ErrorMessageXlsConverter());
+                converters.add(index++, new ErrorMessageTurtleConverter());
+                converters.add(index++, new ErrorMessageNTriplesConverter());
                 converters.add(index++, new UniProtKBXmlMessageConverter(downloadGatekeeper));
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages
@@ -104,6 +107,8 @@ public class MessageConverterConfig {
         asList(
                         context(LIST_MEDIA_TYPE),
                         context(RDF_MEDIA_TYPE),
+                        context(TURTLE_MEDIA_TYPE),
+                        context(N_TRIPLES_MEDIA_TYPE),
                         context(FF_MEDIA_TYPE),
                         context(APPLICATION_XML),
                         context(APPLICATION_JSON),

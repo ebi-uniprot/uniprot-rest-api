@@ -21,7 +21,11 @@ public class CrossRefMessageConverterConfig {
         MessageConverterContextFactory<CrossRefEntry> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        Arrays.asList(context(APPLICATION_JSON), context(UniProtMediaType.RDF_MEDIA_TYPE))
+        Arrays.asList(
+                        context(APPLICATION_JSON),
+                        context(UniProtMediaType.RDF_MEDIA_TYPE),
+                        context(UniProtMediaType.TURTLE_MEDIA_TYPE),
+                        context(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

@@ -62,7 +62,7 @@ public class SolrRequestConverter {
                 setQueryBoostConfigs(solrQuery, request.getQuery(), request.getQueryConfig());
                 setHighlightFieldsConfigs(solrQuery, request.getQueryConfig());
             }
-            setQueryFields(solrQuery, request.getQueryConfig());
+            setQueryFields(solrQuery, request);
         }
 
         JsonQueryRequest result = new JsonQueryRequest(solrQuery);
@@ -185,9 +185,9 @@ public class SolrRequestConverter {
             BoostApplier.addBoosts(solrQuery, query, boosts);
         }
 
-        static void setQueryFields(ModifiableSolrParams solrQuery, SolrQueryConfig boosts) {
-            if (notNullNotEmpty(boosts.getQueryFields())) {
-                solrQuery.add(QUERY_FIELDS, boosts.getQueryFields());
+        static void setQueryFields(ModifiableSolrParams solrQuery, SolrRequest request) {
+            if (notNullNotEmpty(request.getQueryField())) {
+                solrQuery.add(QUERY_FIELDS, request.getQueryField());
             }
         }
 

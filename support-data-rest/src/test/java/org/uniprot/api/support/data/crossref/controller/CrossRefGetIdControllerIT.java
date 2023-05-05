@@ -6,8 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,7 +21,7 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
@@ -48,8 +48,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     @Autowired private CrossRefRepository repository;
 
-    @Autowired
-    @Qualifier("xrefRDFRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @Override
@@ -130,8 +129,8 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.XREF_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.XREF_PROLOG;
     }
 
     static class CrossRefGetIdParameterResolver extends AbstractGetIdParameterResolver {
@@ -253,6 +252,18 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.TURTLE_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -273,6 +284,24 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The cross ref id value should be in the form of DB-XXXX")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The cross ref id value should be in the form of DB-XXXX")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

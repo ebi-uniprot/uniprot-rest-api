@@ -1,29 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
@@ -47,8 +25,29 @@ import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDownloadIT {
@@ -83,7 +82,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist());
-        verifyIdsAndResultFiles(jobId, MediaType.APPLICATION_JSON);
+        verifyIdsAndResultFiles(jobId);
     }
 
     @Test
@@ -101,7 +100,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         Optional<DownloadJob> optJob2 = getDownloadJobRepository().findById(jobId);
         assertAll(() -> assertTrue(optJob1.isPresent()), () -> assertTrue(optJob2.isPresent()));
         assertEquals(optJob1.get(), optJob2.get());
-        verifyIdsAndResultFiles(jobId, format);
+        verifyIdsAndResultFiles(jobId);
     }
 
     @Test
@@ -143,14 +142,17 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     @MethodSource("getSupportedFormats")
     void submitJobAllFormat(String format) throws Exception {
         // when
-
         String query = "content:*";
         String fields = "accession,rhea";
         String jobId = callRunAPIAndVerify(query, fields, null, format, false);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
-        getAndVerifyDetails(jobId);
+        if ("h5".equals(format) || "application/x-hdf5".equals(format)) {
+            await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.RUNNING));
+        } else {
+            await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+            getAndVerifyDetails(jobId);
+        }
     }
 
     @Test
@@ -181,7 +183,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         jsonPath(
                                 "$.messages.*",
                                 Matchers.contains(
-                                        "Invalid format received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml].")));
+                                        "Invalid format received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml, text/turtle, application/n-triples, application/x-hdf5].")));
     }
 
     @Test
@@ -495,6 +497,20 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         Assertions.assertTrue(primaryAccessions.contains("P00012-2"));
     }
 
+    @Test
+    void submitJob_H5_Format_Star_Query_Success() throws Exception {
+        String query = "*:*";
+        MediaType format = HDF5_MEDIA_TYPE;
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.RUNNING));
+        verifyIdsFile(jobId);
+        // result file should not exist yet
+        String fileWithExt = jobId + FileType.GZIP.getExtension();
+        Path resultFilePath = Path.of(this.resultFolder + "/" + fileWithExt);
+        Assertions.assertFalse(Files.exists(resultFilePath));
+    }
+
     protected JobStatus getJobStatus(String jobId) throws Exception {
         ResultActions response = callGetJobStatus(jobId);
         // then
@@ -512,7 +528,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     }
 
     @NotNull
-    private ResultActions callGetJobStatus(String jobId) throws Exception {
+    protected ResultActions callGetJobStatus(String jobId) throws Exception {
         String jobStatusUrl = getDownloadAPIsBasePath() + "/status/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
                 get(jobStatusUrl, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
@@ -575,8 +591,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         return response;
     }
 
-    protected abstract void verifyIdsAndResultFiles(String jobId, MediaType format)
-            throws IOException;
+    protected abstract void verifyIdsAndResultFiles(String jobId) throws IOException;
+
+    protected abstract void verifyIdsFile(String jobId) throws IOException;
 
     private Stream<Arguments> getSupportedFormats() {
         return List.of(
@@ -589,7 +606,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         APPLICATION_JSON_VALUE,
                         FASTA_MEDIA_TYPE_VALUE,
                         GFF_MEDIA_TYPE_VALUE,
-                        RDF_MEDIA_TYPE_VALUE)
+                        RDF_MEDIA_TYPE_VALUE,
+                        TURTLE_MEDIA_TYPE_VALUE,
+                        N_TRIPLES_MEDIA_TYPE_VALUE,
+                        HDF5_MEDIA_TYPE_VALUE,
+                        "h5")
                 .stream()
                 .map(Arguments::of);
     }

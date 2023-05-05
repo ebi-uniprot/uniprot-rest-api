@@ -1,31 +1,28 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.getUniParcFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.saveEntries;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,7 +43,7 @@ import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -83,7 +80,8 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
 
     @Autowired private JobOperation uniParcIdMappingJobOp;
 
-    @Autowired private RestTemplate uniParcRestTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate uniParcRestTemplate;
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
@@ -132,11 +130,14 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
+        saveEntries(cloudSolrClient, storeClient);
+    }
+
+    @BeforeEach
+    void setUp() {
         when(uniParcRestTemplate.getUriTemplateHandler())
                 .thenReturn(new DefaultUriBuilderFactory());
         when(uniParcRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-
-        saveEntries(cloudSolrClient, storeClient);
     }
 
     @Test
@@ -179,7 +180,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
     }
 
     @Test
-    void streamRDFCanReturnSuccess() throws Exception {
+    void streamRdfCanReturnSuccess() throws Exception {
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ;
@@ -194,7 +195,7 @@ class UniParcIdMappingResultsControllerIT extends AbstractIdMappingResultsContro
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIPARC_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
                 .andExpect(
                         content()
                                 .string(

@@ -35,7 +35,7 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     private final MessageConverter converter;
     private final DownloadJobRepository jobRepository;
     private final HashGenerator<DownloadRequest> hashGenerator;
-    private static final String JOB_ID = "jobId";
+    public static final String JOB_ID = "jobId";
 
     public RabbitProducerMessageService(
             MessageConverter converter,

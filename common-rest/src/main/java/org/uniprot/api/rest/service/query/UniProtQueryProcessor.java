@@ -1,12 +1,9 @@
 package org.uniprot.api.rest.service.query;
 
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
 import static org.uniprot.store.search.SolrQueryUtil.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +40,6 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 public class UniProtQueryProcessor implements QueryProcessor {
     public static final String IMPOSSIBLE_FIELD = "NOT_REAL_FIELD";
     public static final String UNIPROTKB_ACCESSION_FIELD = "accession";
-    private static final Pattern CLEAN_QUERY_REGEX = Pattern.compile("(?:^\\()|(?:\\)$)");
     private static final EscapeQuerySyntaxImpl ESCAPER = new EscapeQuerySyntaxImpl();
     private final QueryNodeProcessorPipeline queryProcessorPipeline;
     private final List<SearchFieldItem> optimisableFields;
@@ -67,29 +63,14 @@ public class UniProtQueryProcessor implements QueryProcessor {
     public String processQuery(String query) {
         try {
             StandardSyntaxParser syntaxParser = new StandardSyntaxParser();
-            String optimisedQuery = proccessOptimisableFields(query);
-            String queryWithEscapedForwardSlashes = replaceForwardSlashes(optimisedQuery);
+            String queryWithEscapedForwardSlashes = replaceForwardSlashes(query);
             QueryNode queryTree =
                     syntaxParser.parse(queryWithEscapedForwardSlashes, IMPOSSIBLE_FIELD);
             QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
-            String processedQuery = processedQueryTree.toQueryString(ESCAPER).toString();
-            return processedQuery;
+            return processedQueryTree.toQueryString(ESCAPER).toString();
         } catch (Exception e) {
             log.warn("Problem processing user query: " + query, e);
             return query;
         }
-    }
-
-    private String proccessOptimisableFields(String text) {
-        String cleanQuery = CLEAN_QUERY_REGEX.matcher(text.strip()).replaceAll("");
-        Optional<SearchFieldItem> optionalSearchField =
-                optimisableFields.stream()
-                        .filter(
-                                f ->
-                                        notNullNotEmpty(f.getValidRegex())
-                                                && cleanQuery.strip().matches(f.getValidRegex()))
-                        .findFirst();
-
-        return optionalSearchField.map(f -> f.getFieldName() + ":" + cleanQuery).orElse(text);
     }
 }

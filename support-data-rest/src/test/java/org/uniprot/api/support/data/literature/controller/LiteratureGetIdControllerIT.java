@@ -1,17 +1,11 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +23,7 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.literature.repository.LiteratureRepository;
@@ -50,7 +44,11 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author lgonzales
@@ -66,8 +64,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
             LiteratureGetIdControllerIT.LiteratureGetIdContentTypeParamResolver.class
         })
 class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
-    @Autowired
-    @Qualifier("literatureRDFRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final long PUBMED_ID = 100L;
@@ -184,8 +181,8 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.LITERATURE_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.LITERATURE_PROLOG;
     }
 
     @Override
@@ -194,7 +191,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
     }
 
     @Test
-    void getBySubmissionIdWithRDFExtensionFailure() throws Exception {
+    void getBySubmissionIdWithRdfExtensionFailure() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getIdRequestPathWithoutPathVariable() + SUBMISSION_ID + ".rdf")
@@ -318,6 +315,18 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.TURTLE_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content().contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -362,6 +371,24 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The citation id has invalid format")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The citation id has invalid format")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

@@ -1,10 +1,10 @@
 package org.uniprot.api.support.data.literature.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.config.LiteratureSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
@@ -27,7 +27,8 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     public static final String LITERATURE_ID_FIELD = "id";
     private final UniProtQueryProcessorConfig literatureQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<LiteratureDocument> documentIdStream;
 
     public LiteratureService(
             LiteratureRepository repository,
@@ -37,7 +38,8 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
             SolrQueryConfig literatureSolrQueryConf,
             UniProtQueryProcessorConfig literatureQueryProcessorConfig,
             SearchFieldConfig literatureSearchFieldConfig,
-            @Qualifier("literatureRDFStreamer") RDFStreamer rdfStreamer) {
+            DefaultDocumentIdStream<LiteratureDocument> documentIdStream,
+            RdfStreamer supportDataRdfStreamer) {
         super(
                 repository,
                 entryConverter,
@@ -46,7 +48,8 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
                 facetConfig);
         this.literatureQueryProcessorConfig = literatureQueryProcessorConfig;
         this.searchFieldConfig = literatureSearchFieldConfig;
-        this.rdfStreamer = rdfStreamer;
+        this.rdfStreamer = supportDataRdfStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -60,7 +63,12 @@ public class LiteratureService extends BasicSearchService<LiteratureDocument, Li
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
+    protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
+    }
+
+    @Override
+    protected DefaultDocumentIdStream<LiteratureDocument> getDocumentIdStream() {
+        return this.documentIdStream;
     }
 }

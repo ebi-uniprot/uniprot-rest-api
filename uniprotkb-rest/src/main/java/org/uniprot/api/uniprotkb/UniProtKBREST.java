@@ -25,7 +25,8 @@ import org.uniprot.api.uniprotkb.view.service.ViewByServiceConfig;
         basePackages = {
             "org.uniprot.api.uniprotkb",
             "org.uniprot.api.rest",
-            "org.uniprot.api.common.repository.stream.store.uniprotkb"
+            "org.uniprot.api.common.repository.stream.store.uniprotkb",
+            "org.uniprot.api"
         })
 public class UniProtKBREST {
     public static void main(String[] args) {

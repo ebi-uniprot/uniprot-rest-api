@@ -2,9 +2,12 @@ package org.uniprot.api.rest.service;
 
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,22 +16,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.*;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 /**
  * @param <D> the type of the input to the class. a type of Document
@@ -43,6 +45,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     protected final AbstractSolrSortClause solrSortClause;
     protected final SolrQueryConfig queryBoosts;
     protected final FacetConfig facetConfig;
+    private static final Pattern CLEAN_QUERY_REGEX =
+            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
     // If this property is not set then it is set to empty and later it is set to
     // DEFAULT_SOLR_BATCH_SIZE
@@ -141,6 +145,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         }
         builder.rows(request.getSize());
         builder.totalRows(request.getSize());
+
         return builder.build();
     }
 
@@ -190,17 +195,33 @@ public abstract class BasicSearchService<D extends Document, R> {
 
         String requestedQuery = request.getQuery();
 
-        requestBuilder.query(
+        String query =
                 UniProtQueryProcessor.newInstance(getQueryProcessorConfig())
-                        .processQuery(requestedQuery));
+                        .processQuery(requestedQuery);
+        requestBuilder.query(query);
 
         if (solrSortClause != null) {
             requestBuilder.sorts(solrSortClause.getSort(request.getSort()));
         }
 
+        requestBuilder.queryField(getQueryFields(query));
         requestBuilder.queryConfig(queryBoosts);
 
         return requestBuilder;
+    }
+
+    private String getQueryFields(String query) {
+        String queryFields = "";
+        Optional<String> optimisedQueryField = validateOptimisableField(query);
+        if (optimisedQueryField.isPresent()) {
+            queryFields = optimisedQueryField.get();
+            if (queryBoosts.getExtraOptmisableQueryFields() != null) {
+                queryFields = queryFields + " " + queryBoosts.getExtraOptmisableQueryFields();
+            }
+        } else {
+            queryFields = queryBoosts.getQueryFields();
+        }
+        return queryFields;
     }
 
     private boolean isSizeLessOrEqualToSolrBatchSize(Integer requestedSize) {
@@ -211,20 +232,27 @@ public abstract class BasicSearchService<D extends Document, R> {
         return this.solrBatchSize == null ? DEFAULT_SOLR_BATCH_SIZE : this.solrBatchSize;
     }
 
-    public Stream<String> streamRDF(StreamRequest streamRequest) {
+    public Stream<String> streamRdf(StreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, queryBoosts)
                         .rows(getDefaultBatchSize())
                         .totalRows(Integer.MAX_VALUE)
                         .build();
-        return getRDFStreamer().idsToRDFStoreStream(solrRequest);
+        List<String> idStream =
+                getDocumentIdStream().fetchIds(solrRequest).collect(Collectors.toList());
+        return getRdfStreamer().stream(idStream.stream(), dataType, format);
     }
 
-    public String getRDFXml(String id) {
-        return getRDFStreamer().streamRDFXML(Stream.of(id)).collect(Collectors.joining());
+    protected DefaultDocumentIdStream<D> getDocumentIdStream() {
+        throw new UnsupportedOperationException("Override this method");
     }
 
-    protected RDFStreamer getRDFStreamer() {
+    public String getRdf(String id, String dataType, String format) {
+        return getRdfStreamer().stream(Stream.of(id), dataType, format)
+                .collect(Collectors.joining());
+    }
+
+    protected RdfStreamer getRdfStreamer() {
         throw new UnsupportedOperationException("Override this method");
     }
 
@@ -245,5 +273,16 @@ public abstract class BasicSearchService<D extends Document, R> {
                     LEADING_WILDCARD_IGNORED.getCode(), LEADING_WILDCARD_IGNORED.getMessage());
         }
         return null;
+    }
+
+    private Optional<String> validateOptimisableField(String query) {
+        String cleanQuery = CLEAN_QUERY_REGEX.matcher(query.strip()).replaceAll("");
+        return getQueryProcessorConfig().getOptimisableFields().stream()
+                .filter(
+                        f ->
+                                Utils.notNullNotEmpty(f.getValidRegex())
+                                        && cleanQuery.matches(f.getValidRegex()))
+                .map(SearchFieldItem::getFieldName)
+                .findFirst();
     }
 }

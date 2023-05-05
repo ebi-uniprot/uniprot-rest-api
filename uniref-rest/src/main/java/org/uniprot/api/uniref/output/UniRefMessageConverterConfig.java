@@ -1,15 +1,7 @@
 package org.uniprot.api.uniref.output;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -34,6 +26,13 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_XML;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
 /**
  * @author jluo
  * @date: 22 Aug 2019
@@ -52,11 +51,15 @@ public class UniRefMessageConverterConfig {
 
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXlsConverter());
+                converters.add(new ErrorMessageTurtleConverter());
+                converters.add(new ErrorMessageNTriplesConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter(downloadGatekeeper));
                 converters.add(new UniRefLightFastaMessageConverter(downloadGatekeeper));
                 converters.add(new UniRefFastaMessageConverter(downloadGatekeeper));
-                converters.add(new RDFMessageConverter(downloadGatekeeper));
+                converters.add(new RdfMessageConverter(downloadGatekeeper));
+                converters.add(new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(new NTriplesMessageConverter(downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniRefEntryLight.class,
@@ -124,7 +127,9 @@ public class UniRefMessageConverterConfig {
                         uniRefLightContext(FASTA_MEDIA_TYPE),
                         uniRefLightContext(TSV_MEDIA_TYPE),
                         uniRefLightContext(XLS_MEDIA_TYPE),
-                        uniRefLightContext(RDF_MEDIA_TYPE))
+                        uniRefLightContext(RDF_MEDIA_TYPE),
+                        uniRefLightContext(TURTLE_MEDIA_TYPE),
+                        uniRefLightContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -154,7 +159,9 @@ public class UniRefMessageConverterConfig {
                         uniRefContext(FASTA_MEDIA_TYPE),
                         uniRefContext(TSV_MEDIA_TYPE),
                         uniRefContext(XLS_MEDIA_TYPE),
-                        uniRefContext(RDF_MEDIA_TYPE))
+                        uniRefContext(RDF_MEDIA_TYPE),
+                        uniRefContext(TURTLE_MEDIA_TYPE),
+                        uniRefContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

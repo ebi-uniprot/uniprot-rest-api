@@ -57,6 +57,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "/"
                         + UniProtKBIdMappingResultsController.UNIPROTKB_ID_MAPPING_PATH)
 public class UniProtKBIdMappingResultsController extends BasicSearchController<UniProtKBEntryPair> {
+    private static final String DATA_TYPE = "uniprotkb";
     public static final String UNIPROTKB_ID_MAPPING_PATH = "uniprotkb";
     private final UniProtKBIdService idService;
     private final IdMappingJobCacheService cacheService;
@@ -154,7 +155,9 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.",
@@ -199,12 +202,17 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
         IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
         this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
             Supplier<Stream<String>> result =
                     () ->
-                            this.idService.streamRDF(
-                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
-            return super.streamRDF(result, streamRequest, contentType, request);
+                            this.idService.streamRdf(
+                                    streamRequest,
+                                    idMappingResult,
+                                    cachedJobResult.getJobId(),
+                                    DATA_TYPE,
+                                    acceptedRdfContentType.get());
+            return super.streamRdf(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniProtKBEntryPair>> result =
                     () ->

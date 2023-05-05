@@ -67,7 +67,7 @@ public class PIRResponseConverter {
         HttpStatus statusCode = response.getStatusCode();
         if (statusCode.equals(HttpStatus.OK)) {
             if (response.hasBody()) {
-                Map<String, String> mappedRequestIds = getMappedRequestIds(request);
+                Map<String, Set<String>> mappedRequestIds = getMappedRequestIds(request);
                 response.getBody()
                         .lines()
                         .filter(line -> !line.startsWith("Taxonomy ID:"))
@@ -101,7 +101,7 @@ public class PIRResponseConverter {
     private void convertLine(
             String line,
             IdMappingJobRequest request,
-            Map<String, String> mappedId,
+            Map<String, Set<String>> mappedIds,
             IdMappingResult.IdMappingResultBuilder builder) {
         if (line.startsWith("MSG:")) {
             if (line.endsWith(NO_MATCHES_PIR_RESPONSE)) {
@@ -109,30 +109,32 @@ public class PIRResponseConverter {
             }
         } else {
             String[] rowParts = line.split("\t");
+            Set<String> fromValues = getFromValue(mappedIds, rowParts[0]);
             if (rowParts.length == 1) {
-                builder.unmappedId(getFromValue(mappedId, rowParts[0]));
+                fromValues.stream().forEach(builder::unmappedId);
             } else {
-                String fromValue = getFromValue(mappedId, rowParts[0]);
-                Arrays.stream(rowParts[1].split(";"))
-                        // filter based on valid to
-                        .filter(toValue -> isValidIdPattern(request.getTo(), toValue))
-                        .map(
-                                toValue ->
-                                        IdMappingStringPair.builder()
-                                                .from(fromValue)
-                                                .to(toValue)
-                                                .build())
-                        .forEach(builder::mappedId);
+                for (String fromValue : fromValues) {
+                    Arrays.stream(rowParts[1].split(";"))
+                            // filter based on valid to
+                            .filter(toValue -> isValidIdPattern(request.getTo(), toValue))
+                            .map(
+                                    toValue ->
+                                            IdMappingStringPair.builder()
+                                                    .from(fromValue)
+                                                    .to(toValue)
+                                                    .build())
+                            .forEach(builder::mappedId);
+                }
             }
         }
     }
 
-    private String getFromValue(Map<String, String> mappedIds, String fromValue) {
-        return mappedIds.getOrDefault(fromValue, fromValue);
+    private Set<String> getFromValue(Map<String, Set<String>> mappedIds, String fromValue) {
+        return mappedIds.getOrDefault(fromValue, Set.of(fromValue));
     }
 
-    Map<String, String> getMappedRequestIds(IdMappingJobRequest request) {
-        Map<String, String> mappedIds = new HashMap<>();
+    Map<String, Set<String>> getMappedRequestIds(IdMappingJobRequest request) {
+        Map<String, Set<String>> mappedIds = new HashMap<>();
         if (ACC_ID_STR.equals(request.getFrom())
                 && (request.getIds().contains("[") || request.getIds().contains("."))) {
             String ids = String.join(",", request.getIds());
@@ -140,7 +142,20 @@ public class PIRResponseConverter {
                     Arrays.stream(ids.split(","))
                             .map(this::getMappedId)
                             .filter(Objects::nonNull)
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                            .collect(
+                                    Collectors.groupingBy(
+                                            Map.Entry::getKey,
+                                            Collectors.mapping(
+                                                    Map.Entry::getValue,
+                                                    Collectors.toCollection(LinkedHashSet::new))));
+            // remove more than one versions from values
+            mappedIds.replaceAll(
+                    (key, values) -> {
+                        String firstValue = new ArrayList<>(values).get(0);
+                        return (firstValue.contains("."))
+                                ? Set.of(firstValue.substring(0, firstValue.indexOf(".")))
+                                : values;
+                    });
         }
         return mappedIds;
     }

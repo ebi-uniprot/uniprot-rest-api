@@ -240,7 +240,7 @@ class PIRResponseConverterTest {
                         new IdMappingStringPair("P00001[10-20]", "P00001"),
                         new IdMappingStringPair("P00002[20-30]", "P00002"),
                         new IdMappingStringPair("P00002[20-30]", "Q00002")));
-        assertThat(result.getUnmappedIds(), contains("P00003.3", "P00004"));
+        assertThat(result.getUnmappedIds(), contains("P00003", "P00004"));
         assertThat(result.getWarnings(), is(emptyList()));
     }
 
@@ -274,10 +274,10 @@ class PIRResponseConverterTest {
         assertThat(
                 result.getMappedIds(),
                 contains(
-                        new IdMappingStringPair("P00001.1", "P00001"),
-                        new IdMappingStringPair("P00002.2", "P00002"),
-                        new IdMappingStringPair("P00002.2", "Q00002")));
-        assertThat(result.getUnmappedIds(), contains("P00003.3", "P00004.4"));
+                        new IdMappingStringPair("P00001", "P00001"),
+                        new IdMappingStringPair("P00002", "P00002"),
+                        new IdMappingStringPair("P00002", "Q00002")));
+        assertThat(result.getUnmappedIds(), contains("P00003", "P00004"));
         assertThat(result.getWarnings(), is(emptyList()));
     }
 
@@ -409,7 +409,7 @@ class PIRResponseConverterTest {
         request.setIds("P12345.6,9606.ENSP00000386219,9606.ENSP00000318585,Q98765[12-22],Q12345");
         request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
-        Map<String, String> mappedRequestIds = converter.getMappedRequestIds(request);
+        Map<String, Set<String>> mappedRequestIds = converter.getMappedRequestIds(request);
         assertTrue(Set.of("P12345", "Q98765").containsAll(mappedRequestIds.keySet()));
     }
 
@@ -419,8 +419,20 @@ class PIRResponseConverterTest {
         request.setIds("P12345.6,P12345.3");
         request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
-        // duplicateKeyException
-        assertThrows(IllegalStateException.class, () -> converter.getMappedRequestIds(request));
+        Map<String, Set<String>> mappedIds = converter.getMappedRequestIds(request);
+        assertEquals(Set.of("P12345"), mappedIds.get("P12345"));
+    }
+
+    @Test
+    void testGetMappedRequestIdsWithRepeatedAccessionWithSequence() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setIds("P12345[10-20],P05067[10-20],P12345[20-30],P12345[10-20]");
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+        Map<String, Set<String>> mappedRequestIds = converter.getMappedRequestIds(request);
+        assertTrue(Set.of("P12345", "P05067").containsAll(mappedRequestIds.keySet()));
+        assertEquals(Set.of("P12345[10-20]", "P12345[20-30]"), mappedRequestIds.get("P12345"));
+        assertEquals(Set.of("P05067[10-20]"), mappedRequestIds.get("P05067"));
     }
 
     private static Stream<Arguments> invalidToAndIdPairs() {

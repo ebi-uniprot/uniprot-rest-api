@@ -6,14 +6,13 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,19 +39,23 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
 
     protected abstract String getSearchAccession();
 
-    protected abstract String getRDFProlog();
+    protected abstract String getRdfProlog();
 
     protected abstract String getIdRequestPathWithoutPathVariable();
 
     @BeforeAll
     void init() {
         saveEntry();
+    }
+
+    @BeforeEach
+    void setUp() {
         when(getRestTemple().getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(getRestTemple().getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     @Test
-    void getByIdWithRDFExtensionSuccess() throws Exception {
+    void getByIdWithRdfExtensionSuccess() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
                 get(getIdRequestPathWithoutPathVariable() + getSearchAccession() + ".rdf")
@@ -70,7 +73,7 @@ public abstract class AbstractGetByIdWithTypeExtensionControllerIT
                         content()
                                 .string(
                                         equalTo(
-                                                getRDFProlog()
+                                                getRdfProlog()
                                                         + "\n"
                                                         + "    <sample>text</sample>\n"
                                                         + "    <anotherSample>text2</anotherSample>\n"

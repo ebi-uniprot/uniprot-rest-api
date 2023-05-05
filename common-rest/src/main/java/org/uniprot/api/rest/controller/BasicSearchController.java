@@ -4,6 +4,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -41,6 +42,8 @@ public abstract class BasicSearchController<T> {
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final MessageConverterContextFactory.Resource resource;
     private final Gatekeeper downloadGatekeeper;
+    private final Map<MediaType, String> supportedMediaTypes =
+            Map.of(RDF_MEDIA_TYPE, "rdf", TURTLE_MEDIA_TYPE, "ttl", N_TRIPLES_MEDIA_TYPE, "nt");
 
     protected BasicSearchController(
             ApplicationEventPublisher eventPublisher,
@@ -105,7 +108,7 @@ public abstract class BasicSearchController<T> {
         return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
     }
 
-    protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRDF(
+    protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRdf(
             String entity, MediaType contentType, HttpServletRequest request) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFileType(getBestFileTypeFromRequest(request));
@@ -190,7 +193,7 @@ public abstract class BasicSearchController<T> {
         return getDeferredResultResponseEntity(contextSupplier, request);
     }
 
-    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> streamRDF(
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> streamRdf(
             Supplier<Stream<String>> rdfStreamSupplier,
             StreamRequest streamRequest,
             MediaType contentType,
@@ -266,9 +269,12 @@ public abstract class BasicSearchController<T> {
         return FileType.bestFileTypeMatch(encoding);
     }
 
-    protected boolean isRDFAccept(HttpServletRequest request) {
+    protected Optional<String> getAcceptedRdfContentType(HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        return contentType.equals(RDF_MEDIA_TYPE);
+        if (supportedMediaTypes.containsKey(contentType)) {
+            return Optional.of(supportedMediaTypes.get(contentType));
+        }
+        return Optional.empty();
     }
 
     protected MessageConverterContext<T> createStreamContext(

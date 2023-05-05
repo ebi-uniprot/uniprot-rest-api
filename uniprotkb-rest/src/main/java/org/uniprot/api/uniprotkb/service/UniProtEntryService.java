@@ -1,12 +1,5 @@
 package org.uniprot.api.uniprotkb.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -18,16 +11,13 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.rest.output.converter.OutputFieldsParser;
-import org.uniprot.api.rest.request.BasicRequest;
-import org.uniprot.api.rest.request.IdsSearchRequest;
-import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.request.StreamRequest;
-import org.uniprot.api.rest.request.UniProtKBRequestUtil;
+import org.uniprot.api.rest.request.*;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniProtSolrQueryConfig;
@@ -47,12 +37,22 @@ import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Import(UniProtSolrQueryConfig.class)
 public class UniProtEntryService
         extends StoreStreamerSearchService<UniProtDocument, UniProtKBEntry> {
-    public static final String ACCESSION = "accession_id";
+    public static final String ACCESSION_ID = "accession_id";
+    public static final String ACCESSION = "accession";
     public static final String PROTEIN_ID = "id";
     public static final String IS_ISOFORM = "is_isoform";
     public static final String CANONICAL_ISOFORM = "-1";
@@ -63,7 +63,14 @@ public class UniProtEntryService
     private final UniprotQueryRepository repository;
     private final SearchFieldConfig searchFieldConfig;
     private final ReturnFieldConfig returnFieldConfig;
-    private final RDFStreamer uniProtRDFStreamer;
+    private final RdfStreamer rdfStreamer;
+    private final TupleStreamDocumentIdStream documentIdStream;
+
+    private static final Pattern ACCESSION_REGEX_ISOFORM =
+            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
+
+    private static final Pattern CLEAN_QUERY_REGEX =
+            Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
     public UniProtEntryService(
             UniprotQueryRepository repository,
@@ -77,7 +84,8 @@ public class UniProtEntryService
             FacetTupleStreamTemplate facetTupleStreamTemplate,
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
-            RDFStreamer uniProtRDFStreamer) {
+            TupleStreamDocumentIdStream documentIdStream,
+            RdfStreamer uniProtRdfStreamer) {
         super(
                 repository,
                 uniprotKBFacetConfig,
@@ -93,7 +101,8 @@ public class UniProtEntryService
         this.searchFieldConfig = uniProtKBSearchFieldConfig;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
-        this.uniProtRDFStreamer = uniProtRDFStreamer;
+        this.rdfStreamer = uniProtRdfStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -118,7 +127,7 @@ public class UniProtEntryService
 
     @Override
     protected SearchFieldItem getIdField() {
-        return searchFieldConfig.getSearchFieldItemByName(ACCESSION);
+        return searchFieldConfig.getSearchFieldItemByName(ACCESSION_ID);
     }
 
     @Override
@@ -162,7 +171,7 @@ public class UniProtEntryService
 
     private SolrRequest buildSolrRequest(String accession) {
         return SolrRequest.builder()
-                .query(ACCESSION + ":" + accession)
+                .query(ACCESSION_ID + ":" + accession)
                 .rows(NumberUtils.INTEGER_ONE)
                 .build();
     }
@@ -208,9 +217,11 @@ public class UniProtEntryService
         }
     }
 
-    public Stream<String> streamRDF(UniProtKBStreamRequest streamRequest) {
+    public Stream<String> streamRdf(
+            UniProtKBStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest = createDownloadSolrRequest(streamRequest);
-        return this.uniProtRDFStreamer.idsToRDFStoreStream(solrRequest);
+        List<String> entryIds = documentIdStream.fetchIds(solrRequest).collect(Collectors.toList());
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     @Override
@@ -219,7 +230,7 @@ public class UniProtEntryService
         SolrRequest solrRequest = super.createDownloadSolrRequest(request);
         boolean filterIsoform =
                 UniProtKBRequestUtil.needsToFilterIsoform(
-                        getQueryFieldName(ACCESSION),
+                        getQueryFieldName(ACCESSION_ID),
                         getQueryFieldName("is_isoform"),
                         uniProtRequest.getQuery(),
                         uniProtRequest.isIncludeIsoform());
@@ -245,6 +256,13 @@ public class UniProtEntryService
     @Override
     protected String getSolrIdField() {
         return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+                .getSearchFieldItemByName(ACCESSION_ID)
+                .getFieldName();
+    }
+
+    @Override
+    protected String getTermsQueryField() {
+        return SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
                 .getSearchFieldItemByName(ACCESSION)
                 .getFieldName();
     }
@@ -253,12 +271,15 @@ public class UniProtEntryService
     public SolrRequest createSearchSolrRequest(SearchRequest request) {
 
         UniProtKBSearchRequest uniProtRequest = (UniProtKBSearchRequest) request;
+        String cleanQuery = CLEAN_QUERY_REGEX.matcher(request.getQuery().strip()).replaceAll("");
 
         if (isSearchAll(uniProtRequest)) {
             uniProtRequest.setQuery(getQueryFieldName("active") + ":" + true);
         } else if (needToAddActiveFilter(uniProtRequest)) {
             uniProtRequest.setQuery(
                     uniProtRequest.getQuery() + " AND " + getQueryFieldName("active") + ":" + true);
+        } else if (ACCESSION_REGEX_ISOFORM.matcher(cleanQuery.toUpperCase()).matches()) {
+            uniProtRequest.setQuery(cleanQuery.toUpperCase());
         }
 
         // fill the common params from the basic service class
@@ -268,7 +289,7 @@ public class UniProtEntryService
         solrRequest.setQueryConfig(solrQueryConfig);
         boolean filterIsoform =
                 UniProtKBRequestUtil.needsToFilterIsoform(
-                        getQueryFieldName(ACCESSION),
+                        getQueryFieldName(ACCESSION_ID),
                         getQueryFieldName("is_isoform"),
                         solrRequest.getQuery(),
                         uniProtRequest.isIncludeIsoform());
@@ -286,8 +307,8 @@ public class UniProtEntryService
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
-        return this.uniProtRDFStreamer;
+    protected RdfStreamer getRdfStreamer() {
+        return this.rdfStreamer;
     }
 
     private void addIsoformFilter(SolrRequest solrRequest) {

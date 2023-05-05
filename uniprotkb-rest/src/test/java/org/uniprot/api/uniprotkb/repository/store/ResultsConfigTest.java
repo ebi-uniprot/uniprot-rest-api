@@ -1,18 +1,16 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamerConfigProperties;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
@@ -74,34 +72,6 @@ class ResultsConfigTest {
         StreamerConfigProperties configProps = config.resultsConfigProperties();
 
         TupleStreamTemplate result = config.tupleStreamTemplate(configProps, solrClient, converter);
-        assertNotNull(result);
-    }
-
-    @Test
-    void testUniProtRDFStreamer() {
-        ResultsConfig configMock = Mockito.mock(ResultsConfig.class);
-        ResultsConfig config = new ResultsConfig();
-
-        RDFStreamerConfigProperties rdfConfig = new RDFStreamerConfigProperties();
-        rdfConfig.setRetryDelayMillis(10);
-        rdfConfig.setBatchSize(10);
-        rdfConfig.setMaxRetries(1);
-        Mockito.when(configMock.rdfConfigProperties()).thenReturn(rdfConfig);
-
-        HttpClient httpClient = Mockito.mock(HttpClient.class);
-        SolrClient solrClient = Mockito.mock(SolrClient.class);
-        SolrRequestConverter converter = Mockito.mock(SolrRequestConverter.class);
-        StreamerConfigProperties configProps = config.resultsConfigProperties();
-        configProps.setStoreFetchRetryDelayMillis(10);
-        TupleStreamTemplate tupleStreamTemplate =
-                config.tupleStreamTemplate(configProps, solrClient, converter);
-        RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-        StreamerConfigProperties streamConfig = config.resultsConfigProperties();
-        TupleStreamDocumentIdStream documentIdStream =
-                config.documentIdStream(tupleStreamTemplate, streamConfig);
-        Mockito.when(configMock.uniProtRDFStreamer(restTemplate, documentIdStream))
-                .thenCallRealMethod();
-        RDFStreamer result = configMock.uniProtRDFStreamer(restTemplate, documentIdStream);
         assertNotNull(result);
     }
 

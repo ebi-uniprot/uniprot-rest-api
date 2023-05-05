@@ -8,13 +8,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_AC_ID_STR;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
@@ -24,6 +19,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -55,7 +52,7 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -97,7 +94,8 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @Autowired private MockMvc mockMvc;
 
-    @Autowired private RestTemplate uniProtKBRestTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate uniProtKBRestTemplate;
 
     @Autowired private TaxonomyLineageRepository taxRepository;
 
@@ -148,11 +146,6 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
-
-        when(uniProtKBRestTemplate.getUriTemplateHandler())
-                .thenReturn(new DefaultUriBuilderFactory());
-        when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-
         for (int i = 1; i <= this.maxFromIdsAllowed; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
@@ -165,6 +158,13 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         TaxonomyDocument taxonomyDocument = createTaxonomyEntry(9606L);
         cloudSolrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
+    }
+
+    @BeforeEach
+    void setUp() {
+        when(uniProtKBRestTemplate.getUriTemplateHandler())
+                .thenReturn(new DefaultUriBuilderFactory());
+        when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     @Test
@@ -495,7 +495,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     }
 
     @Test
-    void streamRDFCanReturnSuccess() throws Exception {
+    void streamRdfCanReturnSuccess() throws Exception {
         // when
         IdMappingJob job =
                 getJobOperation()
@@ -511,7 +511,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIPROT_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RdfPrologs.UNIPROT_PROLOG)))
                 .andExpect(
                         content()
                                 .string(
@@ -667,6 +667,29 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                 .string(
                                         containsString(
                                                 "Invalid request received. Unable to compute fasta subsequence for IDs: Q00002,Q00003. Expected format is accession[begin-end], for example:Q00001[10-20]")));
+    }
+
+    @Test
+    void testIdMappingWithRepeatedAccessionSubSequenceValid() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR,
+                                UNIPROTKB_STR,
+                                "Q00001[10-20],Q00002[20-30],Q00001[15-20]");
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param("subsequence", "true"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString(">tr|Q00001|10-20\nLVVVTMATLSL\n")))
+                .andExpect(content().string(containsString(">sp|Q00002|20-30\nLARPSFSLVED")))
+                .andExpect(content().string(containsString(">tr|Q00001|15-20\nMATLSL")));
     }
 
     @Override

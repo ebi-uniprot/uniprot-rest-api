@@ -6,13 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_XML;
 import static org.uniprot.api.idmapping.output.converter.uniparc.UniParcMessageConverterConfig.appendUniParcConverters;
 import static org.uniprot.api.idmapping.output.converter.uniprotkb.UniProtKBMessageConverterConfig.appendUniProtKBConverters;
 import static org.uniprot.api.idmapping.output.converter.uniref.UniRefMessageConverterConfig.appendUniRefConverters;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.FF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.GFF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.store.config.UniProtDataType.PIR_ID_MAPPING;
 
 import java.util.List;
@@ -59,6 +53,8 @@ public class MessageConverterConfig {
                 int index = 0;
                 converters.add(index++, new ErrorMessageConverter());
                 converters.add(index++, new ErrorMessageXlsConverter());
+                converters.add(index++, new ErrorMessageTurtleConverter());
+                converters.add(index++, new ErrorMessageNTriplesConverter());
                 converters.add(
                         index++, new ErrorMessageXMLConverter()); // to handle xml error messages
 
@@ -147,7 +143,9 @@ public class MessageConverterConfig {
                         kbContext(FF_MEDIA_TYPE),
                         kbContext(GFF_MEDIA_TYPE),
                         kbContext(LIST_MEDIA_TYPE),
-                        kbContext(RDF_MEDIA_TYPE))
+                        kbContext(RDF_MEDIA_TYPE),
+                        kbContext(TURTLE_MEDIA_TYPE),
+                        kbContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -166,7 +164,9 @@ public class MessageConverterConfig {
                         uniParcContext(XLS_MEDIA_TYPE),
                         uniParcContext(APPLICATION_XML),
                         uniParcContext(LIST_MEDIA_TYPE),
-                        uniParcContext(RDF_MEDIA_TYPE))
+                        uniParcContext(RDF_MEDIA_TYPE),
+                        uniParcContext(TURTLE_MEDIA_TYPE),
+                        uniParcContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -184,7 +184,9 @@ public class MessageConverterConfig {
                         uniRefContext(TSV_MEDIA_TYPE),
                         uniRefContext(XLS_MEDIA_TYPE),
                         uniRefContext(LIST_MEDIA_TYPE),
-                        uniRefContext(RDF_MEDIA_TYPE))
+                        uniRefContext(RDF_MEDIA_TYPE),
+                        uniRefContext(TURTLE_MEDIA_TYPE),
+                        uniRefContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

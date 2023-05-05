@@ -57,7 +57,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/uniref")
 public class UniRefEntryLightController extends BasicSearchController<UniRefEntryLight> {
-
+    private static final String DATA_TYPE = "uniref";
     private static final int PREVIEW_SIZE = 10;
     private final UniRefEntryLightService service;
 
@@ -89,7 +89,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve a light object of UniRef cluster by id.",
@@ -127,9 +129,10 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
-        if (isRDFAccept(request)) {
-            String rdf = service.getRDFXml(id);
-            return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String rdf = service.getRdf(id, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntryLight entryResult = service.findByUniqueId(id, fields);
             return super.getEntityResponse(entryResult, fields, request);
@@ -197,7 +200,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.",
@@ -236,9 +241,13 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
-            return super.streamRDF(
-                    () -> service.streamRDF(streamRequest), streamRequest, contentType, request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () -> service.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
+                    streamRequest,
+                    contentType,
+                    request);
         } else {
             return super.stream(
                     () -> service.stream(streamRequest), streamRequest, contentType, request);

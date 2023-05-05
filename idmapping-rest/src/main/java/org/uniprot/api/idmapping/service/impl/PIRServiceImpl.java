@@ -4,6 +4,8 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -109,10 +111,11 @@ public class PIRServiceImpl extends IdMappingPIRService {
     String getIdsFromRequest(IdMappingJobRequest request) {
         String ids = String.join(",", request.getIds());
         if (request.getFrom().equals(ACC_ID_STR)) {
-            ids =
+            Set<String> uniqueIds =
                     Arrays.stream(ids.split(","))
                             .map(this::cleanIdBeforeSubmit)
-                            .collect(Collectors.joining(","));
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
+            ids = uniqueIds.stream().collect(Collectors.joining(","));
         }
         return ids;
     }

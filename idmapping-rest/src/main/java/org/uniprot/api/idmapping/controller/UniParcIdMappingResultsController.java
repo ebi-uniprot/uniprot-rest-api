@@ -53,6 +53,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "/"
                         + UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH)
 public class UniParcIdMappingResultsController extends BasicSearchController<UniParcEntryPair> {
+    private static final String DATA_TYPE = "uniparc";
     public static final String UNIPARC_ID_MAPPING_PATH = "uniparc";
     private final UniParcIdService idService;
     private final IdMappingJobCacheService cacheService;
@@ -138,7 +139,9 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream a UniParc sequence entry (or entries) by a submitted job id.",
@@ -182,12 +185,17 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
         IdMappingResult idMappingResult = cachedJobResult.getIdMappingResult();
         this.idService.validateMappedIdsEnrichmentLimit(idMappingResult.getMappedIds());
 
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
             Supplier<Stream<String>> result =
                     () ->
-                            this.idService.streamRDF(
-                                    streamRequest, idMappingResult, cachedJobResult.getJobId());
-            return super.streamRDF(result, streamRequest, contentType, request);
+                            this.idService.streamRdf(
+                                    streamRequest,
+                                    idMappingResult,
+                                    cachedJobResult.getJobId(),
+                                    DATA_TYPE,
+                                    acceptedRdfContentType.get());
+            return super.streamRdf(result, streamRequest, contentType, request);
         } else {
             Supplier<Stream<UniParcEntryPair>> result =
                     () ->

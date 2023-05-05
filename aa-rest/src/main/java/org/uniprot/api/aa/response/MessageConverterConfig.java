@@ -1,10 +1,5 @@
 package org.uniprot.api.aa.response;
 
-import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -20,6 +15,11 @@ import org.uniprot.core.parser.tsv.unirule.UniRuleEntryValueMapper;
 import org.uniprot.core.unirule.UniRuleEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 /**
  * @author sahmad

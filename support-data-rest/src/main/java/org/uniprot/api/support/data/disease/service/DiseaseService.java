@@ -1,10 +1,10 @@
 package org.uniprot.api.support.data.disease.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.disease.repository.DiseaseRepository;
@@ -22,7 +22,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     public static final String DISEASE_ID_FIELD = "id";
     private final UniProtQueryProcessorConfig diseaseQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<DiseaseDocument> documentIdStream;
 
     public DiseaseService(
             DiseaseRepository diseaseRepository,
@@ -31,7 +32,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
             SolrQueryConfig diseaseSolrQueryConf,
             UniProtQueryProcessorConfig diseaseQueryProcessorConfig,
             SearchFieldConfig diseaseSearchFieldConfig,
-            @Qualifier("diseaseRDFStreamer") RDFStreamer rdfStreamer) {
+            DefaultDocumentIdStream<DiseaseDocument> documentIdStream,
+            RdfStreamer supportDataRdfStreamer) {
 
         super(
                 diseaseRepository,
@@ -41,7 +43,8 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
                 null);
         this.diseaseQueryProcessorConfig = diseaseQueryProcessorConfig;
         this.searchFieldConfig = diseaseSearchFieldConfig;
-        this.rdfStreamer = rdfStreamer;
+        this.rdfStreamer = supportDataRdfStreamer;
+        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -55,7 +58,12 @@ public class DiseaseService extends BasicSearchService<DiseaseDocument, DiseaseE
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
-        return this.rdfStreamer;
+    protected DefaultDocumentIdStream<DiseaseDocument> getDocumentIdStream() {
+        return documentIdStream;
+    }
+
+    @Override
+    protected RdfStreamer getRdfStreamer() {
+        return rdfStreamer;
     }
 }

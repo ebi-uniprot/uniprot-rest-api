@@ -5,9 +5,9 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +26,18 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
+import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -36,7 +47,7 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 @Service("DownloadListener")
 @Slf4j
 public class UniProtKBMessageListener extends AbstractMessageListener implements MessageListener {
-
+    private static final String DATA_TYPE = "uniprotkb";
     private final MessageConverter converter;
     private final UniProtEntryService service;
     private final DownloadConfigProperties downloadConfigProperties;
@@ -51,18 +62,22 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
     @Value("${async.download.retryQueueName}")
     private String retryQueueName;
 
+    private final EmbeddingsQueueConfigProperties embeddingsQueueConfigProps;
+
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
             DownloadConfigProperties downloadConfigProperties,
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
-            RabbitTemplate rabbitTemplate) {
+            RabbitTemplate rabbitTemplate,
+            EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties) {
         super(downloadConfigProperties, jobRepository, rabbitTemplate);
         this.converter = converter;
         this.service = service;
         this.downloadConfigProperties = downloadConfigProperties;
         this.downloadResultWriter = downloadResultWriter;
+        this.embeddingsQueueConfigProps = embeddingsQueueConfigProperties;
     }
 
     protected void processMessage(Message message, DownloadJob downloadJob) {
@@ -85,24 +100,54 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             }
         } else {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
-            writeResult(request, idsFile, jobId, contentType);
-            updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
+            if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
+                processH5Message(request, idsFile, jobId);
+                updateDownloadJob(message, downloadJob, JobStatus.UNFINISHED);
+            } else {
+                writeResult(request, idsFile, jobId, contentType);
+                updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
+            }
+        }
+    }
+
+    private void processH5Message(UniProtKBDownloadRequest request, Path idsFile, String jobId) {
+        try {
+            writeSolrResult(request, idsFile, jobId);
+            sendMessageToEmbeddingsQueue(jobId);
+        } catch (Exception ex) {
+            logMessageAndDeleteFile(ex, jobId);
+            throw new MessageListenerException(ex);
         }
     }
 
     private void writeResult(
             DownloadRequest request, Path idsFile, String jobId, MediaType contentType) {
         try {
-            Stream<String> ids = streamIds(request);
-            saveIdsInTempFile(idsFile, ids);
-            log.info("Solr ids saved for job {}", jobId);
+            writeSolrResult(request, idsFile, jobId);
             StoreRequest storeRequest = service.buildStoreRequest(request);
-            downloadResultWriter.writeResult(request, idsFile, jobId, contentType, storeRequest);
+            downloadResultWriter.writeResult(
+                    request, idsFile, jobId, contentType, storeRequest, DATA_TYPE);
             log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId, contentType);
+            logMessageAndDeleteFile(ex, jobId);
             throw new MessageListenerException(ex);
         }
+    }
+
+    private void writeSolrResult(DownloadRequest request, Path idsFile, String jobId)
+            throws IOException {
+        Stream<String> ids = streamIds(request);
+        saveIdsInTempFile(idsFile, ids);
+        log.info("Solr ids saved for job {}", jobId);
+    }
+
+    private void saveIdsInTempFile(Path filePath, Stream<String> ids) throws IOException {
+        Iterable<String> source = ids::iterator;
+        Files.write(filePath, source, StandardOpenOption.CREATE);
+    }
+
+    Stream<String> streamIds(DownloadRequest request) {
+        return service.streamIds(request);
     }
 
     void setMaxRetryCount(Integer maxRetryCount) {
@@ -126,5 +171,22 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
     @Override
     protected String getRetryQueueName() {
         return this.retryQueueName;
+    }
+
+    private void sendMessageToEmbeddingsQueue(String jobId) {
+        log.info(
+                "Sending h5 message to embeddings queue for further processing for jobId {}",
+                jobId);
+        MessageProperties msgProps = new MessageProperties();
+        msgProps.setHeader(JOB_ID_HEADER, jobId);
+        Message message = new Message(new byte[] {}, msgProps);
+        this.rabbitTemplate.send(
+                this.embeddingsQueueConfigProps.getExchangeName(),
+                this.embeddingsQueueConfigProps.getRoutingKey(),
+                message);
+        log.info(
+                "Message with jobId {} sent to embeddings queue {}",
+                jobId,
+                this.embeddingsQueueConfigProps.getQueueName());
     }
 }
