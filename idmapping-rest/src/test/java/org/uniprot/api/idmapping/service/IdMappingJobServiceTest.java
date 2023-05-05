@@ -49,7 +49,7 @@ import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
  * @author sahmad
  * @created 24/02/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
         classes = {IdMappingJobServiceImpl.class, TestConfig.class, DataStoreTestConfig.class})

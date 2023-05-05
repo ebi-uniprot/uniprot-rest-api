@@ -48,7 +48,7 @@ import org.uniprot.store.search.SolrCollection;
  * @author lgonzales
  * @since 08/03/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniRefIdMappingResultsController.class)
 @AutoConfigureWebClient

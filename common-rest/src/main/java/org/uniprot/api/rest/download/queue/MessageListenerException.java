@@ -1,4 +1,4 @@
-package org.uniprot.api.uniprotkb.queue;
+package org.uniprot.api.rest.download.queue;
 
 public class MessageListenerException extends RuntimeException {
     private static final long serialVersionUID = 102409437895437L;

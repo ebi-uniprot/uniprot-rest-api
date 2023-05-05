@@ -51,7 +51,7 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
  * @author lgonzales
  * @since 08/03/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniProtKBIdMappingResultsController.class)
 @AutoConfigureWebClient

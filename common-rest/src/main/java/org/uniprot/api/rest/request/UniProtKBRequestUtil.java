@@ -1,7 +1,9 @@
 package org.uniprot.api.rest.request;
 
 import java.util.List;
+import java.util.Objects;
 
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.store.search.SolrQueryUtil;
 
 /**
@@ -38,5 +40,15 @@ public class UniProtKBRequestUtil {
         } else {
             return false;
         }
+    }
+
+    public static String parseFormat(String format) {
+        String longFormat;
+        try {
+            longFormat = UniProtMediaType.getMediaTypeForFileExtension(format).toString();
+        } catch (IllegalArgumentException ile) {
+            longFormat = null;
+        }
+        return Objects.nonNull(longFormat) ? longFormat : format;
     }
 }

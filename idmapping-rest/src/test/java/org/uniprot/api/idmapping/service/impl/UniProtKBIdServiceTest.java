@@ -20,6 +20,9 @@ import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.store.config.UniProtDataType;
+import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
+import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 class UniProtKBIdServiceTest {
 
@@ -107,27 +110,29 @@ class UniProtKBIdServiceTest {
 
     @Test
     void isLineageAllowedFoundLineage() {
-        SolrClient solrClient = Mockito.mock(SolrClient.class);
-
+        ReturnFieldConfig returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         UniProtKBIdService idService =
                 new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
-        assertTrue(idService.isLineageAllowed("lineage"));
+        assertTrue(idService.isLineageAllowed("lineage", returnFieldConfig));
     }
 
     @Test
     void isLineageAllowedFoundLineageIds() {
+        ReturnFieldConfig returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         UniProtKBIdService idService =
                 new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
-        assertTrue(idService.isLineageAllowed("lineage_ids"));
+        assertTrue(idService.isLineageAllowed("lineage_ids", returnFieldConfig));
     }
 
     @Test
     void isLineageAllowedNotFound() {
-        SolrClient solrClient = Mockito.mock(SolrClient.class);
-
+        ReturnFieldConfig returnFieldConfig =
+                ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         UniProtKBIdService idService =
                 new UniProtKBIdService(null, null, null, null, null, null, null, null, null, null);
-        assertFalse(idService.isLineageAllowed("accession"));
+        assertFalse(idService.isLineageAllowed("accession", returnFieldConfig));
     }
 
     @Test

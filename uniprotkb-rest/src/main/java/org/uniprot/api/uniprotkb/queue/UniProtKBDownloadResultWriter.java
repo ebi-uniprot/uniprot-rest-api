@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
 import java.lang.reflect.Type;
-import java.nio.file.*;
 import java.util.Iterator;
 
 import lombok.extern.slf4j.Slf4j;

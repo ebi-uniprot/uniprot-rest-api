@@ -39,7 +39,7 @@ public class IdMappingConfig {
     }
 
     @Bean(destroyMethod = "shutdown")
-    @Profile("live")
+    @Profile("asyncDownload & live")
     RedissonClient redisson(@Value("${id.mapping.redis.config.file}") Resource redisConfig)
             throws IOException {
         Config config = Config.fromYAML(redisConfig.getInputStream());

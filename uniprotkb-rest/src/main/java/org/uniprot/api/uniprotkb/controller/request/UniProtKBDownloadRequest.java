@@ -4,13 +4,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
-import java.util.Objects;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 
 @Data
@@ -31,12 +29,6 @@ public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements 
     private String format;
 
     public void setFormat(String format) {
-        String longFormat;
-        try {
-            longFormat = UniProtMediaType.getMediaTypeForFileExtension(format).toString();
-        } catch (IllegalArgumentException ile) {
-            longFormat = null;
-        }
-        this.format = Objects.nonNull(longFormat) ? longFormat : format;
+        this.format = UniProtKBRequestUtil.parseFormat(format);
     }
 }

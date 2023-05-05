@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
 
@@ -11,11 +10,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.*;
-import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.controller.BasicDownloadController;
 import org.uniprot.api.rest.download.model.DownloadJob;
@@ -23,12 +19,10 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -41,24 +35,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  */
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
-public class UniProtKBDownloadController extends BasicDownloadController<UniProtKBEntry> {
+public class UniProtKBDownloadController extends BasicDownloadController {
     static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;
     private final DownloadJobRepository jobRepository;
 
     public UniProtKBDownloadController(
-            ProducerMessageService messageService,
-            DownloadJobRepository jobRepository,
-            ApplicationEventPublisher eventPublisher,
-            MessageConverterContextFactory<UniProtKBEntry> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor,
-            Gatekeeper downloadGatekeeper) {
-        super(
-                eventPublisher,
-                converterContextFactory,
-                downloadTaskExecutor,
-                UNIPROTKB,
-                downloadGatekeeper);
+            ProducerMessageService messageService, DownloadJobRepository jobRepository) {
         this.messageService = messageService;
         this.jobRepository = jobRepository;
     }
@@ -114,16 +97,5 @@ public class UniProtKBDownloadController extends BasicDownloadController<UniProt
         }
 
         return ResponseEntity.ok(detailResponse);
-    }
-
-    @Override
-    protected String getEntityId(UniProtKBEntry entity) {
-        return entity.getPrimaryAccession().getValue();
-    }
-
-    @Override
-    protected Optional<String> getEntityRedirectId(
-            UniProtKBEntry entity, HttpServletRequest request) {
-        return Optional.empty();
     }
 }
