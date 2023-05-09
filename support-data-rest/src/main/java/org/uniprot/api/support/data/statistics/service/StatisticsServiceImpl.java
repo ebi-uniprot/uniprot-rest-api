@@ -1,5 +1,10 @@
 package org.uniprot.api.support.data.statistics.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.api.support.data.statistics.entity.StatisticsCategory;
 import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
@@ -10,11 +15,6 @@ import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsC
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
 import org.uniprot.api.support.data.statistics.repository.StatisticsCategoryRepository;
 import org.uniprot.api.support.data.statistics.repository.UniprotKBStatisticsEntryRepository;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {

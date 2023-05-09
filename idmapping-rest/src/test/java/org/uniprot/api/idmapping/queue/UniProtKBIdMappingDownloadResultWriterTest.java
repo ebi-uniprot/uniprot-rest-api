@@ -1,15 +1,26 @@
 package org.uniprot.api.idmapping.queue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl;
@@ -30,18 +41,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 class UniProtKBIdMappingDownloadResultWriterTest {
 
@@ -58,7 +60,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
         Mockito.when(storeStreamConfig.getStreamConfig()).thenReturn(configProperties);
 
         DownloadConfigProperties downloadProperties = null;
-        RDFStreamer rdfStream = null;
+        RdfStreamer rdfStream = null;
         UniProtKBIdMappingDownloadResultWriter writer =
                 new UniProtKBIdMappingDownloadResultWriter(
                         contentAdaptor,
@@ -79,20 +81,30 @@ class UniProtKBIdMappingDownloadResultWriterTest {
     @Test
     void canWriteResultFile() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        RequestMappingHandlerAdapter contentAdaptor = getMockedRequestMappingHandlerAdapter(objectMapper);
-        MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory = getMockedMessageConverterContextFactory();
+        RequestMappingHandlerAdapter contentAdaptor =
+                getMockedRequestMappingHandlerAdapter(objectMapper);
+        MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory =
+                getMockedMessageConverterContextFactory();
 
-        VoldemortInMemoryUniprotEntryStore voldemortClient = VoldemortInMemoryUniprotEntryStore.getInstance("uniprot");
+        VoldemortInMemoryUniprotEntryStore voldemortClient =
+                VoldemortInMemoryUniprotEntryStore.getInstance("uniprot");
         UniProtKBEntry storedEntry = UniProtEntryMocker.create("P12345");
         voldemortClient.saveEntry(storedEntry);
 
-        StoreStreamerConfig<UniProtKBEntry> storeStreamConfig = getMockedStoreStreamConfig(voldemortClient);
+        StoreStreamerConfig<UniProtKBEntry> storeStreamConfig =
+                getMockedStoreStreamConfig(voldemortClient);
 
         DownloadConfigProperties downloadProperties = Mockito.mock(DownloadConfigProperties.class);
         Mockito.when(downloadProperties.getResultFilesFolder()).thenReturn("target");
 
         UniProtKBIdMappingDownloadResultWriter writer =
-                new UniProtKBIdMappingDownloadResultWriter(contentAdaptor,converterContextFactory, storeStreamConfig, downloadProperties, null, null);
+                new UniProtKBIdMappingDownloadResultWriter(
+                        contentAdaptor,
+                        converterContextFactory,
+                        storeStreamConfig,
+                        downloadProperties,
+                        null,
+                        null);
         List<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build());
 
@@ -102,9 +114,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
         request.setFormat("json");
         request.setJobId(jobId);
 
-        IdMappingResult idMappingResult = IdMappingResult.builder()
-                .mappedIds(mappedIds)
-                .build();
+        IdMappingResult idMappingResult = IdMappingResult.builder().mappedIds(mappedIds).build();
 
         assertDoesNotThrow(
                 () ->
@@ -140,7 +150,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
         MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory = null;
         StoreStreamerConfig<UniProtKBEntry> storeStreamConfig = null;
         DownloadConfigProperties downloadProperties = null;
-        RDFStreamer rdfStream = null;
+        RdfStreamer rdfStream = null;
         UniProtKBIdMappingDownloadResultWriter writer =
                 new UniProtKBIdMappingDownloadResultWriter(
                         contentAdaptor,
@@ -156,7 +166,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                 result.getTypeName());
     }
 
-    private MessageConverterContextFactory<UniProtKBEntryPair> getMockedMessageConverterContextFactory() {
+    private MessageConverterContextFactory<UniProtKBEntryPair>
+            getMockedMessageConverterContextFactory() {
         MessageConverterContext<UniProtKBEntryPair> context =
                 MessageConverterContext.<UniProtKBEntryPair>builder()
                         .entities(Stream.of(UniProtKBEntryPair.builder().build()))
@@ -166,28 +177,29 @@ class UniProtKBIdMappingDownloadResultWriterTest {
 
         MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory =
                 Mockito.mock(MessageConverterContextFactory.class);
-        Mockito.when(converterContextFactory.get(Mockito.any(), Mockito.eq(MediaType.APPLICATION_JSON)))
+        Mockito.when(
+                        converterContextFactory.get(
+                                Mockito.any(), Mockito.eq(MediaType.APPLICATION_JSON)))
                 .thenReturn(context);
         return converterContextFactory;
     }
 
-    private RequestMappingHandlerAdapter getMockedRequestMappingHandlerAdapter(ObjectMapper mapper) {
+    private RequestMappingHandlerAdapter getMockedRequestMappingHandlerAdapter(
+            ObjectMapper mapper) {
         RequestMappingHandlerAdapter contentAdaptor =
                 Mockito.mock(RequestMappingHandlerAdapter.class);
         ReturnFieldConfig returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         JsonMessageConverter<UniProtKBEntryPair> jsonMessageConverter =
                 new JsonMessageConverter<>(
-                        mapper,
-                        UniProtKBEntryPair.class,
-                        returnFieldConfig,
-                        null);
+                        mapper, UniProtKBEntryPair.class, returnFieldConfig, null);
         Mockito.when(contentAdaptor.getMessageConverters())
                 .thenReturn(List.of(jsonMessageConverter));
         return contentAdaptor;
     }
 
-    private StoreStreamerConfig<UniProtKBEntry> getMockedStoreStreamConfig(VoldemortInMemoryUniprotEntryStore voldemortClient) {
+    private StoreStreamerConfig<UniProtKBEntry> getMockedStoreStreamConfig(
+            VoldemortInMemoryUniprotEntryStore voldemortClient) {
         StreamerConfigProperties configProperties = new StreamerConfigProperties();
         configProperties.setStoreBatchSize(5);
 
@@ -195,10 +207,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
 
         StoreStreamerConfig<UniProtKBEntry> storeStreamConfig =
                 (StoreStreamerConfig<UniProtKBEntry>) Mockito.mock(StoreStreamerConfig.class);
-        Mockito.when(storeStreamConfig.getStreamConfig())
-                .thenReturn(configProperties);
-        Mockito.when(storeStreamConfig.getStoreFetchRetryPolicy())
-                .thenReturn(storeRetryPolicy);
+        Mockito.when(storeStreamConfig.getStreamConfig()).thenReturn(configProperties);
+        Mockito.when(storeStreamConfig.getStoreFetchRetryPolicy()).thenReturn(storeRetryPolicy);
         Mockito.when(storeStreamConfig.getStoreClient())
                 .thenReturn(new UniProtStoreClient<>(voldemortClient));
 

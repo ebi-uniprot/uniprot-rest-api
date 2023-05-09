@@ -1,10 +1,11 @@
 package org.uniprot.api.support.data.statistics.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Value
 @Builder

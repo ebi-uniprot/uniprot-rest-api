@@ -1,12 +1,16 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.LITERATURE;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -28,15 +32,13 @@ import org.uniprot.api.support.data.literature.service.LiteratureService;
 import org.uniprot.core.literature.LiteratureEntry;
 import org.uniprot.store.config.UniProtDataType;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.LITERATURE;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author lgonzales
@@ -94,8 +96,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> getByLiteratureId(
             @Parameter(description = "Citation id to find")
@@ -115,7 +117,9 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             if (citationId.startsWith("CI") || citationId.startsWith("IND")) {
                 throw new ResourceNotFoundException("Unable to find citation " + citationId);
             }
-            String result = this.literatureService.getRdf(citationId, DATA_TYPE, acceptedRdfContentType.get());
+            String result =
+                    this.literatureService.getRdf(
+                            citationId, DATA_TYPE, acceptedRdfContentType.get());
             return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
         LiteratureEntry literatureEntry = this.literatureService.findByUniqueId(citationId);
@@ -185,8 +189,8 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> stream(
             @Valid @ModelAttribute LiteratureStreamRequest streamRequest,

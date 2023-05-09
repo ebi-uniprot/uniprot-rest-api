@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.common;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -10,23 +12,18 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamerConfigProperties;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 class SupportDataRdfStreamerConfigTest {
-    @Mock
-    private PrologProvider prologProvider;
-    @Mock
-    private TagPositionProvider tagPositionProvider;
-    @Mock
-    private RestTemplate restTemplate;
-    @Mock
-    private RdfServiceFactory rdfServiceFactory;
+    @Mock private PrologProvider prologProvider;
+    @Mock private TagPositionProvider tagPositionProvider;
+    @Mock private RestTemplate restTemplate;
+    @Mock private RdfServiceFactory rdfServiceFactory;
     private RdfStreamerConfigProperties properties;
     private SupportDataRdfStreamerConfig supportDataRdfStreamerConfig;
 
     @BeforeEach
     void setUp() {
-        supportDataRdfStreamerConfig = new SupportDataRdfStreamerConfig(prologProvider, tagPositionProvider);
+        supportDataRdfStreamerConfig =
+                new SupportDataRdfStreamerConfig(prologProvider, tagPositionProvider);
         properties = new RdfStreamerConfigProperties();
         properties.setRequestUrl("http://localhost");
         properties.setBatchSize(25);
@@ -36,13 +33,15 @@ class SupportDataRdfStreamerConfigTest {
 
     @Test
     void supportDataRdfStreamer() {
-        RdfStreamer rdfStreamer = supportDataRdfStreamerConfig.supportDataRdfStreamer(properties, rdfServiceFactory);
+        RdfStreamer rdfStreamer =
+                supportDataRdfStreamerConfig.supportDataRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
     }
 
     @Test
     void supportDataRdfServiceFactory() {
-        RdfServiceFactory rdfServiceFactory = supportDataRdfStreamerConfig.supportDataRdfServiceFactory(restTemplate);
+        RdfServiceFactory rdfServiceFactory =
+                supportDataRdfStreamerConfig.supportDataRdfServiceFactory(restTemplate);
         assertNotNull(rdfServiceFactory);
     }
 

@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.repository.store;
 
+import java.util.Collections;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +14,13 @@ import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
-import java.util.Collections;
-
 @Configuration
 public class UniRefRdfStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagPositionProvider tagPositionProvider;
 
-    public UniRefRdfStreamerConfig(PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
+    public UniRefRdfStreamerConfig(
+            PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
         this.prologProvider = prologProvider;
         this.tagPositionProvider = tagPositionProvider;
     }
@@ -49,8 +50,7 @@ public class UniRefRdfStreamerConfig {
         restTemplate.setInterceptors(
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
-                new DefaultUriBuilderFactory(
-                        unirefRdfStreamerConfigProperties.getRequestUrl()));
+                new DefaultUriBuilderFactory(unirefRdfStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 

@@ -1,7 +1,11 @@
 package org.uniprot.api.uniref.repository.store;
 
+import java.io.IOException;
+import java.time.Duration;
+
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,9 +23,6 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.search.SolrCollection;
-
-import java.io.IOException;
-import java.time.Duration;
 
 /** @author jluo date: 21 Aug 2019 */
 @Configuration

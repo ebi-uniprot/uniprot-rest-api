@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.queue;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -11,10 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.model.EntryPair;
@@ -47,14 +44,14 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
     protected final StoreStreamerConfig<S> storeStreamerConfig;
     private final DownloadConfigProperties downloadConfigProperties;
     private final MessageConverterContextFactory.Resource resource;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
 
     public AbstractIdMappingDownloadResultWriter(
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<T> converterContextFactory,
             StoreStreamerConfig<S> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RDFStreamer rdfStreamer,
+            RdfStreamer rdfStreamer,
             MessageConverterContextFactory.Resource resource) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
@@ -88,9 +85,13 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
             context.setContentType(contentType);
             context.setFailedIds(idMappingResult.getUnmappedIds());
 
-            if (contentType.equals(RDF_MEDIA_TYPE)) {
+            if (SUPPORTED_RDF_MEDIA_TYPES.containsKey(contentType)) {
                 Set<String> toIds = getToIds(idMappingResult);
-                Stream<String> rdfResponse = this.rdfStreamer.streamRDFXML(toIds.stream());
+                Stream<String> rdfResponse =
+                        this.rdfStreamer.stream(
+                                toIds.stream(),
+                                resource.name().toLowerCase(),
+                                SUPPORTED_RDF_MEDIA_TYPES.get(contentType));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 Set<String> toIds = getToIds(idMappingResult);

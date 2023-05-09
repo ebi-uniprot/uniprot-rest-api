@@ -1,12 +1,16 @@
 package org.uniprot.api.support.data.keyword.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -27,15 +31,13 @@ import org.uniprot.api.support.data.keyword.service.KeywordService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.UniProtDataType;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(
         name = "Keyword",
@@ -75,8 +77,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get Keyword by keywordId.",
@@ -161,8 +163,8 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download Keywords by given Lucene search query.",
@@ -190,7 +192,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
             return super.streamRdf(
-                    () -> keywordService.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
+                    () ->
+                            keywordService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

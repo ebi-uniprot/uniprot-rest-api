@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -41,7 +41,7 @@ public class UniProtKBIdMappingDownloadResultWriter
             MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory,
             StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RDFStreamer uniProtKBRDFStreamer,
+            RdfStreamer uniProtKBRDFStreamer,
             TaxonomyLineageService taxonomyLineageService) {
         super(
                 contentAdapter,

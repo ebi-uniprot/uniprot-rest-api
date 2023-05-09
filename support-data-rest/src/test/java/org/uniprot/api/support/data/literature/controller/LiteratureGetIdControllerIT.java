@@ -1,6 +1,11 @@
 package org.uniprot.api.support.data.literature.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,11 +49,7 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * @author lgonzales
@@ -319,13 +320,17 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().contentType(UniProtMediaType.TURTLE_MEDIA_TYPE))
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.TURTLE_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
                                     .build())
                     .build();
         }

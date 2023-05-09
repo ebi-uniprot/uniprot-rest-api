@@ -16,11 +16,10 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.http.MediaType;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.FileType;
 
 @Slf4j
 public abstract class AbstractMessageListener implements MessageListener {
@@ -33,7 +32,7 @@ public abstract class AbstractMessageListener implements MessageListener {
 
     private final DownloadJobRepository jobRepository;
 
-    private final RabbitTemplate rabbitTemplate;
+    protected final RabbitTemplate rabbitTemplate;
 
     public AbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
@@ -215,12 +214,12 @@ public abstract class AbstractMessageListener implements MessageListener {
         // do nothing
     }
 
-    protected void logMessageAndDeleteFile(Exception ex, String jobId, MediaType contentType) {
+    protected void logMessageAndDeleteFile(Exception ex, String jobId) {
         log.warn("Unable to write file due to error for job id {}", jobId);
         log.warn(ex.getMessage());
         Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
         deleteFile(idsFile, jobId);
-        String resultFileName = jobId + "." + UniProtMediaType.getFileExtension(contentType);
+        String resultFileName = jobId + "." + FileType.GZIP.getExtension();
         Path resultFile =
                 Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
         deleteFile(resultFile, jobId);

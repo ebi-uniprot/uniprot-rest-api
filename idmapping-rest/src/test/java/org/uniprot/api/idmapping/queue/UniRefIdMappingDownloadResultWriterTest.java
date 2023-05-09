@@ -1,16 +1,26 @@
 package org.uniprot.api.idmapping.queue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl;
@@ -36,18 +46,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 class UniRefIdMappingDownloadResultWriterTest {
 
@@ -64,7 +65,7 @@ class UniRefIdMappingDownloadResultWriterTest {
         Mockito.when(storeStreamConfig.getStreamConfig()).thenReturn(configProperties);
 
         DownloadConfigProperties downloadProperties = null;
-        RDFStreamer rdfStream = null;
+        RdfStreamer rdfStream = null;
         UniRefIdMappingDownloadResultWriter writer =
                 new UniRefIdMappingDownloadResultWriter(
                         contentAdaptor,
@@ -84,14 +85,18 @@ class UniRefIdMappingDownloadResultWriterTest {
     @Test
     void canWriteResultFile() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        RequestMappingHandlerAdapter contentAdaptor = getMockedRequestMappingHandlerAdapter(objectMapper);
-        MessageConverterContextFactory<UniRefEntryPair> converterContextFactory = getMockedMessageConverterContextFactory();
+        RequestMappingHandlerAdapter contentAdaptor =
+                getMockedRequestMappingHandlerAdapter(objectMapper);
+        MessageConverterContextFactory<UniRefEntryPair> converterContextFactory =
+                getMockedMessageConverterContextFactory();
 
-        VoldemortInMemoryUniRefEntryLightStore voldemortClient = VoldemortInMemoryUniRefEntryLightStore.getInstance("uniref_light");
+        VoldemortInMemoryUniRefEntryLightStore voldemortClient =
+                VoldemortInMemoryUniRefEntryLightStore.getInstance("uniref_light");
         UniRefEntryLight storedEntry = createEntry();
         voldemortClient.saveEntry(storedEntry);
 
-        StoreStreamerConfig<UniRefEntryLight> storeStreamConfig = getMockedStoreStreamConfig(voldemortClient);
+        StoreStreamerConfig<UniRefEntryLight> storeStreamConfig =
+                getMockedStoreStreamConfig(voldemortClient);
 
         DownloadConfigProperties downloadProperties = Mockito.mock(DownloadConfigProperties.class);
         Mockito.when(downloadProperties.getResultFilesFolder()).thenReturn("target");
@@ -104,7 +109,11 @@ class UniRefIdMappingDownloadResultWriterTest {
                         downloadProperties,
                         null);
         List<IdMappingStringPair> mappedIds =
-                List.of(IdMappingStringPair.builder().from("P03910").to("UniRef100_P03910").build());
+                List.of(
+                        IdMappingStringPair.builder()
+                                .from("P03910")
+                                .to("UniRef100_P03910")
+                                .build());
 
         String jobId = "UNIREF_WRITER_JOB_ID";
         IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
@@ -112,9 +121,7 @@ class UniRefIdMappingDownloadResultWriterTest {
         request.setFormat("json");
         request.setJobId(jobId);
 
-        IdMappingResult idMappingResult = IdMappingResult.builder()
-                .mappedIds(mappedIds)
-                .build();
+        IdMappingResult idMappingResult = IdMappingResult.builder().mappedIds(mappedIds).build();
 
         assertDoesNotThrow(
                 () ->
@@ -150,7 +157,7 @@ class UniRefIdMappingDownloadResultWriterTest {
         MessageConverterContextFactory<UniRefEntryPair> converterContextFactory = null;
         StoreStreamerConfig<UniRefEntryLight> storeStreamConfig = null;
         DownloadConfigProperties downloadProperties = null;
-        RDFStreamer rdfStream = null;
+        RdfStreamer rdfStream = null;
         UniRefIdMappingDownloadResultWriter writer =
                 new UniRefIdMappingDownloadResultWriter(
                         contentAdaptor,
@@ -165,7 +172,8 @@ class UniRefIdMappingDownloadResultWriterTest {
                 result.getTypeName());
     }
 
-    private MessageConverterContextFactory<UniRefEntryPair> getMockedMessageConverterContextFactory() {
+    private MessageConverterContextFactory<UniRefEntryPair>
+            getMockedMessageConverterContextFactory() {
         MessageConverterContext<UniRefEntryPair> context =
                 MessageConverterContext.<UniRefEntryPair>builder()
                         .entities(Stream.of(UniRefEntryPair.builder().build()))
@@ -175,28 +183,28 @@ class UniRefIdMappingDownloadResultWriterTest {
 
         MessageConverterContextFactory<UniRefEntryPair> converterContextFactory =
                 Mockito.mock(MessageConverterContextFactory.class);
-        Mockito.when(converterContextFactory.get(Mockito.any(), Mockito.eq(MediaType.APPLICATION_JSON)))
+        Mockito.when(
+                        converterContextFactory.get(
+                                Mockito.any(), Mockito.eq(MediaType.APPLICATION_JSON)))
                 .thenReturn(context);
         return converterContextFactory;
     }
 
-    private RequestMappingHandlerAdapter getMockedRequestMappingHandlerAdapter(ObjectMapper mapper) {
+    private RequestMappingHandlerAdapter getMockedRequestMappingHandlerAdapter(
+            ObjectMapper mapper) {
         RequestMappingHandlerAdapter contentAdaptor =
                 Mockito.mock(RequestMappingHandlerAdapter.class);
         ReturnFieldConfig returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF);
         JsonMessageConverter<UniRefEntryPair> jsonMessageConverter =
-                new JsonMessageConverter<>(
-                        mapper,
-                        UniRefEntryPair.class,
-                        returnFieldConfig,
-                        null);
+                new JsonMessageConverter<>(mapper, UniRefEntryPair.class, returnFieldConfig, null);
         Mockito.when(contentAdaptor.getMessageConverters())
                 .thenReturn(List.of(jsonMessageConverter));
         return contentAdaptor;
     }
 
-    private StoreStreamerConfig<UniRefEntryLight> getMockedStoreStreamConfig(VoldemortInMemoryUniRefEntryLightStore voldemortClient) {
+    private StoreStreamerConfig<UniRefEntryLight> getMockedStoreStreamConfig(
+            VoldemortInMemoryUniRefEntryLightStore voldemortClient) {
         StreamerConfigProperties configProperties = new StreamerConfigProperties();
         configProperties.setStoreBatchSize(5);
 
@@ -204,10 +212,8 @@ class UniRefIdMappingDownloadResultWriterTest {
 
         StoreStreamerConfig<UniRefEntryLight> storeStreamConfig =
                 (StoreStreamerConfig<UniRefEntryLight>) Mockito.mock(StoreStreamerConfig.class);
-        Mockito.when(storeStreamConfig.getStreamConfig())
-                .thenReturn(configProperties);
-        Mockito.when(storeStreamConfig.getStoreFetchRetryPolicy())
-                .thenReturn(storeRetryPolicy);
+        Mockito.when(storeStreamConfig.getStreamConfig()).thenReturn(configProperties);
+        Mockito.when(storeStreamConfig.getStoreFetchRetryPolicy()).thenReturn(storeRetryPolicy);
         Mockito.when(storeStreamConfig.getStoreClient())
                 .thenReturn(new UniProtStoreClient<>(voldemortClient));
 

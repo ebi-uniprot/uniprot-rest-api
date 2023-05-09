@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -43,17 +54,6 @@ import org.uniprot.store.indexer.uniprotkb.converter.UniProtEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControllerIT {

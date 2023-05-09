@@ -99,7 +99,7 @@ public class IdMappingMessageListener extends AbstractMessageListener implements
             writer.writeResult(request, idMappingJob.getIdMappingResult(), jobId, contentType);
             log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId, contentType);
+            logMessageAndDeleteFile(ex, jobId);
             throw new MessageListenerException(ex);
         }
     }

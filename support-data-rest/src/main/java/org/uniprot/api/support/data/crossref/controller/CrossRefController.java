@@ -1,12 +1,16 @@
 package org.uniprot.api.support.data.crossref.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -27,15 +31,13 @@ import org.uniprot.api.support.data.crossref.service.CrossRefService;
 import org.uniprot.core.cv.xdb.CrossRefEntry;
 import org.uniprot.store.config.UniProtDataType;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/database")
@@ -83,8 +85,8 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             produces = {
                 APPLICATION_JSON_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> findByAccession(
             @Parameter(description = "cross-references database id to find")
@@ -102,7 +104,8 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
 
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
-            String result = this.crossRefService.getRdf(id, DATA_TYPE, acceptedRdfContentType.get());
+            String result =
+                    this.crossRefService.getRdf(id, DATA_TYPE, acceptedRdfContentType.get());
             return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
 
@@ -159,8 +162,8 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             produces = {
                 APPLICATION_JSON_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<CrossRefEntry>>> stream(
             @Valid @ModelAttribute CrossRefStreamRequest streamRequest,
@@ -170,7 +173,9 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
             return super.streamRdf(
-                    () -> crossRefService.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
+                    () ->
+                            crossRefService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

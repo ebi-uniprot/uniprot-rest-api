@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,19 +34,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,6 +59,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.lifecycle.Startables;
@@ -128,15 +130,12 @@ public class IdMappingDownloadControllerIT {
 
     @Autowired private UniProtStoreClient<UniParcEntry> uniParcStoreClient;
 
-    @Autowired private RestTemplate uniParcRestTemplate;
-
     @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
-    @Autowired private RestTemplate uniProtKBRestTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate idMappingRdfRestTemplate;
 
     @Autowired private UniProtStoreClient<UniRefEntryLight> uniRefStoreClient;
-
-    @Autowired private RestTemplate uniRefRestTemplate;
 
     private static final UniProtKBEntry TEMPLATE_KB_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
@@ -176,20 +175,6 @@ public class IdMappingDownloadControllerIT {
         Files.createDirectories(Path.of(this.idsFolder));
         Files.createDirectories(Path.of(this.resultFolder));
 
-        when(uniParcRestTemplate.getUriTemplateHandler())
-                .thenReturn(new DefaultUriBuilderFactory());
-        when(uniParcRestTemplate.getForObject(any(), any()))
-                .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_RDF);
-
-        when(uniRefRestTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        when(uniRefRestTemplate.getForObject(any(), any()))
-                .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_RDF);
-
-        when(uniProtKBRestTemplate.getUriTemplateHandler())
-                .thenReturn(new DefaultUriBuilderFactory());
-        when(uniProtKBRestTemplate.getForObject(any(), any()))
-                .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_RDF);
-
         for (int i = 1; i <= 10; i++) {
             saveUniParc(i);
             saveUniProtKB(i, "");
@@ -200,6 +185,25 @@ public class IdMappingDownloadControllerIT {
         }
         saveUniProtKB(11, "-2");
         saveUniProtKB(12, "-2");
+    }
+
+    @BeforeEach
+    public void setUpEach() throws Exception {
+        DefaultUriBuilderFactory handler = Mockito.mock(DefaultUriBuilderFactory.class);
+        when(idMappingRdfRestTemplate.getUriTemplateHandler()).thenReturn(handler);
+
+        UriBuilder uriBuilder = Mockito.mock(UriBuilder.class);
+        when(handler.builder()).thenReturn(uriBuilder);
+
+        URI uniprotkURI = Mockito.mock(URI.class);
+        when(uriBuilder.build(eq("uniprotkb"), eq("rdf"), any())).thenReturn(uniprotkURI);
+        when(idMappingRdfRestTemplate.getForObject(eq(uniprotkURI), any()))
+                .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_RDF);
+
+        URI uniparcURI = Mockito.mock(URI.class);
+        when(uriBuilder.build(eq("uniparc"), eq("rdf"), any())).thenReturn(uniparcURI);
+        when(idMappingRdfRestTemplate.getForObject(eq(uniparcURI), any()))
+                .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_RDF);
     }
 
     private void saveUniProtKB(int i, String isoFormString) {

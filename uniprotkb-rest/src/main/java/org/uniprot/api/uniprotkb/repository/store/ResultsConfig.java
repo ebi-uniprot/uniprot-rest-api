@@ -1,7 +1,14 @@
 package org.uniprot.api.uniprotkb.repository.store;
 
+import static java.util.Arrays.asList;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
@@ -25,12 +32,6 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.UniProtKBRepositoryConfigProperties;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.Optional;
-
-import static java.util.Arrays.asList;
 
 /**
  * Created 21/08/18

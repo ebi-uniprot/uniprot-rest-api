@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
@@ -25,7 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl;
@@ -46,6 +43,10 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 @ExtendWith(MockitoExtension.class)
 class UniParcIdMappingDownloadResultWriterTest {
 
@@ -62,7 +63,7 @@ class UniParcIdMappingDownloadResultWriterTest {
         Mockito.when(storeStreamConfig.getStreamConfig()).thenReturn(configProperties);
 
         DownloadConfigProperties downloadProperties = null;
-        RDFStreamer rdfStream = null;
+        RdfStreamer rdfStream = null;
         UniParcIdMappingDownloadResultWriter writer =
                 new UniParcIdMappingDownloadResultWriter(
                         contentAdaptor,
@@ -82,14 +83,18 @@ class UniParcIdMappingDownloadResultWriterTest {
     @Test
     void canWriteResultFile() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        RequestMappingHandlerAdapter contentAdaptor = getMockedRequestMappingHandlerAdapter(objectMapper);
-        MessageConverterContextFactory<UniParcEntryPair> converterContextFactory = getMockedMessageConverterContextFactory();
+        RequestMappingHandlerAdapter contentAdaptor =
+                getMockedRequestMappingHandlerAdapter(objectMapper);
+        MessageConverterContextFactory<UniParcEntryPair> converterContextFactory =
+                getMockedMessageConverterContextFactory();
 
-        VoldemortInMemoryUniParcEntryStore voldemortClient = VoldemortInMemoryUniParcEntryStore.getInstance("uniparc");
+        VoldemortInMemoryUniParcEntryStore voldemortClient =
+                VoldemortInMemoryUniParcEntryStore.getInstance("uniparc");
         UniParcEntry storedEntry = UniParcEntryMocker.createEntry(10, "UPI0000283A");
         voldemortClient.saveEntry(storedEntry);
 
-        StoreStreamerConfig<UniParcEntry> storeStreamConfig = getMockedStoreStreamConfig(voldemortClient);
+        StoreStreamerConfig<UniParcEntry> storeStreamConfig =
+                getMockedStoreStreamConfig(voldemortClient);
 
         DownloadConfigProperties downloadProperties = Mockito.mock(DownloadConfigProperties.class);
         Mockito.when(downloadProperties.getResultFilesFolder()).thenReturn("target");
@@ -110,9 +115,7 @@ class UniParcIdMappingDownloadResultWriterTest {
         request.setFormat("json");
         request.setJobId(jobId);
 
-        IdMappingResult idMappingResult = IdMappingResult.builder()
-                .mappedIds(mappedIds)
-                .build();
+        IdMappingResult idMappingResult = IdMappingResult.builder().mappedIds(mappedIds).build();
 
         assertDoesNotThrow(
                 () ->
@@ -148,7 +151,7 @@ class UniParcIdMappingDownloadResultWriterTest {
         MessageConverterContextFactory<UniParcEntryPair> converterContextFactory = null;
         StoreStreamerConfig<UniParcEntry> storeStreamConfig = null;
         DownloadConfigProperties downloadProperties = null;
-        RDFStreamer rdfStream = null;
+        RdfStreamer rdfStream = null;
         UniParcIdMappingDownloadResultWriter writer =
                 new UniParcIdMappingDownloadResultWriter(
                         contentAdaptor,
@@ -163,7 +166,8 @@ class UniParcIdMappingDownloadResultWriterTest {
                 result.getTypeName());
     }
 
-    private MessageConverterContextFactory<UniParcEntryPair> getMockedMessageConverterContextFactory() {
+    private MessageConverterContextFactory<UniParcEntryPair>
+            getMockedMessageConverterContextFactory() {
         MessageConverterContext<UniParcEntryPair> context =
                 MessageConverterContext.<UniParcEntryPair>builder()
                         .entities(Stream.of(UniParcEntryPair.builder().build()))
@@ -173,28 +177,28 @@ class UniParcIdMappingDownloadResultWriterTest {
 
         MessageConverterContextFactory<UniParcEntryPair> converterContextFactory =
                 Mockito.mock(MessageConverterContextFactory.class);
-        Mockito.when(converterContextFactory.get(Mockito.any(), Mockito.eq(MediaType.APPLICATION_JSON)))
+        Mockito.when(
+                        converterContextFactory.get(
+                                Mockito.any(), Mockito.eq(MediaType.APPLICATION_JSON)))
                 .thenReturn(context);
         return converterContextFactory;
     }
 
-    private RequestMappingHandlerAdapter getMockedRequestMappingHandlerAdapter(ObjectMapper mapper) {
+    private RequestMappingHandlerAdapter getMockedRequestMappingHandlerAdapter(
+            ObjectMapper mapper) {
         RequestMappingHandlerAdapter contentAdaptor =
                 Mockito.mock(RequestMappingHandlerAdapter.class);
         ReturnFieldConfig returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPARC);
         JsonMessageConverter<UniParcEntryPair> jsonMessageConverter =
-                new JsonMessageConverter<>(
-                        mapper,
-                        UniParcEntryPair.class,
-                        returnFieldConfig,
-                        null);
+                new JsonMessageConverter<>(mapper, UniParcEntryPair.class, returnFieldConfig, null);
         Mockito.when(contentAdaptor.getMessageConverters())
                 .thenReturn(List.of(jsonMessageConverter));
         return contentAdaptor;
     }
 
-    private StoreStreamerConfig<UniParcEntry> getMockedStoreStreamConfig(VoldemortInMemoryUniParcEntryStore voldemortClient) {
+    private StoreStreamerConfig<UniParcEntry> getMockedStoreStreamConfig(
+            VoldemortInMemoryUniParcEntryStore voldemortClient) {
         StreamerConfigProperties configProperties = new StreamerConfigProperties();
         configProperties.setStoreBatchSize(5);
 
@@ -202,14 +206,11 @@ class UniParcIdMappingDownloadResultWriterTest {
 
         StoreStreamerConfig<UniParcEntry> storeStreamConfig =
                 (StoreStreamerConfig<UniParcEntry>) Mockito.mock(StoreStreamerConfig.class);
-        Mockito.when(storeStreamConfig.getStreamConfig())
-                .thenReturn(configProperties);
-        Mockito.when(storeStreamConfig.getStoreFetchRetryPolicy())
-                .thenReturn(storeRetryPolicy);
+        Mockito.when(storeStreamConfig.getStreamConfig()).thenReturn(configProperties);
+        Mockito.when(storeStreamConfig.getStoreFetchRetryPolicy()).thenReturn(storeRetryPolicy);
         Mockito.when(storeStreamConfig.getStoreClient())
                 .thenReturn(new UniProtStoreClient<>(voldemortClient));
 
         return storeStreamConfig;
     }
-
 }

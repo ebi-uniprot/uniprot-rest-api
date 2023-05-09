@@ -1,8 +1,8 @@
 package org.uniprot.api.support.data.statistics.model;
 
-import lombok.Value;
-
 import java.util.Collection;
+
+import lombok.Value;
 
 @Value
 public class StatisticsModuleStatisticsResult<T> {

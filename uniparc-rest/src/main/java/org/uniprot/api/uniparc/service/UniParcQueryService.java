@@ -1,5 +1,12 @@
 package org.uniprot.api.uniparc.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -30,13 +37,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniparc.UniParcDocument;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author jluo

@@ -69,8 +69,8 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve an UniRef cluster by id.",
@@ -98,7 +98,8 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
             HttpServletResponse response) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
-            String rdf = entryService.getRdf(idRequest.getId(), DATA_TYPE, acceptedRdfContentType.get());
+            String rdf =
+                    entryService.getRdf(idRequest.getId(), DATA_TYPE, acceptedRdfContentType.get());
             return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntry entryResult = entryService.getEntity(idRequest.getId());

@@ -1,18 +1,15 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.uniprot.api.rest.output.UniProtMediaType;
 
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
-
-import java.util.Objects;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

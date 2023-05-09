@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.repository.store;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -10,17 +12,11 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamerConfigProperties;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 class UniRefRdfStreamerConfigTest {
-    @Mock
-    private PrologProvider prologProvider;
-    @Mock
-    private TagPositionProvider tagPositionProvider;
-    @Mock
-    private RestTemplate restTemplate;
-    @Mock
-    private RdfServiceFactory rdfServiceFactory;
+    @Mock private PrologProvider prologProvider;
+    @Mock private TagPositionProvider tagPositionProvider;
+    @Mock private RestTemplate restTemplate;
+    @Mock private RdfServiceFactory rdfServiceFactory;
     private RdfStreamerConfigProperties properties;
     private UniRefRdfStreamerConfig unirefRdfStreamerConfig;
 
@@ -36,13 +32,15 @@ class UniRefRdfStreamerConfigTest {
 
     @Test
     void unirefRdfStreamer() {
-        RdfStreamer rdfStreamer = unirefRdfStreamerConfig.unirefRdfStreamer(properties, rdfServiceFactory);
+        RdfStreamer rdfStreamer =
+                unirefRdfStreamerConfig.unirefRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
     }
 
     @Test
     void unirefRdfServiceFactory() {
-        RdfServiceFactory rdfServiceFactory = unirefRdfStreamerConfig.unirefRdfServiceFactory(restTemplate);
+        RdfServiceFactory rdfServiceFactory =
+                unirefRdfStreamerConfig.unirefRdfServiceFactory(restTemplate);
         assertNotNull(rdfServiceFactory);
     }
 

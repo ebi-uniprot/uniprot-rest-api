@@ -130,8 +130,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve an UniParc entry by upi.",
@@ -159,7 +159,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         if (acceptedRdfContentType.isPresent()) {
             String result =
                     queryService.getRdf(
-                            getByUniParcIdRequest.getUpi(), DATA_TYPE, acceptedRdfContentType.get());
+                            getByUniParcIdRequest.getUpi(),
+                            DATA_TYPE,
+                            acceptedRdfContentType.get());
             return super.getEntityResponseRdf(result, contentType, request);
         }
 
@@ -177,8 +179,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                    TURTLE_MEDIA_TYPE_VALUE,
-                    N_TRIPLES_MEDIA_TYPE_VALUE
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Stream a UniParc sequence entry (or entries) by a SOLR query.",
@@ -217,7 +219,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
             return super.streamRdf(
-                    () -> queryService.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
+                    () ->
+                            queryService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

@@ -1,5 +1,11 @@
 package org.uniprot.api.uniref.service;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -28,12 +34,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
-
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author jluo
@@ -152,7 +152,8 @@ public class UniRefEntryLightService
                 .getFieldName();
     }
 
-    public Stream<String> streamRdf(UniRefStreamRequest streamRequest, String dataType, String format) {
+    public Stream<String> streamRdf(
+            UniRefStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
         List<String> entryIds = documentIdStream.fetchIds(solrRequest).collect(Collectors.toList());
@@ -208,7 +209,7 @@ public class UniRefEntryLightService
      * This method remove MemberIdType from member list and return just memberId
      *
      * @param members List of members that are stored in Voldemort with format:
-     *                "memberId,MemberIdType"
+     *     "memberId,MemberIdType"
      * @return List of return clean member with the format "memberId"
      */
     private List<String> removeMemberTypeFromMemberId(List<String> members) {

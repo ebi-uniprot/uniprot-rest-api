@@ -1,6 +1,21 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,21 +61,7 @@ import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /** @author lgonzales */
 @ContextConfiguration(
@@ -110,7 +111,11 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 Arguments.of(
                         getFileExtension(TURTLE_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"),
                 Arguments.of(
-                        getFileExtension(N_TRIPLES_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"));
+                        getFileExtension(N_TRIPLES_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "P00000"));
     }
 
     @Override
@@ -785,7 +790,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
-                                                    .string(startsWith(NTriplesPrologs.N_TRIPLES_COMMON_PROLOG)))
+                                                    .string(
+                                                            startsWith(
+                                                                    NTriplesPrologs
+                                                                            .N_TRIPLES_COMMON_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(
