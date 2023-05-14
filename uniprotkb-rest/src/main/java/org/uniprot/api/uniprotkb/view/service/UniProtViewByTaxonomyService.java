@@ -1,19 +1,18 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.uniprot.api.uniprotkb.view.TaxonomyNode;
+import org.uniprot.api.uniprotkb.view.ViewBy;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.uniprot.api.uniprotkb.view.TaxonomyNode;
-import org.uniprot.api.uniprotkb.view.ViewBy;
 
 public class UniProtViewByTaxonomyService implements UniProtViewByService {
     private final SolrClient solrClient;
@@ -30,65 +29,85 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
 
     @Override
     public List<ViewBy> get(String queryStr, String parent) {
-        String validTaxId = parent;
-        if ((validTaxId == null) || validTaxId.isEmpty()) {
-            validTaxId = "1";
-        }
-        List<TaxonomyNode> nodes = getChildren(validTaxId);
-        if (nodes.isEmpty()) {
-            return Collections.emptyList();
-        }
+        List<FacetField.Count> facetCounts = Collections.emptyList();
+        List<TaxonomyNode> taxonomyNodes = Collections.emptyList();
+        String taxonomyId = StringUtils.isNotEmpty(parent) ? parent : "1";
 
-        Map<Long, TaxonomyNode> taxIdMap =
-                nodes.stream()
-                        .collect(
-                                Collectors.toMap(TaxonomyNode::getTaxonomyId, Function.identity()));
+        do {
+            List<TaxonomyNode> childTaxonomyNodes = getChildren(taxonomyId);
+            List<FacetField.Count> childFacetCounts = getFacetCounts(queryStr, childTaxonomyNodes);
 
-        String facetIterms =
-                nodes.stream()
-                        .map(val -> "" + val.getTaxonomyId())
-                        .collect(Collectors.joining(","));
-        SolrQuery query = new SolrQuery(queryStr);
-        String facetField = "{!terms='" + facetIterms + "'}taxonomy_id";
-        query.setFacet(true);
-        query.addFacetField(facetField);
-
-        try {
-            QueryResponse response = solrClient.query(uniprotCollection, query);
-            List<FacetField> fflist = response.getFacetFields();
-            if (fflist.isEmpty()) {
-                return Collections.emptyList();
+            if (!childFacetCounts.isEmpty()) {
+                facetCounts = childFacetCounts;
+                taxonomyNodes = childTaxonomyNodes;
+                taxonomyId = facetCounts.get(0).getName();
             } else {
-                FacetField ff = fflist.get(0);
-                List<FacetField.Count> counts = ff.getValues();
-                return counts.stream()
-                        .map(val -> convert(val, taxIdMap))
-                        .filter(val -> val != null)
-                        .sorted(ViewBy.SORT_BY_LABEL)
-                        .collect(Collectors.toList());
+                break;
             }
-        } catch (SolrServerException | IOException e) {
-            throw new UniProtViewByServiceException(e);
-        }
+
+        } while (facetCounts.size() == 1 && StringUtils.isEmpty(parent));
+
+        return createViewBys(facetCounts, taxonomyNodes, queryStr);
     }
 
-    private ViewBy convert(FacetField.Count count, Map<Long, TaxonomyNode> taxIdMap) {
-        if (count.getCount() == 0) return null;
-        ViewBy viewBy = new ViewBy();
+    private List<ViewBy> createViewBys(List<FacetField.Count> facetCounts, List<TaxonomyNode> taxonomyNodes, String queryStr) {
+        List<ViewBy> viewBys = Collections.emptyList();
 
+        if (!facetCounts.isEmpty()) {
+            Map<Long, TaxonomyNode> taxIdMap = taxonomyNodes.stream().collect(Collectors.toMap(TaxonomyNode::getTaxonomyId, Function.identity()));
+            viewBys = facetCounts.stream()
+                    .map(fc -> createViewBy(fc, taxIdMap.get(Long.parseLong(fc.getName())), queryStr))
+                    .sorted(ViewBy.SORT_BY_LABEL)
+                    .collect(Collectors.toList());
+        }
+
+        return viewBys;
+    }
+
+    private ViewBy createViewBy(FacetField.Count count, TaxonomyNode taxonomyNode, String queryStr) {
+        ViewBy viewBy = new ViewBy();
         viewBy.setId(count.getName());
         viewBy.setCount(count.getCount());
-        TaxonomyNode node = taxIdMap.get(Long.parseLong(count.getName()));
         viewBy.setLink(URL_PREFIX + count.getName());
-        if (node != null) {
-            viewBy.setLabel(node.getFullName());
-            viewBy.setExpand(hasChildren(node));
-        }
+        viewBy.setLabel(taxonomyNode.getFullName());
+        viewBy.setExpand(hasChildren(count, queryStr));
         return viewBy;
     }
 
-    private boolean hasChildren(TaxonomyNode node) {
-        return (node.getChildrenLinks() != null) && !node.getChildrenLinks().isEmpty();
+    private boolean hasChildren(FacetField.Count count, String queryStr) {
+        return !getFacetCounts(queryStr, getChildren(count.getName())).isEmpty();
+    }
+
+    private List<FacetField.Count> getFacetCounts(String queryStr, List<TaxonomyNode> taxonomyNodes) {
+        List<FacetField.Count> result = Collections.emptyList();
+
+        if (!taxonomyNodes.isEmpty()) {
+            List<FacetField> facetFields = getFacetFields(queryStr, taxonomyNodes);
+
+            if (!facetFields.isEmpty()) {
+                return facetFields.get(0).getValues().stream()
+                        .filter(count -> count.getCount() > 0).collect(Collectors.toList());
+            }
+        }
+
+        return result;
+    }
+
+    private List<FacetField> getFacetFields(String queryStr, List<TaxonomyNode> taxonomyNodes) {
+        try {
+            String facetItems = taxonomyNodes.stream()
+                    .map(val -> "" + val.getTaxonomyId())
+                    .collect(Collectors.joining(","));
+            SolrQuery query = new SolrQuery(queryStr);
+            String facetField = "{!terms='" + facetItems + "'}taxonomy_id";
+            query.setFacet(true);
+            query.addFacetField(facetField);
+
+            QueryResponse response = solrClient.query(uniprotCollection, query);
+            return response.getFacetFields();
+        } catch (Exception e) {
+            throw new UniProtViewByServiceException(e);
+        }
     }
 
     public List<TaxonomyNode> getChildren(String taxId) {
