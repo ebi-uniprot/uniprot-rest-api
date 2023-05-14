@@ -169,7 +169,7 @@ class UniProtViewByTaxonomyServiceTest {
     }
 
     @Test
-    void get_whenParentSpecifiedAndNoRootNodes() throws Exception {
+    void get_whenParentSpecifiedAndNoRootNodes() {
         when(taxonService.getChildren(TAX_ID_A_STRING)).thenReturn(Collections.emptyList());
 
         List<ViewBy> viewBys = service.get(SOME_QUERY, TAX_ID_A_STRING);
