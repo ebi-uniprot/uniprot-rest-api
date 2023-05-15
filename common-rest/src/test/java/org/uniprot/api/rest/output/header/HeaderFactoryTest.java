@@ -51,9 +51,9 @@ class HeaderFactoryTest {
         assertEquals("application/json", result.getFirst("Content-Type"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
-                result.getFirst("Content-Disposition")
-                        .startsWith(
-                                "form-data; name=\"attachment\"; filename=\"uniprot-gene_CDC7-"));
+          result.getFirst("Content-Disposition")
+            .startsWith(
+              "form-data; name=\"attachment\"; filename=\"_gene_CDC7_"));
     }
 
     @Test
@@ -70,8 +70,8 @@ class HeaderFactoryTest {
         assertEquals("application/json", result.getFirst("Content-Type"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
-                result.getFirst("Content-Disposition")
-                        .startsWith("form-data; name=\"attachment\"; filename=\"uniprot-_-"));
+          result.getFirst("Content-Disposition")
+            .startsWith("form-data; name=\"attachment\"; filename=\"_all_"));
     }
 
     @Test
@@ -82,16 +82,16 @@ class HeaderFactoryTest {
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getQueryString())
-                .thenReturn("gene:INeedHereAVeryBigQuery OR gene:itAlsoNeedToBeBiggerThan60");
+          .thenReturn("gene:INeedHereAVeryBigQuery OR gene:itAlsoNeedToBeBiggerThan60");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
-                result.getFirst("Content-Disposition")
-                        .startsWith(
-                                "form-data; name=\"attachment\"; filename=\"uniprot-gene_INeedHereAVeryBigQuery_OR_gene_itAlsoNeedToBeBiggerThan-"));
+          result.getFirst("Content-Disposition")
+            .startsWith(
+              "form-data; name=\"attachment\"; filename=\"_gene_INeedHereAVeryBigQuery_OR_"));
     }
 
     @Test
@@ -108,7 +108,7 @@ class HeaderFactoryTest {
         assertEquals("application/json", result.getFirst("Content-Type"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
-                result.getFirst("Content-Disposition")
-                        .startsWith("form-data; name=\"attachment\"; filename=\"uniprot-20"));
+          result.getFirst("Content-Disposition")
+            .startsWith("form-data; name=\"attachment\"; filename=\"_20"));
     }
 }
