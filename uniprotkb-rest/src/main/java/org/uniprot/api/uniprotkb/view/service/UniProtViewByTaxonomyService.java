@@ -31,7 +31,7 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
     public List<ViewBy> get(String queryStr, String parent) {
         List<FacetField.Count> facetCounts = Collections.emptyList();
         List<TaxonomyNode> taxonomyNodes = Collections.emptyList();
-        String taxonomyId = StringUtils.isNotEmpty(parent) ? parent : "1";
+        String taxonomyId = isOpenParentSearch(parent) ? "1" : parent;
 
         do {
             List<TaxonomyNode> childTaxonomyNodes = getChildren(taxonomyId);
@@ -45,9 +45,13 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
                 break;
             }
 
-        } while (facetCounts.size() == 1 && StringUtils.isEmpty(parent));
+        } while (facetCounts.size() == 1 && isOpenParentSearch(parent));
 
         return createViewBys(facetCounts, taxonomyNodes, queryStr);
+    }
+
+    private static boolean isOpenParentSearch(String parent) {
+        return StringUtils.isEmpty(parent);
     }
 
     private List<ViewBy> createViewBys(List<FacetField.Count> facetCounts, List<TaxonomyNode> taxonomyNodes, String queryStr) {
