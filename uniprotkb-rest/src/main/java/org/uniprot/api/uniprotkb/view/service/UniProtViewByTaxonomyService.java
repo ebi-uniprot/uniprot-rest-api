@@ -16,14 +16,14 @@ import java.util.stream.Collectors;
 
 public class UniProtViewByTaxonomyService implements UniProtViewByService {
     private final SolrClient solrClient;
-    private final String uniprotCollection;
+    private final String uniProtCollection;
     private final TaxonomyService taxonomyService;
     public static final String URL_PREFIX = "https://www.uniprot.org/taxonomy/";
 
     public UniProtViewByTaxonomyService(
-            SolrClient solrClient, String uniprotCollection, TaxonomyService taxonomyService) {
+            SolrClient solrClient, String uniProtCollection, TaxonomyService taxonomyService) {
         this.solrClient = solrClient;
-        this.uniprotCollection = uniprotCollection;
+        this.uniProtCollection = uniProtCollection;
         this.taxonomyService = taxonomyService;
     }
 
@@ -96,14 +96,14 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
     private List<FacetField> getFacetFields(String queryStr, List<TaxonomyNode> taxonomyNodes) {
         try {
             String facetItems = taxonomyNodes.stream()
-                    .map(val -> "" + val.getTaxonomyId())
+                    .map(val -> String.valueOf(val.getTaxonomyId()))
                     .collect(Collectors.joining(","));
             SolrQuery query = new SolrQuery(queryStr);
             String facetField = "{!terms='" + facetItems + "'}taxonomy_id";
             query.setFacet(true);
             query.addFacetField(facetField);
 
-            QueryResponse response = solrClient.query(uniprotCollection, query);
+            QueryResponse response = solrClient.query(uniProtCollection, query);
             return response.getFacetFields();
         } catch (Exception e) {
             throw new UniProtViewByServiceException(e);
@@ -112,11 +112,5 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
 
     public List<TaxonomyNode> getChildren(String taxId) {
         return taxonomyService.getChildren(taxId);
-        //		String url = TAXONOMY_API_PREFIX + taxId +"/children";
-        //		Taxonomies taxonomies =restTemplate.getForObject(url, Taxonomies.class);
-        //		if(taxonomies ==null) {
-        //			return Collections.emptyList();
-        //		}else
-        //			return taxonomies.getTaxonomies();
     }
 }
