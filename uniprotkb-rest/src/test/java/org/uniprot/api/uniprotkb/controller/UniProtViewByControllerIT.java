@@ -1,15 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +13,16 @@ import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.service.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtViewByController.class)
 @ContextConfiguration(classes = {AsyncDownloadMocks.class})
@@ -35,8 +35,6 @@ class UniProtViewByControllerIT {
     @MockBean private UniProtViewByGoService goService;
 
     @MockBean private UniProtViewByKeywordService kwService;
-
-    @MockBean private UniProtViewByPathwayService pwService;
 
     @MockBean private UniProtViewByTaxonomyService taxonService;
 
@@ -110,35 +108,6 @@ class UniProtViewByControllerIT {
                         true));
 
         when(kwService.get(anyString(), anyString())).thenReturn(viewBys);
-    }
-
-    @Test
-    void testGetPathway() throws Exception {
-        mockPathwayService();
-        String query = "organism_id:9606";
-        String parent = "3";
-
-        mockMvc.perform(
-                        get("/uniprotkb/view/pathway")
-                                .param("query", query)
-                                .param("parent", parent))
-                .andDo(log())
-                .andExpect(jsonPath("$[0].id", is("289")))
-                .andExpect(jsonPath("$[0].label", is("Amine and polyamine biosynthesis")))
-                .andExpect(jsonPath("$[1].id", is("456")))
-                .andExpect(jsonPath("$[1].label", is("Amine and polyamine degradation")));
-    }
-
-    private void mockPathwayService() {
-        List<ViewBy> viewBys = new ArrayList<>();
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "289", "Amine and polyamine biosynthesis", 36L, null, false));
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "456", "Amine and polyamine degradation", 1L, null, false));
-
-        when(pwService.get(anyString(), anyString())).thenReturn(viewBys);
     }
 
     @Test

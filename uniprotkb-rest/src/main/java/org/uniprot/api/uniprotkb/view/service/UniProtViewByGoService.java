@@ -1,103 +1,79 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.uniprot.api.uniprotkb.view.GoRelation;
 import org.uniprot.api.uniprotkb.view.GoTerm;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 
-import com.google.common.base.Strings;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class UniProtViewByGoService implements UniProtViewByService {
-    private final SolrClient solrClient;
-    private final String uniprotCollection;
-    private final GoService goService;
+public class UniProtViewByGoService extends UniProtViewByService<GoRelation> {
     public static final String URL_PREFIX = "https://www.ebi.ac.uk/QuickGO/term/";
     private static final String GO_PREFIX = "GO:";
+    private final GoService goService;
 
-    public UniProtViewByGoService(
-            SolrClient solrClient, String uniprotCollection, GoService goService) {
-        this.solrClient = solrClient;
-        this.uniprotCollection = uniprotCollection;
+    public UniProtViewByGoService(SolrClient solrClient, String uniprotCollection, GoService goService) {
+        super(solrClient, uniprotCollection);
         this.goService = goService;
     }
 
     @Override
-    public List<ViewBy> get(String queryStr, String parent) {
-        String parentGo = addGoPrefix(parent);
-        Optional<GoTerm> goTerm = goService.getChildren(parentGo);
-        if (!goTerm.isPresent()) {
-            return Collections.emptyList();
-        }
-        List<GoRelation> children = goTerm.get().getChildren();
-        if (children.isEmpty()) return Collections.emptyList();
-        Map<String, GoRelation> gorelationMap =
-                children.stream().collect(Collectors.toMap(GoRelation::getId, Function.identity()));
-
-        String facetIterms =
-                children.stream()
-                        .map(GoRelation::getId)
-                        .map(this::removeGoPrefix)
-                        .collect(Collectors.joining(","));
-        SolrQuery query = new SolrQuery(queryStr);
-        String facetField = "{!terms='" + facetIterms + "'}go_id";
-        query.setFacet(true);
-        query.addFacetField(facetField);
-
-        try {
-            QueryResponse response = solrClient.query(uniprotCollection, query);
-            List<FacetField> fflist = response.getFacetFields();
-            if (fflist.isEmpty()) {
-                return Collections.emptyList();
-            } else {
-                FacetField ff = fflist.get(0);
-                List<FacetField.Count> counts = ff.getValues();
-                return counts.stream()
-                        .map(val -> convert(val, gorelationMap))
-                        .filter(val -> val != null)
-                        .sorted(ViewBy.SORT_BY_LABEL)
-                        .collect(Collectors.toList());
-            }
-        } catch (SolrServerException | IOException e) {
-            throw new UniProtViewByServiceException(e);
-        }
+    List<ViewBy> createViewBys(List<FacetField.Count> facetCounts, List<GoRelation> entries, String queryStr) {
+        Map<String, GoRelation> goRelationMap = entries.stream()
+                .collect(Collectors.toMap(GoRelation::getId, Function.identity()));
+        return facetCounts.stream()
+                .map(fc -> createViewBy(fc, goRelationMap.get(fc.getName())))
+                .sorted(ViewBy.SORT_BY_LABEL)
+                .collect(Collectors.toList());
     }
 
-    private String removeGoPrefix(String go) {
-        if ((go != null) && go.startsWith(GO_PREFIX)) {
-            return go.substring(GO_PREFIX.length());
-        } else return go;
-    }
-
-    private String addGoPrefix(String go) {
-        if (!Strings.isNullOrEmpty(go) && !go.startsWith(GO_PREFIX)) {
-            return GO_PREFIX + go;
-        } else return go;
-    }
-
-    private ViewBy convert(FacetField.Count count, Map<String, GoRelation> gorelationMap) {
-        if (count.getCount() == 0) return null;
+    private ViewBy createViewBy(FacetField.Count count, GoRelation goRelation) {
         ViewBy viewBy = new ViewBy();
         String goId = addGoPrefix(count.getName());
         viewBy.setId(goId);
         viewBy.setCount(count.getCount());
-        GoRelation goRelation = gorelationMap.get(goId);
         viewBy.setLink(URL_PREFIX + goId);
-        if (goRelation != null) {
-            viewBy.setLabel(goRelation.getName());
-            viewBy.setExpand(goRelation.isHasChildren());
-        }
+        viewBy.setLabel(goRelation.getName());
+        viewBy.setExpand(goRelation.isHasChildren());
         return viewBy;
+    }
+
+    private String addGoPrefix(String go) {
+        if (!isOpenParentSearch(go) && !go.startsWith(GO_PREFIX)) {
+            return GO_PREFIX + go;
+        }
+        return go;
+    }
+
+    @Override
+    SolrQuery getSolrQuery(String queryStr, List<GoRelation> entries) {
+        SolrQuery query = new SolrQuery(queryStr);
+        String facetItems = entries.stream()
+                .map(GoRelation::getId)
+                .map(this::removeGoPrefix)
+                .collect(Collectors.joining(","));
+        String facetField = "{!terms='" + facetItems + "'}go_id";
+        query.setFacet(true);
+        query.addFacetField(facetField);
+        return query;
+    }
+
+    private String removeGoPrefix(String go) {
+        if (go != null && go.startsWith(GO_PREFIX)) {
+            return go.substring(GO_PREFIX.length());
+        }
+        return go;
+    }
+
+    @Override
+    List<GoRelation> getChildren(String parent) {
+        String parentGo = addGoPrefix(parent);
+        return goService.getChildren(parentGo).map(GoTerm::getChildren).orElse(Collections.emptyList());
     }
 }

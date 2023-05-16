@@ -1,70 +1,48 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.ec.ECEntry;
 import org.uniprot.cv.ec.ECRepo;
 
-import com.google.common.base.Strings;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 // @Service
-public class UniProtViewByECService implements UniProtViewByService {
-    private final SolrClient solrClient;
-    private final String uniprotCollection;
-    private final ECRepo ecRepo;
+public class UniProtViewByECService extends UniProtViewByService<String> {
     public static final String URL_PREFIX = "https://enzyme.expasy.org/EC/";
+    private final ECRepo ecRepo;
 
-    public UniProtViewByECService(SolrClient solrClient, String uniprotCollection, ECRepo ecRepo) {
-        this.solrClient = solrClient;
-        this.uniprotCollection = uniprotCollection;
+    public UniProtViewByECService(SolrClient solrClient, String uniProtCollection, ECRepo ecRepo) {
+        super(solrClient, uniProtCollection);
         this.ecRepo = ecRepo;
     }
 
-    public List<ViewBy> get(String queryStr, String parent) {
-        SolrQuery query = new SolrQuery(queryStr);
-        StringBuilder regEx = new StringBuilder();
-        String regExPostfix = "[0-9]+";
-        String parentEc = parent;
-        if (!Strings.isNullOrEmpty(parent)) {
-            parentEc = ecRemoveDash(parentEc);
-            String[] tokens = parentEc.split("\\.");
-            for (String token : tokens) {
-                regEx.append(token).append("\\.");
-            }
-        }
-        regEx.append(regExPostfix);
-        query.setFacet(true);
-        query.add(FacetParams.FACET_FIELD, "ec");
-        query.add(FacetParams.FACET_MATCHES, regEx.toString());
-        query.add(FacetParams.FACET_MINCOUNT, "1");
-        try {
-            QueryResponse response = solrClient.query(uniprotCollection, query);
-            List<FacetField> fflist = response.getFacetFields();
-            if (fflist.isEmpty()) {
-                return Collections.emptyList();
-            } else {
-                FacetField ff = fflist.get(0);
-                List<FacetField.Count> counts = ff.getValues();
-                return counts.stream()
-                        // .filter(val -> val.getCount()>0)
-                        .map(this::convert)
-                        .sorted(ViewBy.SORT_BY_ID)
-                        .collect(Collectors.toList());
-            }
-        } catch (SolrServerException | IOException e) {
-            throw new UniProtViewByServiceException(e);
-        }
+    @Override
+    List<ViewBy> createViewBys(List<FacetField.Count> facetCounts, List<String> entries, String queryStr) {
+        return facetCounts.stream()
+                .map(this::createViewBy)
+                .sorted(ViewBy.SORT_BY_ID)
+                .collect(Collectors.toList());
+    }
+
+    private ViewBy createViewBy(FacetField.Count count) {
+        ViewBy viewBy = new ViewBy();
+        String ecId = count.getName();
+        String fullEc = ecAddDashIfAbsent(ecId);
+        viewBy.setExpand(fullEc.contains(".-"));
+        viewBy.setId(fullEc);
+        Optional<ECEntry> ecOpt = ecRepo.getEC(fullEc);
+        ecOpt.ifPresent(ec -> viewBy.setLabel(ec.getLabel()));
+        viewBy.setLink(URL_PREFIX + fullEc);
+        viewBy.setCount(count.getCount());
+        return viewBy;
     }
 
     private String ecAddDashIfAbsent(String ec) {
@@ -80,29 +58,34 @@ public class UniProtViewByECService implements UniProtViewByService {
         }
     }
 
+    @Override
+    SolrQuery getSolrQuery(String queryStr, List<String> entries) {
+        SolrQuery query = new SolrQuery(queryStr);
+        String regEx = entries.stream().map(token -> token + "\\.").collect(Collectors.joining("", "", "[0-9]+"));
+        query.add(FacetParams.FACET_MATCHES, regEx);
+        query.add(FacetParams.FACET_FIELD, "ec");
+        query.add(FacetParams.FACET_MINCOUNT, "1");
+        query.setFacet(true);
+        return query;
+    }
+
+    @Override
+    List<String> getChildren(String parent) {
+        List<String> children = new LinkedList<>();
+        String parentEc = parent;
+        if (!isOpenParentSearch(parentEc)) {
+            parentEc = ecRemoveDash(parentEc);
+            String[] tokens = parentEc.split("\\.");
+            children.addAll(Arrays.asList(tokens));
+        }
+        return children;
+    }
+
     private String ecRemoveDash(String ec) {
         String temp = ec;
         while (temp.endsWith(".-")) {
             temp = temp.substring(0, temp.length() - 2);
         }
         return temp;
-    }
-
-    private ViewBy convert(FacetField.Count count) {
-        ViewBy viewBy = new ViewBy();
-        String ecId = count.getName();
-        String fullEc = ecAddDashIfAbsent(ecId);
-        if (fullEc.contains(".-")) {
-            viewBy.setExpand(true);
-        } else {
-            viewBy.setExpand(false);
-        }
-        Optional<ECEntry> ecOpt = ecRepo.getEC(fullEc);
-        viewBy.setId(fullEc);
-        ecOpt.ifPresent(ec -> viewBy.setLabel(ec.getLabel()));
-
-        viewBy.setLink(URL_PREFIX + fullEc);
-        viewBy.setCount(count.getCount());
-        return viewBy;
     }
 }

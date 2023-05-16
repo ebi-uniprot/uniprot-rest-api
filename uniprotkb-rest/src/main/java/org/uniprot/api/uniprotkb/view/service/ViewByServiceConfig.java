@@ -61,15 +61,6 @@ public class ViewByServiceConfig {
     }
 
     @Bean
-    public UniProtViewByPathwayService uniprotViewByPathwayService(
-            SolrClient solrClient,
-            ViewByConfigProperties configProperties,
-            UniPathwayRepo unipathwayRepo) {
-        return new UniProtViewByPathwayService(
-                solrClient, configProperties.getUniprotCollection(), unipathwayRepo);
-    }
-
-    @Bean
     public UniProtViewByGoService uniprotViewByGoService(
             SolrClient solrClient, ViewByConfigProperties configProperties, GoService goService) {
         return new UniProtViewByGoService(
