@@ -231,7 +231,7 @@ class UniParcStreamControllerIT extends AbstractStreamControllerIT {
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\"uniparc_")))
                 .andExpect(jsonPath("$.results.size()", is(10)));
     }
 

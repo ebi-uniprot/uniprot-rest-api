@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.createSolrDoc;
 import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.getTaxonomyBinary;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
@@ -104,6 +106,13 @@ class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
     @Override
     protected String getStreamPath() {
         return "/taxonomy/stream";
+    }
+
+    @Override
+    public String getContentDisposition() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+        return "taxonomy_" + now.format(dateTimeFormatter);
     }
 
     @Test

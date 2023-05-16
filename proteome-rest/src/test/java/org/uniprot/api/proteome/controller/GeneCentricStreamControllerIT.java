@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.proteome.controller.GeneCentricControllerITUtils.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
@@ -70,6 +72,13 @@ class GeneCentricStreamControllerIT extends AbstractSolrStreamControllerIT {
     @Override
     protected String getStreamPath() {
         return "/genecentric/stream";
+    }
+
+    @Override
+    public String getContentDisposition() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+        return "genecentric_" + now.format(dateTimeFormatter);
     }
 
     @Override

@@ -174,7 +174,8 @@ public abstract class AbstractSolrStreamControllerIT {
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\""
+                                                        + getContentDisposition())))
                 .andExpect(header().string("Content-Disposition", not(endsWith(".gz"))))
                 .andExpect(jsonPath("$.results.size()", is(totalSavedEntries)));
     }
@@ -200,7 +201,8 @@ public abstract class AbstractSolrStreamControllerIT {
                                 header().string(
                                                 "Content-Disposition",
                                                 startsWith(
-                                                        "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                        "form-data; name=\"attachment\"; filename=\""
+                                                                + getContentDisposition())))
                         .andExpect(header().string("Content-Disposition", endsWith(".gz\"")))
                         .andReturn()
                         .getResponse()
@@ -219,4 +221,6 @@ public abstract class AbstractSolrStreamControllerIT {
             Assertions.fail(io);
         }
     }
+
+    public abstract String getContentDisposition();
 }
