@@ -265,13 +265,17 @@ public class SubcellularLocationGetIdControllerIT
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().contentType(UniProtMediaType.TURTLE_MEDIA_TYPE))
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.TURTLE_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
                                     .build())
                     .build();
         }

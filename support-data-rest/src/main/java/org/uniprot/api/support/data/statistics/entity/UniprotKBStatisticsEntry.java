@@ -1,15 +1,14 @@
 package org.uniprot.api.support.data.statistics.entity;
 
-import lombok.Data;
-
 import javax.persistence.*;
+
+import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "uniprotkb_statistics_entry")
 public class UniprotKBStatisticsEntry {
-    @Id
-    private Long id;
+    @Id private Long id;
     private String attributeName;
 
     @ManyToOne

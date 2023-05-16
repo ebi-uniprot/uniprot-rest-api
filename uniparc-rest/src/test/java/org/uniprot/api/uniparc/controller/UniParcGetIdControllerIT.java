@@ -170,10 +170,7 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
-                                                    .string(
-                                                            startsWith(
-                                                                    RdfPrologs.UNIPARC_PROLOG)))
+                                            content().string(startsWith(RdfPrologs.UNIPARC_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -205,7 +202,10 @@ public class UniParcGetIdControllerIT extends AbstractGetSingleUniParcByIdTest {
                                     .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
-                                                    .string(startsWith(NTriplesPrologs.N_TRIPLES_COMMON_PROLOG)))
+                                                    .string(
+                                                            startsWith(
+                                                                    NTriplesPrologs
+                                                                            .N_TRIPLES_COMMON_PROLOG)))
                                     .resultMatcher(
                                             content()
                                                     .string(

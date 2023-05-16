@@ -1,10 +1,10 @@
 package org.uniprot.api.support.data.common;
 
+import java.util.function.Function;
+
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.literature.LiteratureDocument;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-
-import java.util.function.Function;
 
 /**
  * @author sahmad

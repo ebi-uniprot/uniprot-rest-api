@@ -208,7 +208,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         } else {
             Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
             if (acceptedRdfContentType.isPresent()) {
-                String rdf = entryService.getRdf(accessionOrId, DATA_TYPE, acceptedRdfContentType.get());
+                String rdf =
+                        entryService.getRdf(accessionOrId, DATA_TYPE, acceptedRdfContentType.get());
                 return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
             } else {
                 UniProtKBEntry entry = entryService.findByUniqueId(accessionOrId, fields);
@@ -278,7 +279,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
             return super.streamRdf(
-                    () -> entryService.streamRdf(streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
+                    () ->
+                            entryService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.statistics.mapper;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.support.data.statistics.StatisticsAttributeConfig;
 import org.uniprot.api.support.data.statistics.entity.EntryType;
@@ -7,8 +9,6 @@ import org.uniprot.api.support.data.statistics.entity.UniprotKBStatisticsEntry;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttribute;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsAttributeImpl;
 import org.uniprot.api.support.data.statistics.model.StatisticsModuleStatisticsType;
-
-import java.util.Optional;
 
 @Component
 public class StatisticsMapper {
