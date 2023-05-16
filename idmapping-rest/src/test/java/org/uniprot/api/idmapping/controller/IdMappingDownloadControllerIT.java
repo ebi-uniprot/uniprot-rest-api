@@ -195,15 +195,20 @@ public class IdMappingDownloadControllerIT {
         UriBuilder uriBuilder = Mockito.mock(UriBuilder.class);
         when(handler.builder()).thenReturn(uriBuilder);
 
-        URI uniprotkURI = Mockito.mock(URI.class);
-        when(uriBuilder.build(eq("uniprotkb"), eq("rdf"), any())).thenReturn(uniprotkURI);
-        when(idMappingRdfRestTemplate.getForObject(eq(uniprotkURI), any()))
+        URI rdfServiceURI = Mockito.mock(URI.class);
+        when(uriBuilder.build(any(), eq("rdf"), any())).thenReturn(rdfServiceURI);
+        when(idMappingRdfRestTemplate.getForObject(eq(rdfServiceURI), any()))
                 .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_RDF);
 
-        URI uniparcURI = Mockito.mock(URI.class);
-        when(uriBuilder.build(eq("uniparc"), eq("rdf"), any())).thenReturn(uniparcURI);
-        when(idMappingRdfRestTemplate.getForObject(eq(uniparcURI), any()))
-                .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_RDF);
+        URI ntServiceURI = Mockito.mock(URI.class);
+        when(uriBuilder.build(any(), eq("nt"), any())).thenReturn(ntServiceURI);
+        when(idMappingRdfRestTemplate.getForObject(eq(ntServiceURI), any()))
+                .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_N_TRIPLES);
+
+        URI ttlServiceURI = Mockito.mock(URI.class);
+        when(uriBuilder.build(any(), eq("ttl"), any())).thenReturn(ttlServiceURI);
+        when(idMappingRdfRestTemplate.getForObject(eq(ttlServiceURI), any()))
+                .thenReturn(AbstractIdMappingStreamControllerIT.SAMPLE_TTL);
     }
 
     private void saveUniProtKB(int i, String isoFormString) {
@@ -509,7 +514,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/plain;format=list]")));
+                                        "Invalid request received. Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/turtle, application/n-triples, text/plain;format=list]")));
     }
 
     @Test
@@ -623,8 +628,9 @@ public class IdMappingDownloadControllerIT {
         InputStream inputStream =
                 new GzipCompressorInputStream(new FileInputStream(resultFilePath.toFile()));
         String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        if (format.equals(UniProtMediaType.RDF_MEDIA_TYPE_VALUE)) {
-            assertTrue(text.contains("<rdf:RDF xml"));
+        MediaType mediaType = UniProtMediaType.valueOf(format);
+        if (UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES.containsKey(mediaType)) {
+            validateSupportedRDFMediaTypes(format, text);
         } else {
             assertTrue(text.contains("UPI0000283A01"));
             assertTrue(text.contains("UPI0000283A02"));
@@ -832,7 +838,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, text/plain;format=list]")));
+                                        "Invalid request received. Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, text/plain;format=list, application/rdf+xml, text/turtle, application/n-triples]")));
     }
 
     @Test
@@ -946,8 +952,9 @@ public class IdMappingDownloadControllerIT {
         InputStream inputStream =
                 new GzipCompressorInputStream(new FileInputStream(resultFilePath.toFile()));
         String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        if (format.equals(UniProtMediaType.RDF_MEDIA_TYPE_VALUE)) {
-            assertTrue(text.contains("<rdf:RDF xml"));
+        MediaType mediaType = UniProtMediaType.valueOf(format);
+        if (UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES.containsKey(mediaType)) {
+            validateSupportedRDFMediaTypes(format, text);
         } else {
             assertTrue(text.contains("UniRef50_P03901"));
             assertTrue(text.contains("UniRef50_P03902"));
@@ -1157,7 +1164,7 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/plain;format=flatfile, text/plain;format=gff, text/plain;format=list]")));
+                                        "Invalid request received. Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/turtle, application/n-triples, text/plain;format=flatfile, text/plain;format=gff, text/plain;format=list]")));
     }
 
     @Test
@@ -1271,8 +1278,9 @@ public class IdMappingDownloadControllerIT {
         InputStream inputStream =
                 new GzipCompressorInputStream(new FileInputStream(resultFilePath.toFile()));
         String text = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        if (format.equals(UniProtMediaType.RDF_MEDIA_TYPE_VALUE)) {
-            assertTrue(text.contains("<rdf:RDF xml"));
+        MediaType mediaType = UniProtMediaType.valueOf(format);
+        if (UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES.containsKey(mediaType)) {
+            validateSupportedRDFMediaTypes(format, text);
         } else {
             assertTrue(text.contains("P00001"));
             assertTrue(text.contains("P00002"));
@@ -1289,5 +1297,24 @@ public class IdMappingDownloadControllerIT {
 
     private Stream<Arguments> getAllUniParcFormats() {
         return UniParcIdMappingDownloadRequestValidator.validFormat.stream().map(Arguments::of);
+    }
+
+    private void validateSupportedRDFMediaTypes(String format, String text) {
+        switch (format){
+            case UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE:
+                assertTrue(text.contains("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>"));
+                assertTrue(text.contains("<SAMPLE> rdf:type up:Protein ;"));
+                break;
+            case UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE:
+                assertTrue(text.contains(AbstractIdMappingStreamControllerIT.SAMPLE_N_TRIPLES));
+                break;
+            case UniProtMediaType.RDF_MEDIA_TYPE_VALUE:
+                assertTrue(text.contains("<rdf:RDF"));
+                assertTrue(text.contains("<sample>text</sample>"));
+                assertTrue(text.contains("</rdf:RDF>"));
+                break;
+            default:
+                fail("Invalid SUPPORTED_RDF_MEDIA_TYPES");
+        }
     }
 }

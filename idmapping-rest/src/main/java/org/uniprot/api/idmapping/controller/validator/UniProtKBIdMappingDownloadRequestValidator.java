@@ -23,6 +23,8 @@ public class UniProtKBIdMappingDownloadRequestValidator
                     APPLICATION_JSON_VALUE,
                     APPLICATION_XML_VALUE,
                     RDF_MEDIA_TYPE_VALUE,
+                    TURTLE_MEDIA_TYPE_VALUE,
+                    N_TRIPLES_MEDIA_TYPE_VALUE,
                     FF_MEDIA_TYPE_VALUE,
                     GFF_MEDIA_TYPE_VALUE,
                     LIST_MEDIA_TYPE_VALUE);
