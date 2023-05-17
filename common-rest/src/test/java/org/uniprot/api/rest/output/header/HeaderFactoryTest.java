@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -44,16 +45,15 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getQueryString()).thenReturn("gene:CDC7");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("gene:CDC7");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
-          result.getFirst("Content-Disposition")
-            .startsWith(
-              "form-data; name=\"attachment\"; filename=\"_gene_CDC7_"));
+                result.getFirst("Content-Disposition")
+                        .startsWith("form-data; name=\"attachment\"; filename=\"_gene_CDC7_"));
     }
 
     @Test
@@ -63,15 +63,15 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getQueryString()).thenReturn("*");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("*");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
-          result.getFirst("Content-Disposition")
-            .startsWith("form-data; name=\"attachment\"; filename=\"_all_"));
+                result.getFirst("Content-Disposition")
+                        .startsWith("form-data; name=\"attachment\"; filename=\"_all_"));
     }
 
     @Test
@@ -81,17 +81,17 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getQueryString())
-          .thenReturn("gene:INeedHereAVeryBigQuery OR gene:itAlsoNeedToBeBiggerThan60");
+        when(request.getParameter(Mockito.eq("query")))
+                .thenReturn("gene:INeedHereAVeryBigQuery OR gene:itAlsoNeedToBeBiggerThan60");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
-          result.getFirst("Content-Disposition")
-            .startsWith(
-              "form-data; name=\"attachment\"; filename=\"_gene_INeedHereAVeryBigQuery_OR_"));
+                result.getFirst("Content-Disposition")
+                        .startsWith(
+                                "form-data; name=\"attachment\"; filename=\"_gene_INeedHereAVeryBigQuery_OR_"));
     }
 
     @Test
@@ -101,14 +101,14 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getQueryString()).thenReturn("");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals("application/json", result.getFirst("Content-Type"));
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
-          result.getFirst("Content-Disposition")
-            .startsWith("form-data; name=\"attachment\"; filename=\"_20"));
+                result.getFirst("Content-Disposition")
+                        .startsWith("form-data; name=\"attachment\"; filename=\"_20"));
     }
 }

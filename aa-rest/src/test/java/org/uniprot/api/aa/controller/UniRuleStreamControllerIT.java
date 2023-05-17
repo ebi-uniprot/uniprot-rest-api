@@ -78,7 +78,7 @@ class UniRuleStreamControllerIT extends AbstractSolrStreamControllerIT {
     public String getContentDisposition() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return "unirule_" + now.format(dateTimeFormatter);
+        return "unirule_all_" + now.format(dateTimeFormatter);
     }
 
     @Override

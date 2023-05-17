@@ -112,7 +112,7 @@ class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
     public String getContentDisposition() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return "taxonomy_" + now.format(dateTimeFormatter);
+        return "taxonomy_all_" + now.format(dateTimeFormatter);
     }
 
     @Test

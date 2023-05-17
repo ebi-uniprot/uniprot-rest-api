@@ -78,7 +78,7 @@ class GeneCentricStreamControllerIT extends AbstractSolrStreamControllerIT {
     public String getContentDisposition() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return "genecentric_" + now.format(dateTimeFormatter);
+        return "genecentric_all_" + now.format(dateTimeFormatter);
     }
 
     @Override

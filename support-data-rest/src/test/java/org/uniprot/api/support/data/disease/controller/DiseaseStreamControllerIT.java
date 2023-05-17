@@ -98,7 +98,7 @@ class DiseaseStreamControllerIT extends AbstractRdfStreamControllerIT {
     public String getContentDisposition() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return "diseases_" + now.format(dateTimeFormatter);
+        return "diseases_all_" + now.format(dateTimeFormatter);
     }
 
     @Test

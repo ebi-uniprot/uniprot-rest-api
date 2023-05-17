@@ -29,7 +29,7 @@ public class HeaderFactory {
     }
 
     public static HttpHeaders createHttpDownloadHeader(
-      MessageConverterContext context, HttpServletRequest request) {
+            MessageConverterContext context, HttpServletRequest request) {
         HttpHeaders httpHeaders = new HttpHeaders();
         MediaType mediaType = context.getContentType();
         httpHeaders.setContentType(mediaType);
@@ -41,27 +41,26 @@ public class HeaderFactory {
     }
 
     private static String getContentDispositionFileName(
-      MessageConverterContext context, HttpServletRequest request, MediaType mediaType) {
+            MessageConverterContext context, HttpServletRequest request, MediaType mediaType) {
         String fileName = "";
         String suffix =
-          "."
-            + UniProtMediaType.getFileExtension(mediaType)
-            + context.getFileType().getExtension();
+                "."
+                        + UniProtMediaType.getFileExtension(mediaType)
+                        + context.getFileType().getExtension();
         String requestContext = getRequestContext(request);
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
         String queryString = "";
-        if (Utils.notNullNotEmpty(request.getQueryString())) {
-            queryString = request.getQueryString().replaceAll("[^A-Za-z0-9]", "_");
+        if (Utils.notNullNotEmpty(request.getParameter("query"))) {
+            queryString = request.getParameter("query").replaceAll("[^A-Za-z0-9]", "_");
             if (queryString.length() <= 30 && !queryString.equals("_")) {
                 queryString += "_" + now.format(dateTimeFormatter);
             } else if (queryString.length() > 30) {
                 queryString = queryString.substring(0, 30) + "_" + now.format(dateTimeFormatter);
-            } else if(queryString.equals("_")) {
+            } else if (queryString.equals("_")) {
                 queryString = "all_" + now.format(dateTimeFormatter);
             }
-        }
-        else {
+        } else {
             queryString = now.format(dateTimeFormatter);
         }
         return requestContext + "_" + queryString + suffix;
@@ -70,7 +69,7 @@ public class HeaderFactory {
     private static String getRequestContext(HttpServletRequest request) {
         String requestContext = "";
         String requestURI = request.getRequestURI();
-        if(requestURI != null) {
+        if (requestURI != null) {
             requestContext = requestURI.split("/")[1];
         }
         return requestContext;

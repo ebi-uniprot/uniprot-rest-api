@@ -88,7 +88,7 @@ class CrossRefStreamControllerIT extends AbstractRdfStreamControllerIT {
     public String getContentDisposition() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return "database_" + now.format(dateTimeFormatter);
+        return "database_all_" + now.format(dateTimeFormatter);
     }
 
     @Test

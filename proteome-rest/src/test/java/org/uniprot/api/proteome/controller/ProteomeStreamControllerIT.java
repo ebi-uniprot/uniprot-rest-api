@@ -82,7 +82,7 @@ class ProteomeStreamControllerIT extends AbstractSolrStreamControllerIT {
     public String getContentDisposition() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return "proteomes_" + now.format(dateTimeFormatter);
+        return "proteomes_all_" + now.format(dateTimeFormatter);
     }
 
     @Override

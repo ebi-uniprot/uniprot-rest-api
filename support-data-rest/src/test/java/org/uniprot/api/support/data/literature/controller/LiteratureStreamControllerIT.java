@@ -97,7 +97,7 @@ class LiteratureStreamControllerIT extends AbstractRdfStreamControllerIT {
     public String getContentDisposition() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return "citations_" + now.format(dateTimeFormatter);
+        return "citations_all_" + now.format(dateTimeFormatter);
     }
 
     @Test

@@ -96,7 +96,7 @@ class SubcellularLocationStreamControllerIT extends AbstractRdfStreamControllerI
     public String getContentDisposition() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
-        return "locations_" + now.format(dateTimeFormatter);
+        return "locations_all_" + now.format(dateTimeFormatter);
     }
 
     @Test
