@@ -1,5 +1,11 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -9,12 +15,6 @@ import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 public class UniProtViewByTaxonomyService implements UniProtViewByService {
     public static final String DEFAULT_PARENT_ID = "1";
     private final SolrClient solrClient;
@@ -23,7 +23,9 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
     public static final String URL_PREFIX = "https://www.uniprot.org/taxonomy/";
 
     public UniProtViewByTaxonomyService(
-            SolrClient solrClient, String uniProtCollection, TaxonomyQueryService taxonomyQueryService) {
+            SolrClient solrClient,
+            String uniProtCollection,
+            TaxonomyQueryService taxonomyQueryService) {
         this.solrClient = solrClient;
         this.uniProtCollection = uniProtCollection;
         this.taxonomyQueryService = taxonomyQueryService;
@@ -37,7 +39,8 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
 
         do {
             List<TaxonomyEntry> childTaxonomyEntries = getChildren(taxonomyId);
-            List<FacetField.Count> childFacetCounts = getFacetCounts(queryStr, childTaxonomyEntries);
+            List<FacetField.Count> childFacetCounts =
+                    getFacetCounts(queryStr, childTaxonomyEntries);
 
             if (!childFacetCounts.isEmpty()) {
                 facetCounts = childFacetCounts;
@@ -56,21 +59,33 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
         return StringUtils.isEmpty(parent);
     }
 
-    private List<ViewBy> createViewBys(List<FacetField.Count> facetCounts, List<TaxonomyEntry> taxonomyEntries, String queryStr) {
+    private List<ViewBy> createViewBys(
+            List<FacetField.Count> facetCounts,
+            List<TaxonomyEntry> taxonomyEntries,
+            String queryStr) {
         List<ViewBy> viewBys = Collections.emptyList();
 
         if (!facetCounts.isEmpty()) {
-            Map<Long, TaxonomyEntry> taxIdMap = taxonomyEntries.stream().collect(Collectors.toMap(Taxonomy::getTaxonId, Function.identity()));
-            viewBys = facetCounts.stream()
-                    .map(fc -> createViewBy(fc, taxIdMap.get(Long.parseLong(fc.getName())), queryStr))
-                    .sorted(ViewBy.SORT_BY_LABEL)
-                    .collect(Collectors.toList());
+            Map<Long, TaxonomyEntry> taxIdMap =
+                    taxonomyEntries.stream()
+                            .collect(Collectors.toMap(Taxonomy::getTaxonId, Function.identity()));
+            viewBys =
+                    facetCounts.stream()
+                            .map(
+                                    fc ->
+                                            createViewBy(
+                                                    fc,
+                                                    taxIdMap.get(Long.parseLong(fc.getName())),
+                                                    queryStr))
+                            .sorted(ViewBy.SORT_BY_LABEL)
+                            .collect(Collectors.toList());
         }
 
         return viewBys;
     }
 
-    private ViewBy createViewBy(FacetField.Count count, TaxonomyEntry taxonomyEntry, String queryStr) {
+    private ViewBy createViewBy(
+            FacetField.Count count, TaxonomyEntry taxonomyEntry, String queryStr) {
         ViewBy viewBy = new ViewBy();
         viewBy.setId(count.getName());
         viewBy.setCount(count.getCount());
@@ -84,7 +99,8 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
         return !getFacetCounts(queryStr, getChildren(count.getName())).isEmpty();
     }
 
-    private List<FacetField.Count> getFacetCounts(String queryStr, List<TaxonomyEntry> taxonomyEntries) {
+    private List<FacetField.Count> getFacetCounts(
+            String queryStr, List<TaxonomyEntry> taxonomyEntries) {
         List<FacetField.Count> result = Collections.emptyList();
 
         if (!taxonomyEntries.isEmpty()) {
@@ -92,7 +108,8 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
 
             if (!facetFields.isEmpty()) {
                 return facetFields.get(0).getValues().stream()
-                        .filter(count -> count.getCount() > 0).collect(Collectors.toList());
+                        .filter(count -> count.getCount() > 0)
+                        .collect(Collectors.toList());
             }
         }
 
@@ -101,9 +118,10 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
 
     private List<FacetField> getFacetFields(String queryStr, List<TaxonomyEntry> taxonomyEntries) {
         try {
-            String facetItems = taxonomyEntries.stream()
-                    .map(val -> String.valueOf(val.getTaxonId()))
-                    .collect(Collectors.joining(","));
+            String facetItems =
+                    taxonomyEntries.stream()
+                            .map(val -> String.valueOf(val.getTaxonId()))
+                            .collect(Collectors.joining(","));
             SolrQuery query = new SolrQuery(queryStr);
             String facetField = "{!terms='" + facetItems + "'}taxonomy_id";
             query.setFacet(true);

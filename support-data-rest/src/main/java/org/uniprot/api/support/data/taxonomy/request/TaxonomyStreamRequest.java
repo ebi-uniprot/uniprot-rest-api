@@ -1,13 +1,12 @@
 package org.uniprot.api.support.data.taxonomy.request;
 
-import javax.validation.constraints.Pattern;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.api.rest.request.taxonomy.TaxonomyBasicRequest;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.Pattern;
 
 /**
  * @author sahmad
