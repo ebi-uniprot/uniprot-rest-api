@@ -1,22 +1,22 @@
-package org.uniprot.api.support.data.taxonomy.request;
+package org.uniprot.api.rest.request.taxonomy;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.validation.constraints.*;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
-
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
-
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
-import io.swagger.v3.oas.annotations.Parameter;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.PositiveOrZero;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author lgonzales

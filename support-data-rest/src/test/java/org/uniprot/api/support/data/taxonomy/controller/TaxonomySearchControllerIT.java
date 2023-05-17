@@ -36,8 +36,8 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
-import org.uniprot.api.support.data.taxonomy.request.TaxonomyFacetConfig;
+import org.uniprot.api.rest.respository.taxonomy.TaxonomyRepository;
+import org.uniprot.api.rest.request.taxonomy.TaxonomyFacetConfig;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;

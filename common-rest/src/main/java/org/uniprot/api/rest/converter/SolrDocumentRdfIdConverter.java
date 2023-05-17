@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.common;
+package org.uniprot.api.rest.converter;
 
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.literature.LiteratureDocument;

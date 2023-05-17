@@ -1,5 +1,14 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -8,15 +17,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.mockito.ArgumentMatcher;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 public class MockServiceHelper {
     public static void mockServiceQueryResponse(
             SolrClient solrClient, String name, Map<String, Long> counts)
@@ -24,6 +24,7 @@ public class MockServiceHelper {
         QueryResponse queryResponse = getQueryResponse(name, counts);
         when(solrClient.query(anyString(), any())).thenReturn(queryResponse);
     }
+
     private static QueryResponse getQueryResponse(String name, Map<String, Long> counts) {
         List<FacetField> facetResponse = new ArrayList<>();
         FacetField field1 = new FacetField(name);
@@ -39,7 +40,10 @@ public class MockServiceHelper {
     }
 
     public static void mockServiceQueryResponse(
-            SolrClient solrClient, String name, Map<String, Long> counts, ArgumentMatcher<SolrQuery> argMatcher)
+            SolrClient solrClient,
+            String name,
+            Map<String, Long> counts,
+            ArgumentMatcher<SolrQuery> argMatcher)
             throws SolrServerException, IOException {
         QueryResponse queryResponse = getQueryResponse(name, counts);
         when(solrClient.query(anyString(), argThat(argMatcher))).thenReturn(queryResponse);
