@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.*;
@@ -165,8 +166,8 @@ public abstract class BasicSearchController<T> {
             headers = createHttpDownloadHeader(context, request);
         }
 
-        this.eventPublisher.publishEvent(
-                new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
+        ApplicationEvent paginatedResultEvent = new PaginatedResultsEvent(this, request, response, result.getPageAndClean());
+        this.eventPublisher.publishEvent(paginatedResultEvent);
         return ResponseEntity.ok().headers(headers).body(context);
     }
 
