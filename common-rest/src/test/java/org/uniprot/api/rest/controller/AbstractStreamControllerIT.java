@@ -53,11 +53,11 @@ public abstract class AbstractStreamControllerIT {
             "<http://purl.uniprot.org/uniprot/SAMPLE> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/SAMPLE> .";
 
     public static final String SAMPLE_TTL =
-            "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n" +
-                    "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n" +
-                    "@prefix uniref: <http://purl.uniprot.org/uniref/> .\n" +
-                    "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n" +
-                    "<SAMPLE> rdf:type up:Protein ;";
+            "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
+                    + "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n"
+                    + "@prefix uniref: <http://purl.uniprot.org/uniref/> .\n"
+                    + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
+                    + "<SAMPLE> rdf:type up:Protein ;";
 
     @Autowired private RequestMappingHandlerMapping requestMappingHandlerMapping;
 

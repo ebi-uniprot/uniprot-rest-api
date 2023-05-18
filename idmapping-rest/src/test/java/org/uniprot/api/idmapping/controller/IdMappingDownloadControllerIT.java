@@ -1300,7 +1300,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     private void validateSupportedRDFMediaTypes(String format, String text) {
-        switch (format){
+        switch (format) {
             case UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE:
                 assertTrue(text.contains("@prefix xsd: <http://www.w3.org/2001/XMLSchema#>"));
                 assertTrue(text.contains("<SAMPLE> rdf:type up:Protein ;"));

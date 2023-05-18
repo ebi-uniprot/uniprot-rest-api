@@ -25,7 +25,7 @@ class UniProtKBIdMappingDownloadRequestValidatorTest {
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
         assertEquals(
-                "Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/plain;format=flatfile, text/plain;format=gff, text/plain;format=list]",
+                "Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/turtle, application/n-triples, text/plain;format=flatfile, text/plain;format=gff, text/plain;format=list]",
                 exception.getMessage());
     }
 
@@ -39,7 +39,7 @@ class UniProtKBIdMappingDownloadRequestValidatorTest {
                 assertThrows(InvalidRequestException.class, () -> validator.validate(request));
         assertNotNull(exception);
         assertEquals(
-                "Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/plain;format=flatfile, text/plain;format=gff, text/plain;format=list]",
+                "Invalid download format. Valid values are [text/plain;format=fasta, text/plain;format=tsv, application/json, application/xml, application/rdf+xml, text/turtle, application/n-triples, text/plain;format=flatfile, text/plain;format=gff, text/plain;format=list]",
                 exception.getMessage());
     }
 
