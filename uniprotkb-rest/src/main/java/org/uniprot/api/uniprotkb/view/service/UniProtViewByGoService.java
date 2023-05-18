@@ -34,7 +34,7 @@ public class UniProtViewByGoService implements UniProtViewByService {
     }
 
     @Override
-    public List<ViewBy> get(String queryStr, String parent) {
+    public List<ViewBy> getViewBys(String queryStr, String parent) {
         String parentGo = addGoPrefix(parent);
         Optional<GoTerm> goTerm = goService.getChildren(parentGo);
         if (!goTerm.isPresent()) {
@@ -66,7 +66,7 @@ public class UniProtViewByGoService implements UniProtViewByService {
                 return counts.stream()
                         .map(val -> convert(val, gorelationMap))
                         .filter(val -> val != null)
-                        .sorted(ViewBy.SORT_BY_LABEL)
+                        .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
                         .collect(Collectors.toList());
             }
         } catch (SolrServerException | IOException e) {

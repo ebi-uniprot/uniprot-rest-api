@@ -44,7 +44,7 @@ class UniProtViewByPathwayServiceTest {
         counts.put("289", 36L);
         counts.put("456", 1L);
         MockServiceHelper.mockServiceQueryResponse(solrClient, "ec", counts);
-        List<ViewBy> viewBys = service.get("", "1");
+        List<ViewBy> viewBys = service.getViewBys("", "1");
         assertEquals(2, viewBys.size());
         ViewBy viewBy1 =
                 MockServiceHelper.createViewBy(

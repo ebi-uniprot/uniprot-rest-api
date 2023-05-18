@@ -1,15 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +13,21 @@ import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.service.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = UniProtViewByController.class)
+@WebMvcTest(controllers = UniProtKBViewByController.class)
 @ContextConfiguration(classes = {AsyncDownloadMocks.class})
 @AutoConfigureWebClient
-class UniProtViewByControllerIT {
+class UniProtKBViewByControllerIT {
     @Autowired private MockMvc mockMvc;
 
     @MockBean private UniProtViewByECService ecService;
@@ -38,7 +38,7 @@ class UniProtViewByControllerIT {
 
     @MockBean private UniProtViewByPathwayService pwService;
 
-    @MockBean private UniProtViewByTaxonomyService taxonService;
+    @MockBean private UniProtKBViewByTaxonomyService uniProtKBViewByTaxonomyService;
 
     @Test
     void testGetEC() throws Exception {
@@ -72,7 +72,7 @@ class UniProtViewByControllerIT {
                         UniProtViewByECService.URL_PREFIX + "1.1.3.-",
                         true));
 
-        when(ecService.get(anyString(), anyString())).thenReturn(viewBys);
+        when(ecService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
     }
 
     @Test
@@ -109,7 +109,7 @@ class UniProtViewByControllerIT {
                         UniProtViewByKeywordService.URL_PREFIX + "KW-0131",
                         true));
 
-        when(kwService.get(anyString(), anyString())).thenReturn(viewBys);
+        when(kwService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
     }
 
     @Test
@@ -138,7 +138,7 @@ class UniProtViewByControllerIT {
                 MockServiceHelper.createViewBy(
                         "456", "Amine and polyamine degradation", 1L, null, false));
 
-        when(pwService.get(anyString(), anyString())).thenReturn(viewBys);
+        when(pwService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
     }
 
     @Test
@@ -172,7 +172,7 @@ class UniProtViewByControllerIT {
                         UniProtViewByGoService.URL_PREFIX + "GO:0005575",
                         true));
 
-        when(goService.get(anyString(), anyString())).thenReturn(viewBys);
+        when(goService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
     }
 
     @Test
@@ -199,16 +199,16 @@ class UniProtViewByControllerIT {
                         "1425170",
                         "Homo heidelbergensis",
                         23L,
-                        UniProtViewByTaxonomyService.URL_PREFIX + "1425170",
+                        UniProtKBViewByTaxonomyService.URL_PREFIX + "1425170",
                         false));
         viewBys.add(
                 MockServiceHelper.createViewBy(
                         "9606",
                         "Homo sapiens",
                         50L,
-                        UniProtViewByTaxonomyService.URL_PREFIX + "9606",
+                        UniProtKBViewByTaxonomyService.URL_PREFIX + "9606",
                         false));
 
-        when(taxonService.get(anyString(), anyString())).thenReturn(viewBys);
+        when(uniProtKBViewByTaxonomyService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
     }
 }

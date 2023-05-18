@@ -33,7 +33,7 @@ public class UniProtViewByPathwayService implements UniProtViewByService {
     }
 
     @Override
-    public List<ViewBy> get(String queryStr, String parent) {
+    public List<ViewBy> getViewBys(String queryStr, String parent) {
         SolrQuery query = new SolrQuery(queryStr);
         StringBuilder regEx = new StringBuilder();
         String regExPostfix = "[0-9\\.]+";
@@ -69,7 +69,7 @@ public class UniProtViewByPathwayService implements UniProtViewByService {
                         .distinct()
                         .map(val -> convert(val, idCountMap))
                         .filter(val -> val != null)
-                        .sorted(ViewBy.SORT_BY_LABEL)
+                        .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
                         .collect(Collectors.toList());
             }
         } catch (SolrServerException | IOException e) {

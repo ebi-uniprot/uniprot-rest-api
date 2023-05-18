@@ -32,7 +32,7 @@ public class UniProtViewByKeywordService implements UniProtViewByService {
     }
 
     @Override
-    public List<ViewBy> get(String queryStr, String parent) {
+    public List<ViewBy> getViewBys(String queryStr, String parent) {
         List<KeywordEntry> keywords = getKeywordsFromParent(parent);
         if (keywords.isEmpty()) return Collections.emptyList();
         Map<String, KeywordEntry> keywordAccMap =
@@ -56,7 +56,7 @@ public class UniProtViewByKeywordService implements UniProtViewByService {
                 return counts.stream()
                         .map(val -> convert(val, keywordAccMap))
                         .filter(val -> val != null)
-                        .sorted(ViewBy.SORT_BY_LABEL)
+                        .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
                         .collect(Collectors.toList());
             }
         } catch (SolrServerException | IOException e) {

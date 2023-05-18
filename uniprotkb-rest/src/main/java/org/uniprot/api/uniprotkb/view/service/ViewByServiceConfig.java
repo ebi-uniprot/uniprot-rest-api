@@ -78,16 +78,11 @@ public class ViewByServiceConfig {
     }
 
     @Bean
-    public TaxonomyQueryService taxonomyQueryService(TaxonomyService taxonomyService) {
-        return new TaxonomyQueryService(taxonomyService);
-    }
-
-    @Bean
-    public UniProtViewByTaxonomyService uniProtViewByTaxonomyService(
+    public UniProtKBViewByTaxonomyService uniProtViewByTaxonomyService(
             SolrClient solrClient,
             ViewByConfigProperties configProperties,
-            TaxonomyQueryService taxonomyQueryService) {
-        return new UniProtViewByTaxonomyService(
-                solrClient, configProperties.getUniprotCollection(), taxonomyQueryService);
+            TaxonomyService taxonomyService) {
+        return new UniProtKBViewByTaxonomyService(
+                solrClient, configProperties.getUniprotCollection(), taxonomyService);
     }
 }

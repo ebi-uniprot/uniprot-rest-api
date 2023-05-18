@@ -45,7 +45,7 @@ class UniProtViewByKeywordRepoTest {
         counts.put("KW-0130", 45L);
         counts.put("KW-0131", 102L);
         MockServiceHelper.mockServiceQueryResponse(solrClient, "keyword_id", counts);
-        List<ViewBy> viewBys = service.get("", "KW-9999");
+        List<ViewBy> viewBys = service.getViewBys("", "KW-9999");
         assertEquals(3, viewBys.size());
         ViewBy viewBy1 =
                 MockServiceHelper.createViewBy(

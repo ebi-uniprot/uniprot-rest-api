@@ -31,7 +31,7 @@ public class UniProtViewByECService implements UniProtViewByService {
         this.ecRepo = ecRepo;
     }
 
-    public List<ViewBy> get(String queryStr, String parent) {
+    public List<ViewBy> getViewBys(String queryStr, String parent) {
         SolrQuery query = new SolrQuery(queryStr);
         StringBuilder regEx = new StringBuilder();
         String regExPostfix = "[0-9]+";

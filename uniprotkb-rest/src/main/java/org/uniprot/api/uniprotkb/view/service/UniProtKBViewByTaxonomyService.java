@@ -1,46 +1,47 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.uniprot.api.rest.request.taxonomy.TaxonomyStreamRequest;
+import org.uniprot.api.rest.service.taxonomy.TaxonomyService;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
 
-public class UniProtViewByTaxonomyService implements UniProtViewByService {
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class UniProtKBViewByTaxonomyService implements UniProtViewByService {
     public static final String DEFAULT_PARENT_ID = "1";
+    public static final String TOP_LEVEL_PARENT_QUERY = "-parent:[* TO *] AND active:true";
+    public static final String URL_PREFIX = "https://www.uniprot.org/taxonomy/";
     private final SolrClient solrClient;
     private final String uniProtCollection;
-    private final TaxonomyQueryService taxonomyQueryService;
-    public static final String URL_PREFIX = "https://www.uniprot.org/taxonomy/";
+    private final TaxonomyService taxonomyService;
 
-    public UniProtViewByTaxonomyService(
+    public UniProtKBViewByTaxonomyService(
             SolrClient solrClient,
             String uniProtCollection,
-            TaxonomyQueryService taxonomyQueryService) {
+            TaxonomyService taxonomyService) {
         this.solrClient = solrClient;
         this.uniProtCollection = uniProtCollection;
-        this.taxonomyQueryService = taxonomyQueryService;
+        this.taxonomyService = taxonomyService;
     }
 
     @Override
-    public List<ViewBy> get(String queryStr, String parent) {
-        List<FacetField.Count> facetCounts = Collections.emptyList();
-        List<TaxonomyEntry> taxonomyEntries = Collections.emptyList();
-        String taxonomyId = isOpenParentSearch(parent) ? DEFAULT_PARENT_ID : parent;
+    public List<ViewBy> getViewBys(String queryStr, String parent) {
+        List<FacetField.Count> facetCounts = List.of();
+        List<TaxonomyEntry> taxonomyEntries = List.of();
+        String taxonomyId = isTopLevelSearch(parent) ? DEFAULT_PARENT_ID : parent;
 
         do {
             List<TaxonomyEntry> childTaxonomyEntries = getChildren(taxonomyId);
-            List<FacetField.Count> childFacetCounts =
-                    getFacetCounts(queryStr, childTaxonomyEntries);
+            List<FacetField.Count> childFacetCounts = getFacetCounts(queryStr, childTaxonomyEntries);
 
             if (!childFacetCounts.isEmpty()) {
                 facetCounts = childFacetCounts;
@@ -50,20 +51,20 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
                 break;
             }
 
-        } while (facetCounts.size() == 1 && isOpenParentSearch(parent));
+        } while (facetCounts.size() == 1 && isTopLevelSearch(parent));
 
-        return createViewBys(facetCounts, taxonomyEntries, queryStr);
+        return getViewBys(facetCounts, taxonomyEntries, queryStr);
     }
 
-    private static boolean isOpenParentSearch(String parent) {
+    private static boolean isTopLevelSearch(String parent) {
         return StringUtils.isEmpty(parent);
     }
 
-    private List<ViewBy> createViewBys(
+    private List<ViewBy> getViewBys(
             List<FacetField.Count> facetCounts,
             List<TaxonomyEntry> taxonomyEntries,
             String queryStr) {
-        List<ViewBy> viewBys = Collections.emptyList();
+        List<ViewBy> viewBys = List.of();
 
         if (!facetCounts.isEmpty()) {
             Map<Long, TaxonomyEntry> taxIdMap =
@@ -73,18 +74,18 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
                     facetCounts.stream()
                             .map(
                                     fc ->
-                                            createViewBy(
+                                            getViewBy(
                                                     fc,
                                                     taxIdMap.get(Long.parseLong(fc.getName())),
                                                     queryStr))
-                            .sorted(ViewBy.SORT_BY_LABEL)
+                            .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
                             .collect(Collectors.toList());
         }
 
         return viewBys;
     }
 
-    private ViewBy createViewBy(
+    private ViewBy getViewBy(
             FacetField.Count count, TaxonomyEntry taxonomyEntry, String queryStr) {
         ViewBy viewBy = new ViewBy();
         viewBy.setId(count.getName());
@@ -101,7 +102,7 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
 
     private List<FacetField.Count> getFacetCounts(
             String queryStr, List<TaxonomyEntry> taxonomyEntries) {
-        List<FacetField.Count> result = Collections.emptyList();
+        List<FacetField.Count> facetCounts = List.of();
 
         if (!taxonomyEntries.isEmpty()) {
             List<FacetField> facetFields = getFacetFields(queryStr, taxonomyEntries);
@@ -113,14 +114,14 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
             }
         }
 
-        return result;
+        return facetCounts;
     }
 
     private List<FacetField> getFacetFields(String queryStr, List<TaxonomyEntry> taxonomyEntries) {
         try {
             String facetItems =
                     taxonomyEntries.stream()
-                            .map(val -> String.valueOf(val.getTaxonId()))
+                            .map(taxonomy -> String.valueOf(taxonomy.getTaxonId()))
                             .collect(Collectors.joining(","));
             SolrQuery query = new SolrQuery(queryStr);
             String facetField = "{!terms='" + facetItems + "'}taxonomy_id";
@@ -135,6 +136,8 @@ public class UniProtViewByTaxonomyService implements UniProtViewByService {
     }
 
     public List<TaxonomyEntry> getChildren(String taxId) {
-        return taxonomyQueryService.getChildren(taxId);
+        TaxonomyStreamRequest taxonomyStreamRequest = new TaxonomyStreamRequest();
+        taxonomyStreamRequest.setQuery(DEFAULT_PARENT_ID.equals(taxId) ? TOP_LEVEL_PARENT_QUERY : "parent:" + taxId);
+        return taxonomyService.stream(taxonomyStreamRequest).collect(Collectors.toList());
     }
 }
