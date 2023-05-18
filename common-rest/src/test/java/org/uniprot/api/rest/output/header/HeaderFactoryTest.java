@@ -45,7 +45,7 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getParameter(Mockito.eq("query"))).thenReturn("gene:CDC7");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("(gene:P53)");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -53,7 +53,7 @@ class HeaderFactoryTest {
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
-                        .startsWith("form-data; name=\"attachment\"; filename=\"_gene_CDC7_"));
+                        .startsWith("form-data; name=\"attachment\"; filename=\"_gene_P53_20"));
     }
 
     @Test

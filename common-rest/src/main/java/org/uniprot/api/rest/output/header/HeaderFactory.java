@@ -63,7 +63,10 @@ public class HeaderFactory {
         } else {
             queryString = now.format(dateTimeFormatter);
         }
-        return requestContext + "_" + queryString + suffix;
+
+        fileName = requestContext + "_" + queryString + suffix;
+        fileName = fileName.replaceAll("__", "_");
+        return fileName;
     }
 
     private static String getRequestContext(HttpServletRequest request) {
