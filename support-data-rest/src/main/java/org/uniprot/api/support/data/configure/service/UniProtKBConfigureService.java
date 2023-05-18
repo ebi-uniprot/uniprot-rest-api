@@ -70,12 +70,7 @@ public class UniProtKBConfigureService {
     public List<DatabaseGroup> getDatabases() {
         List<DatabaseGroup> databases =
                 Arrays.stream(UniProtDatabaseCategory.values())
-                        .filter(
-                                dbCat ->
-                                        (dbCat != UniProtDatabaseCategory.UNKNOWN
-                                                && dbCat
-                                                        != UniProtDatabaseCategory
-                                                                .GENE_ONTOLOGY_DATABASES))
+                        .filter(dbCat -> filteredUniProtDBCategory(dbCat))
                         .map(this::getDatabaseGroup)
                         .filter(dbGroup -> !dbGroup.getItems().isEmpty())
                         .collect(Collectors.toList());
@@ -155,5 +150,10 @@ public class UniProtKBConfigureService {
         builder.dataType("string");
         builder.fieldType("general");
         return builder.build();
+    }
+
+    boolean filteredUniProtDBCategory(UniProtDatabaseCategory dbCategory){
+        return dbCategory != UniProtDatabaseCategory.UNKNOWN &&
+          dbCategory != UniProtDatabaseCategory.GENE_ONTOLOGY_DATABASES;
     }
 }
