@@ -232,7 +232,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\"uniref_")))
                 .andExpect(jsonPath("$.results.size()", is(12)));
     }
 

@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.uniprotkb.controller.UniProtKBEntryConvertITUtils.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -447,5 +449,12 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPROTKB;
+    }
+
+    @Override
+    public String getContentDisposition() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+        return "uniprotkb_" + now.format(dateTimeFormatter);
     }
 }

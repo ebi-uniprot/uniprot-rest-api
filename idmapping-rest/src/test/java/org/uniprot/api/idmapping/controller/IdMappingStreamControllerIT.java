@@ -66,7 +66,7 @@ class IdMappingStreamControllerIT extends AbstractIdMappingPIRResultsControllerI
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\"idmapping_")))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL, containsString("max-age")))
                 .andExpect(content().contentTypeCompatibleWith(mediaType))

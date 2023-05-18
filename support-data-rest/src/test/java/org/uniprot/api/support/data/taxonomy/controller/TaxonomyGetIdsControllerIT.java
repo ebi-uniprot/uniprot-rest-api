@@ -233,7 +233,7 @@ class TaxonomyGetIdsControllerIT {
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\"taxonomy_")))
                 .andExpect(jsonPath("$.results.size()", is(3)))
                 .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)));
     }

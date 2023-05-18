@@ -13,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -354,6 +356,13 @@ class UniParcGetByUpisIT extends AbstractGetByIdsControllerIT {
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIPARC;
+    }
+
+    @Override
+    public String getContentDisposition() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+        return "uniparc_" + now.format(dateTimeFormatter);
     }
 
     private void saveEntries() throws Exception {

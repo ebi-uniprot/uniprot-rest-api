@@ -123,7 +123,8 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\""
+                                                        + getContentDisposition())))
                 .andExpect(jsonPath("$.results.size()", is(10)))
                 .andExpect(jsonPath("$.facets").doesNotExist()); // no facets in download
 
@@ -671,6 +672,8 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     protected abstract String[] getIdLengthErrorMessage();
 
     protected abstract UniProtDataType getUniProtDataType();
+
+    public abstract String getContentDisposition();
 
     private void verifyResults(ResultActions response) throws Exception {
         for (ResultMatcher matcher : getResultsResultMatchers()) {
