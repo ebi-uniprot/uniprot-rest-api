@@ -45,7 +45,8 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getParameter(Mockito.eq("query"))).thenReturn("(gene:P53)");
+        when(request.getRequestURI()).thenReturn("/uniprotkb/search");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("(gene:P53 )");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -53,7 +54,7 @@ class HeaderFactoryTest {
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
-                        .startsWith("form-data; name=\"attachment\"; filename=\"_gene_P53_20"));
+                        .startsWith("form-data; name=\"attachment\"; filename=\"uniprotkb_gene_P53_20"));
     }
 
     @Test
@@ -63,7 +64,8 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getParameter(Mockito.eq("query"))).thenReturn("*");
+        when(request.getRequestURI()).thenReturn("/uniref/search");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("(*:*)");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -71,7 +73,7 @@ class HeaderFactoryTest {
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
-                        .startsWith("form-data; name=\"attachment\"; filename=\"_all_"));
+                        .startsWith("form-data; name=\"attachment\"; filename=\"uniref_all_"));
     }
 
     @Test
