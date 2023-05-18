@@ -70,7 +70,12 @@ public class UniProtKBConfigureService {
     public List<DatabaseGroup> getDatabases() {
         List<DatabaseGroup> databases =
                 Arrays.stream(UniProtDatabaseCategory.values())
-                        .filter(dbCat -> dbCat != UniProtDatabaseCategory.UNKNOWN)
+                        .filter(
+                                dbCat ->
+                                        (dbCat != UniProtDatabaseCategory.UNKNOWN
+                                                && dbCat
+                                                        != UniProtDatabaseCategory
+                                                                .GENE_ONTOLOGY_DATABASES))
                         .map(this::getDatabaseGroup)
                         .filter(dbGroup -> !dbGroup.getItems().isEmpty())
                         .collect(Collectors.toList());

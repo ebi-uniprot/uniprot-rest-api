@@ -39,7 +39,7 @@ class UniProtKBConfigureServiceTest {
         assertNotNull(crossRefGroup.getItems());
 
         List<AdvancedSearchTerm> crossRefCat = crossRefGroup.getItems();
-        assertEquals(21, crossRefCat.size());
+        assertEquals(20, crossRefCat.size());
         AdvancedSearchTerm anyGroup = crossRefCat.get(0);
         assertEquals("xref_group_any", anyGroup.getId());
         assertEquals(1, anyGroup.getItems().size());
