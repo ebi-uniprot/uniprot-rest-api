@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskRejectedException;
@@ -34,7 +36,7 @@ import org.uniprot.core.util.Utils;
  * @param <T>
  * @author lgonzales
  */
-//@Slf4j
+@Slf4j
 public abstract class BasicSearchController<T> {
     protected final ApplicationEventPublisher eventPublisher;
     private final MessageConverterContextFactory<T> converterContextFactory;
@@ -165,8 +167,18 @@ public abstract class BasicSearchController<T> {
         }
 
         ApplicationEvent paginatedResultEvent = new PaginatedResultsEvent(this, request, response, result.getPageAndClean());
-        this.eventPublisher.publishEvent(paginatedResultEvent);
+        publishPaginationEvent(paginatedResultEvent);
         return ResponseEntity.ok().headers(headers).body(context);
+    }
+
+    /**
+     This is to suppress a false positive sonar failure
+     Sonar error says: "Logging should not be vulnerable to injection attacks"
+     This line does not log anything, this is why we added suppress below
+     */
+    @SuppressWarnings("javasecurity:S5145")
+    private void publishPaginationEvent(ApplicationEvent paginatedResultEvent) {
+        this.eventPublisher.publishEvent(paginatedResultEvent);
     }
 
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> stream(
@@ -229,7 +241,7 @@ public abstract class BasicSearchController<T> {
                                 runRequestNow(contextSupplier, request, deferredResult);
                             }
                         } catch (Exception e) {
-                            //log.error("Error occurred during processing.", e);
+                            log.error("Error occurred during processing.", e);
                             if (Utils.notNull(downloadGatekeeper)) {
                                 downloadGatekeeper.exit();
                             }
@@ -237,9 +249,9 @@ public abstract class BasicSearchController<T> {
                         }
                     });
         } catch (TaskRejectedException ex) {
-            /*log.info(
+            log.info(
                     "Task executor rejected stream request (space inside={})",
-                    downloadGatekeeper.getSpaceInside());*/
+                    downloadGatekeeper.getSpaceInside());
             setTooManyRequestsResponse(deferredResult);
         }
 
@@ -320,12 +332,12 @@ public abstract class BasicSearchController<T> {
                             .body(context);
             context.setLargeDownload(true);
 
-            //log.info("Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
+            log.info("Gatekeeper let me in (space inside={})", downloadGatekeeper.getSpaceInside());
             deferredResult.setResult(okayResponse);
         } else {
-            /*log.info(
+            log.info(
                     "Gatekeeper did NOT let me in (space inside={})",
-                    downloadGatekeeper.getSpaceInside());*/
+                    downloadGatekeeper.getSpaceInside());
             setTooManyRequestsResponse(deferredResult);
         }
     }
