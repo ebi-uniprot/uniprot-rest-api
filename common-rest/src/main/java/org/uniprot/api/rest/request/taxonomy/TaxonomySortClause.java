@@ -1,11 +1,11 @@
-package org.uniprot.api.support.data.taxonomy.request;
-
-import javax.annotation.PostConstruct;
+package org.uniprot.api.rest.request.taxonomy;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.store.config.UniProtDataType;
+
+import javax.annotation.PostConstruct;
 
 @Component
 public class TaxonomySortClause extends AbstractSolrSortClause {

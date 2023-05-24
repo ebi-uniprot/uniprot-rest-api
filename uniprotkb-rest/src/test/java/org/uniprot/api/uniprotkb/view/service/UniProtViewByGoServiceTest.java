@@ -38,7 +38,7 @@ class UniProtViewByGoServiceTest {
         counts.put("GO:0005575", 70L);
         counts.put("GO:0003674", 73L);
         MockServiceHelper.mockServiceQueryResponse(solrClient, "go_id", counts);
-        List<ViewBy> viewBys = service.get("", "");
+        List<ViewBy> viewBys = service.getViewBys("", "");
         assertEquals(3, viewBys.size());
         ViewBy viewBy1 =
                 MockServiceHelper.createViewBy(

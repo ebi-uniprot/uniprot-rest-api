@@ -1,14 +1,12 @@
-package org.uniprot.api.support.data.taxonomy.request;
+package org.uniprot.api.rest.request.taxonomy;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.PositiveOrZero;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
-
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.PositiveOrZero;
 
 @Data
 public class TaxonomySearchRequest extends TaxonomyBasicRequest implements SearchRequest {

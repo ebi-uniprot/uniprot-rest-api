@@ -1,13 +1,6 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Strings;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -16,8 +9,15 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.uniprot.api.uniprotkb.view.GoRelation;
 import org.uniprot.api.uniprotkb.view.GoTerm;
 import org.uniprot.api.uniprotkb.view.ViewBy;
+import org.uniprot.api.uniprotkb.view.ViewByImpl;
 
-import com.google.common.base.Strings;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class UniProtViewByGoService implements UniProtViewByService {
     private final SolrClient solrClient;
@@ -34,7 +34,7 @@ public class UniProtViewByGoService implements UniProtViewByService {
     }
 
     @Override
-    public List<ViewBy> get(String queryStr, String parent) {
+    public List<ViewBy> getViewBys(String queryStr, String parent) {
         String parentGo = addGoPrefix(parent);
         Optional<GoTerm> goTerm = goService.getChildren(parentGo);
         if (!goTerm.isPresent()) {
@@ -66,7 +66,7 @@ public class UniProtViewByGoService implements UniProtViewByService {
                 return counts.stream()
                         .map(val -> convert(val, gorelationMap))
                         .filter(val -> val != null)
-                        .sorted(ViewBy.SORT_BY_LABEL)
+                        .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
                         .collect(Collectors.toList());
             }
         } catch (SolrServerException | IOException e) {
@@ -87,17 +87,13 @@ public class UniProtViewByGoService implements UniProtViewByService {
     }
 
     private ViewBy convert(FacetField.Count count, Map<String, GoRelation> gorelationMap) {
-        if (count.getCount() == 0) return null;
-        ViewBy viewBy = new ViewBy();
         String goId = addGoPrefix(count.getName());
-        viewBy.setId(goId);
-        viewBy.setCount(count.getCount());
-        GoRelation goRelation = gorelationMap.get(goId);
-        viewBy.setLink(URL_PREFIX + goId);
-        if (goRelation != null) {
-            viewBy.setLabel(goRelation.getName());
-            viewBy.setExpand(goRelation.isHasChildren());
-        }
-        return viewBy;
+        Optional<GoRelation> goRelation = Optional.ofNullable(gorelationMap.get(goId));
+        return ViewByImpl.builder()
+                .id(goId)
+                .count(count.getCount())
+                .link(URL_PREFIX + goId)
+                .label(goRelation.map(GoRelation::getName).orElse(""))
+                .expand(goRelation.map(GoRelation::isHasChildren).orElse(false)).build();
     }
 }
