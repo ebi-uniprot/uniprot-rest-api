@@ -1,10 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -410,11 +406,8 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                                         UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(UniProtMediaType.TSV_MEDIA_TYPE))
                 .andExpect(content().string(containsString("Entry\tRhea ID")))
-                .andExpect(
-                        content()
-                                .string(
-                                        containsString(
-                                                "P00001\tRHEA:10596 RHEA-COMP:10136 RHEA-COMP:10137")));
+                .andExpect(content().string(not(containsString("RHEA-COMP:10136 RHEA-COMP:10137"))))
+                .andExpect(content().string(containsString("P00001\tRHEA:10596")));
     }
 
     @Test
