@@ -5,7 +5,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import org.uniprot.api.support.data.taxonomy.service.TaxonomyService;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.ec.ECRepoFactory;
 import org.uniprot.cv.keyword.KeywordRepo;
@@ -62,32 +61,9 @@ public class ViewByServiceConfig {
     }
 
     @Bean
-    public UniProtViewByPathwayService uniprotViewByPathwayService(
-            SolrClient solrClient,
-            ViewByConfigProperties configProperties,
-            UniPathwayRepo unipathwayRepo) {
-        return new UniProtViewByPathwayService(
-                solrClient, configProperties.getUniprotCollection(), unipathwayRepo);
-    }
-
-    @Bean
     public UniProtViewByGoService uniprotViewByGoService(
             SolrClient solrClient, ViewByConfigProperties configProperties, GoService goService) {
         return new UniProtViewByGoService(
                 solrClient, configProperties.getUniprotCollection(), goService);
-    }
-
-    @Bean
-    public TaxonomyQueryService taxonomyService(TaxonomyService taxonomyService) {
-        return new TaxonomyQueryService(taxonomyService);
-    }
-
-    @Bean
-    public UniProtViewByTaxonomyService uniProtViewByTaxonomyService(
-            SolrClient solrClient,
-            ViewByConfigProperties configProperties,
-            TaxonomyQueryService taxonomyQueryService) {
-        return new UniProtViewByTaxonomyService(
-                solrClient, configProperties.getUniprotCollection(), taxonomyQueryService);
     }
 }

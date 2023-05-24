@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.taxonomy.service;
+package org.uniprot.api.rest.service.taxonomy;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -7,15 +7,15 @@ import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.request.BasicRequest;
+import org.uniprot.api.rest.request.taxonomy.GetByTaxonIdsRequest;
+import org.uniprot.api.rest.request.taxonomy.TaxonomyFacetConfig;
+import org.uniprot.api.rest.request.taxonomy.TaxonomySolrQueryConfig;
+import org.uniprot.api.rest.request.taxonomy.TaxonomySortClause;
+import org.uniprot.api.rest.response.taxonomy.TaxonomyEntryConverter;
+import org.uniprot.api.rest.respository.taxonomy.TaxonomyRepository;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
-import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
-import org.uniprot.api.support.data.taxonomy.request.GetByTaxonIdsRequest;
-import org.uniprot.api.support.data.taxonomy.request.TaxonomyFacetConfig;
-import org.uniprot.api.support.data.taxonomy.request.TaxonomySolrQueryConfig;
-import org.uniprot.api.support.data.taxonomy.request.TaxonomySortClause;
-import org.uniprot.api.support.data.taxonomy.response.TaxonomyEntryConverter;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;

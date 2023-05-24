@@ -1,11 +1,7 @@
 package org.uniprot.api.common.repository.search;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -24,6 +20,11 @@ import org.uniprot.api.common.repository.search.term.TermInfo;
 import org.uniprot.api.common.repository.search.term.TermInfoConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Solr Basic Repository class to enable the execution of dynamically build queries in a solr
@@ -119,6 +120,14 @@ public abstract class SolrQueryRepository<T extends Document> {
                         Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
                         false)
                 .flatMap(Collection::stream);
+    }
+
+    public QueryResponse query(SolrQuery solrQuery) {
+        try {
+            return solrClient.query(collection.name(), solrQuery);
+        } catch (Exception e) {
+            throw new QueryRetrievalException("Unexpected error retrieving data from our Repository", e);
+        }
     }
 
     protected List<T> getResponseDocuments(QueryResponse solrResponse) {
