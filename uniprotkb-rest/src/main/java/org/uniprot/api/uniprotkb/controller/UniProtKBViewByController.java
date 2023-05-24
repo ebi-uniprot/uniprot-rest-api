@@ -29,7 +29,6 @@ public class UniProtKBViewByController {
     static final String VIEW_BY_RESOURCE = UNIPROTKB_RESOURCE + "/view";
     private final UniProtViewByECService viewByECService;
     private final UniProtViewByKeywordService viewByKeywordService;
-    private final UniProtViewByPathwayService viewByPathwayService;
     private final UniProtViewByGoService viewByGoService;
     private final UniProtKBViewByTaxonomyService uniProtKBViewByTaxonomyService;
 
@@ -37,12 +36,10 @@ public class UniProtKBViewByController {
     public UniProtKBViewByController(
             UniProtViewByECService viewByECService,
             UniProtViewByKeywordService viewByKeywordService,
-            UniProtViewByPathwayService viewByPathwayService,
             UniProtViewByGoService viewByGoService,
             UniProtKBViewByTaxonomyService uniProtKBViewByTaxonomyService) {
         this.viewByECService = viewByECService;
         this.viewByKeywordService = viewByKeywordService;
-        this.viewByPathwayService = viewByPathwayService;
         this.viewByGoService = viewByGoService;
         this.uniProtKBViewByTaxonomyService = uniProtKBViewByTaxonomyService;
     }
@@ -93,28 +90,6 @@ public class UniProtKBViewByController {
                     @RequestParam(value = "parent", required = false)
                     String parent) {
         return new ResponseEntity<>(viewByKeywordService.getViewBys(query, parent), HttpStatus.OK);
-    }
-
-    @Tag(name = "uniprotkbview")
-    @GetMapping(
-            value = "/pathway",
-            produces = {APPLICATION_JSON_VALUE})
-    @Operation(
-            summary =
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
-    @ApiResponse(
-            content =
-                    @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
-    public ResponseEntity<List<ViewBy>> getPathway(
-            @Parameter(
-                            description =
-                                    "Criteria to search the views. It can take any valid solr query.")
-                    @RequestParam(value = "query", required = true)
-                    String query,
-            @Parameter(description = "Name of the parent")
-                    @RequestParam(value = "parent", required = false)
-                    String parent) {
-        return new ResponseEntity<>(viewByPathwayService.getViewBys(query, parent), HttpStatus.OK);
     }
 
     @Tag(name = "uniprotkbview")

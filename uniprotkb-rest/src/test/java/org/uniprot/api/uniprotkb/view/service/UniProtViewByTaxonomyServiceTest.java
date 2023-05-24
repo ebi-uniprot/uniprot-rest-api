@@ -1,6 +1,6 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,19 +8,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.taxonomy.TaxonomyService;
+import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByTaxonomyService.TOP_LEVEL_PARENT_QUERY;
@@ -51,40 +50,44 @@ class UniProtViewByTaxonomyServiceTest {
     private static final long TAX_COUNT_B = 50L;
     private static final long TAX_COUNT_C = 9999L;
     private static final long TAX_COUNT_D = 10L;
-    private static final Map<String, Long> SINGLE_TAXONOMY_FACET_COUNTS_A =
-            Map.of(String.valueOf(TAX_ID_A), TAX_COUNT_A);
-    private static final Map<String, Long> SINGLE_TAXONOMY_FACET_COUNTS_B =
-            Map.of(String.valueOf(TAX_ID_B), TAX_COUNT_B);
-    private static final Map<String, Long> SINGLE_TAXONOMY_FACET_COUNTS_C =
-            Map.of(String.valueOf(TAX_ID_C), TAX_COUNT_C);
-    private static final Map<String, Long> SINGLE_TAXONOMY_FACET_COUNTS_D =
-            Map.of(String.valueOf(TAX_ID_D), TAX_COUNT_D);
-    private static final Map<String, Long> MULTIPLE_TAXONOMY_FACET_COUNTS =
-            Map.of(String.valueOf(TAX_ID_A), TAX_COUNT_A, String.valueOf(TAX_ID_C), TAX_COUNT_C);
+    private static final String SOME_NAME = "someName";
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_A = List.of(new FacetField(SOME_NAME) {{
+        add(String.valueOf(TAX_ID_A), TAX_COUNT_A);
+    }});
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_B = List.of(new FacetField(SOME_NAME) {{
+        add(String.valueOf(TAX_ID_B), TAX_COUNT_B);
+    }});
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_C = List.of(new FacetField(SOME_NAME) {{
+        add(String.valueOf(TAX_ID_C), TAX_COUNT_C);
+    }});
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_D = List.of(new FacetField(SOME_NAME) {{
+        add(String.valueOf(TAX_ID_D), TAX_COUNT_D);
+    }});
+    private static final List<FacetField> MULTIPLE_TAXONOMY_FACET_COUNTS = List.of(new FacetField(SOME_NAME) {{
+        add(String.valueOf(TAX_ID_A), TAX_COUNT_A);
+        add(String.valueOf(TAX_ID_C), TAX_COUNT_C);
+    }});
     private static final String SOME_QUERY = "someQuery";
-    private static final String TAXONOMY_ID = "taxonomy_id";
-    private static final String UNIPROT = "uniprot";
     @Mock
-    private SolrClient solrClient;
+    private TaxonomyService taxonomyService;
     @Mock
-    private TaxonomyService taxonService;
+    private UniProtEntryService uniProtEntryService;
     private UniProtKBViewByTaxonomyService service;
 
     @BeforeEach
     void setup() {
-        service = new UniProtKBViewByTaxonomyService(solrClient, UNIPROT, taxonService);
+        service = new UniProtKBViewByTaxonomyService(taxonomyService, uniProtEntryService);
     }
 
     @Test
-    void get_whenNoParentSpecifiedAndMultipleRootNodes() throws Exception {
-        when(taxonService.stream(
+    void getViewBys_whenNoParentSpecifiedAndMultipleRootNodes() {
+        when(taxonomyService.stream(
                 argThat(
                         arg ->
                                 Set.of(TOP_LEVEL_PARENT_QUERY, PARENT_TAX_ID_A)
                                         .contains(arg.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient, TAXONOMY_ID, MULTIPLE_TAXONOMY_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(eq(SOME_QUERY), anyString())).thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -92,10 +95,9 @@ class UniProtViewByTaxonomyServiceTest {
     }
 
     @Test
-    void get_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() throws Exception {
-        when(taxonService.stream(argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery())))).thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_C));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient, TAXONOMY_ID, SINGLE_TAXONOMY_FACET_COUNTS_C);
+    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
+        when(taxonomyService.stream(argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery())))).thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_C));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_C_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -103,32 +105,17 @@ class UniProtViewByTaxonomyServiceTest {
     }
 
     @Test
-    void get_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() throws Exception {
-        when(taxonService.stream(argThat(argument -> argument != null && (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
+    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
+        when(taxonomyService.stream(argThat(argument -> argument != null && (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_B));
-        when(taxonService.stream(
+        when(taxonomyService.stream(
                 argThat(
                         argument ->
                                 argument != null && Set.of(PARENT_TAX_ID_A, PARENT_TAX_ID_B)
                                         .contains(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                SINGLE_TAXONOMY_FACET_COUNTS_B,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_B_STRING));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                MULTIPLE_TAXONOMY_FACET_COUNTS,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_A_STRING)
-                                && argument.getFacetFields()[0].contains(TAX_ID_C_STRING));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_B_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_A_STRING + "," + TAX_ID_C_STRING))).thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -136,9 +123,8 @@ class UniProtViewByTaxonomyServiceTest {
     }
 
     @Test
-    void get_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge()
-            throws Exception {
-        when(taxonService.stream(any()))
+    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+        when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
                             StreamRequest streamRequest = invocation.getArgument(0, StreamRequest.class);
@@ -153,30 +139,9 @@ class UniProtViewByTaxonomyServiceTest {
                             }
                             return Stream.of();
                         });
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                SINGLE_TAXONOMY_FACET_COUNTS_A,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_A_STRING));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                SINGLE_TAXONOMY_FACET_COUNTS_B,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_B_STRING));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                SINGLE_TAXONOMY_FACET_COUNTS_C,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_C_STRING));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_A_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_A);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_B_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_C_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -185,9 +150,8 @@ class UniProtViewByTaxonomyServiceTest {
 
     @Test
     void
-    get_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren()
-            throws Exception {
-        when(taxonService.stream(any()))
+    getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+        when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
                             StreamRequest streamRequest = invocation.getArgument(0, StreamRequest.class);
@@ -202,31 +166,9 @@ class UniProtViewByTaxonomyServiceTest {
                             }
                             return Stream.of();
                         });
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                SINGLE_TAXONOMY_FACET_COUNTS_B,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_B_STRING));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                SINGLE_TAXONOMY_FACET_COUNTS_D,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_D_STRING));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                MULTIPLE_TAXONOMY_FACET_COUNTS,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_A_STRING)
-                                && argument.getFacetFields()[0].contains(TAX_ID_C_STRING));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_B_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_D_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_A_STRING + "," + TAX_ID_C_STRING))).thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -234,15 +176,14 @@ class UniProtViewByTaxonomyServiceTest {
     }
 
     @Test
-    void get_whenParentSpecifiedAndMultipleRootNodes() throws Exception {
-        when(taxonService.stream(
+    void getViewBys_whenParentSpecifiedAndMultipleRootNodes() {
+        when(taxonomyService.stream(
                 argThat(
                         argument ->
                                 Set.of(PARENT_TAX_ID_B, PARENT_TAX_ID_A)
                                         .contains(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient, TAXONOMY_ID, MULTIPLE_TAXONOMY_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(eq(SOME_QUERY), anyString())).thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, TAX_ID_B_STRING);
 
@@ -250,8 +191,8 @@ class UniProtViewByTaxonomyServiceTest {
     }
 
     @Test
-    void get_whenParentSpecifiedAndNoRootNodes() {
-        when(taxonService.stream(argThat(argument -> PARENT_TAX_ID_A.equals(argument.getQuery())))).thenAnswer(invocation -> Stream.of());
+    void getViewBys_whenParentSpecifiedAndNoRootNodes() {
+        when(taxonomyService.stream(argThat(argument -> PARENT_TAX_ID_A.equals(argument.getQuery())))).thenAnswer(invocation -> Stream.of());
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, TAX_ID_A_STRING);
 
@@ -259,9 +200,8 @@ class UniProtViewByTaxonomyServiceTest {
     }
 
     @Test
-    void get_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_doNotTraverseMore()
-            throws Exception {
-        when(taxonService.stream(any()))
+    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_doNotTraverseMore() {
+        when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
                             StreamRequest streamRequest = invocation.getArgument(0, StreamRequest.class);
@@ -273,26 +213,16 @@ class UniProtViewByTaxonomyServiceTest {
                             }
                             return Stream.of();
                         });
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                SINGLE_TAXONOMY_FACET_COUNTS_B,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_B_STRING));
-        MockServiceHelper.mockServiceQueryResponse(
-                solrClient,
-                TAXONOMY_ID,
-                SINGLE_TAXONOMY_FACET_COUNTS_C,
-                argument ->
-                        argument != null
-                                && argument.getFacetFields() != null
-                                && argument.getFacetFields()[0].contains(TAX_ID_C_STRING));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_B_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacets(TAX_ID_C_STRING))).thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, TAX_ID_A_STRING);
 
         assertViewByB(viewBys);
+    }
+
+    private static String getFacets(String facetItems) {
+        return String.format("{!terms='%s'}taxonomy_id", facetItems);
     }
 
     private static TaxonomyEntry getTaxonomyEntry(long id, String label) {
@@ -328,6 +258,6 @@ class UniProtViewByTaxonomyServiceTest {
 
     private static ViewBy getViewBy(String taxId, String taxLabel, long taxCount, boolean expand) {
         return MockServiceHelper.createViewBy(
-                taxId, taxLabel, taxCount, UniProtKBViewByTaxonomyService.URL_PREFIX + taxId, expand);
+                taxId, taxLabel, taxCount, UniProtKBViewByTaxonomyService.URL_PHRASE + taxId, expand);
     }
 }

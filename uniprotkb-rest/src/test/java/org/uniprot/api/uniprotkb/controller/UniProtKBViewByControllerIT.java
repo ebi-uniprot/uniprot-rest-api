@@ -36,8 +36,6 @@ class UniProtKBViewByControllerIT {
 
     @MockBean private UniProtViewByKeywordService kwService;
 
-    @MockBean private UniProtViewByPathwayService pwService;
-
     @MockBean private UniProtKBViewByTaxonomyService uniProtKBViewByTaxonomyService;
 
     @Test
@@ -113,35 +111,6 @@ class UniProtKBViewByControllerIT {
     }
 
     @Test
-    void testGetPathway() throws Exception {
-        mockPathwayService();
-        String query = "organism_id:9606";
-        String parent = "3";
-
-        mockMvc.perform(
-                        get("/uniprotkb/view/pathway")
-                                .param("query", query)
-                                .param("parent", parent))
-                .andDo(log())
-                .andExpect(jsonPath("$[0].id", is("289")))
-                .andExpect(jsonPath("$[0].label", is("Amine and polyamine biosynthesis")))
-                .andExpect(jsonPath("$[1].id", is("456")))
-                .andExpect(jsonPath("$[1].label", is("Amine and polyamine degradation")));
-    }
-
-    private void mockPathwayService() {
-        List<ViewBy> viewBys = new ArrayList<>();
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "289", "Amine and polyamine biosynthesis", 36L, null, false));
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "456", "Amine and polyamine degradation", 1L, null, false));
-
-        when(pwService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
-    }
-
-    @Test
     void testGetGo() throws Exception {
         mockGoService();
         String query = "organism_id:9606";
@@ -199,14 +168,14 @@ class UniProtKBViewByControllerIT {
                         "1425170",
                         "Homo heidelbergensis",
                         23L,
-                        UniProtKBViewByTaxonomyService.URL_PREFIX + "1425170",
+                        UniProtKBViewByTaxonomyService.URL_PHRASE + "1425170",
                         false));
         viewBys.add(
                 MockServiceHelper.createViewBy(
                         "9606",
                         "Homo sapiens",
                         50L,
-                        UniProtKBViewByTaxonomyService.URL_PREFIX + "9606",
+                        UniProtKBViewByTaxonomyService.URL_PHRASE + "9606",
                         false));
 
         when(uniProtKBViewByTaxonomyService.getViewBys(anyString(), anyString())).thenReturn(viewBys);

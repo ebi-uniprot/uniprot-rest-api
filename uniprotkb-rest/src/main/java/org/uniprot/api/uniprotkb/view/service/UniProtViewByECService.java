@@ -1,11 +1,6 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Strings;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -13,10 +8,15 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.uniprot.api.uniprotkb.view.ViewBy;
+import org.uniprot.api.uniprotkb.view.ViewByImpl;
 import org.uniprot.core.cv.ec.ECEntry;
 import org.uniprot.cv.ec.ECRepo;
 
-import com.google.common.base.Strings;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 // @Service
 public class UniProtViewByECService implements UniProtViewByService {
@@ -89,20 +89,16 @@ public class UniProtViewByECService implements UniProtViewByService {
     }
 
     private ViewBy convert(FacetField.Count count) {
-        ViewBy viewBy = new ViewBy();
         String ecId = count.getName();
         String fullEc = ecAddDashIfAbsent(ecId);
-        if (fullEc.contains(".-")) {
-            viewBy.setExpand(true);
-        } else {
-            viewBy.setExpand(false);
-        }
         Optional<ECEntry> ecOpt = ecRepo.getEC(fullEc);
-        viewBy.setId(fullEc);
-        ecOpt.ifPresent(ec -> viewBy.setLabel(ec.getLabel()));
 
-        viewBy.setLink(URL_PREFIX + fullEc);
-        viewBy.setCount(count.getCount());
-        return viewBy;
+        return ViewByImpl.builder()
+                .id(fullEc)
+                .label(ecOpt.map(ECEntry::getLabel).orElse(""))
+                .link(URL_PREFIX + fullEc)
+                .expand(fullEc.contains(".-"))
+                .count(count.getCount())
+                .build();
     }
 }
