@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.taxonomy.response;
+package org.uniprot.api.rest.response.taxonomy;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.support.data.common.SolrDocumentRdfIdConverter;
-import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
+import org.uniprot.api.rest.converter.SolrDocumentRdfIdConverter;
+import org.uniprot.api.rest.respository.taxonomy.TaxonomyRepository;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 
 /**

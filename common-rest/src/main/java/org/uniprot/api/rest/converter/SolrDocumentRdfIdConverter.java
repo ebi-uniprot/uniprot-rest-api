@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.common;
+package org.uniprot.api.rest.converter;
 
 import java.util.function.Function;
 

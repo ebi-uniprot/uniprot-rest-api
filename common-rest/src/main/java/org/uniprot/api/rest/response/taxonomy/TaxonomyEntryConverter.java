@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.taxonomy.response;
+package org.uniprot.api.rest.response.taxonomy;
 
 import java.util.function.Function;
 

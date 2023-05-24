@@ -44,7 +44,7 @@ class UniProtViewByECServiceTest {
         counts.put("1.1.1.-", 346L);
         counts.put("1.1.3.-", 1L);
         MockServiceHelper.mockServiceQueryResponse(solrClient, "ec", counts);
-        List<ViewBy> viewBys = service.get("", "1.1");
+        List<ViewBy> viewBys = service.getViewBys("", "1.1");
         assertEquals(2, viewBys.size());
         ViewBy viewBy1 =
                 MockServiceHelper.createViewBy(

@@ -1,18 +1,18 @@
-package org.uniprot.api.support.data.taxonomy.request;
-
-import java.util.*;
+package org.uniprot.api.rest.request.taxonomy;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrQueryConfigFileReader;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.api.rest.service.taxonomy.TaxonomyService;
 import org.uniprot.api.rest.validation.config.WhitelistFieldConfig;
-import org.uniprot.api.support.data.taxonomy.service.TaxonomyService;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+
+import java.util.*;
 
 @Configuration
 public class TaxonomySolrQueryConfig {
