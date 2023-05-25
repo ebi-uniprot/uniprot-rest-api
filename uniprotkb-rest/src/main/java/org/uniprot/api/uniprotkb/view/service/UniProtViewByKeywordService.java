@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class UniProtViewByKeywordService implements UniProtViewByService {
+public class UniProtViewByKeywordService extends UniProtViewByService<KeywordEntry> {
     private final SolrClient solrClient;
     private final String uniprotCollection;
     private final KeywordRepo keywordRepo;
@@ -63,6 +63,27 @@ public class UniProtViewByKeywordService implements UniProtViewByService {
         } catch (SolrServerException | IOException e) {
             throw new UniProtViewByServiceException(e);
         }
+    }
+
+    @Override
+    protected List<KeywordEntry> getChildren(String parent) {
+        if (isTopLevelSearch(parent)) {
+            return keywordRepo.getAllCategories();
+        }
+        KeywordEntry keyword = keywordRepo.getByAccession(parent);
+        return keyword != null ? keyword.getChildren() : keywordRepo.getAllCategories();
+    }
+
+    @Override
+    protected String getFacetFields(List<KeywordEntry> keywordEntries) {
+        String facetItems = keywordEntries.stream().map(KeywordEntry::getAccession)
+                .collect(Collectors.joining(","));
+        return String.format("{!terms='%s'}keyword_id", facetItems);
+    }
+
+    @Override
+    protected List<ViewBy> getViewBys(List<FacetField.Count> facetCounts, List<KeywordEntry> keywordEntries, String query) {
+        return null;
     }
 
     private ViewBy convert(FacetField.Count count, Map<String, KeywordEntry> keywordAccMap) {
