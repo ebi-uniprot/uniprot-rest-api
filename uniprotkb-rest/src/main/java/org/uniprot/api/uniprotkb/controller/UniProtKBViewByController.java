@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.view.ViewBy;
+import org.uniprot.api.uniprotkb.view.ViewByResult;
 import org.uniprot.api.uniprotkb.view.service.*;
 
 import java.util.List;
@@ -124,7 +125,7 @@ public class UniProtKBViewByController {
     @ApiResponse(
             content =
                     @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
-    public ResponseEntity<List<ViewBy>> getViewByTaxonomy(
+    public ResponseEntity<ViewByResult<ViewBy>> getViewByTaxonomy(
             @Parameter(
                             description =
                                     "Criteria to search the views. It can take any valid solr query.")
@@ -133,6 +134,7 @@ public class UniProtKBViewByController {
             @Parameter(description = "Name of the parent")
                     @RequestParam(value = "parent", required = false)
                     String parent) {
-        return new ResponseEntity<>(uniProtKBViewByTaxonomyService.getViewBys(query, parent), HttpStatus.OK);
+        return new ResponseEntity<>(new ViewByResult<>(uniProtKBViewByTaxonomyService.getViewBys(query, parent)),
+                HttpStatus.OK);
     }
 }

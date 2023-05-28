@@ -1,183 +1,244 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
-import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.service.*;
+import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
+import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
+import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.indexer.DataStoreManager.StoreType;
+import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.Document;
+import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
+import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBViewByController.class)
-@ContextConfiguration(classes = {AsyncDownloadMocks.class})
+@ContextConfiguration(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
 @AutoConfigureWebClient
+@ActiveProfiles("viewbytest")
 class UniProtKBViewByControllerIT {
-    @Autowired private MockMvc mockMvc;
+    private static final String EMPTY_PARENT = "";
+    private static final String ACCESSION_0 = "A0";
+    private static final int TAX_ID_0 = 9600;
+    private static final String TAX_ID_0_STRING = String.valueOf(TAX_ID_0);
+    private static final String TAX_SCIENTIFIC_0 = "scientific_9600";
+    private static final String ACCESSION_1 = "A1";
+    private static final int TAX_ID_1 = 9601;
+    private static final String TAX_ID_1_STRING = String.valueOf(TAX_ID_1);
+    private static final String TAX_SCIENTIFIC_1 = "scientific_9601";
+    private static final String ACCESSION_2 = "A2";
+    private static final int TAX_ID_2 = 9602;
+    private static final String TAX_ID_2_STRING = String.valueOf(TAX_ID_2);
+    private static final String TAX_SCIENTIFIC_2 = "scientific_9602";
+    @Autowired
+    private MockMvc mockMvc;
+    @RegisterExtension
+    static DataStoreManager dataStoreManager = new DataStoreManager();
 
-    @MockBean private UniProtViewByECService ecService;
+    @TestConfiguration
+    static class TestConfig {
+        @Bean("uniProtKBSolrClient")
+        public SolrClient uniProtKBSolrClient() {
+            return dataStoreManager.getSolrClient(UNIPROT);
+        }
 
-    @MockBean private UniProtViewByGoService goService;
-
-    @MockBean private UniProtViewByKeywordService kwService;
-
-    @MockBean private UniProtKBViewByTaxonomyService uniProtKBViewByTaxonomyService;
-
-    @Test
-    void testGetEC() throws Exception {
-        mockEcService();
-
-        String query = "organism_id:9606";
-        String parent = "1.1.-.-";
-
-        mockMvc.perform(get("/uniprotkb/view/ec").param("query", query).param("parent", parent))
-                .andDo(log())
-                .andExpect(jsonPath("$[0].id", is("1.1.1.-")))
-                .andExpect(jsonPath("$[0].label", is("With NAD(+) or NADP(+) as acceptor")))
-                .andExpect(jsonPath("$[1].id", is("1.1.3.-")))
-                .andExpect(jsonPath("$[1].label", is("With oxygen as acceptor")));
+        @Bean
+        public SolrClient solrClient() {
+            return dataStoreManager.getSolrClient(TAXONOMY);
+        }
     }
 
-    private void mockEcService() {
-        List<ViewBy> viewBys = new ArrayList<>();
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "1.1.1.-",
-                        "With NAD(+) or NADP(+) as acceptor",
-                        346L,
-                        UniProtViewByECService.URL_PREFIX + "1.1.1.-",
-                        true));
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "1.1.3.-",
-                        "With oxygen as acceptor",
-                        1L,
-                        UniProtViewByECService.URL_PREFIX + "1.1.3.-",
-                        true));
-
-        when(ecService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
+    @BeforeAll
+    static void beforeAll() {
+        dataStoreManager.addSolrClient(UNIPROT, SolrCollection.uniprot);
+        dataStoreManager.addSolrClient(TAXONOMY, SolrCollection.taxonomy);
     }
 
-    @Test
-    void testGetKeyword() throws Exception {
-        mockKeywordService();
-        String query = "organism_id:9606";
-        String parent = "KW-0123";
-
-        mockMvc.perform(
-                        get("/uniprotkb/view/keyword")
-                                .param("query", query)
-                                .param("parent", parent))
-                .andDo(log())
-                .andExpect(jsonPath("$[0].id", is("KW-0128")))
-                .andExpect(jsonPath("$[0].label", is("Catecholamine metabolism")))
-                .andExpect(jsonPath("$[1].id", is("KW-0131")))
-                .andExpect(jsonPath("$[1].label", is("Cell cycle")));
-    }
-
-    private void mockKeywordService() {
-        List<ViewBy> viewBys = new ArrayList<>();
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "KW-0128",
-                        "Catecholamine metabolism",
-                        5L,
-                        UniProtViewByKeywordService.URL_PREFIX + "KW-0128",
-                        false));
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "KW-0131",
-                        "Cell cycle",
-                        102L,
-                        UniProtViewByKeywordService.URL_PREFIX + "KW-0131",
-                        true));
-
-        when(kwService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
+    @AfterEach
+    void tearDown() {
+        dataStoreManager.cleanSolr(UNIPROT);
+        dataStoreManager.cleanSolr(TAXONOMY);
     }
 
     @Test
-    void testGetGo() throws Exception {
-        mockGoService();
-        String query = "organism_id:9606";
-        String parent = "GO:0002150";
+    void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField() throws Exception {
+        prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/go").param("query", query).param("parent", parent))
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("query", "organism_id:" + TAX_ID_0_STRING)
+                        .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$[0].id", is("GO:0008150")))
-                .andExpect(jsonPath("$[0].label", is("biological_process")))
-                .andExpect(jsonPath("$[1].id", is("GO:0005575")))
-                .andExpect(jsonPath("$[1].label", is("cellular_component")));
-    }
-
-    private void mockGoService() {
-        List<ViewBy> viewBys = new ArrayList<>();
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "GO:0008150",
-                        "biological_process",
-                        78L,
-                        UniProtViewByGoService.URL_PREFIX + "GO:0008150",
-                        true));
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "GO:0005575",
-                        "cellular_component",
-                        70L,
-                        UniProtViewByGoService.URL_PREFIX + "GO:0005575",
-                        true));
-
-        when(goService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(jsonPath("$.results[0].expand", is(false)))
+                .andExpect(jsonPath("$.results[0].count", is(1)));
     }
 
     @Test
-    void testGetTaxonomy() throws Exception {
-        mockTaxonService();
-        String query = "organism_id:9606";
-        String parent = "9605";
+    void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
+        prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(
-                        get("/uniprotkb/view/taxonomy")
-                                .param("query", query)
-                                .param("parent", parent))
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("query", TAX_ID_0_STRING)
+                        .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$[0].id", is("1425170")))
-                .andExpect(jsonPath("$[0].label", is("Homo heidelbergensis")))
-                .andExpect(jsonPath("$[1].id", is("9606")))
-                .andExpect(jsonPath("$[1].label", is("Homo sapiens")));
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(jsonPath("$.results[0].expand", is(false)))
+                .andExpect(jsonPath("$.results[0].count", is(1)));
     }
 
-    private void mockTaxonService() {
-        List<ViewBy> viewBys = new ArrayList<>();
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "1425170",
-                        "Homo heidelbergensis",
-                        23L,
-                        UniProtKBViewByTaxonomyService.URL_PHRASE + "1425170",
-                        false));
-        viewBys.add(
-                MockServiceHelper.createViewBy(
-                        "9606",
-                        "Homo sapiens",
-                        50L,
-                        UniProtKBViewByTaxonomyService.URL_PHRASE + "9606",
-                        false));
+    @Test
+    void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
+        prepareSingleRootWithTwoLevelsOfChildren();
 
-        when(uniProtKBViewByTaxonomyService.getViewBys(anyString(), anyString())).thenReturn(viewBys);
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("query", "organism_id:" + TAX_ID_2_STRING)
+                        .param("parent", EMPTY_PARENT))
+                .andDo(log())
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.results[0].expand", is(false)))
+                .andExpect(jsonPath("$.results[0].count", is(1)));
+    }
+
+    @Test
+    void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+        prepareSingleRootWithTwoLevelsOfChildren();
+
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("query", TAX_ID_2_STRING)
+                        .param("parent", EMPTY_PARENT))
+                .andDo(log())
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.results[0].expand", is(false)))
+                .andExpect(jsonPath("$.results[0].count", is(1)));
+    }
+
+    @Test
+    void viewByTaxonomy_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
+        prepareSingleRootWithTwoLevelsOfChildren();
+
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("query", "taxonomy_id:" + TAX_ID_1_STRING)
+                        .param("parent", TAX_ID_0_STRING))
+                .andDo(log())
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_1_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(jsonPath("$.results[0].expand", is(true)))
+                .andExpect(jsonPath("$.results[0].count", is(2)));
+    }
+
+    @Test
+    void viewByTaxonomy_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+        prepareSingleRootWithTwoLevelsOfChildren();
+
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("query", TAX_ID_1_STRING)
+                        .param("parent", TAX_ID_0_STRING))
+                .andDo(print())
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_1_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(jsonPath("$.results[0].expand", is(true)))
+                .andExpect(jsonPath("$.results[0].count", is(2)));
+    }
+
+    @Test
+    void viewByTaxonomy_emptyResults() throws Exception {
+        prepareSingleRootNodeWithNoChildren();
+
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("query", "organism_id:" + TAX_ID_1_STRING)
+                        .param("parent", EMPTY_PARENT))
+                .andDo(log())
+                .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
+    @Test
+    void viewByTaxonomy_whenFreeFormQueryAndEmptyResults() throws Exception {
+        prepareSingleRootNodeWithNoChildren();
+
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("query", TAX_ID_1_STRING)
+                        .param("parent", EMPTY_PARENT))
+                .andDo(print())
+                .andExpect(jsonPath("$.results.size()", is(0)));
+    }
+
+    @Test
+    void viewByTaxonomy_whenQueryNotSpecified() throws Exception {
+        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+                        .param("parent", EMPTY_PARENT))
+                .andDo(log())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsStringIgnoringCase("query is a required parameter")));
+
+    }
+
+    private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {
+        saveTaxonomyDocument((long) TAX_ID_0, TAX_SCIENTIFIC_0, null);
+        saveUniProtDocument(ACCESSION_0, TAX_ID_0, List.of(TAX_ID_0));
+        saveTaxonomyDocument((long) TAX_ID_1, TAX_SCIENTIFIC_1, (long) TAX_ID_0);
+        saveUniProtDocument(ACCESSION_1, TAX_ID_1, List.of(TAX_ID_0, TAX_ID_1));
+        saveTaxonomyDocument((long) TAX_ID_2, TAX_SCIENTIFIC_2, (long) TAX_ID_1);
+        saveUniProtDocument(ACCESSION_2, TAX_ID_2, List.of(TAX_ID_0, TAX_ID_1, TAX_ID_2));
+    }
+
+    private void prepareSingleRootNodeWithNoChildren() throws Exception {
+        saveTaxonomyDocument((long) TAX_ID_0, TAX_SCIENTIFIC_0, null);
+        saveUniProtDocument(ACCESSION_0, TAX_ID_0, List.of(TAX_ID_0));
+    }
+
+    private void saveUniProtDocument(String accession, int organismId, List<Integer> taxonomies) {
+        UniProtDocument uniProtDocument = new UniProtDocument();
+        uniProtDocument.active = true;
+        uniProtDocument.accession = accession;
+        uniProtDocument.organismTaxId = organismId;
+        uniProtDocument.taxLineageIds = taxonomies;
+        save(UNIPROT, uniProtDocument);
+    }
+
+    private void saveTaxonomyDocument(Long taxId, String scientificName, Long parent) throws Exception {
+        byte[] scientific00s = TaxonomyJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(new TaxonomyEntryBuilder()
+                .taxonId(taxId)
+                .scientificName(scientificName).build());
+        TaxonomyDocument taxonomyDocument = TaxonomyDocument.builder()
+                .id(String.valueOf(taxId))
+                .taxId(taxId)
+                .parent(parent)
+                .active(true)
+                .taxonomyObj(scientific00s).build();
+        save(TAXONOMY, taxonomyDocument);
+    }
+
+    void save(StoreType type, Document doc) {
+        dataStoreManager.saveDocs(type, doc);
     }
 }
