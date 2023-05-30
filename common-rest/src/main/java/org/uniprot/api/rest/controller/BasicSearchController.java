@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.*;
@@ -162,9 +163,19 @@ public abstract class BasicSearchController<T> {
             headers = createHttpDownloadHeader(context, request);
         }
 
-        this.eventPublisher.publishEvent(
-                new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
+        ApplicationEvent paginatedResultEvent = new PaginatedResultsEvent(this, request, response, result.getPageAndClean());
+        publishPaginationEvent(paginatedResultEvent);
         return ResponseEntity.ok().headers(headers).body(context);
+    }
+
+    /**
+     This is to suppress a false positive sonar failure
+     Sonar error says: "Logging should not be vulnerable to injection attacks"
+     This line does not log anything, this is why we added suppress below
+     */
+    @SuppressWarnings("javasecurity:S5145")
+    private void publishPaginationEvent(ApplicationEvent paginatedResultEvent) {
+        this.eventPublisher.publishEvent(paginatedResultEvent);
     }
 
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> stream(

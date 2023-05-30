@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -382,5 +384,12 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIREF;
+    }
+
+    @Override
+    public String getContentDisposition() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+        return "uniref_" + now.format(dateTimeFormatter);
     }
 }

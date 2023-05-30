@@ -81,7 +81,7 @@ abstract class AbstractIdMappingStreamControllerIT extends AbstractIdMappingBasi
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\"idmapping_")))
                 .andExpect(jsonPath("$.results.size()", greaterThan(0)))
                 .andExpect(jsonPath("$.facets").doesNotExist());
     }
