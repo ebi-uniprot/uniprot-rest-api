@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.ProblemPair;
+import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl;
 import org.uniprot.api.idmapping.controller.validator.IdMappingDownloadRequestValidator;
 import org.uniprot.api.idmapping.controller.validator.IdMappingDownloadRequestValidatorFactory;
@@ -36,7 +37,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "downloadJob", description = "APIs related to idmapping download job")
+@Tag(name = "downloadJob", description = "APIs related to idMapping download job")
 @RestController
 @RequestMapping(value = ID_MAPPING_DOWNLOAD_RESOURCE)
 public class IdMappingDownloadController extends BasicDownloadController {
@@ -66,7 +67,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
                                     schema =
                                             @Schema(
                                                     implementation =
-                                                            IdMappingDownloadRequestImpl.class))
+                                                            IdMappingDownloadRequest.class))
                         })
             })
     public ResponseEntity<JobSubmitResponse> submitDownloadJob(
@@ -120,7 +121,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
         return ResponseEntity.ok(detailResponse);
     }
 
-    private void validateRequest(IdMappingDownloadRequestImpl request) {
+    private void validateRequest(IdMappingDownloadRequest request) {
         String jobId = request.getJobId();
         IdMappingJob idMappingJob = idMappingJobCacheService.getJobAsResource(jobId);
         if (idMappingJob.getJobStatus() != FINISHED) {

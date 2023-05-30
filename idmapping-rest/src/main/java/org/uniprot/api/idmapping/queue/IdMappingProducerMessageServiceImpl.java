@@ -59,7 +59,7 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
 
     @Override
     public void alreadyProcessed(String jobId) {
-        log.info("Job is already processed {}", jobId);
+        log.info("Job is either being processed or already processed {}", jobId);
     }
 
     private void doSendMessage(

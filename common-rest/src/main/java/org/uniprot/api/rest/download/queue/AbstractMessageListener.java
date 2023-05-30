@@ -30,15 +30,19 @@ public abstract class AbstractMessageListener implements MessageListener {
 
     private final DownloadConfigProperties downloadConfigProperties;
 
+    private final AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
+
     private final DownloadJobRepository jobRepository;
 
     protected final RabbitTemplate rabbitTemplate;
 
     public AbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
+            AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
             RabbitTemplate rabbitTemplate) {
         this.downloadConfigProperties = downloadConfigProperties;
+        this.asyncDownloadQueueConfigProperties = asyncDownloadQueueConfigProperties;
         this.jobRepository = jobRepository;
         this.rabbitTemplate = rabbitTemplate;
     }
@@ -89,12 +93,6 @@ public abstract class AbstractMessageListener implements MessageListener {
         }
     }
 
-    protected abstract String getRejectedQueueName();
-
-    protected abstract Integer getMaxRetryCount();
-
-    protected abstract String getRetryQueueName();
-
     protected abstract void processMessage(Message message, DownloadJob downloadJob);
 
     protected static boolean isJobSeenBefore(
@@ -131,6 +129,18 @@ public abstract class AbstractMessageListener implements MessageListener {
 
     private boolean isMaxRetriedReached(Message message) {
         return getRetryCount(message) >= getMaxRetryCount();
+    }
+
+    private int getMaxRetryCount() {
+        return asyncDownloadQueueConfigProperties.getRetryMaxCount();
+    }
+
+    private String getRejectedQueueName() {
+        return asyncDownloadQueueConfigProperties.getRejectedQueueName();
+    }
+
+    private String getRetryQueueName() {
+        return asyncDownloadQueueConfigProperties.getRetryQueueName();
     }
 
     private int getRetryCount(Message message) {

@@ -267,7 +267,6 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         verify(this.uniProtKBMessageListener, atLeast(timesAddHeader))
                 .addAdditionalHeaders(any(), any());
         verify(this.uniProtKBMessageListener, atLeast(timesStreamIds)).streamIds(any());
-        verify(this.uniProtKBMessageListener, never()).setMaxRetryCount(any());
     }
 
     private Callable<Boolean> jobCreatedInRedis(String jobId) {

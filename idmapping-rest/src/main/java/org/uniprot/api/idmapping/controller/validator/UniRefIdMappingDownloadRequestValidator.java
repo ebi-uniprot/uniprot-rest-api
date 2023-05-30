@@ -15,7 +15,7 @@ public class UniRefIdMappingDownloadRequestValidator
     static ReturnFieldConfig returnFieldConfig =
             ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIREF);
 
-    public static final List<String> validFormat =
+    public static final List<String> VALID_FORMATS =
             List.of(
                     FASTA_MEDIA_TYPE_VALUE,
                     TSV_MEDIA_TYPE_VALUE,
@@ -37,6 +37,6 @@ public class UniRefIdMappingDownloadRequestValidator
 
     @Override
     protected List<String> getValidFormats() {
-        return validFormat;
+        return VALID_FORMATS;
     }
 }

@@ -1288,15 +1288,15 @@ public class IdMappingDownloadControllerIT {
     }
 
     private Stream<Arguments> getAllUniProtKBFormats() {
-        return UniProtKBIdMappingDownloadRequestValidator.validFormat.stream().map(Arguments::of);
+        return UniProtKBIdMappingDownloadRequestValidator.VALID_FORMATS.stream().map(Arguments::of);
     }
 
     private Stream<Arguments> getAllUniRefFormats() {
-        return UniRefIdMappingDownloadRequestValidator.validFormat.stream().map(Arguments::of);
+        return UniRefIdMappingDownloadRequestValidator.VALID_FORMATS.stream().map(Arguments::of);
     }
 
     private Stream<Arguments> getAllUniParcFormats() {
-        return UniParcIdMappingDownloadRequestValidator.validFormat.stream().map(Arguments::of);
+        return UniParcIdMappingDownloadRequestValidator.VALID_FORMATS.stream().map(Arguments::of);
     }
 
     private void validateSupportedRDFMediaTypes(String format, String text) {

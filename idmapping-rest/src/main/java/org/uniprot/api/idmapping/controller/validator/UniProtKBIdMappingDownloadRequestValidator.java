@@ -16,7 +16,7 @@ public class UniProtKBIdMappingDownloadRequestValidator
     static ReturnFieldConfig returnFieldConfig =
             ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
 
-    public static final List<String> validFormat =
+    public static final List<String> VALID_FORMATS =
             List.of(
                     FASTA_MEDIA_TYPE_VALUE,
                     TSV_MEDIA_TYPE_VALUE,
@@ -41,6 +41,6 @@ public class UniProtKBIdMappingDownloadRequestValidator
 
     @Override
     protected List<String> getValidFormats() {
-        return validFormat;
+        return VALID_FORMATS;
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,7 @@ import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.AbstractMessageListener;
+import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -45,27 +45,22 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
     private final UniProtEntryService service;
     private final DownloadConfigProperties downloadConfigProperties;
     private final DownloadResultWriter downloadResultWriter;
-
-    @Value("${async.download.rejectedQueueName}")
-    private String rejectedQueueName;
-
-    @Value("${async.download.retryMaxCount}")
-    private Integer maxRetryCount;
-
-    @Value("${async.download.retryQueueName}")
-    private String retryQueueName;
-
     private final EmbeddingsQueueConfigProperties embeddingsQueueConfigProps;
 
     public UniProtKBMessageListener(
             MessageConverter converter,
             UniProtEntryService service,
             DownloadConfigProperties downloadConfigProperties,
+            AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
             EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties) {
-        super(downloadConfigProperties, jobRepository, rabbitTemplate);
+        super(
+                downloadConfigProperties,
+                asyncDownloadQueueConfigProperties,
+                jobRepository,
+                rabbitTemplate);
         this.converter = converter;
         this.service = service;
         this.downloadConfigProperties = downloadConfigProperties;
@@ -136,25 +131,6 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
 
     Stream<String> streamIds(DownloadRequest request) {
         return service.streamIds(request);
-    }
-
-    void setMaxRetryCount(Integer maxRetryCount) {
-        this.maxRetryCount = maxRetryCount;
-    }
-
-    @Override
-    protected String getRejectedQueueName() {
-        return this.rejectedQueueName;
-    }
-
-    @Override
-    protected Integer getMaxRetryCount() {
-        return this.maxRetryCount;
-    }
-
-    @Override
-    protected String getRetryQueueName() {
-        return this.retryQueueName;
     }
 
     private void sendMessageToEmbeddingsQueue(String jobId) {

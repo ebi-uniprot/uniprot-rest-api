@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +29,7 @@ import org.uniprot.api.idmapping.model.*;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
@@ -41,6 +41,8 @@ class IdMappingMessageListenerIT {
     @Mock private MessageConverter converter;
 
     @Mock DownloadConfigProperties downloadConfigProperties;
+
+    @Mock AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
     @Mock DownloadJobRepository jobRepository;
 
@@ -65,7 +67,6 @@ class IdMappingMessageListenerIT {
         Message message = builder.setHeader("jobId", jobId).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
         // stub
-        List<String> accessions = List.of("P12345", "P05067");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
@@ -92,8 +93,7 @@ class IdMappingMessageListenerIT {
                 .thenReturn(
                         (AbstractIdMappingDownloadResultWriter)
                                 this.uniProtKBIdMappingDownloadResultWriter);
-
-        ReflectionTestUtils.setField(this.idMappingMessageListener, "maxRetryCount", 3);
+        when(asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
         ReflectionTestUtils.setField(this.idMappingMessageListener, "writerFactory", writerFactory);
 
         this.idMappingMessageListener.onMessage(message);
@@ -117,7 +117,6 @@ class IdMappingMessageListenerIT {
         Message message = builder.setHeader("jobId", jobId).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
         // stub
-        List<String> accessions = List.of("P12345", "P05067");
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
@@ -144,7 +143,7 @@ class IdMappingMessageListenerIT {
                         (AbstractIdMappingDownloadResultWriter)
                                 this.uniProtKBIdMappingDownloadResultWriter);
 
-        ReflectionTestUtils.setField(this.idMappingMessageListener, "maxRetryCount", 3);
+        when(asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
         ReflectionTestUtils.setField(this.idMappingMessageListener, "writerFactory", writerFactory);
 
         Mockito.doThrow(new IOException("Forced IO Exception"))
@@ -176,10 +175,10 @@ class IdMappingMessageListenerIT {
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
         String rejectedQueueName = "rejectedQueueNameValue";
-        ReflectionTestUtils.setField(this.idMappingMessageListener, "maxRetryCount", 0);
+        when(asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(0);
+        when(asyncDownloadQueueConfigProperties.getRejectedQueueName())
+                .thenReturn(rejectedQueueName);
         ReflectionTestUtils.setField(this.idMappingMessageListener, "writerFactory", writerFactory);
-        ReflectionTestUtils.setField(
-                this.idMappingMessageListener, "rejectedQueueName", rejectedQueueName);
 
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
         Mockito.verify(this.rabbitTemplate, atMostOnce())
@@ -221,7 +220,7 @@ class IdMappingMessageListenerIT {
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
 
         Files.createFile(Path.of("target/" + jobId + FileType.GZIP.getExtension()));
-        ReflectionTestUtils.setField(this.idMappingMessageListener, "maxRetryCount", 3);
+        when(asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
         ReflectionTestUtils.setField(this.idMappingMessageListener, "writerFactory", writerFactory);
 
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
@@ -268,7 +267,7 @@ class IdMappingMessageListenerIT {
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
 
         Files.createFile(Path.of("target/" + jobId + FileType.GZIP.getExtension()));
-        ReflectionTestUtils.setField(this.idMappingMessageListener, "maxRetryCount", 3);
+        when(asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
         ReflectionTestUtils.setField(this.idMappingMessageListener, "writerFactory", writerFactory);
 
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
