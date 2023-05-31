@@ -24,6 +24,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl;
 import org.uniprot.api.idmapping.model.*;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
@@ -219,6 +220,35 @@ class IdMappingMessageListenerIT {
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
         assertEquals(JobStatus.RUNNING, downloadJobResult.getStatus());
+    }
+
+    @Test
+    void testOnMessageWhenIdMappingCacheNotFound() throws IOException {
+        String jobId = UUID.randomUUID().toString();
+        IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
+
+        MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
+        Message message = builder.setHeader("jobId", jobId).build();
+
+        when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
+        String retryQueueName = "retryQueueNameValue";
+        when(asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
+        when(asyncDownloadQueueConfigProperties.getRetryQueueName()).thenReturn(retryQueueName);
+        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
+        when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
+                .thenThrow(new ResourceNotFoundException("Cache not found"));
+
+        Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
+
+        Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
+        assertNotNull(downloadJobResultOpt);
+        assertTrue(downloadJobResultOpt.isPresent());
+        DownloadJob downloadJobResult = downloadJobResultOpt.get();
+        assertEquals(JobStatus.ERROR, downloadJobResult.getStatus());
+        assertEquals(1, downloadJobResult.getRetried());
+        Mockito.verify(this.rabbitTemplate, atMostOnce())
+                .convertAndSend(eq(retryQueueName), any(Message.class));
     }
 
     private IdMappingDownloadRequestImpl getIdMappingDownloadRequest(String jobId) {
