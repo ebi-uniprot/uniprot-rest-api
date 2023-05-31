@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.keyword.repository;
+package org.uniprot.api.rest.respository.keyword;
 
 import java.util.Collection;
 import java.util.HashMap;

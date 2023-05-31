@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.ec.ECRepoFactory;
-import org.uniprot.cv.keyword.KeywordRepo;
-import org.uniprot.cv.keyword.impl.KeywordRepoImpl;
 import org.uniprot.cv.pathway.UniPathwayRepo;
 import org.uniprot.cv.pathway.impl.UniPathwayRepoImpl;
 
@@ -17,11 +15,6 @@ public class ViewByServiceConfig {
     @Bean
     public ViewByConfigProperties configProperties() {
         return new ViewByConfigProperties();
-    }
-
-    @Bean
-    public KeywordRepo keywordService(ViewByConfigProperties configProperties) {
-        return new KeywordRepoImpl(configProperties.getKeywordFile());
     }
 
     @Bean
@@ -49,15 +42,6 @@ public class ViewByServiceConfig {
             SolrClient solrClient, ViewByConfigProperties configProperties, ECRepo ecRepo) {
         return new UniProtViewByECService(
                 solrClient, configProperties.getUniprotCollection(), ecRepo);
-    }
-
-    @Bean
-    public UniProtViewByKeywordService uniprotViewByKeywordService(
-            SolrClient solrClient,
-            ViewByConfigProperties configProperties,
-            KeywordRepo keywordRepo) {
-        return new UniProtViewByKeywordService(
-                solrClient, configProperties.getUniprotCollection(), keywordRepo);
     }
 
     @Bean

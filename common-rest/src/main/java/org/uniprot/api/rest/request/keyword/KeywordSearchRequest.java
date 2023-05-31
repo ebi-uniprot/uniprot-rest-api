@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.keyword.request;
+package org.uniprot.api.rest.request.keyword;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.rest.respository.keyword.KeywordFacetConfig;
 import org.uniprot.api.rest.validation.ValidFacets;
-import org.uniprot.api.support.data.keyword.repository.KeywordFacetConfig;
 
 import io.swagger.v3.oas.annotations.Parameter;
 

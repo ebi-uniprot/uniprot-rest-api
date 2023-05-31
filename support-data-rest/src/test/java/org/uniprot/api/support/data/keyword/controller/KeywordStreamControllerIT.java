@@ -37,7 +37,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
+import org.uniprot.api.rest.respository.keyword.KeywordRepository;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.keyword.KeywordDocument;

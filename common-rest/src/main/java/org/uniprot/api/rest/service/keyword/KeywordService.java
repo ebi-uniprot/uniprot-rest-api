@@ -1,14 +1,14 @@
-package org.uniprot.api.support.data.keyword.service;
+package org.uniprot.api.rest.service.keyword;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.rest.respository.keyword.KeywordFacetConfig;
+import org.uniprot.api.rest.respository.keyword.KeywordRepository;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
-import org.uniprot.api.support.data.keyword.repository.KeywordFacetConfig;
-import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
