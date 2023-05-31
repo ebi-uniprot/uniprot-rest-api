@@ -44,8 +44,7 @@ public abstract class UniProtViewByService<T> {
 
     private List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
         if (!entries.isEmpty()) {
-            List<FacetField> facetFields = uniProtEntryService
-                    .getFacets(query, getFacetFields(entries));
+            List<FacetField> facetFields = uniProtEntryService.getFacets(query, getFacetFields(entries));
 
             if (!facetFields.isEmpty()) {
                 return facetFields.get(0).getValues().stream()

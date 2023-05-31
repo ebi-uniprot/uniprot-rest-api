@@ -34,8 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBViewByController.class)
@@ -78,12 +77,14 @@ class UniProtKBViewByControllerIT {
     static void beforeAll() {
         dataStoreManager.addSolrClient(UNIPROT, SolrCollection.uniprot);
         dataStoreManager.addSolrClient(TAXONOMY, SolrCollection.taxonomy);
+        dataStoreManager.addSolrClient(KEYWORD, SolrCollection.keyword);
     }
 
     @AfterEach
     void tearDown() {
         dataStoreManager.cleanSolr(UNIPROT);
         dataStoreManager.cleanSolr(TAXONOMY);
+        dataStoreManager.cleanSolr(KEYWORD);
     }
 
     @Test

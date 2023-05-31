@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.keyword.repository;
+package org.uniprot.api.rest.respository.keyword;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.stereotype.Repository;

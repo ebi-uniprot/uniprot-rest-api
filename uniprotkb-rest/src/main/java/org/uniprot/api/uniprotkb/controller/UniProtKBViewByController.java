@@ -77,11 +77,11 @@ public class UniProtKBViewByController {
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary =
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
+                    "List of view-bys w.r.t. to the given query and parent")
     @ApiResponse(
             content =
                     @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
-    public ResponseEntity<List<ViewBy>> getKeyword(
+    public ResponseEntity<List<ViewBy>> getViewByKeyword(
             @Parameter(
                             description =
                                     "Criteria to search the views. It can take any valid solr query.")

@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.keyword.request;
+package org.uniprot.api.rest.request.keyword;
 
 import javax.validation.constraints.Pattern;
 

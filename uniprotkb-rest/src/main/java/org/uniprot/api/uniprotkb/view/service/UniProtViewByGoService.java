@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class UniProtViewByGoService implements UniProtViewByService {
+public class UniProtViewByGoService extends UniProtViewByService<GoRelation> {
     private final SolrClient solrClient;
     private final String uniprotCollection;
     private final GoService goService;
@@ -28,6 +28,7 @@ public class UniProtViewByGoService implements UniProtViewByService {
 
     public UniProtViewByGoService(
             SolrClient solrClient, String uniprotCollection, GoService goService) {
+        super(null);
         this.solrClient = solrClient;
         this.uniprotCollection = uniprotCollection;
         this.goService = goService;
@@ -72,6 +73,21 @@ public class UniProtViewByGoService implements UniProtViewByService {
         } catch (SolrServerException | IOException e) {
             throw new UniProtViewByServiceException(e);
         }
+    }
+
+    @Override
+    protected List<GoRelation> getChildren(String parent) {
+        return null;
+    }
+
+    @Override
+    protected String getFacetFields(List<GoRelation> goRelations) {
+        return null;
+    }
+
+    @Override
+    protected List<ViewBy> getViewBys(List<FacetField.Count> facetCounts, List<GoRelation> goRelations, String query) {
+        return null;
     }
 
     private String removeGoPrefix(String go) {

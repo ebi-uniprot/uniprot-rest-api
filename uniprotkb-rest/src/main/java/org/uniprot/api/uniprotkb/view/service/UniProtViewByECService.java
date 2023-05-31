@@ -19,13 +19,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 // @Service
-public class UniProtViewByECService implements UniProtViewByService {
+public class UniProtViewByECService extends UniProtViewByService<String> {
     private final SolrClient solrClient;
     private final String uniprotCollection;
     private final ECRepo ecRepo;
     public static final String URL_PREFIX = "https://enzyme.expasy.org/EC/";
 
     public UniProtViewByECService(SolrClient solrClient, String uniprotCollection, ECRepo ecRepo) {
+        super(null);
         this.solrClient = solrClient;
         this.uniprotCollection = uniprotCollection;
         this.ecRepo = ecRepo;
@@ -65,6 +66,21 @@ public class UniProtViewByECService implements UniProtViewByService {
         } catch (SolrServerException | IOException e) {
             throw new UniProtViewByServiceException(e);
         }
+    }
+
+    @Override
+    protected List<String> getChildren(String parent) {
+        return null;
+    }
+
+    @Override
+    protected String getFacetFields(List<String> strings) {
+        return null;
+    }
+
+    @Override
+    protected List<ViewBy> getViewBys(List<FacetField.Count> facetCounts, List<String> strings, String query) {
+        return null;
     }
 
     private String ecAddDashIfAbsent(String ec) {

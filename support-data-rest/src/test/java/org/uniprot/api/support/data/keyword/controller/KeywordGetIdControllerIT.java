@@ -26,7 +26,7 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
+import org.uniprot.api.rest.respository.keyword.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordEntryBuilder;

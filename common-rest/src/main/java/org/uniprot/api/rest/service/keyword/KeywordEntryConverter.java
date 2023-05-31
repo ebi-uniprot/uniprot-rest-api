@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.keyword.service;
+package org.uniprot.api.rest.service.keyword;
 
 import java.util.function.Function;
 
