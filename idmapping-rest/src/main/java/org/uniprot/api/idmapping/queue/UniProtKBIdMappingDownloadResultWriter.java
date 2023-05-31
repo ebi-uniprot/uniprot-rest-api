@@ -32,7 +32,7 @@ public class UniProtKBIdMappingDownloadResultWriter
 
     private final TaxonomyLineageService taxonomyLineageService;
     private final ReturnFieldConfig returnFieldConfig;
-    private static final Type type =
+    private static final Type TYPE =
             (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntryPair>>() {})
                     .getType();
 
@@ -69,6 +69,6 @@ public class UniProtKBIdMappingDownloadResultWriter
 
     @Override
     public Type getType() {
-        return type;
+        return TYPE;
     }
 }

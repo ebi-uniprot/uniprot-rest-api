@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.queue;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.idmapping.model.EntryPair;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 @Component
 public class IdMappingDownloadResultWriterFactory {
@@ -24,15 +25,15 @@ public class IdMappingDownloadResultWriterFactory {
             String type) {
         AbstractIdMappingDownloadResultWriter<? extends EntryPair<?>, ?> writer;
         switch (type) {
-            case "uniprotkb":
+            case IdMappingFieldConfig.UNIPROTKB_STR:
                 writer = uniProtKBIdMappingDownloadResultWriter;
                 break;
-            case "uniparc":
+            case IdMappingFieldConfig.UNIPARC_STR:
                 writer = uniParcIdMappingDownloadResultWriter;
                 break;
-            case "uniref50":
-            case "uniref90":
-            case "uniref100":
+            case IdMappingFieldConfig.UNIREF_50_STR:
+            case IdMappingFieldConfig.UNIREF_90_STR:
+            case IdMappingFieldConfig.UNIREF_100_STR:
                 writer = uniRefIdMappingDownloadResultWriter;
                 break;
             default:

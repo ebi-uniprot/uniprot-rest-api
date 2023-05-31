@@ -46,7 +46,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
     private final MessageConverterContextFactory.Resource resource;
     private final RdfStreamer rdfStreamer;
 
-    public AbstractIdMappingDownloadResultWriter(
+    protected AbstractIdMappingDownloadResultWriter(
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<T> converterContextFactory,
             StoreStreamerConfig<S> storeStreamerConfig,

@@ -313,7 +313,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadJobDetailsNotFound() throws Exception {
+    void uniParcDownloadJobDetailsNotFound() throws Exception {
         // Do not save request in idmapping cache
         String jobId = "UNIPARC_JOB_DETAILS_NOT_FOUND";
 
@@ -329,13 +329,13 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadCanGetJobDetails() throws Exception {
+    void uniParcDownloadCanGetJobDetails() throws Exception {
         String jobId = "UNIPARC_JOB_ID_DETAILS";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
         mappedIds.add(new IdMappingStringPair("P10002", "UPI0000283A02"));
-        cacheIdMappingJob(jobId, "uniparc", JobStatus.FINISHED, mappedIds);
+        cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, mappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -368,10 +368,10 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadCanGetJobDetailsWithError() throws Exception {
+    void uniParcDownloadCanGetJobDetailsWithError() throws Exception {
         String jobId = "UNIPARC_JOB_ID_DETAILS_ERROR";
 
-        cacheIdMappingJob(jobId, "uniparc", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, List.of());
         DownloadJob downloadJob =
                 DownloadJob.builder()
                         .id(jobId)
@@ -408,7 +408,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadJobSubmittedNotFound() throws Exception {
+    void uniParcDownloadJobSubmittedNotFound() throws Exception {
         // Do not save request in idmapping cache
 
         ResultActions response =
@@ -425,7 +425,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadJobSubmittedBadRequestRequired() throws Exception {
+    void uniParcDownloadJobSubmittedBadRequestRequired() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -443,13 +443,13 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadJobSubmittedBadRequestNotFinished() throws Exception {
+    void uniParcDownloadJobSubmittedBadRequestNotFinished() throws Exception {
         String jobId = "UNIPARC_JOB_RUNNING";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
         mappedIds.add(new IdMappingStringPair("P10002", "UPI0000283A02"));
-        cacheIdMappingJob(jobId, "uniparc", JobStatus.RUNNING, mappedIds);
+        cacheIdMappingJob(jobId, "UniParc", JobStatus.RUNNING, mappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -470,7 +470,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadJobSubmittedBadRequestWrongTo() throws Exception {
+    void uniParcDownloadJobSubmittedBadRequestWrongTo() throws Exception {
         String jobId = "UNIPARC_JOB_WRONG_TO";
 
         cacheIdMappingJob(jobId, "invalid", JobStatus.FINISHED, List.of());
@@ -490,14 +490,14 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'uniprotkb', 'uniparc', 'uniref50', 'uniref90' or 'uniref100'.")));
+                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
     }
 
     @Test
-    void uniparcDownloadJobSubmittedBadRequestWrongFormat() throws Exception {
+    void uniParcDownloadJobSubmittedBadRequestWrongFormat() throws Exception {
         String jobId = "UNIPARC_JOB_WRONG_FORMAT";
 
-        cacheIdMappingJob(jobId, "uniparc", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, List.of());
 
         ResultActions response =
                 mockMvc.perform(
@@ -518,10 +518,10 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadJobSubmittedBadRequestInvalidField() throws Exception {
+    void uniParcDownloadJobSubmittedBadRequestInvalidField() throws Exception {
         String jobId = "UNIPARC_JOB_WRONG_FIELD";
 
-        cacheIdMappingJob(jobId, "uniparc", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, List.of());
 
         ResultActions response =
                 mockMvc.perform(
@@ -543,7 +543,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniparcDownloadJobSubmittedSuccessfully() throws Exception {
+    void uniParcDownloadJobSubmittedSuccessfully() throws Exception {
         // when
         String jobId = "UNIPARC_JOB_SUCCESS";
 
@@ -551,7 +551,7 @@ public class IdMappingDownloadControllerIT {
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
         mappedIds.add(new IdMappingStringPair("P10002", "UPI0000283A02"));
         List<String> unMappedIds = List.of("UPI0000283100", "UPI0000283200");
-        cacheIdMappingJob(jobId, "uniparc", JobStatus.FINISHED, mappedIds, unMappedIds);
+        cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, mappedIds, unMappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -600,14 +600,14 @@ public class IdMappingDownloadControllerIT {
 
     @ParameterizedTest(name = "[{index}] with format {0}")
     @MethodSource("getAllUniParcFormats")
-    void uniparcDownloadJobSubmittedAllFormats(String format) throws Exception {
+    void uniParcDownloadJobSubmittedAllFormats(String format) throws Exception {
         // when
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
         mappedIds.add(new IdMappingStringPair("P10002", "UPI0000283A02"));
 
         String jobId = "UNIPARC_JOB_FORMAT_" + cleanFormat(format);
-        cacheIdMappingJob(jobId, "uniparc", JobStatus.FINISHED, mappedIds);
+        cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, mappedIds);
         ResultActions response =
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
@@ -660,7 +660,7 @@ public class IdMappingDownloadControllerIT {
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UniRef50_P03901"));
         mappedIds.add(new IdMappingStringPair("P10002", "UniRef50_P03902"));
-        cacheIdMappingJob(jobId, "uniref50", JobStatus.FINISHED, mappedIds);
+        cacheIdMappingJob(jobId, "UniRef50", JobStatus.FINISHED, mappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -696,7 +696,7 @@ public class IdMappingDownloadControllerIT {
     void unirefDownloadCanGetJobDetailsWithError() throws Exception {
         String jobId = "UNIREF_JOB_ID_DETAILS_ERROR";
 
-        cacheIdMappingJob(jobId, "uniref90", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniRef90", JobStatus.FINISHED, List.of());
         DownloadJob downloadJob =
                 DownloadJob.builder()
                         .id(jobId)
@@ -773,7 +773,7 @@ public class IdMappingDownloadControllerIT {
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UniRef90_P03901"));
         mappedIds.add(new IdMappingStringPair("P10002", "UniRef90_P03902"));
-        cacheIdMappingJob(jobId, "uniref90", JobStatus.RUNNING, mappedIds);
+        cacheIdMappingJob(jobId, "UniRef90", JobStatus.RUNNING, mappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -814,14 +814,14 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'uniprotkb', 'uniparc', 'uniref50', 'uniref90' or 'uniref100'.")));
+                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
     }
 
     @Test
     void unirefDownloadJobSubmittedBadRequestWrongFormat() throws Exception {
         String jobId = "UNIREF_JOB_WRONG_FORMAT";
 
-        cacheIdMappingJob(jobId, "uniref100", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniRef100", JobStatus.FINISHED, List.of());
 
         ResultActions response =
                 mockMvc.perform(
@@ -845,7 +845,7 @@ public class IdMappingDownloadControllerIT {
     void unirefDownloadJobSubmittedBadRequestInvalidField() throws Exception {
         String jobId = "UNIREF_JOB_WRONG_FIELD";
 
-        cacheIdMappingJob(jobId, "uniref100", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniRef100", JobStatus.FINISHED, List.of());
 
         ResultActions response =
                 mockMvc.perform(
@@ -875,7 +875,7 @@ public class IdMappingDownloadControllerIT {
         mappedIds.add(new IdMappingStringPair("P10001", "UniRef90_P03901"));
         mappedIds.add(new IdMappingStringPair("P10002", "UniRef90_P03902"));
         List<String> unMappedIds = List.of("UniRef90_P03001", "UniRef90_P03002");
-        cacheIdMappingJob(jobId, "uniref90", JobStatus.FINISHED, mappedIds, unMappedIds);
+        cacheIdMappingJob(jobId, "UniRef90", JobStatus.FINISHED, mappedIds, unMappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -931,7 +931,7 @@ public class IdMappingDownloadControllerIT {
         mappedIds.add(new IdMappingStringPair("P10002", "UniRef50_P03902"));
 
         String jobId = "UNIREF_JOB_FORMAT_" + cleanFormat(format);
-        cacheIdMappingJob(jobId, "uniref50", JobStatus.FINISHED, mappedIds);
+        cacheIdMappingJob(jobId, "UniRef50", JobStatus.FINISHED, mappedIds);
         ResultActions response =
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
@@ -962,7 +962,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadJobDetailsNotFound() throws Exception {
+    void uniProtKBDownloadJobDetailsNotFound() throws Exception {
         // Do not save request in idmapping cache
         String jobId = "UNIPROTKB_JOB_DETAILS_NOT_FOUND";
 
@@ -978,13 +978,13 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadCanGetJobDetails() throws Exception {
+    void uniProtKBDownloadCanGetJobDetails() throws Exception {
         String jobId = "UNIPROTKB_JOB_ID_DETAILS";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P00001", "P00001"));
         mappedIds.add(new IdMappingStringPair("P00002", "P00002"));
-        cacheIdMappingJob(jobId, "uniprotkb", JobStatus.FINISHED, mappedIds);
+        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.FINISHED, mappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -1017,10 +1017,10 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadCanGetJobDetailsWithError() throws Exception {
+    void uniProtKBDownloadCanGetJobDetailsWithError() throws Exception {
         String jobId = "UNIPROTKB_JOB_ID_DETAILS_ERROR";
 
-        cacheIdMappingJob(jobId, "uniprotkb", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.FINISHED, List.of());
         DownloadJob downloadJob =
                 DownloadJob.builder()
                         .id(jobId)
@@ -1057,7 +1057,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadJobSubmittedNotFound() throws Exception {
+    void uniProtKBDownloadJobSubmittedNotFound() throws Exception {
         // Do not save request in idmapping cache
 
         ResultActions response =
@@ -1075,7 +1075,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadJobSubmittedBadRequestRequired() throws Exception {
+    void uniProtKBDownloadJobSubmittedBadRequestRequired() throws Exception {
         // when
         ResultActions response =
                 mockMvc.perform(
@@ -1093,13 +1093,13 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadJobSubmittedBadRequestNotFinished() throws Exception {
+    void uniProtKBDownloadJobSubmittedBadRequestNotFinished() throws Exception {
         String jobId = "UNIPROTKB_JOB_RUNNING";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P00001", "P00001"));
         mappedIds.add(new IdMappingStringPair("P00002", "P00002"));
-        cacheIdMappingJob(jobId, "uniprotkb", JobStatus.RUNNING, mappedIds);
+        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.RUNNING, mappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -1120,7 +1120,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadJobSubmittedBadRequestWrongTo() throws Exception {
+    void uniProtKBDownloadJobSubmittedBadRequestWrongTo() throws Exception {
         String jobId = "UNIPROTKB_JOB_WRONG_TO";
 
         cacheIdMappingJob(jobId, "invalid", JobStatus.FINISHED, List.of());
@@ -1140,14 +1140,14 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'uniprotkb', 'uniparc', 'uniref50', 'uniref90' or 'uniref100'.")));
+                                        "Invalid request received. The IdMapping 'to' parameter value is invalid. It should be 'UniProtKB', 'UniParc', 'UniRef50', 'UniRef90' or 'UniRef100'.")));
     }
 
     @Test
-    void uniprotkbDownloadJobSubmittedBadRequestWrongFormat() throws Exception {
+    void uniProtKBDownloadJobSubmittedBadRequestWrongFormat() throws Exception {
         String jobId = "UNIPROTKB_JOB_WRONG_FORMAT";
 
-        cacheIdMappingJob(jobId, "uniprotkb", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.FINISHED, List.of());
 
         ResultActions response =
                 mockMvc.perform(
@@ -1168,10 +1168,10 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadJobSubmittedBadRequestInvalidField() throws Exception {
+    void uniProtKBDownloadJobSubmittedBadRequestInvalidField() throws Exception {
         String jobId = "UNIPROTKB_JOB_WRONG_FIELD";
 
-        cacheIdMappingJob(jobId, "uniprotkb", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.FINISHED, List.of());
 
         ResultActions response =
                 mockMvc.perform(
@@ -1193,7 +1193,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniprotkbDownloadJobSubmittedSuccessfully() throws Exception {
+    void uniProtKBDownloadJobSubmittedSuccessfully() throws Exception {
         // when
         String jobId = "UNIPROTKB_JOB_SUCCESS";
 
@@ -1201,7 +1201,7 @@ public class IdMappingDownloadControllerIT {
         mappedIds.add(new IdMappingStringPair("P00001", "P00001"));
         mappedIds.add(new IdMappingStringPair("P00002", "P00002"));
         List<String> unMappedIds = List.of("P12345", "P54321");
-        cacheIdMappingJob(jobId, "uniprotkb", JobStatus.FINISHED, mappedIds, unMappedIds);
+        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.FINISHED, mappedIds, unMappedIds);
 
         ResultActions response =
                 mockMvc.perform(
@@ -1250,14 +1250,14 @@ public class IdMappingDownloadControllerIT {
 
     @ParameterizedTest(name = "[{index}] with format {0}")
     @MethodSource("getAllUniProtKBFormats")
-    void uniprotkbDownloadJobSubmittedAllFormats(String format) throws Exception {
+    void uniProtKBDownloadJobSubmittedAllFormats(String format) throws Exception {
         // when
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P00001", "P00001"));
         mappedIds.add(new IdMappingStringPair("P00002", "P00002"));
 
         String jobId = "UNIPROTKB_JOB_FORMAT_" + cleanFormat(format);
-        cacheIdMappingJob(jobId, "uniprotkb", JobStatus.FINISHED, mappedIds);
+        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.FINISHED, mappedIds);
         ResultActions response =
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)

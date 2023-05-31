@@ -24,7 +24,7 @@ import org.uniprot.core.uniparc.UniParcEntry;
 public class UniParcIdMappingDownloadResultWriter
         extends AbstractIdMappingDownloadResultWriter<UniParcEntryPair, UniParcEntry> {
 
-    private static final Type type =
+    private static final Type TYPE =
             (new ParameterizedTypeReference<MessageConverterContext<UniParcEntryPair>>() {})
                     .getType();
 
@@ -55,6 +55,6 @@ public class UniParcIdMappingDownloadResultWriter
 
     @Override
     public Type getType() {
-        return type;
+        return TYPE;
     }
 }

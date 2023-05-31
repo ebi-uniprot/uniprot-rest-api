@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 class IdMappingDownloadResultWriterFactoryTest {
 
@@ -21,7 +22,7 @@ class IdMappingDownloadResultWriterFactoryTest {
                 new IdMappingDownloadResultWriterFactory(
                         uniparcWriter, uniprotWriter, unirefWriter);
         AbstractIdMappingDownloadResultWriter<? extends EntryPair<?>, ?> result =
-                factory.getResultWriter("uniprotkb");
+                factory.getResultWriter(IdMappingFieldConfig.UNIPROTKB_STR);
         assertNotNull(result);
         assertEquals(uniprotWriter, result);
     }
@@ -32,7 +33,7 @@ class IdMappingDownloadResultWriterFactoryTest {
                 new IdMappingDownloadResultWriterFactory(
                         uniparcWriter, uniprotWriter, unirefWriter);
         AbstractIdMappingDownloadResultWriter<? extends EntryPair<?>, ?> result =
-                factory.getResultWriter("uniparc");
+                factory.getResultWriter(IdMappingFieldConfig.UNIPARC_STR);
         assertNotNull(result);
         assertEquals(uniparcWriter, result);
     }
@@ -43,7 +44,7 @@ class IdMappingDownloadResultWriterFactoryTest {
                 new IdMappingDownloadResultWriterFactory(
                         uniparcWriter, uniprotWriter, unirefWriter);
         AbstractIdMappingDownloadResultWriter<? extends EntryPair<?>, ?> result =
-                factory.getResultWriter("uniref50");
+                factory.getResultWriter(IdMappingFieldConfig.UNIREF_50_STR);
         assertNotNull(result);
         assertEquals(unirefWriter, result);
     }
@@ -54,7 +55,7 @@ class IdMappingDownloadResultWriterFactoryTest {
                 new IdMappingDownloadResultWriterFactory(
                         uniparcWriter, uniprotWriter, unirefWriter);
         AbstractIdMappingDownloadResultWriter<? extends EntryPair<?>, ?> result =
-                factory.getResultWriter("uniref90");
+                factory.getResultWriter(IdMappingFieldConfig.UNIREF_90_STR);
         assertNotNull(result);
         assertEquals(unirefWriter, result);
     }
@@ -65,7 +66,7 @@ class IdMappingDownloadResultWriterFactoryTest {
                 new IdMappingDownloadResultWriterFactory(
                         uniparcWriter, uniprotWriter, unirefWriter);
         AbstractIdMappingDownloadResultWriter<? extends EntryPair<?>, ?> result =
-                factory.getResultWriter("uniref100");
+                factory.getResultWriter(IdMappingFieldConfig.UNIREF_90_STR);
         assertNotNull(result);
         assertEquals(unirefWriter, result);
     }

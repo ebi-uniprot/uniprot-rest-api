@@ -59,10 +59,7 @@ class IdMappingMessageListenerIT {
     @Test
     void testOnMessageFinishedWithSuccess() throws IOException {
         String jobId = UUID.randomUUID().toString();
-        IdMappingDownloadRequestImpl downloadRequest = new IdMappingDownloadRequestImpl();
-        downloadRequest.setJobId(jobId);
-        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
-        downloadRequest.setFields("accession,gene_names");
+        IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
@@ -75,16 +72,8 @@ class IdMappingMessageListenerIT {
                         .mappedId(IdMappingStringPair.builder().from("P12345").to("P12345").build())
                         .mappedId(IdMappingStringPair.builder().from("P05067").to("P05067").build())
                         .build();
-        IdMappingJobRequest idMappingRequest = new IdMappingJobRequest();
-        String to = "uniprotkb";
-        idMappingRequest.setTo(to);
-        IdMappingJob idMappingJob =
-                IdMappingJob.builder()
-                        .idMappingResult(idMappingResult)
-                        .idMappingRequest(idMappingRequest)
-                        .jobStatus(JobStatus.FINISHED)
-                        .created(new Date())
-                        .build();
+        String to = "UniProtKB";
+        IdMappingJob idMappingJob = getIdMappingJob(to);
         when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
                 .thenReturn(idMappingJob);
         Mockito.verify(this.uniProtKBIdMappingDownloadResultWriter, atMostOnce())
@@ -98,7 +87,6 @@ class IdMappingMessageListenerIT {
 
         this.idMappingMessageListener.onMessage(message);
 
-        // verify the ids file and clean up
         Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
         assertNotNull(downloadJobResultOpt);
         assertTrue(downloadJobResultOpt.isPresent());
@@ -107,12 +95,9 @@ class IdMappingMessageListenerIT {
     }
 
     @Test
-    void testOnMessageWithIOExceptionDuringWrite() throws IOException {
+    void testOnMessageWithIOExceptionDuringWriteRetryIsCalled() throws IOException {
         String jobId = UUID.randomUUID().toString();
-        IdMappingDownloadRequestImpl downloadRequest = new IdMappingDownloadRequestImpl();
-        downloadRequest.setJobId(jobId);
-        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
-        downloadRequest.setFields("accession,gene_names");
+        IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
         DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
@@ -120,21 +105,8 @@ class IdMappingMessageListenerIT {
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
-        IdMappingResult idMappingResult =
-                IdMappingResult.builder()
-                        .mappedId(IdMappingStringPair.builder().from("P12345").to("P12345").build())
-                        .mappedId(IdMappingStringPair.builder().from("P05067").to("P05067").build())
-                        .build();
-        IdMappingJobRequest idMappingRequest = new IdMappingJobRequest();
-        String to = "uniprotkb";
-        idMappingRequest.setTo(to);
-        IdMappingJob idMappingJob =
-                IdMappingJob.builder()
-                        .idMappingResult(idMappingResult)
-                        .idMappingRequest(idMappingRequest)
-                        .jobStatus(JobStatus.FINISHED)
-                        .created(new Date())
-                        .build();
+        String to = "UniProtKB";
+        IdMappingJob idMappingJob = getIdMappingJob(to);
         when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
                 .thenReturn(idMappingJob);
 
@@ -144,6 +116,8 @@ class IdMappingMessageListenerIT {
                                 this.uniProtKBIdMappingDownloadResultWriter);
 
         when(asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
+        String retryQueue = "retry_queue";
+        when(asyncDownloadQueueConfigProperties.getRetryQueueName()).thenReturn(retryQueue);
         ReflectionTestUtils.setField(this.idMappingMessageListener, "writerFactory", writerFactory);
 
         Mockito.doThrow(new IOException("Forced IO Exception"))
@@ -152,7 +126,6 @@ class IdMappingMessageListenerIT {
 
         this.idMappingMessageListener.onMessage(message);
 
-        // verify the ids file and clean up
         Optional<DownloadJob> downloadJobResultOpt = this.jobRepository.findById(jobId);
         assertNotNull(downloadJobResultOpt);
         assertTrue(downloadJobResultOpt.isPresent());
@@ -166,12 +139,14 @@ class IdMappingMessageListenerIT {
                         .getError()
                         .contains(
                                 "IdMappingMessageListener.writeResult(IdMappingMessageListener.java"));
+
+        verify(this.rabbitTemplate, atLeast(1)).convertAndSend(eq(retryQueue), any(Message.class));
     }
 
     @Test
     void testOnMessageWhenMaxRetryReached() {
         String jobId = UUID.randomUUID().toString();
-        IdMappingDownloadRequestImpl downloadRequest = new IdMappingDownloadRequestImpl();
+        IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
         String rejectedQueueName = "rejectedQueueNameValue";
@@ -188,29 +163,13 @@ class IdMappingMessageListenerIT {
     @Test
     void testOnMessageWhenIsJobSeenBefore() throws IOException {
         String jobId = UUID.randomUUID().toString();
-        IdMappingDownloadRequestImpl downloadRequest = new IdMappingDownloadRequestImpl();
-        downloadRequest.setJobId(jobId);
-        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
-        downloadRequest.setFields("accession,gene_names");
+        IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
 
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
 
-        IdMappingResult idMappingResult =
-                IdMappingResult.builder()
-                        .mappedId(IdMappingStringPair.builder().from("P12345").to("P12345").build())
-                        .mappedId(IdMappingStringPair.builder().from("P05067").to("P05067").build())
-                        .build();
-        IdMappingJobRequest idMappingRequest = new IdMappingJobRequest();
-        String to = "uniprotkb";
-        idMappingRequest.setTo(to);
-        IdMappingJob idMappingJob =
-                IdMappingJob.builder()
-                        .idMappingResult(idMappingResult)
-                        .idMappingRequest(idMappingRequest)
-                        .jobStatus(JobStatus.FINISHED)
-                        .created(new Date())
-                        .build();
+        String to = "UniProtKB";
+        IdMappingJob idMappingJob = getIdMappingJob(to);
         when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
                 .thenReturn(idMappingJob);
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
@@ -235,29 +194,12 @@ class IdMappingMessageListenerIT {
     @Test
     void testOnMessageWhenIsJobSeenBeforeProcessingDoNothing() throws IOException {
         String jobId = UUID.randomUUID().toString();
-        IdMappingDownloadRequestImpl downloadRequest = new IdMappingDownloadRequestImpl();
-        downloadRequest.setJobId(jobId);
-        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
-        downloadRequest.setFields("accession,gene_names");
+        IdMappingDownloadRequestImpl downloadRequest = getIdMappingDownloadRequest(jobId);
 
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-
-        IdMappingResult idMappingResult =
-                IdMappingResult.builder()
-                        .mappedId(IdMappingStringPair.builder().from("P12345").to("P12345").build())
-                        .mappedId(IdMappingStringPair.builder().from("P05067").to("P05067").build())
-                        .build();
-        IdMappingJobRequest idMappingRequest = new IdMappingJobRequest();
-        String to = "uniprotkb";
-        idMappingRequest.setTo(to);
-        IdMappingJob idMappingJob =
-                IdMappingJob.builder()
-                        .idMappingResult(idMappingResult)
-                        .idMappingRequest(idMappingRequest)
-                        .jobStatus(JobStatus.FINISHED)
-                        .created(new Date())
-                        .build();
+        String to = "UniProtKB";
+        IdMappingJob idMappingJob = getIdMappingJob(to);
         when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
                 .thenReturn(idMappingJob);
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
@@ -277,5 +219,31 @@ class IdMappingMessageListenerIT {
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
         assertEquals(JobStatus.RUNNING, downloadJobResult.getStatus());
+    }
+
+    private IdMappingDownloadRequestImpl getIdMappingDownloadRequest(String jobId) {
+        IdMappingDownloadRequestImpl downloadRequest = new IdMappingDownloadRequestImpl();
+        downloadRequest.setJobId(jobId);
+        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
+        downloadRequest.setFields("accession,gene_names");
+        return downloadRequest;
+    }
+
+    private IdMappingJob getIdMappingJob(String to) {
+        IdMappingResult idMappingResult =
+                IdMappingResult.builder()
+                        .mappedId(IdMappingStringPair.builder().from("P12345").to("P12345").build())
+                        .mappedId(IdMappingStringPair.builder().from("P05067").to("P05067").build())
+                        .build();
+
+        IdMappingJobRequest idMappingRequest = new IdMappingJobRequest();
+        idMappingRequest.setTo(to);
+
+        return IdMappingJob.builder()
+                .idMappingResult(idMappingResult)
+                .idMappingRequest(idMappingRequest)
+                .jobStatus(JobStatus.FINISHED)
+                .created(new Date())
+                .build();
     }
 }

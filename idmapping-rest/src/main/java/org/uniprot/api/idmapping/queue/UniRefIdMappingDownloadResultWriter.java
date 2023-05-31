@@ -24,7 +24,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 public class UniRefIdMappingDownloadResultWriter
         extends AbstractIdMappingDownloadResultWriter<UniRefEntryPair, UniRefEntryLight> {
 
-    private static final Type type =
+    private static final Type TYPE =
             (new ParameterizedTypeReference<MessageConverterContext<UniRefEntryPair>>() {})
                     .getType();
 
@@ -55,6 +55,6 @@ public class UniRefIdMappingDownloadResultWriter
 
     @Override
     public Type getType() {
-        return type;
+        return TYPE;
     }
 }
