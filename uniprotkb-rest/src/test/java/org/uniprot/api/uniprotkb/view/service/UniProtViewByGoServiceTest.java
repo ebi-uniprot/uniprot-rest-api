@@ -1,13 +1,5 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,16 +11,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @ExtendWith(MockitoExtension.class)
 class UniProtViewByGoServiceTest {
-    @Mock private SolrClient solrClient;
+    @Mock
+    private SolrClient solrClient;
     private UniProtViewByGoService service;
 
     @BeforeEach
     void setup() {
         solrClient = Mockito.mock(SolrClient.class);
         GoService goService = new GoService(new RestTemplate());
-        service = new UniProtViewByGoService(solrClient, "uniprot", goService);
+        service = null;
     }
 
     @Test

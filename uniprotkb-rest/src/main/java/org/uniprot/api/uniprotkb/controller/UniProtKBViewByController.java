@@ -53,16 +53,15 @@ public class UniProtKBViewByController {
             value = "/ec",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary =
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua")
+            summary = "List of view-bys w.r.t. to the given query and parent")
     @ApiResponse(
             content =
                     @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
-    public ResponseEntity<List<ViewBy>> getEC(
+    public ResponseEntity<List<ViewBy>> getViewByEC(
             @Parameter(
                             description =
                                     "Criteria to search the views. It can take any valid solr query.")
-                    @RequestParam(value = "query", required = true)
+                    @RequestParam(value = "query")
                     String query,
             @Parameter(description = "Name of the parent")
                     @RequestParam(value = "parent", required = false)
@@ -129,7 +128,7 @@ public class UniProtKBViewByController {
             @Parameter(
                             description =
                                     "Criteria to search the views. It can take any valid solr query.")
-                    @RequestParam(value = "query", required = true)
+                    @RequestParam(value = "query")
                     String query,
             @Parameter(description = "Name of the parent")
                     @RequestParam(value = "parent", required = false)

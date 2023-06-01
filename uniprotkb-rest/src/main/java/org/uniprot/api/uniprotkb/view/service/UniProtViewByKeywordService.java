@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.view.service;
 
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.request.keyword.KeywordStreamRequest;
 import org.uniprot.api.rest.service.keyword.KeywordService;
@@ -34,10 +35,10 @@ public class UniProtViewByKeywordService extends UniProtViewByService<KeywordEnt
     }
 
     @Override
-    protected String getFacetFields(List<KeywordEntry> entries) {
+    protected Map<String, String> getFacetFields(List<KeywordEntry> entries) {
         String facetItems = entries.stream().map(KeywordEntry::getAccession)
                 .collect(Collectors.joining(","));
-        return String.format("{!terms='%s'}keyword", facetItems);
+        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}keyword", facetItems));
     }
 
     @Override

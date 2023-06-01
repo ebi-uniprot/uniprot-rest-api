@@ -1,30 +1,24 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.cv.ec.ECRepoFactory;
-import org.uniprot.cv.pathway.UniPathwayRepo;
-import org.uniprot.cv.pathway.impl.UniPathwayRepoImpl;
 
 @Configuration
 public class ViewByServiceConfig {
-    @Bean
-    public ViewByConfigProperties configProperties() {
-        return new ViewByConfigProperties();
+    private final String ecDirectory;
+
+    public ViewByServiceConfig(@Value("${solr.viewby.ecDir}") String ecDirectory) {
+        this.ecDirectory = ecDirectory;
     }
 
     @Bean
-    public ECRepo ecService(ViewByConfigProperties configProperties) {
-        return ECRepoFactory.get(configProperties.getEcDir());
-    }
-
-    @Bean
-    public UniPathwayRepo pathwayService(ViewByConfigProperties configProperties) {
-        return new UniPathwayRepoImpl(configProperties.getUniPathWayFile());
+    public ECRepo ecRepo() {
+        return ECRepoFactory.get(ecDirectory);
     }
 
     @Bean
@@ -35,19 +29,5 @@ public class ViewByServiceConfig {
     @Bean
     public GoService goService(RestTemplate restTemplate) {
         return new GoService(restTemplate);
-    }
-
-    @Bean
-    public UniProtViewByECService uniprotViewByECService(
-            SolrClient solrClient, ViewByConfigProperties configProperties, ECRepo ecRepo) {
-        return new UniProtViewByECService(
-                solrClient, configProperties.getUniprotCollection(), ecRepo);
-    }
-
-    @Bean
-    public UniProtViewByGoService uniprotViewByGoService(
-            SolrClient solrClient, ViewByConfigProperties configProperties, GoService goService) {
-        return new UniProtViewByGoService(
-                solrClient, configProperties.getUniprotCollection(), goService);
     }
 }

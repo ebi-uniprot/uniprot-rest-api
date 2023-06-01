@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.view.service;
 
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.request.taxonomy.TaxonomyStreamRequest;
 import org.uniprot.api.rest.service.taxonomy.TaxonomyService;
@@ -34,11 +35,11 @@ public class UniProtKBViewByTaxonomyService extends UniProtViewByService<Taxonom
     }
 
     @Override
-    protected String getFacetFields(List<TaxonomyEntry> entries) {
+    protected Map<String, String> getFacetFields(List<TaxonomyEntry> entries) {
         String facetItems = entries.stream()
                 .map(taxonomy -> String.valueOf(taxonomy.getTaxonId()))
                 .collect(Collectors.joining(","));
-        return String.format("{!terms='%s'}taxonomy_id", facetItems);
+        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}taxonomy_id", facetItems));
     }
 
     @Override

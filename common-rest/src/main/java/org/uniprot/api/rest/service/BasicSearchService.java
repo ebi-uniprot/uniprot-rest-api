@@ -3,6 +3,7 @@ package org.uniprot.api.rest.service;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.common.params.FacetParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -23,10 +24,7 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -256,10 +254,11 @@ public abstract class BasicSearchService<D extends Document, R> {
                 .collect(Collectors.joining());
     }
 
-    public List<FacetField> getFacets(String query, String ... facetField) {
+    public List<FacetField> getFacets(String query, Map<String,String> facetFields) {
         SolrQuery solrQuery = new SolrQuery(query);
+        facetFields.forEach(solrQuery::set);
+        solrQuery.set(FacetParams.FACET, true);
         solrQuery.set(DEF_TYPE, "edismax");
-        solrQuery.addFacetField(facetField);
         solrQuery.add(QUERY_FIELDS, getQueryFields(query));
         return repository.query(solrQuery).getFacetFields();
     }
