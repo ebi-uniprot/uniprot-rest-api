@@ -1,15 +1,5 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +13,16 @@ import org.uniprot.core.cv.ec.ECEntry;
 import org.uniprot.core.cv.ec.impl.ECEntryBuilder;
 import org.uniprot.cv.ec.ECRepo;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doReturn;
+
 @ExtendWith(MockitoExtension.class)
 class UniProtViewByECServiceTest {
     @Mock private SolrClient solrClient;
@@ -35,7 +35,7 @@ class UniProtViewByECServiceTest {
         solrClient = Mockito.mock(SolrClient.class);
         ecRepo = Mockito.mock(ECRepo.class);
         mockEcService();
-        service = new UniProtViewByECService(solrClient, "uniprot", ecRepo);
+        service = null;
     }
 
     @Test

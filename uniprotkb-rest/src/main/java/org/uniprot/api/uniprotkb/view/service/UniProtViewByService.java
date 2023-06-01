@@ -6,6 +6,7 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class UniProtViewByService<T> {
@@ -43,14 +44,12 @@ public abstract class UniProtViewByService<T> {
     }
 
     private List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
-        if (!entries.isEmpty()) {
-            List<FacetField> facetFields = uniProtEntryService.getFacets(query, getFacetFields(entries));
+        List<FacetField> facetFields = uniProtEntryService.getFacets(query, getFacetFields(entries));
 
-            if (!facetFields.isEmpty()) {
-                return facetFields.get(0).getValues().stream()
-                        .filter(count -> count.getCount() > 0)
-                        .collect(Collectors.toList());
-            }
+        if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
+            return facetFields.get(0).getValues().stream()
+                    .filter(count -> count.getCount() > 0)
+                    .collect(Collectors.toList());
         }
 
         return List.of();
@@ -62,7 +61,7 @@ public abstract class UniProtViewByService<T> {
 
     protected abstract List<T> getChildren(String parent);
 
-    protected abstract String getFacetFields(List<T> entries);
+    protected abstract Map<String, String> getFacetFields(List<T> entries);
 
     protected abstract List<ViewBy> getViewBys(List<FacetField.Count> facetCounts, List<T> entries, String query);
 }
