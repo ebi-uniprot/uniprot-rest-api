@@ -17,12 +17,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtViewByGoService extends UniProtViewByService<GoRelation> {
+public class UniProtKBViewByGoService extends UniProtKBViewByService<GoRelation> {
     public static final String URL_PREFIX = "/QuickGO/term/";
     private static final String GO_PREFIX = "GO:";
     private final GoService goService;
 
-    public UniProtViewByGoService(GoService goService, UniProtEntryService uniProtEntryService) {
+    public UniProtKBViewByGoService(GoService goService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.goService = goService;
     }
@@ -35,9 +35,9 @@ public class UniProtViewByGoService extends UniProtViewByService<GoRelation> {
 
     @Override
     protected Map<String, String> getFacetFields(List<GoRelation> entries) {
-        String facetItems = entries.stream().map(GoRelation::getId).map(this::removeGoPrefix)
+        String goIds = entries.stream().map(GoRelation::getId).map(this::removeGoPrefix)
                 .collect(Collectors.joining(","));
-        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}go_id", facetItems));
+        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}go_id", goIds));
     }
 
     @Override

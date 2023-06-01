@@ -17,7 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtKBViewByTaxonomyService extends UniProtViewByService<TaxonomyEntry> {
+public class UniProtKBViewByTaxonomyService extends UniProtKBViewByService<TaxonomyEntry> {
     public static final String TOP_LEVEL_PARENT_QUERY = "-parent:[* TO *] AND active:true";
     public static final String URL_PHRASE = "/taxonomy/";
     private final TaxonomyService taxonomyService;
@@ -36,10 +36,10 @@ public class UniProtKBViewByTaxonomyService extends UniProtViewByService<Taxonom
 
     @Override
     protected Map<String, String> getFacetFields(List<TaxonomyEntry> entries) {
-        String facetItems = entries.stream()
+        String taxonomyIds = entries.stream()
                 .map(taxonomy -> String.valueOf(taxonomy.getTaxonId()))
                 .collect(Collectors.joining(","));
-        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}taxonomy_id", facetItems));
+        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}taxonomy_id", taxonomyIds));
     }
 
     @Override

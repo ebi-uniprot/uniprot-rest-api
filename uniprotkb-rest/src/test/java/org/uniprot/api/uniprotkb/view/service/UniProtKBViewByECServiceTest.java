@@ -24,11 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtViewByECServiceTest {
+class UniProtKBViewByECServiceTest {
     @Mock private SolrClient solrClient;
 
     @Mock private ECRepo ecRepo;
-    private UniProtViewByECService service;
+    private UniProtKBViewByECService service;
 
     @BeforeEach
     void setup() {
@@ -51,7 +51,7 @@ class UniProtViewByECServiceTest {
                         "1.1.1.-",
                         "With NAD(+) or NADP(+) as acceptor",
                         346L,
-                        UniProtViewByECService.URL_PREFIX + "1.1.1.-",
+                        UniProtKBViewByECService.URL_PREFIX + "1.1.1.-",
                         true);
         assertTrue(viewBys.contains(viewBy1));
         ViewBy viewBy2 =
@@ -59,7 +59,7 @@ class UniProtViewByECServiceTest {
                         "1.1.3.-",
                         "With oxygen as acceptor",
                         1L,
-                        UniProtViewByECService.URL_PREFIX + "1.1.3.-",
+                        UniProtKBViewByECService.URL_PREFIX + "1.1.3.-",
                         true);
         assertTrue(viewBys.contains(viewBy2));
     }

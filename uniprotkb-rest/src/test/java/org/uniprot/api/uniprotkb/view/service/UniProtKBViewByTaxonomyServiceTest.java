@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByTaxonomyService.TOP_LEVEL_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtViewByTaxonomyServiceTest {
+class UniProtKBViewByTaxonomyServiceTest {
     private static final String EMPTY_PARENT_ID = "";
     private static final long TAX_ID_A = 1425170;
     private static final long TAX_ID_B = 9606;
@@ -89,7 +89,7 @@ class UniProtViewByTaxonomyServiceTest {
                                 Set.of(TOP_LEVEL_PARENT_QUERY, PARENT_TAX_ID_A)
                                         .contains(arg.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
-        when(uniProtEntryService.getFacets(eq(SOME_QUERY), anyMap())).thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING))).thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -185,7 +185,7 @@ class UniProtViewByTaxonomyServiceTest {
                                 Set.of(PARENT_TAX_ID_B, PARENT_TAX_ID_A)
                                         .contains(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
-        when(uniProtEntryService.getFacets(eq(SOME_QUERY), anyMap())).thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING))).thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, TAX_ID_B_STRING);
 

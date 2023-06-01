@@ -25,11 +25,11 @@ import static org.hamcrest.Matchers.empty;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.view.service.UniProtViewByKeywordService.TOP_LEVEL_PARENT_QUERY;
-import static org.uniprot.api.uniprotkb.view.service.UniProtViewByKeywordService.URL_PHRASE;
+import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByKeywordService.TOP_LEVEL_PARENT_QUERY;
+import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByKeywordService.URL_PHRASE;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtViewByKeywordServiceTest {
+class UniProtKBViewByKeywordServiceTest {
     private static final String EMPTY_PARENT_ID = "";
     private static final String KEYWORD_ID_A = "1425170";
     private static final String KEYWORD_ID_B = "9606";
@@ -73,11 +73,11 @@ class UniProtViewByKeywordServiceTest {
     @Mock
     private UniProtEntryService uniProtEntryService;
 
-    private UniProtViewByKeywordService service;
+    private UniProtKBViewByKeywordService service;
 
     @BeforeEach
     void setup() {
-        service = new UniProtViewByKeywordService(keywordService, uniProtEntryService);
+        service = new UniProtKBViewByKeywordService(keywordService, uniProtEntryService);
     }
 
     @Test
@@ -88,7 +88,7 @@ class UniProtViewByKeywordServiceTest {
                                 Set.of(TOP_LEVEL_PARENT_QUERY, PARENT_KEYWORD_ID_A)
                                         .contains(arg.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_C));
-        when(uniProtEntryService.getFacets(eq(SOME_QUERY), anyMap())).thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C))).thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -184,7 +184,7 @@ class UniProtViewByKeywordServiceTest {
                                 Set.of(PARENT_KEYWORD_ID_B, PARENT_KEYWORD_ID_A)
                                         .contains(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_C));
-        when(uniProtEntryService.getFacets(eq(SOME_QUERY), anyMap())).thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C))).thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, KEYWORD_ID_B);
 

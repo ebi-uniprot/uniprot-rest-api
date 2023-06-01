@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class UniProtViewByService<T> {
+public abstract class UniProtKBViewByService<T> {
     private final UniProtEntryService uniProtEntryService;
 
-    UniProtViewByService(UniProtEntryService uniProtEntryService) {
+    UniProtKBViewByService(UniProtEntryService uniProtEntryService) {
         this.uniProtEntryService = uniProtEntryService;
     }
 
