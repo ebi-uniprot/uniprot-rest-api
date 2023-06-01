@@ -16,12 +16,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtViewByKeywordService extends UniProtViewByService<KeywordEntry> {
+public class UniProtKBViewByKeywordService extends UniProtKBViewByService<KeywordEntry> {
     public static final String TOP_LEVEL_PARENT_QUERY = "-parent:[* TO *] ";
     public static final String URL_PHRASE = "/keywords/";
     private final KeywordService keywordService;
 
-    public UniProtViewByKeywordService(
+    public UniProtKBViewByKeywordService(
             KeywordService keywordService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.keywordService = keywordService;
@@ -36,9 +36,9 @@ public class UniProtViewByKeywordService extends UniProtViewByService<KeywordEnt
 
     @Override
     protected Map<String, String> getFacetFields(List<KeywordEntry> entries) {
-        String facetItems = entries.stream().map(KeywordEntry::getAccession)
+        String keywordIds = entries.stream().map(KeywordEntry::getAccession)
                 .collect(Collectors.joining(","));
-        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}keyword", facetItems));
+        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}keyword", keywordIds));
     }
 
     @Override

@@ -28,16 +28,16 @@ import static org.uniprot.api.uniprotkb.controller.UniProtKBViewByController.*;
 @RequestMapping(VIEW_BY_RESOURCE)
 public class UniProtKBViewByController {
     static final String VIEW_BY_RESOURCE = UNIPROTKB_RESOURCE + "/view";
-    private final UniProtViewByECService viewByECService;
-    private final UniProtViewByKeywordService viewByKeywordService;
-    private final UniProtViewByGoService viewByGoService;
+    private final UniProtKBViewByECService viewByECService;
+    private final UniProtKBViewByKeywordService viewByKeywordService;
+    private final UniProtKBViewByGoService viewByGoService;
     private final UniProtKBViewByTaxonomyService uniProtKBViewByTaxonomyService;
 
     @Autowired
     public UniProtKBViewByController(
-            UniProtViewByECService viewByECService,
-            UniProtViewByKeywordService viewByKeywordService,
-            UniProtViewByGoService viewByGoService,
+            UniProtKBViewByECService viewByECService,
+            UniProtKBViewByKeywordService viewByKeywordService,
+            UniProtKBViewByGoService viewByGoService,
             UniProtKBViewByTaxonomyService uniProtKBViewByTaxonomyService) {
         this.viewByECService = viewByECService;
         this.viewByKeywordService = viewByKeywordService;

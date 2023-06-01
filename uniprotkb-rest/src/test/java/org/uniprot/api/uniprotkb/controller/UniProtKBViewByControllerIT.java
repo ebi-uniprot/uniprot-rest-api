@@ -55,6 +55,7 @@ class UniProtKBViewByControllerIT {
     private static final int TAX_ID_2 = 9602;
     private static final String TAX_ID_2_STRING = String.valueOf(TAX_ID_2);
     private static final String TAX_SCIENTIFIC_2 = "scientific_9602";
+    public static final String PATH = "/uniprotkb/view/taxonomy";
     @Autowired
     private MockMvc mockMvc;
     @RegisterExtension
@@ -91,7 +92,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("query", "organism_id:" + TAX_ID_0_STRING)
                         .param("parent", EMPTY_PARENT))
                 .andDo(log())
@@ -105,7 +106,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("query", TAX_ID_0_STRING)
                         .param("parent", EMPTY_PARENT))
                 .andDo(log())
@@ -119,7 +120,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("query", "organism_id:" + TAX_ID_2_STRING)
                         .param("parent", EMPTY_PARENT))
                 .andDo(log())
@@ -133,7 +134,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("query", TAX_ID_2_STRING)
                         .param("parent", EMPTY_PARENT))
                 .andDo(log())
@@ -147,7 +148,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("query", "taxonomy_id:" + TAX_ID_1_STRING)
                         .param("parent", TAX_ID_0_STRING))
                 .andDo(log())
@@ -161,7 +162,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("query", TAX_ID_1_STRING)
                         .param("parent", TAX_ID_0_STRING))
                 .andDo(print())
@@ -175,7 +176,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("query", "organism_id:" + TAX_ID_1_STRING)
                         .param("parent", EMPTY_PARENT))
                 .andDo(log())
@@ -186,7 +187,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenFreeFormQueryAndEmptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("query", TAX_ID_1_STRING)
                         .param("parent", EMPTY_PARENT))
                 .andDo(print())
@@ -195,7 +196,7 @@ class UniProtKBViewByControllerIT {
 
     @Test
     void viewByTaxonomy_whenQueryNotSpecified() throws Exception {
-        mockMvc.perform(get("/uniprotkb/view/taxonomy")
+        mockMvc.perform(get(PATH)
                         .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())

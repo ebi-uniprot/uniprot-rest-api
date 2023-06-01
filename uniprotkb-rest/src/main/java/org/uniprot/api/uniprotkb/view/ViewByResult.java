@@ -2,9 +2,9 @@ package org.uniprot.api.uniprotkb.view;
 
 import lombok.Value;
 
-import java.util.Collection;
+import java.util.List;
 
 @Value
 public class ViewByResult<T> {
-    Collection<T> results;
+    List<T> results;
 }

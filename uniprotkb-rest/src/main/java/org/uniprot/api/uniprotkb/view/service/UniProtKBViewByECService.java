@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtViewByECService extends UniProtViewByService<String> {
+public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
     public static final String URL_PREFIX = "/EC/";
     public static final String REGEX_SUFFIX = "[0-9]+";
     public static final String TOKEN_REGEX = "\\.";
@@ -25,7 +25,7 @@ public class UniProtViewByECService extends UniProtViewByService<String> {
     public static final int MAX_TOKEN_COUNT = 4;
     private final ECService ecService;
 
-    public UniProtViewByECService(ECService ecService, UniProtEntryService uniProtEntryService) {
+    public UniProtKBViewByECService(ECService ecService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.ecService = ecService;
     }

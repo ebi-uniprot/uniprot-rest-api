@@ -20,10 +20,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtViewByGoServiceTest {
+class UniProtKBViewByGoServiceTest {
     @Mock
     private SolrClient solrClient;
-    private UniProtViewByGoService service;
+    private UniProtKBViewByGoService service;
 
     @BeforeEach
     void setup() {
@@ -46,7 +46,7 @@ class UniProtViewByGoServiceTest {
                         "GO:0008150",
                         "biological_process",
                         78L,
-                        UniProtViewByGoService.URL_PREFIX + "GO:0008150",
+                        UniProtKBViewByGoService.URL_PREFIX + "GO:0008150",
                         true);
         assertTrue(viewBys.contains(viewBy1));
         ViewBy viewBy2 =
@@ -54,7 +54,7 @@ class UniProtViewByGoServiceTest {
                         "GO:0005575",
                         "cellular_component",
                         70L,
-                        UniProtViewByGoService.URL_PREFIX + "GO:0005575",
+                        UniProtKBViewByGoService.URL_PREFIX + "GO:0005575",
                         true);
         assertTrue(viewBys.contains(viewBy2));
         ViewBy viewBy3 =
@@ -62,7 +62,7 @@ class UniProtViewByGoServiceTest {
                         "GO:0003674",
                         "molecular_function",
                         73L,
-                        UniProtViewByGoService.URL_PREFIX + "GO:0003674",
+                        UniProtKBViewByGoService.URL_PREFIX + "GO:0003674",
                         true);
         assertTrue(viewBys.contains(viewBy3));
     }
