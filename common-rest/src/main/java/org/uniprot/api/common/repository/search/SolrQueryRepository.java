@@ -125,7 +125,7 @@ public abstract class SolrQueryRepository<T extends Document> {
     public QueryResponse query(SolrQuery solrQuery) {
         try {
             return solrClient.query(collection.name(), solrQuery);
-        } catch (Exception e) {
+        } catch ( SolrServerException | IOException e) {
             throw new QueryRetrievalException("Unexpected error retrieving data from our Repository", e);
         }
     }

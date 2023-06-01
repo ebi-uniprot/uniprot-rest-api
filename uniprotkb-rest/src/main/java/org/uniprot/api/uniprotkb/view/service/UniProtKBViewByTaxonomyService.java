@@ -90,18 +90,16 @@ public class UniProtKBViewByTaxonomyService implements UniProtViewByService {
     }
 
     private List<FacetField.Count> getFacetCounts(String query, List<TaxonomyEntry> taxonomyEntries) {
-        if (!taxonomyEntries.isEmpty()) {
-            String facetItems = taxonomyEntries.stream()
-                    .map(taxonomy -> String.valueOf(taxonomy.getTaxonId()))
-                    .collect(Collectors.joining(","));
-            List<FacetField> facetFields = uniProtEntryService
-                    .getFacets(query, String.format("{!terms='%s'}taxonomy_id", facetItems));
+        String facetItems = taxonomyEntries.stream()
+                .map(taxonomy -> String.valueOf(taxonomy.getTaxonId()))
+                .collect(Collectors.joining(","));
+        List<FacetField> facetFields = uniProtEntryService
+                .getFacets(query, String.format("{!terms='%s'}taxonomy_id", facetItems));
 
-            if (!facetFields.isEmpty()) {
-                return facetFields.get(0).getValues().stream()
-                        .filter(count -> count.getCount() > 0)
-                        .collect(Collectors.toList());
-            }
+        if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
+            return facetFields.get(0).getValues().stream()
+                    .filter(count -> count.getCount() > 0)
+                    .collect(Collectors.toList());
         }
 
         return List.of();

@@ -1,8 +1,6 @@
 package org.uniprot.api.rest.service;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.FacetField;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -41,8 +39,6 @@ import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_I
  */
 @PropertySource("classpath:common-message.properties")
 public abstract class BasicSearchService<D extends Document, R> {
-    private static final String QUERY_FIELDS = "qf";
-    private static final String DEF_TYPE = "defType";
     public static final Integer DEFAULT_SOLR_BATCH_SIZE = 100;
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
@@ -214,7 +210,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         return requestBuilder;
     }
 
-    private String getQueryFields(String query) {
+    protected String getQueryFields(String query) {
         String queryFields = "";
         Optional<String> optimisedQueryField = validateOptimisableField(query);
         if (optimisedQueryField.isPresent()) {
@@ -254,14 +250,6 @@ public abstract class BasicSearchService<D extends Document, R> {
     public String getRdf(String id, String dataType, String format) {
         return getRdfStreamer().stream(Stream.of(id), dataType, format)
                 .collect(Collectors.joining());
-    }
-
-    public List<FacetField> getFacets(String query, String ... facetField) {
-        SolrQuery solrQuery = new SolrQuery(query);
-        solrQuery.set(DEF_TYPE, "edismax");
-        solrQuery.addFacetField(facetField);
-        solrQuery.add(QUERY_FIELDS, getQueryFields(query));
-        return repository.query(solrQuery).getFacetFields();
     }
 
     protected RdfStreamer getRdfStreamer() {
