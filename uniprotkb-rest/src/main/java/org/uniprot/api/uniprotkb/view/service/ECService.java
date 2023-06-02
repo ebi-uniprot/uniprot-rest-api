@@ -1,10 +1,10 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.core.cv.ec.ECEntry;
 import org.uniprot.cv.ec.ECRepo;
-
-import java.util.Optional;
 
 @Service
 public class ECService {

@@ -44,7 +44,8 @@ public abstract class UniProtKBViewByService<T> {
     }
 
     private List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
-        List<FacetField> facetFields = uniProtEntryService.getFacets(query, getFacetFields(entries));
+        List<FacetField> facetFields =
+                uniProtEntryService.getFacets(query, getFacetFields(entries));
 
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()
@@ -63,5 +64,6 @@ public abstract class UniProtKBViewByService<T> {
 
     protected abstract Map<String, String> getFacetFields(List<T> entries);
 
-    protected abstract List<ViewBy> getViewBys(List<FacetField.Count> facetCounts, List<T> entries, String query);
+    protected abstract List<ViewBy> getViewBys(
+            List<FacetField.Count> facetCounts, List<T> entries, String query);
 }

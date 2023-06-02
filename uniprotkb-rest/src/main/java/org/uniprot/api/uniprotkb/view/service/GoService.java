@@ -1,22 +1,23 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.uniprotkb.view.GoRelation;
 import org.uniprot.api.uniprotkb.view.GoTerm;
 import org.uniprot.api.uniprotkb.view.GoTermResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.google.common.base.Strings;
 
 public class GoService {
     private final RestTemplate restTemplate;
-    private static final String GO_API_PREFIX = "https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/";
+    private static final String GO_API_PREFIX =
+            "https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/";
 
     public GoService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-
     }
 
     Optional<GoTerm> getChildren(String goId) {

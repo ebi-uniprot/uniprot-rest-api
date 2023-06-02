@@ -1,5 +1,13 @@
 package org.uniprot.api.uniprotkb.service;
 
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.QUERY_FIELDS;
+
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -41,14 +49,6 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.QUERY_FIELDS;
 
 @Service
 @Import(UniProtSolrQueryConfig.class)
@@ -172,7 +172,7 @@ public class UniProtEntryService
         return super.storeStreamer.idsToStoreStream(query, storeRequest);
     }
 
-    public List<FacetField> getFacets(String query, Map<String,String> facetFields) {
+    public List<FacetField> getFacets(String query, Map<String, String> facetFields) {
         SolrQuery solrQuery = new SolrQuery(query);
         facetFields.forEach(solrQuery::set);
         solrQuery.set(FacetParams.FACET, true);
