@@ -700,7 +700,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     private void saveInactiveEntry() throws IOException, SolrServerException {
         UniProtDocument inactiveDoc = new UniProtDocument();
         inactiveDoc.accession = "I8FBX0";
-        inactiveDoc.id = "INACTIVE_DROME";
+        inactiveDoc.id.add("INACTIVE_DROME");
         inactiveDoc.idInactive = "INACTIVE_DROME";
         inactiveDoc.inactiveReason = "DELETED";
         inactiveDoc.active = false;
