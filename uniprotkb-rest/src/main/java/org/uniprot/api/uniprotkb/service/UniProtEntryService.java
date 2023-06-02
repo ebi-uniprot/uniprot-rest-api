@@ -186,7 +186,7 @@ public class UniProtEntryService
         }
     }
 
-    public List<FacetField> getFacets(String query, Map<String,String> facetFields) {
+    public List<FacetField> getFacets(String query, Map<String, String> facetFields) {
         SolrQuery solrQuery = new SolrQuery(query);
         facetFields.forEach(solrQuery::set);
         solrQuery.set(FacetParams.FACET, true);

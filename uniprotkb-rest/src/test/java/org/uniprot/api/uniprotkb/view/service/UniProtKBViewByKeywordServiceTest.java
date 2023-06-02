@@ -22,7 +22,8 @@ import java.util.stream.Stream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByKeywordService.TOP_LEVEL_PARENT_QUERY;
@@ -42,36 +43,58 @@ class UniProtKBViewByKeywordServiceTest {
     private static final String KEYWORD_LABEL_B = "keywordLabelB";
     private static final String KEYWORD_LABEL_C = "keywordLabelC";
     private static final String KEYWORD_LABEL_D = "keywordLabelD";
-    private static final KeywordEntry KEYWORD_ENTRY_A = getKeywordEntry(KEYWORD_ID_A, KEYWORD_LABEL_A);
-    private static final KeywordEntry KEYWORD_ENTRY_B = getKeywordEntry(KEYWORD_ID_B, KEYWORD_LABEL_B);
-    private static final KeywordEntry KEYWORD_ENTRY_C = getKeywordEntry(KEYWORD_ID_C, KEYWORD_LABEL_C);
-    private static final KeywordEntry KEYWORD_ENTRY_D = getKeywordEntry(KEYWORD_ID_D, KEYWORD_LABEL_D);
+    private static final KeywordEntry KEYWORD_ENTRY_A =
+            getKeywordEntry(KEYWORD_ID_A, KEYWORD_LABEL_A);
+    private static final KeywordEntry KEYWORD_ENTRY_B =
+            getKeywordEntry(KEYWORD_ID_B, KEYWORD_LABEL_B);
+    private static final KeywordEntry KEYWORD_ENTRY_C =
+            getKeywordEntry(KEYWORD_ID_C, KEYWORD_LABEL_C);
+    private static final KeywordEntry KEYWORD_ENTRY_D =
+            getKeywordEntry(KEYWORD_ID_D, KEYWORD_LABEL_D);
     private static final long KEYWORD_COUNT_A = 23L;
     private static final long KEYWORD_COUNT_B = 50L;
     private static final long KEYWORD_COUNT_C = 9999L;
     private static final long KEYWORD_COUNT_D = 10L;
     private static final String SOME_NAME = "someName";
-    private static final List<FacetField> SINGLE_KEYWORD_FACET_COUNTS_A = List.of(new FacetField(SOME_NAME) {{
-        add(KEYWORD_ID_A, KEYWORD_COUNT_A);
-    }});
-    private static final List<FacetField> SINGLE_KEYWORD_FACET_COUNTS_B = List.of(new FacetField(SOME_NAME) {{
-        add(KEYWORD_ID_B, KEYWORD_COUNT_B);
-    }});
-    private static final List<FacetField> SINGLE_KEYWORD_FACET_COUNTS_C = List.of(new FacetField(SOME_NAME) {{
-        add(KEYWORD_ID_C, KEYWORD_COUNT_C);
-    }});
-    private static final List<FacetField> SINGLE_KEYWORD_FACET_COUNTS_D = List.of(new FacetField(SOME_NAME) {{
-        add(KEYWORD_ID_D, KEYWORD_COUNT_D);
-    }});
-    private static final List<FacetField> MULTIPLE_KEYWORD_FACET_COUNTS = List.of(new FacetField(SOME_NAME) {{
-        add(KEYWORD_ID_A, KEYWORD_COUNT_A);
-        add(KEYWORD_ID_C, KEYWORD_COUNT_C);
-    }});
+    private static final List<FacetField> SINGLE_KEYWORD_FACET_COUNTS_A =
+            List.of(
+                    new FacetField(SOME_NAME) {
+                        {
+                            add(KEYWORD_ID_A, KEYWORD_COUNT_A);
+                        }
+                    });
+    private static final List<FacetField> SINGLE_KEYWORD_FACET_COUNTS_B =
+            List.of(
+                    new FacetField(SOME_NAME) {
+                        {
+                            add(KEYWORD_ID_B, KEYWORD_COUNT_B);
+                        }
+                    });
+    private static final List<FacetField> SINGLE_KEYWORD_FACET_COUNTS_C =
+            List.of(
+                    new FacetField(SOME_NAME) {
+                        {
+                            add(KEYWORD_ID_C, KEYWORD_COUNT_C);
+                        }
+                    });
+    private static final List<FacetField> SINGLE_KEYWORD_FACET_COUNTS_D =
+            List.of(
+                    new FacetField(SOME_NAME) {
+                        {
+                            add(KEYWORD_ID_D, KEYWORD_COUNT_D);
+                        }
+                    });
+    private static final List<FacetField> MULTIPLE_KEYWORD_FACET_COUNTS =
+            List.of(
+                    new FacetField(SOME_NAME) {
+                        {
+                            add(KEYWORD_ID_A, KEYWORD_COUNT_A);
+                            add(KEYWORD_ID_C, KEYWORD_COUNT_C);
+                        }
+                    });
     private static final String SOME_QUERY = "someQuery";
-    @Mock
-    private KeywordService keywordService;
-    @Mock
-    private UniProtEntryService uniProtEntryService;
+    @Mock private KeywordService keywordService;
+    @Mock private UniProtEntryService uniProtEntryService;
 
     private UniProtKBViewByKeywordService service;
 
@@ -83,12 +106,14 @@ class UniProtKBViewByKeywordServiceTest {
     @Test
     void getViewBys_whenNoParentSpecifiedAndMultipleRootNodes() {
         when(keywordService.stream(
-                argThat(
-                        arg ->
-                                Set.of(TOP_LEVEL_PARENT_QUERY, PARENT_KEYWORD_ID_A)
-                                        .contains(arg.getQuery()))))
+                        argThat(
+                                arg ->
+                                        Set.of(TOP_LEVEL_PARENT_QUERY, PARENT_KEYWORD_ID_A)
+                                                .contains(arg.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_C));
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C))).thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C)))
+                .thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -97,8 +122,11 @@ class UniProtKBViewByKeywordServiceTest {
 
     @Test
     void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
-        when(keywordService.stream(argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery())))).thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_C));
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
+        when(keywordService.stream(
+                        argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
+                .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_C));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -107,16 +135,25 @@ class UniProtKBViewByKeywordServiceTest {
 
     @Test
     void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
-        when(keywordService.stream(argThat(argument -> argument != null && (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
+        when(keywordService.stream(
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && (TOP_LEVEL_PARENT_QUERY)
+                                                        .equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_B));
         when(keywordService.stream(
-                argThat(
-                        argument ->
-                                argument != null && Set.of(PARENT_KEYWORD_ID_A, PARENT_KEYWORD_ID_B)
-                                        .contains(argument.getQuery()))))
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && Set.of(PARENT_KEYWORD_ID_A, PARENT_KEYWORD_ID_B)
+                                                        .contains(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_C));
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C))).thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C)))
+                .thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -128,7 +165,8 @@ class UniProtKBViewByKeywordServiceTest {
         when(keywordService.stream(any()))
                 .thenAnswer(
                         invocation -> {
-                            StreamRequest streamRequest = invocation.getArgument(0, StreamRequest.class);
+                            StreamRequest streamRequest =
+                                    invocation.getArgument(0, StreamRequest.class);
                             if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
                                 return Stream.of(KEYWORD_ENTRY_A);
                             }
@@ -140,9 +178,12 @@ class UniProtKBViewByKeywordServiceTest {
                             }
                             return Stream.of();
                         });
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_A);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_A);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -151,25 +192,31 @@ class UniProtKBViewByKeywordServiceTest {
 
     @Test
     void
-    getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+            getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         when(keywordService.stream(any()))
                 .thenAnswer(
                         invocation -> {
-                            StreamRequest streamRequest = invocation.getArgument(0, StreamRequest.class);
+                            StreamRequest streamRequest =
+                                    invocation.getArgument(0, StreamRequest.class);
                             if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
                                 return Stream.of(KEYWORD_ENTRY_B);
                             }
                             if (PARENT_KEYWORD_ID_B.equals(streamRequest.getQuery())) {
                                 return Stream.of(KEYWORD_ENTRY_D);
                             }
-                            if (PARENT_KEYWORD_ID_D.equals(streamRequest.getQuery()) || PARENT_KEYWORD_ID_A.equals(streamRequest.getQuery())) {
+                            if (PARENT_KEYWORD_ID_D.equals(streamRequest.getQuery())
+                                    || PARENT_KEYWORD_ID_A.equals(streamRequest.getQuery())) {
                                 return Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_C);
                             }
                             return Stream.of();
                         });
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_D))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_D);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C))).thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_D)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_D);
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C)))
+                .thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
 
@@ -179,12 +226,14 @@ class UniProtKBViewByKeywordServiceTest {
     @Test
     void getViewBys_whenParentSpecifiedAndMultipleRootNodes() {
         when(keywordService.stream(
-                argThat(
-                        argument ->
-                                Set.of(PARENT_KEYWORD_ID_B, PARENT_KEYWORD_ID_A)
-                                        .contains(argument.getQuery()))))
+                        argThat(
+                                argument ->
+                                        Set.of(PARENT_KEYWORD_ID_B, PARENT_KEYWORD_ID_A)
+                                                .contains(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_C));
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C))).thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C)))
+                .thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, KEYWORD_ID_B);
 
@@ -193,7 +242,9 @@ class UniProtKBViewByKeywordServiceTest {
 
     @Test
     void getViewBys_whenParentSpecifiedAndNoRootNodes() {
-        when(keywordService.stream(argThat(argument -> PARENT_KEYWORD_ID_A.equals(argument.getQuery())))).thenAnswer(invocation -> Stream.of());
+        when(keywordService.stream(
+                        argThat(argument -> PARENT_KEYWORD_ID_A.equals(argument.getQuery()))))
+                .thenAnswer(invocation -> Stream.of());
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, KEYWORD_ID_A);
 
@@ -205,7 +256,8 @@ class UniProtKBViewByKeywordServiceTest {
         when(keywordService.stream(any()))
                 .thenAnswer(
                         invocation -> {
-                            StreamRequest streamRequest = invocation.getArgument(0, StreamRequest.class);
+                            StreamRequest streamRequest =
+                                    invocation.getArgument(0, StreamRequest.class);
                             if (PARENT_KEYWORD_ID_A.equals(streamRequest.getQuery())) {
                                 return Stream.of(KEYWORD_ENTRY_B);
                             }
@@ -214,8 +266,10 @@ class UniProtKBViewByKeywordServiceTest {
                             }
                             return Stream.of();
                         });
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C))).thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
 
         List<ViewBy> viewBys = service.getViewBys(SOME_QUERY, KEYWORD_ID_A);
 
@@ -259,7 +313,8 @@ class UniProtKBViewByKeywordServiceTest {
         return getViewBy(KEYWORD_ID_B, KEYWORD_LABEL_B, KEYWORD_COUNT_B, true);
     }
 
-    private static ViewBy getViewBy(String keywordId, String keywordLabel, long keywordCount, boolean expand) {
+    private static ViewBy getViewBy(
+            String keywordId, String keywordLabel, long keywordCount, boolean expand) {
         return MockServiceHelper.createViewBy(
                 keywordId, keywordLabel, keywordCount, URL_PHRASE + keywordId, expand);
     }

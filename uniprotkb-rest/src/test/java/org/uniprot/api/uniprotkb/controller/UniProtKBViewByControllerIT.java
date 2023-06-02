@@ -1,5 +1,15 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
+
+import java.util.List;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,16 +36,6 @@ import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
-
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBViewByController.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
@@ -56,10 +56,8 @@ class UniProtKBViewByControllerIT {
     private static final String TAX_ID_2_STRING = String.valueOf(TAX_ID_2);
     private static final String TAX_SCIENTIFIC_2 = "scientific_9602";
     public static final String PATH = "/uniprotkb/view/taxonomy";
-    @Autowired
-    private MockMvc mockMvc;
-    @RegisterExtension
-    static DataStoreManager dataStoreManager = new DataStoreManager();
+    @Autowired private MockMvc mockMvc;
+    @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
 
     @TestConfiguration
     static class TestConfig {
@@ -89,12 +87,14 @@ class UniProtKBViewByControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField() throws Exception {
+    void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField()
+            throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH)
-                        .param("query", "organism_id:" + TAX_ID_0_STRING)
-                        .param("parent", EMPTY_PARENT))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + TAX_ID_0_STRING)
+                                .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_0)))
@@ -106,9 +106,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH)
-                        .param("query", TAX_ID_0_STRING)
-                        .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", TAX_ID_0_STRING).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_0)))
@@ -117,12 +115,14 @@ class UniProtKBViewByControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
+    void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField()
+            throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH)
-                        .param("query", "organism_id:" + TAX_ID_2_STRING)
-                        .param("parent", EMPTY_PARENT))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + TAX_ID_2_STRING)
+                                .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
@@ -134,9 +134,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH)
-                        .param("query", TAX_ID_2_STRING)
-                        .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", TAX_ID_2_STRING).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
@@ -148,9 +146,10 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH)
-                        .param("query", "taxonomy_id:" + TAX_ID_1_STRING)
-                        .param("parent", TAX_ID_0_STRING))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "taxonomy_id:" + TAX_ID_1_STRING)
+                                .param("parent", TAX_ID_0_STRING))
                 .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_1)))
@@ -162,9 +161,7 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH)
-                        .param("query", TAX_ID_1_STRING)
-                        .param("parent", TAX_ID_0_STRING))
+        mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", TAX_ID_0_STRING))
                 .andDo(print())
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_1)))
@@ -176,9 +173,10 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH)
-                        .param("query", "organism_id:" + TAX_ID_1_STRING)
-                        .param("parent", EMPTY_PARENT))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + TAX_ID_1_STRING)
+                                .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.results.size()", is(0)));
     }
@@ -187,21 +185,21 @@ class UniProtKBViewByControllerIT {
     void viewByTaxonomy_whenFreeFormQueryAndEmptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH)
-                        .param("query", TAX_ID_1_STRING)
-                        .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
                 .andDo(print())
                 .andExpect(jsonPath("$.results.size()", is(0)));
     }
 
     @Test
     void viewByTaxonomy_whenQueryNotSpecified() throws Exception {
-        mockMvc.perform(get(PATH)
-                        .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsStringIgnoringCase("query is a required parameter")));
-
+                .andExpect(
+                        content()
+                                .string(
+                                        containsStringIgnoringCase(
+                                                "query is a required parameter")));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {
@@ -227,16 +225,24 @@ class UniProtKBViewByControllerIT {
         save(UNIPROT, uniProtDocument);
     }
 
-    private void saveTaxonomyDocument(Long taxId, String scientificName, Long parent) throws Exception {
-        byte[] scientific00s = TaxonomyJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(new TaxonomyEntryBuilder()
-                .taxonId(taxId)
-                .scientificName(scientificName).build());
-        TaxonomyDocument taxonomyDocument = TaxonomyDocument.builder()
-                .id(String.valueOf(taxId))
-                .taxId(taxId)
-                .parent(parent)
-                .active(true)
-                .taxonomyObj(scientific00s).build();
+    private void saveTaxonomyDocument(Long taxId, String scientificName, Long parent)
+            throws Exception {
+        byte[] scientific00s =
+                TaxonomyJsonConfig.getInstance()
+                        .getFullObjectMapper()
+                        .writeValueAsBytes(
+                                new TaxonomyEntryBuilder()
+                                        .taxonId(taxId)
+                                        .scientificName(scientificName)
+                                        .build());
+        TaxonomyDocument taxonomyDocument =
+                TaxonomyDocument.builder()
+                        .id(String.valueOf(taxId))
+                        .taxId(taxId)
+                        .parent(parent)
+                        .active(true)
+                        .taxonomyObj(scientific00s)
+                        .build();
         save(TAXONOMY, taxonomyDocument);
     }
 

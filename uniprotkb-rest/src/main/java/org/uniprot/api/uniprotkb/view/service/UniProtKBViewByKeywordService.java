@@ -1,5 +1,10 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
@@ -9,11 +14,6 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.ViewByImpl;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class UniProtKBViewByKeywordService extends UniProtKBViewByService<KeywordEntry> {
@@ -30,32 +30,38 @@ public class UniProtKBViewByKeywordService extends UniProtKBViewByService<Keywor
     @Override
     protected List<KeywordEntry> getChildren(String parent) {
         KeywordStreamRequest taxonomyStreamRequest = new KeywordStreamRequest();
-        taxonomyStreamRequest.setQuery(isTopLevelSearch(parent) ? TOP_LEVEL_PARENT_QUERY : "parent:" + parent);
+        taxonomyStreamRequest.setQuery(
+                isTopLevelSearch(parent) ? TOP_LEVEL_PARENT_QUERY : "parent:" + parent);
         return keywordService.stream(taxonomyStreamRequest).collect(Collectors.toList());
     }
 
     @Override
     protected Map<String, String> getFacetFields(List<KeywordEntry> entries) {
-        String keywordIds = entries.stream().map(KeywordEntry::getAccession)
-                .collect(Collectors.joining(","));
+        String keywordIds =
+                entries.stream().map(KeywordEntry::getAccession).collect(Collectors.joining(","));
         return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}keyword", keywordIds));
     }
 
     @Override
-    protected List<ViewBy> getViewBys(List<FacetField.Count> facetCounts, List<KeywordEntry> entries, String query) {
-        Map<String, KeywordEntry> keywordIdMap = entries.stream()
-                .collect(Collectors.toMap(KeywordEntry::getAccession, Function.identity()));
+    protected List<ViewBy> getViewBys(
+            List<FacetField.Count> facetCounts, List<KeywordEntry> entries, String query) {
+        Map<String, KeywordEntry> keywordIdMap =
+                entries.stream()
+                        .collect(Collectors.toMap(KeywordEntry::getAccession, Function.identity()));
         return facetCounts.stream()
                 .map(fc -> getViewBy(fc, keywordIdMap.get(fc.getName()), query))
                 .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
                 .collect(Collectors.toList());
     }
 
-    private ViewBy getViewBy(FacetField.Count count, KeywordEntry keywordEntry, String queryString) {
-        return ViewByImpl.builder().id(count.getName())
+    private ViewBy getViewBy(
+            FacetField.Count count, KeywordEntry keywordEntry, String queryString) {
+        return ViewByImpl.builder()
+                .id(count.getName())
                 .count(count.getCount())
                 .link(URL_PHRASE + count.getName())
                 .label(keywordEntry.getKeyword().getName())
-                .expand(hasChildren(count, queryString)).build();
+                .expand(hasChildren(count, queryString))
+                .build();
     }
 }

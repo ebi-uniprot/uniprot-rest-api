@@ -1,5 +1,11 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
@@ -7,12 +13,6 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.ViewByImpl;
 import org.uniprot.core.cv.ec.ECEntry;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
@@ -44,14 +44,22 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
 
     @Override
     protected Map<String, String> getFacetFields(List<String> entries) {
-        String regEx = entries.stream().map(token -> token + TOKEN_REGEX).collect(Collectors.joining("", "", REGEX_SUFFIX));
-        return Map.of(FacetParams.FACET_MATCHES, regEx,
-                FacetParams.FACET_FIELD, EC,
-                FacetParams.FACET_MINCOUNT, FACET_MIN_COUNT);
+        String regEx =
+                entries.stream()
+                        .map(token -> token + TOKEN_REGEX)
+                        .collect(Collectors.joining("", "", REGEX_SUFFIX));
+        return Map.of(
+                FacetParams.FACET_MATCHES,
+                regEx,
+                FacetParams.FACET_FIELD,
+                EC,
+                FacetParams.FACET_MINCOUNT,
+                FACET_MIN_COUNT);
     }
 
     @Override
-    protected List<ViewBy> getViewBys(List<FacetField.Count> facetCounts, List<String> strings, String query) {
+    protected List<ViewBy> getViewBys(
+            List<FacetField.Count> facetCounts, List<String> strings, String query) {
         return facetCounts.stream()
                 .map(fc -> getViewBy(fc, query))
                 .sorted(ViewBy.SORT_BY_ID)
@@ -66,7 +74,8 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
                 .label(ecService.getEC(fullEc).map(ECEntry::getLabel).orElse(""))
                 .expand(hasChildren(count, query))
                 .link(URL_PREFIX + fullEc)
-                .count(count.getCount()).build();
+                .count(count.getCount())
+                .build();
     }
 
     private String ecRemoveDash(String ec) {
