@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.uniprot.core.cv.xdb.UniProtDatabaseDetail;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
@@ -108,6 +109,18 @@ public class IdMappingUniProtKBITUtils {
             }
         }
         return value;
+    }
+
+    public static void saveInactiveEntry(CloudSolrClient cloudSolrClient)
+            throws IOException, SolrServerException {
+        UniProtDocument inactiveDoc = new UniProtDocument();
+        inactiveDoc.accession = "I8FBX0";
+        inactiveDoc.id = "INACTIVE_DROME";
+        inactiveDoc.idInactive = "INACTIVE_DROME";
+        inactiveDoc.inactiveReason = "DELETED";
+        inactiveDoc.active = false;
+        cloudSolrClient.addBean(SolrCollection.uniprot.name(), inactiveDoc);
+        cloudSolrClient.commit(SolrCollection.uniprot.name());
     }
 
     public static void saveEntry(

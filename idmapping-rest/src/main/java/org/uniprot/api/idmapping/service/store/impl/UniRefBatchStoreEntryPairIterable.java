@@ -32,7 +32,7 @@ public class UniRefBatchStoreEntryPairIterable
             IdMappingStringPair mId, Map<String, UniRefEntryLight> idEntryMap) {
         return UniRefEntryPair.builder()
                 .from(mId.getFrom())
-                .to(idEntryMap.get(mId.getTo()))
+                .to(idEntryMap.getOrDefault(mId.getTo(), null))
                 .build();
     }
 

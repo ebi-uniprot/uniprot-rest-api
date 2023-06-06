@@ -79,8 +79,8 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
 
         // id mapping pairs -> Ts
         return batch.stream()
-                .filter(mId -> idEntryMap.containsKey(mId.getTo()))
                 .map(mId -> convertToPair(mId, idEntryMap))
+                .filter(pair -> pair.getTo() != null)
                 .collect(Collectors.toList());
     }
 
