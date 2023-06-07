@@ -313,9 +313,9 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniParcDownloadJobDetailsNotFound() throws Exception {
+    void downloadJobDetailsNotFound() throws Exception {
         // Do not save request in idmapping cache
-        String jobId = "UNIPARC_JOB_DETAILS_NOT_FOUND";
+        String jobId = "JOB_DETAILS_NOT_FOUND";
 
         ResultActions response =
                 mockMvc.perform(
@@ -329,8 +329,8 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniParcDownloadCanGetJobDetails() throws Exception {
-        String jobId = "UNIPARC_JOB_ID_DETAILS";
+    void downloadCanGetJobDetails() throws Exception {
+        String jobId = "JOB_ID_DETAILS";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
@@ -368,8 +368,8 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniParcDownloadCanGetJobDetailsWithError() throws Exception {
-        String jobId = "UNIPARC_JOB_ID_DETAILS_ERROR";
+    void downloadCanGetJobDetailsWithError() throws Exception {
+        String jobId = "JOB_ID_DETAILS_ERROR";
 
         cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, List.of());
         DownloadJob downloadJob =
@@ -408,7 +408,7 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void uniParcDownloadJobSubmittedNotFound() throws Exception {
+    void downloadJobSubmittedNotFound() throws Exception {
         // Do not save request in idmapping cache
 
         ResultActions response =
@@ -638,117 +638,6 @@ public class IdMappingDownloadControllerIT {
     }
 
     @Test
-    void unirefDownloadJobDetailsNotFound() throws Exception {
-        // Do not save request in idmapping cache
-        String jobId = "UNIREF_JOB_DETAILS_NOT_FOUND";
-
-        ResultActions response =
-                mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.size()", is(1)))
-                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
-    }
-
-    @Test
-    void unirefDownloadCanGetJobDetails() throws Exception {
-        String jobId = "UNIREF_JOB_ID_DETAILS";
-
-        List<IdMappingStringPair> mappedIds = new ArrayList<>();
-        mappedIds.add(new IdMappingStringPair("P10001", "UniRef50_P03901"));
-        mappedIds.add(new IdMappingStringPair("P10002", "UniRef50_P03902"));
-        cacheIdMappingJob(jobId, "UniRef50", JobStatus.FINISHED, mappedIds);
-
-        ResultActions response =
-                mockMvc.perform(
-                        post(JOB_SUBMIT_ENDPOINT)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", jobId)
-                                .param("format", "json")
-                                .param("fields", "id,name,types"));
-        // then
-        response.andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
-
-        await().until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
-
-        response =
-                mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.redirectURL",
-                                is("https://localhost/idmapping/download/results/" + jobId)))
-                .andExpect(jsonPath("$.fields", is("id,name,types")))
-                .andExpect(jsonPath("$.format", is(APPLICATION_JSON_VALUE)));
-    }
-
-    @Test
-    void unirefDownloadCanGetJobDetailsWithError() throws Exception {
-        String jobId = "UNIREF_JOB_ID_DETAILS_ERROR";
-
-        cacheIdMappingJob(jobId, "UniRef90", JobStatus.FINISHED, List.of());
-        DownloadJob downloadJob =
-                DownloadJob.builder()
-                        .id(jobId)
-                        .status(JobStatus.ERROR)
-                        .error("Error message")
-                        .build();
-        downloadJobRepository.save(downloadJob);
-
-        ResultActions response =
-                mockMvc.perform(
-                        post(JOB_SUBMIT_ENDPOINT)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", jobId)
-                                .param("format", "json"));
-        // then
-        response.andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
-
-        response =
-                mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.size()", is(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.errors[0].code", is(PredefinedAPIStatus.SERVER_ERROR.getCode())))
-                .andExpect(jsonPath("$.errors[0].message", is(downloadJob.getError())));
-    }
-
-    @Test
-    void unirefDownloadJobSubmittedNotFound() throws Exception {
-        // Do not save request in idmapping cache
-
-        ResultActions response =
-                mockMvc.perform(
-                        post(JOB_SUBMIT_ENDPOINT)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", "JOB_NOT_FOUND")
-                                .param("format", "json"));
-        // then
-        response.andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.size()", is(1)))
-                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
-    }
-
-    @Test
     void unirefDownloadJobSubmittedBadRequestRequired() throws Exception {
         // when
         ResultActions response =
@@ -959,119 +848,6 @@ public class IdMappingDownloadControllerIT {
             assertTrue(text.contains("UniRef50_P03901"));
             assertTrue(text.contains("UniRef50_P03902"));
         }
-    }
-
-    @Test
-    void uniProtKBDownloadJobDetailsNotFound() throws Exception {
-        // Do not save request in idmapping cache
-        String jobId = "UNIPROTKB_JOB_DETAILS_NOT_FOUND";
-
-        ResultActions response =
-                mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.size()", is(1)))
-                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
-    }
-
-    @Test
-    void uniProtKBDownloadCanGetJobDetails() throws Exception {
-        String jobId = "UNIPROTKB_JOB_ID_DETAILS";
-
-        List<IdMappingStringPair> mappedIds = new ArrayList<>();
-        mappedIds.add(new IdMappingStringPair("P00001", "P00001"));
-        mappedIds.add(new IdMappingStringPair("P00002", "P00002"));
-        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.FINISHED, mappedIds);
-
-        ResultActions response =
-                mockMvc.perform(
-                        post(JOB_SUBMIT_ENDPOINT)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", jobId)
-                                .param("format", "json")
-                                .param("fields", "accession"));
-        // then
-        response.andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
-
-        await().until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
-
-        response =
-                mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(
-                        jsonPath(
-                                "$.redirectURL",
-                                is("https://localhost/idmapping/download/results/" + jobId)))
-                .andExpect(jsonPath("$.fields", is("accession")))
-                .andExpect(jsonPath("$.format", is(APPLICATION_JSON_VALUE)));
-    }
-
-    @Test
-    void uniProtKBDownloadCanGetJobDetailsWithError() throws Exception {
-        String jobId = "UNIPROTKB_JOB_ID_DETAILS_ERROR";
-
-        cacheIdMappingJob(jobId, "UniProtKB", JobStatus.FINISHED, List.of());
-        DownloadJob downloadJob =
-                DownloadJob.builder()
-                        .id(jobId)
-                        .status(JobStatus.ERROR)
-                        .error("Error message")
-                        .build();
-        downloadJobRepository.save(downloadJob);
-
-        ResultActions response =
-                mockMvc.perform(
-                        post(JOB_SUBMIT_ENDPOINT)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", jobId)
-                                .param("format", "json")
-                                .param("fields", "accession"));
-        // then
-        response.andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
-
-        response =
-                mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT, jobId)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errors.size()", is(1)))
-                .andExpect(
-                        jsonPath(
-                                "$.errors[0].code", is(PredefinedAPIStatus.SERVER_ERROR.getCode())))
-                .andExpect(jsonPath("$.errors[0].message", is(downloadJob.getError())));
-    }
-
-    @Test
-    void uniProtKBDownloadJobSubmittedNotFound() throws Exception {
-        // Do not save request in idmapping cache
-
-        ResultActions response =
-                mockMvc.perform(
-                        post(JOB_SUBMIT_ENDPOINT)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", "JOB_NOT_FOUND")
-                                .param("format", "json")
-                                .param("fields", "accession"));
-        // then
-        response.andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.size()", is(1)))
-                .andExpect(jsonPath("$.messages.*", contains("Resource not found")));
     }
 
     @Test

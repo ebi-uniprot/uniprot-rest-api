@@ -38,14 +38,6 @@ public class IdMappingConfig {
         return restTemplateBuilder.build();
     }
 
-    @Bean(destroyMethod = "shutdown")
-    @Profile("asyncDownload & live")
-    RedissonClient redisson(@Value("${id.mapping.redis.config.file}") Resource redisConfig)
-            throws IOException {
-        Config config = Config.fromYAML(redisConfig.getInputStream());
-        return Redisson.create(config);
-    }
-
     @Bean
     @Profile("live")
     public IdMappingJobCacheService idMappingJobCacheService(

@@ -126,7 +126,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
     private AbstractUUWHttpMessageConverter<T, S> getOutputWriter(
             MediaType contentType, Type type) {
         return messageConverters.stream()
-                .filter(converter -> converter instanceof AbstractUUWHttpMessageConverter)
+                .filter(AbstractUUWHttpMessageConverter.class::isInstance)
                 .filter(
                         converter ->
                                 ((AbstractUUWHttpMessageConverter<?, ?>) converter)
