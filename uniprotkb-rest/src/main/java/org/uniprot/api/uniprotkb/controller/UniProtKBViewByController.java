@@ -1,11 +1,12 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBViewByController.*;
-
-import java.util.List;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +16,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.ViewByResult;
-import org.uniprot.api.uniprotkb.view.service.*;
+import org.uniprot.api.uniprotkb.view.service.UniProtKBViewByECService;
+import org.uniprot.api.uniprotkb.view.service.UniProtKBViewByGoService;
+import org.uniprot.api.uniprotkb.view.service.UniProtKBViewByKeywordService;
+import org.uniprot.api.uniprotkb.view.service.UniProtKBViewByTaxonomyService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBViewByController.VIEW_BY_RESOURCE;
 
 @RestController
 @RequestMapping(VIEW_BY_RESOURCE)
@@ -57,7 +57,7 @@ public class UniProtKBViewByController {
     @ApiResponse(
             content =
                     @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
-    public ResponseEntity<List<ViewBy>> getViewByEC(
+    public ResponseEntity<ViewByResult> getViewByEC(
             @Parameter(
                             description =
                                     "Criteria to search the views. It can take any valid solr query.")
@@ -66,8 +66,7 @@ public class UniProtKBViewByController {
             @Parameter(description = "Name of the parent")
                     @RequestParam(value = "parent", required = false)
                     String parent) {
-        List<ViewBy> viewBys = viewByECService.getViewBys(query, parent);
-        return new ResponseEntity<>(viewBys, HttpStatus.OK);
+        return new ResponseEntity<>(viewByECService.getViewBys(query, parent), HttpStatus.OK);
     }
 
     @Tag(name = "uniprotkbview")
@@ -78,7 +77,7 @@ public class UniProtKBViewByController {
     @ApiResponse(
             content =
                     @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
-    public ResponseEntity<List<ViewBy>> getViewByKeyword(
+    public ResponseEntity<ViewByResult> getViewByKeyword(
             @Parameter(
                             description =
                                     "Criteria to search the views. It can take any valid solr query.")
@@ -100,7 +99,7 @@ public class UniProtKBViewByController {
     @ApiResponse(
             content =
                     @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
-    public ResponseEntity<List<ViewBy>> getGo(
+    public ResponseEntity<ViewByResult> getGo(
             @Parameter(
                             description =
                                     "Criteria to search the views. It can take any valid solr query.")
@@ -120,7 +119,7 @@ public class UniProtKBViewByController {
     @ApiResponse(
             content =
                     @Content(array = @ArraySchema(schema = @Schema(implementation = ViewBy.class))))
-    public ResponseEntity<ViewByResult<ViewBy>> getViewByTaxonomy(
+    public ResponseEntity<ViewByResult> getViewByTaxonomy(
             @Parameter(
                             description =
                                     "Criteria to search the views. It can take any valid solr query.")
@@ -129,8 +128,6 @@ public class UniProtKBViewByController {
             @Parameter(description = "Name of the parent")
                     @RequestParam(value = "parent", required = false)
                     String parent) {
-        return new ResponseEntity<>(
-                new ViewByResult<>(uniProtKBViewByTaxonomyService.getViewBys(query, parent)),
-                HttpStatus.OK);
+        return new ResponseEntity<>(uniProtKBViewByTaxonomyService.getViewBys(query, parent), HttpStatus.OK);
     }
 }

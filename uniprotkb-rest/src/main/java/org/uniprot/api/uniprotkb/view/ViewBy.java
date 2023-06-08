@@ -7,8 +7,6 @@ public interface ViewBy {
 
     String getLabel();
 
-    String getLink();
-
     boolean isExpand();
 
     long getCount();

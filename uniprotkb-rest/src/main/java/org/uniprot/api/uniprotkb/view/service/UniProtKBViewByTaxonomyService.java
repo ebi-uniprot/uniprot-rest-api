@@ -1,25 +1,19 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.request.taxonomy.TaxonomyStreamRequest;
 import org.uniprot.api.rest.service.taxonomy.TaxonomyService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.ViewByImpl;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-import org.uniprot.core.uniprotkb.taxonomy.Taxonomy;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UniProtKBViewByTaxonomyService extends UniProtKBViewByService<TaxonomyEntry> {
     public static final String TOP_LEVEL_PARENT_QUERY = "-parent:[* TO *] AND active:true";
-    public static final String URL_PHRASE = "/taxonomy/";
     private final TaxonomyService taxonomyService;
 
     public UniProtKBViewByTaxonomyService(
@@ -47,25 +41,40 @@ public class UniProtKBViewByTaxonomyService extends UniProtKBViewByService<Taxon
     }
 
     @Override
-    protected List<ViewBy> getViewBys(
-            List<FacetField.Count> facetCounts, List<TaxonomyEntry> entries, String query) {
+    protected String getId(TaxonomyEntry entry) {
+        return String.valueOf(entry.getTaxonId());
+    }
+
+    @Override
+    protected String getLabel(TaxonomyEntry entry) {
+        return entry.getScientificName();
+    }
+
+    /*@Override
+    protected ViewByResult getViewBys(
+            List<FacetField.Count> facetCounts, List<TaxonomyEntry> entries, List<TaxonomyEntry> ancestors, String query) {
         Map<Long, TaxonomyEntry> taxIdMap =
                 entries.stream()
                         .collect(Collectors.toMap(Taxonomy::getTaxonId, Function.identity()));
 
-        return facetCounts.stream()
+        return new ViewByResult(getAncestors(ancestors), facetCounts.stream()
                 .map(fc -> getViewBy(fc, taxIdMap.get(Long.parseLong(fc.getName())), query))
                 .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
+                .collect(Collectors.toList()));
+    }
+
+    private List<Ancestor> getAncestors(List<TaxonomyEntry> ancestors) {
+        return ancestors.stream()
+                .map(te -> AncestorImpl.builder().id(String.valueOf(te.getTaxonId())).label(te.getScientificName()).build())
                 .collect(Collectors.toList());
     }
 
     private ViewBy getViewBy(FacetField.Count count, TaxonomyEntry taxonomyEntry, String queryStr) {
         return ViewByImpl.builder()
                 .id(count.getName())
-                .count(count.getCount())
-                .link(URL_PHRASE + count.getName())
                 .label(taxonomyEntry.getScientificName())
+                .count(count.getCount())
                 .expand(hasChildren(count, queryStr))
                 .build();
-    }
+    }*/
 }

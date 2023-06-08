@@ -1,10 +1,11 @@
 package org.uniprot.api.uniprotkb.view;
 
-import java.util.List;
-
 import lombok.Value;
 
+import java.util.List;
+
 @Value
-public class ViewByResult<T> {
-    List<T> results;
+public class ViewByResult {
+    List<Ancestor> ancestors;
+    List<ViewBy> results;
 }

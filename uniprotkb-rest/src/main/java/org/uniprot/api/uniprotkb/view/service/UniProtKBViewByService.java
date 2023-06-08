@@ -3,10 +3,12 @@ package org.uniprot.api.uniprotkb.view.service;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.api.uniprotkb.view.ViewBy;
+import org.uniprot.api.uniprotkb.view.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class UniProtKBViewByService<T> {
@@ -16,16 +18,18 @@ public abstract class UniProtKBViewByService<T> {
         this.uniProtEntryService = uniProtEntryService;
     }
 
-    public List<ViewBy> getViewBys(String query, String parent) {
+    public ViewByResult getViewBys(String query, String parent) {
         List<FacetField.Count> facetCounts = List.of();
         List<T> entries = List.of();
         String id = parent;
+        List<T> ancestors = new LinkedList<>();
 
         do {
             List<T> childEntries = getChildren(id);
             List<FacetField.Count> childFacetCounts = getFacetCounts(query, childEntries);
 
             if (!childFacetCounts.isEmpty()) {
+                addToAncestors(entries, id, ancestors);
                 facetCounts = childFacetCounts;
                 entries = childEntries;
                 id = facetCounts.get(0).getName();
@@ -33,19 +37,23 @@ public abstract class UniProtKBViewByService<T> {
                 break;
             }
 
-        } while (facetCounts.size() == 1 && isTopLevelSearch(parent));
+        } while (facetCounts.size() == 1);
 
-        return getViewBys(facetCounts, entries, query);
+        return getViewBys(facetCounts, entries, ancestors, query);
     }
 
-    protected boolean hasChildren(FacetField.Count count, String queryStr) {
-        List<T> children = getChildren(count.getName());
-        return !getFacetCounts(queryStr, children).isEmpty();
+    protected static boolean isTopLevelSearch(String parent) {
+        return StringUtils.isEmpty(parent);
+    }
+
+    private void addToAncestors(List<T> entries, String id, List<T> ancestors) {
+        if (!isTopLevelSearch(id) && !entries.isEmpty()) {
+            ancestors.add(entries.stream().filter(t -> id.equals(getId(t))).findAny().orElseThrow());
+        }
     }
 
     private List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
-        List<FacetField> facetFields =
-                uniProtEntryService.getFacets(query, getFacetFields(entries));
+        List<FacetField> facetFields = uniProtEntryService.getFacets(query, getFacetFields(entries));
 
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()
@@ -56,14 +64,48 @@ public abstract class UniProtKBViewByService<T> {
         return List.of();
     }
 
-    protected static boolean isTopLevelSearch(String parent) {
-        return StringUtils.isEmpty(parent);
+    protected boolean hasChildren(FacetField.Count count, String queryStr) {
+        List<T> children = getChildren(count.getName());
+        return !getFacetCounts(queryStr, children).isEmpty();
     }
+
+    private ViewByResult getViewBys(List<FacetField.Count> facetCounts, List<T> entries, List<T> ancestorEntries, String query) {
+        Map<String, T> taxIdMap = getEntryMap(entries, facetCounts);
+        List<ViewBy> viewBys = facetCounts.stream()
+                .map(fc -> getViewBy(fc, taxIdMap.get(getFacetName(fc)), query))
+                .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
+                .collect(Collectors.toList());
+        List<Ancestor> ancestors = ancestorEntries.stream().map(this::getAncestor).collect(Collectors.toList());
+        return new ViewByResult(ancestors, viewBys);
+    }
+
+    protected Map<String, T> getEntryMap(List<T> entries, List<FacetField.Count> facetCounts) {
+        return entries.stream()
+                .collect(Collectors.toMap(this::getId, Function.identity()));
+    }
+
+    protected String getFacetName(FacetField.Count fc) {
+        return fc.getName();
+    }
+
+    private Ancestor getAncestor(T t) {
+        return AncestorImpl.builder().id(getId(t)).label(getLabel(t)).build();
+    }
+
+    private ViewBy getViewBy(FacetField.Count count, T entry, String queryStr) {
+        return ViewByImpl.builder()
+                .id(getId(entry))
+                .label(getLabel(entry))
+                .count(count.getCount())
+                .expand(hasChildren(count, queryStr))
+                .build();
+    }
+
+    protected abstract String getId(T entry);
+
+    protected abstract String getLabel(T entry);
 
     protected abstract List<T> getChildren(String parent);
 
     protected abstract Map<String, String> getFacetFields(List<T> entries);
-
-    protected abstract List<ViewBy> getViewBys(
-            List<FacetField.Count> facetCounts, List<T> entries, String query);
 }
