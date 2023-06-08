@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,7 +51,7 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
  * @author lgonzales
  * @since 08/03/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniProtKBIdMappingResultsController.class)
 @AutoConfigureWebClient
@@ -75,7 +76,8 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
 
     @Autowired private MockMvc mockMvc;
 
-    @Autowired private RestTemplate uniProtKBRestTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate idMappingRdfRestTemplate;
 
     @Autowired private TaxonomyLineageRepository taxRepository;
 
@@ -122,9 +124,9 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
     @BeforeAll
     void saveEntriesStore() throws Exception {
 
-        when(uniProtKBRestTemplate.getUriTemplateHandler())
+        when(idMappingRdfRestTemplate.getUriTemplateHandler())
                 .thenReturn(new DefaultUriBuilderFactory());
-        when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+        when(idMappingRdfRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
 
         for (int i = 1; i <= 20; i++) {
             saveEntry(i, cloudSolrClient, storeClient);

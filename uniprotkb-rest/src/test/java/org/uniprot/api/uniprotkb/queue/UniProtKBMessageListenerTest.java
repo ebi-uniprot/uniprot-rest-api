@@ -26,7 +26,9 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
@@ -36,6 +38,8 @@ public class UniProtKBMessageListenerTest {
     @Mock private MessageConverter converter;
     @Mock private UniProtEntryService service;
     @Mock DownloadConfigProperties downloadConfigProperties;
+
+    @Mock AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
     @Mock DownloadJobRepository jobRepository;
 
@@ -59,7 +63,7 @@ public class UniProtKBMessageListenerTest {
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
-        this.uniProtKBMessageListener.setMaxRetryCount(3);
+        when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
 
         this.uniProtKBMessageListener.onMessage(message);
 
@@ -93,7 +97,7 @@ public class UniProtKBMessageListenerTest {
         Mockito.doThrow(new IOException("Forced IO Exception"))
                 .when(this.downloadResultWriter)
                 .writeResult(any(), any(), any(), any(), any(), any());
-        this.uniProtKBMessageListener.setMaxRetryCount(3);
+        when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
 
         this.uniProtKBMessageListener.onMessage(message);
 
@@ -112,7 +116,7 @@ public class UniProtKBMessageListenerTest {
         String jobId = UUID.randomUUID().toString();
         MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
         Message message = builder.setHeader("jobId", jobId).build();
-        this.uniProtKBMessageListener.setMaxRetryCount(0);
+        when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> this.uniProtKBMessageListener.onMessage(message));
     }
 
@@ -120,7 +124,7 @@ public class UniProtKBMessageListenerTest {
     void testOnMessageWhenExceptionIsThrown() {
         Message message =
                 MessageBuilder.withBody("test".getBytes()).setHeader("jobId", "12345").build();
-        this.uniProtKBMessageListener.setMaxRetryCount(0);
+        when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> this.uniProtKBMessageListener.onMessage(message));
     }
 

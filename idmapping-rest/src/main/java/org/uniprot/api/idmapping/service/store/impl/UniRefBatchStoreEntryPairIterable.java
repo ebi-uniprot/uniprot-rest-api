@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.service.store.impl;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,14 @@ public class UniRefBatchStoreEntryPairIterable
             UniProtStoreClient<UniRefEntryLight> storeClient,
             RetryPolicy<Object> retryPolicy) {
         super(sourceIterable, batchSize, storeClient, retryPolicy);
+    }
+
+    public UniRefBatchStoreEntryPairIterable(
+            Iterator<IdMappingStringPair> sourceIterator,
+            int batchSize,
+            UniProtStoreClient<UniRefEntryLight> storeClient,
+            RetryPolicy<Object> retryPolicy) {
+        super(sourceIterator, batchSize, storeClient, retryPolicy);
     }
 
     @Override

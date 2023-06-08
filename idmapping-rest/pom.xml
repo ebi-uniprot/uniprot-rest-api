@@ -21,6 +21,7 @@
 		<redisson-version>3.17.4</redisson-version>
 		<testcontainers.version>1.17.6</testcontainers.version>
 		<jna.version>5.8.0</jna.version>
+		<awaitility.version>4.2.0</awaitility.version>
 	</properties>
 
 	<dependencies>
@@ -194,9 +195,21 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>rabbitmq</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
 			<version>${jna.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility</artifactId>
+			<version>${awaitility.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
