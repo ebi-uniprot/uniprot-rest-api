@@ -54,7 +54,8 @@ class HeaderFactoryTest {
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
-                        .startsWith("form-data; name=\"attachment\"; filename=\"uniprotkb_gene_P53_20"));
+                        .startsWith(
+                                "form-data; name=\"attachment\"; filename=\"uniprotkb_gene_P53_20"));
     }
 
     @Test

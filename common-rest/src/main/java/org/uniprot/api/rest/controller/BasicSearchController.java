@@ -169,9 +169,9 @@ public abstract class BasicSearchController<T> {
     }
 
     /**
-     This is to suppress a false positive sonar failure
-     Sonar error says: "Logging should not be vulnerable to injection attacks"
-     This line does not log anything, this is why we added suppress below
+     * This is to suppress a false positive sonar failure Sonar error says: "Logging should not be
+     * vulnerable to injection attacks" This line does not log anything, this is why we added
+     * suppress below
      */
     @SuppressWarnings("javasecurity:S5145")
     private void publishPaginationEvent(ApplicationEvent paginatedResultEvent) {
