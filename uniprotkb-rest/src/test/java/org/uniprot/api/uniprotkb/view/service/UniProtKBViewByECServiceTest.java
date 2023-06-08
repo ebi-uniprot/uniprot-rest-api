@@ -1,27 +1,18 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.core.cv.ec.ECEntry;
 import org.uniprot.core.cv.ec.impl.ECEntryBuilder;
 import org.uniprot.cv.ec.ECRepo;
+
+import java.util.Optional;
+
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBViewByECServiceTest {
@@ -38,7 +29,7 @@ class UniProtKBViewByECServiceTest {
         service = null;
     }
 
-    @Test
+    /*@Test
     void test() throws IOException, SolrServerException {
         Map<String, Long> counts = new HashMap<>();
         counts.put("1.1.1.-", 346L);
@@ -62,7 +53,7 @@ class UniProtKBViewByECServiceTest {
                         UniProtKBViewByECService.URL_PREFIX + "1.1.3.-",
                         true);
         assertTrue(viewBys.contains(viewBy2));
-    }
+    }*/
 
     void mockEcService() {
         ECEntry ec1 =

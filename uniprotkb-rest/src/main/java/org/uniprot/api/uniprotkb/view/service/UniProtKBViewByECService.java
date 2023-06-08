@@ -1,22 +1,23 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.common.params.FacetParams;
+import org.springframework.stereotype.Service;
+import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+import org.uniprot.api.uniprotkb.view.Ancestor;
+import org.uniprot.api.uniprotkb.view.AncestorImpl;
+import org.uniprot.api.uniprotkb.view.ViewBy;
+import org.uniprot.api.uniprotkb.view.ViewByImpl;
+import org.uniprot.core.cv.ec.ECEntry;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.common.params.FacetParams;
-import org.springframework.stereotype.Service;
-import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.ViewByImpl;
-import org.uniprot.core.cv.ec.ECEntry;
-
 @Service
 public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
-    public static final String URL_PREFIX = "/EC/";
     public static final String REGEX_SUFFIX = "[0-9]+";
     public static final String TOKEN_REGEX = "\\.";
     public static final String DASH = ".-";
@@ -35,7 +36,7 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
         List<String> children = new LinkedList<>();
         String parentEc = parent;
         if (!isTopLevelSearch(parentEc)) {
-            parentEc = ecRemoveDash(parentEc);
+            parentEc = getShortFormEc(parentEc);
             String[] tokens = parentEc.split(TOKEN_REGEX);
             children.addAll(Arrays.asList(tokens));
         }
@@ -58,35 +59,62 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
     }
 
     @Override
-    protected List<ViewBy> getViewBys(
-            List<FacetField.Count> facetCounts, List<String> strings, String query) {
-        return facetCounts.stream()
+    protected String getId(String entry) {
+        return entry;
+    }
+
+    @Override
+    protected String getLabel(String fullEc) {
+        return ecService.getEC(fullEc).map(ECEntry::getLabel).orElse("");
+    }
+
+    @Override
+    protected Map<String, String> getEntryMap(List<String> entries, List<FacetField.Count> facetCounts) {
+        if (!entries.isEmpty()) {
+            super.getEntryMap(entries, facetCounts);
+        }
+        return facetCounts.stream().collect(Collectors.toMap(FacetField.Count::getName, count -> this.getFullEc(count.getName())));
+    }
+
+    /*@Override
+    protected ViewByResult getViewBys(
+            List<FacetField.Count> facetCounts, List<String> entries, List<String> ancestors, String query) {
+        return new ViewByResult(getAncestors(ancestors), facetCounts.stream()
                 .map(fc -> getViewBy(fc, query))
                 .sorted(ViewBy.SORT_BY_ID)
+                .collect(Collectors.toList()));
+    }*/
+
+    private List<Ancestor> getAncestors(List<String> ancestors) {
+        return ancestors.stream()
+                .map(ec -> {
+                    String fullEc = getFullEc(ec);
+                    return AncestorImpl.builder().id(fullEc)
+                            .label(ecService.getEC(fullEc).map(ECEntry::getLabel).orElse("")).build();
+                })
                 .collect(Collectors.toList());
     }
 
     private ViewBy getViewBy(FacetField.Count count, String query) {
         String ecId = count.getName();
-        String fullEc = ecAddDashIfAbsent(ecId);
+        String fullEc = getFullEc(ecId);
         return ViewByImpl.builder()
                 .id(fullEc)
                 .label(ecService.getEC(fullEc).map(ECEntry::getLabel).orElse(""))
-                .expand(hasChildren(count, query))
-                .link(URL_PREFIX + fullEc)
                 .count(count.getCount())
+                .expand(hasChildren(count, query))
                 .build();
     }
 
-    private String ecRemoveDash(String ec) {
-        String temp = ec;
+    private String getShortFormEc(String fullEc) {
+        String temp = fullEc;
         while (temp.endsWith(DASH)) {
             temp = temp.substring(0, temp.length() - 2);
         }
         return temp;
     }
 
-    private String ecAddDashIfAbsent(String ec) {
+    private String getFullEc(String ec) {
         String[] tokens = ec.split(TOKEN_REGEX);
         int count = MAX_TOKEN_COUNT - tokens.length;
         return ec + DASH.repeat(Math.max(0, count));
