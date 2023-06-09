@@ -3,34 +3,18 @@ package org.uniprot.api.rest.controller;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 
-public abstract class BasicDownloadController<T> extends BasicSearchController<T> {
+public abstract class BasicDownloadController {
 
-    protected BasicDownloadController(
-            ApplicationEventPublisher eventPublisher,
-            MessageConverterContextFactory<T> converterContextFactory,
-            ThreadPoolTaskExecutor downloadTaskExecutor,
-            MessageConverterContextFactory.Resource resource,
-            Gatekeeper downloadGatekeeper) {
-        super(
-                eventPublisher,
-                converterContextFactory,
-                downloadTaskExecutor,
-                resource,
-                downloadGatekeeper);
-    }
+    protected BasicDownloadController() {}
 
     protected ResponseEntity<JobStatusResponse> getAsyncDownloadStatus(DownloadJob job) {
         ResponseEntity<JobStatusResponse> response;
