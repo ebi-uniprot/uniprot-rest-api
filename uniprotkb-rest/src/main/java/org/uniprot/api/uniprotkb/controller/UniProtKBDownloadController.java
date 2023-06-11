@@ -94,6 +94,9 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             ProblemPair error =
                     new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), job.getError());
             detailResponse.setErrors(List.of(error));
+        } else if(JobStatus.ABORTED == job.getStatus()){
+            ProblemPair error = new ProblemPair(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode(), job.getError());
+            detailResponse.setErrors(List.of(error));
         }
 
         return ResponseEntity.ok(detailResponse);

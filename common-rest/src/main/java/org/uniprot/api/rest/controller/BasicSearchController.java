@@ -163,7 +163,8 @@ public abstract class BasicSearchController<T> {
             headers = createHttpDownloadHeader(context, request);
         }
 
-        ApplicationEvent paginatedResultEvent = new PaginatedResultsEvent(this, request, response, result.getPageAndClean());
+        ApplicationEvent paginatedResultEvent =
+                new PaginatedResultsEvent(this, request, response, result.getPageAndClean());
         publishPaginationEvent(paginatedResultEvent);
         return ResponseEntity.ok().headers(headers).body(context);
     }

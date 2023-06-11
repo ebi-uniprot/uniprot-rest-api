@@ -81,7 +81,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         Assertions.assertTrue(
                 List.of(
                                 "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
-                                "P00007", "P00008", "P00009", "P00010")
+                                "P00007", "P00008", "P00009", "P00010", "P00013", "P00014")
                         .containsAll(primaryAccessions));
     }
 

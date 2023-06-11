@@ -28,6 +28,10 @@ public abstract class BasicDownloadController {
             case UNFINISHED:
                 response = ResponseEntity.ok(new JobStatusResponse(JobStatus.RUNNING));
                 break;
+            case ABORTED:
+                ProblemPair abortedError = new ProblemPair(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode(), job.getError());
+                response = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new JobStatusResponse(JobStatus.ABORTED, List.of(), List.of(abortedError)));
+                break;
             default:
                 ProblemPair error =
                         new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), job.getError());

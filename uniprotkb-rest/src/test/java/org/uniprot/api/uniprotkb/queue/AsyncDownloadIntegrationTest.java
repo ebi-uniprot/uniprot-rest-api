@@ -1,25 +1,9 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
-import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
-
-import org.apache.solr.client.solrj.SolrClient;
+import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +12,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -39,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
@@ -57,10 +41,26 @@ import org.uniprot.api.uniprotkb.controller.AbstractUniProtKBDownloadIT;
 import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.store.search.SolrCollection;
 
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
+import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
+import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload", "integration"})
 @EnableConfigurationProperties
@@ -82,12 +82,6 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
-    @Autowired
-    @Qualifier("uniProtKBSolrClient")
-    private SolrClient
-            solrClient; // this is NOT inmemory solr cluster client, see CloudSolrClient in parent
-    // class
-
     @SpyBean
     private DownloadJobRepository
             downloadJobRepository; // RedisRepository with inMemory redis server
@@ -101,6 +95,9 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
 
     @Value("${async.download.retryMaxCount}")
     private int maxRetry;
+
+    @Value("${async.download.embeddings.maxEntryCount}")
+    private long maxEntryCount;
 
     @Test
     void sendAndProcessDownloadMessageSuccessfully() throws IOException {
@@ -228,6 +225,24 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         Assertions.assertFalse(Files.exists(resultFilePath));
     }
 
+    @Test
+    void sendAndProcessEmbeddingsH5MessageWithAbortedStatus() throws IOException {
+        String query = "*:*";
+        MediaType format = UniProtMediaType.HDF5_MEDIA_TYPE;
+        UniProtKBDownloadRequest request = createDownloadRequest(query, format);
+        String jobId = this.messageService.sendMessage(request);
+        // Producer
+        verify(this.messageService, never()).alreadyProcessed(jobId);
+        await().until(jobCreatedInRedis(jobId));
+        await().until(jobAborted(jobId));
+        // verify  redis
+        verifyRedisEntry(query, jobId, List.of(JobStatus.ABORTED), 0, true);
+        DownloadJob job = this.downloadJobRepository.findById(jobId).get();
+        String errorMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount);
+        assertEquals(errorMsg, job.getError());
+        verifyIdsAndResultFilesDoNotExist(jobId);
+    }
+
     private UniProtKBDownloadRequest createDownloadRequest(String query, MediaType format) {
         UniProtKBDownloadRequest request = new UniProtKBDownloadRequest();
         request.setQuery(query);
@@ -285,6 +300,13 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
                 this.downloadJobRepository.existsById(jobId)
                         && this.downloadJobRepository.findById(jobId).get().getStatus()
                                 == JobStatus.ERROR;
+    }
+
+    private Callable<Boolean> jobAborted(String jobId) {
+        return () ->
+                this.downloadJobRepository.existsById(jobId)
+                        && this.downloadJobRepository.findById(jobId).get().getStatus()
+                        == JobStatus.ABORTED;
     }
 
     private Callable<Boolean> jobUnfinished(String jobId) {
