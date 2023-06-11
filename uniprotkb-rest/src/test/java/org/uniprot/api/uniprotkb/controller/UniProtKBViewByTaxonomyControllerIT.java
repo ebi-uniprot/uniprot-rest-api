@@ -1,15 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
-
-import java.util.List;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,12 +26,21 @@ import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
+import java.util.List;
+
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
+
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBViewByController.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
 @AutoConfigureWebClient
 @ActiveProfiles("viewbytest")
-class UniProtKBViewByControllerIT {
+class UniProtKBViewByTaxonomyControllerIT {
     private static final String EMPTY_PARENT = "";
     private static final String ACCESSION_0 = "A0";
     private static final int TAX_ID_0 = 9600;
@@ -56,8 +55,10 @@ class UniProtKBViewByControllerIT {
     private static final String TAX_ID_2_STRING = String.valueOf(TAX_ID_2);
     private static final String TAX_SCIENTIFIC_2 = "scientific_9602";
     public static final String PATH = "/uniprotkb/view/taxonomy";
-    @Autowired private MockMvc mockMvc;
-    @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
+    @Autowired
+    private MockMvc mockMvc;
+    @RegisterExtension
+    static DataStoreManager dataStoreManager = new DataStoreManager();
 
     @TestConfiguration
     static class TestConfig {
@@ -139,22 +140,47 @@ class UniProtKBViewByControllerIT {
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)));
+                .andExpect(jsonPath("$.results[0].count", is(1)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
+                .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(jsonPath("$.ancestors.size()", is(2)));
     }
 
     @Test
     void viewByTaxonomy_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "taxonomy_id:" + TAX_ID_1_STRING)
-                                .param("parent", TAX_ID_0_STRING))
+        mockMvc.perform(get(PATH).param("query", "taxonomy_id:" + TAX_ID_1_STRING).param("parent", TAX_ID_0_STRING))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_1_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.results[0].expand", is(true)))
-                .andExpect(jsonPath("$.results[0].count", is(2)));
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.results[0].expand", is(false)))
+                .andExpect(jsonPath("$.results[0].count", is(1)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(jsonPath("$.ancestors.size()", is(1)));
+    }
+
+    @Test
+    void viewByTaxonomy_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+        prepareSingleRootWithTwoLevelsOfChildren();
+
+        mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
+                .andDo(log())
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.results[0].expand", is(false)))
+                .andExpect(jsonPath("$.results[0].count", is(1)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
+                .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(jsonPath("$.ancestors.size()", is(2)));
     }
 
     @Test
@@ -162,23 +188,25 @@ class UniProtKBViewByControllerIT {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", TAX_ID_0_STRING))
-                .andDo(print())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_1_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.results[0].expand", is(true)))
-                .andExpect(jsonPath("$.results[0].count", is(2)));
+                .andDo(log())
+                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.results[0].expand", is(false)))
+                .andExpect(jsonPath("$.results[0].count", is(1)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(jsonPath("$.ancestors.size()", is(1)));
     }
 
     @Test
     void viewByTaxonomy_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + TAX_ID_1_STRING)
-                                .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results.size()", is(0)));
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
     @Test
@@ -186,8 +214,9 @@ class UniProtKBViewByControllerIT {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
-                .andDo(print())
-                .andExpect(jsonPath("$.results.size()", is(0)));
+                .andDo(log())
+                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
     @Test
@@ -195,11 +224,7 @@ class UniProtKBViewByControllerIT {
         mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())
-                .andExpect(
-                        content()
-                                .string(
-                                        containsStringIgnoringCase(
-                                                "query is a required parameter")));
+                .andExpect(content().string(containsStringIgnoringCase("query is a required parameter")));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {

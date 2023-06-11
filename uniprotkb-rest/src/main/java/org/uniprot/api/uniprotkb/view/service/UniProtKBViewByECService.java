@@ -4,16 +4,9 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.api.uniprotkb.view.Ancestor;
-import org.uniprot.api.uniprotkb.view.AncestorImpl;
-import org.uniprot.api.uniprotkb.view.ViewBy;
-import org.uniprot.api.uniprotkb.view.ViewByImpl;
 import org.uniprot.core.cv.ec.ECEntry;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,7 +53,7 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
 
     @Override
     protected String getId(String entry) {
-        return entry;
+        return getFullEc(entry);
     }
 
     @Override
@@ -70,10 +63,14 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
 
     @Override
     protected Map<String, String> getEntryMap(List<String> entries, List<FacetField.Count> facetCounts) {
-        if (!entries.isEmpty()) {
-            super.getEntryMap(entries, facetCounts);
-        }
         return facetCounts.stream().collect(Collectors.toMap(FacetField.Count::getName, count -> this.getFullEc(count.getName())));
+    }
+
+    @Override
+    protected void addToAncestors(List<String> ancestors, List<String> entries, String parent, String id) {
+        if (!Objects.equals(parent, id)) {
+            ancestors.add(id);
+        }
     }
 
     /*@Override
@@ -83,7 +80,7 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
                 .map(fc -> getViewBy(fc, query))
                 .sorted(ViewBy.SORT_BY_ID)
                 .collect(Collectors.toList()));
-    }*/
+    }
 
     private List<Ancestor> getAncestors(List<String> ancestors) {
         return ancestors.stream()
@@ -104,7 +101,7 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
                 .count(count.getCount())
                 .expand(hasChildren(count, query))
                 .build();
-    }
+    }*/
 
     private String getShortFormEc(String fullEc) {
         String temp = fullEc;

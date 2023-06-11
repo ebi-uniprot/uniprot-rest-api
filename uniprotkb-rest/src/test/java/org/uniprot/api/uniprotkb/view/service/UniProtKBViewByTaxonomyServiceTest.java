@@ -62,49 +62,32 @@ class UniProtKBViewByTaxonomyServiceTest {
     private static final long TAX_COUNT_D = 10L;
     private static final long TAX_COUNT_E = 1995L;
     private static final String SOME_NAME = "someName";
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_A =
-            List.of(
-                    new FacetField(SOME_NAME) {
-                        {
-                            add(String.valueOf(TAX_ID_A), TAX_COUNT_A);
-                        }
-                    });
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_B =
-            List.of(
-                    new FacetField(SOME_NAME) {
-                        {
-                            add(String.valueOf(TAX_ID_B), TAX_COUNT_B);
-                        }
-                    });
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_C =
-            List.of(
-                    new FacetField(SOME_NAME) {
-                        {
-                            add(String.valueOf(TAX_ID_C), TAX_COUNT_C);
-                        }
-                    });
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_D =
-            List.of(
-                    new FacetField(SOME_NAME) {
-                        {
-                            add(String.valueOf(TAX_ID_D), TAX_COUNT_D);
-                        }
-                    });
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_E =
-            List.of(
-                    new FacetField(SOME_NAME) {
-                        {
-                            add(String.valueOf(TAX_ID_E), TAX_COUNT_E);
-                        }
-                    });
-    private static final List<FacetField> MULTIPLE_TAXONOMY_FACET_COUNTS =
-            List.of(
-                    new FacetField(SOME_NAME) {
-                        {
-                            add(String.valueOf(TAX_ID_A), TAX_COUNT_A);
-                            add(String.valueOf(TAX_ID_C), TAX_COUNT_C);
-                        }
-                    });
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_A = getFacetFields(TAX_ID_A_STRING, TAX_COUNT_A);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_B = getFacetFields(TAX_ID_B_STRING, TAX_COUNT_B);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_C = getFacetFields(TAX_ID_C_STRING, TAX_COUNT_C);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_D = getFacetFields(TAX_ID_D_STRING, TAX_COUNT_D);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_E = getFacetFields(TAX_ID_E_STRING, TAX_COUNT_E);
+    private static final List<FacetField> MULTIPLE_TAXONOMY_FACET_COUNTS = getMultipleFacetFields();
+
+    private static List<FacetField> getFacetFields(String id, long count) {
+        return List.of(
+                new FacetField(SOME_NAME) {
+                    {
+                        add(id, count);
+                    }
+                });
+    }
+
+    private static List<FacetField> getMultipleFacetFields() {
+        return List.of(
+                new FacetField(SOME_NAME) {
+                    {
+                        add(String.valueOf(TAX_ID_A), TAX_COUNT_A);
+                        add(String.valueOf(TAX_ID_C), TAX_COUNT_C);
+                    }
+                });
+    }
+
     private static final String SOME_QUERY = "someQuery";
     @Mock
     private TaxonomyService taxonomyService;
