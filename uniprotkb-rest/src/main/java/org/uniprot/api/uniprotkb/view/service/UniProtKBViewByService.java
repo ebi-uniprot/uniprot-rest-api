@@ -8,6 +8,7 @@ import org.uniprot.api.uniprotkb.view.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ public abstract class UniProtKBViewByService<T> {
             List<FacetField.Count> childFacetCounts = getFacetCounts(query, childEntries);
 
             if (!childFacetCounts.isEmpty()) {
-                addToAncestors(entries, id, ancestors);
+                addToAncestors(ancestors, entries, parent, id);
                 facetCounts = childFacetCounts;
                 entries = childEntries;
                 id = facetCounts.get(0).getName();
@@ -46,9 +47,9 @@ public abstract class UniProtKBViewByService<T> {
         return StringUtils.isEmpty(parent);
     }
 
-    private void addToAncestors(List<T> entries, String id, List<T> ancestors) {
-        if (!isTopLevelSearch(id) && !entries.isEmpty()) {
-            ancestors.add(entries.stream().filter(t -> id.equals(getId(t))).findAny().orElseThrow());
+    protected void addToAncestors(List<T> ancestors, List<T> entries, String parent, String id) {
+        if (!Objects.equals(parent, id) && !entries.isEmpty()) {
+            ancestors.add(entries.get(0));
         }
     }
 
