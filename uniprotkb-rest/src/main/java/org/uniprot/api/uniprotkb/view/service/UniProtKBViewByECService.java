@@ -69,39 +69,9 @@ public class UniProtKBViewByECService extends UniProtKBViewByService<String> {
     @Override
     protected void addToAncestors(List<String> ancestors, List<String> entries, String parent, String id) {
         if (!Objects.equals(parent, id)) {
-            ancestors.add(id);
+            ancestors.add(getFullEc(id));
         }
     }
-
-    /*@Override
-    protected ViewByResult getViewBys(
-            List<FacetField.Count> facetCounts, List<String> entries, List<String> ancestors, String query) {
-        return new ViewByResult(getAncestors(ancestors), facetCounts.stream()
-                .map(fc -> getViewBy(fc, query))
-                .sorted(ViewBy.SORT_BY_ID)
-                .collect(Collectors.toList()));
-    }
-
-    private List<Ancestor> getAncestors(List<String> ancestors) {
-        return ancestors.stream()
-                .map(ec -> {
-                    String fullEc = getFullEc(ec);
-                    return AncestorImpl.builder().id(fullEc)
-                            .label(ecService.getEC(fullEc).map(ECEntry::getLabel).orElse("")).build();
-                })
-                .collect(Collectors.toList());
-    }
-
-    private ViewBy getViewBy(FacetField.Count count, String query) {
-        String ecId = count.getName();
-        String fullEc = getFullEc(ecId);
-        return ViewByImpl.builder()
-                .id(fullEc)
-                .label(ecService.getEC(fullEc).map(ECEntry::getLabel).orElse(""))
-                .count(count.getCount())
-                .expand(hasChildren(count, query))
-                .build();
-    }*/
 
     private String getShortFormEc(String fullEc) {
         String temp = fullEc;

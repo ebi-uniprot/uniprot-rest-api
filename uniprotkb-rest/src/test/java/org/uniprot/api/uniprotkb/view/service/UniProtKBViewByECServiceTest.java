@@ -62,7 +62,7 @@ class UniProtKBViewByECServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of())))
                 .thenReturn(getMultipleFacetFields());
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1"))))
-                .thenReturn(getFacetFields(ecIdB, EC_COUNT_B));
+                .thenReturn(getFacetFields("1.1", EC_COUNT_B));
         mockLabels();
 
         ViewByResult viewBys = service.getViewBys(SOME_QUERY, EMPTY_PARENT_ID);
@@ -133,7 +133,7 @@ class UniProtKBViewByECServiceTest {
                 .thenReturn(getFacetFields(ecIdD, EC_COUNT_D));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1"))))
                 .thenReturn(getMultipleFacetFields());
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1","1","1"))))
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1", "1"))))
                 .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
         mockLabels();
 
@@ -208,7 +208,7 @@ class UniProtKBViewByECServiceTest {
         return List.of(
                 new FacetField(SOME_NAME) {
                     {
-                        add(id, count);
+                        add(id.split(".-")[0], count);
                     }
                 });
     }
@@ -217,8 +217,8 @@ class UniProtKBViewByECServiceTest {
         return List.of(
                 new FacetField(SOME_NAME) {
                     {
-                        add(String.valueOf(ecIdA), EC_COUNT_A);
-                        add(String.valueOf(ecIdC), EC_COUNT_C);
+                        add(ecIdA.split(".-")[0], EC_COUNT_A);
+                        add(ecIdC.split(".-")[0], EC_COUNT_C);
                     }
                 });
     }
