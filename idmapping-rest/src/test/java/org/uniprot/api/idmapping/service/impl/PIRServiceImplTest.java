@@ -126,7 +126,7 @@ class PIRServiceImplTest {
         map.add("async", "NO");
 
         when(restTemplate.postForEntity(
-                "http://localhost", new HttpEntity<>(map, HTTP_HEADERS), String.class))
+                        "http://localhost", new HttpEntity<>(map, HTTP_HEADERS), String.class))
                 .thenReturn(ResponseEntity.ok().body("P00001\tP00001\nP00002\n"));
 
         IdMappingResult idMappingResult = pirService.mapIds(request, "dummyJobId");

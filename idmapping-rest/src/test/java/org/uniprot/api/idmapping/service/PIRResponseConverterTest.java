@@ -269,7 +269,15 @@ class PIRResponseConverterTest {
                                         + "\n"
                                         + "MSG: 200 -- 2 IDs have no matches: \"P00006,P00007,\".\n");
 
-        List<String> ids = List.of("P00001[10-20]", "P00002[20-30]", "P00003.3", "P00004_TREMBL", "SWISS_IDFIVE", "P00006[10-20]", "P00007");
+        List<String> ids =
+                List.of(
+                        "P00001[10-20]",
+                        "P00002[20-30]",
+                        "P00003.3",
+                        "P00004_TREMBL",
+                        "SWISS_IDFIVE",
+                        "P00006[10-20]",
+                        "P00007");
         String idsStr = String.join(",", ids);
         request.setIds(idsStr);
         IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);

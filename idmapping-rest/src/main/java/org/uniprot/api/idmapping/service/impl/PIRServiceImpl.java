@@ -134,8 +134,8 @@ public class PIRServiceImpl extends IdMappingPIRService {
             if (id.contains("[")) {
                 result = id.substring(0, id.indexOf("["));
             }
-        } else if (id.contains("_") &&
-                UNIPROTKB_ACCESSION_REGEX.matcher(id.split("_")[0]).matches()){
+        } else if (id.contains("_")
+                && UNIPROTKB_ACCESSION_REGEX.matcher(id.split("_")[0]).matches()) {
             result = id.substring(0, id.indexOf("_"));
         }
         return result.strip();

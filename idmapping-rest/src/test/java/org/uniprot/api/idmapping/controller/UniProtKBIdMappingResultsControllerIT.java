@@ -608,7 +608,9 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         IdMappingJob job =
                 getJobOperation()
                         .createAndPutJobInCache(
-                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001.2,Q00002_TREMBL2,Q00003_TREMBL3");
+                                UNIPROTKB_AC_ID_STR,
+                                UNIPROTKB_STR,
+                                "Q00001.2,Q00002_TREMBL2,Q00003_TREMBL3");
         ResultActions response =
                 mockMvc.perform(
                         get(getIdMappingResultPath(), job.getJobId())
