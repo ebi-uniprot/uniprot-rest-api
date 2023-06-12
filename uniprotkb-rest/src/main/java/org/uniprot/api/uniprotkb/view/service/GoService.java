@@ -1,15 +1,13 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.google.common.base.Strings;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.uniprotkb.view.GoRelation;
 import org.uniprot.api.uniprotkb.view.GoTerm;
 import org.uniprot.api.uniprotkb.view.GoTermResult;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GoService {
     private final RestTemplate restTemplate;
@@ -20,19 +18,19 @@ public class GoService {
         this.restTemplate = restTemplate;
     }
 
-    Optional<GoTerm> getChildren(String goId) {
+    List<GoRelation> getChildren(String goId) {
         if (Strings.isNullOrEmpty(goId)) {
-            return rootChildren();
+            return rootChildren().getChildren();
         }
 
         String url = GO_API_PREFIX + goId + "/children";
         GoTermResult result = restTemplate.getForObject(url, GoTermResult.class);
         if ((result == null) || result.getResults().isEmpty()) {
-            return Optional.empty();
-        } else return Optional.of(result.getResults().get(0));
+            return List.of();
+        } else return result.getResults().get(0).getChildren();
     }
 
-    private Optional<GoTerm> rootChildren() {
+    private GoTerm rootChildren() {
         GoTerm goTerm = new GoTerm();
         goTerm.setId("GO:00000");
         goTerm.setName("root");
@@ -41,7 +39,7 @@ public class GoService {
         children.add(getGoRelation("GO:0005575", "cellular_component"));
         children.add(getGoRelation("GO:0003674", "molecular_function"));
         goTerm.setChildren(children);
-        return Optional.of(goTerm);
+        return goTerm;
     }
 
     private GoRelation getGoRelation(String id, String name) {
