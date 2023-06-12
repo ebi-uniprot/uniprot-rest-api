@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByKeywordService.TOP_LEVEL_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBViewByKeywordTest {
+class UniProtKBViewByKeywordServiceTest {
     private static final String EMPTY_PARENT_ID = "";
     private static final String KEYWORD_ID_A = "1425170";
     private static final String KEYWORD_ID_B = "9606";
@@ -51,18 +51,12 @@ class UniProtKBViewByKeywordTest {
     private static final String KEYWORD_LABEL_D = "keywordLabelD";
     private static final String KEYWORD_LABEL_E = "keywordLabelE";
     private static final String KEYWORD_LABEL_F = "keywordLabelF";
-    private static final KeywordEntry KEYWORD_ENTRY_A =
-            getKeywordEntry(KEYWORD_ID_A, KEYWORD_LABEL_A);
-    private static final KeywordEntry KEYWORD_ENTRY_B =
-            getKeywordEntry(KEYWORD_ID_B, KEYWORD_LABEL_B);
-    private static final KeywordEntry KEYWORD_ENTRY_C =
-            getKeywordEntry(KEYWORD_ID_C, KEYWORD_LABEL_C);
-    private static final KeywordEntry KEYWORD_ENTRY_D =
-            getKeywordEntry(KEYWORD_ID_D, KEYWORD_LABEL_D);
-    private static final KeywordEntry KEYWORD_ENTRY_E =
-            getKeywordEntry(KEYWORD_ID_E, KEYWORD_LABEL_E);
-    private static final KeywordEntry KEYWORD_ENTRY_F =
-            getKeywordEntry(KEYWORD_ID_F, KEYWORD_LABEL_F);
+    private static final KeywordEntry KEYWORD_ENTRY_A = getKeywordEntry(KEYWORD_ID_A, KEYWORD_LABEL_A);
+    private static final KeywordEntry KEYWORD_ENTRY_B = getKeywordEntry(KEYWORD_ID_B, KEYWORD_LABEL_B);
+    private static final KeywordEntry KEYWORD_ENTRY_C = getKeywordEntry(KEYWORD_ID_C, KEYWORD_LABEL_C);
+    private static final KeywordEntry KEYWORD_ENTRY_D = getKeywordEntry(KEYWORD_ID_D, KEYWORD_LABEL_D);
+    private static final KeywordEntry KEYWORD_ENTRY_E = getKeywordEntry(KEYWORD_ID_E, KEYWORD_LABEL_E);
+    private static final KeywordEntry KEYWORD_ENTRY_F = getKeywordEntry(KEYWORD_ID_F, KEYWORD_LABEL_F);
     private static final long KEYWORD_COUNT_A = 23L;
     private static final long KEYWORD_COUNT_B = 50L;
     private static final long KEYWORD_COUNT_C = 9999L;
