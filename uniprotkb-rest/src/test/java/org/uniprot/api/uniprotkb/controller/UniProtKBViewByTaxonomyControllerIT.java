@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebCl
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,7 +40,7 @@ import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
 @WebMvcTest(controllers = UniProtKBViewByController.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
 @AutoConfigureWebClient
-@ActiveProfiles("viewbytest")
+@ActiveProfiles({"viewbytest", "viewbyTaxonomytest"})
 class UniProtKBViewByTaxonomyControllerIT {
     private static final String EMPTY_PARENT = "";
     private static final String ACCESSION_0 = "A0";
@@ -61,6 +62,7 @@ class UniProtKBViewByTaxonomyControllerIT {
     static DataStoreManager dataStoreManager = new DataStoreManager();
 
     @TestConfiguration
+    @Profile("viewbyTaxonomytest")
     static class TestConfig {
         @Bean("uniProtKBSolrClient")
         public SolrClient uniProtKBSolrClient() {
@@ -77,14 +79,12 @@ class UniProtKBViewByTaxonomyControllerIT {
     static void beforeAll() {
         dataStoreManager.addSolrClient(UNIPROT, SolrCollection.uniprot);
         dataStoreManager.addSolrClient(TAXONOMY, SolrCollection.taxonomy);
-        dataStoreManager.addSolrClient(KEYWORD, SolrCollection.keyword);
     }
 
     @AfterEach
     void tearDown() {
         dataStoreManager.cleanSolr(UNIPROT);
         dataStoreManager.cleanSolr(TAXONOMY);
-        dataStoreManager.cleanSolr(KEYWORD);
     }
 
     @Test
@@ -100,7 +100,9 @@ class UniProtKBViewByTaxonomyControllerIT {
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_0)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)));
+                .andExpect(jsonPath("$.results[0].count", is(1)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
     @Test
@@ -112,7 +114,9 @@ class UniProtKBViewByTaxonomyControllerIT {
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_0)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)));
+                .andExpect(jsonPath("$.results[0].count", is(1)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
     @Test
@@ -128,7 +132,13 @@ class UniProtKBViewByTaxonomyControllerIT {
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)));
+                .andExpect(jsonPath("$.results[0].count", is(1)))
+                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
+                .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(jsonPath("$.ancestors.size()", is(2)));
     }
 
     @Test
