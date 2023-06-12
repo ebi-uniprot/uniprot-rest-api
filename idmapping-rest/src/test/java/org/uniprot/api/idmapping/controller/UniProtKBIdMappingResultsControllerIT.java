@@ -546,11 +546,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         content()
                                 .string(
                                         containsString(
-                                                "Q00001\tQ00001\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
+                                                "Q00001\tQ00001\tQ00001_HUMAN\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
                                                         + "Q00002\tQ00002\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 2 gene 2 gene 2\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00003\tQ00003\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00003\tQ00003\tQ00003_HUMAN\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
                                                         + "Q00004\tQ00004\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 4 gene 4 gene 4\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00005\tQ00005\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
+                                                        + "Q00005\tQ00005\tQ00005_HUMAN\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
     }
 
     @Test
@@ -596,6 +596,33 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         jsonPath(
                                 "$.results.*.from",
                                 containsInAnyOrder("Q00001", "Q00002.2", "Q00003.3")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                containsInAnyOrder("Q00001", "Q00002", "Q00003")));
+    }
+
+    @Test
+    void testIdMappingWithTremblProteinIdIgnoresAfterUnderScore() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001.2,Q00002_TREMBL2,Q00003_TREMBL3");
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .param("fields", "accession")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.from",
+                                containsInAnyOrder("Q00001.2", "Q00002_TREMBL2", "Q00003_TREMBL3")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.to.primaryAccession",

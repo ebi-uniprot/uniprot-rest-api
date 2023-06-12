@@ -123,7 +123,7 @@ public class IdMappingUniProtKBITUtils {
             entryBuilder.uniProtId("FGFR12345_HUMAN");
             isoFormEntryBuilder.entryType(UniProtKBEntryType.SWISSPROT);
         } else {
-            entryBuilder.uniProtId("ATPG_12345");
+            entryBuilder.uniProtId(acc + "_HUMAN");
             entryBuilder.entryType(UniProtKBEntryType.TREMBL);
             isoFormEntryBuilder.entryType(UniProtKBEntryType.TREMBL);
         }

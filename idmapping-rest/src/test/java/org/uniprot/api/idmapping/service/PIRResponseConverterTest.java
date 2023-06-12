@@ -208,7 +208,44 @@ class PIRResponseConverterTest {
     }
 
     @Test
-    void checkUniProtKBSubSequenceMixedInputError() {
+    void checkUniProtKBTremblIdCorrectly() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setFrom(ACC_ID_STR);
+        request.setTo(UNIPROTKB_STR);
+
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "Taxonomy ID: 9606\n"
+                                        + "\n"
+                                        + "P00001\tP00001\n"
+                                        + "P00002\tP00002\n"
+                                        + "P00003\n"
+                                        + "P00004\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "\n"
+                                        + "MSG: 200 -- 2 IDs have no matches: \"P00003,P00004,\".\n");
+
+        List<String> ids =
+                List.of("P00001_TREMBL1", "P00002_TREMBL2", "P00003_TREMBL3", "P00004_TREMBL4");
+        String idsStr = String.join(",", ids);
+        request.setIds(idsStr);
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+
+        assertThat(
+                result.getMappedIds(),
+                contains(
+                        new IdMappingStringPair("P00001_TREMBL1", "P00001"),
+                        new IdMappingStringPair("P00002_TREMBL2", "P00002")));
+        assertThat(result.getUnmappedIds(), contains("P00003_TREMBL3", "P00004_TREMBL4"));
+        assertThat(result.getWarnings(), is(emptyList()));
+    }
+
+    @Test
+    void checkUniProtKBSubSequenceMixedInput() {
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setFrom(ACC_ID_STR);
         request.setTo(UNIPROTKB_STR);
@@ -220,16 +257,19 @@ class PIRResponseConverterTest {
                                         + "\n"
                                         + "P00001\tP00001\n"
                                         + "P00002\tP00002;Q00002\n"
-                                        + "P00003\n"
-                                        + "P00004\n"
+                                        + "P00003\tP00003\n"
+                                        + "P00004\tP00004\n"
+                                        + "SWISS_IDFIVE\tP00005\n"
+                                        + "P00006\n"
+                                        + "P00007\n"
                                         + "\n"
                                         + "\n"
                                         + "\n"
                                         + "\n"
                                         + "\n"
-                                        + "MSG: 200 -- 2 IDs have no matches: \"P00003,P00004,\".\n");
+                                        + "MSG: 200 -- 2 IDs have no matches: \"P00006,P00007,\".\n");
 
-        List<String> ids = List.of("P00001[10-20]", "P00002[20-30]", "P00003.3", "P00004");
+        List<String> ids = List.of("P00001[10-20]", "P00002[20-30]", "P00003.3", "P00004_TREMBL", "SWISS_IDFIVE", "P00006[10-20]", "P00007");
         String idsStr = String.join(",", ids);
         request.setIds(idsStr);
         IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
@@ -239,8 +279,11 @@ class PIRResponseConverterTest {
                 contains(
                         new IdMappingStringPair("P00001[10-20]", "P00001"),
                         new IdMappingStringPair("P00002[20-30]", "P00002"),
-                        new IdMappingStringPair("P00002[20-30]", "Q00002")));
-        assertThat(result.getUnmappedIds(), contains("P00003", "P00004"));
+                        new IdMappingStringPair("P00002[20-30]", "Q00002"),
+                        new IdMappingStringPair("P00003", "P00003"),
+                        new IdMappingStringPair("P00004_TREMBL", "P00004"),
+                        new IdMappingStringPair("SWISS_IDFIVE", "P00005")));
+        assertThat(result.getUnmappedIds(), contains("P00006[10-20]", "P00007"));
         assertThat(result.getWarnings(), is(emptyList()));
     }
 

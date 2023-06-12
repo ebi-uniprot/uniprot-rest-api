@@ -13,6 +13,8 @@ import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.*;
+
 /**
  * @author sahmad
  * @created 03/03/2021
@@ -47,10 +49,11 @@ public abstract class AbstractJobOperation implements JobOperation {
         int subSequenceIndex = value.indexOf("[");
         if (subSequenceIndex > 0) {
             result = value.substring(0, subSequenceIndex);
-        } else {
-            int versionIndex = value.indexOf(".");
-            if (versionIndex > 0) {
-                result = value.substring(0, versionIndex);
+        } else if (value.indexOf(".") > 0) {
+            result = value.substring(0, value.indexOf("."));
+        } else if (value.indexOf("_") > 0) {
+            if(UNIPROTKB_ACCESSION_REGEX.matcher(value.split("_")[0]).matches()){
+                result = value.substring(0, value.indexOf("_"));
             }
         }
         return result;

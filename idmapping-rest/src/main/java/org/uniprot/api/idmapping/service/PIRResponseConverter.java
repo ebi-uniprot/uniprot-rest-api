@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.service;
 
 import static java.util.Arrays.asList;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.UNIPROTKB_ACCESSION_REGEX;
 import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LIMIT_EXCEED_ERROR;
@@ -136,7 +137,7 @@ public class PIRResponseConverter {
     Map<String, Set<String>> getMappedRequestIds(IdMappingJobRequest request) {
         Map<String, Set<String>> mappedIds = new HashMap<>();
         if (ACC_ID_STR.equals(request.getFrom())
-                && (request.getIds().contains("[") || request.getIds().contains("."))) {
+                && (request.getIds().contains("[") || request.getIds().contains(".") || request.getIds().contains("_"))) {
             String ids = String.join(",", request.getIds());
             mappedIds =
                     Arrays.stream(ids.split(","))
@@ -169,6 +170,8 @@ public class PIRResponseConverter {
             if (id.contains("[")) {
                 result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf("[")), id);
             }
+        } else if(id.contains("_") && UNIPROTKB_ACCESSION_REGEX.matcher(id.split("_")[0]).matches()){
+            result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf("_")), id);
         }
         return result;
     }
