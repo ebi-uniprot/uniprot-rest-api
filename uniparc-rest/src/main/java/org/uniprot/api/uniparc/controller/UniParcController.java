@@ -117,6 +117,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
+        setBasicRequestFormat(searchRequest, request);
         QueryResult<UniParcEntry> results = queryService.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
@@ -215,7 +216,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
-
+        setBasicRequestFormat(streamRequest, request);
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
             return super.streamRdf(

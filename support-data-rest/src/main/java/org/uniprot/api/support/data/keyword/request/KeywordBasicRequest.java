@@ -40,4 +40,6 @@ public class KeywordBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.KEYWORD)
     private String fields;
+
+    private String format;
 }

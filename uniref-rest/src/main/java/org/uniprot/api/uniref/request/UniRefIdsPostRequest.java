@@ -18,6 +18,7 @@ import org.uniprot.store.config.UniProtDataType;
 public class UniRefIdsPostRequest extends IdsDownloadRequest {
     private String ids;
     private String fields;
+    private String format;
 
     public String getCommaSeparatedIds() {
         return this.ids;

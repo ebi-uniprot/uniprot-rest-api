@@ -16,6 +16,8 @@ public class UniParcIdsPostRequest extends IdsDownloadRequest {
     private String upis;
     private String fields;
 
+    private String format;
+
     public String getCommaSeparatedIds() {
         return this.upis;
     }

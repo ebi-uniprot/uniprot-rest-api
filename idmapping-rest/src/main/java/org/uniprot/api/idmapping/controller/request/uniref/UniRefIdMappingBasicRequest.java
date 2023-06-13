@@ -38,4 +38,6 @@ public class UniRefIdMappingBasicRequest extends IdMappingPageRequest {
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIREF)
     private String sort;
+
+    private String format;
 }

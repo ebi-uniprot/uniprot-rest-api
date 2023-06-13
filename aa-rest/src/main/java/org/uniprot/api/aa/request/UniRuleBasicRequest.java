@@ -40,4 +40,6 @@ public class UniRuleBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE)
     private String fields;
+
+    private String format;
 }

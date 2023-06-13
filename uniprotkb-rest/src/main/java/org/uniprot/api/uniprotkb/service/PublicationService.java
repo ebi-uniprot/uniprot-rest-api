@@ -182,6 +182,7 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         private String fields;
         private Integer size;
         private String facets;
+        private String format;
 
         @Override
         public List<String> getFacetList() {

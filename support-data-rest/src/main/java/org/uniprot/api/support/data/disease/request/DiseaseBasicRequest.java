@@ -40,4 +40,6 @@ public class DiseaseBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.DISEASE)
     private String fields;
+
+    private String format;
 }

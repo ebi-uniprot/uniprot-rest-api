@@ -47,4 +47,6 @@ public class GeneCentricBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String fields;
+
+    private String format;
 }
