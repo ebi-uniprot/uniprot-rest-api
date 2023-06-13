@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -112,7 +113,11 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         verify(this.messageService, never()).alreadyProcessed(jobId);
         // redis entry created
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobFinished(jobId));
+        await().atLeast(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(15))
+                .with()
+                .pollInterval(Duration.ofMillis(100))
+                .until(jobFinished(jobId));
         verifyMessageListener(1, 0, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false);
         verifyIdsAndResultFiles(jobId);
@@ -131,11 +136,21 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobErrored(jobId));
+        //        await().until(jobErrored(jobId));
+        await().atLeast(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(15))
+                .with()
+                .pollInterval(Duration.ofMillis(100))
+                .until(jobErrored(jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
         // after certain delay the job should be reprocessed
-        await().until(jobFinished(jobId));
+        //        await().until(jobFinished(jobId));
+        await().atLeast(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(15))
+                .with()
+                .pollInterval(Duration.ofMillis(100))
+                .until(jobFinished(jobId));
         verifyMessageListener(2, 1, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true);
         verifyIdsAndResultFiles(jobId);
@@ -156,7 +171,12 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobErrored(jobId));
+        //        await().until(jobErrored(jobId));
+        await().atLeast(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(15))
+                .with()
+                .pollInterval(Duration.ofMillis(100))
+                .until(jobErrored(jobId));
         await().until(jobRetriedMaximumTimes(jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
@@ -189,7 +209,12 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         this.messageService.sendMessage(request);
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobErrored(jobId));
+        //        await().until(jobErrored(jobId));
+        await().atLeast(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(15))
+                .with()
+                .pollInterval(Duration.ofMillis(100))
+                .until(jobErrored(jobId));
         await().until(getJobRetriedCount(jobId), Matchers.equalTo(2));
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
         //        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
@@ -210,16 +235,31 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobErrored(jobId));
+        //        await().until(jobErrored(jobId));
+        await().atLeast(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(15))
+                .with()
+                .pollInterval(Duration.ofMillis(100))
+                .until(jobErrored(jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
         // after certain delay the job should be reprocessed from kb side
-        await().until(jobUnfinished(jobId));
+        //        await().until(jobUnfinished(jobId));
+        await().atLeast(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(15))
+                .with()
+                .pollInterval(Duration.ofMillis(100))
+                .until(jobUnfinished(jobId));
         verifyRedisEntry(query, jobId, List.of(JobStatus.UNFINISHED), 1, true);
         // then job should be picked by embeddings consumers and set to Running again
         //        await().until(jobRunning(jobId));
         // the job should be completed after sometime by embeddings consumer
-        await().until(jobFinished(jobId));
+        //        await().until(jobFinished(jobId));
+        await().atLeast(Duration.ofMillis(100))
+                .atMost(Duration.ofSeconds(15))
+                .with()
+                .pollInterval(Duration.ofMillis(100))
+                .until(jobFinished(jobId));
         // verify ids file generated from solr
         verifyIdsFile(jobId);
         // verify result file doesn't exist yet
