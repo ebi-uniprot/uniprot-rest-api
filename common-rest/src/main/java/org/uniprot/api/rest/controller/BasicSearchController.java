@@ -28,6 +28,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Utils;
 
@@ -163,7 +164,8 @@ public abstract class BasicSearchController<T> {
             headers = createHttpDownloadHeader(context, request);
         }
 
-        ApplicationEvent paginatedResultEvent = new PaginatedResultsEvent(this, request, response, result.getPageAndClean());
+        ApplicationEvent paginatedResultEvent =
+                new PaginatedResultsEvent(this, request, response, result.getPageAndClean());
         publishPaginationEvent(paginatedResultEvent);
         return ResponseEntity.ok().headers(headers).body(context);
     }
@@ -283,6 +285,11 @@ public abstract class BasicSearchController<T> {
             return Optional.of(SUPPORTED_RDF_MEDIA_TYPES.get(contentType));
         }
         return Optional.empty();
+    }
+
+    protected void setBasicRequestFormat(BasicRequest basicRequest, HttpServletRequest request) {
+        MediaType mediaType = getAcceptHeader(request);
+        basicRequest.setFormat(mediaType.toString());
     }
 
     protected MessageConverterContext<T> createStreamContext(

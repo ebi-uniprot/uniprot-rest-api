@@ -187,6 +187,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             HttpServletRequest request,
             HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
+        setBasicRequestFormat(searchRequest, request);
         QueryResult<UniRefEntryLight> results = service.search(searchRequest);
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
@@ -240,7 +241,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                     MediaType contentType,
             @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
-
+        setBasicRequestFormat(streamRequest, request);
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
             return super.streamRdf(

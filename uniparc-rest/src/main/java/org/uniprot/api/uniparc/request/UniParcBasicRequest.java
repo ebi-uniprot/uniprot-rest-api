@@ -7,6 +7,7 @@ import lombok.Data;
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
+import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -38,4 +39,11 @@ public class UniParcBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     protected String fields;
+
+    @Parameter(hidden = true)
+    private String format;
+
+    public void setFormat(String format) {
+        this.format = UniProtKBRequestUtil.parseFormat(format);
+    }
 }

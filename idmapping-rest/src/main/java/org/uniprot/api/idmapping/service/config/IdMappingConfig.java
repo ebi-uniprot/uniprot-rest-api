@@ -3,9 +3,7 @@ package org.uniprot.api.idmapping.service.config;
 import java.io.IOException;
 import java.util.Map;
 
-import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
-import org.redisson.config.Config;
 import org.redisson.spring.cache.CacheConfig;
 import org.redisson.spring.cache.RedissonSpringCacheManager;
 import org.springframework.beans.factory.annotation.Value;

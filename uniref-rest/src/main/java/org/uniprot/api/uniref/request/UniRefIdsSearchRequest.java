@@ -72,6 +72,8 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIREF)
     private String sort;
 
+    private String format;
+
     public String getCommaSeparatedIds() {
         return this.ids;
     }

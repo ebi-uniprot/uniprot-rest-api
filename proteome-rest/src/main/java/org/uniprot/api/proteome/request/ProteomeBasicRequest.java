@@ -41,4 +41,6 @@ public class ProteomeBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String fields;
+
+    private String format;
 }

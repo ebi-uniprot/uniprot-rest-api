@@ -379,6 +379,7 @@ public abstract class BasicIdService<T, U> {
         private final String sort;
         private final String fields;
         private Integer size;
+        private String format;
 
         @Override
         public void setSize(Integer size) {
@@ -390,7 +391,13 @@ public abstract class BasicIdService<T, U> {
                     .fields(streamRequest.getFields())
                     .query(streamRequest.getQuery())
                     .sort(streamRequest.getSort())
+                    .format(streamRequest.getFormat())
                     .build();
+        }
+
+        @Override
+        public void setFormat(String format) {
+            // do nothing
         }
     }
 }
