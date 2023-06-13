@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.service.store.impl;
 
 import static org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchStoreIterableUtil.populateLineageInEntry;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,18 @@ public class UniProtKBBatchStoreEntryPairIterable
         this.addLineage = addLineage;
         this.taxonomyLineageService = taxonomyLineageService;
         this.uniprotKBMappingRepository = uniprotKBMappingRepository;
+    }
+
+    public UniProtKBBatchStoreEntryPairIterable(
+            Iterator<IdMappingStringPair> sourceIterator,
+            int batchSize,
+            UniProtStoreClient<UniProtKBEntry> storeClient,
+            RetryPolicy<Object> retryPolicy,
+            TaxonomyLineageService taxonomyLineageService,
+            boolean addLineage) {
+        super(sourceIterator, batchSize, storeClient, retryPolicy);
+        this.addLineage = addLineage;
+        this.taxonomyLineageService = taxonomyLineageService;
     }
 
     @Override

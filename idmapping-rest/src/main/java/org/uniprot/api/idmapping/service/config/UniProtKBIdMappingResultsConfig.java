@@ -88,22 +88,26 @@ public class UniProtKBIdMappingResultsConfig {
 
     @Bean("uniProtKBEntryStoreStreamer")
     public StoreStreamer<UniProtKBEntry> uniProtKBEntryStoreStreamer(
+            @Qualifier("uniProtKBStoreStreamerConfig")
+                    StoreStreamerConfig<UniProtKBEntry> uniProtKBStoreStreamerConfig,
+            TaxonomyLineageService taxonomyLineageService) {
+        return new UniProtKBStoreStreamer(uniProtKBStoreStreamerConfig, taxonomyLineageService);
+    }
+
+    @Bean("uniProtKBStoreStreamerConfig")
+    public StoreStreamerConfig<UniProtKBEntry> uniProtKBStoreStreamerConfig(
             @Qualifier("uniProtStoreClient") UniProtStoreClient<UniProtKBEntry> storeClient,
             @Qualifier("uniProtKBTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
             @Qualifier("uniprotKBdocumentIdStream") TupleStreamDocumentIdStream documentIdStream,
-            @Qualifier("uniProtKBStoreRetryPolicy") RetryPolicy<Object> uniProtKBStoreRetryPolicy,
-            TaxonomyLineageService taxonomyLineageService) {
-
-        StoreStreamerConfig<UniProtKBEntry> config =
-                StoreStreamerConfig.<UniProtKBEntry>builder()
-                        .streamConfig(streamConfig)
-                        .storeClient(storeClient)
-                        .tupleStreamTemplate(tupleStreamTemplate)
-                        .storeFetchRetryPolicy(uniProtKBStoreRetryPolicy)
-                        .documentIdStream(documentIdStream)
-                        .build();
-        return new UniProtKBStoreStreamer(config, taxonomyLineageService);
+            @Qualifier("uniProtKBStoreRetryPolicy") RetryPolicy<Object> uniProtKBStoreRetryPolicy) {
+        return StoreStreamerConfig.<UniProtKBEntry>builder()
+                .streamConfig(streamConfig)
+                .storeClient(storeClient)
+                .tupleStreamTemplate(tupleStreamTemplate)
+                .storeFetchRetryPolicy(uniProtKBStoreRetryPolicy)
+                .documentIdStream(documentIdStream)
+                .build();
     }
 
     @Bean("uniProtKBStoreRetryPolicy")

@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_MARKDOWN_VALUE;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.http.MediaType;
@@ -41,6 +42,8 @@ public class UniProtMediaType {
     public static final MediaType MARKDOWN_MEDIA_TYPE = MediaType.TEXT_MARKDOWN;
     public static final String UNKNOWN_MEDIA_TYPE_VALUE = "unknown" + "/unknown";
     public static final MediaType UNKNOWN_MEDIA_TYPE = valueOf(UNKNOWN_MEDIA_TYPE_VALUE);
+    public static final Map<MediaType, String> SUPPORTED_RDF_MEDIA_TYPES =
+            Map.of(RDF_MEDIA_TYPE, "rdf", TURTLE_MEDIA_TYPE, "ttl", N_TRIPLES_MEDIA_TYPE, "nt");
 
     public static final Collection<MediaType> ALL_TYPES =
             asList(

@@ -23,6 +23,7 @@ public class HeaderFactory {
 
     private static final String QUERY_STRING_MULTIPLE_UNDERSCORE_REGEX = "_{2,10}";
     private static final String UNDERSCORE = "_";
+
     private HeaderFactory() {}
 
     public static HttpHeaders createHttpSearchHeader(MediaType mediaType) {
@@ -50,14 +51,17 @@ public class HeaderFactory {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
         String suffix =
-          UNDERSCORE + now.format(dateTimeFormatter) + "."
+                UNDERSCORE
+                        + now.format(dateTimeFormatter)
+                        + "."
                         + UniProtMediaType.getFileExtension(mediaType)
                         + context.getFileType().getExtension();
         String requestContext = getRequestContext(request);
         if (Utils.notNullNotEmpty(request.getParameter("query"))) {
-            queryString = request.getParameter("query")
-              .replaceAll("[^A-Za-z0-9]", UNDERSCORE)
-              .replaceAll(QUERY_STRING_MULTIPLE_UNDERSCORE_REGEX, UNDERSCORE);
+            queryString =
+                    request.getParameter("query")
+                            .replaceAll("[^A-Za-z0-9]", UNDERSCORE)
+                            .replaceAll(QUERY_STRING_MULTIPLE_UNDERSCORE_REGEX, UNDERSCORE);
             if (queryString.length() > 30) {
                 queryString = queryString.substring(0, 30);
             } else if (queryString.equals(UNDERSCORE)) {

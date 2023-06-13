@@ -39,6 +39,17 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
         this.retryPolicy = retryPolicy;
     }
 
+    public BatchStoreEntryPairIterable(
+            Iterator<IdMappingStringPair> sourceIterator,
+            int batchSize,
+            UniProtStoreClient<S> storeClient,
+            RetryPolicy<Object> retryPolicy) {
+        this.batchSize = batchSize;
+        this.sourceIterator = sourceIterator;
+        this.storeClient = storeClient;
+        this.retryPolicy = retryPolicy;
+    }
+
     @Override
     public Iterator<Collection<T>> iterator() {
         return new Iterator<>() {

@@ -106,7 +106,9 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     @Override
     protected Stream<UniProtKBEntry> getEntries(List<String> toIds, String fields) {
         StoreRequest storeRequest =
-                StoreRequest.builder().addLineage(isLineageAllowed(fields)).build();
+                StoreRequest.builder()
+                        .addLineage(isLineageAllowed(fields, returnFieldConfig))
+                        .build();
         return this.storeStreamer.streamEntries(toIds, storeRequest);
     }
 
@@ -154,7 +156,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                         storeFetchRetryPolicy,
                         lineageService,
                         repository,
-                        isLineageAllowed(fields));
+                        isLineageAllowed(fields, returnFieldConfig));
         return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
     }
 
@@ -168,7 +170,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 streamRequest, mappedIds, kbIdMappingStreamRequest.isIncludeIsoform(), jobId);
     }
 
-    boolean isLineageAllowed(String fields) {
+    public static boolean isLineageAllowed(String fields, ReturnFieldConfig returnFieldConfig) {
         List<ReturnField> fieldList = OutputFieldsParser.parse(fields, returnFieldConfig);
         return fieldList.stream()
                 .map(ReturnField::getName)

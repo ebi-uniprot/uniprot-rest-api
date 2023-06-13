@@ -43,7 +43,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
  * @author sahmad
  * @created 03/03/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {IdMappingREST.class})
 @WebMvcTest(IdMappingResultsController.class)
 @AutoConfigureWebClient

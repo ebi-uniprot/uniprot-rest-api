@@ -4,7 +4,6 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -43,8 +42,6 @@ public abstract class BasicSearchController<T> {
     private final ThreadPoolTaskExecutor downloadTaskExecutor;
     private final MessageConverterContextFactory.Resource resource;
     private final Gatekeeper downloadGatekeeper;
-    private final Map<MediaType, String> supportedMediaTypes =
-            Map.of(RDF_MEDIA_TYPE, "rdf", TURTLE_MEDIA_TYPE, "ttl", N_TRIPLES_MEDIA_TYPE, "nt");
 
     protected BasicSearchController(
             ApplicationEventPublisher eventPublisher,
@@ -172,9 +169,9 @@ public abstract class BasicSearchController<T> {
     }
 
     /**
-     This is to suppress a false positive sonar failure
-     Sonar error says: "Logging should not be vulnerable to injection attacks"
-     This line does not log anything, this is why we added suppress below
+     * This is to suppress a false positive sonar failure Sonar error says: "Logging should not be
+     * vulnerable to injection attacks" This line does not log anything, this is why we added
+     * suppress below
      */
     @SuppressWarnings("javasecurity:S5145")
     private void publishPaginationEvent(ApplicationEvent paginatedResultEvent) {
@@ -282,8 +279,8 @@ public abstract class BasicSearchController<T> {
 
     protected Optional<String> getAcceptedRdfContentType(HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        if (supportedMediaTypes.containsKey(contentType)) {
-            return Optional.of(supportedMediaTypes.get(contentType));
+        if (UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES.containsKey(contentType)) {
+            return Optional.of(SUPPORTED_RDF_MEDIA_TYPES.get(contentType));
         }
         return Optional.empty();
     }

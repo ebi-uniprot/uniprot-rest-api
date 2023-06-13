@@ -49,7 +49,7 @@ public class TestConfig {
     }
 
     @Bean(destroyMethod = "shutdown")
-    @Profile("offline")
+    @Profile("idmapping")
     RedissonClient redisson() {
         Config config = new Config();
         config.useSingleServer()
@@ -62,7 +62,7 @@ public class TestConfig {
     }
 
     @Bean
-    @Profile("offline")
+    @Profile("idmapping | asyncDownload")
     public IdMappingJobCacheService idMappingJobCacheService(RedissonClient redissonClient) {
         Map<String, CacheConfig> config = new HashMap<>();
         config.put("testMap", null);
@@ -72,7 +72,7 @@ public class TestConfig {
     }
 
     @Bean
-    @Profile("offline")
+    @Profile("idmapping")
     public ThreadPoolTaskExecutor jobTaskExecutor() {
         return new ThreadPoolTaskExecutor();
     }
