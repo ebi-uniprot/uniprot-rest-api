@@ -29,7 +29,7 @@ import org.uniprot.core.util.Utils;
  * @author Edd
  */
 @Constraint(validatedBy = ValidContentTypes.ContentTypesValidator.class)
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidContentTypes {
     String[] contentTypes();

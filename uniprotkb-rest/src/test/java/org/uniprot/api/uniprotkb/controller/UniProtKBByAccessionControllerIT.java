@@ -570,6 +570,81 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                         "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
     }
 
+    @Test
+    void searchAccessionLastVersionRedirectToUnisave() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                        .param("version", "last")
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        "/unisave/A0A1J4H6S2?from=A0A1J4H6S2&versions=9&format=fasta"));
+    }
+
+    @Test
+    void searchAccessionSpecificVersionRedirectToUnisave() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                        .param("version", "5")
+                                        .header(ACCEPT, FF_MEDIA_TYPE_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FF_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        "/unisave/A0A1J4H6S2?from=A0A1J4H6S2&versions=5&format=txt"));
+    }
+
+    @Test
+    void searchAccessionSpecificVersionWithNonAllowedFormats() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                        .param("version", "last")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
+
+        // when
+        ResultActions rsp =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                        .param("version", "5")
+                                        .header(ACCEPT, TSV_MEDIA_TYPE_VALUE));
+        // then
+        rsp.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, TSV_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
+    }
+
     @Override
     protected RestTemplate getRestTemple() {
         return restTemplate;

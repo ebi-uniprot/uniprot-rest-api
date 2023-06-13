@@ -15,12 +15,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +32,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
+import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsPostRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsSearchRequest;
@@ -68,6 +67,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     private static final String DATA_TYPE = "uniprotkb";
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
     private static final int PREVIEW_SIZE = 10;
+    private static final java.util.regex.Pattern ACCESSION_REGEX_PATTERN =
+            java.util.regex.Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
 
     private final UniProtEntryService entryService;
 
@@ -199,12 +200,20 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                                     "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
                     String fields,
+            @Parameter(description = "Entry version")
+                    @RequestParam(value = "version", required = false)
+                    @ValidContentTypes(contentTypes = {FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
+                    String version,
             HttpServletRequest request) {
+        if (Utils.notNullNotEmpty(version)
+                && ACCESSION_REGEX_PATTERN.matcher(accessionOrId).matches()) {
+            return redirectToEntryVersion(accessionOrId, request);
+        }
         if (accessionOrId.contains("_")) {
             String accession = entryService.findAccessionByProteinId(accessionOrId);
             return redirectToAccession(accessionOrId, accession, request);
         } else if (accessionOrId.contains(".")) {
-            return redirectToUniSave(accessionOrId, request);
+            return redirectToUniSave(accessionOrId, request, Optional.ofNullable(null));
         } else {
             Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
             if (acceptedRdfContentType.isPresent()) {
@@ -216,6 +225,30 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 return super.getEntityResponse(entry, fields, request);
             }
         }
+    }
+
+    private ResponseEntity<MessageConverterContext<UniProtKBEntry>> redirectToEntryVersion(
+            String accessionOrId, HttpServletRequest request) {
+        String version = null;
+        if (request.getParameter("version").equals("last")) {
+            try {
+                String entryVersionHistoryURI = "https://rest.uniprot.org/unisave/" + accessionOrId;
+                String response = Utils.httpGetRequest(entryVersionHistoryURI);
+                JSONObject jsonObject = new JSONObject(response);
+                version =
+                        jsonObject
+                                .getJSONArray("results")
+                                .getJSONObject(0)
+                                .get("entryVersion")
+                                .toString();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            version = request.getParameter("version");
+        }
+
+        return redirectToUniSave(accessionOrId, request, Optional.of(version));
     }
 
     /*
@@ -438,15 +471,22 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     }
 
     private ResponseEntity<MessageConverterContext<UniProtKBEntry>> redirectToUniSave(
-            String accessionOrId, HttpServletRequest request) {
+            String accessionOrId, HttpServletRequest request, Optional<String> entryVersion) {
         MediaType contentType = getAcceptHeader(request);
 
         String uniProtPath = ServletUriComponentsBuilder.fromCurrentRequest().build().getPath();
         String uniSavePath = "";
+        String version = "";
+        String accession = "";
         if (uniProtPath != null) {
+            if (entryVersion.isPresent()) {
+                version = entryVersion.get();
+                accession = accessionOrId;
+            } else {
+                version = accessionOrId.substring(accessionOrId.indexOf('.') + 1);
+                accession = accessionOrId.substring(0, accessionOrId.indexOf('.'));
+            }
             String format = UniProtMediaType.getFileExtension(contentType);
-            String accession = accessionOrId.substring(0, accessionOrId.indexOf('.'));
-            String version = accessionOrId.substring(accessionOrId.indexOf('.') + 1);
             uniSavePath = uniProtPath.replace("uniprotkb", "unisave");
             uniSavePath = uniSavePath.substring(0, uniSavePath.lastIndexOf('/') + 1) + accession;
             uniSavePath =
