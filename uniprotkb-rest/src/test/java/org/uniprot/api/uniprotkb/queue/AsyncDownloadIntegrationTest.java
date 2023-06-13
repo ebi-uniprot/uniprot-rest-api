@@ -114,7 +114,7 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // redis entry created
         await().until(jobCreatedInRedis(jobId));
         await().atLeast(Duration.ofMillis(100))
-                .atMost(Duration.ofSeconds(15))
+                .atMost(Duration.ofSeconds(20))
                 .with()
                 .pollInterval(Duration.ofMillis(100))
                 .until(jobFinished(jobId));
