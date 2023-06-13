@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hamcrest.Matcher;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,6 +54,7 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
@@ -63,7 +66,9 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/** @author lgonzales */
+/**
+ * @author lgonzales
+ */
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
@@ -71,18 +76,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @WebMvcTest(UniProtKBController.class)
 @ExtendWith(
         value = {
-            SpringExtension.class,
-            UniProtKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
-            UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
+                SpringExtension.class,
+                UniProtKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
+                UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
         })
 class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/{accession}";
 
     private static final String ACCESSION_ID = "Q8DIA7";
 
-    @Autowired private UniprotQueryRepository repository;
+    @Autowired
+    private UniprotQueryRepository repository;
 
     private UniProtKBStoreClient storeClient;
 
@@ -434,8 +441,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                        HttpHeaders.LOCATION,
-                                        "/unisave/P21802?from=P21802.20&versions=20&format=json"));
+                                HttpHeaders.LOCATION,
+                                "/unisave/P21802?from=P21802.20&versions=20&format=json"));
     }
 
     @Test
@@ -458,8 +465,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                        HttpHeaders.LOCATION,
-                                        "/uniprotkb/P21802?from=FGFR2_HUMAN"));
+                                HttpHeaders.LOCATION,
+                                "/uniprotkb/P21802?from=FGFR2_HUMAN"));
     }
 
     @Test
@@ -508,8 +515,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                        HttpHeaders.LOCATION,
-                                        "/uniprotkb/P21802?from=FGFR2_HUMAN"));
+                                HttpHeaders.LOCATION,
+                                "/uniprotkb/P21802?from=FGFR2_HUMAN"));
     }
 
     @Test
@@ -537,8 +544,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                        HttpHeaders.LOCATION,
-                                        "/uniprotkb/Q14301?from=Q14301_FGFR2"));
+                                HttpHeaders.LOCATION,
+                                "/uniprotkb/Q14301?from=Q14301_FGFR2"));
     }
 
     @Test
@@ -566,12 +573,13 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                        HttpHeaders.LOCATION,
-                                        "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
+                                HttpHeaders.LOCATION,
+                                "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
     }
 
     @Test
     void searchAccessionLastVersionRedirectToUnisave() throws Exception {
+        String lastVersion = retrieveLastEntryVersion("A0A1J4H6S2");
         // when
         ResultActions response =
                 getMockMvc()
@@ -585,8 +593,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
                 .andExpect(
                         header().string(
-                                        HttpHeaders.LOCATION,
-                                        "/unisave/A0A1J4H6S2?from=A0A1J4H6S2&versions=9&format=fasta"));
+                                HttpHeaders.LOCATION,
+                                getRedirectToEntryVersionPath("A0A1J4H6S2", lastVersion, "fasta")));
     }
 
     @Test
@@ -604,12 +612,12 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FF_MEDIA_TYPE_VALUE))
                 .andExpect(
                         header().string(
-                                        HttpHeaders.LOCATION,
-                                        "/unisave/A0A1J4H6S2?from=A0A1J4H6S2&versions=5&format=txt"));
+                                HttpHeaders.LOCATION,
+                                getRedirectToEntryVersionPath("A0A1J4H6S2", "5", "txt")));
     }
 
     @Test
-    void searchAccessionSpecificVersionWithNonAllowedFormats() throws Exception {
+    void searchAccessionSpecificVersionWithNonAllowedJsonFormat() throws Exception {
         // when
         ResultActions response =
                 getMockMvc()
@@ -626,16 +634,19 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                 .string(
                                         containsString(
                                                 "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
+    }
 
+    @Test
+    void searchAccessionSpecificVersionWithNonAllowedTsvFormat() throws Exception {
         // when
-        ResultActions rsp =
+        ResultActions response =
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE, "A0A1J4H6S2")
                                         .param("version", "5")
                                         .header(ACCEPT, TSV_MEDIA_TYPE_VALUE));
         // then
-        rsp.andDo(log())
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, TSV_MEDIA_TYPE_VALUE))
                 .andExpect(
@@ -643,6 +654,22 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                 .string(
                                         containsString(
                                                 "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
+    }
+
+    private String retrieveLastEntryVersion(String accession) throws Exception {
+        String entryVersionHistoryURI = "https://rest.uniprot.org/unisave/" + accession;
+        String response = Utils.httpGetRequest(entryVersionHistoryURI);
+        JSONObject jsonObject = new JSONObject(response);
+        return jsonObject.getJSONArray("results")
+                .getJSONObject(0)
+                .get("entryVersion")
+                .toString();
+    }
+
+    private String getRedirectToEntryVersionPath(String accession, String version, String format) {
+        return String.format(
+                "/unisave/%s?from=%s&versions=%s&format=%s",
+                accession, accession, version, format);
     }
 
     @Override
