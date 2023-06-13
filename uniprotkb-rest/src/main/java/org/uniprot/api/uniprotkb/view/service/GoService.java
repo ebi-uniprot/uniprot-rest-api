@@ -1,53 +1,19 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import com.google.common.base.Strings;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Service;
 import org.uniprot.api.uniprotkb.view.GoRelation;
-import org.uniprot.api.uniprotkb.view.GoTerm;
-import org.uniprot.api.uniprotkb.view.GoTermResult;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class GoService {
-    private final RestTemplate restTemplate;
-    private static final String GO_API_PREFIX =
-            "https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/";
+    private final GoClient goClient;
 
-    public GoService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public GoService(GoClient goClient) {
+        this.goClient = goClient;
     }
 
-    List<GoRelation> getChildren(String goId) {
-        if (Strings.isNullOrEmpty(goId)) {
-            return rootChildren().getChildren();
-        }
-
-        String url = GO_API_PREFIX + goId + "/children";
-        GoTermResult result = restTemplate.getForObject(url, GoTermResult.class);
-        if ((result == null) || result.getResults().isEmpty()) {
-            return List.of();
-        } else return result.getResults().get(0).getChildren();
-    }
-
-    private GoTerm rootChildren() {
-        GoTerm goTerm = new GoTerm();
-        goTerm.setId("GO:00000");
-        goTerm.setName("root");
-        List<GoRelation> children = new ArrayList<>();
-        children.add(getGoRelation("GO:0008150", "biological_process"));
-        children.add(getGoRelation("GO:0005575", "cellular_component"));
-        children.add(getGoRelation("GO:0003674", "molecular_function"));
-        goTerm.setChildren(children);
-        return goTerm;
-    }
-
-    private GoRelation getGoRelation(String id, String name) {
-        GoRelation goRelation = new GoRelation();
-        goRelation.setId(id);
-        goRelation.setName(name);
-        goRelation.setRelation("is_a");
-        goRelation.setHasChildren(true);
-        return goRelation;
+    public List<GoRelation> getChildren(String parentGo) {
+        return goClient.getChildren(parentGo);
     }
 }

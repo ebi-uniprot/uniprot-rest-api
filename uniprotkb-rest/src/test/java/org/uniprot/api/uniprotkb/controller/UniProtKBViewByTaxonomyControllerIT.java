@@ -40,7 +40,7 @@ import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
 @WebMvcTest(controllers = UniProtKBViewByController.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
 @AutoConfigureWebClient
-@ActiveProfiles({"viewbytest", "viewbyTaxonomytest"})
+@ActiveProfiles({"viewbyTest", "viewbyTaxonomyTest"})
 class UniProtKBViewByTaxonomyControllerIT {
     private static final String EMPTY_PARENT = "";
     private static final String ACCESSION_0 = "A0";
@@ -62,7 +62,7 @@ class UniProtKBViewByTaxonomyControllerIT {
     static DataStoreManager dataStoreManager = new DataStoreManager();
 
     @TestConfiguration
-    @Profile("viewbyTaxonomytest")
+    @Profile("viewbyTaxonomyTest")
     static class TestConfig {
         @Bean("uniProtKBSolrClient")
         public SolrClient uniProtKBSolrClient() {
