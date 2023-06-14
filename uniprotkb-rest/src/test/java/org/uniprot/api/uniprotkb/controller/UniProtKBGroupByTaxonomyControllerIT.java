@@ -1,33 +1,20 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
-
-import java.util.List;
-
-import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.rest.respository.taxonomy.TaxonomyRepository;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -37,11 +24,19 @@ import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
+import java.util.List;
+
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
+
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
-@ContextConfiguration(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
 @AutoConfigureWebClient
-@ActiveProfiles({"viewbyTest", "viewbyTaxonomyTest"})
+@ActiveProfiles({"offline"})
 class UniProtKBGroupByTaxonomyControllerIT {
     private static final String EMPTY_PARENT = "";
     private static final String ACCESSION_0 = "A0";
@@ -56,28 +51,22 @@ class UniProtKBGroupByTaxonomyControllerIT {
     private static final int TAX_ID_2 = 9602;
     private static final String TAX_ID_2_STRING = String.valueOf(TAX_ID_2);
     private static final String TAX_SCIENTIFIC_2 = "scientific_9602";
-    public static final String PATH = "/uniprotkb/view/taxonomy";
-    @Autowired private MockMvc mockMvc;
+    public static final String PATH = "/uniprotkb/groups/taxonomy";
     @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
-
-    @TestConfiguration
-    @Profile("viewbyTaxonomyTest")
-    static class TestConfig {
-        @Bean("uniProtKBSolrClient")
-        public SolrClient uniProtKBSolrClient() {
-            return dataStoreManager.getSolrClient(UNIPROT);
-        }
-
-        @Bean
-        public SolrClient solrClient() {
-            return dataStoreManager.getSolrClient(TAXONOMY);
-        }
-    }
+    @Autowired private MockMvc mockMvc;
+    @Autowired private UniprotQueryRepository uniprotQueryRepository;
+    @Autowired private TaxonomyRepository taxonomyRepository;
 
     @BeforeAll
     static void beforeAll() {
         dataStoreManager.addSolrClient(UNIPROT, SolrCollection.uniprot);
         dataStoreManager.addSolrClient(TAXONOMY, SolrCollection.taxonomy);
+    }
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(uniprotQueryRepository, "solrClient", dataStoreManager.getSolrClient(UNIPROT));
+        ReflectionTestUtils.setField(taxonomyRepository, "solrClient", dataStoreManager.getSolrClient(TAXONOMY));
     }
 
     @AfterEach
