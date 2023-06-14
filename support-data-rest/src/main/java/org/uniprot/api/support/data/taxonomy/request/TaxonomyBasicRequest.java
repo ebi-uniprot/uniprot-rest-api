@@ -41,5 +41,6 @@ public class TaxonomyBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }

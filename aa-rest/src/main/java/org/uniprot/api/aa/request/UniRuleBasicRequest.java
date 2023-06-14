@@ -41,5 +41,6 @@ public class UniRuleBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }

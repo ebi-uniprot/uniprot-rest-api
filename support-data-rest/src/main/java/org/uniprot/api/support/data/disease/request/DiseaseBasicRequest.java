@@ -41,5 +41,6 @@ public class DiseaseBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.DISEASE)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }

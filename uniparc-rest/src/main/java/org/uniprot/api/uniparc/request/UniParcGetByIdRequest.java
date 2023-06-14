@@ -26,5 +26,6 @@ public class UniParcGetByIdRequest {
     @ValidCommaSeparatedItemsLength(maxLength = 100)
     private String taxonIds;
 
+    @Parameter(hidden = true)
     private String format;
 }

@@ -48,5 +48,6 @@ public class GeneCentricBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }

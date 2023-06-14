@@ -41,5 +41,6 @@ public class KeywordBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.KEYWORD)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }

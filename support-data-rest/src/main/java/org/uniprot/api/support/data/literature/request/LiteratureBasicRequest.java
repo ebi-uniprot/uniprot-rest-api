@@ -45,5 +45,6 @@ public class LiteratureBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }
