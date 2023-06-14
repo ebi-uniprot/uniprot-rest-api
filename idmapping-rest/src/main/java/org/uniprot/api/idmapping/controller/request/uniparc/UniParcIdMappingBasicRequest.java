@@ -42,5 +42,6 @@ public class UniParcIdMappingBasicRequest extends IdMappingPageRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String sort;
 
+    @Parameter(hidden = true)
     private String format;
 }

@@ -39,5 +39,6 @@ public class ArbaBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.ARBA)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }

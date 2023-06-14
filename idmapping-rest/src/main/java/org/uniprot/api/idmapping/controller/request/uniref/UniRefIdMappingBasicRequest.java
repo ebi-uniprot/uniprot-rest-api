@@ -39,5 +39,6 @@ public class UniRefIdMappingBasicRequest extends IdMappingPageRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIREF)
     private String sort;
 
+    @Parameter(hidden = true)
     private String format;
 }

@@ -59,6 +59,7 @@ public class UniProtKBIdMappingBasicRequest extends IdMappingPageRequest {
             message = "{search.invalid.contentType.subsequence}")
     private String subsequence;
 
+    @Parameter(hidden = true)
     private String format;
 
     public boolean isSubSequence() {

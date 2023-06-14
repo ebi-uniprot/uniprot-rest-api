@@ -68,6 +68,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
+    @Parameter(hidden = true)
     private String format;
 
     @Override

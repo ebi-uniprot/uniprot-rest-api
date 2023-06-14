@@ -42,5 +42,6 @@ public class ProteomeBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }

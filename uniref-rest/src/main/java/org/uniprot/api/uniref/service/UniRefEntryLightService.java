@@ -134,10 +134,10 @@ public class UniRefEntryLightService
 
     @Override
     public Stream<UniRefEntryLight> stream(StreamRequest request) {
-        UniRefStreamRequest unirefRequest = (UniRefStreamRequest) request;
+        UniRefStreamRequest uniRefRequest = (UniRefStreamRequest) request;
         Stream<UniRefEntryLight> result = super.stream(request);
         if (!LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
-            if (!unirefRequest.isComplete()) {
+            if (!uniRefRequest.isComplete()) {
                 result = result.map(this::removeOverLimitAndCleanMemberId);
             } else {
                 result = result.map(this::cleanMemberId);

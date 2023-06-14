@@ -43,5 +43,6 @@ public class CrossRefBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.CROSSREF)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }

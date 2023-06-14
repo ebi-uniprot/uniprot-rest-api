@@ -49,5 +49,6 @@ public class SubcellularLocationBasicRequest {
     @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String fields;
 
+    @Parameter(hidden = true)
     private String format;
 }
