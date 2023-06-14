@@ -5,7 +5,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.api.uniprotkb.view.*;
+import org.uniprot.api.uniprotkb.view.GoRelation;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,9 @@ public class UniProtKBViewByGoService extends UniProtKBViewByService<GoRelation>
     }
 
     private String removeGoPrefix(String go) {
-        return !StringUtils.isEmpty(go) && go.startsWith(GO_PREFIX) ? go.substring(GO_PREFIX.length()) : go;
+        return !StringUtils.isEmpty(go) && go.startsWith(GO_PREFIX)
+                ? go.substring(GO_PREFIX.length())
+                : go;
     }
 
     private String addGoPrefix(String go) {

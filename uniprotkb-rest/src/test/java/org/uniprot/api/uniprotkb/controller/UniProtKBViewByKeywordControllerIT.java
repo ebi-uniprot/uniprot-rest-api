@@ -36,7 +36,6 @@ import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
@@ -45,7 +44,7 @@ import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 @WebMvcTest(controllers = UniProtKBViewByController.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
 @AutoConfigureWebClient
-@ActiveProfiles({"viewbyTest", "viewbyKeywordTest"})
+@ActiveProfiles({"viewbyTest", "viewByKeywordTest"})
 class UniProtKBViewByKeywordControllerIT {
     private static final String EMPTY_PARENT = "";
     private static final String ACCESSION_0 = "A0";
@@ -65,13 +64,11 @@ class UniProtKBViewByKeywordControllerIT {
     private static final String KEYWORD_ID_4 = "keywordId4";
     private static final String KEYWORD_NAME_4 = "keywordName4";
     public static final String PATH = "/uniprotkb/view/keyword";
-    @Autowired
-    private MockMvc mockMvc;
-    @RegisterExtension
-    static DataStoreManager dataStoreManager = new DataStoreManager();
+    @Autowired private MockMvc mockMvc;
+    @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
 
     @TestConfiguration
-    @Profile("viewbyKeywordTest")
+    @Profile("viewByKeywordTest")
     static class TestConfig {
         @Bean("uniProtKBSolrClient")
         public SolrClient uniProtKBSolrClient() {
@@ -97,12 +94,15 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField()
+    void viewByKeyword_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField()
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_0).param("parent", EMPTY_PARENT))
-                .andDo(print())
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + ORGANISM_ID_0)
+                                .param("parent", EMPTY_PARENT))
+                .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_0)))
                 .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_0)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
@@ -112,7 +112,7 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
+    void viewByKeyword_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
@@ -126,11 +126,15 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
+    void viewByKeyword_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField()
+            throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_2).param("parent", EMPTY_PARENT))
-                .andDo(print())
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + ORGANISM_ID_2)
+                                .param("parent", EMPTY_PARENT))
+                .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_2)))
                 .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_2)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
@@ -144,7 +148,7 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void viewByKeyword_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
@@ -162,10 +166,13 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
+    void viewByKeyword_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildrenAndSidePaths();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_2).param("parent", KEYWORD_ID_0))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + ORGANISM_ID_2)
+                                .param("parent", KEYWORD_ID_0))
                 .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_2)))
                 .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_2)))
@@ -178,7 +185,7 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void viewByKeyword_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", KEYWORD_ID_2).param("parent", EMPTY_PARENT))
@@ -196,7 +203,7 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void viewByKeyword_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildrenAndSidePaths();
 
         mockMvc.perform(get(PATH).param("query", KEYWORD_ID_2).param("parent", KEYWORD_ID_0))
@@ -212,17 +219,20 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_emptyResults() throws Exception {
+    void viewByKeyword_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_1).param("parent", EMPTY_PARENT))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + ORGANISM_ID_1)
+                                .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
     @Test
-    void viewByKEYWORD_whenFreeFormQueryAndEmptyResults() throws Exception {
+    void viewByKeyword_whenFreeFormQueryAndEmptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_1).param("parent", EMPTY_PARENT))
@@ -232,11 +242,15 @@ class UniProtKBViewByKeywordControllerIT {
     }
 
     @Test
-    void viewByKEYWORD_whenQueryNotSpecified() throws Exception {
+    void viewByKeyword_whenQueryNotSpecified() throws Exception {
         mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsStringIgnoringCase("query is a required parameter")));
+                .andExpect(
+                        content()
+                                .string(
+                                        containsStringIgnoringCase(
+                                                "query is a required parameter")));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {
@@ -245,7 +259,8 @@ class UniProtKBViewByKeywordControllerIT {
         saveKeywordDocument(KEYWORD_ID_1, KEYWORD_NAME_1, List.of(KEYWORD_ID_0));
         saveUniProtDocument(ACCESSION_1, ORGANISM_ID_1, List.of(KEYWORD_ID_0, KEYWORD_ID_1));
         saveKeywordDocument(KEYWORD_ID_2, KEYWORD_NAME_2, List.of(KEYWORD_ID_1));
-        saveUniProtDocument(ACCESSION_2, ORGANISM_ID_2, List.of(KEYWORD_ID_0, KEYWORD_ID_1, KEYWORD_ID_2));
+        saveUniProtDocument(
+                ACCESSION_2, ORGANISM_ID_2, List.of(KEYWORD_ID_0, KEYWORD_ID_1, KEYWORD_ID_2));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildrenAndSidePaths() throws Exception {
@@ -254,7 +269,8 @@ class UniProtKBViewByKeywordControllerIT {
         saveKeywordDocument(KEYWORD_ID_1, KEYWORD_NAME_1, List.of(KEYWORD_ID_0, KEYWORD_ID_3));
         saveUniProtDocument(ACCESSION_1, ORGANISM_ID_1, List.of(KEYWORD_ID_0, KEYWORD_ID_1));
         saveKeywordDocument(KEYWORD_ID_2, KEYWORD_NAME_2, List.of(KEYWORD_ID_1, KEYWORD_ID_4));
-        saveUniProtDocument(ACCESSION_2, ORGANISM_ID_2, List.of(KEYWORD_ID_0, KEYWORD_ID_1, KEYWORD_ID_2));
+        saveUniProtDocument(
+                ACCESSION_2, ORGANISM_ID_2, List.of(KEYWORD_ID_0, KEYWORD_ID_1, KEYWORD_ID_2));
         saveKeywordDocument(KEYWORD_ID_3, KEYWORD_NAME_3, null);
         saveKeywordDocument(KEYWORD_ID_4, KEYWORD_NAME_4, null);
     }
@@ -274,16 +290,22 @@ class UniProtKBViewByKeywordControllerIT {
         save(UNIPROT, uniProtDocument);
     }
 
-    private void saveKeywordDocument(String id, String name, List<String> parents) throws Exception {
+    private void saveKeywordDocument(String id, String name, List<String> parents)
+            throws Exception {
         KeywordId keyword = new KeywordIdBuilder().name(name).id(id).build();
-        ByteBuffer keywordObject = ByteBuffer.wrap(KeywordJsonConfig.getInstance()
-                .getFullObjectMapper().writeValueAsBytes(new KeywordEntryBuilder().keyword(keyword).build()));
-        KeywordDocument keywordDocument = KeywordDocument.builder()
-                .id(id)
-                .name(name)
-                .keywordObj(keywordObject)
-                .parent(parents)
-                .build();
+        ByteBuffer keywordObject =
+                ByteBuffer.wrap(
+                        KeywordJsonConfig.getInstance()
+                                .getFullObjectMapper()
+                                .writeValueAsBytes(
+                                        new KeywordEntryBuilder().keyword(keyword).build()));
+        KeywordDocument keywordDocument =
+                KeywordDocument.builder()
+                        .id(id)
+                        .name(name)
+                        .keywordObj(keywordObject)
+                        .parent(parents)
+                        .build();
         save(KEYWORD, keywordDocument);
     }
 
