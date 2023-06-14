@@ -1,34 +1,20 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-
-import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.rest.respository.keyword.KeywordRepository;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordEntryBuilder;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
@@ -40,11 +26,21 @@ import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
+import java.nio.ByteBuffer;
+import java.util.List;
+
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
+
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
-@ContextConfiguration(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
 @AutoConfigureWebClient
-@ActiveProfiles({"viewbyTest", "viewByKeywordTest"})
+@ActiveProfiles({"offline"})
 class UniProtKBGroupByKeywordControllerIT {
     private static final String EMPTY_PARENT = "";
     private static final String ACCESSION_0 = "A0";
@@ -63,28 +59,22 @@ class UniProtKBGroupByKeywordControllerIT {
     private static final String KEYWORD_NAME_3 = "keywordName3";
     private static final String KEYWORD_ID_4 = "keywordId4";
     private static final String KEYWORD_NAME_4 = "keywordName4";
-    public static final String PATH = "/uniprotkb/view/keyword";
-    @Autowired private MockMvc mockMvc;
+    public static final String PATH = "/uniprotkb/groups/keyword";
     @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
-
-    @TestConfiguration
-    @Profile("viewByKeywordTest")
-    static class TestConfig {
-        @Bean("uniProtKBSolrClient")
-        public SolrClient uniProtKBSolrClient() {
-            return dataStoreManager.getSolrClient(UNIPROT);
-        }
-
-        @Bean
-        public SolrClient solrClient() {
-            return dataStoreManager.getSolrClient(KEYWORD);
-        }
-    }
+    @Autowired private MockMvc mockMvc;
+    @Autowired private UniprotQueryRepository uniprotQueryRepository;
+    @Autowired private KeywordRepository keywordRepository;
 
     @BeforeAll
     static void beforeAll() {
         dataStoreManager.addSolrClient(UNIPROT, SolrCollection.uniprot);
         dataStoreManager.addSolrClient(KEYWORD, SolrCollection.keyword);
+    }
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(uniprotQueryRepository, "solrClient", dataStoreManager.getSolrClient(UNIPROT));
+        ReflectionTestUtils.setField(keywordRepository, "solrClient", dataStoreManager.getSolrClient(KEYWORD));
     }
 
     @AfterEach
