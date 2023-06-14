@@ -1,5 +1,9 @@
 package org.uniprot.api.uniprotkb.repository;
 
+import static org.mockito.Mockito.mock;
+
+import java.net.URISyntaxException;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
@@ -13,10 +17,6 @@ import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
-
-import java.net.URISyntaxException;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * A test configuration providing {@link SolrClient} and {@link VoldemortClient} beans that override

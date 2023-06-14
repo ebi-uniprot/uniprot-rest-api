@@ -1,8 +1,9 @@
 package org.uniprot.api.uniprotkb.view;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Value;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Builder
 @Value

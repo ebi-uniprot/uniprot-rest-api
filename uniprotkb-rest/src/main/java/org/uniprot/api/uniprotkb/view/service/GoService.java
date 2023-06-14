@@ -1,9 +1,9 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.uniprot.api.uniprotkb.view.GoRelation;
-
-import java.util.List;
 
 @Service
 public class GoService {

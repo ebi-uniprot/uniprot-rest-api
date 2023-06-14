@@ -1,5 +1,18 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByGoService.GO_PREFIX;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -10,19 +23,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.api.uniprotkb.view.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByGoService.GO_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBViewByGoServiceTest {
@@ -52,17 +52,20 @@ class UniProtKBViewByGoServiceTest {
     private static final long GO_COUNT_E = 12233L;
     private static final long GO_COUNT_F = 99L;
     private static final String SOME_NAME = "someName";
-    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_A = getFacetFields(GO_ID_A, GO_COUNT_A);
-    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_B = getFacetFields(GO_ID_B, GO_COUNT_B);
-    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_C = getFacetFields(GO_ID_C, GO_COUNT_C);
-    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_D = getFacetFields(GO_ID_D, GO_COUNT_D);
-    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_E = getFacetFields(GO_ID_E, GO_COUNT_E);
+    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_A =
+            getFacetFields(GO_ID_A, GO_COUNT_A);
+    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_B =
+            getFacetFields(GO_ID_B, GO_COUNT_B);
+    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_C =
+            getFacetFields(GO_ID_C, GO_COUNT_C);
+    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_D =
+            getFacetFields(GO_ID_D, GO_COUNT_D);
+    private static final List<FacetField> SINGLE_GO_FACET_COUNTS_E =
+            getFacetFields(GO_ID_E, GO_COUNT_E);
     private static final List<FacetField> MULTIPLE_GO_FACET_COUNTS = getMultipleFields();
     private static final String SOME_QUERY = "someQuery";
-    @Mock
-    private GoService goService;
-    @Mock
-    private UniProtEntryService uniProtEntryService;
+    @Mock private GoService goService;
+    @Mock private UniProtEntryService uniProtEntryService;
 
     private UniProtKBViewByGoService service;
 
@@ -95,9 +98,17 @@ class UniProtKBViewByGoServiceTest {
     void getViewBys_whenNoParentSpecifiedAndMultipleRootNodes() {
         when(goService.getChildren(EMPTY_ID))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
-        when(goService.getChildren(argThat(arg -> arg != null && Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F)).contains(arg))))
+        when(goService.getChildren(
+                        argThat(
+                                arg ->
+                                        arg != null
+                                                && Set.of(
+                                                                addGoPrefix(GO_ID_A),
+                                                                addGoPrefix(GO_ID_F))
+                                                        .contains(arg))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_B));
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
@@ -109,8 +120,7 @@ class UniProtKBViewByGoServiceTest {
 
     @Test
     void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
-        when(goService.getChildren(EMPTY_ID))
-                .thenAnswer(invocation -> List.of(GO_ENTRY_C));
+        when(goService.getChildren(EMPTY_ID)).thenAnswer(invocation -> List.of(GO_ENTRY_C));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_C);
 
@@ -121,15 +131,22 @@ class UniProtKBViewByGoServiceTest {
 
     @Test
     void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
-        when(goService.getChildren(EMPTY_ID))
-                .thenAnswer(invocation -> List.of(GO_ENTRY_B));
+        when(goService.getChildren(EMPTY_ID)).thenAnswer(invocation -> List.of(GO_ENTRY_B));
         when(goService.getChildren(addGoPrefix(GO_ID_B)))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
-        when(goService.getChildren(argThat(argument -> argument != null && Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F)).contains(argument))))
+        when(goService.getChildren(
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && Set.of(
+                                                                addGoPrefix(GO_ID_A),
+                                                                addGoPrefix(GO_ID_F))
+                                                        .contains(argument))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_E));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
@@ -169,7 +186,8 @@ class UniProtKBViewByGoServiceTest {
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+    void
+            getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -183,7 +201,8 @@ class UniProtKBViewByGoServiceTest {
                             if (addGoPrefix(GO_ID_D).equals(parent)) {
                                 return List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F);
                             }
-                            if (Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F)).contains(parent)) {
+                            if (Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F))
+                                    .contains(parent)) {
                                 return List.of(GO_ENTRY_E);
                             }
                             return List.of();
@@ -192,7 +211,8 @@ class UniProtKBViewByGoServiceTest {
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_D);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
@@ -206,9 +226,14 @@ class UniProtKBViewByGoServiceTest {
     void getViewBys_whenParentSpecifiedAndMultipleRootNodes() {
         when(goService.getChildren(argThat(argument -> addGoPrefix(GO_ID_B).equals(argument))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
-        when(goService.getChildren(argThat(argument -> Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F)).contains(argument))))
+        when(goService.getChildren(
+                        argThat(
+                                argument ->
+                                        Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F))
+                                                .contains(argument))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_E));
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
@@ -231,17 +256,18 @@ class UniProtKBViewByGoServiceTest {
 
     @Test
     void getViewBys_whenParentSpecifiedAndSingleChildWithSingleChild_traverseUntilEnd() {
-        when(goService.getChildren(any())).thenAnswer(
-                invocation -> {
-                    String parent = invocation.getArgument(0, String.class);
-                    if (addGoPrefix(GO_ID_A).equals(parent)) {
-                        return List.of(GO_ENTRY_B);
-                    }
-                    if (addGoPrefix(GO_ID_B).equals(parent)) {
-                        return List.of(GO_ENTRY_C);
-                    }
-                    return List.of();
-                });
+        when(goService.getChildren(any()))
+                .thenAnswer(
+                        invocation -> {
+                            String parent = invocation.getArgument(0, String.class);
+                            if (addGoPrefix(GO_ID_A).equals(parent)) {
+                                return List.of(GO_ENTRY_B);
+                            }
+                            if (addGoPrefix(GO_ID_B).equals(parent)) {
+                                return List.of(GO_ENTRY_C);
+                            }
+                            return List.of();
+                        });
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
@@ -253,24 +279,28 @@ class UniProtKBViewByGoServiceTest {
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
-        when(goService.getChildren(any())).thenAnswer(
-                invocation -> {
-                    String parent = invocation.getArgument(0, String.class);
-                    if (addGoPrefix(GO_ID_B).equals(parent)) {
-                        return List.of(GO_ENTRY_D);
-                    }
-                    if (addGoPrefix(GO_ID_D).equals(parent)) {
-                        return List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F);
-                    }
-                    if (Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F)).contains(parent)) {
-                        return List.of(GO_ENTRY_E);
-                    }
-                    return List.of();
-                });
+    void
+            getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
+        when(goService.getChildren(any()))
+                .thenAnswer(
+                        invocation -> {
+                            String parent = invocation.getArgument(0, String.class);
+                            if (addGoPrefix(GO_ID_B).equals(parent)) {
+                                return List.of(GO_ENTRY_D);
+                            }
+                            if (addGoPrefix(GO_ID_D).equals(parent)) {
+                                return List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F);
+                            }
+                            if (Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F))
+                                    .contains(parent)) {
+                                return List.of(GO_ENTRY_E);
+                            }
+                            return List.of();
+                        });
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_D);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
@@ -285,8 +315,7 @@ class UniProtKBViewByGoServiceTest {
     }
 
     private static Map<String, String> getFacetFields(String facetItems) {
-        return Map.of(
-                FacetParams.FACET_FIELD, String.format("{!terms='%s'}go_id", facetItems));
+        return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}go_id", facetItems));
     }
 
     private static GoRelation getGoRelation(String id, String label) {
@@ -296,12 +325,14 @@ class UniProtKBViewByGoServiceTest {
         return goRelation;
     }
 
-    private static void assertViewBysMultiple(ViewByResult viewByResult, Matcher<? super List<Ancestor>> matcher) {
+    private static void assertViewBysMultiple(
+            ViewByResult viewByResult, Matcher<? super List<Ancestor>> matcher) {
         assertThat(viewByResult.getResults(), contains(getViewByA(), getViewByC(), getViewByF()));
         assertThat(viewByResult.getAncestors(), matcher);
     }
 
-    private static void assertViewByC(ViewByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
+    private static void assertViewByC(
+            ViewByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
         assertThat(viewBys.getResults(), contains(getViewByC()));
         assertThat(viewBys.getAncestors(), matcher);
     }

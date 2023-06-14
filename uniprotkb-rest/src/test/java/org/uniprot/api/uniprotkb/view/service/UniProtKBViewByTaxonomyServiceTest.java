@@ -1,5 +1,18 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByTaxonomyService.TOP_LEVEL_PARENT_QUERY;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -16,19 +29,6 @@ import org.uniprot.api.uniprotkb.view.AncestorImpl;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.ViewByResult;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByTaxonomyService.TOP_LEVEL_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBViewByTaxonomyServiceTest {
@@ -62,11 +62,16 @@ class UniProtKBViewByTaxonomyServiceTest {
     private static final long TAX_COUNT_D = 10L;
     private static final long TAX_COUNT_E = 1995L;
     private static final String SOME_NAME = "someName";
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_A = getFacetFields(TAX_ID_A_STRING, TAX_COUNT_A);
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_B = getFacetFields(TAX_ID_B_STRING, TAX_COUNT_B);
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_C = getFacetFields(TAX_ID_C_STRING, TAX_COUNT_C);
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_D = getFacetFields(TAX_ID_D_STRING, TAX_COUNT_D);
-    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_E = getFacetFields(TAX_ID_E_STRING, TAX_COUNT_E);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_A =
+            getFacetFields(TAX_ID_A_STRING, TAX_COUNT_A);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_B =
+            getFacetFields(TAX_ID_B_STRING, TAX_COUNT_B);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_C =
+            getFacetFields(TAX_ID_C_STRING, TAX_COUNT_C);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_D =
+            getFacetFields(TAX_ID_D_STRING, TAX_COUNT_D);
+    private static final List<FacetField> SINGLE_TAXONOMY_FACET_COUNTS_E =
+            getFacetFields(TAX_ID_E_STRING, TAX_COUNT_E);
     private static final List<FacetField> MULTIPLE_TAXONOMY_FACET_COUNTS = getMultipleFacetFields();
 
     private static List<FacetField> getFacetFields(String id, long count) {
@@ -89,10 +94,8 @@ class UniProtKBViewByTaxonomyServiceTest {
     }
 
     private static final String SOME_QUERY = "someQuery";
-    @Mock
-    private TaxonomyService taxonomyService;
-    @Mock
-    private UniProtEntryService uniProtEntryService;
+    @Mock private TaxonomyService taxonomyService;
+    @Mock private UniProtEntryService uniProtEntryService;
     private UniProtKBViewByTaxonomyService service;
 
     @BeforeEach
@@ -102,11 +105,17 @@ class UniProtKBViewByTaxonomyServiceTest {
 
     @Test
     void getViewBys_whenNoParentSpecifiedAndMultipleRootNodes() {
-        when(taxonomyService.stream(argThat(arg -> arg != null && TOP_LEVEL_PARENT_QUERY.equals(arg.getQuery()))))
+        when(taxonomyService.stream(
+                        argThat(
+                                arg ->
+                                        arg != null
+                                                && TOP_LEVEL_PARENT_QUERY.equals(arg.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
-        when(taxonomyService.stream(argThat(arg -> arg != null && PARENT_TAX_ID_A.equals(arg.getQuery()))))
+        when(taxonomyService.stream(
+                        argThat(arg -> arg != null && PARENT_TAX_ID_A.equals(arg.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_B));
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
                 .thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_B_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
@@ -119,7 +128,7 @@ class UniProtKBViewByTaxonomyServiceTest {
     @Test
     void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
         when(taxonomyService.stream(
-                argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
+                        argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_C));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
@@ -131,15 +140,29 @@ class UniProtKBViewByTaxonomyServiceTest {
 
     @Test
     void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
-        when(taxonomyService.stream(argThat(argument -> argument != null && (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
+        when(taxonomyService.stream(
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && (TOP_LEVEL_PARENT_QUERY)
+                                                        .equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_B));
-        when(taxonomyService.stream(argThat(argument -> argument != null && PARENT_TAX_ID_B.equals(argument.getQuery()))))
+        when(taxonomyService.stream(
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && PARENT_TAX_ID_B.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
-        when(taxonomyService.stream(argThat(argument -> argument != null && PARENT_TAX_ID_A.equals(argument.getQuery()))))
+        when(taxonomyService.stream(
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && PARENT_TAX_ID_A.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_E));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_B_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
                 .thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
@@ -180,7 +203,8 @@ class UniProtKBViewByTaxonomyServiceTest {
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+    void
+            getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -204,7 +228,8 @@ class UniProtKBViewByTaxonomyServiceTest {
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_D_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
                 .thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
@@ -216,11 +241,20 @@ class UniProtKBViewByTaxonomyServiceTest {
 
     @Test
     void getViewBys_whenParentSpecifiedAndMultipleRootNodes() {
-        when(taxonomyService.stream(argThat(argument -> argument != null && PARENT_TAX_ID_B.equals(argument.getQuery()))))
+        when(taxonomyService.stream(
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && PARENT_TAX_ID_B.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
-        when(taxonomyService.stream(argThat(argument -> argument != null && PARENT_TAX_ID_A.equals(argument.getQuery()))))
+        when(taxonomyService.stream(
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && PARENT_TAX_ID_A.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_E));
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
                 .thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
@@ -233,7 +267,7 @@ class UniProtKBViewByTaxonomyServiceTest {
     @Test
     void getViewBys_whenParentSpecifiedAndNoChildNodes() {
         when(taxonomyService.stream(
-                argThat(argument -> PARENT_TAX_ID_A.equals(argument.getQuery()))))
+                        argThat(argument -> PARENT_TAX_ID_A.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of());
 
         ViewByResult viewBys = service.getViewBys(SOME_QUERY, TAX_ID_A_STRING);
@@ -268,7 +302,8 @@ class UniProtKBViewByTaxonomyServiceTest {
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
+    void
+            getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
         when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -287,7 +322,8 @@ class UniProtKBViewByTaxonomyServiceTest {
                         });
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_D_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
-        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
+        when(uniProtEntryService.getFacets(
+                        SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
                 .thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
@@ -309,12 +345,14 @@ class UniProtKBViewByTaxonomyServiceTest {
         return taxonomyEntry;
     }
 
-    private static void assertViewBysMultiple(ViewByResult viewByResult, Matcher<? super List<Ancestor>> matcher) {
+    private static void assertViewBysMultiple(
+            ViewByResult viewByResult, Matcher<? super List<Ancestor>> matcher) {
         assertThat(viewByResult.getResults(), contains(getViewByA(), getViewByC()));
         assertThat(viewByResult.getAncestors(), matcher);
     }
 
-    private static void assertViewByC(ViewByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
+    private static void assertViewByC(
+            ViewByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
         assertThat(viewBys.getResults(), contains(getViewByC()));
         assertThat(viewBys.getAncestors(), matcher);
     }
@@ -328,11 +366,7 @@ class UniProtKBViewByTaxonomyServiceTest {
     }
 
     private static ViewBy getViewBy(String taxId, String taxLabel, long taxCount, boolean expand) {
-        return MockServiceHelper.createViewBy(
-                taxId,
-                taxLabel,
-                taxCount,
-                expand);
+        return MockServiceHelper.createViewBy(taxId, taxLabel, taxCount, expand);
     }
 
     private static Ancestor getAncestorA() {

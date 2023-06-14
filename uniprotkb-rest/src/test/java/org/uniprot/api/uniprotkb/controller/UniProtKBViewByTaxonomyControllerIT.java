@@ -34,7 +34,8 @@ import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBViewByController.class)
@@ -56,10 +57,8 @@ class UniProtKBViewByTaxonomyControllerIT {
     private static final String TAX_ID_2_STRING = String.valueOf(TAX_ID_2);
     private static final String TAX_SCIENTIFIC_2 = "scientific_9602";
     public static final String PATH = "/uniprotkb/view/taxonomy";
-    @Autowired
-    private MockMvc mockMvc;
-    @RegisterExtension
-    static DataStoreManager dataStoreManager = new DataStoreManager();
+    @Autowired private MockMvc mockMvc;
+    @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
 
     @TestConfiguration
     @Profile("viewbyTaxonomyTest")
@@ -163,7 +162,10 @@ class UniProtKBViewByTaxonomyControllerIT {
     void viewByTaxonomy_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", "taxonomy_id:" + TAX_ID_1_STRING).param("parent", TAX_ID_0_STRING))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "taxonomy_id:" + TAX_ID_1_STRING)
+                                .param("parent", TAX_ID_0_STRING))
                 .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
@@ -213,7 +215,10 @@ class UniProtKBViewByTaxonomyControllerIT {
     void viewByTaxonomy_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + TAX_ID_1_STRING)
+                                .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
@@ -234,7 +239,11 @@ class UniProtKBViewByTaxonomyControllerIT {
         mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsStringIgnoringCase("query is a required parameter")));
+                .andExpect(
+                        content()
+                                .string(
+                                        containsStringIgnoringCase(
+                                                "query is a required parameter")));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {

@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.request.taxonomy.TaxonomyStreamRequest;
 import org.uniprot.api.rest.service.taxonomy.TaxonomyService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class UniProtKBViewByTaxonomyService extends UniProtKBViewByService<TaxonomyEntry> {

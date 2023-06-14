@@ -18,7 +18,8 @@ public class GoClientImpl implements GoClient {
     public static final String BIOLOGICAL_PROCESS = "biological_process";
     public static final String CELLULAR_COMPONENT = "cellular_component";
     public static final String MOLECULAR_FUNCTION = "molecular_function";
-    private static final String GO_API_PREFIX = "https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/";
+    private static final String GO_API_PREFIX =
+            "https://www.ebi.ac.uk/QuickGO/services/ontology/go/terms/";
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override

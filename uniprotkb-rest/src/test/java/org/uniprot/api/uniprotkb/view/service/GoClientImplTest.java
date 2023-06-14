@@ -1,12 +1,12 @@
 package org.uniprot.api.uniprotkb.view.service;
 
-import org.junit.jupiter.api.Test;
-import org.uniprot.api.uniprotkb.view.GoRelation;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
+import org.uniprot.api.uniprotkb.view.GoRelation;
 
 class GoClientImplTest {
     private GoClientImpl goClientImpl = new GoClientImpl();

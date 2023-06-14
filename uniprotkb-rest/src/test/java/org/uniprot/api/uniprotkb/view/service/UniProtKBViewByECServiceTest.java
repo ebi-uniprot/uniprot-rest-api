@@ -1,5 +1,17 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByECService.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -14,18 +26,6 @@ import org.uniprot.api.uniprotkb.view.AncestorImpl;
 import org.uniprot.api.uniprotkb.view.ViewBy;
 import org.uniprot.api.uniprotkb.view.ViewByResult;
 import org.uniprot.core.cv.ec.ECEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.view.service.UniProtKBViewByECService.*;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBViewByECServiceTest {
@@ -43,10 +43,8 @@ class UniProtKBViewByECServiceTest {
     private static String ecIdD = "";
     private static String ecIdE = "";
     private static final String SOME_QUERY = "someQuery";
-    @Mock
-    private ECService ecService;
-    @Mock
-    private UniProtEntryService uniProtEntryService;
+    @Mock private ECService ecService;
+    @Mock private UniProtEntryService uniProtEntryService;
     private UniProtKBViewByECService service;
 
     @BeforeEach
@@ -101,7 +99,6 @@ class UniProtKBViewByECServiceTest {
         assertViewBysMultiple(viewBys, contains(getAncestorB()));
     }
 
-
     @Test
     void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         ecIdA = "1.-.-.-";
@@ -121,7 +118,8 @@ class UniProtKBViewByECServiceTest {
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+    void
+            getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         ecIdB = "1.-.-.-";
         ecIdD = "1.1.-.-";
         ecIdA = "1.1.1.-";
@@ -154,7 +152,6 @@ class UniProtKBViewByECServiceTest {
                 .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
         mockLabels();
 
-
         ViewByResult viewBys = service.getViewBys(SOME_QUERY, ecIdB);
 
         assertViewBysMultiple(viewBys, empty());
@@ -185,7 +182,8 @@ class UniProtKBViewByECServiceTest {
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
+    void
+            getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
         ecIdB = "1.-.-.-";
         ecIdD = "1.1.-.-";
         ecIdA = "1.1.1.-";
@@ -224,9 +222,10 @@ class UniProtKBViewByECServiceTest {
     }
 
     private static Map<String, String> getFacetFields(List<String> entries) {
-        String regEx = entries.stream()
-                .map(token -> token + TOKEN_REGEX)
-                .collect(Collectors.joining("", "", REGEX_SUFFIX));
+        String regEx =
+                entries.stream()
+                        .map(token -> token + TOKEN_REGEX)
+                        .collect(Collectors.joining("", "", REGEX_SUFFIX));
         return Map.of(
                 FacetParams.FACET_MATCHES,
                 regEx,
@@ -236,12 +235,14 @@ class UniProtKBViewByECServiceTest {
                 FACET_MIN_COUNT);
     }
 
-    private static void assertViewBysMultiple(ViewByResult viewByResult, Matcher<? super List<Ancestor>> matcher) {
+    private static void assertViewBysMultiple(
+            ViewByResult viewByResult, Matcher<? super List<Ancestor>> matcher) {
         assertThat(viewByResult.getResults(), contains(getViewByA(), getViewByC()));
         assertThat(viewByResult.getAncestors(), matcher);
     }
 
-    private static void assertViewByC(ViewByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
+    private static void assertViewByC(
+            ViewByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
         assertThat(viewBys.getResults(), contains(getViewByC()));
         assertThat(viewBys.getAncestors(), matcher);
     }
@@ -255,11 +256,7 @@ class UniProtKBViewByECServiceTest {
     }
 
     private static ViewBy getViewBy(String ecId, String ecLabel, long ecCount, boolean expand) {
-        return MockServiceHelper.createViewBy(
-                ecId,
-                ecLabel,
-                ecCount,
-                expand);
+        return MockServiceHelper.createViewBy(ecId, ecLabel, ecCount, expand);
     }
 
     private static Ancestor getAncestorA() {
@@ -283,20 +280,22 @@ class UniProtKBViewByECServiceTest {
     }
 
     private void mockLabels() {
-        when(ecService.getEC(any())).thenAnswer(
-                invocation -> {
-                    String fullEC = invocation.getArgument(0, String.class);
-                    return Optional.of(new ECEntry() {
-                        @Override
-                        public String getId() {
-                            return fullEC;
-                        }
+        when(ecService.getEC(any()))
+                .thenAnswer(
+                        invocation -> {
+                            String fullEC = invocation.getArgument(0, String.class);
+                            return Optional.of(
+                                    new ECEntry() {
+                                        @Override
+                                        public String getId() {
+                                            return fullEC;
+                                        }
 
-                        @Override
-                        public String getLabel() {
-                            return LABEL + fullEC;
-                        }
-                    });
-                });
+                                        @Override
+                                        public String getLabel() {
+                                            return LABEL + fullEC;
+                                        }
+                                    });
+                        });
     }
 }

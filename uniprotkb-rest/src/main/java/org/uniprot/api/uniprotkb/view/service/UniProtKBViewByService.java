@@ -54,7 +54,8 @@ public abstract class UniProtKBViewByService<T> {
     }
 
     private List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
-        List<FacetField> facetFields = uniProtEntryService.getFacets(query, getFacetFields(entries));
+        List<FacetField> facetFields =
+                uniProtEntryService.getFacets(query, getFacetFields(entries));
 
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()
@@ -70,19 +71,24 @@ public abstract class UniProtKBViewByService<T> {
         return !getFacetCounts(queryStr, children).isEmpty();
     }
 
-    private ViewByResult getViewBys(List<FacetField.Count> facetCounts, List<T> entries, List<T> ancestorEntries, String query) {
-        Map<String, T> taxIdMap = getEntryMap(entries, facetCounts);
-        List<ViewBy> viewBys = facetCounts.stream()
-                .map(fc -> getViewBy(fc, taxIdMap.get(getFacetName(fc)), query))
-                .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
-                .collect(Collectors.toList());
-        List<Ancestor> ancestors = ancestorEntries.stream().map(this::getAncestor).collect(Collectors.toList());
+    private ViewByResult getViewBys(
+            List<FacetField.Count> facetCounts,
+            List<T> entries,
+            List<T> ancestorEntries,
+            String query) {
+        Map<String, T> idEntryMap = getEntryMap(entries, facetCounts);
+        List<ViewBy> viewBys =
+                facetCounts.stream()
+                        .map(fc -> getViewBy(fc, idEntryMap.get(getFacetName(fc)), query))
+                        .sorted(ViewBy.SORT_BY_LABEL_IGNORE_CASE)
+                        .collect(Collectors.toList());
+        List<Ancestor> ancestors =
+                ancestorEntries.stream().map(this::getAncestor).collect(Collectors.toList());
         return new ViewByResult(ancestors, viewBys);
     }
 
     protected Map<String, T> getEntryMap(List<T> entries, List<FacetField.Count> facetCounts) {
-        return entries.stream()
-                .collect(Collectors.toMap(this::getId, Function.identity()));
+        return entries.stream().collect(Collectors.toMap(this::getId, Function.identity()));
     }
 
     protected String getFacetName(FacetField.Count fc) {

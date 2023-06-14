@@ -35,7 +35,6 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
@@ -60,12 +59,9 @@ class UniProtKBViewByEcControllerIT {
     private static final String EC_ID_2 = "1.1.1.-";
     private static final String EC_LABEL_2 = "ec_label_2";
     public static final String PATH = "/uniprotkb/view/ec";
-    @Autowired
-    private MockMvc mockMvc;
-    @RegisterExtension
-    static DataStoreManager dataStoreManager = new DataStoreManager();
-    @MockBean
-    private ECRepo ecRepo;
+    @Autowired private MockMvc mockMvc;
+    @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
+    @MockBean private ECRepo ecRepo;
 
     @TestConfiguration
     @Profile("viewbyECTest")
@@ -108,7 +104,7 @@ class UniProtKBViewByEcControllerIT {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(EC_ID_0)))
                 .andExpect(jsonPath("$.results[0].label", is(EC_LABEL_0)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
@@ -118,13 +114,14 @@ class UniProtKBViewByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField()
-            throws Exception {
+    void viewByEC_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_2)
-                        .param("parent", EMPTY_PARENT))
-                .andDo(print())
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + ORGANISM_ID_2)
+                                .param("parent", EMPTY_PARENT))
+                .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(EC_ID_2)))
                 .andExpect(jsonPath("$.results[0].label", is(EC_LABEL_2)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
@@ -159,8 +156,11 @@ class UniProtKBViewByEcControllerIT {
     void viewByEC_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_2).param("parent", EC_ID_0))
-                .andDo(print())
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + ORGANISM_ID_2)
+                                .param("parent", EC_ID_0))
+                .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(EC_ID_2)))
                 .andExpect(jsonPath("$.results[0].label", is(EC_LABEL_2)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
@@ -194,7 +194,7 @@ class UniProtKBViewByEcControllerIT {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EC_ID_0))
-                .andDo(print())
+                .andDo(log())
                 .andExpect(jsonPath("$.results[0].id", is(EC_ID_2)))
                 .andExpect(jsonPath("$.results[0].label", is(EC_LABEL_2)))
                 .andExpect(jsonPath("$.results[0].expand", is(false)))
@@ -209,7 +209,10 @@ class UniProtKBViewByEcControllerIT {
     void viewByEC_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + INVALID_ORGANISM_ID).param("parent", EMPTY_PARENT))
+        mockMvc.perform(
+                        get(PATH)
+                                .param("query", "organism_id:" + INVALID_ORGANISM_ID)
+                                .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.results.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
@@ -230,7 +233,11 @@ class UniProtKBViewByEcControllerIT {
         mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsStringIgnoringCase("query is a required parameter")));
+                .andExpect(
+                        content()
+                                .string(
+                                        containsStringIgnoringCase(
+                                                "query is a required parameter")));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() {
@@ -258,17 +265,20 @@ class UniProtKBViewByEcControllerIT {
     }
 
     private void mockEcEntry(String ecId, String label) {
-        when(ecRepo.getEC(ecId)).thenReturn(Optional.of(new ECEntry() {
-            @Override
-            public String getId() {
-                return ecId;
-            }
+        when(ecRepo.getEC(ecId))
+                .thenReturn(
+                        Optional.of(
+                                new ECEntry() {
+                                    @Override
+                                    public String getId() {
+                                        return ecId;
+                                    }
 
-            @Override
-            public String getLabel() {
-                return label;
-            }
-        }));
+                                    @Override
+                                    public String getLabel() {
+                                        return label;
+                                    }
+                                }));
     }
 
     void save(Document doc) {

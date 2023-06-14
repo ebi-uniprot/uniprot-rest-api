@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.view.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.rest.request.keyword.KeywordStreamRequest;
 import org.uniprot.api.rest.service.keyword.KeywordService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class UniProtKBViewByKeywordService extends UniProtKBViewByService<KeywordEntry> {
