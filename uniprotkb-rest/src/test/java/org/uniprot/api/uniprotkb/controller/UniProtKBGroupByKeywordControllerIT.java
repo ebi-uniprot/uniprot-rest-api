@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
+
+import java.nio.ByteBuffer;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,17 +36,6 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
@@ -73,8 +73,10 @@ class UniProtKBGroupByKeywordControllerIT {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(uniprotQueryRepository, "solrClient", dataStoreManager.getSolrClient(UNIPROT));
-        ReflectionTestUtils.setField(keywordRepository, "solrClient", dataStoreManager.getSolrClient(KEYWORD));
+        ReflectionTestUtils.setField(
+                uniprotQueryRepository, "solrClient", dataStoreManager.getSolrClient(UNIPROT));
+        ReflectionTestUtils.setField(
+                keywordRepository, "solrClient", dataStoreManager.getSolrClient(KEYWORD));
     }
 
     @AfterEach

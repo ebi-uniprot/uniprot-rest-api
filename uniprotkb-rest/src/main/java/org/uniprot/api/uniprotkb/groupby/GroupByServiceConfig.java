@@ -10,7 +10,7 @@ import org.uniprot.cv.ec.ECRepoFactory;
 public class GroupByServiceConfig {
     private final String ecDirectory;
 
-    public GroupByServiceConfig(@Value("${solr.groupby.ecDir}") String ecDirectory) {
+    public GroupByServiceConfig(@Value("${groupby.solr.ec.dir}") String ecDirectory) {
         this.ecDirectory = ecDirectory;
     }
 
