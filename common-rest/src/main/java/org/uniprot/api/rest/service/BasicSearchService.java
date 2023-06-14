@@ -1,16 +1,5 @@
 package org.uniprot.api.rest.service;
 
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -32,6 +21,17 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
+
 /**
  * @param <D> the type of the input to the class. a type of Document
  * @param <R> the type of the result of the class
@@ -39,8 +39,6 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
  */
 @PropertySource("classpath:common-message.properties")
 public abstract class BasicSearchService<D extends Document, R> {
-    private static final String QUERY_FIELDS = "qf";
-    private static final String DEF_TYPE = "defType";
     public static final Integer DEFAULT_SOLR_BATCH_SIZE = 100;
     private final SolrQueryRepository<D> repository;
     private final Function<D, R> entryConverter;
