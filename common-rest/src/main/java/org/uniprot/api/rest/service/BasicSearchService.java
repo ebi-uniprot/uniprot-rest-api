@@ -1,7 +1,6 @@
 package org.uniprot.api.rest.service;
 
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 
 import java.util.List;
 import java.util.Objects;
@@ -103,16 +102,8 @@ public abstract class BasicSearchService<D extends Document, R> {
     public QueryResult<R> search(SearchRequest request) {
         SolrRequest solrRequest = createSearchSolrRequest(request);
         QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
-        Stream<R> converted;
-        if (LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
-            converted =
-                    results.getContent()
-                            .map(Document::getDocumentId)
-                            .map(this::mapToThinEntry)
-                            .filter(Objects::nonNull);
-        } else {
-            converted = results.getContent().map(entryConverter).filter(Objects::nonNull);
-        }
+
+        Stream<R> converted = convertDocumentsToEntries(request, results);
 
         Set<ProblemPair> warnings = getWarnings(request.getQuery(), Set.of());
         return QueryResult.of(
@@ -123,6 +114,10 @@ public abstract class BasicSearchService<D extends Document, R> {
                 null,
                 results.getSuggestions(),
                 warnings);
+    }
+
+    protected Stream<R> convertDocumentsToEntries(SearchRequest request, QueryResult<D> results) {
+        return results.getContent().map(entryConverter).filter(Objects::nonNull);
     }
 
     public Stream<R> stream(StreamRequest request) {
@@ -275,10 +270,6 @@ public abstract class BasicSearchService<D extends Document, R> {
         ProblemPair warning = getLeadingWildcardIgnoredWarning(query, leadWildcardSupportedFields);
         Set<ProblemPair> warnings = Objects.isNull(warning) ? null : Set.of(warning);
         return warnings;
-    }
-
-    protected R mapToThinEntry(String entryId) {
-        throw new UnsupportedOperationException("Override this method");
     }
 
     private ProblemPair getLeadingWildcardIgnoredWarning(
