@@ -213,7 +213,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             String accession = entryService.findAccessionByProteinId(accessionOrId);
             return redirectToAccession(accessionOrId, accession, request);
         } else if (accessionOrId.contains(".")) {
-            return redirectToUniSave(accessionOrId, request, Optional.ofNullable(null));
+            return redirectToUniSave(accessionOrId, request, Optional.empty());
         } else {
             Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
             if (acceptedRdfContentType.isPresent()) {
