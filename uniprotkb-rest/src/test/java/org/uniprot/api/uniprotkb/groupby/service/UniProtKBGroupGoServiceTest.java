@@ -1,18 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByGoService.GO_PREFIX;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -28,6 +15,19 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.go.GoService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByGoService.GO_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBGroupGoServiceTest {
@@ -100,7 +100,7 @@ class UniProtKBGroupGoServiceTest {
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndMultipleRootNodes() {
+    void getGroupByResults_whenNoParentSpecifiedAndMultipleRootNodes() {
         when(goService.getChildren(EMPTY_ID))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
         when(goService.getChildren(
@@ -118,24 +118,24 @@ class UniProtKBGroupGoServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
         assertViewBysMultiple(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
         when(goService.getChildren(EMPTY_ID)).thenAnswer(invocation -> List.of(GO_ENTRY_C));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
         assertViewByC(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
         when(goService.getChildren(EMPTY_ID)).thenAnswer(invocation -> List.of(GO_ENTRY_B));
         when(goService.getChildren(addGoPrefix(GO_ID_B)))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
@@ -156,13 +156,13 @@ class UniProtKBGroupGoServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
         assertViewBysMultiple(viewBys, contains(getAncestorB()));
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -185,14 +185,14 @@ class UniProtKBGroupGoServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
         assertViewByC(viewBys, contains(getAncestorA(), getAncestorB()));
     }
 
     @Test
     void
-            getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -222,13 +222,13 @@ class UniProtKBGroupGoServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
         assertViewBysMultiple(viewBys, contains(getAncestorB(), getAncestorD()));
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndMultipleRootNodes() {
+    void getGroupByResults_whenParentSpecifiedAndMultipleRootNodes() {
         when(goService.getChildren(argThat(argument -> addGoPrefix(GO_ID_B).equals(argument))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
         when(goService.getChildren(
@@ -243,24 +243,24 @@ class UniProtKBGroupGoServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, GO_ID_B);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, GO_ID_B);
 
         assertViewBysMultiple(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndNoChildNodes() {
+    void getGroupByResults_whenParentSpecifiedAndNoChildNodes() {
         when(goService.getChildren(argThat(argument -> addGoPrefix(GO_ID_A).equals(argument))))
                 .thenAnswer(invocation -> List.of());
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, GO_ID_A);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, GO_ID_A);
 
         assertThat(viewBys.getResults(), empty());
         assertThat(viewBys.getAncestors(), empty());
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndSingleChildWithSingleChild_traverseUntilEnd() {
+    void getGroupByResults_whenParentSpecifiedAndSingleChildWithSingleChild_traverseUntilEnd() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -278,14 +278,14 @@ class UniProtKBGroupGoServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, GO_ID_A);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, GO_ID_A);
 
         assertViewByC(viewBys, contains(getAncestorB()));
     }
 
     @Test
     void
-            getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -310,7 +310,7 @@ class UniProtKBGroupGoServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, GO_ID_B);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, GO_ID_B);
 
         assertViewBysMultiple(viewBys, contains(getAncestorD()));
     }

@@ -1,14 +1,15 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UniProtKBGroupByECService extends UniProtKBGroupByService<String> {
@@ -63,21 +64,26 @@ public class UniProtKBGroupByECService extends UniProtKBGroupByService<String> {
     }
 
     @Override
-    protected Map<String, String> getEntryMap(
-            List<String> entries, List<FacetField.Count> facetCounts) {
-        return facetCounts.stream()
-                .collect(
-                        Collectors.toMap(
-                                FacetField.Count::getName,
-                                count -> this.getFullEc(count.getName())));
-    }
-
-    @Override
     protected void addToAncestors(
             List<String> ancestors, List<String> entries, String parent, String id) {
         if (!Objects.equals(parent, id)) {
             ancestors.add(getFullEc(id));
         }
+    }
+
+    @Override
+    protected GroupByResult getGroupByResult(
+            List<FacetField.Count> facetCounts,
+            List<String> ecs,
+            List<String> ancestorEntries,
+            String query) {
+        Map<String, String> idEntryMap =
+                facetCounts.stream()
+                        .collect(
+                                Collectors.toMap(
+                                        FacetField.Count::getName,
+                                        count -> this.getFullEc(count.getName())));
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, query);
     }
 
     private String getShortFormEc(String fullEc) {

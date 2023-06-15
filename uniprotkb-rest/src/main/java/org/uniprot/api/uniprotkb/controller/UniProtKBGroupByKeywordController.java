@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByKeywordService;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
 
 @RequestMapping(value = GROUP_BY_KEYWORD_RESOURCE)
 @RestController
@@ -27,7 +27,7 @@ public class UniProtKBGroupByKeywordController extends UniProtKBGroupByControlle
     }
 
     @Override
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<GroupByResult> getGroups(
             @Parameter(
                             description =
@@ -38,6 +38,6 @@ public class UniProtKBGroupByKeywordController extends UniProtKBGroupByControlle
                     @RequestParam(value = "parent", required = false)
                     String parent) {
         return new ResponseEntity<>(
-                uniProtKBGroupByKeywordService.getGroups(query, parent), HttpStatus.OK);
+                uniProtKBGroupByKeywordService.getGroupByResult(query, parent), HttpStatus.OK);
     }
 }

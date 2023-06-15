@@ -1,17 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByECService.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -27,6 +15,18 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByECService.*;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBGroupECServiceTest {
@@ -54,7 +54,7 @@ class UniProtKBGroupECServiceTest {
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndMultipleRootNodes() {
+    void getGroupByResults_whenNoParentSpecifiedAndMultipleRootNodes() {
         ecIdA = "1.-.-.-";
         ecIdB = "1.1.-.-";
         ecIdC = "2.-.-.-";
@@ -64,25 +64,25 @@ class UniProtKBGroupECServiceTest {
                 .thenReturn(getFacetFields("1.1", EC_COUNT_B));
         mockLabels();
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewBysMultiple(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
         ecIdC = "2.-.-.-";
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of())))
                 .thenReturn(getFacetFields(ecIdC, EC_COUNT_C));
         mockLabels();
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewByC(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
         ecIdB = "1.-.-.-";
         ecIdA = "1.1.-.-";
         ecIdC = "1.2.-.-";
@@ -95,13 +95,13 @@ class UniProtKBGroupECServiceTest {
                 .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
         mockLabels();
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewBysMultiple(viewBys, contains(getAncestorB()));
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         ecIdA = "1.-.-.-";
         ecIdB = "1.1.-.-";
         ecIdC = "1.1.1.-";
@@ -113,14 +113,14 @@ class UniProtKBGroupECServiceTest {
                 .thenReturn(getFacetFields(ecIdC, EC_COUNT_C));
         mockLabels();
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewByC(viewBys, contains(getAncestorA(), getAncestorB()));
     }
 
     @Test
     void
-            getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         ecIdB = "1.-.-.-";
         ecIdD = "1.1.-.-";
         ecIdA = "1.1.1.-";
@@ -136,13 +136,13 @@ class UniProtKBGroupECServiceTest {
                 .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
         mockLabels();
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewBysMultiple(viewBys, contains(getAncestorB(), getAncestorD()));
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndMultipleRootNodes() {
+    void getGroupByResults_whenParentSpecifiedAndMultipleRootNodes() {
         ecIdB = "1.-.-.-";
         ecIdA = "1.1.-.-";
         ecIdC = "1.2.-.-";
@@ -153,21 +153,21 @@ class UniProtKBGroupECServiceTest {
                 .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
         mockLabels();
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, ecIdB);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, ecIdB);
 
         assertViewBysMultiple(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndNoChildNodes() {
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, ecIdA);
+    void getGroupByResults_whenParentSpecifiedAndNoChildNodes() {
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, ecIdA);
 
         assertThat(viewBys.getResults(), empty());
         assertThat(viewBys.getAncestors(), empty());
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndSingleChildWithSingleChild_traverseUntilEnd() {
+    void getGroupByResults_whenParentSpecifiedAndSingleChildWithSingleChild_traverseUntilEnd() {
         ecIdA = "1.-.-.-";
         ecIdB = "1.1.-.-";
         ecIdC = "1.1.1.-";
@@ -177,14 +177,14 @@ class UniProtKBGroupECServiceTest {
                 .thenReturn(getFacetFields(ecIdC, EC_COUNT_C));
         mockLabels();
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, ecIdA);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, ecIdA);
 
         assertViewByC(viewBys, contains(getAncestorB()));
     }
 
     @Test
     void
-            getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
         ecIdB = "1.-.-.-";
         ecIdD = "1.1.-.-";
         ecIdA = "1.1.1.-";
@@ -198,7 +198,7 @@ class UniProtKBGroupECServiceTest {
                 .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
         mockLabels();
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, ecIdB);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, ecIdB);
 
         assertViewBysMultiple(viewBys, contains(getAncestorD()));
     }

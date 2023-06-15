@@ -1,16 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
-
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +22,17 @@ import org.uniprot.store.indexer.DataStoreManager.StoreType;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
@@ -76,7 +76,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField() throws Exception {
+    void getGroupByEC_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(
@@ -93,7 +93,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByEC_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
@@ -107,7 +107,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
+    void getGroupByEC_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(
@@ -128,7 +128,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByEC_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
@@ -146,7 +146,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
+    void getGroupByEC_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(
@@ -165,7 +165,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByEC_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
@@ -183,7 +183,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByEC_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EC_ID_0))
@@ -199,7 +199,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_emptyResults() throws Exception {
+    void getGroupByEC_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(
@@ -212,7 +212,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenFreeFormQueryAndEmptyResults() throws Exception {
+    void getGroupByEC_whenFreeFormQueryAndEmptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", INVALID_ORGANISM_ID).param("parent", EMPTY_PARENT))
@@ -222,7 +222,7 @@ class UniProtKBGroupByEcControllerIT {
     }
 
     @Test
-    void viewByEC_whenQueryNotSpecified() throws Exception {
+    void getGroupByEC_whenQueryNotSpecified() throws Exception {
         mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())

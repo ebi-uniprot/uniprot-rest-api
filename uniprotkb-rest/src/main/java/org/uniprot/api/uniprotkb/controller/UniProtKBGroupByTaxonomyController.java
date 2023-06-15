@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByTaxonomyController.GROUP_BY_TAXONOMY_RESOURCE;
-
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByTaxonomyService;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByTaxonomyController.GROUP_BY_TAXONOMY_RESOURCE;
 
 @RequestMapping(value = GROUP_BY_TAXONOMY_RESOURCE)
 @RestController
@@ -27,7 +27,7 @@ public class UniProtKBGroupByTaxonomyController extends UniProtKBGroupByControll
     }
 
     @Override
-    @GetMapping
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<GroupByResult> getGroups(
             @Parameter(
                             description =
@@ -38,6 +38,6 @@ public class UniProtKBGroupByTaxonomyController extends UniProtKBGroupByControll
                     @RequestParam(value = "parent", required = false)
                     String parent) {
         return new ResponseEntity<>(
-                uniProtKBGroupByTaxonomyService.getGroups(query, parent), HttpStatus.OK);
+                uniProtKBGroupByTaxonomyService.getGroupByResult(query, parent), HttpStatus.OK);
     }
 }

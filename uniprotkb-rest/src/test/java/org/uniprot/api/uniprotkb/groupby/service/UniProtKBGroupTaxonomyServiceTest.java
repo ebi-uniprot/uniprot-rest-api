@@ -1,18 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByTaxonomyService.TOP_LEVEL_PARENT_QUERY;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -29,6 +16,19 @@ import org.uniprot.api.uniprotkb.groupby.model.Group;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByTaxonomyService.TOP_LEVEL_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBGroupTaxonomyServiceTest {
@@ -104,7 +104,7 @@ class UniProtKBGroupTaxonomyServiceTest {
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndMultipleRootNodes() {
+    void getGroupByResults_whenNoParentSpecifiedAndMultipleRootNodes() {
         when(taxonomyService.stream(
                         argThat(
                                 arg ->
@@ -120,26 +120,26 @@ class UniProtKBGroupTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_B_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewBysMultiple(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
         when(taxonomyService.stream(
                         argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_C));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewByC(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithMultipleChildren() {
         when(taxonomyService.stream(
                         argThat(
                                 argument ->
@@ -167,13 +167,13 @@ class UniProtKBGroupTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewBysMultiple(viewBys, contains(getAncestorB()));
     }
 
     @Test
-    void getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -197,14 +197,14 @@ class UniProtKBGroupTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewByC(viewBys, contains(getAncestorA(), getAncestorB()));
     }
 
     @Test
     void
-            getViewBys_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -234,13 +234,13 @@ class UniProtKBGroupTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertViewBysMultiple(viewBys, contains(getAncestorB(), getAncestorD()));
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndMultipleRootNodes() {
+    void getGroupByResults_whenParentSpecifiedAndMultipleRootNodes() {
         when(taxonomyService.stream(
                         argThat(
                                 argument ->
@@ -259,25 +259,25 @@ class UniProtKBGroupTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, TAX_ID_B_STRING);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, TAX_ID_B_STRING);
 
         assertViewBysMultiple(viewBys, empty());
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndNoChildNodes() {
+    void getGroupByResults_whenParentSpecifiedAndNoChildNodes() {
         when(taxonomyService.stream(
                         argThat(argument -> PARENT_TAX_ID_A.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of());
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, TAX_ID_A_STRING);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, TAX_ID_A_STRING);
 
         assertThat(viewBys.getResults(), empty());
         assertThat(viewBys.getAncestors(), empty());
     }
 
     @Test
-    void getViewBys_whenParentSpecifiedAndSingleChildWithSingleChild_traverseUntilEnd() {
+    void getGroupByResults_whenParentSpecifiedAndSingleChildWithSingleChild_traverseUntilEnd() {
         when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -296,14 +296,14 @@ class UniProtKBGroupTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, TAX_ID_A_STRING);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, TAX_ID_A_STRING);
 
         assertViewByC(viewBys, contains(getAncestorB()));
     }
 
     @Test
     void
-            getViewBys_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
         when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -328,7 +328,7 @@ class UniProtKBGroupTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroups(SOME_QUERY, TAX_ID_B_STRING);
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, TAX_ID_B_STRING);
 
         assertViewBysMultiple(viewBys, contains(getAncestorD()));
     }

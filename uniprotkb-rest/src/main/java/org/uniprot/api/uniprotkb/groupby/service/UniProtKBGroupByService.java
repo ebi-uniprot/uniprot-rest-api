@@ -1,16 +1,15 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class UniProtKBGroupByService<T> {
     private final UniProtEntryService uniProtEntryService;
@@ -19,7 +18,7 @@ public abstract class UniProtKBGroupByService<T> {
         this.uniProtEntryService = uniProtEntryService;
     }
 
-    public GroupByResult getGroups(String query, String parent) {
+    public GroupByResult getGroupByResult(String query, String parent) {
         List<FacetField.Count> facetCounts = List.of();
         List<T> entries = List.of();
         String id = parent;
@@ -40,7 +39,7 @@ public abstract class UniProtKBGroupByService<T> {
 
         } while (facetCounts.size() == 1);
 
-        return getGroups(facetCounts, entries, ancestors, query);
+        return getGroupByResult(facetCounts, entries, ancestors, query);
     }
 
     protected static boolean isTopLevelSearch(String parent) {
@@ -71,12 +70,17 @@ public abstract class UniProtKBGroupByService<T> {
         return !getFacetCounts(queryStr, children).isEmpty();
     }
 
-    private GroupByResult getGroups(
+    protected abstract GroupByResult getGroupByResult(
             List<FacetField.Count> facetCounts,
             List<T> entries,
             List<T> ancestorEntries,
+            String query);
+
+    protected GroupByResult getGroupByResult(
+            List<FacetField.Count> facetCounts,
+            Map<String, T> idEntryMap,
+            List<T> ancestorEntries,
             String query) {
-        Map<String, T> idEntryMap = getEntryMap(entries, facetCounts);
         List<Group> groups =
                 facetCounts.stream()
                         .map(fc -> getGroup(fc, idEntryMap.get(getFacetName(fc)), query))
@@ -84,22 +88,19 @@ public abstract class UniProtKBGroupByService<T> {
                         .collect(Collectors.toList());
         List<Ancestor> ancestors =
                 ancestorEntries.stream().map(this::getAncestor).collect(Collectors.toList());
-        return new GroupByResult(ancestors, groups);
-    }
 
-    protected Map<String, T> getEntryMap(List<T> entries, List<FacetField.Count> facetCounts) {
-        return entries.stream().collect(Collectors.toMap(this::getId, Function.identity()));
+        return new GroupByResult(ancestors, groups);
     }
 
     protected String getFacetName(FacetField.Count fc) {
         return fc.getName();
     }
 
-    private Ancestor getAncestor(T t) {
+    protected Ancestor getAncestor(T t) {
         return AncestorImpl.builder().id(getId(t)).label(getLabel(t)).build();
     }
 
-    private Group getGroup(FacetField.Count count, T entry, String queryStr) {
+    protected Group getGroup(FacetField.Count count, T entry, String queryStr) {
         return GroupImpl.builder()
                 .id(getId(entry))
                 .label(getLabel(entry))
