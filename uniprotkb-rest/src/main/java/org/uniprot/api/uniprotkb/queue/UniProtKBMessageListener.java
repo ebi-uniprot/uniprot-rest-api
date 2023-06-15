@@ -43,7 +43,7 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 @Service("DownloadListener")
 @Slf4j
 public class UniProtKBMessageListener extends AbstractMessageListener implements MessageListener {
-    public static final String H5_LIMIT_EXCEED_MSG = "Embeddings Limit Exceeded(%s)";
+    public static final String H5_LIMIT_EXCEED_MSG = "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s";
     private static final String DATA_TYPE = "uniprotkb";
     private final MessageConverter converter;
     private final UniProtEntryService service;
@@ -115,7 +115,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
                 updateDownloadJob(
                         downloadJob,
                         JobStatus.ABORTED,
-                        String.format(H5_LIMIT_EXCEED_MSG, maxAllowedHits),
+                        String.format(H5_LIMIT_EXCEED_MSG, maxAllowedHits, totalHits),
                         downloadJob.getRetried(),
                         null);
             }
@@ -128,6 +128,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
     private Long getSolrHits(UniProtKBDownloadRequest request) {
         UniProtKBSearchRequest searchRequest = new UniProtKBSearchRequest();
         searchRequest.setQuery(request.getQuery());
+        searchRequest.setIncludeIsoform(request.getIncludeIsoform());
         searchRequest.setSize(0);
         QueryResult<UniProtKBEntry> searchResults = service.search(searchRequest);
         Long totalHits = searchResults.getPage().getTotalElements();

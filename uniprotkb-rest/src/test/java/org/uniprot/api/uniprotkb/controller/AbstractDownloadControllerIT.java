@@ -287,7 +287,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void getStatusReturnsAborted() throws Exception {
         String jobId = UUID.randomUUID().toString();
         DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
-        String errMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount);
+        String errMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount, totalNonIsoformEntries);
         DownloadJob job = builder.id(jobId).status(JobStatus.ABORTED).error(errMsg).format(HDF5_MEDIA_TYPE_VALUE).build();
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
@@ -297,7 +297,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
 
         // then
         response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", is(JobStatus.ABORTED.toString())))
                 .andExpect(jsonPath("$.errors").exists())
@@ -393,7 +393,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void getDetailsWithAbortedForH5Job() throws Exception {
         String jobId = UUID.randomUUID().toString();
         DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
-        String errMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount);
+        String errMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount, totalNonIsoformEntries);
         String query = "key:value";
         DownloadJob job =
                 builder.id(jobId)
@@ -557,10 +557,36 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     }
 
     @Test
+    void submitJob_H5_Format_Success() throws Exception {
+        String query = "reviewed:true";
+        MediaType format = HDF5_MEDIA_TYPE;
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), Matchers.equalTo(JobStatus.RUNNING));
+        verifyIdsFile(jobId);
+        // result file should not exist yet
+        String fileWithExt = jobId + FileType.GZIP.getExtension();
+        Path resultFilePath = Path.of(this.resultFolder + "/" + fileWithExt);
+        Assertions.assertFalse(Files.exists(resultFilePath));
+    }
+
+    @Test
     void submitJob_H5_Format_Star_Query_Aborted() throws Exception {
         String query = "*:*";
         MediaType format = HDF5_MEDIA_TYPE;
         String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
+        await().until(() -> getDownloadJobRepository().existsById(jobId));
+        await().until(jobProcessed(jobId), equalTo(JobStatus.ABORTED));
+        // id file should not exist yet
+        Path resultFilePath = Path.of(this.idsFolder + "/" + jobId);
+        Assertions.assertFalse(Files.exists(resultFilePath));
+    }
+
+    @Test
+    void submitJob_H5_Format_With_Isoform_Aborted() throws Exception {
+        String query = "reviewed:true";
+        MediaType format = HDF5_MEDIA_TYPE;
+        String jobId = callRunAPIAndVerify(query, "accession", null, format.toString(), true);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.ABORTED));
         // id file should not exist yet

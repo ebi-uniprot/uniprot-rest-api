@@ -59,6 +59,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControllerIT {
+    protected int totalNonIsoformEntries;
 
     static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
@@ -181,13 +182,15 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     }
 
     private void saveEntries() throws Exception {
-        for (int i = 1; i <= 10; i++) {
+        int i = 1;
+        for (; i <= 10; i++) {
             saveEntry(i, "");
         }
-        saveEntry(11, "-2");
-        saveEntry(12, "-2");
-        saveEntry(13, "", false);
-        saveEntry(14, "", false);
+        saveEntry(i++, "-2");
+        saveEntry(i++, "-2");
+        saveEntry(i++, "", false);
+        saveEntry(i, "", false);
+        totalNonIsoformEntries = i - 2;
         cloudSolrClient.commit(SolrCollection.uniprot.name());
         saveTaxonomyEntry(9606L);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());

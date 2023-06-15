@@ -225,6 +225,8 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         Assertions.assertFalse(Files.exists(resultFilePath));
     }
 
+
+
     @Test
     void sendAndProcessEmbeddingsH5MessageWithAbortedStatus() throws IOException {
         String query = "*:*";
@@ -238,7 +240,7 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ABORTED), 0, true);
         DownloadJob job = this.downloadJobRepository.findById(jobId).get();
-        String errorMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount);
+        String errorMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount, totalNonIsoformEntries);
         assertEquals(errorMsg, job.getError());
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
