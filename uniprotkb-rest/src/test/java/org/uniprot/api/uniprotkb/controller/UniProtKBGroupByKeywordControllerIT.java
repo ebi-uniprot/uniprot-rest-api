@@ -1,16 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +25,17 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.nio.ByteBuffer;
+import java.util.List;
+
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
@@ -86,7 +86,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField()
+    void getGroupByKeyword_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField()
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
@@ -104,7 +104,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByKeyword_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
@@ -118,7 +118,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField()
+    void getGroupByKeyword_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField()
             throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
@@ -140,7 +140,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByKeyword_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
@@ -158,7 +158,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
+    void getGroupByKeyword_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildrenAndSidePaths();
 
         mockMvc.perform(
@@ -177,7 +177,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByKeyword_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", KEYWORD_ID_2).param("parent", EMPTY_PARENT))
@@ -195,7 +195,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByKeyword_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildrenAndSidePaths();
 
         mockMvc.perform(get(PATH).param("query", KEYWORD_ID_2).param("parent", KEYWORD_ID_0))
@@ -211,7 +211,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_emptyResults() throws Exception {
+    void getGroupByKeyword_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(
@@ -224,7 +224,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenFreeFormQueryAndEmptyResults() throws Exception {
+    void getGroupByKeyword_whenFreeFormQueryAndEmptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_1).param("parent", EMPTY_PARENT))
@@ -234,7 +234,7 @@ class UniProtKBGroupByKeywordControllerIT {
     }
 
     @Test
-    void viewByKeyword_whenQueryNotSpecified() throws Exception {
+    void getGroupByKeyword_whenQueryNotSpecified() throws Exception {
         mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())

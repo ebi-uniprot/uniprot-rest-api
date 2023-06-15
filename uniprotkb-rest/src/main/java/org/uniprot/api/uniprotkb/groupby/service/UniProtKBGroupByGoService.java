@@ -2,12 +2,14 @@ package org.uniprot.api.uniprotkb.groupby.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.go.GoService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
@@ -46,6 +48,17 @@ public class UniProtKBGroupByGoService extends UniProtKBGroupByService<GoRelatio
     @Override
     protected String getLabel(GoRelation entry) {
         return entry.getName();
+    }
+
+    @Override
+    protected GroupByResult getGroupByResult(
+            List<FacetField.Count> facetCounts,
+            List<GoRelation> goRelations,
+            List<GoRelation> ancestorEntries,
+            String query) {
+        Map<String, GoRelation> idEntryMap =
+                goRelations.stream().collect(Collectors.toMap(this::getId, Function.identity()));
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, query);
     }
 
     @Override

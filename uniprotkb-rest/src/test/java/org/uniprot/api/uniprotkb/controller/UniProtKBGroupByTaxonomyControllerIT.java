@@ -1,15 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
-
-import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +23,16 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.List;
+
+import static org.hamcrest.Matchers.containsStringIgnoringCase;
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
@@ -79,7 +79,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField()
+    void getGroupByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField()
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
@@ -97,7 +97,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_0_STRING).param("parent", EMPTY_PARENT))
@@ -111,7 +111,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField()
+    void getGroupByTaxonomy_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField()
             throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
@@ -133,7 +133,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByTaxonomy_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_2_STRING).param("parent", EMPTY_PARENT))
@@ -151,7 +151,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
+    void getGroupByTaxonomy_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(
@@ -170,7 +170,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByTaxonomy_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
@@ -188,7 +188,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByTaxonomy_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", TAX_ID_0_STRING))
@@ -204,7 +204,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_emptyResults() throws Exception {
+    void getGroupByTaxonomy_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(
@@ -217,7 +217,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenFreeFormQueryAndEmptyResults() throws Exception {
+    void getGroupByTaxonomy_whenFreeFormQueryAndEmptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
@@ -227,7 +227,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
     }
 
     @Test
-    void viewByTaxonomy_whenQueryNotSpecified() throws Exception {
+    void getGroupByTaxonomy_whenQueryNotSpecified() throws Exception {
         mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(status().isBadRequest())
