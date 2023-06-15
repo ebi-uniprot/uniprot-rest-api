@@ -23,6 +23,7 @@ import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.IdsSearchRequest;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.core.util.Utils;
@@ -76,6 +77,8 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     }
 
     public abstract R findByUniqueId(final String uniqueId, final String filters);
+
+    protected abstract R mapToThinEntry(String entryId);
 
     @Override
     public Stream<R> stream(StreamRequest request) {
@@ -144,6 +147,21 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
     protected String getTermsQueryField() {
         return getSolrIdField();
+    }
+
+    @Override
+    protected Stream<R> convertDocumentsToEntries(SearchRequest request, QueryResult<D> results) {
+        Stream<R> converted;
+        if (LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            converted =
+                    results.getContent()
+                            .map(Document::getDocumentId)
+                            .map(this::mapToThinEntry)
+                            .filter(Objects::nonNull);
+        } else {
+            converted = super.convertDocumentsToEntries(request, results);
+        }
+        return converted;
     }
 
     private SolrStreamFacetResponse searchBySolrStream(
