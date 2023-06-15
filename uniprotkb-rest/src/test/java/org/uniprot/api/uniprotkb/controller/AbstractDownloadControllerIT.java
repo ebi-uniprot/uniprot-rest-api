@@ -1,7 +1,29 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
@@ -27,34 +49,14 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDownloadIT {
     @Value("${async.download.embeddings.maxEntryCount}")
     private long maxEntryCount;
+
     @Autowired private MockMvc mockMvc;
     private static ObjectMapper MAPPER = new ObjectMapper();
 
@@ -123,8 +125,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         MatcherAssert.assertThat(
                 ids,
                 contains(
-                        "P00014", "P00013", "P00010", "P00009", "P00008", "P00007", "P00006", "P00005", "P00004",
-                        "P00003", "P00002", "P00001"));
+                        "P00014", "P00013", "P00010", "P00009", "P00008", "P00007", "P00006",
+                        "P00005", "P00004", "P00003", "P00002", "P00001"));
         // verify result file
 
         Path resultFilePath =
@@ -137,8 +139,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
         MatcherAssert.assertThat(
                 primaryAccessions,
                 contains(
-                        "P00014", "P00013", "P00010", "P00009", "P00008", "P00007", "P00006", "P00005", "P00004",
-                        "P00003", "P00002", "P00001"));
+                        "P00014", "P00013", "P00010", "P00009", "P00008", "P00007", "P00006",
+                        "P00005", "P00004", "P00003", "P00002", "P00001"));
     }
 
     @ParameterizedTest(name = "[{index}] format {0}")
@@ -287,8 +289,17 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void getStatusReturnsAborted() throws Exception {
         String jobId = UUID.randomUUID().toString();
         DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
-        String errMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount, totalNonIsoformEntries);
-        DownloadJob job = builder.id(jobId).status(JobStatus.ABORTED).error(errMsg).format(HDF5_MEDIA_TYPE_VALUE).build();
+        String errMsg =
+                String.format(
+                        UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
+                        this.maxEntryCount,
+                        totalNonIsoformEntries);
+        DownloadJob job =
+                builder.id(jobId)
+                        .status(JobStatus.ABORTED)
+                        .error(errMsg)
+                        .format(HDF5_MEDIA_TYPE_VALUE)
+                        .build();
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
         await().until(() -> repo.existsById(jobId));
@@ -304,7 +315,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andExpect(jsonPath("$.errors.length()", is(1)))
                 .andExpect(
                         jsonPath(
-                                "$.errors[0].code", is(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode())))
+                                "$.errors[0].code",
+                                is(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode())))
                 .andExpect(jsonPath("$.errors[0].message", is(errMsg)));
     }
 
@@ -393,7 +405,11 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void getDetailsWithAbortedForH5Job() throws Exception {
         String jobId = UUID.randomUUID().toString();
         DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
-        String errMsg = String.format(UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG, this.maxEntryCount, totalNonIsoformEntries);
+        String errMsg =
+                String.format(
+                        UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
+                        this.maxEntryCount,
+                        totalNonIsoformEntries);
         String query = "key:value";
         DownloadJob job =
                 builder.id(jobId)
@@ -416,7 +432,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andExpect(jsonPath("$.format", is(HDF5_MEDIA_TYPE_VALUE)))
                 .andExpect(jsonPath("$.errors").exists())
                 .andExpect(jsonPath("$.errors.length()", is(1)))
-                .andExpect(jsonPath("$.errors[0].code", is(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode())))
+                .andExpect(
+                        jsonPath(
+                                "$.errors[0].code",
+                                is(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode())))
                 .andExpect(jsonPath("$.errors[0].message", is(errMsg)));
     }
 

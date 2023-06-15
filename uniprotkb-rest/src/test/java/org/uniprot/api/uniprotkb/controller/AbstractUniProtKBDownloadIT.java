@@ -195,14 +195,16 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         saveTaxonomyEntry(9606L);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
+
     private void saveEntry(int i, String isoFormString) throws Exception {
         saveEntry(i, isoFormString, true);
     }
+
     private void saveEntry(int i, String isoFormString, boolean reviewed) throws Exception {
         UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
         String acc = String.format("P%05d", i) + isoFormString;
         entryBuilder.primaryAccession(acc);
-        if(reviewed) {
+        if (reviewed) {
             entryBuilder.entryType(UniProtKBEntryType.SWISSPROT);
         } else {
             entryBuilder.entryType(UniProtKBEntryType.TREMBL);
