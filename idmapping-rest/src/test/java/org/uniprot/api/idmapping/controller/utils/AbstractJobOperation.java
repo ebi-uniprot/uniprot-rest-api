@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.controller.utils;
 
+import static org.uniprot.api.idmapping.service.PIRResponseConverter.*;
 import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.*;
 
 import java.security.NoSuchAlgorithmException;
@@ -46,14 +47,14 @@ public abstract class AbstractJobOperation implements JobOperation {
 
     private String getValue(String value) {
         String result = value;
-        int subSequenceIndex = value.indexOf("[");
+        int subSequenceIndex = value.indexOf(SEQ_SEP);
         if (subSequenceIndex > 0) {
             result = value.substring(0, subSequenceIndex);
-        } else if (value.indexOf(".") > 0) {
-            result = value.substring(0, value.indexOf("."));
-        } else if (value.indexOf("_") > 0) {
-            if (UNIPROTKB_ACCESSION_REGEX.matcher(value.split("_")[0]).matches()) {
-                result = value.substring(0, value.indexOf("_"));
+        } else if (value.indexOf(VERSION_SEP) > 0) {
+            result = value.substring(0, value.indexOf(VERSION_SEP));
+        } else if (value.indexOf(ID_SEP) > 0) {
+            if (UNIPROTKB_ACCESSION_REGEX.matcher(value.split(ID_SEP)[0]).matches()) {
+                result = value.substring(0, value.indexOf(ID_SEP));
             }
         }
         return result;

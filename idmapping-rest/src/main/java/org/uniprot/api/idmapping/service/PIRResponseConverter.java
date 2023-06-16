@@ -45,9 +45,9 @@ public class PIRResponseConverter {
                             .getSearchFieldItemByName("accession_id")
                             .getValidRegex());
     private static final String NO_MATCHES_PIR_RESPONSE = "MSG: 200 -- No Matches.";
-    private static final String SEQ_SEP = "[";
-    private static final String VERSION_SEP = ".";
-    private static final String ID_SEP = "_";
+    public static final String SEQ_SEP = "[";
+    public static final String VERSION_SEP = ".";
+    public static final String ID_SEP = "_";
 
     static boolean isValidIdPattern(String to, String toValue) {
         to = to.strip();
@@ -170,7 +170,8 @@ public class PIRResponseConverter {
         Map.Entry<String, String> result = null;
         if (UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION.matcher(id).matches()) {
             if (id.contains(VERSION_SEP)) {
-                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(VERSION_SEP)), id);
+                result =
+                        new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(VERSION_SEP)), id);
             }
             if (id.contains(SEQ_SEP)) {
                 result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(SEQ_SEP)), id);
