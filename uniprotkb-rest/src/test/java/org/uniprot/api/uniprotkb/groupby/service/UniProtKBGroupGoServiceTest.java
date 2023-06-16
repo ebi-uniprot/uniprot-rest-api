@@ -315,6 +315,71 @@ class UniProtKBGroupGoServiceTest {
         assertViewBysMultiple(viewBys, contains(getAncestorD()));
     }
 
+    @Test
+    void getGroupByResult_whenParentNotSpecifiedAndOnlyOneChildExistsInFacets() {
+        when(goService.getChildren(any()))
+                .thenAnswer(
+                        invocation -> {
+                            String parent = invocation.getArgument(0, String.class);
+                            if (EMPTY_ID.equals(parent)) {
+                                return List.of(GO_ENTRY_B);
+                            }
+                            if (addGoPrefix(GO_ID_B).equals(parent)) {
+                                return List.of(GO_ENTRY_D);
+                            }
+                            if (addGoPrefix(GO_ID_D).equals(parent)) {
+                                return List.of(GO_ENTRY_A, GO_ENTRY_E);
+                            }
+                            if (addGoPrefix(GO_ID_E).equals(parent)) {
+                                return List.of(GO_ENTRY_C);
+                            }
+                            return List.of();
+                        });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_D);
+        when(uniProtEntryService.getFacets(
+                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_E)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_E);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_C);
+
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
+
+        assertViewByC(viewBys, contains(getAncestorB(), getAncestorD(), getAncestorE()));
+    }
+
+    @Test
+    void getGroupByResult_whenParentSpecifiedAndOnlyOneChildExistsInFacets() {
+        when(goService.getChildren(any()))
+                .thenAnswer(
+                        invocation -> {
+                            String parent = invocation.getArgument(0, String.class);
+                            if (addGoPrefix(GO_ID_B).equals(parent)) {
+                                return List.of(GO_ENTRY_D);
+                            }
+                            if (addGoPrefix(GO_ID_D).equals(parent)) {
+                                return List.of(GO_ENTRY_A, GO_ENTRY_E);
+                            }
+                            if (addGoPrefix(GO_ID_E).equals(parent)) {
+                                return List.of(GO_ENTRY_C);
+                            }
+                            return List.of();
+                        });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_D);
+        when(uniProtEntryService.getFacets(
+                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_E)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_E);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_C);
+
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, GO_ID_B);
+
+        assertViewByC(viewBys, contains(getAncestorD(), getAncestorE()));
+    }
+
     private static String addGoPrefix(String goId) {
         return GO_PREFIX + goId;
     }
@@ -368,6 +433,10 @@ class UniProtKBGroupGoServiceTest {
 
     private static Ancestor getAncestorD() {
         return getAncestor(GO_ID_D, GO_LABEL_D);
+    }
+
+    private static Ancestor getAncestorE() {
+        return getAncestor(GO_ID_E, GO_LABEL_E);
     }
 
     private static Ancestor getAncestor(String id, String label) {
