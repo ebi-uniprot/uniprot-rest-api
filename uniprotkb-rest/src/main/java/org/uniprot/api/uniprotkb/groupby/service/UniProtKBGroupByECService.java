@@ -65,9 +65,12 @@ public class UniProtKBGroupByECService extends UniProtKBGroupByService<String> {
 
     @Override
     protected void addToAncestors(
-            List<String> ancestors, List<String> entries, String parent, String id) {
-        if (!Objects.equals(parent, id)) {
-            ancestors.add(getFullEc(id));
+            List<String> ancestors, List<String> entries, String parent, List<FacetField.Count> facetCounts) {
+        if (!facetCounts.isEmpty()){
+            String facetId = getFacetId(facetCounts.get(0));
+            if (!Objects.equals(parent, facetId)) {
+                ancestors.add(getFullEc(facetId));
+            }
         }
     }
 

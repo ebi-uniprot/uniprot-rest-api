@@ -44,6 +44,7 @@ class UniProtKBGroupKeywordServiceTest {
     public static final String PARENT_KEYWORD_ID_A = ("parent:" + KEYWORD_ID_A);
     public static final String PARENT_KEYWORD_ID_B = ("parent:" + KEYWORD_ID_B);
     public static final String PARENT_KEYWORD_ID_D = ("parent:" + KEYWORD_ID_D);
+    public static final String PARENT_KEYWORD_ID_E = ("parent:" + KEYWORD_ID_E);
     public static final String PARENT_KEYWORD_ID_F = ("parent:" + KEYWORD_ID_F);
     private static final String KEYWORD_LABEL_A = "keywordLabelA";
     private static final String KEYWORD_LABEL_B = "keywordLabelB";
@@ -360,6 +361,75 @@ class UniProtKBGroupKeywordServiceTest {
         assertViewBysMultiple(viewBys, contains(getAncestorD()));
     }
 
+    @Test
+    void getGroupByResult_whenParentNotSpecifiedAndOnlyOneChildExistsInFacets() {
+        when(keywordService.stream(any()))
+                .thenAnswer(
+                        invocation -> {
+                            StreamRequest streamRequest =
+                                    invocation.getArgument(0, StreamRequest.class);
+                            if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
+                                return Stream.of(KEYWORD_ENTRY_B);
+                            }
+                            if (PARENT_KEYWORD_ID_B.equals(streamRequest.getQuery())) {
+                                return Stream.of(KEYWORD_ENTRY_D);
+                            }
+                            if (PARENT_KEYWORD_ID_D.equals(streamRequest.getQuery())) {
+                                return Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_E);
+                            }
+                            if (PARENT_KEYWORD_ID_E.equals(streamRequest.getQuery())) {
+                                return Stream.of(KEYWORD_ENTRY_C);
+                            }
+                            return Stream.of();
+                        });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_D)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_D);
+        when(uniProtEntryService.getFacets(
+                SOME_QUERY,
+                getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_E)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
+
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+
+        assertViewByC(viewBys, contains(getAncestorB(), getAncestorD(), getAncestorE()));
+    }
+
+    @Test
+    void getGroupByResult_whenParentSpecifiedAndOnlyOneChildExistsInFacets() {
+        when(keywordService.stream(any()))
+                .thenAnswer(
+                        invocation -> {
+                            StreamRequest streamRequest =
+                                    invocation.getArgument(0, StreamRequest.class);
+                            if (PARENT_KEYWORD_ID_B.equals(streamRequest.getQuery())) {
+                                return Stream.of(KEYWORD_ENTRY_D);
+                            }
+                            if (PARENT_KEYWORD_ID_D.equals(streamRequest.getQuery())) {
+                                return Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_E);
+                            }
+                            if (PARENT_KEYWORD_ID_E.equals(streamRequest.getQuery())) {
+                                return Stream.of(KEYWORD_ENTRY_C);
+                            }
+                            return Stream.of();
+                        });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_D)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_D);
+        when(uniProtEntryService.getFacets(
+                SOME_QUERY,
+                getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_E)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
+
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_B);
+
+        assertViewByC(viewBys, contains(getAncestorD(), getAncestorE()));
+    }
+
     private static Map<String, String> getFacetFields(String facetItems) {
         return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}keyword", facetItems));
     }
@@ -412,6 +482,10 @@ class UniProtKBGroupKeywordServiceTest {
 
     private static Ancestor getAncestorD() {
         return getAncestor(KEYWORD_ID_D, KEYWORD_LABEL_D);
+    }
+
+    private static Ancestor getAncestorE() {
+        return getAncestor(KEYWORD_ID_E, KEYWORD_LABEL_E);
     }
 
     private static Ancestor getAncestor(String id, String label) {

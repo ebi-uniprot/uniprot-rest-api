@@ -29,7 +29,7 @@ public abstract class UniProtKBGroupByService<T> {
             List<FacetField.Count> childFacetCounts = getFacetCounts(query, childEntries);
 
             if (!childFacetCounts.isEmpty()) {
-                addToAncestors(ancestors, entries, parent, id);
+                addToAncestors(ancestors, entries, parent, facetCounts);
                 facetCounts = childFacetCounts;
                 entries = childEntries;
                 id = facetCounts.get(0).getName();
@@ -46,9 +46,12 @@ public abstract class UniProtKBGroupByService<T> {
         return StringUtils.isEmpty(parent);
     }
 
-    protected void addToAncestors(List<T> ancestors, List<T> entries, String parent, String id) {
-        if (!Objects.equals(parent, id) && !entries.isEmpty()) {
-            ancestors.add(entries.get(0));
+    protected void addToAncestors(List<T> ancestors, List<T> entries, String parent, List<FacetField.Count> facetCounts) {
+        if (!facetCounts.isEmpty()) {
+            String facetId = getFacetId(facetCounts.get(0));
+            if (!Objects.equals(parent, facetId) && !entries.isEmpty()) {
+                ancestors.add(entries.stream().filter(t -> facetId.equals(getId(t))).findAny().orElseThrow());
+            }
         }
     }
 
@@ -83,7 +86,7 @@ public abstract class UniProtKBGroupByService<T> {
             String query) {
         List<Group> groups =
                 facetCounts.stream()
-                        .map(fc -> getGroup(fc, idEntryMap.get(getFacetName(fc)), query))
+                        .map(fc -> getGroup(fc, idEntryMap.get(getFacetId(fc)), query))
                         .sorted(Group.SORT_BY_LABEL_IGNORE_CASE)
                         .collect(Collectors.toList());
         List<Ancestor> ancestors =
@@ -92,7 +95,7 @@ public abstract class UniProtKBGroupByService<T> {
         return new GroupByResult(ancestors, groups);
     }
 
-    protected String getFacetName(FacetField.Count fc) {
+    protected String getFacetId(FacetField.Count fc) {
         return fc.getName();
     }
 

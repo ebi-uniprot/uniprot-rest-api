@@ -46,6 +46,7 @@ class UniProtKBGroupTaxonomyServiceTest {
     public static final String PARENT_TAX_ID_A = ("parent:" + TAX_ID_A);
     public static final String PARENT_TAX_ID_B = ("parent:" + TAX_ID_B);
     public static final String PARENT_TAX_ID_D = ("parent:" + TAX_ID_D);
+    public static final String PARENT_TAX_ID_E = ("parent:" + TAX_ID_E);
     private static final String TAX_LABEL_A = "taxLabelA";
     private static final String TAX_LABEL_B = "taxLabelB";
     private static final String TAX_LABEL_C = "taxLabelC";
@@ -333,6 +334,73 @@ class UniProtKBGroupTaxonomyServiceTest {
         assertViewBysMultiple(viewBys, contains(getAncestorD()));
     }
 
+    @Test
+    void getGroupByResult_whenParentNotSpecifiedAndOnlyOneChildExistsInFacets() {
+        when(taxonomyService.stream(any()))
+                .thenAnswer(
+                        invocation -> {
+                            StreamRequest streamRequest =
+                                    invocation.getArgument(0, StreamRequest.class);
+                            if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
+                                return Stream.of(TAXONOMY_ENTRY_B);
+                            }
+                            if (PARENT_TAX_ID_B.equals(streamRequest.getQuery())) {
+                                return Stream.of(TAXONOMY_ENTRY_D);
+                            }
+                            if (PARENT_TAX_ID_D.equals(streamRequest.getQuery())) {
+                                return Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_E);
+                            }
+                            if (PARENT_TAX_ID_E.equals(streamRequest.getQuery())) {
+                                return Stream.of(TAXONOMY_ENTRY_C);
+                            }
+                            return Stream.of();
+                        });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_B_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_D_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
+        when(uniProtEntryService.getFacets(
+                SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_E_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
+
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+
+        assertViewByC(viewBys, contains(getAncestorB(), getAncestorD(), getAncestorE()));
+    }
+
+    @Test
+    void getGroupByResult_whenParentSpecifiedAndOnlyOneChildExistsInFacets() {
+        when(taxonomyService.stream(any()))
+                .thenAnswer(
+                        invocation -> {
+                            StreamRequest streamRequest =
+                                    invocation.getArgument(0, StreamRequest.class);
+                            if (PARENT_TAX_ID_B.equals(streamRequest.getQuery())) {
+                                return Stream.of(TAXONOMY_ENTRY_D);
+                            }
+                            if (PARENT_TAX_ID_D.equals(streamRequest.getQuery())) {
+                                return Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_E);
+                            }
+                            if (PARENT_TAX_ID_E.equals(streamRequest.getQuery())) {
+                                return Stream.of(TAXONOMY_ENTRY_C);
+                            }
+                            return Stream.of();
+                        });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_D_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
+        when(uniProtEntryService.getFacets(
+                SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_E_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
+
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, TAX_ID_B_STRING);
+
+        assertViewByC(viewBys, contains(getAncestorD(), getAncestorE()));
+    }
+
     private static Map<String, String> getFacetFields(String facetItems) {
         return Map.of(
                 FacetParams.FACET_FIELD, String.format("{!terms='%s'}taxonomy_id", facetItems));
@@ -379,6 +447,10 @@ class UniProtKBGroupTaxonomyServiceTest {
 
     private static Ancestor getAncestorD() {
         return getAncestor(String.valueOf(TAX_ID_D), TAX_LABEL_D);
+    }
+
+    private static Ancestor getAncestorE() {
+        return getAncestor(String.valueOf(TAX_ID_E), TAX_LABEL_E);
     }
 
     private static Ancestor getAncestor(String id, String label) {

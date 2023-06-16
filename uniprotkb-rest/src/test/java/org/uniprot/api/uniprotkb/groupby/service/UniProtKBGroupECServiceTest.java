@@ -203,6 +203,48 @@ class UniProtKBGroupECServiceTest {
         assertViewBysMultiple(viewBys, contains(getAncestorD()));
     }
 
+    @Test
+    void getGroupByResult_whenParentNotSpecifiedAndOnlyOneChildExistsInFacets() {
+        ecIdB = "1.-.-.-";
+        ecIdD = "1.1.-.-";
+        ecIdA = "1.1.1.-";
+        ecIdE = "1.1.2.-";
+        ecIdC = "1.1.2.1";
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of())))
+                .thenReturn(getFacetFields(ecIdB, EC_COUNT_B));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1"))))
+                .thenReturn(getFacetFields(ecIdD, EC_COUNT_D));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1"))))
+                .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1", "2"))))
+                .thenReturn(getFacetFields(ecIdC, EC_COUNT_C));
+        mockLabels();
+
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+
+        assertViewByC(viewBys, contains(getAncestorB(), getAncestorD(), getAncestorE()));
+    }
+
+    @Test
+    void getGroupByResult_whenParentSpecifiedAndOnlyOneChildExistsInFacets() {
+        ecIdB = "1.-.-.-";
+        ecIdD = "1.1.-.-";
+        ecIdA = "1.1.1.-";
+        ecIdE = "1.1.2.-";
+        ecIdC = "1.1.2.1";
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1"))))
+                .thenReturn(getFacetFields(ecIdD, EC_COUNT_D));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1"))))
+                .thenReturn(getFacetFields(ecIdE, EC_COUNT_E));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1", "2"))))
+                .thenReturn(getFacetFields(ecIdC, EC_COUNT_C));
+        mockLabels();
+
+        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, ecIdB);
+
+        assertViewByC(viewBys, contains(getAncestorD(), getAncestorE()));
+    }
+
     private List<FacetField> getFacetFields(String id, long count) {
         return List.of(
                 new FacetField(SOME_NAME) {
@@ -270,6 +312,10 @@ class UniProtKBGroupECServiceTest {
 
     private static Ancestor getAncestorD() {
         return getAncestor(ecIdD, getLabel(ecIdD));
+    }
+
+    private static Ancestor getAncestorE() {
+        return getAncestor(ecIdE, getLabel(ecIdE));
     }
 
     private static String getLabel(String suffix) {
