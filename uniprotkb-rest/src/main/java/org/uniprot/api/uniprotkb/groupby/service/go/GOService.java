@@ -1,16 +1,16 @@
 package org.uniprot.api.uniprotkb.groupby.service.go;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
-import org.uniprot.api.uniprotkb.groupby.service.go.client.GoClient;
+import org.uniprot.api.uniprotkb.groupby.service.go.client.GOClient;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 
-@Service
-public class GoService {
-    private final GoClient goClient;
+import java.util.List;
 
-    public GoService(GoClient goClient) {
+@Service
+public class GOService {
+    private final GOClient goClient;
+
+    public GOService(GOClient goClient) {
         this.goClient = goClient;
     }
 

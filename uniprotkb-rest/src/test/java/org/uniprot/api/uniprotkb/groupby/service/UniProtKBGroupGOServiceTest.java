@@ -12,7 +12,7 @@ import org.uniprot.api.uniprotkb.groupby.model.Ancestor;
 import org.uniprot.api.uniprotkb.groupby.model.AncestorImpl;
 import org.uniprot.api.uniprotkb.groupby.model.Group;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
-import org.uniprot.api.uniprotkb.groupby.service.go.GoService;
+import org.uniprot.api.uniprotkb.groupby.service.go.GOService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
@@ -27,10 +27,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByGoService.GO_PREFIX;
+import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByGOService.GO_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBGroupGoServiceTest {
+class UniProtKBGroupGOServiceTest {
     private static final String EMPTY_ID = "";
     private static final String GO_ID_A = "1425170";
     private static final String GO_ID_B = "9606";
@@ -69,10 +69,10 @@ class UniProtKBGroupGoServiceTest {
             getFacetFields(GO_ID_E, GO_COUNT_E);
     private static final List<FacetField> MULTIPLE_GO_FACET_COUNTS = getMultipleFields();
     private static final String SOME_QUERY = "someQuery";
-    @Mock private GoService goService;
+    @Mock private GOService goService;
     @Mock private UniProtEntryService uniProtEntryService;
 
-    private UniProtKBGroupByGoService service;
+    private UniProtKBGroupByGOService service;
 
     private static List<FacetField> getFacetFields(String id, long count) {
         return List.of(
@@ -96,7 +96,7 @@ class UniProtKBGroupGoServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new UniProtKBGroupByGoService(goService, uniProtEntryService);
+        service = new UniProtKBGroupByGOService(goService, uniProtEntryService);
     }
 
     @Test
@@ -255,7 +255,7 @@ class UniProtKBGroupGoServiceTest {
 
         GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, GO_ID_A);
 
-        assertThat(viewBys.getResults(), empty());
+        assertThat(viewBys.getGroups(), empty());
         assertThat(viewBys.getAncestors(), empty());
     }
 
@@ -397,13 +397,13 @@ class UniProtKBGroupGoServiceTest {
 
     private static void assertViewBysMultiple(
             GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(groupByResult.getResults(), contains(getViewByA(), getViewByC(), getViewByF()));
+        assertThat(groupByResult.getGroups(), contains(getViewByA(), getViewByC(), getViewByF()));
         assertThat(groupByResult.getAncestors(), matcher);
     }
 
     private static void assertViewByC(
             GroupByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(viewBys.getResults(), contains(getViewByC()));
+        assertThat(viewBys.getGroups(), contains(getViewByC()));
         assertThat(viewBys.getAncestors(), matcher);
     }
 

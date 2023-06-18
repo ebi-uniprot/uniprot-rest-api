@@ -5,7 +5,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
-import org.uniprot.api.uniprotkb.groupby.service.go.GoService;
+import org.uniprot.api.uniprotkb.groupby.service.go.GOService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
@@ -15,23 +15,23 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtKBGroupByGoService extends UniProtKBGroupByService<GoRelation> {
+public class UniProtKBGroupByGOService extends UniProtKBGroupByService<GoRelation> {
     protected static final String GO_PREFIX = "GO:";
-    private final GoService goService;
+    private final GOService goService;
 
-    public UniProtKBGroupByGoService(GoService goService, UniProtEntryService uniProtEntryService) {
+    public UniProtKBGroupByGOService(GOService goService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.goService = goService;
     }
 
     @Override
-    protected List<GoRelation> getChildren(String parent) {
+    protected List<GoRelation> getChildEntries(String parent) {
         String parentGo = addGoPrefix(parent);
         return goService.getChildren(parentGo);
     }
 
     @Override
-    protected Map<String, String> getFacetFields(List<GoRelation> entries) {
+    protected Map<String, String> getFacetParams(List<GoRelation> entries) {
         String goIds =
                 entries.stream()
                         .map(GoRelation::getId)
@@ -66,13 +66,13 @@ public class UniProtKBGroupByGoService extends UniProtKBGroupByService<GoRelatio
         return addGoPrefix(fc.getName());
     }
 
-    private String removeGoPrefix(String go) {
-        return !StringUtils.isEmpty(go) && go.startsWith(GO_PREFIX)
-                ? go.substring(GO_PREFIX.length())
-                : go;
+    private String removeGoPrefix(String goIdWithPrefix) {
+        return !StringUtils.isEmpty(goIdWithPrefix) && goIdWithPrefix.startsWith(GO_PREFIX)
+                ? goIdWithPrefix.substring(GO_PREFIX.length())
+                : goIdWithPrefix;
     }
 
-    private String addGoPrefix(String go) {
-        return !StringUtils.isEmpty(go) && !go.startsWith(GO_PREFIX) ? GO_PREFIX + go : go;
+    private String addGoPrefix(String goIdWithoutPrefix) {
+        return !StringUtils.isEmpty(goIdWithoutPrefix) && !goIdWithoutPrefix.startsWith(GO_PREFIX) ? GO_PREFIX + goIdWithoutPrefix : goIdWithoutPrefix;
     }
 }

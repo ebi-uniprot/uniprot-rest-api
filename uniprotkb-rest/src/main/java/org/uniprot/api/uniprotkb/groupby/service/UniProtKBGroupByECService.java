@@ -27,19 +27,19 @@ public class UniProtKBGroupByECService extends UniProtKBGroupByService<String> {
     }
 
     @Override
-    protected List<String> getChildren(String parent) {
+    protected List<String> getChildEntries(String parent) {
         List<String> children = new LinkedList<>();
-        String parentEc = parent;
-        if (!isTopLevelSearch(parentEc)) {
-            parentEc = getShortFormEc(parentEc);
-            String[] tokens = parentEc.split(TOKEN_REGEX);
+        String parentEC = parent;
+        if (!isTopLevelSearch(parentEC)) {
+            parentEC = getShortFormEc(parentEC);
+            String[] tokens = parentEC.split(TOKEN_REGEX);
             children.addAll(Arrays.asList(tokens));
         }
         return children;
     }
 
     @Override
-    protected Map<String, String> getFacetFields(List<String> entries) {
+    protected Map<String, String> getFacetParams(List<String> entries) {
         String regEx =
                 entries.stream()
                         .map(token -> token + TOKEN_REGEX)

@@ -7,13 +7,13 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-class GoClientImplTest {
-    private GoClientImpl goClientImpl = new GoClientImpl();
+class GOClientImplTest {
+    private GOClientImpl goClientImpl = new GOClientImpl();
 
     @Test
     void test() {
         String goId = "GO:0008150";
-        goClientImpl = new GoClientImpl();
+        goClientImpl = new GOClientImpl();
         List<GoRelation> result = goClientImpl.getChildren(goId);
         assertNotNull(result);
     }

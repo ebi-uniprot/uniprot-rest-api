@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UniProtKBGroupByKeywordService extends UniProtKBGroupByService<KeywordEntry> {
-    public static final String TOP_LEVEL_PARENT_QUERY = "-parent:[* TO *] ";
+    public static final String TOP_LEVEL_KEYWORD_PARENT_QUERY = "-parent:[* TO *] ";
     private final KeywordService keywordService;
 
     public UniProtKBGroupByKeywordService(
@@ -26,15 +26,15 @@ public class UniProtKBGroupByKeywordService extends UniProtKBGroupByService<Keyw
     }
 
     @Override
-    protected List<KeywordEntry> getChildren(String parent) {
+    protected List<KeywordEntry> getChildEntries(String parent) {
         KeywordStreamRequest taxonomyStreamRequest = new KeywordStreamRequest();
         taxonomyStreamRequest.setQuery(
-                isTopLevelSearch(parent) ? TOP_LEVEL_PARENT_QUERY : "parent:" + parent);
+                isTopLevelSearch(parent) ? TOP_LEVEL_KEYWORD_PARENT_QUERY : "parent:" + parent);
         return keywordService.stream(taxonomyStreamRequest).collect(Collectors.toList());
     }
 
     @Override
-    protected Map<String, String> getFacetFields(List<KeywordEntry> entries) {
+    protected Map<String, String> getFacetParams(List<KeywordEntry> entries) {
         String keywordIds =
                 entries.stream().map(KeywordEntry::getAccession).collect(Collectors.joining(","));
         return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}keyword", keywordIds));

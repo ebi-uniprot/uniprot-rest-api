@@ -11,6 +11,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class GroupImpl implements Group {
     String id;
     String label;
-    boolean expand;
+    boolean expandable;
     long count;
 }

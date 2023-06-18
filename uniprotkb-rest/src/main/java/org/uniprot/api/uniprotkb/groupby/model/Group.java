@@ -7,7 +7,7 @@ public interface Group {
 
     String getLabel();
 
-    boolean isExpand();
+    boolean isExpandable();
 
     long getCount();
 

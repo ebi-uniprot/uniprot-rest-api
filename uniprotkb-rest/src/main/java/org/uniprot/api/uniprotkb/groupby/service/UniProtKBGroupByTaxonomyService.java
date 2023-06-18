@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UniProtKBGroupByTaxonomyService extends UniProtKBGroupByService<TaxonomyEntry> {
-    public static final String TOP_LEVEL_PARENT_QUERY = "-parent:[* TO *] AND active:true";
+    public static final String TOP_LEVEL_TAXONOMY_PARENT_QUERY = "-parent:[* TO *] AND active:true";
     private final TaxonomyService taxonomyService;
 
     public UniProtKBGroupByTaxonomyService(
@@ -26,15 +26,15 @@ public class UniProtKBGroupByTaxonomyService extends UniProtKBGroupByService<Tax
     }
 
     @Override
-    protected List<TaxonomyEntry> getChildren(String parent) {
+    protected List<TaxonomyEntry> getChildEntries(String parent) {
         TaxonomyStreamRequest taxonomyStreamRequest = new TaxonomyStreamRequest();
         taxonomyStreamRequest.setQuery(
-                isTopLevelSearch(parent) ? TOP_LEVEL_PARENT_QUERY : "parent:" + parent);
+                isTopLevelSearch(parent) ? TOP_LEVEL_TAXONOMY_PARENT_QUERY : "parent:" + parent);
         return taxonomyService.stream(taxonomyStreamRequest).collect(Collectors.toList());
     }
 
     @Override
-    protected Map<String, String> getFacetFields(List<TaxonomyEntry> entries) {
+    protected Map<String, String> getFacetParams(List<TaxonomyEntry> entries) {
         String taxonomyIds =
                 entries.stream()
                         .map(taxonomy -> String.valueOf(taxonomy.getTaxonId()))

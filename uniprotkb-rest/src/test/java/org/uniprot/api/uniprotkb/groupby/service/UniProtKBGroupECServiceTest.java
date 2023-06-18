@@ -162,7 +162,7 @@ class UniProtKBGroupECServiceTest {
     void getGroupByResults_whenParentSpecifiedAndNoChildNodes() {
         GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, ecIdA);
 
-        assertThat(viewBys.getResults(), empty());
+        assertThat(viewBys.getGroups(), empty());
         assertThat(viewBys.getAncestors(), empty());
     }
 
@@ -280,13 +280,13 @@ class UniProtKBGroupECServiceTest {
 
     private static void assertViewBysMultiple(
             GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(groupByResult.getResults(), contains(getViewByA(), getViewByC()));
+        assertThat(groupByResult.getGroups(), contains(getViewByA(), getViewByC()));
         assertThat(groupByResult.getAncestors(), matcher);
     }
 
     private static void assertViewByC(
             GroupByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(viewBys.getResults(), contains(getViewByC()));
+        assertThat(viewBys.getGroups(), contains(getViewByC()));
         assertThat(viewBys.getAncestors(), matcher);
     }
 

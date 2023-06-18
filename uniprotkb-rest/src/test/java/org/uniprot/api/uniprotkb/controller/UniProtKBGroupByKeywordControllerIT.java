@@ -95,11 +95,11 @@ class UniProtKBGroupByKeywordControllerIT {
                                 .param("query", "organism_id:" + ORGANISM_ID_0)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_0)))
-                .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_0)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_0)))
+                .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_0)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -109,11 +109,11 @@ class UniProtKBGroupByKeywordControllerIT {
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_0)))
-                .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_0)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_0)))
+                .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_0)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -127,11 +127,11 @@ class UniProtKBGroupByKeywordControllerIT {
                                 .param("query", "organism_id:" + ORGANISM_ID_2)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(KEYWORD_ID_0)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(KEYWORD_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(KEYWORD_ID_1)))
@@ -145,11 +145,11 @@ class UniProtKBGroupByKeywordControllerIT {
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(KEYWORD_ID_0)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(KEYWORD_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(KEYWORD_ID_1)))
@@ -166,11 +166,11 @@ class UniProtKBGroupByKeywordControllerIT {
                                 .param("query", "organism_id:" + ORGANISM_ID_2)
                                 .param("parent", KEYWORD_ID_0))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(KEYWORD_ID_1)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(KEYWORD_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
@@ -182,11 +182,11 @@ class UniProtKBGroupByKeywordControllerIT {
 
         mockMvc.perform(get(PATH).param("query", KEYWORD_ID_2).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(KEYWORD_ID_0)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(KEYWORD_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(KEYWORD_ID_1)))
@@ -200,11 +200,11 @@ class UniProtKBGroupByKeywordControllerIT {
 
         mockMvc.perform(get(PATH).param("query", KEYWORD_ID_2).param("parent", KEYWORD_ID_0))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(KEYWORD_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(KEYWORD_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(KEYWORD_ID_1)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(KEYWORD_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
@@ -219,7 +219,7 @@ class UniProtKBGroupByKeywordControllerIT {
                                 .param("query", "organism_id:" + ORGANISM_ID_1)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -229,7 +229,7 @@ class UniProtKBGroupByKeywordControllerIT {
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_1).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
