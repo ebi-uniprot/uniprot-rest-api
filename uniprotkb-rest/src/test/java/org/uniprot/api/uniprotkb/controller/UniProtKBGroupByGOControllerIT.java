@@ -26,20 +26,18 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
 @AutoConfigureWebClient
 @ActiveProfiles({"offline"})
-class UniProtKBGroupByGOControllerIT {
-    private static final String EMPTY_PARENT = "";
+class UniProtKBGroupByGOControllerIT extends UniProtKBGroupByControllerIT{
     private static final String ACCESSION_0 = "A0";
     private static final String ACCESSION_1 = "A1";
     private static final String ACCESSION_2 = "A2";
@@ -197,41 +195,6 @@ class UniProtKBGroupByGOControllerIT {
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
     }
 
-    @Test
-    void getGroupByGO_emptyResults() throws Exception {
-        prepareSingleRootNodeWithNoChildren();
-
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_1)
-                                .param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
-    }
-
-    @Test
-    void getGroupByGO_whenFreeFormQueryAndEmptyResults() throws Exception {
-        prepareSingleRootNodeWithNoChildren();
-
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_1).param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
-    }
-
-    @Test
-    void getGroupByGO_whenQueryNotSpecified() throws Exception {
-        mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(status().isBadRequest())
-                .andExpect(
-                        content()
-                                .string(
-                                        containsStringIgnoringCase(
-                                                "query is a required parameter")));
-    }
-
     private void prepareSingleRootWithTwoLevelsOfChildren() {
         mockGoRelation(GO_ID_0, GO_NAME_0, EMPTY_PARENT);
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, Set.of(removeGoPrefix(GO_ID_0)));
@@ -247,7 +210,17 @@ class UniProtKBGroupByGOControllerIT {
                 Set.of(removeGoPrefix(GO_ID_0), removeGoPrefix(GO_ID_1), removeGoPrefix(GO_ID_2)));
     }
 
-    private void prepareSingleRootNodeWithNoChildren() {
+    @Override
+    protected MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    @Override
+    protected String getPath() {
+        return PATH;
+    }
+
+    protected void prepareSingleRootNodeWithNoChildren() {
         mockGoRelation(GO_ID_0, GO_NAME_0, EMPTY_PARENT);
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, Set.of(removeGoPrefix(GO_ID_0)));
     }

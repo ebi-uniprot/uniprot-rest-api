@@ -26,25 +26,22 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
 @AutoConfigureWebClient
 @ActiveProfiles({"offline"})
-class UniProtKBGroupByEcControllerIT {
-    private static final String EMPTY_PARENT = "";
+class UniProtKBGroupByEcControllerIT extends UniProtKBGroupByControllerIT{
     private static final String ORGANISM_ID_0 = "29";
     private static final String ORGANISM_ID_1 = "517";
     private static final String ORGANISM_ID_2 = "34959";
-    private static final String INVALID_ORGANISM_ID = "36";
     private static final String ACCESSION_0 = "A0";
     private static final String EC_ID_0 = "1.-.-.-";
     private static final String EC_LABEL_0 = "ec_label_0";
@@ -199,41 +196,6 @@ class UniProtKBGroupByEcControllerIT {
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
     }
 
-    @Test
-    void getGroupByEC_emptyResults() throws Exception {
-        prepareSingleRootNodeWithNoChildren();
-
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + INVALID_ORGANISM_ID)
-                                .param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
-    }
-
-    @Test
-    void getGroupByEC_whenFreeFormQueryAndEmptyResults() throws Exception {
-        prepareSingleRootNodeWithNoChildren();
-
-        mockMvc.perform(get(PATH).param("query", INVALID_ORGANISM_ID).param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
-    }
-
-    @Test
-    void getGroupByEC_whenQueryNotSpecified() throws Exception {
-        mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(status().isBadRequest())
-                .andExpect(
-                        content()
-                                .string(
-                                        containsStringIgnoringCase(
-                                                "query is a required parameter")));
-    }
-
     private void prepareSingleRootWithTwoLevelsOfChildren() {
         mockEcEntry(EC_ID_0, EC_LABEL_0);
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, List.of(EC_ID_0));
@@ -243,7 +205,17 @@ class UniProtKBGroupByEcControllerIT {
         saveUniProtDocument(ACCESSION_2, ORGANISM_ID_2, List.of(EC_ID_0, EC_ID_1, EC_ID_2));
     }
 
-    private void prepareSingleRootNodeWithNoChildren() {
+    @Override
+    protected MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    @Override
+    protected String getPath() {
+        return PATH;
+    }
+
+    protected void prepareSingleRootNodeWithNoChildren() {
         mockEcEntry(EC_ID_0, EC_LABEL_0);
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, List.of(EC_ID_0));
     }

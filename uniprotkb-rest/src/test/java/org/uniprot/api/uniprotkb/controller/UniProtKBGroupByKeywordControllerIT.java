@@ -29,11 +29,10 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
@@ -41,8 +40,7 @@ import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
 @AutoConfigureWebClient
 @ActiveProfiles({"offline"})
-class UniProtKBGroupByKeywordControllerIT {
-    private static final String EMPTY_PARENT = "";
+class UniProtKBGroupByKeywordControllerIT extends UniProtKBGroupByControllerIT{
     private static final String ACCESSION_0 = "A0";
     private static final String ACCESSION_1 = "A1";
     private static final String ACCESSION_2 = "A2";
@@ -210,41 +208,6 @@ class UniProtKBGroupByKeywordControllerIT {
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
     }
 
-    @Test
-    void getGroupByKeyword_emptyResults() throws Exception {
-        prepareSingleRootNodeWithNoChildren();
-
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_1)
-                                .param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
-    }
-
-    @Test
-    void getGroupByKeyword_whenFreeFormQueryAndEmptyResults() throws Exception {
-        prepareSingleRootNodeWithNoChildren();
-
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_1).param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
-    }
-
-    @Test
-    void getGroupByKeyword_whenQueryNotSpecified() throws Exception {
-        mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(status().isBadRequest())
-                .andExpect(
-                        content()
-                                .string(
-                                        containsStringIgnoringCase(
-                                                "query is a required parameter")));
-    }
-
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {
         saveKeywordDocument(KEYWORD_ID_0, KEYWORD_NAME_0, null);
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, List.of(KEYWORD_ID_0));
@@ -267,7 +230,17 @@ class UniProtKBGroupByKeywordControllerIT {
         saveKeywordDocument(KEYWORD_ID_4, KEYWORD_NAME_4, null);
     }
 
-    private void prepareSingleRootNodeWithNoChildren() throws Exception {
+    @Override
+    protected MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    @Override
+    protected String getPath() {
+        return PATH;
+    }
+
+    protected void prepareSingleRootNodeWithNoChildren() throws Exception {
         saveKeywordDocument(KEYWORD_ID_0, KEYWORD_NAME_0, List.of());
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, List.of(KEYWORD_ID_0));
     }

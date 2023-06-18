@@ -26,11 +26,10 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
@@ -38,8 +37,7 @@ import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
 @AutoConfigureWebClient
 @ActiveProfiles({"offline"})
-class UniProtKBGroupByTaxonomyControllerIT {
-    private static final String EMPTY_PARENT = "";
+class UniProtKBGroupByTaxonomyControllerIT extends UniProtKBGroupByControllerIT{
     private static final String ACCESSION_0 = "A0";
     private static final int TAX_ID_0 = 9600;
     private static final String TAX_ID_0_STRING = String.valueOf(TAX_ID_0);
@@ -203,41 +201,6 @@ class UniProtKBGroupByTaxonomyControllerIT {
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
     }
 
-    @Test
-    void getGroupByTaxonomy_emptyResults() throws Exception {
-        prepareSingleRootNodeWithNoChildren();
-
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + TAX_ID_1_STRING)
-                                .param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
-    }
-
-    @Test
-    void getGroupByTaxonomy_whenFreeFormQueryAndEmptyResults() throws Exception {
-        prepareSingleRootNodeWithNoChildren();
-
-        mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
-    }
-
-    @Test
-    void getGroupByTaxonomy_whenQueryNotSpecified() throws Exception {
-        mockMvc.perform(get(PATH).param("parent", EMPTY_PARENT))
-                .andDo(log())
-                .andExpect(status().isBadRequest())
-                .andExpect(
-                        content()
-                                .string(
-                                        containsStringIgnoringCase(
-                                                "query is a required parameter")));
-    }
-
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {
         saveTaxonomyDocument((long) TAX_ID_0, TAX_SCIENTIFIC_0, null);
         saveUniProtDocument(ACCESSION_0, TAX_ID_0, List.of(TAX_ID_0));
@@ -247,7 +210,17 @@ class UniProtKBGroupByTaxonomyControllerIT {
         saveUniProtDocument(ACCESSION_2, TAX_ID_2, List.of(TAX_ID_0, TAX_ID_1, TAX_ID_2));
     }
 
-    private void prepareSingleRootNodeWithNoChildren() throws Exception {
+    @Override
+    protected MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    @Override
+    protected String getPath() {
+        return PATH;
+    }
+
+    protected void prepareSingleRootNodeWithNoChildren() throws Exception {
         saveTaxonomyDocument((long) TAX_ID_0, TAX_SCIENTIFIC_0, null);
         saveUniProtDocument(ACCESSION_0, TAX_ID_0, List.of(TAX_ID_0));
     }
