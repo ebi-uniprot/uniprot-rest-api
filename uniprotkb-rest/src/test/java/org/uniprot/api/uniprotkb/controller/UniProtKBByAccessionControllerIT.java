@@ -1,41 +1,30 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matcher;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.client.RestTemplate;
+import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -45,6 +34,7 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.service.NTriplesPrologs;
 import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.service.TurtlePrologs;
@@ -52,9 +42,9 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
-import org.uniprot.core.util.Utils;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.indexer.uniprot.inactiveentry.InactiveUniProtEntry;
@@ -64,7 +54,26 @@ import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
 
 /**
  * @author lgonzales
@@ -95,6 +104,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     @MockBean(name = "uniProtRdfRestTemplate")
     private RestTemplate restTemplate;
+    @Value("${rest.endpoint}")
+    private String restEndpoint;
 
     public Stream<Arguments> fetchingInactiveEntriesWithFileExtension() {
         return Stream.of(
@@ -579,22 +590,37 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     @Test
     void searchAccessionLastVersionRedirectToUnisave() throws Exception {
-        String lastVersion = retrieveLastEntryVersion("A0A1J4H6S2");
-        // when
-        ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
-                                        .param("version", "last")
-                                        .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE));
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        header().string(
-                                HttpHeaders.LOCATION,
-                                getRedirectToEntryVersionPath("A0A1J4H6S2", lastVersion, "fasta")));
+        UniProtKBController uniProtKBController = mockUniProtKBControllerInstance();
+        // mock HttpServletRequest
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setScheme("https");
+        request.setServerPort(443);
+        request.setServerName(restEndpoint);
+        request.setRequestURI("/uniprotkb/A0A1J4H6S2");
+        request.addParameter("version", "last");
+        request.addHeader(ACCEPT, FASTA_MEDIA_TYPE_VALUE);
+        String entryVersion = uniProtKBController.getEntryVersion(request);
+        assertEquals(entryVersion, "9");
+    }
+
+    @Test
+    void uniSaveHistoryEndpointWithAccessionNotPresent() throws Exception {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            UniProtKBController uniProtKBController = mockUniProtKBControllerInstance();
+            // mock HttpServletRequest
+            MockHttpServletRequest request = new MockHttpServletRequest();
+            HttpServletResponse response = new MockHttpServletResponse();
+            request.setScheme("https");
+            request.setServerPort(443);
+            request.setServerName(restEndpoint);
+            request.setRequestURI("/uniprotkb/B0B1J1H6A7");
+            request.addParameter("version", "last");
+            request.addHeader(ACCEPT, FASTA_MEDIA_TYPE_VALUE);
+            uniProtKBController.getEntryVersion(request);
+        });
+        String expectedMessage = "No entries for B0B1J1H6A7 were found";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -623,7 +649,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 getMockMvc()
                         .perform(
                                 get(ACCESSION_RESOURCE, "A0A1J4H6S2")
-                                        .param("version", "last")
+                                        .param("version", "3")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
         // then
         response.andDo(log())
@@ -656,20 +682,20 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                 "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
     }
 
-    private String retrieveLastEntryVersion(String accession) throws Exception {
-        String entryVersionHistoryURI = "https://rest.uniprot.org/unisave/" + accession;
-        String response = Utils.httpGetRequest(entryVersionHistoryURI);
-        JSONObject jsonObject = new JSONObject(response);
-        return jsonObject.getJSONArray("results")
-                .getJSONObject(0)
-                .get("entryVersion")
-                .toString();
-    }
-
     private String getRedirectToEntryVersionPath(String accession, String version, String format) {
         return String.format(
                 "/unisave/%s?from=%s&versions=%s&format=%s",
                 accession, accession, version, format);
+    }
+
+    private UniProtKBController mockUniProtKBControllerInstance() {
+        ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+        UniProtEntryService entryService = mock(UniProtEntryService.class);
+        MessageConverterContextFactory<UniProtKBEntry> converterContextFactory = mock(MessageConverterContextFactory.class);
+        ThreadPoolTaskExecutor downloadTaskExecutor = mock(ThreadPoolTaskExecutor.class);
+        Gatekeeper downloadGatekeeper = mock(Gatekeeper.class);
+        UniProtKBController uniProtKBController = new UniProtKBController(eventPublisher, entryService, converterContextFactory, downloadTaskExecutor, downloadGatekeeper);
+        return uniProtKBController;
     }
 
     @Override
