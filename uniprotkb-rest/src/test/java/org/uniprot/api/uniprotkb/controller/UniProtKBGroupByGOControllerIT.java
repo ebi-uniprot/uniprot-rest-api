@@ -14,7 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
-import org.uniprot.api.uniprotkb.groupby.service.go.client.GoClient;
+import org.uniprot.api.uniprotkb.groupby.service.go.client.GOClient;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -38,7 +38,7 @@ import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 @WebMvcTest(controllers = UniProtKBGroupByController.class)
 @AutoConfigureWebClient
 @ActiveProfiles({"offline"})
-class UniProtKBGroupByGoControllerIT {
+class UniProtKBGroupByGOControllerIT {
     private static final String EMPTY_PARENT = "";
     private static final String ACCESSION_0 = "A0";
     private static final String ACCESSION_1 = "A1";
@@ -54,7 +54,7 @@ class UniProtKBGroupByGoControllerIT {
     private static final String GO_NAME_2 = "goName2";
     public static final String PATH = "/uniprotkb/groups/go";
     @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
-    @MockBean private GoClient goClient;
+    @MockBean private GOClient goClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private UniprotQueryRepository repository;
 
@@ -83,11 +83,11 @@ class UniProtKBGroupByGoControllerIT {
                                 .param("query", "organism_id:" + ORGANISM_ID_0)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(GO_ID_0)))
-                .andExpect(jsonPath("$.results[0].label", is(GO_NAME_0)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_0)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_0)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -97,11 +97,11 @@ class UniProtKBGroupByGoControllerIT {
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(GO_ID_0)))
-                .andExpect(jsonPath("$.results[0].label", is(GO_NAME_0)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_0)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_0)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -114,11 +114,11 @@ class UniProtKBGroupByGoControllerIT {
                                 .param("query", "organism_id:" + ORGANISM_ID_2)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
@@ -132,11 +132,11 @@ class UniProtKBGroupByGoControllerIT {
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
@@ -153,11 +153,11 @@ class UniProtKBGroupByGoControllerIT {
                                 .param("query", "organism_id:" + ORGANISM_ID_2)
                                 .param("parent", GO_ID_0))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
@@ -169,11 +169,11 @@ class UniProtKBGroupByGoControllerIT {
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
@@ -187,11 +187,11 @@ class UniProtKBGroupByGoControllerIT {
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", GO_ID_0))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.results[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
@@ -206,7 +206,7 @@ class UniProtKBGroupByGoControllerIT {
                                 .param("query", "organism_id:" + ORGANISM_ID_1)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -216,7 +216,7 @@ class UniProtKBGroupByGoControllerIT {
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_1).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 

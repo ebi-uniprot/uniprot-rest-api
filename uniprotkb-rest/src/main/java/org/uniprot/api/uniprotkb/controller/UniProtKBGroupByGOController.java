@@ -9,19 +9,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
-import org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByGoService;
+import org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByGOService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByGoController.GROUP_BY_GO_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByGOController.GROUP_BY_GO_RESOURCE;
 
 @RequestMapping(value = GROUP_BY_GO_RESOURCE)
 @RestController
-public class UniProtKBGroupByGoController extends UniProtKBGroupByController {
+public class UniProtKBGroupByGOController extends UniProtKBGroupByController {
     static final String GROUP_BY_GO_RESOURCE = GROUP_BY_RESOURCE + "/go";
-    private final UniProtKBGroupByGoService uniProtKBGroupByGoService;
+    private final UniProtKBGroupByGOService uniProtKBGroupByGoService;
 
     @Autowired
-    public UniProtKBGroupByGoController(UniProtKBGroupByGoService uniProtKBGroupByGoService) {
+    public UniProtKBGroupByGOController(UniProtKBGroupByGOService uniProtKBGroupByGoService) {
         this.uniProtKBGroupByGoService = uniProtKBGroupByGoService;
     }
 

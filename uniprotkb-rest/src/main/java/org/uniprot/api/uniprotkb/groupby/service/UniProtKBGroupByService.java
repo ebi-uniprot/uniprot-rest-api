@@ -18,28 +18,28 @@ public abstract class UniProtKBGroupByService<T> {
         this.uniProtEntryService = uniProtEntryService;
     }
 
-    public GroupByResult getGroupByResult(String query, String parent) {
-        List<FacetField.Count> facetCounts = List.of();
-        List<T> entries = List.of();
-        String id = parent;
+    public GroupByResult getGroupByResult(String query, String parentId) {
+        List<FacetField.Count> lastChildFacetCounts = List.of();
+        List<T> lastChildEntries = List.of();
+        String currentId = parentId;
         List<T> ancestors = new LinkedList<>();
 
         do {
-            List<T> childEntries = getChildren(id);
+            List<T> childEntries = getChildEntries(currentId);
             List<FacetField.Count> childFacetCounts = getFacetCounts(query, childEntries);
 
             if (!childFacetCounts.isEmpty()) {
-                addToAncestors(ancestors, entries, parent, facetCounts);
-                facetCounts = childFacetCounts;
-                entries = childEntries;
-                id = facetCounts.get(0).getName();
+                addToAncestors(ancestors, lastChildEntries, parentId, lastChildFacetCounts);
+                lastChildFacetCounts = childFacetCounts;
+                lastChildEntries = childEntries;
+                currentId = lastChildFacetCounts.get(0).getName();
             } else {
                 break;
             }
 
-        } while (facetCounts.size() == 1);
+        } while (lastChildFacetCounts.size() == 1);
 
-        return getGroupByResult(facetCounts, entries, ancestors, query);
+        return getGroupByResult(lastChildFacetCounts, lastChildEntries, ancestors, query);
     }
 
     protected static boolean isTopLevelSearch(String parent) {
@@ -57,7 +57,7 @@ public abstract class UniProtKBGroupByService<T> {
 
     private List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
         List<FacetField> facetFields =
-                uniProtEntryService.getFacets(query, getFacetFields(entries));
+                uniProtEntryService.getFacets(query, getFacetParams(entries));
 
         if (!facetFields.isEmpty() && facetFields.get(0).getValues() != null) {
             return facetFields.get(0).getValues().stream()
@@ -69,7 +69,7 @@ public abstract class UniProtKBGroupByService<T> {
     }
 
     protected boolean hasChildren(FacetField.Count count, String queryStr) {
-        List<T> children = getChildren(count.getName());
+        List<T> children = getChildEntries(count.getName());
         return !getFacetCounts(queryStr, children).isEmpty();
     }
 
@@ -108,7 +108,7 @@ public abstract class UniProtKBGroupByService<T> {
                 .id(getId(entry))
                 .label(getLabel(entry))
                 .count(count.getCount())
-                .expand(hasChildren(count, queryStr))
+                .expandable(hasChildren(count, queryStr))
                 .build();
     }
 
@@ -116,7 +116,7 @@ public abstract class UniProtKBGroupByService<T> {
 
     protected abstract String getLabel(T entry);
 
-    protected abstract List<T> getChildren(String parent);
+    protected abstract List<T> getChildEntries(String parent);
 
-    protected abstract Map<String, String> getFacetFields(List<T> entries);
+    protected abstract Map<String, String> getFacetParams(List<T> entries);
 }

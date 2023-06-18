@@ -88,11 +88,11 @@ class UniProtKBGroupByTaxonomyControllerIT {
                                 .param("query", "organism_id:" + TAX_ID_0_STRING)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_0_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_0)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -102,11 +102,11 @@ class UniProtKBGroupByTaxonomyControllerIT {
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_0_STRING).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_0_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_0)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -120,11 +120,11 @@ class UniProtKBGroupByTaxonomyControllerIT {
                                 .param("query", "organism_id:" + TAX_ID_2_STRING)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
@@ -138,11 +138,11 @@ class UniProtKBGroupByTaxonomyControllerIT {
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_2_STRING).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
@@ -159,11 +159,11 @@ class UniProtKBGroupByTaxonomyControllerIT {
                                 .param("query", "taxonomy_id:" + TAX_ID_1_STRING)
                                 .param("parent", TAX_ID_0_STRING))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
@@ -175,11 +175,11 @@ class UniProtKBGroupByTaxonomyControllerIT {
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
@@ -193,11 +193,11 @@ class UniProtKBGroupByTaxonomyControllerIT {
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", TAX_ID_0_STRING))
                 .andDo(log())
-                .andExpect(jsonPath("$.results[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.results[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.results[0].expand", is(false)))
-                .andExpect(jsonPath("$.results[0].count", is(1)))
-                .andExpect(jsonPath("$.results.size()", is(1)))
+                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(jsonPath("$.groups[0].count", is(1)))
+                .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
@@ -212,7 +212,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
                                 .param("query", "organism_id:" + TAX_ID_1_STRING)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 
@@ -222,7 +222,7 @@ class UniProtKBGroupByTaxonomyControllerIT {
 
         mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.results.size()", is(0)))
+                .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)));
     }
 

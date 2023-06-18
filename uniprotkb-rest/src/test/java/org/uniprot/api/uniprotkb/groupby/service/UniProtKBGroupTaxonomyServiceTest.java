@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByTaxonomyService.TOP_LEVEL_PARENT_QUERY;
+import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBGroupTaxonomyServiceTest {
@@ -110,7 +110,7 @@ class UniProtKBGroupTaxonomyServiceTest {
                         argThat(
                                 arg ->
                                         arg != null
-                                                && TOP_LEVEL_PARENT_QUERY.equals(arg.getQuery()))))
+                                                && TOP_LEVEL_TAXONOMY_PARENT_QUERY.equals(arg.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
         when(taxonomyService.stream(
                         argThat(arg -> arg != null && PARENT_TAX_ID_A.equals(arg.getQuery()))))
@@ -129,7 +129,7 @@ class UniProtKBGroupTaxonomyServiceTest {
     @Test
     void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
         when(taxonomyService.stream(
-                        argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
+                        argThat(argument -> (TOP_LEVEL_TAXONOMY_PARENT_QUERY).equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_C));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
@@ -145,7 +145,7 @@ class UniProtKBGroupTaxonomyServiceTest {
                         argThat(
                                 argument ->
                                         argument != null
-                                                && (TOP_LEVEL_PARENT_QUERY)
+                                                && (TOP_LEVEL_TAXONOMY_PARENT_QUERY)
                                                         .equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_B));
         when(taxonomyService.stream(
@@ -180,7 +180,7 @@ class UniProtKBGroupTaxonomyServiceTest {
                         invocation -> {
                             StreamRequest streamRequest =
                                     invocation.getArgument(0, StreamRequest.class);
-                            if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
+                            if (TOP_LEVEL_TAXONOMY_PARENT_QUERY.equals(streamRequest.getQuery())) {
                                 return Stream.of(TAXONOMY_ENTRY_A);
                             }
                             if (PARENT_TAX_ID_A.equals(streamRequest.getQuery())) {
@@ -211,7 +211,7 @@ class UniProtKBGroupTaxonomyServiceTest {
                         invocation -> {
                             StreamRequest streamRequest =
                                     invocation.getArgument(0, StreamRequest.class);
-                            if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
+                            if (TOP_LEVEL_TAXONOMY_PARENT_QUERY.equals(streamRequest.getQuery())) {
                                 return Stream.of(TAXONOMY_ENTRY_B);
                             }
                             if (PARENT_TAX_ID_B.equals(streamRequest.getQuery())) {
@@ -273,7 +273,7 @@ class UniProtKBGroupTaxonomyServiceTest {
 
         GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, TAX_ID_A_STRING);
 
-        assertThat(viewBys.getResults(), empty());
+        assertThat(viewBys.getGroups(), empty());
         assertThat(viewBys.getAncestors(), empty());
     }
 
@@ -341,7 +341,7 @@ class UniProtKBGroupTaxonomyServiceTest {
                         invocation -> {
                             StreamRequest streamRequest =
                                     invocation.getArgument(0, StreamRequest.class);
-                            if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
+                            if (TOP_LEVEL_TAXONOMY_PARENT_QUERY.equals(streamRequest.getQuery())) {
                                 return Stream.of(TAXONOMY_ENTRY_B);
                             }
                             if (PARENT_TAX_ID_B.equals(streamRequest.getQuery())) {
@@ -415,13 +415,13 @@ class UniProtKBGroupTaxonomyServiceTest {
 
     private static void assertViewBysMultiple(
             GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(groupByResult.getResults(), contains(getViewByA(), getViewByC()));
+        assertThat(groupByResult.getGroups(), contains(getViewByA(), getViewByC()));
         assertThat(groupByResult.getAncestors(), matcher);
     }
 
     private static void assertViewByC(
             GroupByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(viewBys.getResults(), contains(getViewByC()));
+        assertThat(viewBys.getGroups(), contains(getViewByC()));
         assertThat(viewBys.getAncestors(), matcher);
     }
 

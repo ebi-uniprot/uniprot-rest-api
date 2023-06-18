@@ -12,15 +12,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.uniprot.api.uniprotkb.groupby.service.go.client.GoClient;
+import org.uniprot.api.uniprotkb.groupby.service.go.client.GOClient;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 
 @ExtendWith(MockitoExtension.class)
-class GoServiceTest {
+class GOServiceTest {
     private static final String ID = "id";
     @Mock private List<GoRelation> result;
-    @Mock private GoClient goClient;
-    @InjectMocks private GoService goService;
+    @Mock private GOClient goClient;
+    @InjectMocks private GOService goService;
 
     @BeforeEach
     void setUp() {}

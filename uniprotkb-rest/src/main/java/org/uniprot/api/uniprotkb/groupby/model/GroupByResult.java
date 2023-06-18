@@ -1,11 +1,11 @@
 package org.uniprot.api.uniprotkb.groupby.model;
 
-import java.util.List;
-
 import lombok.Value;
+
+import java.util.List;
 
 @Value
 public class GroupByResult {
     List<Ancestor> ancestors;
-    List<Group> results;
+    List<Group> groups;
 }

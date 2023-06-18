@@ -30,7 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByKeywordService.TOP_LEVEL_PARENT_QUERY;
+import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtKBGroupKeywordServiceTest {
@@ -119,7 +119,7 @@ class UniProtKBGroupKeywordServiceTest {
                         argThat(
                                 arg ->
                                         arg != null
-                                                && TOP_LEVEL_PARENT_QUERY.equals(arg.getQuery()))))
+                                                && TOP_LEVEL_KEYWORD_PARENT_QUERY.equals(arg.getQuery()))))
                 .thenAnswer(
                         invocation -> Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_C, KEYWORD_ENTRY_F));
         when(keywordService.stream(
@@ -144,7 +144,7 @@ class UniProtKBGroupKeywordServiceTest {
     @Test
     void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
         when(keywordService.stream(
-                        argThat(argument -> (TOP_LEVEL_PARENT_QUERY).equals(argument.getQuery()))))
+                        argThat(argument -> (TOP_LEVEL_KEYWORD_PARENT_QUERY).equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_C));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
@@ -160,7 +160,7 @@ class UniProtKBGroupKeywordServiceTest {
                         argThat(
                                 argument ->
                                         argument != null
-                                                && (TOP_LEVEL_PARENT_QUERY)
+                                                && (TOP_LEVEL_KEYWORD_PARENT_QUERY)
                                                         .equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_B));
         when(keywordService.stream(
@@ -199,7 +199,7 @@ class UniProtKBGroupKeywordServiceTest {
                         invocation -> {
                             StreamRequest streamRequest =
                                     invocation.getArgument(0, StreamRequest.class);
-                            if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
+                            if (TOP_LEVEL_KEYWORD_PARENT_QUERY.equals(streamRequest.getQuery())) {
                                 return Stream.of(KEYWORD_ENTRY_A);
                             }
                             if (PARENT_KEYWORD_ID_A.equals(streamRequest.getQuery())) {
@@ -230,7 +230,7 @@ class UniProtKBGroupKeywordServiceTest {
                         invocation -> {
                             StreamRequest streamRequest =
                                     invocation.getArgument(0, StreamRequest.class);
-                            if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
+                            if (TOP_LEVEL_KEYWORD_PARENT_QUERY.equals(streamRequest.getQuery())) {
                                 return Stream.of(KEYWORD_ENTRY_B);
                             }
                             if (PARENT_KEYWORD_ID_B.equals(streamRequest.getQuery())) {
@@ -298,7 +298,7 @@ class UniProtKBGroupKeywordServiceTest {
 
         GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_A);
 
-        assertThat(viewBys.getResults(), empty());
+        assertThat(viewBys.getGroups(), empty());
         assertThat(viewBys.getAncestors(), empty());
     }
 
@@ -368,7 +368,7 @@ class UniProtKBGroupKeywordServiceTest {
                         invocation -> {
                             StreamRequest streamRequest =
                                     invocation.getArgument(0, StreamRequest.class);
-                            if (TOP_LEVEL_PARENT_QUERY.equals(streamRequest.getQuery())) {
+                            if (TOP_LEVEL_KEYWORD_PARENT_QUERY.equals(streamRequest.getQuery())) {
                                 return Stream.of(KEYWORD_ENTRY_B);
                             }
                             if (PARENT_KEYWORD_ID_B.equals(streamRequest.getQuery())) {
@@ -445,13 +445,13 @@ class UniProtKBGroupKeywordServiceTest {
 
     private static void assertViewBysMultiple(
             GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(groupByResult.getResults(), contains(getViewByA(), getViewByC(), getViewByF()));
+        assertThat(groupByResult.getGroups(), contains(getViewByA(), getViewByC(), getViewByF()));
         assertThat(groupByResult.getAncestors(), matcher);
     }
 
     private static void assertViewByC(
             GroupByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(viewBys.getResults(), contains(getViewByC()));
+        assertThat(viewBys.getGroups(), contains(getViewByC()));
         assertThat(viewBys.getAncestors(), matcher);
     }
 

@@ -1,15 +1,14 @@
 package org.uniprot.api.uniprotkb.groupby.service.go.client;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.base.Strings;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-public class GoClientImpl implements GoClient {
+public class GOClientImpl implements GOClient {
     public static final String GO_0008150 = "GO:0008150";
     public static final String GO_0005575 = "GO:0005575";
     public static final String GO_0003674 = "GO:0003674";
