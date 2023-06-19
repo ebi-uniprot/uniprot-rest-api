@@ -1,16 +1,5 @@
 package org.uniprot.api.rest.service;
 
-import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -31,6 +20,17 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
 
 /**
  * @param <D> the type of the input to the class. a type of Document
@@ -216,7 +216,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         return requestBuilder;
     }
 
-    private String getQueryFields(String query) {
+    protected String getQueryFields(String query) {
         String queryFields = "";
         Optional<String> optimisedQueryField = validateOptimisableField(query);
         if (optimisedQueryField.isPresent()) {

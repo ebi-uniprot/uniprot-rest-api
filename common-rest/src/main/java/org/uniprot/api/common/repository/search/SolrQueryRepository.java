@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -119,6 +120,15 @@ public abstract class SolrQueryRepository<T extends Document> {
                         Spliterators.spliteratorUnknownSize(resultsIterator, Spliterator.ORDERED),
                         false)
                 .flatMap(Collection::stream);
+    }
+
+    public QueryResponse query(SolrQuery solrQuery) {
+        try {
+            return solrClient.query(collection.name(), solrQuery);
+        } catch (SolrServerException | IOException e) {
+            throw new QueryRetrievalException(
+                    "Unexpected error retrieving data from our Repository", e);
+        }
     }
 
     protected List<T> getResponseDocuments(QueryResponse solrResponse) {

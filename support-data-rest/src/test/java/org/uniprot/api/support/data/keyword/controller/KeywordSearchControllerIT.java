@@ -29,8 +29,8 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterRes
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.keyword.repository.KeywordFacetConfig;
-import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
+import org.uniprot.api.rest.respository.keyword.KeywordFacetConfig;
+import org.uniprot.api.rest.respository.keyword.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.config.UniProtDataType;

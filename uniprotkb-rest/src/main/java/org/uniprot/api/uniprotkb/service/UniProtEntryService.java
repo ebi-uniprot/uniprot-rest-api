@@ -1,13 +1,9 @@
 package org.uniprot.api.uniprotkb.service;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.common.params.FacetParams;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
@@ -48,6 +44,15 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.QUERY_FIELDS;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 
 @Service
 @Import(UniProtSolrQueryConfig.class)
@@ -179,6 +184,15 @@ public class UniProtEntryService
             StoreRequest storeRequest = buildStoreRequest(request);
             return super.storeStreamer.idsToStoreStream(query, storeRequest);
         }
+    }
+
+    public List<FacetField> getFacets(String query, Map<String, String> facetFields) {
+        SolrQuery solrQuery = new SolrQuery(query);
+        facetFields.forEach(solrQuery::set);
+        solrQuery.set(FacetParams.FACET, true);
+        solrQuery.set(DEF_TYPE, "edismax");
+        solrQuery.add(QUERY_FIELDS, getQueryFields(query));
+        return repository.query(solrQuery).getFacetFields();
     }
 
     private SolrRequest buildSolrRequest(String accession) {
