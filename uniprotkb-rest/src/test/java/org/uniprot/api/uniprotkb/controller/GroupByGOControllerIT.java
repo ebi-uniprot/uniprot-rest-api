@@ -14,46 +14,43 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.uniprot.api.uniprotkb.groupby.service.go.client.GOClient;
+import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.core.cv.ec.ECEntry;
-import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.DataStoreManager.StoreType;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = UniProtKBGroupByController.class)
+@WebMvcTest(controllers = GroupByController.class)
 @AutoConfigureWebClient
 @ActiveProfiles({"offline"})
-class UniProtKBGroupByEcControllerIT extends UniProtKBGroupByControllerIT{
-    private static final String ORGANISM_ID_0 = "29";
-    private static final String ORGANISM_ID_1 = "517";
-    private static final String ORGANISM_ID_2 = "34959";
+class GroupByGOControllerIT extends GroupByControllerIT {
     private static final String ACCESSION_0 = "A0";
-    private static final String EC_ID_0 = "1.-.-.-";
-    private static final String EC_LABEL_0 = "ec_label_0";
     private static final String ACCESSION_1 = "A1";
-    private static final String EC_ID_1 = "1.1.-.-";
-    private static final String EC_LABEL_1 = "ec_label_1";
     private static final String ACCESSION_2 = "A2";
-    private static final String EC_ID_2 = "1.1.1.-";
-    private static final String EC_LABEL_2 = "ec_label_2";
-    public static final String PATH = "/uniprotkb/groups/ec";
+    private static final String ORGANISM_ID_0 = "29";
+    private static final String ORGANISM_ID_1 = "324";
+    private static final String ORGANISM_ID_2 = "994";
+    private static final String GO_ID_0 = "GO:goId0";
+    private static final String GO_NAME_0 = "goName0";
+    private static final String GO_ID_1 = "GO:goId1";
+    private static final String GO_NAME_1 = "goName1";
+    private static final String GO_ID_2 = "GO:goId2";
+    private static final String GO_NAME_2 = "goName2";
+    public static final String PATH = "/uniprotkb/groups/go";
     @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
-    @MockBean private ECRepo ecRepo;
+    @MockBean private GOClient goClient;
     @Autowired private MockMvc mockMvc;
     @Autowired private UniprotQueryRepository repository;
 
@@ -74,7 +71,7 @@ class UniProtKBGroupByEcControllerIT extends UniProtKBGroupByControllerIT{
     }
 
     @Test
-    void getGroupByEC_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField() throws Exception {
+    void getGroupByGO_whenNoParentSpecifiedAndNoTraversalAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(
@@ -82,8 +79,8 @@ class UniProtKBGroupByEcControllerIT extends UniProtKBGroupByControllerIT{
                                 .param("query", "organism_id:" + ORGANISM_ID_0)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(EC_ID_0)))
-                .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_0)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_0)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_0)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
@@ -91,13 +88,13 @@ class UniProtKBGroupByEcControllerIT extends UniProtKBGroupByControllerIT{
     }
 
     @Test
-    void getGroupByEC_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByGO_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(EC_ID_0)))
-                .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_0)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_0)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_0)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
@@ -105,7 +102,7 @@ class UniProtKBGroupByEcControllerIT extends UniProtKBGroupByControllerIT{
     }
 
     @Test
-    void getGroupByEC_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
+    void getGroupByGO_whenNoParentSpecifiedAndTraversalAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(
@@ -113,96 +110,107 @@ class UniProtKBGroupByEcControllerIT extends UniProtKBGroupByControllerIT{
                                 .param("query", "organism_id:" + ORGANISM_ID_2)
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(EC_ID_0)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(EC_ID_1)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(EC_LABEL_1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
+                .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
+                .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(2)));
     }
 
     @Test
-    void getGroupByEC_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByGO_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
-                .andDo(print())
-                .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
+                .andDo(log())
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(EC_ID_0)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(EC_ID_1)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(EC_LABEL_1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
+                .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
+                .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(2)));
     }
 
     @Test
-    void getGroupByEC_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
+    void getGroupByGO_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(
                         get(PATH)
                                 .param("query", "organism_id:" + ORGANISM_ID_2)
-                                .param("parent", EC_ID_0))
+                                .param("parent", GO_ID_0))
                 .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(EC_ID_1)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_1)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
     }
 
     @Test
-    void getGroupByEC_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByGO_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
                 .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(EC_ID_0)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(EC_ID_1)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(EC_LABEL_1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
+                .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
+                .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(2)));
     }
 
     @Test
-    void getGroupByEC_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
+    void getGroupByGO_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EC_ID_0))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", GO_ID_0))
                 .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
+                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(EC_ID_1)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_1)))
+                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_1)))
+                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() {
-        mockEcEntry(EC_ID_0, EC_LABEL_0);
-        saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, List.of(EC_ID_0));
-        mockEcEntry(EC_ID_1, EC_LABEL_1);
-        saveUniProtDocument(ACCESSION_1, ORGANISM_ID_1, List.of(EC_ID_0, EC_ID_1));
-        mockEcEntry(EC_ID_2, EC_LABEL_2);
-        saveUniProtDocument(ACCESSION_2, ORGANISM_ID_2, List.of(EC_ID_0, EC_ID_1, EC_ID_2));
+        mockGoRelation(GO_ID_0, GO_NAME_0, EMPTY_PARENT);
+        saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, Set.of(removeGoPrefix(GO_ID_0)));
+        mockGoRelation(GO_ID_1, GO_NAME_1, GO_ID_0);
+        saveUniProtDocument(
+                ACCESSION_1,
+                ORGANISM_ID_1,
+                Set.of(removeGoPrefix(GO_ID_0), removeGoPrefix(GO_ID_1)));
+        mockGoRelation(GO_ID_2, GO_NAME_2, GO_ID_1);
+        saveUniProtDocument(
+                ACCESSION_2,
+                ORGANISM_ID_2,
+                Set.of(removeGoPrefix(GO_ID_0), removeGoPrefix(GO_ID_1), removeGoPrefix(GO_ID_2)));
+    }
+
+    @Override
+    protected DataStoreManager getDataStoreManager() {
+        return dataStoreManager;
     }
 
     @Override
@@ -215,39 +223,36 @@ class UniProtKBGroupByEcControllerIT extends UniProtKBGroupByControllerIT{
         return PATH;
     }
 
+    @Override
     protected void prepareSingleRootNodeWithNoChildren() {
-        mockEcEntry(EC_ID_0, EC_LABEL_0);
-        saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, List.of(EC_ID_0));
+        mockGoRelation(GO_ID_0, GO_NAME_0, EMPTY_PARENT);
+        saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, Set.of(removeGoPrefix(GO_ID_0)));
     }
 
-    private void saveUniProtDocument(String accession, String organismId, List<String> ecs) {
+    private static String removeGoPrefix(String id) {
+        return id.split(":")[1];
+    }
+
+    private void mockGoRelation(String goId0, String goName0, String parent) {
+        when(goClient.getChildren(parent)).thenReturn(List.of(getGoRelation(goId0, goName0)));
+    }
+
+    private void saveUniProtDocument(String accession, String organismId, Set<String> gos) {
         UniProtDocument uniProtDocument = new UniProtDocument();
         uniProtDocument.active = true;
         uniProtDocument.accession = accession;
-        uniProtDocument.ecNumbers = ecs;
+        uniProtDocument.goIds = gos;
         uniProtDocument.organismTaxId = Integer.parseInt(organismId);
         uniProtDocument.taxLineageIds = List.of(Integer.parseInt(organismId));
         save(uniProtDocument);
     }
 
-    private void mockEcEntry(String ecId, String label) {
-        when(ecRepo.getEC(ecId))
-                .thenReturn(
-                        Optional.of(
-                                new ECEntry() {
-                                    @Override
-                                    public String getId() {
-                                        return ecId;
-                                    }
-
-                                    @Override
-                                    public String getLabel() {
-                                        return label;
-                                    }
-                                }));
-    }
-
-    void save(Document doc) {
-        dataStoreManager.saveDocs(StoreType.UNIPROT, doc);
+    private GoRelation getGoRelation(String id, String name) {
+        GoRelation goRelation = new GoRelation();
+        goRelation.setId(id);
+        goRelation.setName(name);
+        goRelation.setRelation("is_a");
+        goRelation.setHasChildren(true);
+        return goRelation;
     }
 }

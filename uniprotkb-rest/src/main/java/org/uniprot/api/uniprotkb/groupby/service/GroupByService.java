@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class UniProtKBGroupByService<T> {
+public abstract class GroupByService<T> {
     private final UniProtEntryService uniProtEntryService;
 
-    UniProtKBGroupByService(UniProtEntryService uniProtEntryService) {
+    GroupByService(UniProtEntryService uniProtEntryService) {
         this.uniProtEntryService = uniProtEntryService;
     }
 

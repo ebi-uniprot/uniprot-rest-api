@@ -9,20 +9,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
-import org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByECService;
+import org.uniprot.api.uniprotkb.groupby.service.GroupByGOService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByECController.GROUP_BY_EC_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.GroupByGOController.GROUP_BY_GO_RESOURCE;
 
-@RequestMapping(value = GROUP_BY_EC_RESOURCE)
+@RequestMapping(value = GROUP_BY_GO_RESOURCE)
 @RestController
-public class UniProtKBGroupByECController extends UniProtKBGroupByController {
-    static final String GROUP_BY_EC_RESOURCE = GROUP_BY_RESOURCE + "/ec";
-    private final UniProtKBGroupByECService uniProtKBGroupByECService;
+public class GroupByGOController extends GroupByController {
+    static final String GROUP_BY_GO_RESOURCE = GROUP_BY_RESOURCE + "/go";
+    private final GroupByGOService uniProtKBGroupByGoService;
 
     @Autowired
-    public UniProtKBGroupByECController(UniProtKBGroupByECService uniProtKBGroupByECService) {
-        this.uniProtKBGroupByECService = uniProtKBGroupByECService;
+    public GroupByGOController(GroupByGOService uniProtKBGroupByGoService) {
+        this.uniProtKBGroupByGoService = uniProtKBGroupByGoService;
     }
 
     @Override
@@ -37,6 +37,6 @@ public class UniProtKBGroupByECController extends UniProtKBGroupByController {
                     @RequestParam(value = "parent", required = false)
                     String parent) {
         return new ResponseEntity<>(
-                uniProtKBGroupByECService.getGroupByResult(query, parent), HttpStatus.OK);
+                uniProtKBGroupByGoService.getGroupByResult(query, parent), HttpStatus.OK);
     }
 }

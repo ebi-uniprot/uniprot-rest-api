@@ -26,10 +26,10 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByECService.*;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByECService.*;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBGroupECServiceTest {
+class GroupByECServiceTest {
     private static final String EMPTY_PARENT_ID = "";
     private static final long EC_COUNT_A = 23L;
     private static final long EC_COUNT_B = 50L;
@@ -46,11 +46,11 @@ class UniProtKBGroupECServiceTest {
     private static final String SOME_QUERY = "someQuery";
     @Mock private ECService ecService;
     @Mock private UniProtEntryService uniProtEntryService;
-    private UniProtKBGroupByECService service;
+    private GroupByECService service;
 
     @BeforeEach
     void setup() {
-        service = new UniProtKBGroupByECService(ecService, uniProtEntryService);
+        service = new GroupByECService(ecService, uniProtEntryService);
     }
 
     @Test

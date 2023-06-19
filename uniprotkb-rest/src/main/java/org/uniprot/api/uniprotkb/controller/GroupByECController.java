@@ -9,21 +9,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
-import org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByTaxonomyService;
+import org.uniprot.api.uniprotkb.groupby.service.GroupByECService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByTaxonomyController.GROUP_BY_TAXONOMY_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.GroupByECController.GROUP_BY_EC_RESOURCE;
 
-@RequestMapping(value = GROUP_BY_TAXONOMY_RESOURCE)
+@RequestMapping(value = GROUP_BY_EC_RESOURCE)
 @RestController
-public class UniProtKBGroupByTaxonomyController extends UniProtKBGroupByController {
-    static final String GROUP_BY_TAXONOMY_RESOURCE = GROUP_BY_RESOURCE + "/taxonomy";
-    private final UniProtKBGroupByTaxonomyService uniProtKBGroupByTaxonomyService;
+public class GroupByECController extends GroupByController {
+    static final String GROUP_BY_EC_RESOURCE = GROUP_BY_RESOURCE + "/ec";
+    private final GroupByECService uniProtKBGroupByECService;
 
     @Autowired
-    public UniProtKBGroupByTaxonomyController(
-            UniProtKBGroupByTaxonomyService uniProtKBGroupByTaxonomyService) {
-        this.uniProtKBGroupByTaxonomyService = uniProtKBGroupByTaxonomyService;
+    public GroupByECController(GroupByECService uniProtKBGroupByECService) {
+        this.uniProtKBGroupByECService = uniProtKBGroupByECService;
     }
 
     @Override
@@ -38,6 +37,6 @@ public class UniProtKBGroupByTaxonomyController extends UniProtKBGroupByControll
                     @RequestParam(value = "parent", required = false)
                     String parent) {
         return new ResponseEntity<>(
-                uniProtKBGroupByTaxonomyService.getGroupByResult(query, parent), HttpStatus.OK);
+                uniProtKBGroupByECService.getGroupByResult(query, parent), HttpStatus.OK);
     }
 }

@@ -30,10 +30,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBGroupKeywordServiceTest {
+class GroupByKeywordServiceTest {
     private static final String EMPTY_PARENT_ID = "";
     private static final String KEYWORD_ID_A = "1425170";
     private static final String KEYWORD_ID_B = "9606";
@@ -86,7 +86,7 @@ class UniProtKBGroupKeywordServiceTest {
     @Mock private KeywordService keywordService;
     @Mock private UniProtEntryService uniProtEntryService;
 
-    private UniProtKBGroupByKeywordService service;
+    private GroupByKeywordService service;
 
     private static List<FacetField> getFacetFields(String id, long count) {
         return List.of(
@@ -110,7 +110,7 @@ class UniProtKBGroupKeywordServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new UniProtKBGroupByKeywordService(keywordService, uniProtEntryService);
+        service = new GroupByKeywordService(keywordService, uniProtEntryService);
     }
 
     @Test

@@ -15,11 +15,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtKBGroupByGOService extends UniProtKBGroupByService<GoRelation> {
+public class GroupByGOService extends GroupByService<GoRelation> {
     protected static final String GO_PREFIX = "GO:";
     private final GOService goService;
 
-    public UniProtKBGroupByGOService(GOService goService, UniProtEntryService uniProtEntryService) {
+    public GroupByGOService(GOService goService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.goService = goService;
     }

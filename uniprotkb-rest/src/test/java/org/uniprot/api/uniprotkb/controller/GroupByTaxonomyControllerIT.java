@@ -18,9 +18,7 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.DataStoreManager.StoreType;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
@@ -34,10 +32,10 @@ import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = UniProtKBGroupByController.class)
+@WebMvcTest(controllers = GroupByController.class)
 @AutoConfigureWebClient
 @ActiveProfiles({"offline"})
-class UniProtKBGroupByTaxonomyControllerIT extends UniProtKBGroupByControllerIT{
+class GroupByTaxonomyControllerIT extends GroupByControllerIT {
     private static final String ACCESSION_0 = "A0";
     private static final int TAX_ID_0 = 9600;
     private static final String TAX_ID_0_STRING = String.valueOf(TAX_ID_0);
@@ -211,6 +209,11 @@ class UniProtKBGroupByTaxonomyControllerIT extends UniProtKBGroupByControllerIT{
     }
 
     @Override
+    protected DataStoreManager getDataStoreManager() {
+        return dataStoreManager;
+    }
+
+    @Override
     protected MockMvc getMockMvc() {
         return mockMvc;
     }
@@ -220,6 +223,7 @@ class UniProtKBGroupByTaxonomyControllerIT extends UniProtKBGroupByControllerIT{
         return PATH;
     }
 
+    @Override
     protected void prepareSingleRootNodeWithNoChildren() throws Exception {
         saveTaxonomyDocument((long) TAX_ID_0, TAX_SCIENTIFIC_0, null);
         saveUniProtDocument(ACCESSION_0, TAX_ID_0, List.of(TAX_ID_0));
@@ -253,9 +257,5 @@ class UniProtKBGroupByTaxonomyControllerIT extends UniProtKBGroupByControllerIT{
                         .taxonomyObj(scientific00s)
                         .build();
         save(TAXONOMY, taxonomyDocument);
-    }
-
-    void save(StoreType type, Document doc) {
-        dataStoreManager.saveDocs(type, doc);
     }
 }
