@@ -13,6 +13,7 @@ import net.jodah.failsafe.RetryPolicy;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
+import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -26,6 +27,7 @@ public class UniProtKBBatchStoreEntryPairIterable
         extends BatchStoreEntryPairIterable<UniProtKBEntryPair, UniProtKBEntry> {
 
     private final TaxonomyLineageService taxonomyLineageService;
+    private final UniprotKBMappingRepository uniprotKBMappingRepository;
     private final boolean addLineage;
 
     public UniProtKBBatchStoreEntryPairIterable(
@@ -34,10 +36,12 @@ public class UniProtKBBatchStoreEntryPairIterable
             UniProtStoreClient<UniProtKBEntry> storeClient,
             RetryPolicy<Object> retryPolicy,
             TaxonomyLineageService taxonomyLineageService,
+            UniprotKBMappingRepository uniprotKBMappingRepository,
             boolean addLineage) {
         super(sourceIterable, batchSize, storeClient, retryPolicy);
         this.addLineage = addLineage;
         this.taxonomyLineageService = taxonomyLineageService;
+        this.uniprotKBMappingRepository = uniprotKBMappingRepository;
     }
 
     public UniProtKBBatchStoreEntryPairIterable(
@@ -57,7 +61,9 @@ public class UniProtKBBatchStoreEntryPairIterable
             IdMappingStringPair mId, Map<String, UniProtKBEntry> idEntryMap) {
         return UniProtKBEntryPair.builder()
                 .from(mId.getFrom())
-                .to(idEntryMap.get(mId.getTo()))
+                .to(
+                        idEntryMap.computeIfAbsent(
+                                mId.getTo(), uniprotKBMappingRepository::getDeletedEntry))
                 .build();
     }
 

@@ -155,6 +155,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                         storeClient,
                         storeFetchRetryPolicy,
                         lineageService,
+                        repository,
                         isLineageAllowed(fields, returnFieldConfig));
         return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
     }

@@ -41,6 +41,7 @@ import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -80,6 +81,8 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
     private RestTemplate idMappingRdfRestTemplate;
 
     @Autowired private TaxonomyLineageRepository taxRepository;
+
+    @Autowired private UniprotKBMappingRepository repository;
 
     @Override
     protected String getIdMappingResultPath() {
@@ -131,7 +134,8 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
         for (int i = 1; i <= 20; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
-
+        saveInactiveEntry(cloudSolrClient);
+        ReflectionTestUtils.setField(repository, "solrClient", cloudSolrClient);
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
 
         TaxonomyDocument taxonomyDocument = createTaxonomyEntry(9606L);
@@ -376,6 +380,36 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                         jsonPath(
                                 "$.results.*.to.lineages[1].taxonId",
                                 contains(9608, 9608, 9608, 9608, 9608, 9608)));
+    }
+
+    @Test
+    void testUniProtKBToUniProtKBInactiveEntriesMapping() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001,I8FBX0");
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .param("fields", "accession")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
+                .andExpect(jsonPath("$.results.*.from", contains("Q00001", "I8FBX0")))
+                .andExpect(
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "I8FBX0")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.entryType",
+                                contains("UniProtKB unreviewed (TrEMBL)", "Inactive")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[1].to.inactiveReason.inactiveReasonType",
+                                is("DELETED")));
     }
 
     @Test

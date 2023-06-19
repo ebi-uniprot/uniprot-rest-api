@@ -22,7 +22,7 @@ import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
  */
 public abstract class AbstractJobOperation implements JobOperation {
     public static final int DEFAULT_IDS_COUNT = 20; // same as id.mapping.max.from.ids.count
-    private IdMappingJobCacheService cacheService;
+    private final IdMappingJobCacheService cacheService;
 
     public AbstractJobOperation(IdMappingJobCacheService cacheService) {
         this.cacheService = cacheService;
@@ -30,6 +30,11 @@ public abstract class AbstractJobOperation implements JobOperation {
 
     public IdMappingJobCacheService getIdMappingJobCacheService() {
         return this.cacheService;
+    }
+
+    @Override
+    public IdMappingJob createAndPutJobInCacheForAllFields() throws Exception {
+        return createAndPutJobInCache();
     }
 
     public IdMappingJob createAndPutJobInCache(String from, String to, String fromIds)
@@ -79,7 +84,7 @@ public abstract class AbstractJobOperation implements JobOperation {
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         String fromIds = String.join(",", mappedIds.keySet());
         IdMappingJobRequest idMappingRequest = createRequest(from, to, fromIds);
-        String jobId = generateHash(idMappingRequest);
+        String jobId = generateHash();
         IdMappingResult idMappingResult = createIdMappingResult(idMappingRequest, mappedIds);
         IdMappingJob job = createJob(jobId, idMappingRequest, idMappingResult, jobStatus);
         if (!this.cacheService.exists(jobId)) {
@@ -96,7 +101,7 @@ public abstract class AbstractJobOperation implements JobOperation {
         return request;
     }
 
-    private String generateHash(IdMappingJobRequest request) {
+    private String generateHash() {
         return UUID.randomUUID().toString();
     }
 

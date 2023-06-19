@@ -285,7 +285,8 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"primaryAccession\":\"P00001\"},\n{\"primaryAccession\":\"P00001\"}]}",
+                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"},\n"
+                        + "{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}]}",
                 result);
     }
 
@@ -307,7 +308,7 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"]}",
+                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"]}",
                 result);
     }
 
