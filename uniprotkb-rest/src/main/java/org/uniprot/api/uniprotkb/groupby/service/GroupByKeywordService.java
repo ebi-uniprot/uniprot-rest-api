@@ -15,11 +15,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtKBGroupByKeywordService extends UniProtKBGroupByService<KeywordEntry> {
+public class GroupByKeywordService extends GroupByService<KeywordEntry> {
     public static final String TOP_LEVEL_KEYWORD_PARENT_QUERY = "-parent:[* TO *] ";
     private final KeywordService keywordService;
 
-    public UniProtKBGroupByKeywordService(
+    public GroupByKeywordService(
             KeywordService keywordService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.keywordService = keywordService;

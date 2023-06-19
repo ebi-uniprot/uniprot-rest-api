@@ -9,20 +9,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
-import org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByGOService;
+import org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBGroupByGOController.GROUP_BY_GO_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.GroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
 
-@RequestMapping(value = GROUP_BY_GO_RESOURCE)
+@RequestMapping(value = GROUP_BY_KEYWORD_RESOURCE)
 @RestController
-public class UniProtKBGroupByGOController extends UniProtKBGroupByController {
-    static final String GROUP_BY_GO_RESOURCE = GROUP_BY_RESOURCE + "/go";
-    private final UniProtKBGroupByGOService uniProtKBGroupByGoService;
+public class GroupByKeywordController extends GroupByController {
+    static final String GROUP_BY_KEYWORD_RESOURCE = GROUP_BY_RESOURCE + "/keyword";
+    private final GroupByKeywordService uniProtKBGroupByKeywordService;
 
     @Autowired
-    public UniProtKBGroupByGOController(UniProtKBGroupByGOService uniProtKBGroupByGoService) {
-        this.uniProtKBGroupByGoService = uniProtKBGroupByGoService;
+    public GroupByKeywordController(
+            GroupByKeywordService uniProtKBGroupByKeywordService) {
+        this.uniProtKBGroupByKeywordService = uniProtKBGroupByKeywordService;
     }
 
     @Override
@@ -37,6 +38,6 @@ public class UniProtKBGroupByGOController extends UniProtKBGroupByController {
                     @RequestParam(value = "parent", required = false)
                     String parent) {
         return new ResponseEntity<>(
-                uniProtKBGroupByGoService.getGroupByResult(query, parent), HttpStatus.OK);
+                uniProtKBGroupByKeywordService.getGroupByResult(query, parent), HttpStatus.OK);
     }
 }

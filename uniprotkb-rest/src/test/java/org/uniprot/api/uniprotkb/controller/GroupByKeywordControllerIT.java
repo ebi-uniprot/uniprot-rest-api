@@ -20,9 +20,7 @@ import org.uniprot.core.cv.keyword.impl.KeywordEntryBuilder;
 import org.uniprot.core.cv.keyword.impl.KeywordIdBuilder;
 import org.uniprot.core.json.parser.keyword.KeywordJsonConfig;
 import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.indexer.DataStoreManager.StoreType;
 import org.uniprot.store.search.SolrCollection;
-import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.keyword.KeywordDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
@@ -37,10 +35,10 @@ import static org.uniprot.store.indexer.DataStoreManager.StoreType.KEYWORD;
 import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
-@WebMvcTest(controllers = UniProtKBGroupByController.class)
+@WebMvcTest(controllers = GroupByController.class)
 @AutoConfigureWebClient
 @ActiveProfiles({"offline"})
-class UniProtKBGroupByKeywordControllerIT extends UniProtKBGroupByControllerIT{
+class GroupByKeywordControllerIT extends GroupByControllerIT {
     private static final String ACCESSION_0 = "A0";
     private static final String ACCESSION_1 = "A1";
     private static final String ACCESSION_2 = "A2";
@@ -231,6 +229,11 @@ class UniProtKBGroupByKeywordControllerIT extends UniProtKBGroupByControllerIT{
     }
 
     @Override
+    protected DataStoreManager getDataStoreManager() {
+        return dataStoreManager;
+    }
+
+    @Override
     protected MockMvc getMockMvc() {
         return mockMvc;
     }
@@ -240,6 +243,7 @@ class UniProtKBGroupByKeywordControllerIT extends UniProtKBGroupByControllerIT{
         return PATH;
     }
 
+    @Override
     protected void prepareSingleRootNodeWithNoChildren() throws Exception {
         saveKeywordDocument(KEYWORD_ID_0, KEYWORD_NAME_0, List.of());
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, List.of(KEYWORD_ID_0));
@@ -272,9 +276,5 @@ class UniProtKBGroupByKeywordControllerIT extends UniProtKBGroupByControllerIT{
                         .parent(parents)
                         .build();
         save(KEYWORD, keywordDocument);
-    }
-
-    void save(StoreType type, Document doc) {
-        dataStoreManager.saveDocs(type, doc);
     }
 }

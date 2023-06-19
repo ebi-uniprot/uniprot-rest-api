@@ -15,11 +15,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtKBGroupByTaxonomyService extends UniProtKBGroupByService<TaxonomyEntry> {
+public class GroupByTaxonomyService extends GroupByService<TaxonomyEntry> {
     public static final String TOP_LEVEL_TAXONOMY_PARENT_QUERY = "-parent:[* TO *] AND active:true";
     private final TaxonomyService taxonomyService;
 
-    public UniProtKBGroupByTaxonomyService(
+    public GroupByTaxonomyService(
             TaxonomyService taxonomyService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.taxonomyService = taxonomyService;

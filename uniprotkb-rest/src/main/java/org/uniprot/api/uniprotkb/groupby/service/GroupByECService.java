@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class UniProtKBGroupByECService extends UniProtKBGroupByService<String> {
+public class GroupByECService extends GroupByService<String> {
     public static final String REGEX_SUFFIX = "[0-9]+";
     public static final String TOKEN_REGEX = "\\.";
     public static final String DASH = ".-";
@@ -21,7 +21,7 @@ public class UniProtKBGroupByECService extends UniProtKBGroupByService<String> {
     public static final int MAX_TOKEN_COUNT = 4;
     private final ECService ecService;
 
-    public UniProtKBGroupByECService(ECService ecService, UniProtEntryService uniProtEntryService) {
+    public GroupByECService(ECService ecService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.ecService = ecService;
     }

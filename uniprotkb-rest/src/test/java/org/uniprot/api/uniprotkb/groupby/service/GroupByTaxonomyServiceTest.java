@@ -28,10 +28,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBGroupTaxonomyServiceTest {
+class GroupByTaxonomyServiceTest {
     private static final String EMPTY_PARENT_ID = "";
     private static final long TAX_ID_A = 1425170;
     private static final long TAX_ID_B = 9606;
@@ -97,11 +97,11 @@ class UniProtKBGroupTaxonomyServiceTest {
     private static final String SOME_QUERY = "someQuery";
     @Mock private TaxonomyService taxonomyService;
     @Mock private UniProtEntryService uniProtEntryService;
-    private UniProtKBGroupByTaxonomyService service;
+    private GroupByTaxonomyService service;
 
     @BeforeEach
     void setup() {
-        service = new UniProtKBGroupByTaxonomyService(taxonomyService, uniProtEntryService);
+        service = new GroupByTaxonomyService(taxonomyService, uniProtEntryService);
     }
 
     @Test

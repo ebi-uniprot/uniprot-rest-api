@@ -27,10 +27,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.UniProtKBGroupByGOService.GO_PREFIX;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
-class UniProtKBGroupGOServiceTest {
+class GroupByGOServiceTest {
     private static final String EMPTY_ID = "";
     private static final String GO_ID_A = "1425170";
     private static final String GO_ID_B = "9606";
@@ -72,7 +72,7 @@ class UniProtKBGroupGOServiceTest {
     @Mock private GOService goService;
     @Mock private UniProtEntryService uniProtEntryService;
 
-    private UniProtKBGroupByGOService service;
+    private GroupByGOService service;
 
     private static List<FacetField> getFacetFields(String id, long count) {
         return List.of(
@@ -96,7 +96,7 @@ class UniProtKBGroupGOServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new UniProtKBGroupByGOService(goService, uniProtEntryService);
+        service = new GroupByGOService(goService, uniProtEntryService);
     }
 
     @Test
