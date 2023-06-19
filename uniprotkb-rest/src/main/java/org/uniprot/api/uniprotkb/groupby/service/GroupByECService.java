@@ -100,6 +100,6 @@ public class GroupByECService extends GroupByService<String> {
     private String getFullEc(String ec) {
         String[] tokens = ec.split(TOKEN_REGEX);
         int count = MAX_TOKEN_COUNT - tokens.length;
-        return ec + DASH.repeat(Math.max(0, count));
+        return ec + DASH.repeat(count);
     }
 }
