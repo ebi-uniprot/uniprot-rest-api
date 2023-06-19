@@ -10,6 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * @author lgonzales
@@ -45,5 +48,10 @@ public class HelpCentreStoreTestConfig {
                 return solrQuery;
             }
         };
+    }
+
+    @Bean
+    public RdfStreamer rdfStreamer() {
+        return mock(RdfStreamer.class);
     }
 }
