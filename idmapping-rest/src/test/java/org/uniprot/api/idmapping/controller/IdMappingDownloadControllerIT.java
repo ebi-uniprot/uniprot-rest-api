@@ -1013,7 +1013,7 @@ public class IdMappingDownloadControllerIT {
 
         assertTrue(
                 to.stream()
-                        .map(node -> node.findPath("entryType"))
+                        .map(node -> node.findPath("features"))
                         .filter(node -> !(node instanceof MissingNode))
                         .collect(Collectors.toSet())
                         .isEmpty());

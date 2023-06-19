@@ -50,10 +50,12 @@ public class UniProtKBBatchStoreEntryPairIterable
             UniProtStoreClient<UniProtKBEntry> storeClient,
             RetryPolicy<Object> retryPolicy,
             TaxonomyLineageService taxonomyLineageService,
+            UniprotKBMappingRepository uniprotKBMappingRepository,
             boolean addLineage) {
         super(sourceIterator, batchSize, storeClient, retryPolicy);
         this.addLineage = addLineage;
         this.taxonomyLineageService = taxonomyLineageService;
+        this.uniprotKBMappingRepository = uniprotKBMappingRepository;
     }
 
     @Override
