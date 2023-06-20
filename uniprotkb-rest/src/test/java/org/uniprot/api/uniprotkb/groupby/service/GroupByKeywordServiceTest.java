@@ -1,5 +1,19 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -17,20 +31,6 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByKeywordServiceTest {
@@ -119,7 +119,8 @@ class GroupByKeywordServiceTest {
                         argThat(
                                 arg ->
                                         arg != null
-                                                && TOP_LEVEL_KEYWORD_PARENT_QUERY.equals(arg.getQuery()))))
+                                                && TOP_LEVEL_KEYWORD_PARENT_QUERY.equals(
+                                                        arg.getQuery()))))
                 .thenAnswer(
                         invocation -> Stream.of(KEYWORD_ENTRY_A, KEYWORD_ENTRY_C, KEYWORD_ENTRY_F));
         when(keywordService.stream(
@@ -144,7 +145,10 @@ class GroupByKeywordServiceTest {
     @Test
     void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
         when(keywordService.stream(
-                        argThat(argument -> (TOP_LEVEL_KEYWORD_PARENT_QUERY).equals(argument.getQuery()))))
+                        argThat(
+                                argument ->
+                                        (TOP_LEVEL_KEYWORD_PARENT_QUERY)
+                                                .equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_C));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
@@ -193,7 +197,8 @@ class GroupByKeywordServiceTest {
     }
 
     @Test
-    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+    void
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         when(keywordService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -387,8 +392,7 @@ class GroupByKeywordServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_D)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
-                SOME_QUERY,
-                getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_E)))
+                        SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_E)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
@@ -419,8 +423,7 @@ class GroupByKeywordServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_D)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
-                SOME_QUERY,
-                getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_E)))
+                        SOME_QUERY, getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_E)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);

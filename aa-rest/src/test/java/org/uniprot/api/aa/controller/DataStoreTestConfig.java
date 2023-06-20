@@ -1,5 +1,7 @@
 package org.uniprot.api.aa.controller;
 
+import static org.mockito.Mockito.mock;
+
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
@@ -11,8 +13,6 @@ import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * @author sahmad

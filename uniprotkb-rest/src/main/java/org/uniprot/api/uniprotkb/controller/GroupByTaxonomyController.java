@@ -1,6 +1,8 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniprotkb.controller.GroupByTaxonomyController.GROUP_BY_TAXONOMY_RESOURCE;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.GroupByTaxonomyController.GROUP_BY_TAXONOMY_RESOURCE;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @RequestMapping(value = GROUP_BY_TAXONOMY_RESOURCE)
 @RestController
@@ -21,8 +22,7 @@ public class GroupByTaxonomyController extends GroupByController {
     private final GroupByTaxonomyService uniProtKBGroupByTaxonomyService;
 
     @Autowired
-    public GroupByTaxonomyController(
-            GroupByTaxonomyService uniProtKBGroupByTaxonomyService) {
+    public GroupByTaxonomyController(GroupByTaxonomyService uniProtKBGroupByTaxonomyService) {
         this.uniProtKBGroupByTaxonomyService = uniProtKBGroupByTaxonomyService;
     }
 

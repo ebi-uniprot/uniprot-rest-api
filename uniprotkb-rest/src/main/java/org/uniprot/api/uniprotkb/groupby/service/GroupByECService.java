@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
@@ -7,9 +10,6 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class GroupByECService extends GroupByService<String> {
@@ -65,8 +65,11 @@ public class GroupByECService extends GroupByService<String> {
 
     @Override
     protected void addToAncestors(
-            List<String> ancestors, List<String> entries, String parent, List<FacetField.Count> facetCounts) {
-        if (!facetCounts.isEmpty()){
+            List<String> ancestors,
+            List<String> entries,
+            String parent,
+            List<FacetField.Count> facetCounts) {
+        if (!facetCounts.isEmpty()) {
             String facetId = getFacetId(facetCounts.get(0));
             if (!Objects.equals(parent, facetId)) {
                 ancestors.add(getFullEc(facetId));

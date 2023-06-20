@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.uniprot.api.uniprotkb.groupby.model.*;
-import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.uniprot.api.uniprotkb.groupby.model.*;
+import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
 public abstract class GroupByService<T> {
     private final UniProtEntryService uniProtEntryService;
@@ -46,11 +46,16 @@ public abstract class GroupByService<T> {
         return StringUtils.isEmpty(parent);
     }
 
-    protected void addToAncestors(List<T> ancestors, List<T> entries, String parent, List<FacetField.Count> facetCounts) {
+    protected void addToAncestors(
+            List<T> ancestors, List<T> entries, String parent, List<FacetField.Count> facetCounts) {
         if (!facetCounts.isEmpty()) {
             String facetId = getFacetId(facetCounts.get(0));
             if (!Objects.equals(parent, facetId) && !entries.isEmpty()) {
-                ancestors.add(entries.stream().filter(t -> facetId.equals(getId(t))).findAny().orElseThrow());
+                ancestors.add(
+                        entries.stream()
+                                .filter(t -> facetId.equals(getId(t)))
+                                .findAny()
+                                .orElseThrow());
             }
         }
     }

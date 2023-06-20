@@ -1,5 +1,7 @@
 package org.uniprot.api.rest.download;
 
+import static org.mockito.Mockito.mock;
+
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -8,8 +10,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
-import static org.mockito.Mockito.mock;
 
 @Profile({"offline & !asyncDownload", "use-fake-app", "server-errors"})
 @TestConfiguration

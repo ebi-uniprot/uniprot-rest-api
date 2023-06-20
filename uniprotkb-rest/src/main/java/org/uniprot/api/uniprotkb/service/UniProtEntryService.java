@@ -1,5 +1,14 @@
 package org.uniprot.api.uniprotkb.service;
 
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.QUERY_FIELDS;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -44,15 +53,6 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.QUERY_FIELDS;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 
 @Service
 @Import(UniProtSolrQueryConfig.class)

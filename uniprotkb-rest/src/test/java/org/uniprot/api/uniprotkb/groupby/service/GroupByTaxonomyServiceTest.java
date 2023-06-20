@@ -1,5 +1,18 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -16,19 +29,6 @@ import org.uniprot.api.uniprotkb.groupby.model.Group;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByTaxonomyServiceTest {
@@ -110,7 +110,8 @@ class GroupByTaxonomyServiceTest {
                         argThat(
                                 arg ->
                                         arg != null
-                                                && TOP_LEVEL_TAXONOMY_PARENT_QUERY.equals(arg.getQuery()))))
+                                                && TOP_LEVEL_TAXONOMY_PARENT_QUERY.equals(
+                                                        arg.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_A, TAXONOMY_ENTRY_C));
         when(taxonomyService.stream(
                         argThat(arg -> arg != null && PARENT_TAX_ID_A.equals(arg.getQuery()))))
@@ -129,7 +130,10 @@ class GroupByTaxonomyServiceTest {
     @Test
     void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithNoChildren() {
         when(taxonomyService.stream(
-                        argThat(argument -> (TOP_LEVEL_TAXONOMY_PARENT_QUERY).equals(argument.getQuery()))))
+                        argThat(
+                                argument ->
+                                        (TOP_LEVEL_TAXONOMY_PARENT_QUERY)
+                                                .equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_C));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
@@ -174,7 +178,8 @@ class GroupByTaxonomyServiceTest {
     }
 
     @Test
-    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+    void
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -360,7 +365,7 @@ class GroupByTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_D_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_E_STRING)))
+                        SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
@@ -391,7 +396,7 @@ class GroupByTaxonomyServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_D_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_E_STRING)))
+                        SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_E_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_E);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);

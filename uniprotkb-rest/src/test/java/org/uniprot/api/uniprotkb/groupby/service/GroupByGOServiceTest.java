@@ -1,5 +1,18 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -15,19 +28,6 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.go.GOService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByGOServiceTest {
@@ -162,7 +162,8 @@ class GroupByGOServiceTest {
     }
 
     @Test
-    void getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+    void
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -339,8 +340,7 @@ class GroupByGOServiceTest {
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_D);
-        when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_E)))
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_C);
@@ -369,8 +369,7 @@ class GroupByGOServiceTest {
                         });
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_D);
-        when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_E)))
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_C);
