@@ -25,7 +25,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
@@ -41,6 +40,7 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+import org.uniprot.api.uniprotkb.service.UniProtKBEntryVersionService;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;
@@ -73,6 +73,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             java.util.regex.Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
 
     private final UniProtEntryService entryService;
+
+    @Autowired
+    UniProtKBEntryVersionService uniProtKBEntryVersionService;
 
     @Autowired
     public UniProtKBController(
@@ -209,7 +212,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             HttpServletRequest request) {
         if (Utils.notNullNotEmpty(version)
                 && ACCESSION_REGEX_PATTERN.matcher(accessionOrId).matches()) {
-            return redirectToUniSave(accessionOrId, request, Optional.of(getEntryVersion(request)));
+            String entryVersion = uniProtKBEntryVersionService.getEntryVersion(request, accessionOrId);
+            return redirectToUniSave(accessionOrId, request, Optional.of(entryVersion));
         }
         if (accessionOrId.contains("_")) {
             String accession = entryService.findAccessionByProteinId(accessionOrId);
@@ -227,38 +231,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 return super.getEntityResponse(entry, fields, request);
             }
         }
-    }
-
-    public String getEntryVersion(HttpServletRequest request) {
-        String version = null;
-        if (request.getParameter("version").equals("last")) {
-            try {
-                UriComponentsBuilder uriBuilder =
-                        UriComponentsBuilder.fromHttpUrl(String.valueOf(request.getRequestURL()));
-                String entryVersionHistoryURI = uriBuilder.toUriString().replace("uniprotkb", "unisave");
-                String response = Utils.httpGetRequest(entryVersionHistoryURI);
-                JSONObject jsonObject = new JSONObject(response);
-                if (!jsonObject.has("messages")) {
-                    version =
-                            jsonObject
-                                    .getJSONArray("results")
-                                    .getJSONObject(0)
-                                    .get("entryVersion")
-                                    .toString();
-                } else {
-                    String errorResponse = (String) ((JSONArray) jsonObject.get("messages")).get(0);
-                    throw new IllegalArgumentException(errorResponse);
-                }
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException(e);
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            version = request.getParameter("version");
-        }
-
-        return version;
     }
 
     /*
