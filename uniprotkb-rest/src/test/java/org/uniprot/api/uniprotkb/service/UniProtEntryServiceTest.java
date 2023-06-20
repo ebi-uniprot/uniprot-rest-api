@@ -4,17 +4,25 @@ import static java.util.Collections.EMPTY_SET;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
@@ -23,18 +31,22 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageS
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniProtTermsConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
+import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /** @author tibrahim */
 @ExtendWith(MockitoExtension.class)
-public class UniProtEntryServiceTest {
+class UniProtEntryServiceTest {
 
     @Mock private UniprotQueryRepository repository;
     @Mock private UniProtKBFacetConfig uniprotKBFacetConfig;
@@ -118,6 +130,106 @@ public class UniProtEntryServiceTest {
         assertTrue(!verifyFailingSolrRequestCase.getFilterQueries().isEmpty());
     }
 
+    @Test
+    void search_in_list_format_without_voldemort_being_called() {
+        mockSolrRequest();
+        // when
+        String acc1 = "P12345";
+        String acc2 = "P54321";
+        UniProtDocument doc1 = new UniProtDocument();
+        doc1.accession = acc1;
+        UniProtDocument doc2 = new UniProtDocument();
+        doc2.accession = acc2;
+        UniProtKBEntry entry1 =
+                new UniProtKBEntryBuilder(acc1, acc1, UniProtKBEntryType.SWISSPROT).build();
+        UniProtKBEntry entry2 =
+                new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
+        QueryResult<UniProtDocument> solrDocs =
+                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 1, 2));
+        UniProtKBSearchRequest request = new UniProtKBSearchRequest();
+        request.setQuery("field:value");
+        request.setSize(10);
+        request.setFormat(LIST_MEDIA_TYPE_VALUE);
+        when(repository.searchPage(any(), any())).thenReturn(solrDocs);
+        QueryResult<UniProtKBEntry> result = entryService.search(request);
+        List<UniProtKBEntry> entries = result.getContent().collect(Collectors.toList());
+        verify(entryStore, never()).getEntry(any());
+        assertEquals(2, entries.size());
+        assertEquals(entry1, entries.get(0));
+        assertEquals(entry2, entries.get(1));
+    }
+
+    @Test
+    void search_in_non_list_format_with_voldemort_being_called() {
+        mockSolrRequest();
+        // when
+        String acc1 = "Q56789";
+        String acc2 = "P56789";
+        UniProtDocument doc1 = new UniProtDocument();
+        doc1.accession = acc1;
+        UniProtDocument doc2 = new UniProtDocument();
+        doc2.accession = acc2;
+        UniProtKBEntry entry1 =
+                new UniProtKBEntryBuilder(acc1, acc1, UniProtKBEntryType.SWISSPROT).build();
+        UniProtKBEntry entry2 =
+                new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
+        QueryResult<UniProtDocument> solrDocs =
+                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 2));
+        UniProtKBSearchRequest request = new UniProtKBSearchRequest();
+        request.setQuery("field2:value");
+        request.setSize(10);
+        request.setFormat(TSV_MEDIA_TYPE_VALUE);
+        when(repository.searchPage(any(), any())).thenReturn(solrDocs);
+        doReturn(Optional.of(entry1)).when(entryStore).getEntry(acc1);
+        doReturn(Optional.of(entry2)).when(entryStore).getEntry(acc2);
+        QueryResult<UniProtKBEntry> result = entryService.search(request);
+        List<UniProtKBEntry> entries = result.getContent().collect(Collectors.toList());
+        verify(entryStore, times(2)).getEntry(any());
+        assertEquals(2, entries.size());
+        assertEquals(entry1, entries.get(0));
+    }
+
+    @Test
+    void stream_in_list_format_without_voldemort_being_called() {
+        mockSolrRequest();
+        // when
+        String acc1 = "Q12345";
+        String acc2 = "Q54321";
+        UniProtKBEntry entry1 =
+                new UniProtKBEntryBuilder(acc1, acc1, UniProtKBEntryType.SWISSPROT).build();
+        UniProtKBEntry entry2 =
+                new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
+        UniProtKBStreamRequest request = new UniProtKBStreamRequest();
+        request.setQuery("field1:value1");
+        request.setFormat(LIST_MEDIA_TYPE_VALUE);
+        when(documentIdStream.fetchIds(any())).thenReturn(Stream.of(acc1, acc2));
+        Stream<UniProtKBEntry> result = entryService.stream(request);
+        List<UniProtKBEntry> entries = result.collect(Collectors.toList());
+        verify(entryStore, never()).getEntries(any());
+        assertEquals(2, entries.size());
+        assertEquals(entry1, entries.get(0));
+        assertEquals(entry2, entries.get(1));
+    }
+
+    @Test
+    void stream_in_non_list_format_with_voldemort_store_streamer_being_called() {
+        mockSolrRequest();
+        // when
+        String acc1 = "P56789";
+        UniProtKBEntry entry1 =
+                new UniProtKBEntryBuilder(acc1, acc1, UniProtKBEntryType.SWISSPROT).build();
+        UniProtKBStreamRequest request = new UniProtKBStreamRequest();
+        request.setQuery("field1:value1");
+        request.setFormat(APPLICATION_JSON_VALUE);
+        when(uniProtEntryStoreStreamer.idsToStoreStream(any(), any()))
+                .thenReturn(Stream.of(entry1));
+        Stream<UniProtKBEntry> result = entryService.stream(request);
+        List<UniProtKBEntry> entries = result.collect(Collectors.toList());
+        verify(uniProtEntryStoreStreamer, times(1)).idsToStoreStream(any(), any());
+        assertEquals(1, entries.size());
+        assertEquals(entry1, entries.get(0));
+    }
+
     private void mockSolrRequest() {
         SearchFieldConfig searchFieldConfig =
                 SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB);
@@ -128,14 +240,13 @@ public class UniProtEntryServiceTest {
         SearchFieldItem accessionSearchField =
                 searchFieldConfig.getSearchFieldItemByName("accession");
 
-        Mockito.when(uniProtKBQueryProcessorConfig.getOptimisableFields())
+        when(uniProtKBQueryProcessorConfig.getOptimisableFields())
                 .thenReturn(List.of(accessionSearchField));
-        Mockito.when(uniProtKBQueryProcessorConfig.getSearchFieldsNames()).thenReturn(EMPTY_SET);
-        Mockito.when(uniProtKBQueryProcessorConfig.getLeadingWildcardFields())
-                .thenReturn(EMPTY_SET);
-        Mockito.when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("accession_id"))
+        when(uniProtKBQueryProcessorConfig.getSearchFieldsNames()).thenReturn(EMPTY_SET);
+        when(uniProtKBQueryProcessorConfig.getLeadingWildcardFields()).thenReturn(EMPTY_SET);
+        when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("accession_id"))
                 .thenReturn(accessionIdSearchField);
-        Mockito.when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("is_isoform"))
+        when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("is_isoform"))
                 .thenReturn(isoFormSearchField);
     }
 }

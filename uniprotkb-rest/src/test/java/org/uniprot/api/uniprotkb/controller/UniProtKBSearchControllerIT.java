@@ -923,7 +923,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=accession:I8FBX2")
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "accession:I8FBX2")
+                                        .param("fields", "accession")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         response.andDo(log())
@@ -1493,7 +1495,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=*&fields=accession,xref_dbsnp")
+                                get(SEARCH_RESOURCE + "?query=*&fields=xref_dbsnp")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
@@ -1650,6 +1652,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     }
 
     @Override
+    protected String getAllReturnedFieldsQuery() {
+        return "id:*";
+    }
+
+    @Override
     protected void saveEntry(SaveScenario saveContext) {
         UniProtEntryConverter converter = new UniProtEntryConverter(new HashMap<>());
         UniProtKBEntry entry =
@@ -1674,8 +1681,15 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         if (SaveScenario.SEARCH_ALL_FIELDS.equals(saveContext)
                 || SaveScenario.SEARCH_ALL_RETURN_FIELDS.equals(saveContext)
                 || SaveScenario.FACETS_SUCCESS.equals(saveContext)) {
+
+            InactiveUniProtEntry inactiveDrome =
+                    InactiveUniProtEntry.from("I8FBX0", "INACTIVE_DROME", DELETED, null);
+            getStoreManager()
+                    .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
+
             UniProtDocument doc = new UniProtDocument();
             doc.accession = "P00001";
+            doc.id = "Search All";
             doc.active = true;
             doc.fragment = true;
             doc.precursor = true;

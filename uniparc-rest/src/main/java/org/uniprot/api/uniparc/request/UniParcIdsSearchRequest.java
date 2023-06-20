@@ -76,6 +76,9 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String sort;
 
+    @Parameter(hidden = true)
+    private String format;
+
     public String getCommaSeparatedIds() {
         return this.upis;
     }

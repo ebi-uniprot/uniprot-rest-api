@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 
 /**
  * @author jluo
@@ -28,6 +29,12 @@ public class DataStoreTestConfig {
     @Profile("offline")
     public SolrClient solrClient() {
         return Mockito.mock(SolrClient.class);
+    }
+
+    @Bean
+    @Profile("offline")
+    public RdfStreamer rdfStreamer() {
+        return Mockito.mock(RdfStreamer.class);
     }
 
     @Bean

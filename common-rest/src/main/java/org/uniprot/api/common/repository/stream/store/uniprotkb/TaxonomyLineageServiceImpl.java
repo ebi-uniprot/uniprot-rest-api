@@ -112,6 +112,7 @@ public class TaxonomyLineageServiceImpl extends BasicSearchService<TaxonomyDocum
     static class TaxonomyLineageStreamRequest implements StreamRequest {
 
         private final String query;
+        private String format;
 
         TaxonomyLineageStreamRequest(String query) {
             this.query = query;
@@ -130,6 +131,16 @@ public class TaxonomyLineageServiceImpl extends BasicSearchService<TaxonomyDocum
         @Override
         public String getSort() {
             return null;
+        }
+
+        @Override
+        public String getFormat() {
+            return null;
+        }
+
+        @Override
+        public void setFormat(String format) {
+            this.format = format;
         }
 
         @Override

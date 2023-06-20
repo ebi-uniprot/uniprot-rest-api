@@ -53,6 +53,11 @@ public class PIRServiceImpl extends IdMappingPIRService {
                                     .getSearchFieldItemByName("accession_id")
                                     .getValidRegex()
                             + "(\\[[0-9]+\\-[0-9]+\\]|\\.[0-9]+)");
+    public static final Pattern UNIPROTKB_ACCESSION_REGEX =
+            Pattern.compile(
+                    SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+                            .getSearchFieldItemByName("accession_id")
+                            .getValidRegex());
 
     public final String pirIdMappingUrl;
     private final RestTemplate restTemplate;
@@ -115,7 +120,7 @@ public class PIRServiceImpl extends IdMappingPIRService {
                     Arrays.stream(ids.split(","))
                             .map(this::cleanIdBeforeSubmit)
                             .collect(Collectors.toCollection(LinkedHashSet::new));
-            ids = uniqueIds.stream().collect(Collectors.joining(","));
+            ids = String.join(",", uniqueIds);
         }
         return ids;
     }
@@ -129,6 +134,9 @@ public class PIRServiceImpl extends IdMappingPIRService {
             if (id.contains("[")) {
                 result = id.substring(0, id.indexOf("["));
             }
+        } else if (id.contains("_")
+                && UNIPROTKB_ACCESSION_REGEX.matcher(id.split("_")[0]).matches()) {
+            result = id.substring(0, id.indexOf("_"));
         }
         return result.strip();
     }

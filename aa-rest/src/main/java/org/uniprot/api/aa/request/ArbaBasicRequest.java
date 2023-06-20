@@ -38,4 +38,7 @@ public class ArbaBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.ARBA)
     private String fields;
+
+    @Parameter(hidden = true)
+    private String format;
 }

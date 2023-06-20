@@ -42,4 +42,7 @@ public class CrossRefBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.CROSSREF)
     private String fields;
+
+    @Parameter(hidden = true)
+    private String format;
 }

@@ -115,11 +115,23 @@ public abstract class AbstractMessageListener implements MessageListener {
     protected void updateDownloadJob(
             Message message, DownloadJob downloadJob, JobStatus jobStatus, String resultFile) {
         if (Objects.nonNull(downloadJob)) {
+            int retryCount = getRetryCount(message);
+            String error = getLastError(message);
+            updateDownloadJob(downloadJob, jobStatus, error, retryCount, resultFile);
+        }
+    }
+
+    protected void updateDownloadJob(
+            DownloadJob downloadJob,
+            JobStatus jobStatus,
+            String error,
+            int retryCount,
+            String resultFile) {
+        if (Objects.nonNull(downloadJob)) {
             LocalDateTime now = LocalDateTime.now();
             downloadJob.setUpdated(now);
             downloadJob.setStatus(jobStatus);
-            downloadJob.setRetried(getRetryCount(message));
-            String error = getLastError(message);
+            downloadJob.setRetried(retryCount);
             downloadJob.setError(error);
             downloadJob.setResultFile(resultFile);
             this.jobRepository.save(downloadJob);
