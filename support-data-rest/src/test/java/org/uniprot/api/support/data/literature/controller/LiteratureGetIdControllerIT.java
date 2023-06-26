@@ -69,8 +69,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
     private RestTemplate restTemplate;
 
     private static final long PUBMED_ID = 100L;
-    private static final String SUBMISSION_ID = "CI-6LG40CJ34FGTT";
-
+    private static final String SUBMISSION_ID = "CI-SUB-6LG40CJ34FGTT";
     @Autowired private LiteratureRepository repository;
 
     @Override
@@ -191,6 +190,7 @@ class LiteratureGetIdControllerIT extends AbstractGetByIdWithTypeExtensionContro
         return "/citations/";
     }
 
+    // TODO: Revert submission id when changes are live in schema
     @Test
     void getBySubmissionIdWithRdfExtensionFailure() throws Exception {
         // when

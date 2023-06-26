@@ -3,6 +3,7 @@ package org.uniprot.api.support.data.literature.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.LITERATURE;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.LITERATURE_ID_REGEX;
 
 import java.util.Optional;
 
@@ -55,7 +56,6 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     private static final String DATA_TYPE = "citations";
 
     private final LiteratureService literatureService;
-    private static final String LITERATURE_ID_REGEX = "^[0-9]+$|CI-\\w{1,13}$|IND[0-9]+$";
 
     public LiteratureController(
             ApplicationEventPublisher eventPublisher,

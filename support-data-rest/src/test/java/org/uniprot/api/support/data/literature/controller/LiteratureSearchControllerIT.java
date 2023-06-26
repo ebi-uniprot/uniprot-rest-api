@@ -64,7 +64,7 @@ import org.uniprot.store.search.document.literature.LiteratureDocument;
         })
 class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
 
-    private static final String SUBMISSION_ID = "CI-6LG40CJ34FGTT";
+    private static final String SUBMISSION_ID = "CI-SUB-6LG40CJ34FGTT";
 
     @Autowired private LiteratureFacetConfig facetConfig;
 
@@ -124,6 +124,7 @@ class LiteratureSearchControllerIT extends AbstractSearchWithFacetControllerIT {
         LongStream.rangeClosed(1, numberOfEntries).forEach(i -> saveEntry(i, i % 2 == 0));
     }
 
+    // TODO: Fix submission id when schema changes are done
     @Override
     protected void saveEntry(SaveScenario saveContext) {
         saveEntry(10, true);
