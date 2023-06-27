@@ -2,18 +2,8 @@ package org.uniprot.api.uniprotkb.service;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.restlet.Response;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.core.util.Utils;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class UniProtKBEntryVersionService {
@@ -24,14 +14,14 @@ public class UniProtKBEntryVersionService {
         this.uniSaveClient = uniSaveClient;
     }
 
-    public String getEntryVersion(HttpServletRequest request, String accession) {
-        String version = null;
-        if (request.getParameter("version").equals("last")) {
+    public String getEntryVersion(String version, String accession) {
+        String entryVersion = null;
+        if (version.equals("last")) {
             try {
                 String response = uniSaveClient.getUniSaveHistoryVersion(accession);
                 JSONObject jsonObject = new JSONObject(response);
                 if (!jsonObject.has("messages")) {
-                    version =
+                    entryVersion =
                             jsonObject
                                     .getJSONArray("results")
                                     .getJSONObject(0)
@@ -47,9 +37,9 @@ public class UniProtKBEntryVersionService {
                 throw e;
             }
         } else {
-            version = request.getParameter("version");
+            entryVersion = version;
         }
 
-        return version;
+        return entryVersion;
     }
 }

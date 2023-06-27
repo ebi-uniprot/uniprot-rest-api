@@ -1,20 +1,15 @@
 package org.uniprot.api.uniprotkb.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,9 +30,7 @@ public class UniProtKBEntryVersionServiceTest {
     void searchAccessionLastVersionFromUnisave() throws Exception {
         when(uniSaveClient.getUniSaveHistoryVersion("A0A1J4H6S2"))
                 .thenReturn(SAMPLE_ENTRY_VERSION_HISTORY_RESPONSE);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getParameter("version")).thenReturn("last");
-        String entryVersion = uniProtKBEntryVersionService.getEntryVersion(request, "A0A1J4H6S2");
+        String entryVersion = uniProtKBEntryVersionService.getEntryVersion("last", "A0A1J4H6S2");
         assertEquals(entryVersion, "9");
     }
 
@@ -45,10 +38,8 @@ public class UniProtKBEntryVersionServiceTest {
     void uniSaveEntryHistoryEndpointWithAccessionNotPresent() throws Exception {
         when(uniSaveClient.getUniSaveHistoryVersion("B0B1J1H6A7"))
                 .thenReturn(SAMPLE_ENTRY_VERSION_HISTORY_NOT_FOUND);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getParameter("version")).thenReturn("last");
         Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-            uniProtKBEntryVersionService.getEntryVersion(request, "B0B1J1H6A7");
+            uniProtKBEntryVersionService.getEntryVersion("last", "B0B1J1H6A7");
         });
         String expectedMessage = "No entries for B0B1J1H6A7 were found";
         String actualMessage = exception.getMessage();
