@@ -1,5 +1,24 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,28 +68,7 @@ import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
-
-/**
- * @author lgonzales
- */
+/** @author lgonzales */
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
@@ -78,10 +76,10 @@ import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERG
 @WebMvcTest(UniProtKBController.class)
 @ExtendWith(
         value = {
-                SpringExtension.class,
-                UniProtKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
-                UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class,
-                MockitoExtension.class
+            SpringExtension.class,
+            UniProtKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
+            UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class,
+            MockitoExtension.class
         })
 class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
 
@@ -89,16 +87,14 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     private static final String ACCESSION_ID = "Q8DIA7";
 
-    @Autowired
-    private UniprotQueryRepository repository;
+    @Autowired private UniprotQueryRepository repository;
 
     private UniProtKBStoreClient storeClient;
 
     @MockBean(name = "uniProtRdfRestTemplate")
     private RestTemplate restTemplate;
 
-    @Autowired
-    private UniSaveClient uniSaveClient;
+    @Autowired private UniSaveClient uniSaveClient;
 
     public Stream<Arguments> fetchingInactiveEntriesWithFileExtension() {
         return Stream.of(
@@ -445,8 +441,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                HttpHeaders.LOCATION,
-                                "/unisave/P21802?from=P21802.20&versions=20&format=json"));
+                                        HttpHeaders.LOCATION,
+                                        "/unisave/P21802?from=P21802.20&versions=20&format=json"));
     }
 
     @Test
@@ -469,8 +465,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                HttpHeaders.LOCATION,
-                                "/uniprotkb/P21802?from=FGFR2_HUMAN"));
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/P21802?from=FGFR2_HUMAN"));
     }
 
     @Test
@@ -519,8 +515,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                HttpHeaders.LOCATION,
-                                "/uniprotkb/P21802?from=FGFR2_HUMAN"));
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/P21802?from=FGFR2_HUMAN"));
     }
 
     @Test
@@ -548,8 +544,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                HttpHeaders.LOCATION,
-                                "/uniprotkb/Q14301?from=Q14301_FGFR2"));
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/Q14301?from=Q14301_FGFR2"));
     }
 
     @Test
@@ -577,8 +573,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
                 .andExpect(
                         header().string(
-                                HttpHeaders.LOCATION,
-                                "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
+                                        HttpHeaders.LOCATION,
+                                        "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
     }
 
     @Test
@@ -600,8 +596,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FF_MEDIA_TYPE_VALUE))
                 .andExpect(
                         header().string(
-                                HttpHeaders.LOCATION,
-                                getRedirectToEntryVersionPath("A0A1J4H6S2", "9", "txt")));
+                                        HttpHeaders.LOCATION,
+                                        getRedirectToEntryVersionPath("A0A1J4H6S2", "9", "txt")));
     }
 
     @Test
@@ -620,8 +616,16 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResourceNotFoundException))
-                .andExpect(result -> assertEquals("No entries for B0B1J1H6A7 were found", result.getResolvedException().getMessage()));
+                .andExpect(
+                        result ->
+                                assertTrue(
+                                        result.getResolvedException()
+                                                instanceof ResourceNotFoundException))
+                .andExpect(
+                        result ->
+                                assertEquals(
+                                        "No entries for B0B1J1H6A7 were found",
+                                        result.getResolvedException().getMessage()));
     }
 
     @Test
@@ -639,8 +643,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FF_MEDIA_TYPE_VALUE))
                 .andExpect(
                         header().string(
-                                HttpHeaders.LOCATION,
-                                getRedirectToEntryVersionPath("A0A1J4H6S2", "5", "txt")));
+                                        HttpHeaders.LOCATION,
+                                        getRedirectToEntryVersionPath("A0A1J4H6S2", "5", "txt")));
     }
 
     @Test
@@ -685,8 +689,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     private String getRedirectToEntryVersionPath(String accession, String version, String format) {
         return String.format(
-                "/unisave/%s?from=%s&versions=%s&format=%s",
-                accession, accession, version, format);
+                "/unisave/%s?from=%s&versions=%s&format=%s", accession, accession, version, format);
     }
 
     @Override
