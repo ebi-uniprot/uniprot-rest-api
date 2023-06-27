@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.service.UniSaveClient;
 import org.uniprot.store.datastore.voldemort.VoldemortClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 
@@ -76,5 +77,12 @@ public class DataStoreTestConfig {
     @Profile("offline")
     public RestTemplate restTemplate() {
         return mock(RestTemplate.class);
+    }
+
+    @Bean()
+    @Profile("offline")
+    public UniSaveClient unisaveClient() {
+        UniSaveClient client = mock(UniSaveClient.class);
+        return client;
     }
 }

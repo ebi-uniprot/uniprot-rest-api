@@ -1,6 +1,9 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -22,6 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,6 +39,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.web.client.RestTemplate;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.controller.AbstractGetByIdWithTypeExtensionControllerIT;
 import org.uniprot.api.rest.controller.param.ContentTypeParam;
@@ -50,6 +56,7 @@ import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.service.UniSaveClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -61,8 +68,6 @@ import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /** @author lgonzales */
 @ContextConfiguration(
         classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
@@ -73,10 +78,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
         value = {
             SpringExtension.class,
             UniProtKBByAccessionControllerIT.UniprotKBGetIdParameterResolver.class,
-            UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class
+            UniProtKBByAccessionControllerIT.UniprotKBGetIdContentTypeParamResolver.class,
+            MockitoExtension.class
         })
 class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
-    @Autowired private ObjectMapper objectMapper;
 
     private static final String ACCESSION_RESOURCE = UNIPROTKB_RESOURCE + "/{accession}";
 
@@ -88,6 +93,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
     @MockBean(name = "uniProtRdfRestTemplate")
     private RestTemplate restTemplate;
+
+    @Autowired private UniSaveClient uniSaveClient;
 
     public Stream<Arguments> fetchingInactiveEntriesWithFileExtension() {
         return Stream.of(
@@ -568,6 +575,121 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                         header().string(
                                         HttpHeaders.LOCATION,
                                         "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
+    }
+
+    @Test
+    void searchAccessionLastVersionFromUnisave() throws Exception {
+        String SAMPLE_ENTRY_VERSION_HISTORY_RESPONSE =
+                "{'results':[{'accession':'A0A1J4H6S2','database':'TrEMBL','entryVersion':9,'firstRelease':'2021_02/2021_02','firstReleaseDate':'07-Apr-2021','lastRelease':'2022_01/2022_01','lastReleaseDate':'23-Feb-2022','name':'A0A1J4H6S2_9STAP','sequenceVersion':1}]}";
+
+        when(uniSaveClient.getUniSaveHistoryVersion(Mockito.any()))
+                .thenReturn(SAMPLE_ENTRY_VERSION_HISTORY_RESPONSE);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                        .param("version", "last")
+                                        .header(ACCEPT, FF_MEDIA_TYPE_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FF_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        getRedirectToEntryVersionPath("A0A1J4H6S2", "9", "txt")));
+    }
+
+    @Test
+    void uniSaveEntryHistoryEndpointWithAccessionNotPresent() throws Exception {
+        String SAMPLE_ENTRY_VERSION_HISTORY_NOT_FOUND =
+                "{'url':'http://rest.uniprot.org/unisave/B0B1J1H6A7','messages':['No entries for B0B1J1H6A7 were found']}";
+
+        when(uniSaveClient.getUniSaveHistoryVersion(Mockito.any()))
+                .thenReturn(SAMPLE_ENTRY_VERSION_HISTORY_NOT_FOUND);
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "B0B1J1H6A7")
+                                        .param("version", "last")
+                                        .header(ACCEPT, FF_MEDIA_TYPE_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(
+                        result ->
+                                assertTrue(
+                                        result.getResolvedException()
+                                                instanceof ResourceNotFoundException))
+                .andExpect(
+                        result ->
+                                assertEquals(
+                                        "No entries for B0B1J1H6A7 were found",
+                                        result.getResolvedException().getMessage()));
+    }
+
+    @Test
+    void searchAccessionSpecificVersionRedirectToUnisave() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                        .param("version", "5")
+                                        .header(ACCEPT, FF_MEDIA_TYPE_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FF_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.LOCATION,
+                                        getRedirectToEntryVersionPath("A0A1J4H6S2", "5", "txt")));
+    }
+
+    @Test
+    void searchAccessionSpecificVersionWithNonAllowedJsonFormat() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                        .param("version", "3")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
+    }
+
+    @Test
+    void searchAccessionSpecificVersionWithNonAllowedTsvFormat() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                        .param("version", "5")
+                                        .header(ACCEPT, TSV_MEDIA_TYPE_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, TSV_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
+    }
+
+    private String getRedirectToEntryVersionPath(String accession, String version, String format) {
+        return String.format(
+                "/unisave/%s?from=%s&versions=%s&format=%s", accession, accession, version, format);
     }
 
     @Override
