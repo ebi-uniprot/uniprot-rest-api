@@ -41,7 +41,7 @@ public class UniParcBatchStoreEntryPairIterable
             IdMappingStringPair mId, Map<String, UniParcEntry> idEntryMap) {
         return UniParcEntryPair.builder()
                 .from(mId.getFrom())
-                .to(idEntryMap.get(mId.getTo()))
+                .to(idEntryMap.getOrDefault(mId.getTo(), null))
                 .build();
     }
 

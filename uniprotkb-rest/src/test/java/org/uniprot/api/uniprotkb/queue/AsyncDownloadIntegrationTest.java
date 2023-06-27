@@ -11,13 +11,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -82,12 +81,6 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
     @Autowired private TupleStreamTemplate tupleStreamTemplate;
     @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
 
-    @Autowired
-    @Qualifier("uniProtKBSolrClient")
-    private SolrClient
-            solrClient; // this is NOT inmemory solr cluster client, see CloudSolrClient in parent
-    // class
-
     @SpyBean
     private DownloadJobRepository
             downloadJobRepository; // RedisRepository with inMemory redis server
@@ -102,6 +95,9 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
     @Value("${async.download.retryMaxCount}")
     private int maxRetry;
 
+    @Value("${async.download.embeddings.maxEntryCount}")
+    private long maxEntryCount;
+
     @Test
     void sendAndProcessDownloadMessageSuccessfully() throws IOException {
         String query = "content:P";
@@ -112,7 +108,7 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         verify(this.messageService, never()).alreadyProcessed(jobId);
         // redis entry created
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobFinished(jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobFinished(jobId));
         verifyMessageListener(1, 0, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false);
         verifyIdsAndResultFiles(jobId);
@@ -131,11 +127,11 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobErrored(jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobErrored(jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
         // after certain delay the job should be reprocessed
-        await().until(jobFinished(jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobFinished(jobId));
         verifyMessageListener(2, 1, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true);
         verifyIdsAndResultFiles(jobId);
@@ -156,7 +152,7 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobErrored(jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobErrored(jobId));
         await().until(jobRetriedMaximumTimes(jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
@@ -189,7 +185,7 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         this.messageService.sendMessage(request);
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobErrored(jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobErrored(jobId));
         await().until(getJobRetriedCount(jobId), Matchers.equalTo(2));
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
         //        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
@@ -210,16 +206,16 @@ public class AsyncDownloadIntegrationTest extends AbstractUniProtKBDownloadIT {
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
-        await().until(jobErrored(jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobErrored(jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
         // after certain delay the job should be reprocessed from kb side
-        await().until(jobUnfinished(jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobUnfinished(jobId));
         verifyRedisEntry(query, jobId, List.of(JobStatus.UNFINISHED), 1, true);
         // then job should be picked by embeddings consumers and set to Running again
         //        await().until(jobRunning(jobId));
         // the job should be completed after sometime by embeddings consumer
-        await().until(jobFinished(jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobFinished(jobId));
         // verify ids file generated from solr
         verifyIdsFile(jobId);
         // verify result file doesn't exist yet

@@ -11,6 +11,7 @@ import org.uniprot.store.config.UniProtDataType;
 public class UniProtKBIdsPostRequest extends IdsDownloadRequest {
     private String accessions;
     private String fields;
+    private String format;
 
     public String getCommaSeparatedIds() {
         return this.accessions;

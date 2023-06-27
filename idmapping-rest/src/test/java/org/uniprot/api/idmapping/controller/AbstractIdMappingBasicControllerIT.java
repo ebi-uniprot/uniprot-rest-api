@@ -380,7 +380,7 @@ abstract class AbstractIdMappingBasicControllerIT extends AbstractStreamControll
         assertThat(name, notNullValue());
         assertThat(paths, notNullValue());
         // when
-        IdMappingJob job = getJobOperation().createAndPutJobInCache();
+        IdMappingJob job = getJobOperation().createAndPutJobInCacheForAllFields();
         ResultActions response =
                 performRequest(
                         get(getIdMappingResultPath(), job.getJobId())

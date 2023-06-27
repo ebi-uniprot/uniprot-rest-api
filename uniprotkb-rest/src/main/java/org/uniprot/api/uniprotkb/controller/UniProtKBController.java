@@ -140,6 +140,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
         setPreviewInfo(searchRequest, preview);
+        setBasicRequestFormat(searchRequest, request);
         QueryResult<UniProtKBEntry> result = entryService.search(searchRequest);
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
@@ -275,7 +276,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
-
+        setBasicRequestFormat(streamRequest, request);
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
             return super.streamRdf(

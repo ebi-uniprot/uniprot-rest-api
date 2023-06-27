@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.service;
 
 import static java.util.Arrays.asList;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.UNIPROTKB_ACCESSION_REGEX;
 import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LIMIT_EXCEED_ERROR;
@@ -44,6 +45,9 @@ public class PIRResponseConverter {
                             .getSearchFieldItemByName("accession_id")
                             .getValidRegex());
     private static final String NO_MATCHES_PIR_RESPONSE = "MSG: 200 -- No Matches.";
+    public static final String SEQ_SEP = "[";
+    public static final String VERSION_SEP = ".";
+    public static final String ID_SEP = "_";
 
     static boolean isValidIdPattern(String to, String toValue) {
         to = to.strip();
@@ -136,7 +140,9 @@ public class PIRResponseConverter {
     Map<String, Set<String>> getMappedRequestIds(IdMappingJobRequest request) {
         Map<String, Set<String>> mappedIds = new HashMap<>();
         if (ACC_ID_STR.equals(request.getFrom())
-                && (request.getIds().contains("[") || request.getIds().contains("."))) {
+                && (request.getIds().contains(SEQ_SEP)
+                        || request.getIds().contains(VERSION_SEP)
+                        || request.getIds().contains(ID_SEP))) {
             String ids = String.join(",", request.getIds());
             mappedIds =
                     Arrays.stream(ids.split(","))
@@ -152,8 +158,8 @@ public class PIRResponseConverter {
             mappedIds.replaceAll(
                     (key, values) -> {
                         String firstValue = new ArrayList<>(values).get(0);
-                        return (firstValue.contains("."))
-                                ? Set.of(firstValue.substring(0, firstValue.indexOf(".")))
+                        return (firstValue.contains(VERSION_SEP))
+                                ? Set.of(firstValue.substring(0, firstValue.indexOf(VERSION_SEP)))
                                 : values;
                     });
         }
@@ -163,12 +169,16 @@ public class PIRResponseConverter {
     private Map.Entry<String, String> getMappedId(String id) {
         Map.Entry<String, String> result = null;
         if (UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION.matcher(id).matches()) {
-            if (id.contains(".")) {
-                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(".")), id);
+            if (id.contains(VERSION_SEP)) {
+                result =
+                        new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(VERSION_SEP)), id);
             }
-            if (id.contains("[")) {
-                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf("[")), id);
+            if (id.contains(SEQ_SEP)) {
+                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(SEQ_SEP)), id);
             }
+        } else if (id.contains(ID_SEP)
+                && UNIPROTKB_ACCESSION_REGEX.matcher(id.split(ID_SEP)[0]).matches()) {
+            result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(ID_SEP)), id);
         }
         return result;
     }

@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.service;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,8 +52,6 @@ public class UniRefEntryLightService
     private final SearchFieldConfig searchFieldConfig;
     private final RdfStreamer rdfStreamer;
 
-    private final TupleStreamDocumentIdStream documentIdStream;
-
     @Autowired
     public UniRefEntryLightService(
             UniRefQueryRepository repository,
@@ -64,7 +64,7 @@ public class UniRefEntryLightService
             SearchFieldConfig uniRefSearchFieldConfig,
             RdfStreamer unirefRdfStreamer,
             FacetTupleStreamTemplate facetTupleStreamTemplate,
-            TupleStreamDocumentIdStream documentIdStream) {
+            TupleStreamDocumentIdStream solrIdStreamer) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -72,12 +72,12 @@ public class UniRefEntryLightService
                 facetConfig,
                 storeStreamer,
                 uniRefSolrQueryConf,
-                facetTupleStreamTemplate);
+                facetTupleStreamTemplate,
+                solrIdStreamer);
         this.uniRefQueryProcessorConfig = uniRefQueryProcessorConfig;
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.solrQueryConfig = uniRefSolrQueryConf;
         this.rdfStreamer = unirefRdfStreamer;
-        this.documentIdStream = documentIdStream;
     }
 
     @Override
@@ -107,35 +107,41 @@ public class UniRefEntryLightService
         Set<ProblemPair> warnings =
                 getWarnings(
                         request.getQuery(), uniRefQueryProcessorConfig.getLeadingWildcardFields());
-        if (!unirefRequest.isComplete()) {
-            Stream<UniRefEntryLight> content =
-                    result.getContent().map(this::removeOverLimitAndCleanMemberId);
+        if (!LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            if (!unirefRequest.isComplete()) {
+                Stream<UniRefEntryLight> content =
+                        result.getContent().map(this::removeOverLimitAndCleanMemberId);
 
-            result =
-                    QueryResult.of(
-                            content,
-                            result.getPage(),
-                            result.getFacets(),
-                            null,
-                            null,
-                            result.getSuggestions(),
-                            warnings);
-        } else {
-            Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
+                result =
+                        QueryResult.of(
+                                content,
+                                result.getPage(),
+                                result.getFacets(),
+                                null,
+                                null,
+                                result.getSuggestions(),
+                                warnings);
+            } else {
+                Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
 
-            result = QueryResult.of(content, result.getPage(), result.getFacets(), null, warnings);
+                result =
+                        QueryResult.of(
+                                content, result.getPage(), result.getFacets(), null, warnings);
+            }
         }
         return result;
     }
 
     @Override
     public Stream<UniRefEntryLight> stream(StreamRequest request) {
-        UniRefStreamRequest unirefRequest = (UniRefStreamRequest) request;
+        UniRefStreamRequest uniRefRequest = (UniRefStreamRequest) request;
         Stream<UniRefEntryLight> result = super.stream(request);
-        if (!unirefRequest.isComplete()) {
-            result = result.map(this::removeOverLimitAndCleanMemberId);
-        } else {
-            result = result.map(this::cleanMemberId);
+        if (!LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            if (!uniRefRequest.isComplete()) {
+                result = result.map(this::removeOverLimitAndCleanMemberId);
+            } else {
+                result = result.map(this::cleanMemberId);
+            }
         }
         return result;
     }
@@ -156,7 +162,7 @@ public class UniRefEntryLightService
             UniRefStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        List<String> entryIds = documentIdStream.fetchIds(solrRequest).collect(Collectors.toList());
+        List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).collect(Collectors.toList());
         return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
@@ -173,6 +179,12 @@ public class UniRefEntryLightService
     @Override
     protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
+    }
+
+    @Override
+    protected UniRefEntryLight mapToThinEntry(String uniRefId) {
+        UniRefEntryLightBuilder builder = new UniRefEntryLightBuilder().id(uniRefId);
+        return builder.build();
     }
 
     private UniRefEntryLight cleanMemberId(UniRefEntryLight entry) {

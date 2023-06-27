@@ -102,7 +102,9 @@ public abstract class BasicSearchService<D extends Document, R> {
     public QueryResult<R> search(SearchRequest request) {
         SolrRequest solrRequest = createSearchSolrRequest(request);
         QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
-        Stream<R> converted = results.getContent().map(entryConverter).filter(Objects::nonNull);
+
+        Stream<R> converted = convertDocumentsToEntries(request, results);
+
         Set<ProblemPair> warnings = getWarnings(request.getQuery(), Set.of());
         return QueryResult.of(
                 converted,
@@ -112,6 +114,10 @@ public abstract class BasicSearchService<D extends Document, R> {
                 null,
                 results.getSuggestions(),
                 warnings);
+    }
+
+    protected Stream<R> convertDocumentsToEntries(SearchRequest request, QueryResult<D> results) {
+        return results.getContent().map(entryConverter).filter(Objects::nonNull);
     }
 
     public Stream<R> stream(StreamRequest request) {
@@ -210,7 +216,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         return requestBuilder;
     }
 
-    private String getQueryFields(String query) {
+    protected String getQueryFields(String query) {
         String queryFields = "";
         Optional<String> optimisedQueryField = validateOptimisableField(query);
         if (optimisedQueryField.isPresent()) {

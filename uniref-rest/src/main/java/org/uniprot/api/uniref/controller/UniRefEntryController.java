@@ -8,7 +8,6 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,9 +92,7 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntry>> getById(
-            @Valid @ModelAttribute UniRefIdRequest idRequest,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @Valid @ModelAttribute UniRefIdRequest idRequest, HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
         if (acceptedRdfContentType.isPresent()) {
             String rdf =

@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.service;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.request.UniProtKBRequestUtil.*;
 
 import java.util.List;
@@ -19,8 +20,10 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.IdsSearchRequest;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.core.util.Utils;
@@ -30,6 +33,7 @@ import org.uniprot.store.search.document.Document;
 public abstract class StoreStreamerSearchService<D extends Document, R>
         extends BasicSearchService<D, R> {
     protected final StoreStreamer<R> storeStreamer;
+    protected final TupleStreamDocumentIdStream solrIdStreamer;
     private final FacetTupleStreamTemplate tupleStreamTemplate;
     private final FacetTupleStreamConverter tupleStreamConverter;
     private final SolrQueryConfig solrQueryConfig;
@@ -40,7 +44,8 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             AbstractSolrSortClause solrSortClause,
             StoreStreamer<R> storeStreamer,
             SolrQueryConfig solrQueryConfig,
-            FacetTupleStreamTemplate tupleStreamTemplate) {
+            FacetTupleStreamTemplate tupleStreamTemplate,
+            TupleStreamDocumentIdStream solrIdStreamer) {
 
         this(
                 repository,
@@ -49,7 +54,8 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
                 facetConfig,
                 storeStreamer,
                 solrQueryConfig,
-                tupleStreamTemplate);
+                tupleStreamTemplate,
+                solrIdStreamer);
     }
 
     public StoreStreamerSearchService(
@@ -59,21 +65,32 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             FacetConfig facetConfig,
             StoreStreamer<R> storeStreamer,
             SolrQueryConfig solrQueryConfig,
-            FacetTupleStreamTemplate tupleStreamTemplate) {
+            FacetTupleStreamTemplate tupleStreamTemplate,
+            TupleStreamDocumentIdStream solrIdStreamer) {
 
         super(repository, entryConverter, solrSortClause, solrQueryConfig, facetConfig);
         this.storeStreamer = storeStreamer;
         this.solrQueryConfig = solrQueryConfig;
         this.tupleStreamTemplate = tupleStreamTemplate;
         this.tupleStreamConverter = new FacetTupleStreamConverter(getSolrIdField(), facetConfig);
+        this.solrIdStreamer = solrIdStreamer;
     }
 
     public abstract R findByUniqueId(final String uniqueId, final String filters);
 
+    protected abstract R mapToThinEntry(String entryId);
+
     @Override
     public Stream<R> stream(StreamRequest request) {
         SolrRequest query = createDownloadSolrRequest(request);
-        return this.storeStreamer.idsToStoreStream(query);
+        if (LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            return this.solrIdStreamer
+                    .fetchIds(query)
+                    .map(this::mapToThinEntry)
+                    .filter(Objects::nonNull);
+        } else {
+            return this.storeStreamer.idsToStoreStream(query);
+        }
     }
 
     public Stream<String> streamIds(StreamRequest request) {
@@ -130,6 +147,21 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
     protected String getTermsQueryField() {
         return getSolrIdField();
+    }
+
+    @Override
+    protected Stream<R> convertDocumentsToEntries(SearchRequest request, QueryResult<D> results) {
+        Stream<R> converted;
+        if (LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            converted =
+                    results.getContent()
+                            .map(Document::getDocumentId)
+                            .map(this::mapToThinEntry)
+                            .filter(Objects::nonNull);
+        } else {
+            converted = super.convertDocumentsToEntries(request, results);
+        }
+        return converted;
     }
 
     private SolrStreamFacetResponse searchBySolrStream(

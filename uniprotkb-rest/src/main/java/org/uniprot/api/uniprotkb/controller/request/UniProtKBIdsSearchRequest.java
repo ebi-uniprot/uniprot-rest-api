@@ -67,6 +67,9 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 
+    @Parameter(hidden = true)
+    private String format;
+
     public String getCommaSeparatedIds() {
         return this.accessions;
     }

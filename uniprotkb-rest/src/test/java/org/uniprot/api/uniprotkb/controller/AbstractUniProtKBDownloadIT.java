@@ -36,12 +36,14 @@ import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
 import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
 import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.cv.chebi.ChebiRepo;
 import org.uniprot.cv.ec.ECRepo;
@@ -57,6 +59,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControllerIT {
+    protected int totalNonIsoformEntries;
 
     static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
@@ -94,6 +97,8 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     @Value(("${async.download.embeddings.queueName}"))
     protected String embeddingsQueue;
 
+    @Autowired private UniprotQueryRepository uniprotQueryRepository;
+
     private static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
     private final UniProtEntryConverter documentConverter =
@@ -121,6 +126,7 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
 
     @BeforeAll
     public void saveEntriesInSolrAndStore() throws Exception {
+        ReflectionTestUtils.setField(uniprotQueryRepository, "solrClient", cloudSolrClient);
         prepareDownloadFolders();
         saveEntries();
 
@@ -176,21 +182,33 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
     }
 
     private void saveEntries() throws Exception {
-        for (int i = 1; i <= 10; i++) {
+        int i = 1;
+        for (; i <= 10; i++) {
             saveEntry(i, "");
         }
-        saveEntry(11, "-2");
-        saveEntry(12, "-2");
+        saveEntry(i++, "-2");
+        saveEntry(i++, "-2");
+        saveEntry(i++, "", false);
+        saveEntry(i, "", false);
+        totalNonIsoformEntries = i - 2;
         cloudSolrClient.commit(SolrCollection.uniprot.name());
         saveTaxonomyEntry(9606L);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
 
     private void saveEntry(int i, String isoFormString) throws Exception {
+        saveEntry(i, isoFormString, true);
+    }
+
+    private void saveEntry(int i, String isoFormString, boolean reviewed) throws Exception {
         UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
         String acc = String.format("P%05d", i) + isoFormString;
         entryBuilder.primaryAccession(acc);
-
+        if (reviewed) {
+            entryBuilder.entryType(UniProtKBEntryType.SWISSPROT);
+        } else {
+            entryBuilder.entryType(UniProtKBEntryType.TREMBL);
+        }
         UniProtKBEntry uniProtKBEntry = entryBuilder.build();
         UniProtDocument convert = documentConverter.convert(uniProtKBEntry);
 

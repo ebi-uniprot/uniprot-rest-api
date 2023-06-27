@@ -152,8 +152,8 @@ public class UniProtKBConfigureService {
         return builder.build();
     }
 
-    boolean filteredUniProtDBCategory(UniProtDatabaseCategory dbCategory){
-        return dbCategory != UniProtDatabaseCategory.UNKNOWN &&
-          dbCategory != UniProtDatabaseCategory.GENE_ONTOLOGY_DATABASES;
+    boolean filteredUniProtDBCategory(UniProtDatabaseCategory dbCategory) {
+        return dbCategory != UniProtDatabaseCategory.UNKNOWN
+                && dbCategory != UniProtDatabaseCategory.GENE_ONTOLOGY_DATABASES;
     }
 }

@@ -27,6 +27,7 @@ import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
+import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.output.context.FileType;
@@ -68,6 +69,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         storeStreamConfig,
                         downloadProperties,
                         rdfStream,
+                        null,
                         null);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build())
@@ -96,6 +98,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
 
         DownloadConfigProperties downloadProperties = Mockito.mock(DownloadConfigProperties.class);
         Mockito.when(downloadProperties.getResultFilesFolder()).thenReturn("target");
+        UniprotKBMappingRepository uniprotKBMappingRepository =
+                Mockito.mock(UniprotKBMappingRepository.class);
 
         UniProtKBIdMappingDownloadResultWriter writer =
                 new UniProtKBIdMappingDownloadResultWriter(
@@ -104,7 +108,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         storeStreamConfig,
                         downloadProperties,
                         null,
-                        null);
+                        null,
+                        uniprotKBMappingRepository);
         List<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build());
 
@@ -158,6 +163,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         storeStreamConfig,
                         downloadProperties,
                         rdfStream,
+                        null,
                         null);
         Type result = writer.getType();
         assertNotNull(result);

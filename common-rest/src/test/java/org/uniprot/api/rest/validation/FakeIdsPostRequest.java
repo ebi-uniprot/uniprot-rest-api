@@ -30,6 +30,14 @@ public class FakeIdsPostRequest implements IdsSearchRequest {
     }
 
     @Override
+    public String getFormat() {
+        return null;
+    }
+
+    @Override
+    public void setFormat(String format) {}
+
+    @Override
     public void setCursor(String cursor) {
         // do nothing
     }

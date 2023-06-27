@@ -50,6 +50,9 @@ public class UniProtKBBasicRequest {
             message = "{search.invalid.includeIsoform}")
     private String includeIsoform;
 
+    @Parameter(hidden = true)
+    private String format;
+
     public boolean isIncludeIsoform() {
         return Boolean.parseBoolean(includeIsoform);
     }

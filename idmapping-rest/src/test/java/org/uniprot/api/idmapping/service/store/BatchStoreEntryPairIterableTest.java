@@ -93,7 +93,8 @@ class BatchStoreEntryPairIterableTest {
     @Test
     void testLoggingUniProtKB() {
         BatchStoreEntryPairIterable<UniProtKBEntryPair, UniProtKBEntry> iterable =
-                new UniProtKBBatchStoreEntryPairIterable(List.of(), 10, null, null, null, false);
+                new UniProtKBBatchStoreEntryPairIterable(
+                        List.of(), 10, null, null, null, null, false);
         iterable.logTiming(1, 2, 3);
         assertNotNull(iterable);
     }

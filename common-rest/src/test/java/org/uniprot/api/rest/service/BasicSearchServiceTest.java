@@ -395,5 +395,7 @@ class BasicSearchServiceTest {
         private String query;
         private String fields;
         private String sort;
+
+        private String format;
     }
 }

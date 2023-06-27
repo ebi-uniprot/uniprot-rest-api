@@ -11,5 +11,6 @@ public enum JobStatus {
     PROCESSING, // while AA embedding consumer is running
     UNFINISHED, // rest code sets before handing over to AA embedding consumer
     FINISHED,
-    ERROR
+    ERROR,
+    ABORTED // status when embeddings call exceeds limit
 }

@@ -20,4 +20,6 @@ public class EmbeddingsQueueConfigProperties {
     private int prefetchCount;
 
     private int ttlInMillis;
+
+    private long maxEntryCount;
 }

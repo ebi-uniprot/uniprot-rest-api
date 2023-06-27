@@ -16,6 +16,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.model.DownloadJob;
@@ -29,8 +30,10 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
+import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 /**
  * @author sahmad
@@ -40,6 +43,8 @@ import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 @Service("DownloadListener")
 @Slf4j
 public class UniProtKBMessageListener extends AbstractMessageListener implements MessageListener {
+    public static final String H5_LIMIT_EXCEED_MSG =
+            "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s";
     private static final String DATA_TYPE = "uniprotkb";
     private final MessageConverter converter;
     private final UniProtEntryService service;
@@ -89,8 +94,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         } else {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
             if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
-                processH5Message(request, idsFile, jobId);
-                updateDownloadJob(message, downloadJob, JobStatus.UNFINISHED);
+                processH5Message(message, request, downloadJob, idsFile, jobId);
             } else {
                 writeResult(request, idsFile, jobId, contentType);
                 updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
@@ -98,14 +102,42 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         }
     }
 
-    private void processH5Message(UniProtKBDownloadRequest request, Path idsFile, String jobId) {
+    private void processH5Message(
+            Message message,
+            UniProtKBDownloadRequest request,
+            DownloadJob downloadJob,
+            Path idsFile,
+            String jobId) {
         try {
-            writeSolrResult(request, idsFile, jobId);
-            sendMessageToEmbeddingsQueue(jobId);
+            Long totalHits = getSolrHits(request);
+            Long maxAllowedHits = this.embeddingsQueueConfigProps.getMaxEntryCount();
+            if (maxAllowedHits >= totalHits) {
+                writeSolrResult(request, idsFile, jobId);
+                sendMessageToEmbeddingsQueue(jobId);
+                updateDownloadJob(message, downloadJob, JobStatus.UNFINISHED);
+            } else {
+                log.warn("Embeddings limit exceeded {}. Max allowed {}", totalHits, maxAllowedHits);
+                updateDownloadJob(
+                        downloadJob,
+                        JobStatus.ABORTED,
+                        String.format(H5_LIMIT_EXCEED_MSG, maxAllowedHits, totalHits),
+                        downloadJob.getRetried(),
+                        null);
+            }
         } catch (Exception ex) {
             logMessageAndDeleteFile(ex, jobId);
             throw new MessageListenerException(ex);
         }
+    }
+
+    private Long getSolrHits(UniProtKBDownloadRequest request) {
+        UniProtKBSearchRequest searchRequest = new UniProtKBSearchRequest();
+        searchRequest.setQuery(request.getQuery());
+        searchRequest.setIncludeIsoform(request.getIncludeIsoform());
+        searchRequest.setSize(0);
+        QueryResult<UniProtKBEntry> searchResults = service.search(searchRequest);
+        Long totalHits = searchResults.getPage().getTotalElements();
+        return totalHits;
     }
 
     private void writeResult(

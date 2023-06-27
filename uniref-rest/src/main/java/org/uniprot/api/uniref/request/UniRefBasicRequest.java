@@ -52,6 +52,9 @@ public class UniRefBasicRequest {
             message = "{search.uniref.invalid.complete.value}")
     private String complete;
 
+    @Parameter(hidden = true)
+    private String format;
+
     public boolean isComplete() {
         boolean result = false;
         if (Utils.notNullNotEmpty(complete)) {

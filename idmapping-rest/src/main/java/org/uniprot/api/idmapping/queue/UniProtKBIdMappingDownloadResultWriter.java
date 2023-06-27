@@ -15,6 +15,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageService;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
+import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
 import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
@@ -31,6 +32,7 @@ public class UniProtKBIdMappingDownloadResultWriter
         extends AbstractIdMappingDownloadResultWriter<UniProtKBEntryPair, UniProtKBEntry> {
 
     private final TaxonomyLineageService taxonomyLineageService;
+    private final UniprotKBMappingRepository uniprotKBMappingRepository;
     private final ReturnFieldConfig returnFieldConfig;
     private static final Type TYPE =
             (new ParameterizedTypeReference<MessageConverterContext<UniProtKBEntryPair>>() {})
@@ -42,7 +44,8 @@ public class UniProtKBIdMappingDownloadResultWriter
             StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer uniProtKBRDFStreamer,
-            TaxonomyLineageService taxonomyLineageService) {
+            TaxonomyLineageService taxonomyLineageService,
+            UniprotKBMappingRepository uniprotKBMappingRepository) {
         super(
                 contentAdapter,
                 converterContextFactory,
@@ -51,6 +54,7 @@ public class UniProtKBIdMappingDownloadResultWriter
                 uniProtKBRDFStreamer,
                 MessageConverterContextFactory.Resource.UNIPROTKB);
         this.taxonomyLineageService = taxonomyLineageService;
+        this.uniprotKBMappingRepository = uniprotKBMappingRepository;
         this.returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
     }
@@ -64,6 +68,7 @@ public class UniProtKBIdMappingDownloadResultWriter
                 storeStreamerConfig.getStoreClient(),
                 storeStreamerConfig.getStoreFetchRetryPolicy(),
                 taxonomyLineageService,
+                uniprotKBMappingRepository,
                 isLineageAllowed(fields, returnFieldConfig));
     }
 

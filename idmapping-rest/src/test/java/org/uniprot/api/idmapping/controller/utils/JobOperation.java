@@ -14,6 +14,8 @@ import org.uniprot.api.rest.download.model.JobStatus;
 public interface JobOperation {
     IdMappingJob createAndPutJobInCache() throws Exception;
 
+    IdMappingJob createAndPutJobInCacheForAllFields() throws Exception;
+
     IdMappingJob createAndPutJobInCache(int idsCount) throws Exception;
 
     IdMappingJob createAndPutJobInCache(JobStatus jobStatus) throws Exception;

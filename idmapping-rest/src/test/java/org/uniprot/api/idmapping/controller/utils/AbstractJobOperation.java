@@ -1,5 +1,8 @@
 package org.uniprot.api.idmapping.controller.utils;
 
+import static org.uniprot.api.idmapping.service.PIRResponseConverter.*;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.*;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
@@ -19,7 +22,7 @@ import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
  */
 public abstract class AbstractJobOperation implements JobOperation {
     public static final int DEFAULT_IDS_COUNT = 20; // same as id.mapping.max.from.ids.count
-    private IdMappingJobCacheService cacheService;
+    private final IdMappingJobCacheService cacheService;
 
     public AbstractJobOperation(IdMappingJobCacheService cacheService) {
         this.cacheService = cacheService;
@@ -27,6 +30,11 @@ public abstract class AbstractJobOperation implements JobOperation {
 
     public IdMappingJobCacheService getIdMappingJobCacheService() {
         return this.cacheService;
+    }
+
+    @Override
+    public IdMappingJob createAndPutJobInCacheForAllFields() throws Exception {
+        return createAndPutJobInCache();
     }
 
     public IdMappingJob createAndPutJobInCache(String from, String to, String fromIds)
@@ -44,13 +52,14 @@ public abstract class AbstractJobOperation implements JobOperation {
 
     private String getValue(String value) {
         String result = value;
-        int subSequenceIndex = value.indexOf("[");
+        int subSequenceIndex = value.indexOf(SEQ_SEP);
         if (subSequenceIndex > 0) {
             result = value.substring(0, subSequenceIndex);
-        } else {
-            int versionIndex = value.indexOf(".");
-            if (versionIndex > 0) {
-                result = value.substring(0, versionIndex);
+        } else if (value.indexOf(VERSION_SEP) > 0) {
+            result = value.substring(0, value.indexOf(VERSION_SEP));
+        } else if (value.indexOf(ID_SEP) > 0) {
+            if (UNIPROTKB_ACCESSION_REGEX.matcher(value.split(ID_SEP)[0]).matches()) {
+                result = value.substring(0, value.indexOf(ID_SEP));
             }
         }
         return result;
@@ -75,7 +84,7 @@ public abstract class AbstractJobOperation implements JobOperation {
             throws InvalidKeySpecException, NoSuchAlgorithmException {
         String fromIds = String.join(",", mappedIds.keySet());
         IdMappingJobRequest idMappingRequest = createRequest(from, to, fromIds);
-        String jobId = generateHash(idMappingRequest);
+        String jobId = generateHash();
         IdMappingResult idMappingResult = createIdMappingResult(idMappingRequest, mappedIds);
         IdMappingJob job = createJob(jobId, idMappingRequest, idMappingResult, jobStatus);
         if (!this.cacheService.exists(jobId)) {
@@ -92,7 +101,7 @@ public abstract class AbstractJobOperation implements JobOperation {
         return request;
     }
 
-    private String generateHash(IdMappingJobRequest request) {
+    private String generateHash() {
         return UUID.randomUUID().toString();
     }
 
