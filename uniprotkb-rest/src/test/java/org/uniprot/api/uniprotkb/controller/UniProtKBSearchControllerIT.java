@@ -1689,7 +1689,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
 
             UniProtDocument doc = new UniProtDocument();
             doc.accession = "P00001";
-            doc.id = "Search All";
+            doc.id.add("Search All");
             doc.active = true;
             doc.fragment = true;
             doc.precursor = true;

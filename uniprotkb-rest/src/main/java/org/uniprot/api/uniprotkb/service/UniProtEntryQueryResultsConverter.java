@@ -122,7 +122,11 @@ class UniProtEntryQueryResultsConverter {
             mergeDemergeList.addAll(Arrays.asList(reasonItems[1].split(",")));
         }
 
-        UniProtKBId uniProtkbId = new UniProtKBIdBuilder(doc.id).build();
+        String id = "";
+        if (Utils.notNullNotEmpty(doc.id)) {
+            id = doc.id.get(0);
+        }
+        UniProtKBId uniProtkbId = new UniProtKBIdBuilder(id).build();
         EntryInactiveReason inactiveReason =
                 new EntryInactiveReasonBuilder()
                         .type(type)
