@@ -33,13 +33,13 @@ public class UniRefIdMappingDownloadResultWriter
             MessageConverterContextFactory<UniRefEntryPair> converterContextFactory,
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RdfStreamer uniRefRDFStreamer) {
+            RdfStreamer idMappingRdfStreamer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
-                uniRefRDFStreamer,
+                idMappingRdfStreamer,
                 MessageConverterContextFactory.Resource.UNIREF);
     }
 

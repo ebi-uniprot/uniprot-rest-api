@@ -15,6 +15,7 @@ import org.uniprot.api.support.data.suggester.service.SuggesterServiceConfig;
             "org.uniprot.api",
             "org.uniprot.api.rest",
             "org.uniprot.api.rest.validation"
+
         })
 public class SupportDataRestApplication {
     public static void main(String[] args) {
