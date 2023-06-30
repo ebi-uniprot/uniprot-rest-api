@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.controller.ControllerITUtils.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
@@ -106,6 +107,7 @@ public abstract class AbstractSearchControllerIT {
         ResultActions resultActions =
                 response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(header().string(HttpHeaders.CACHE_CONTROL, CACHE_VALUE))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
 
@@ -136,6 +138,7 @@ public abstract class AbstractSearchControllerIT {
         ResultActions resultActions =
                 response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(header().string(HttpHeaders.CACHE_CONTROL, CACHE_VALUE))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                         .andExpect(header().string(X_TOTAL_RESULTS, "0"));
@@ -157,6 +160,7 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(jsonPath("$.messages.*", contains("'query' is a required parameter")));
     }
 
@@ -608,7 +612,7 @@ public abstract class AbstractSearchControllerIT {
         assertThat(contentTypeParam.getQuery(), not(isEmptyOrNullString()));
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), not(emptyIterable()));
-        ControllerITUtils.verifyContentTypes(
+        verifyContentTypes(
                 getSearchRequestPath(),
                 requestMappingHandlerMapping,
                 contentTypeParam.getContentTypeParams());

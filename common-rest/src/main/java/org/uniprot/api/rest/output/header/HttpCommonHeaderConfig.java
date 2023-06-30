@@ -88,8 +88,11 @@ public class HttpCommonHeaderConfig {
                 response.addHeader(X_UNIPROT_RELEASE, serviceInfo.getReleaseNumber());
                 response.addHeader(X_UNIPROT_RELEASE_DATE, serviceInfo.getReleaseDate());
                 response.addHeader(X_API_DEPLOYMENT_DATE, serviceInfo.getDeploymentDate());
-                handleGatewayCaching(request, response);
-                chain.doFilter(mutableRequest, response);
+                try {
+                    chain.doFilter(mutableRequest, response);
+                } finally {
+                    handleGatewayCaching(request, response);
+                }
             }
         };
     }
@@ -116,7 +119,9 @@ public class HttpCommonHeaderConfig {
                 break;
             }
         }
-        if (requiresCachingHeaders) {
+        if (requiresCachingHeaders
+                && (HttpServletResponse.SC_OK == response.getStatus()
+                        || HttpServletResponse.SC_SEE_OTHER == response.getStatus())) {
             // request gateway caching
             response.addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + serviceInfo.getMaxAgeInSeconds());
         } else {
