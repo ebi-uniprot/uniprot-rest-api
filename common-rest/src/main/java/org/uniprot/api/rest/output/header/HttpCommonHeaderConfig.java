@@ -119,9 +119,7 @@ public class HttpCommonHeaderConfig {
                 break;
             }
         }
-        if (requiresCachingHeaders
-                && (HttpServletResponse.SC_OK == response.getStatus()
-                        || HttpServletResponse.SC_SEE_OTHER == response.getStatus())) {
+        if (requiresCachingHeaders && response.getStatus() < 400) {
             // request gateway caching
             response.addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + serviceInfo.getMaxAgeInSeconds());
         } else {

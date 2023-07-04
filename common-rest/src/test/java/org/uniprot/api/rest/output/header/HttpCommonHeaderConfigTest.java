@@ -79,11 +79,11 @@ class HttpCommonHeaderConfigTest {
     }
 
     @Test
-    void noCacheHeadersAddedForErrorResponse() {
+    void noCacheHeadersAddedForBadRequestResponse() {
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         when(mockRequest.getServletPath()).thenReturn("/uniprotkb/accession/P12345");
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-        when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_BAD_REQUEST);
 
         config.handleGatewayCaching(mockRequest, mockResponse);
 
