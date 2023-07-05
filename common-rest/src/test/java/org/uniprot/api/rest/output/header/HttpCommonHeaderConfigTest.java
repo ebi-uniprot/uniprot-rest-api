@@ -47,10 +47,11 @@ class HttpCommonHeaderConfigTest {
     }
 
     @Test
-    void cacheHeadersAdded() {
+    void cacheHeadersAddedForSuccessResponse() {
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         when(mockRequest.getServletPath()).thenReturn("/uniprotkb/accession/P12345");
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+        when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_OK);
 
         config.handleGatewayCaching(mockRequest, mockResponse);
 
@@ -62,10 +63,44 @@ class HttpCommonHeaderConfigTest {
     }
 
     @Test
-    void noCacheHeadersAdded() {
+    void cacheHeadersAddedForRedirectResponse() {
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        when(mockRequest.getServletPath()).thenReturn("/uniprotkb/accession/P12345");
+        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+        when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_SEE_OTHER);
+
+        config.handleGatewayCaching(mockRequest, mockResponse);
+
+        verify(mockResponse).addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + MAX_AGE);
+        verify(mockResponse).addHeader(VARY, ACCEPT);
+        verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
+        verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
+        verify(mockResponse).addHeader(VARY, X_API_DEPLOYMENT_DATE);
+    }
+
+    @Test
+    void noCacheHeadersAddedForBadRequestResponse() {
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        when(mockRequest.getServletPath()).thenReturn("/uniprotkb/accession/P12345");
+        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+        when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_BAD_REQUEST);
+
+        config.handleGatewayCaching(mockRequest, mockResponse);
+
+        verify(mockResponse).addHeader(CACHE_CONTROL, NO_CACHE);
+        verify(mockResponse, never()).addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + MAX_AGE);
+        verify(mockResponse).addHeader(VARY, ACCEPT);
+        verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
+        verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
+        verify(mockResponse).addHeader(VARY, X_API_DEPLOYMENT_DATE);
+    }
+
+    @Test
+    void noCacheHeadersAddedForNonCacheablePaths() {
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
         when(mockRequest.getServletPath()).thenReturn("/idmapping/run/12345");
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+        when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_OK);
 
         config.handleGatewayCaching(mockRequest, mockResponse);
 
