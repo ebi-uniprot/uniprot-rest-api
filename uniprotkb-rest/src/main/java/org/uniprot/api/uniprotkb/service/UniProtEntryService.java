@@ -224,6 +224,7 @@ public class UniProtEntryService
                     docResult =
                             docResult.stream()
                                     .filter(doc -> doc.active != null && doc.active)
+                                    .filter(doc -> proteinId.equalsIgnoreCase(doc.id.get(0)))
                                     .collect(Collectors.toList());
                 }
                 if (docResult.size() > 1) {
