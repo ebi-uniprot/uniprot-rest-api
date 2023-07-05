@@ -27,6 +27,8 @@ public class UniProtKBEntryPairFlatFileMessageConverter
     @Override
     protected void writeEntity(UniProtKBEntryPair entryPair, OutputStream outputStream)
             throws IOException {
-        outputStream.write((UniProtFlatfileWriter.write(entryPair.getTo()) + "\n").getBytes());
+        if (entryPair.getTo().isActive()) {
+            outputStream.write((UniProtFlatfileWriter.write(entryPair.getTo()) + "\n").getBytes());
+        }
     }
 }

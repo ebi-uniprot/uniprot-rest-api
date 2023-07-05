@@ -11,13 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -42,6 +47,7 @@ import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
 import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
@@ -412,6 +418,38 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                                 is("DELETED")));
     }
 
+    @ParameterizedTest(name = "[{index}] contentType with inactive {0} show inactive {1}")
+    @MethodSource("getContentTypesForInactive")
+    void testUniProtKBToUniProtKBWithInactiveEntriesContentType(
+            MediaType mediaType, boolean hasInactiveData) throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR, UNIPROTKB_STR, "Q00001,I8FBX0");
+        ResultActions response =
+                performRequest(
+                        get(getIdMappingResultPath(), job.getJobId()).header(ACCEPT, mediaType));
+        // then
+        ResultActions resultActions =
+                response.andDo(log())
+                        .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                        .andExpect(content().string(containsString("Q00001")))
+                        .andExpect(
+                                content()
+                                        .string(
+                                                not(
+                                                        containsString(
+                                                                "Error encountered when streaming data. Please try again later"))));
+
+        if (hasInactiveData) {
+            resultActions.andExpect(content().string(containsString("I8FBX0")));
+        } else {
+            resultActions.andExpect(content().string(not(containsString("I8FBX0"))));
+        }
+    }
+
     @Test
     void testIdMappingWithProteinVersions() throws Exception {
         // when
@@ -526,5 +564,19 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
                 .andExpect(content().string(containsString(">tr|Q00001|10-20\nLVVVTMATLSL\n")))
                 .andExpect(content().string(containsString(">tr|Q00001|20-30\nLARPSFSLVED\n")))
                 .andExpect(content().string(containsString(">sp|Q00002|20-30\nLARPSFSLVED")));
+    }
+
+    private Stream<Arguments> getContentTypesForInactive() {
+        List<Arguments> result = new ArrayList<>();
+        result.add(Arguments.of(UniProtMediaType.TSV_MEDIA_TYPE, true));
+        result.add(Arguments.of(MediaType.APPLICATION_JSON, true));
+        result.add(Arguments.of(UniProtMediaType.LIST_MEDIA_TYPE, true));
+
+        result.add(Arguments.of(UniProtMediaType.FASTA_MEDIA_TYPE, false));
+        result.add(Arguments.of(UniProtMediaType.FF_MEDIA_TYPE, false));
+        result.add(Arguments.of(UniProtMediaType.GFF_MEDIA_TYPE, false));
+        result.add(Arguments.of(MediaType.APPLICATION_XML, false));
+
+        return result.stream();
     }
 }
