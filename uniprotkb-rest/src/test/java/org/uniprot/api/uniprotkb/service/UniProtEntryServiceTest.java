@@ -2,8 +2,7 @@ package org.uniprot.api.uniprotkb.service;
 
 import static java.util.Collections.EMPTY_SET;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
@@ -18,10 +17,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.page.Page;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
@@ -228,6 +231,94 @@ class UniProtEntryServiceTest {
         verify(uniProtEntryStoreStreamer, times(1)).idsToStoreStream(any(), any());
         assertEquals(1, entries.size());
         assertEquals(entry1, entries.get(0));
+    }
+
+    @Test
+    void findAccessionByProteinIdReturnSuccess() {
+        String proteinId = "PROTEIN_ID";
+        UniProtDocument doc1 = new UniProtDocument();
+        doc1.accession = "DOC1";
+        doc1.id.add(proteinId);
+        doc1.active = true;
+        Page page = CursorPage.of(null, 10, 1);
+        QueryResult<UniProtDocument> queryResult =
+                QueryResult.of(Stream.of(doc1), page, null, null, null, null);
+        Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
+        String result = entryService.findAccessionByProteinId(proteinId);
+        assertNotNull(result);
+        assertEquals("DOC1", result);
+    }
+
+    @Test
+    void findAccessionByProteinIdReturnProteinIdThatHasProteinAddedDuringFlatFileConvert() {
+        String proteinId = "PROTEIN_ID";
+        UniProtDocument doc1 = new UniProtDocument();
+        doc1.accession = "DOC1";
+        doc1.id.add(proteinId);
+        doc1.active = true;
+        UniProtDocument doc2 = new UniProtDocument();
+        doc2.id.add("OTHER_ID");
+        doc2.id.add(proteinId); // added by idTracker file logic
+        doc2.active = true;
+        doc2.accession = "DOC2";
+        Page page = CursorPage.of(null, 10, 2);
+        QueryResult<UniProtDocument> queryResult =
+                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+        Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
+        String result = entryService.findAccessionByProteinId(proteinId);
+        assertNotNull(result);
+        assertEquals("DOC1", result);
+    }
+
+    @Test
+    void findAccessionByProteinIdReturnProteinIdThatIsActive() {
+        String proteinId = "PROTEIN_ID";
+        UniProtDocument doc1 = new UniProtDocument();
+        doc1.accession = "DOC1";
+        doc1.id.add(proteinId);
+        doc1.active = true;
+        UniProtDocument doc2 = new UniProtDocument();
+        doc2.id.add(proteinId);
+        doc2.active = false;
+        doc2.accession = "DOC2";
+        Page page = CursorPage.of(null, 10, 2);
+        QueryResult<UniProtDocument> queryResult =
+                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+        Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
+        String result = entryService.findAccessionByProteinId(proteinId);
+        assertNotNull(result);
+        assertEquals("DOC1", result);
+    }
+
+    @Test
+    void findAccessionByProteinIdMultipleEntries() {
+        // This use case should not have with real data..
+        String proteinId = "PROTEIN_ID";
+        UniProtDocument doc1 = new UniProtDocument();
+        doc1.accession = "DOC1";
+        doc1.id.add(proteinId);
+        doc1.active = true;
+        UniProtDocument doc2 = new UniProtDocument();
+        doc2.id.add(proteinId);
+        doc2.active = true;
+        doc2.accession = "DOC2";
+        Page page = CursorPage.of(null, 10, 2);
+        QueryResult<UniProtDocument> queryResult =
+                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+        Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
+        assertThrows(
+                ServiceException.class, () -> entryService.findAccessionByProteinId("PROTEIN_ID"));
+    }
+
+    @Test
+    void findAccessionByProteinIdNotFound() {
+        Page page = CursorPage.of(null, 10, 0);
+        QueryResult<UniProtDocument> queryResult =
+                QueryResult.of(Stream.empty(), page, null, null, null, null);
+        Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
+        assertThrows(
+                ResourceNotFoundException.class,
+                () -> entryService.findAccessionByProteinId("PROTEIN_ID"));
     }
 
     private void mockSolrRequest() {
