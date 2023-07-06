@@ -434,19 +434,20 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
         ResultActions resultActions =
                 response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
-                        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
-                        .andExpect(content().string(containsString("Q00001")))
-                        .andExpect(
-                                content()
-                                        .string(
-                                                not(
-                                                        containsString(
-                                                                "Error encountered when streaming data. Please try again later"))));
-
-        if (hasInactiveData) {
-            resultActions.andExpect(content().string(containsString("I8FBX0")));
-        } else {
-            resultActions.andExpect(content().string(not(containsString("I8FBX0"))));
+                        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()));
+        if (!UniProtMediaType.XLS_MEDIA_TYPE.equals(mediaType)) {
+            resultActions.andExpect(content().string(containsString("Q00001")));
+            resultActions.andExpect(
+                    content()
+                            .string(
+                                    not(
+                                            containsString(
+                                                    "Error encountered when streaming data. Please try again later"))));
+            if (hasInactiveData) {
+                resultActions.andExpect(content().string(containsString("I8FBX0")));
+            } else {
+                resultActions.andExpect(content().string(not(containsString("I8FBX0"))));
+            }
         }
     }
 
@@ -569,6 +570,7 @@ class UniProtKBIdMappingStreamControllerIT extends AbstractIdMappingStreamContro
     private Stream<Arguments> getContentTypesForInactive() {
         List<Arguments> result = new ArrayList<>();
         result.add(Arguments.of(UniProtMediaType.TSV_MEDIA_TYPE, true));
+        result.add(Arguments.of(UniProtMediaType.XLS_MEDIA_TYPE, true));
         result.add(Arguments.of(MediaType.APPLICATION_JSON, true));
         result.add(Arguments.of(UniProtMediaType.LIST_MEDIA_TYPE, true));
 
