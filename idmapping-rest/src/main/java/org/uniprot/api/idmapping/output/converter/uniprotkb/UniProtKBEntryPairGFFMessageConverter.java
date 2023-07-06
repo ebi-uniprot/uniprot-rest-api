@@ -26,6 +26,8 @@ public class UniProtKBEntryPairGFFMessageConverter
     @Override
     protected void writeEntity(UniProtKBEntryPair entryPair, OutputStream outputStream)
             throws IOException {
-        outputStream.write((UniProtGffParser.convert(entryPair.getTo()) + "\n").getBytes());
+        if (entryPair.getTo().isActive()) {
+            outputStream.write((UniProtGffParser.convert(entryPair.getTo()) + "\n").getBytes());
+        }
     }
 }

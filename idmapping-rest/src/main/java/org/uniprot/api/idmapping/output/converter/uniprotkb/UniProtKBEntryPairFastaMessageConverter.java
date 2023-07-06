@@ -34,12 +34,16 @@ public class UniProtKBEntryPairFastaMessageConverter
 
     @Override
     protected String toFasta(UniProtKBEntryPair entryPair) {
-        if (TL_SUBSEQUENCE.get()) {
-            UniProtKBFasta uniProtKBFasta = getSubSequenceUniProtKBFasta(entryPair);
-            return UniProtKBFastaParser.toFasta(uniProtKBFasta);
-        } else {
-            return UniProtKBFastaParser.toFasta(entryPair.getTo());
+        String result = "";
+        if (entryPair.getTo().isActive()) {
+            if (TL_SUBSEQUENCE.get()) {
+                UniProtKBFasta uniProtKBFasta = getSubSequenceUniProtKBFasta(entryPair);
+                result = UniProtKBFastaParser.toFasta(uniProtKBFasta);
+            } else {
+                result = UniProtKBFastaParser.toFasta(entryPair.getTo());
+            }
         }
+        return result;
     }
 
     @Override

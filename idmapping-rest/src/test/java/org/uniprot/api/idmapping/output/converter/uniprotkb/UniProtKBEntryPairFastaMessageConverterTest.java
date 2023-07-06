@@ -8,16 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.impl.SequenceBuilder;
-import org.uniprot.core.uniprotkb.ProteinExistence;
-import org.uniprot.core.uniprotkb.UniProtKBEntry;
-import org.uniprot.core.uniprotkb.UniProtKBEntryType;
+import org.uniprot.core.uniprotkb.*;
 import org.uniprot.core.uniprotkb.description.impl.NameBuilder;
 import org.uniprot.core.uniprotkb.description.impl.ProteinDescriptionBuilder;
 import org.uniprot.core.uniprotkb.description.impl.ProteinNameBuilder;
-import org.uniprot.core.uniprotkb.impl.EntryAuditBuilder;
-import org.uniprot.core.uniprotkb.impl.GeneBuilder;
-import org.uniprot.core.uniprotkb.impl.GeneNameBuilder;
-import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.uniprotkb.impl.*;
 import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 
 class UniProtKBEntryPairFastaMessageConverterTest {
@@ -83,5 +78,24 @@ class UniProtKBEntryPairFastaMessageConverterTest {
         assertEquals(
                 ">sp|P21802|P21802_HUMAN PName OS=OName OX=9606 GN=P53 PE=3 SV=2\nABCDEFGHIJKLMNOPQRSTUVXZ",
                 result);
+    }
+
+    @Test
+    void toFastaInactive() throws IOException {
+        UniProtKBEntryPairFastaMessageConverter converter =
+                new UniProtKBEntryPairFastaMessageConverter();
+
+        MessageConverterContext<UniProtKBEntryPair> context =
+                MessageConverterContext.<UniProtKBEntryPair>builder().subsequence(false).build();
+        converter.before(context, null);
+
+        EntryInactiveReason reason =
+                new EntryInactiveReasonBuilder().type(InactiveReasonType.DELETED).build();
+        UniProtKBEntry entry = new UniProtKBEntryBuilder("P21802", "P21802_HUMAN", reason).build();
+        UniProtKBEntryPair entryPair =
+                UniProtKBEntryPair.builder().from("P21802").to(entry).build();
+        String result = converter.toFasta(entryPair);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }

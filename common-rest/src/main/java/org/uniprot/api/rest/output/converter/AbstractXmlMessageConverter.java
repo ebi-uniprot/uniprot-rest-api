@@ -56,12 +56,14 @@ public abstract class AbstractXmlMessageConverter<T, X>
     protected void writeEntity(T entity, OutputStream outputStream) throws IOException {
         try {
             X entry = toXml(entity);
-            Writer out = new OutputStreamWriter(outputStream);
-            DataWriter writer = new DataWriter(out, "UTF-8");
-            writer.setIndentStep("  ");
-            getMarshaller().marshal(entry, writer);
-            writer.characters("\n");
-            writer.flush();
+            if (entry != null) {
+                Writer out = new OutputStreamWriter(outputStream);
+                DataWriter writer = new DataWriter(out, "UTF-8");
+                writer.setIndentStep("  ");
+                getMarshaller().marshal(entry, writer);
+                writer.characters("\n");
+                writer.flush();
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

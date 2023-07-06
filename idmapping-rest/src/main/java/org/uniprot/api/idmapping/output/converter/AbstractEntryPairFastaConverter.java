@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.idmapping.model.EntryPair;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
+import org.uniprot.core.util.Utils;
 
 /**
  * @author sahmad
@@ -26,7 +27,10 @@ public abstract class AbstractEntryPairFastaConverter<T extends EntryPair<U>, U>
 
     @Override
     protected void writeEntity(T entryPair, OutputStream outputStream) throws IOException {
-        outputStream.write((toFasta(entryPair) + "\n").getBytes());
+        String fastaContent = toFasta(entryPair);
+        if (Utils.notNullNotEmpty(fastaContent)) {
+            outputStream.write((fastaContent + "\n").getBytes());
+        }
     }
 
     protected abstract String toFasta(T entryPair);
