@@ -33,13 +33,13 @@ public class UniParcIdMappingDownloadResultWriter
             MessageConverterContextFactory<UniParcEntryPair> converterContextFactory,
             StoreStreamerConfig<UniParcEntry> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RdfStreamer uniParcRDFStreamer) {
+            RdfStreamer idMappingRdfStreamer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
-                uniParcRDFStreamer,
+                idMappingRdfStreamer,
                 MessageConverterContextFactory.Resource.UNIPARC);
     }
 

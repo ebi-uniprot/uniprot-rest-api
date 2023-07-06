@@ -1,4 +1,4 @@
-package org.uniprot.api.support.data.common;
+package org.uniprot.api.rest.output;
 
 import java.util.Collections;
 
@@ -11,7 +11,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.stream.rdf.*;
-import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
 @Configuration

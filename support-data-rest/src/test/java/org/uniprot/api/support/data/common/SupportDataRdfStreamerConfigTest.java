@@ -10,6 +10,7 @@ import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
 import org.uniprot.api.common.repository.stream.rdf.RdfServiceFactory;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamerConfigProperties;
+import org.uniprot.api.rest.output.SupportDataRdfStreamerConfig;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
 class SupportDataRdfStreamerConfigTest {

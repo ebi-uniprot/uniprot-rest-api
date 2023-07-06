@@ -14,7 +14,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
  */
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ErrorHandlerConfig.class})
-@ComponentScan(basePackages = {"org.uniprot.api.proteome", "org.uniprot.api.rest"})
+@ComponentScan(basePackages = {"org.uniprot.api.proteome", "org.uniprot.api.rest", "org.uniprot.api"})
 public class ProteomeRestApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProteomeRestApplication.class, args);
