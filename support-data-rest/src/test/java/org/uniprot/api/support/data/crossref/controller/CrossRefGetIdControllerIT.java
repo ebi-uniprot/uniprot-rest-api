@@ -89,13 +89,13 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
         CrossRefEntry crossRefEntry =
                 entryBuilder
                         .id(ACCESSION)
-                        .abbrev("TIGRFAMs")
-                        .name("TIGRFAMs; a protein family database")
+                        .abbrev("NCBIfam")
+                        .name("NCBIfam; a protein family database")
                         .pubMedId("17151080")
                         .doiId("10.1093/nar/gkl1043")
                         .linkType("Explicit")
-                        .server("http://tigrfams.jcvi.org/cgi-bin/index.cgi")
-                        .dbUrl("http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")
+                        .server("http://ncbifam.jcvi.org/cgi-bin/index.cgi")
+                        .dbUrl("http://ncbifam.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")
                         .category("Family and domain databases")
                         .statistics(statistics)
                         .build();
@@ -141,17 +141,16 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
                     .id(ACCESSION)
                     .resultMatcher(jsonPath("$.linkType", is("Explicit")))
                     .resultMatcher(
-                            jsonPath("$.server", is("http://tigrfams.jcvi.org/cgi-bin/index.cgi")))
+                            jsonPath("$.server", is("http://ncbifam.jcvi.org/cgi-bin/index.cgi")))
                     .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", is(5)))
-                    .resultMatcher(jsonPath("$.name", is("TIGRFAMs; a protein family database")))
+                    .resultMatcher(jsonPath("$.name", is("NCBIfam; a protein family database")))
                     .resultMatcher(
                             jsonPath(
                                     "$.dbUrl",
-                                    is(
-                                            "http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
+                                    is("http://ncbifam.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
                     .resultMatcher(jsonPath("$.pubMedId", is("17151080")))
                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
-                    .resultMatcher(jsonPath("$.abbrev", is("TIGRFAMs")))
+                    .resultMatcher(jsonPath("$.abbrev", is("NCBIfam")))
                     .resultMatcher(jsonPath("$.statistics.reviewedProteinCount", is(10)))
                     .resultMatcher(jsonPath("$.category", is("Family and domain databases")))
                     .resultMatcher(jsonPath("$.doiId", is("10.1093/nar/gkl1043")))
@@ -223,21 +222,21 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
                                             jsonPath(
                                                     "$.server",
                                                     is(
-                                                            "http://tigrfams.jcvi.org/cgi-bin/index.cgi")))
+                                                            "http://ncbifam.jcvi.org/cgi-bin/index.cgi")))
                                     .resultMatcher(
                                             jsonPath("$.statistics.unreviewedProteinCount", is(5)))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.name",
-                                                    is("TIGRFAMs; a protein family database")))
+                                                    is("NCBIfam; a protein family database")))
                                     .resultMatcher(
                                             jsonPath(
                                                     "$.dbUrl",
                                                     is(
-                                                            "http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
+                                                            "http://ncbifam.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")))
                                     .resultMatcher(jsonPath("$.pubMedId", is("17151080")))
                                     .resultMatcher(jsonPath("$.id", is(ACCESSION)))
-                                    .resultMatcher(jsonPath("$.abbrev", is("TIGRFAMs")))
+                                    .resultMatcher(jsonPath("$.abbrev", is("NCBIfam")))
                                     .resultMatcher(
                                             jsonPath("$.statistics.reviewedProteinCount", is(10)))
                                     .resultMatcher(
