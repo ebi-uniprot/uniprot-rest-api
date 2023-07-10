@@ -57,6 +57,11 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>support-data-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>core-parser</artifactId>
 			<version>${uniprot-core.version}</version>
 		</dependency>

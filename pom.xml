@@ -64,6 +64,7 @@
 
 	<modules>
 		<module>common-rest</module>
+		<module>support-data-common</module>
 		<module>support-data-rest</module>
 		<module>uniprotkb-rest</module>
 		<module>proteome-rest</module>

@@ -10,7 +10,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ErrorHandlerConfig.class})
-@ComponentScan(basePackages = {"org.uniprot.api", "org.uniprot.api.rest"})
+@ComponentScan(basePackages = {"org.uniprot.api.help.centre", "org.uniprot.api.rest"})
 public class HelpCentreRestApplication {
     public static void main(String[] args) {
         SpringApplication.run(HelpCentreRestApplication.class, args);

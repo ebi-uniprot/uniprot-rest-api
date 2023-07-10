@@ -22,7 +22,8 @@ public class UniRefEntryService {
 
     @Autowired
     public UniRefEntryService(
-            UniRefEntryStoreRepository entryStoreRepository, RdfServiceFactory unirefRdfServiceFactory) {
+            UniRefEntryStoreRepository entryStoreRepository,
+            RdfServiceFactory unirefRdfServiceFactory) {
         this.entryStoreRepository = entryStoreRepository;
         this.rdfServiceFactory = unirefRdfServiceFactory;
     }

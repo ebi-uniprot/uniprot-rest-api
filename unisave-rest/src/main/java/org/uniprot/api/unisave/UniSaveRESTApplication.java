@@ -18,7 +18,7 @@ import org.uniprot.api.rest.respository.RepositoryConfig;
 @Import({HttpCommonHeaderConfig.class})
 @EntityScan(basePackages = {"org.uniprot.api.unisave"})
 @ComponentScan(
-        basePackages = {"org.uniprot.api.unisave", "org.uniprot.api.rest", "org.uniprot.api"},
+        basePackages = {"org.uniprot.api.unisave", "org.uniprot.api.rest"},
         excludeFilters = {
             @ComponentScan.Filter(
                     type = FilterType.ASSIGNABLE_TYPE,

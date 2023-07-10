@@ -26,7 +26,9 @@ import org.uniprot.api.uniprotkb.groupby.GroupByServiceConfig;
             "org.uniprot.api.uniprotkb",
             "org.uniprot.api.rest",
             "org.uniprot.api.common.repository.stream.store.uniprotkb",
-            "org.uniprot.api"
+            "org.uniprot.api.common.repository.stream.rdf",
+            "org.uniprot.api.support.data.common.keyword",
+            "org.uniprot.api.support.data.common.taxonomy"
         })
 public class UniProtKBREST {
     public static void main(String[] args) {
