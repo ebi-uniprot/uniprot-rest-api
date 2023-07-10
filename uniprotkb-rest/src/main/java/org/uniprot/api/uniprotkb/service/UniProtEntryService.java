@@ -1,14 +1,5 @@
 package org.uniprot.api.uniprotkb.service;
 
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.QUERY_FIELDS;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -53,6 +44,14 @@ import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.document.Document;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
+
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 
 @Service
 @Import(UniProtSolrQueryConfig.class)
@@ -192,6 +191,9 @@ public class UniProtEntryService
         solrQuery.set(FacetParams.FACET, true);
         solrQuery.set(DEF_TYPE, "edismax");
         solrQuery.add(QUERY_FIELDS, getQueryFields(query));
+        if (UniProtKBRequestUtil.needsToFilterIsoform(ACCESSION, IS_ISOFORM, query, false)) {
+            solrQuery.add(FILTER_QUERY, getQueryFieldName(IS_ISOFORM) + ":" + false);
+        }
         return repository.query(solrQuery).getFacetFields();
     }
 
@@ -372,7 +374,7 @@ public class UniProtEntryService
         return SolrQueryUtil.hasNegativeTerm(uniProtRequest.getQuery());
     }
 
-    private String getQueryFieldName(String active) {
+    public String getQueryFieldName(String active) {
         return searchFieldConfig.getSearchFieldItemByName(active).getFieldName();
     }
 

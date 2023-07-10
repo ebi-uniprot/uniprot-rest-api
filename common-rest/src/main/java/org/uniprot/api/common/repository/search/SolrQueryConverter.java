@@ -1,14 +1,5 @@
 package org.uniprot.api.common.repository.search;
 
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
@@ -17,6 +8,15 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.common.repository.search.request.BoostApplier;
 import org.uniprot.core.util.Utils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 public class SolrQueryConverter {
     private static final String QUERY_OPERATOR = "q.op";
@@ -30,6 +30,7 @@ public class SolrQueryConverter {
     public static final String DEF_TYPE = "defType";
     public static final String DEFAULT_FIELD = "df";
     public static final String QUERY_FIELDS = "qf";
+    public static final String FILTER_QUERY = "fq";
     public static final String HIGHLIGHT = "hl";
     public static final String HIGHLIGHT_FIELDS = "hl.fl";
     public static final String HIGHLIGHT_PRE = "hl.simple.pre";
