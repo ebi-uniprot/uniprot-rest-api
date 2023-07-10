@@ -1,5 +1,21 @@
 package org.uniprot.api.uniprotkb.service;
 
+import static java.util.Collections.EMPTY_SET;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.FILTER_QUERY;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
@@ -36,22 +52,6 @@ import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.factory.SearchFieldConfigFactory;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.Collections.EMPTY_SET;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
-import static org.uniprot.api.common.repository.search.SolrQueryConverter.FILTER_QUERY;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
 /** @author tibrahim */
 @ExtendWith(MockitoExtension.class)
@@ -227,9 +227,16 @@ class UniProtEntryServiceTest {
         when(queryResponse.getFacetFields()).thenReturn(facetFields);
         SearchFieldItem searchFieldItem = mock(SearchFieldItem.class);
         when(searchFieldItem.getFieldName()).thenReturn("fieldName");
-        when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("is_isoform")).thenReturn(searchFieldItem);
-        when(repository.query(argThat(solrQuery -> solrQuery.get(FacetParams.FACET).equals("true")
-                && solrQuery.get(DEF_TYPE).equals("edismax") && solrQuery.get(FILTER_QUERY).contains("fieldName"))))
+        when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("is_isoform"))
+                .thenReturn(searchFieldItem);
+        when(repository.query(
+                        argThat(
+                                solrQuery ->
+                                        solrQuery.get(FacetParams.FACET).equals("true")
+                                                && solrQuery.get(DEF_TYPE).equals("edismax")
+                                                && solrQuery
+                                                        .get(FILTER_QUERY)
+                                                        .contains("fieldName"))))
                 .thenAnswer(invocation -> queryResponse);
 
         List<FacetField> facets = entryService.getFacets("query", Map.of());
