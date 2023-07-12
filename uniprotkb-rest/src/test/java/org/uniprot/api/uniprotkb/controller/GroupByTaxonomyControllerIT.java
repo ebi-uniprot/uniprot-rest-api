@@ -1,14 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
-
-import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +21,15 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.List;
+
+import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = GroupByController.class)
@@ -89,7 +89,8 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
+                .andExpect(jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -103,7 +104,8 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
+                .andExpect(jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -125,7 +127,8 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -143,7 +146,8 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -162,7 +166,9 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)));
+                .andExpect(jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(jsonPath("$.parent.label", is("scientific_9600")))
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -180,7 +186,8 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -196,7 +203,9 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)));
+                .andExpect(jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(jsonPath("$.parent.label", is("scientific_9600")))
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {

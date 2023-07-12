@@ -1,8 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
@@ -10,6 +7,9 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupByECService extends GroupByService<String> {
@@ -82,6 +82,7 @@ public class GroupByECService extends GroupByService<String> {
             List<FacetField.Count> facetCounts,
             List<String> ecs,
             List<String> ancestorEntries,
+            String parentId,
             String query) {
         Map<String, String> idEntryMap =
                 facetCounts.stream()
@@ -89,7 +90,12 @@ public class GroupByECService extends GroupByService<String> {
                                 Collectors.toMap(
                                         FacetField.Count::getName,
                                         count -> this.getFullEc(count.getName())));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, query);
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+    }
+
+    @Override
+    protected String getEntry(String parentId) {
+        return parentId;
     }
 
     private String getShortFormEc(String fullEc) {

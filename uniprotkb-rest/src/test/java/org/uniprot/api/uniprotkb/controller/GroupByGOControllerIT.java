@@ -1,15 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
-
-import java.util.List;
-import java.util.Set;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +20,17 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = GroupByController.class)
@@ -85,7 +86,8 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
+                .andExpect(jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -99,7 +101,8 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
+                .andExpect(jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -121,7 +124,8 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -139,12 +143,16 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
     void getGroupByGO_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
+        GoRelation goRelation = new GoRelation();
+        goRelation.setName(GO_NAME_0);
+        when(goClient.getGoEntry(GO_ID_0)).thenReturn(Optional.of(goRelation));
 
         mockMvc.perform(
                         get(PATH)
@@ -158,7 +166,9 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)));
+                .andExpect(jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(jsonPath("$.parent.label", is("goName0")))
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -176,12 +186,16 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
     void getGroupByGO_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
+        GoRelation goRelation = new GoRelation();
+        goRelation.setName(GO_NAME_0);
+        when(goClient.getGoEntry(GO_ID_0)).thenReturn(Optional.of(goRelation));
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", GO_ID_0))
                 .andDo(log())
@@ -192,7 +206,9 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)));
+                .andExpect(jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(jsonPath("$.parent.label", is("goName0")))
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() {

@@ -1,10 +1,11 @@
 package org.uniprot.api.uniprotkb.groupby.service.go;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GOClient;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GOService {
@@ -16,5 +17,9 @@ public class GOService {
 
     public List<GoRelation> getChildren(String parentGo) {
         return goClient.getChildren(parentGo);
+    }
+
+    public Optional<GoRelation> getGoRelation(String goId) {
+        return goClient.getGoEntry(goId);
     }
 }

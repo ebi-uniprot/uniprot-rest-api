@@ -1,19 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -24,13 +10,23 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.api.rest.service.keyword.KeywordService;
-import org.uniprot.api.uniprotkb.groupby.model.Ancestor;
-import org.uniprot.api.uniprotkb.groupby.model.AncestorImpl;
-import org.uniprot.api.uniprotkb.groupby.model.Group;
-import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
+import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByKeywordServiceTest {
@@ -137,9 +133,9 @@ class GroupByKeywordServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertViewBysMultiple(viewBys, empty());
+        assertGroupByResultMultiple(groupByResult, empty(), is(nullValue()));
     }
 
     @Test
@@ -153,9 +149,9 @@ class GroupByKeywordServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertViewByC(viewBys, empty());
+        assertGroupByResultC(groupByResult, empty(), is(nullValue()));
     }
 
     @Test
@@ -191,9 +187,9 @@ class GroupByKeywordServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_E)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertViewBysMultiple(viewBys, contains(getAncestorB()));
+        assertGroupByResultMultiple(groupByResult, contains(getAncestorB()), is(nullValue()));
     }
 
     @Test
@@ -222,9 +218,9 @@ class GroupByKeywordServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertViewByC(viewBys, contains(getAncestorA(), getAncestorB()));
+        assertGroupByResultC(groupByResult, contains(getAncestorA(), getAncestorB()), is(nullValue()));
     }
 
     @Test
@@ -261,9 +257,9 @@ class GroupByKeywordServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_E)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertViewBysMultiple(viewBys, contains(getAncestorB(), getAncestorD()));
+        assertGroupByResultMultiple(groupByResult, contains(getAncestorB(), getAncestorD()), is(nullValue()));
     }
 
     @Test
@@ -289,10 +285,11 @@ class GroupByKeywordServiceTest {
                 .thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_E)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
+        when(keywordService.findByUniqueId(KEYWORD_ID_B)).thenReturn(KEYWORD_ENTRY_B);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_B);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_B);
 
-        assertViewBysMultiple(viewBys, empty());
+        assertGroupByResultMultiple(groupByResult, empty(), is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(10121L).build()));
     }
 
     @Test
@@ -300,11 +297,13 @@ class GroupByKeywordServiceTest {
         when(keywordService.stream(
                         argThat(argument -> PARENT_KEYWORD_ID_A.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of());
+        when(keywordService.findByUniqueId(KEYWORD_ID_A)).thenReturn(KEYWORD_ENTRY_A);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_A);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_A);
 
-        assertThat(viewBys.getGroups(), empty());
-        assertThat(viewBys.getAncestors(), empty());
+        assertThat(groupByResult.getGroups(), empty());
+        assertThat(groupByResult.getAncestors(), empty());
+        assertThat(groupByResult.getParent(), is(ParentImpl.builder().label(KEYWORD_LABEL_A).count(0L).build()));
     }
 
     @Test
@@ -326,10 +325,11 @@ class GroupByKeywordServiceTest {
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
+        when(keywordService.findByUniqueId(KEYWORD_ID_A)).thenReturn(KEYWORD_ENTRY_A);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_A);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_A);
 
-        assertViewByC(viewBys, contains(getAncestorB()));
+        assertGroupByResultC(groupByResult, contains(getAncestorB()), is(ParentImpl.builder().label(KEYWORD_LABEL_A).count(9999L).build()));
     }
 
     @Test
@@ -360,10 +360,11 @@ class GroupByKeywordServiceTest {
                 .thenReturn(MULTIPLE_KEYWORD_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_E)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
+        when(keywordService.findByUniqueId(KEYWORD_ID_B)).thenReturn(KEYWORD_ENTRY_B);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_B);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_B);
 
-        assertViewBysMultiple(viewBys, contains(getAncestorD()));
+        assertGroupByResultMultiple(groupByResult, contains(getAncestorD()), is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(10121L).build()));
     }
 
     @Test
@@ -397,9 +398,9 @@ class GroupByKeywordServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertViewByC(viewBys, contains(getAncestorB(), getAncestorD(), getAncestorE()));
+        assertGroupByResultC(groupByResult, contains(getAncestorB(), getAncestorD(), getAncestorE()), is(nullValue()));
     }
 
     @Test
@@ -427,10 +428,11 @@ class GroupByKeywordServiceTest {
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_E);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
+        when(keywordService.findByUniqueId(KEYWORD_ID_B)).thenReturn(KEYWORD_ENTRY_B);
 
-        GroupByResult viewBys = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_B);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_B);
 
-        assertViewByC(viewBys, contains(getAncestorD(), getAncestorE()));
+        assertGroupByResultC(groupByResult, contains(getAncestorD(), getAncestorE()), is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(9999L).build()));
     }
 
     private static Map<String, String> getFacetFields(String facetItems) {
@@ -446,33 +448,35 @@ class GroupByKeywordServiceTest {
         return keywordEntry;
     }
 
-    private static void assertViewBysMultiple(
-            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(groupByResult.getGroups(), contains(getViewByA(), getViewByC(), getViewByF()));
+    private static void assertGroupByResultMultiple(
+            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcher, Matcher<? super Parent> matcherParent) {
+        assertThat(groupByResult.getGroups(), contains(getGroupByResultA(), getGroupByResultC(), getGroupByResultF()));
         assertThat(groupByResult.getAncestors(), matcher);
+        assertThat(groupByResult.getParent(), matcherParent);
     }
 
-    private static void assertViewByC(
-            GroupByResult viewBys, Matcher<? super List<Ancestor>> matcher) {
-        assertThat(viewBys.getGroups(), contains(getViewByC()));
-        assertThat(viewBys.getAncestors(), matcher);
+    private static void assertGroupByResultC(
+            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcherAncestors, Matcher<? super Parent> matcherParent) {
+        assertThat(groupByResult.getGroups(), contains(getGroupByResultC()));
+        assertThat(groupByResult.getAncestors(), matcherAncestors);
+        assertThat(groupByResult.getParent(), matcherParent);
     }
 
-    private static Group getViewByA() {
-        return getViewBy(KEYWORD_ID_A, KEYWORD_LABEL_A, KEYWORD_COUNT_A, true);
+    private static Group getGroupByResultA() {
+        return getGroupByResult(KEYWORD_ID_A, KEYWORD_LABEL_A, KEYWORD_COUNT_A, true);
     }
 
-    private static Group getViewByC() {
-        return getViewBy(KEYWORD_ID_C, KEYWORD_LABEL_C, KEYWORD_COUNT_C, false);
+    private static Group getGroupByResultC() {
+        return getGroupByResult(KEYWORD_ID_C, KEYWORD_LABEL_C, KEYWORD_COUNT_C, false);
     }
 
-    private static Group getViewByF() {
-        return getViewBy(KEYWORD_ID_F, KEYWORD_LABEL_F, KEYWORD_COUNT_F, true);
+    private static Group getGroupByResultF() {
+        return getGroupByResult(KEYWORD_ID_F, KEYWORD_LABEL_F, KEYWORD_COUNT_F, true);
     }
 
-    private static Group getViewBy(
+    private static Group getGroupByResult(
             String keywordId, String keywordLabel, long keywordCount, boolean expand) {
-        return MockServiceHelper.createViewBy(keywordId, keywordLabel, keywordCount, expand);
+        return MockServiceHelper.createGroupByResult(keywordId, keywordLabel, keywordCount, expand);
     }
 
     private static Ancestor getAncestorA() {
