@@ -107,14 +107,13 @@ public class HelpCentreService extends BasicSearchService<HelpDocument, HelpCent
                             helpCentreQueryProcessorConfig.getLeadingWildcardFields());
 
             result =
-                    QueryResult.of(
-                            result.getContent(),
-                            result.getPage(),
-                            result.getFacets(),
-                            null,
-                            null,
-                            suggestionsWithoutDefaultFilters,
-                            warnings);
+                    QueryResult.<HelpCentreEntry>builder()
+                            .content(result.getContent())
+                            .page(result.getPage())
+                            .facets(result.getFacets())
+                            .suggestions(suggestionsWithoutDefaultFilters)
+                            .warnings(warnings)
+                            .build();
         }
         return result;
     }

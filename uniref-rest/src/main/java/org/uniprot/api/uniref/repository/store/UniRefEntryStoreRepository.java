@@ -122,7 +122,11 @@ public class UniRefEntryStoreRepository {
         // Build members
         Stream<UniRefMember> uniRefMembers = getUniRefMembers(entryLight, memberIds);
 
-        return QueryResult.of(uniRefMembers, page, facets);
+        return QueryResult.<UniRefMember>builder()
+                .content(uniRefMembers)
+                .page(page)
+                .facets(facets)
+                .build();
     }
 
     private List<String> getMemberIds(List<String> members) {

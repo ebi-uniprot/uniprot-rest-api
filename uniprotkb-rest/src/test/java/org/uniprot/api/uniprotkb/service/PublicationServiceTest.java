@@ -71,18 +71,21 @@ class PublicationServiceTest {
                                         .build())
                         .build();
         QueryResult<PublicationDocument> pubDocs =
-                QueryResult.of(
-                        Stream.of(
-                                PublicationDocument.builder()
-                                        .publicationMappedReferences(
-                                                asBinary(
-                                                        new MappedPublicationsBuilder()
-                                                                .uniProtKBMappedReference(ref)
-                                                                .build()))
-                                        .citationId("2")
-                                        .build()),
-                        CursorPage.of(null, 1),
-                        emptyList());
+                QueryResult.<PublicationDocument>builder()
+                        .content(
+                                Stream.of(
+                                        PublicationDocument.builder()
+                                                .publicationMappedReferences(
+                                                        asBinary(
+                                                                new MappedPublicationsBuilder()
+                                                                        .uniProtKBMappedReference(
+                                                                                ref)
+                                                                        .build()))
+                                                .citationId("2")
+                                                .build()))
+                        .page(CursorPage.of(null, 1))
+                        .facets(emptyList())
+                        .build();
 
         when(publicationRepository.searchPage(any(), eq(null))).thenReturn(pubDocs);
 

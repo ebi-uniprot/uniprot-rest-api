@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.search.IdMappingStatistics;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
@@ -80,10 +81,17 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 StandardOpenOption.TRUNCATE_EXISTING);
                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
+            IdMappingStatistics idMappingStatistics =
+                    IdMappingStatistics.builder()
+                            .failedIds(idMappingResult.getUnmappedIds())
+                            .suggestedIds(idMappingResult.getSuggestedIds())
+                            .build();
+
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
             context.setContentType(contentType);
-            context.setFailedIds(idMappingResult.getUnmappedIds());
+            context.setIdMappingStatistics(idMappingStatistics);
+            context.setWarnings(idMappingResult.getWarnings());
 
             if (SUPPORTED_RDF_MEDIA_TYPES.containsKey(contentType)) {
                 Set<String> toIds = getToIds(idMappingResult);

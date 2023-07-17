@@ -119,17 +119,24 @@ public class PIRResponseConverter {
             } else {
                 for (String fromValue : fromValues) {
                     Arrays.stream(rowParts[1].split(";"))
-                            // filter based on valid to
-                            .filter(toValue -> isValidIdPattern(request.getTo(), toValue))
                             .map(
                                     toValue ->
                                             IdMappingStringPair.builder()
                                                     .from(fromValue)
                                                     .to(toValue)
                                                     .build())
-                            .forEach(builder::mappedId);
+                            .forEach(pair -> convertIdMappingPair(request.getTo(), pair, builder));
                 }
             }
+        }
+    }
+
+    private void convertIdMappingPair(
+            String to, IdMappingStringPair pair, IdMappingResult.IdMappingResultBuilder builder) {
+        if (isValidIdPattern(to, pair.getTo())) {
+            builder.mappedId(pair);
+        } else {
+            builder.suggestedId(pair.getTo());
         }
     }
 

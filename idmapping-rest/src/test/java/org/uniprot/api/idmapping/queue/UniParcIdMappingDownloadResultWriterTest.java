@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
@@ -115,7 +116,14 @@ class UniParcIdMappingDownloadResultWriterTest {
         request.setFormat("json");
         request.setJobId(jobId);
 
-        IdMappingResult idMappingResult = IdMappingResult.builder().mappedIds(mappedIds).build();
+        ProblemPair warning = new ProblemPair(1, "msg");
+        IdMappingResult idMappingResult =
+                IdMappingResult.builder()
+                        .mappedIds(mappedIds)
+                        .warning(warning)
+                        .unmappedId("unm1")
+                        .suggestedId("sug1")
+                        .build();
 
         assertDoesNotThrow(
                 () ->
@@ -140,6 +148,20 @@ class UniParcIdMappingDownloadResultWriterTest {
                         .map(node -> node.findValue("value").asText())
                         .collect(Collectors.toSet())
                         .contains("UPI0000283A10"));
+
+        ArrayNode failedIds = (ArrayNode) jsonResult.findPath("failedIds");
+        assertEquals(1, failedIds.size());
+        assertEquals("unm1", failedIds.get(0).asText());
+
+        ArrayNode suggestedIds = (ArrayNode) jsonResult.findPath("suggestedIds");
+        assertEquals(1, suggestedIds.size());
+        assertEquals("sug1", suggestedIds.get(0).asText());
+
+        ArrayNode warnings = (ArrayNode) jsonResult.findPath("warnings");
+        assertEquals(1, warnings.size());
+        JsonNode warningNode = warnings.get(0);
+        assertEquals("1", warningNode.findValue("code").asText());
+        assertEquals("msg", warningNode.findValue("message").asText());
     }
 
     @Test

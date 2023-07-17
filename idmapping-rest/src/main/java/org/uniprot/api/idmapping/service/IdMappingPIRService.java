@@ -1,7 +1,9 @@
 package org.uniprot.api.idmapping.service;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
+import org.uniprot.api.common.repository.search.IdMappingStatistics;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
@@ -31,24 +33,33 @@ public abstract class IdMappingPIRService {
         CursorPage cursorPage =
                 CursorPage.of(request.getCursor(), pageSize, result.getMappedIds().size());
 
-        return QueryResult.of(
+        Stream<IdMappingStringPair> pageContent =
                 result.getMappedIds()
                         .subList(
                                 cursorPage.getOffset().intValue(),
                                 CursorPage.getNextOffset(cursorPage))
-                        .stream(),
-                cursorPage,
-                null,
-                result.getUnmappedIds(),
-                result.getWarnings());
+                        .stream();
+
+        return QueryResult.<IdMappingStringPair>builder()
+                .content(pageContent)
+                .page(cursorPage)
+                .idMappingStatistics(getIdMappingStatistics(result))
+                .warnings(result.getWarnings())
+                .build();
     }
 
     public QueryResult<IdMappingStringPair> queryResultAll(IdMappingResult result) {
-        return QueryResult.of(
-                result.getMappedIds().stream(),
-                null,
-                null,
-                result.getUnmappedIds(),
-                result.getWarnings());
+        return QueryResult.<IdMappingStringPair>builder()
+                .content(result.getMappedIds().stream())
+                .idMappingStatistics(getIdMappingStatistics(result))
+                .warnings(result.getWarnings())
+                .build();
+    }
+
+    private IdMappingStatistics getIdMappingStatistics(IdMappingResult result) {
+        return IdMappingStatistics.builder()
+                .failedIds(result.getUnmappedIds())
+                .suggestedIds(result.getSuggestedIds())
+                .build();
     }
 }

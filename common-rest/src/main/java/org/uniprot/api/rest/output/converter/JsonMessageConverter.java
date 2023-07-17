@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.output.converter;
 
+import static org.uniprot.core.util.Utils.notNull;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.repository.search.IdMappingStatistics;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
@@ -159,13 +161,24 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         if (!context.isEntityOnly()) {
             generator.writeEndArray();
 
-            if (notNullNotEmpty(context.getFailedIds())) {
-                generator.writeFieldName("failedIds");
-                generator.writeStartArray();
-                for (Object matchedField : context.getFailedIds()) {
-                    writeElement(generator, matchedField);
+            if (notNull(context.getIdMappingStatistics())) {
+                IdMappingStatistics idMappingStatistics = context.getIdMappingStatistics();
+                if (notNullNotEmpty(idMappingStatistics.getFailedIds())) {
+                    generator.writeFieldName("failedIds");
+                    generator.writeStartArray();
+                    for (Object matchedField : idMappingStatistics.getFailedIds()) {
+                        writeElement(generator, matchedField);
+                    }
+                    generator.writeEndArray();
                 }
-                generator.writeEndArray();
+                if (notNullNotEmpty(idMappingStatistics.getSuggestedIds())) {
+                    generator.writeFieldName("suggestedIds");
+                    generator.writeStartArray();
+                    for (Object matchedField : idMappingStatistics.getSuggestedIds()) {
+                        writeElement(generator, matchedField);
+                    }
+                    generator.writeEndArray();
+                }
             }
 
             if (notNullNotEmpty(context.getSuggestions())) {

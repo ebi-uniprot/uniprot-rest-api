@@ -455,6 +455,137 @@ class PIRResponseConverterTest {
     }
 
     @Test
+    void checkIdMappingResultWithUniProtKBSuggestedIds() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo("UniProtKB");
+        request.setIds("ID1");
+        // when  more than allowed ids (20 for tests) for enrichment
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "From1\tP00001\n"
+                                        + "From2\tP00002;P00003\n"
+                                        + "From3\tUPI0000000001\n"
+                                        + "From4\tUniRef50_P12345\n"
+                                        + "From5\tP00005\n");
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+
+        assertFalse(result.getMappedIds().isEmpty());
+        assertEquals(4, result.getMappedIds().size());
+        assertTrue(
+                result.getMappedIds()
+                        .containsAll(
+                                List.of(
+                                        new IdMappingStringPair("From1", "P00001"),
+                                        new IdMappingStringPair("From2", "P00002"),
+                                        new IdMappingStringPair("From2", "P00003"),
+                                        new IdMappingStringPair("From5", "P00005"))));
+        assertTrue(result.getWarnings().isEmpty());
+        assertFalse(result.getSuggestedIds().isEmpty());
+        assertEquals(2, result.getSuggestedIds().size());
+        assertTrue(
+                result.getSuggestedIds().containsAll(List.of("UPI0000000001", "UniRef50_P12345")));
+        assertThat(result.getUnmappedIds(), is(emptyList()));
+    }
+
+    @Test
+    void checkIdMappingResultDoesNotSuggestToEMBL() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo("EMBL");
+        request.setIds("ID1");
+        // when  more than allowed ids (20 for tests) for enrichment
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "From1\t00001\n"
+                                        + "From2\t00002;00003\n"
+                                        + "From3\tUPI0000000001\n"
+                                        + "From4\tUniRef50_P12345\n"
+                                        + "From5\n");
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+
+        assertFalse(result.getMappedIds().isEmpty());
+        assertEquals(5, result.getMappedIds().size());
+        assertTrue(
+                result.getMappedIds()
+                        .containsAll(
+                                List.of(
+                                        new IdMappingStringPair("From1", "00001"),
+                                        new IdMappingStringPair("From2", "00002"),
+                                        new IdMappingStringPair("From2", "00003"),
+                                        new IdMappingStringPair("From3", "UPI0000000001"),
+                                        new IdMappingStringPair("From4", "UniRef50_P12345"))));
+        assertTrue(result.getWarnings().isEmpty());
+        assertTrue(result.getSuggestedIds().isEmpty());
+        assertThat(result.getUnmappedIds(), is(List.of("From5")));
+    }
+
+    @Test
+    void checkIdMappingResultSuggestForUniRef50() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo("UniRef50");
+        request.setIds("ID1");
+        // when  more than allowed ids (20 for tests) for enrichment
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "From1\tUniRef50_P12345\n"
+                                        + "From2\tUniRef50_P21802;UniRef50_P00003\n"
+                                        + "From3\tUPI0000000001\n"
+                                        + "From4\tUniRef50_P12345\n"
+                                        + "From5\tP00005\n");
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+
+        assertFalse(result.getMappedIds().isEmpty());
+        assertEquals(4, result.getMappedIds().size());
+        assertTrue(
+                result.getMappedIds()
+                        .containsAll(
+                                List.of(
+                                        new IdMappingStringPair("From1", "UniRef50_P12345"),
+                                        new IdMappingStringPair("From2", "UniRef50_P21802"),
+                                        new IdMappingStringPair("From2", "UniRef50_P00003"),
+                                        new IdMappingStringPair("From4", "UniRef50_P12345"))));
+        assertTrue(result.getWarnings().isEmpty());
+        assertEquals(2, result.getSuggestedIds().size());
+        assertTrue(result.getSuggestedIds().containsAll(List.of("UPI0000000001", "P00005")));
+
+        assertThat(result.getUnmappedIds(), is(emptyList()));
+    }
+
+    @Test
+    void checkIdMappingResultSuggestForUniParc() {
+        IdMappingJobRequest request = new IdMappingJobRequest();
+        request.setTo("UniParc");
+        request.setIds("ID1");
+        // when  more than allowed ids (20 for tests) for enrichment
+        ResponseEntity<String> responseEntity =
+                ResponseEntity.status(HttpStatus.OK)
+                        .body(
+                                "From1\tUPI0000000001\n"
+                                        + "From2\tUPI0000000002;UPI0000000003\n"
+                                        + "From3\tP21802\n"
+                                        + "From4\tUniRef50_P12345\n"
+                                        + "From5\n");
+        IdMappingResult result = converter.convertToIDMappings(request, 20, 40, responseEntity);
+
+        assertFalse(result.getMappedIds().isEmpty());
+        assertEquals(3, result.getMappedIds().size());
+        assertTrue(
+                result.getMappedIds()
+                        .containsAll(
+                                List.of(
+                                        new IdMappingStringPair("From1", "UPI0000000001"),
+                                        new IdMappingStringPair("From2", "UPI0000000002"),
+                                        new IdMappingStringPair("From2", "UPI0000000003"))));
+        assertTrue(result.getWarnings().isEmpty());
+        assertEquals(2, result.getSuggestedIds().size());
+        assertTrue(result.getSuggestedIds().containsAll(List.of("P21802", "UniRef50_P12345")));
+
+        assertThat(result.getUnmappedIds(), is(List.of("From5")));
+    }
+
+    @Test
     void testGetMappedRequestIds() {
         IdMappingJobRequest request = new IdMappingJobRequest();
         request.setIds("P12345.6,9606.ENSP00000386219,9606.ENSP00000318585,Q98765[12-22],Q12345");
