@@ -1,13 +1,6 @@
 package org.uniprot.api.common.repository.search;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
-import org.apache.solr.client.solrj.request.json.TermsFacetMap;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.search.facet.FacetProperty;
-import org.uniprot.api.common.repository.search.request.BoostApplier;
-import org.uniprot.core.util.Utils;
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +9,14 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.client.solrj.request.json.TermsFacetMap;
+import org.apache.solr.common.params.ModifiableSolrParams;
+import org.uniprot.api.common.repository.search.facet.FacetConfig;
+import org.uniprot.api.common.repository.search.facet.FacetProperty;
+import org.uniprot.api.common.repository.search.request.BoostApplier;
+import org.uniprot.core.util.Utils;
 
 public class SolrQueryConverter {
     private static final String QUERY_OPERATOR = "q.op";
