@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.IdMappingStatistics;
-import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -88,28 +87,15 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             generator.writeStartObject();
 
             if (notNullNotEmpty(context.getWarnings())) {
-                generator.writeFieldName("warnings");
-                generator.writeStartArray();
-                context.getWarnings().forEach(warn -> writeElement(generator, warn));
-                generator.writeEndArray();
+                writeJsonArray(generator, "warnings", context.getWarnings());
             }
 
             if (notNullNotEmpty(context.getFacets())) {
-                generator.writeFieldName("facets");
-                generator.writeStartArray();
-                for (Object facet : context.getFacets()) {
-                    writeElement(generator, facet);
-                }
-                generator.writeEndArray();
+                writeJsonArray(generator, "facets", context.getFacets());
             }
 
             if (notNullNotEmpty(context.getMatchedFields())) {
-                generator.writeFieldName("matchedFields");
-                generator.writeStartArray();
-                for (Object matchedField : context.getMatchedFields()) {
-                    writeElement(generator, matchedField);
-                }
-                generator.writeEndArray();
+                writeJsonArray(generator, "matchedFields", context.getMatchedFields());
             }
 
             generator.writeFieldName("results");
@@ -164,30 +150,16 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             if (notNull(context.getIdMappingStatistics())) {
                 IdMappingStatistics idMappingStatistics = context.getIdMappingStatistics();
                 if (notNullNotEmpty(idMappingStatistics.getFailedIds())) {
-                    generator.writeFieldName("failedIds");
-                    generator.writeStartArray();
-                    for (Object matchedField : idMappingStatistics.getFailedIds()) {
-                        writeElement(generator, matchedField);
-                    }
-                    generator.writeEndArray();
+                    writeJsonArray(generator, "failedIds", idMappingStatistics.getFailedIds());
                 }
                 if (notNullNotEmpty(idMappingStatistics.getSuggestedIds())) {
-                    generator.writeFieldName("suggestedIds");
-                    generator.writeStartArray();
-                    for (Object matchedField : idMappingStatistics.getSuggestedIds()) {
-                        writeElement(generator, matchedField);
-                    }
-                    generator.writeEndArray();
+                    writeJsonArray(
+                            generator, "suggestedIds", idMappingStatistics.getSuggestedIds());
                 }
             }
 
             if (notNullNotEmpty(context.getSuggestions())) {
-                generator.writeFieldName("suggestions");
-                generator.writeStartArray();
-                for (Suggestion suggestion : context.getSuggestions()) {
-                    writeElement(generator, suggestion);
-                }
-                generator.writeEndArray();
+                writeJsonArray(generator, "suggestions", context.getSuggestions());
             }
 
             generator.writeEndObject();
@@ -234,6 +206,17 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         } else {
             return Collections.emptyList();
         }
+    }
+
+    private void writeJsonArray(
+            JsonGenerator generator, String arrayFieldName, Collection<?> values)
+            throws IOException {
+        generator.writeFieldName(arrayFieldName);
+        generator.writeStartArray();
+        for (Object matchedField : values) {
+            writeElement(generator, matchedField);
+        }
+        generator.writeEndArray();
     }
 
     private void writeElement(JsonGenerator generator, Object facet) {
