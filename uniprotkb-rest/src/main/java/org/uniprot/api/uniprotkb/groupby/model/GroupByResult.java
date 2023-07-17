@@ -8,4 +8,5 @@ import lombok.Value;
 public class GroupByResult {
     List<Ancestor> ancestors;
     List<Group> groups;
+    Parent parent;
 }

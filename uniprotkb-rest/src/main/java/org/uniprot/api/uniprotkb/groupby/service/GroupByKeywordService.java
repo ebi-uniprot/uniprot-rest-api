@@ -45,10 +45,16 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
             List<FacetField.Count> facetCounts,
             List<KeywordEntry> keywordEntries,
             List<KeywordEntry> ancestorEntries,
+            String parentId,
             String query) {
         Map<String, KeywordEntry> idEntryMap =
                 keywordEntries.stream().collect(Collectors.toMap(this::getId, Function.identity()));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, query);
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+    }
+
+    @Override
+    protected KeywordEntry getEntry(String parentId) {
+        return keywordService.findByUniqueId(parentId);
     }
 
     @Override
