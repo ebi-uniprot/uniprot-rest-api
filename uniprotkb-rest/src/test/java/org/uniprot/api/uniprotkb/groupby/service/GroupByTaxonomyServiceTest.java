@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -13,17 +24,6 @@ import org.uniprot.api.rest.service.taxonomy.TaxonomyService;
 import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByTaxonomyServiceTest {
@@ -200,7 +200,8 @@ class GroupByTaxonomyServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorA(), getAncestorB()), is(nullValue()));
+        assertGroupByResultC(
+                groupByResult, contains(getAncestorA(), getAncestorB()), is(nullValue()));
     }
 
     @Test
@@ -237,7 +238,8 @@ class GroupByTaxonomyServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorB(), getAncestorD()), is(nullValue()));
+        assertGroupByResultMultiple(
+                groupByResult, contains(getAncestorB(), getAncestorD()), is(nullValue()));
     }
 
     @Test
@@ -263,7 +265,10 @@ class GroupByTaxonomyServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, TAX_ID_B_STRING);
 
-        assertGroupByResultMultiple(groupByResult, empty(), is(ParentImpl.builder().label(TAX_LABEL_B).count(10022L).build()));
+        assertGroupByResultMultiple(
+                groupByResult,
+                empty(),
+                is(ParentImpl.builder().label(TAX_LABEL_B).count(10022L).build()));
     }
 
     @Test
@@ -277,7 +282,9 @@ class GroupByTaxonomyServiceTest {
 
         assertThat(groupByResult.getGroups(), empty());
         assertThat(groupByResult.getAncestors(), empty());
-        assertThat(groupByResult.getParent(), is(ParentImpl.builder().label(TAX_LABEL_A).count(0).build()));
+        assertThat(
+                groupByResult.getParent(),
+                is(ParentImpl.builder().label(TAX_LABEL_A).count(0).build()));
     }
 
     @Test
@@ -303,7 +310,10 @@ class GroupByTaxonomyServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, TAX_ID_A_STRING);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorB()), is(ParentImpl.builder().label(TAX_LABEL_A).count(9999L).build()));
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorB()),
+                is(ParentImpl.builder().label(TAX_LABEL_A).count(9999L).build()));
     }
 
     @Test
@@ -336,7 +346,10 @@ class GroupByTaxonomyServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, TAX_ID_B_STRING);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorD()), is(ParentImpl.builder().label(TAX_LABEL_B).count(10022L).build()));
+        assertGroupByResultMultiple(
+                groupByResult,
+                contains(getAncestorD()),
+                is(ParentImpl.builder().label(TAX_LABEL_B).count(10022L).build()));
     }
 
     @Test
@@ -372,7 +385,10 @@ class GroupByTaxonomyServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorB(), getAncestorD(), getAncestorE()), is(nullValue()));
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorB(), getAncestorD(), getAncestorE()),
+                is(nullValue()));
     }
 
     @Test
@@ -404,7 +420,10 @@ class GroupByTaxonomyServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, TAX_ID_B_STRING);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorD(), getAncestorE()), is(ParentImpl.builder().label(TAX_LABEL_B).count(9999L).build()));
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorD(), getAncestorE()),
+                is(ParentImpl.builder().label(TAX_LABEL_B).count(9999L).build()));
     }
 
     private static Map<String, String> getFacetFields(String facetItems) {
@@ -420,14 +439,18 @@ class GroupByTaxonomyServiceTest {
     }
 
     private static void assertGroupByResultMultiple(
-            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcherAncestors, Matcher<? super Parent> matcherParent) {
+            GroupByResult groupByResult,
+            Matcher<? super List<Ancestor>> matcherAncestors,
+            Matcher<? super Parent> matcherParent) {
         assertThat(groupByResult.getGroups(), contains(getGroupByResultA(), getGroupByResultC()));
         assertThat(groupByResult.getAncestors(), matcherAncestors);
         assertThat(groupByResult.getParent(), matcherParent);
     }
 
     private static void assertGroupByResultC(
-            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcherAncestors, Matcher<? super Parent> matcherParent) {
+            GroupByResult groupByResult,
+            Matcher<? super List<Ancestor>> matcherAncestors,
+            Matcher<? super Parent> matcherParent) {
         assertThat(groupByResult.getGroups(), contains(getGroupByResultC()));
         assertThat(groupByResult.getAncestors(), matcherAncestors);
         assertThat(groupByResult.getParent(), matcherParent);
@@ -441,7 +464,8 @@ class GroupByTaxonomyServiceTest {
         return getGroupByResult(String.valueOf(TAX_ID_C), TAX_LABEL_C, TAX_COUNT_C, false);
     }
 
-    private static Group getGroupByResult(String taxId, String taxLabel, long taxCount, boolean expand) {
+    private static Group getGroupByResult(
+            String taxId, String taxLabel, long taxCount, boolean expand) {
         return MockServiceHelper.createGroupByResult(taxId, taxLabel, taxCount, expand);
     }
 

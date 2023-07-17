@@ -1,5 +1,18 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -12,19 +25,6 @@ import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.groupby.service.go.GOService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByGOServiceTest {
@@ -185,7 +185,8 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorA(), getAncestorB()), is(nullValue()));
+        assertGroupByResultC(
+                groupByResult, contains(getAncestorA(), getAncestorB()), is(nullValue()));
     }
 
     @Test
@@ -222,7 +223,8 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorB(), getAncestorD()), is(nullValue()));
+        assertGroupByResultMultiple(
+                groupByResult, contains(getAncestorB(), getAncestorD()), is(nullValue()));
     }
 
     @Test
@@ -244,7 +246,10 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, GO_ID_B);
 
-        assertGroupByResultMultiple(groupByResult, empty(), is(ParentImpl.builder().label(GO_LABEL_B).count(10121L).build()));
+        assertGroupByResultMultiple(
+                groupByResult,
+                empty(),
+                is(ParentImpl.builder().label(GO_LABEL_B).count(10121L).build()));
     }
 
     @Test
@@ -257,7 +262,9 @@ class GroupByGOServiceTest {
 
         assertThat(groupByResult.getGroups(), empty());
         assertThat(groupByResult.getAncestors(), empty());
-        assertThat(groupByResult.getParent(), is(ParentImpl.builder().label(GO_LABEL_A).count(0L).build()));
+        assertThat(
+                groupByResult.getParent(),
+                is(ParentImpl.builder().label(GO_LABEL_A).count(0L).build()));
     }
 
     @Test
@@ -282,7 +289,10 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, GO_ID_A);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorB()), is(ParentImpl.builder().label(GO_LABEL_A).count(9999L).build()));
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorB()),
+                is(ParentImpl.builder().label(GO_LABEL_A).count(9999L).build()));
     }
 
     @Test
@@ -315,7 +325,10 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, GO_ID_B);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorD()), is(ParentImpl.builder().label(GO_LABEL_B).count(10121L).build()));
+        assertGroupByResultMultiple(
+                groupByResult,
+                contains(getAncestorD()),
+                is(ParentImpl.builder().label(GO_LABEL_B).count(10121L).build()));
     }
 
     @Test
@@ -349,7 +362,10 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorB(), getAncestorD(), getAncestorE()), is(nullValue()));
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorB(), getAncestorD(), getAncestorE()),
+                is(nullValue()));
     }
 
     @Test
@@ -379,7 +395,10 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, GO_ID_B);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorD(), getAncestorE()), is(ParentImpl.builder().label(GO_LABEL_B).count(9999L).build()));
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorD(), getAncestorE()),
+                is(ParentImpl.builder().label(GO_LABEL_B).count(9999L).build()));
     }
 
     private static String addGoPrefix(String goId) {
@@ -398,14 +417,20 @@ class GroupByGOServiceTest {
     }
 
     private static void assertGroupByResultMultiple(
-            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcherAncestors, Matcher<? super Parent> matcherParent) {
-        assertThat(groupByResult.getGroups(), contains(getGroupByResultA(), getGroupByResultC(), getGroupByResultF()));
+            GroupByResult groupByResult,
+            Matcher<? super List<Ancestor>> matcherAncestors,
+            Matcher<? super Parent> matcherParent) {
+        assertThat(
+                groupByResult.getGroups(),
+                contains(getGroupByResultA(), getGroupByResultC(), getGroupByResultF()));
         assertThat(groupByResult.getAncestors(), matcherAncestors);
         assertThat(groupByResult.getParent(), matcherParent);
     }
 
     private static void assertGroupByResultC(
-            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcherAncestors, Matcher<? super Parent> matcherParent) {
+            GroupByResult groupByResult,
+            Matcher<? super List<Ancestor>> matcherAncestors,
+            Matcher<? super Parent> matcherParent) {
         assertThat(groupByResult.getGroups(), contains(getGroupByResultC()));
         assertThat(groupByResult.getAncestors(), matcherAncestors);
         assertThat(groupByResult.getParent(), matcherParent);
@@ -423,7 +448,8 @@ class GroupByGOServiceTest {
         return getGroupByResult(GO_ID_F, GO_LABEL_F, GO_COUNT_F, true);
     }
 
-    private static Group getGroupByResult(String goId, String goLabel, long goCount, boolean expand) {
+    private static Group getGroupByResult(
+            String goId, String goLabel, long goCount, boolean expand) {
         return MockServiceHelper.createGroupByResult(addGoPrefix(goId), goLabel, goCount, expand);
     }
 

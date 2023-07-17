@@ -1,8 +1,8 @@
 package org.uniprot.api.uniprotkb.groupby.model;
 
-import lombok.Value;
-
 import java.util.List;
+
+import lombok.Value;
 
 @Value
 public class GroupByResult {
