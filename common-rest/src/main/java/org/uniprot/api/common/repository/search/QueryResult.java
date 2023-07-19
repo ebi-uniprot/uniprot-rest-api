@@ -24,7 +24,7 @@ public class QueryResult<T> {
     private Page page;
     private final Stream<T> content;
     private final Collection<Facet> facets;
-    private final IdMappingStatistics idMappingStatistics;
+    private final ExtraOptions extraOptions;
     private final Collection<ProblemPair> warnings;
 
     public Page getPageAndClean() {

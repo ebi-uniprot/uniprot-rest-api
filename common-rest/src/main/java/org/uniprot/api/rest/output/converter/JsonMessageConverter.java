@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.common.repository.search.IdMappingStatistics;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
@@ -147,14 +147,13 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
         if (!context.isEntityOnly()) {
             generator.writeEndArray();
 
-            if (notNull(context.getIdMappingStatistics())) {
-                IdMappingStatistics idMappingStatistics = context.getIdMappingStatistics();
-                if (notNullNotEmpty(idMappingStatistics.getFailedIds())) {
-                    writeJsonArray(generator, "failedIds", idMappingStatistics.getFailedIds());
+            if (notNull(context.getExtraOptions())) {
+                ExtraOptions extraOptions = context.getExtraOptions();
+                if (notNullNotEmpty(extraOptions.getFailedIds())) {
+                    writeJsonArray(generator, "failedIds", extraOptions.getFailedIds());
                 }
-                if (notNullNotEmpty(idMappingStatistics.getSuggestedIds())) {
-                    writeJsonArray(
-                            generator, "suggestedIds", idMappingStatistics.getSuggestedIds());
+                if (notNullNotEmpty(extraOptions.getSuggestedIds())) {
+                    writeJsonArray(generator, "suggestedIds", extraOptions.getSuggestedIds());
                 }
             }
 

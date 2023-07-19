@@ -3,7 +3,7 @@ package org.uniprot.api.idmapping.service;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.uniprot.api.common.repository.search.IdMappingStatistics;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
@@ -43,7 +43,7 @@ public abstract class IdMappingPIRService {
         return QueryResult.<IdMappingStringPair>builder()
                 .content(pageContent)
                 .page(cursorPage)
-                .idMappingStatistics(getIdMappingStatistics(result))
+                .extraOptions(getExtraOptions(result))
                 .warnings(result.getWarnings())
                 .build();
     }
@@ -51,13 +51,13 @@ public abstract class IdMappingPIRService {
     public QueryResult<IdMappingStringPair> queryResultAll(IdMappingResult result) {
         return QueryResult.<IdMappingStringPair>builder()
                 .content(result.getMappedIds().stream())
-                .idMappingStatistics(getIdMappingStatistics(result))
+                .extraOptions(getExtraOptions(result))
                 .warnings(result.getWarnings())
                 .build();
     }
 
-    private IdMappingStatistics getIdMappingStatistics(IdMappingResult result) {
-        return IdMappingStatistics.builder()
+    private ExtraOptions getExtraOptions(IdMappingResult result) {
+        return ExtraOptions.builder()
                 .failedIds(result.getUnmappedIds())
                 .suggestedIds(result.getSuggestedIds())
                 .build();

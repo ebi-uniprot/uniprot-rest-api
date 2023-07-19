@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.repository.search.IdMappingStatistics;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -147,8 +147,8 @@ public abstract class BasicIdService<T, U> {
                 "Total time taken to call voldemort in ms {} for jobId {} in getMappedEntries",
                 (end - start),
                 jobId);
-        IdMappingStatistics idMappingStatistics =
-                IdMappingStatistics.builder()
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
                         .failedIds(mappingResult.getUnmappedIds())
                         .suggestedIds(mappingResult.getSuggestedIds())
                         .build();
@@ -157,7 +157,7 @@ public abstract class BasicIdService<T, U> {
                 .content(result)
                 .page(cursor)
                 .facets(facets)
-                .idMappingStatistics(idMappingStatistics)
+                .extraOptions(extraOptions)
                 .warnings(warnings)
                 .build();
     }

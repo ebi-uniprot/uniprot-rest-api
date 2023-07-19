@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.common.repository.search.IdMappingStatistics;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
@@ -34,7 +34,7 @@ class IdMappingPIRServiceTest {
 
         List<IdMappingStringPair> mappingPairs = createMappingPairs(10);
         List<String> unmappedIds = createUnmappedIds(5);
-        List<String> suggestedIds = createSuggestedIds(2);
+        List<IdMappingStringPair> suggestedIds = createSuggestedIds(2);
         IdMappingResult mappingResult =
                 IdMappingResult.builder()
                         .mappedIds(mappingPairs)
@@ -50,17 +50,17 @@ class IdMappingPIRServiceTest {
         assertThat(
                 queryResult.getContent().collect(Collectors.toList()),
                 is(mappingPairs.subList(0, pageSize)));
-        assertThat(queryResult.getIdMappingStatistics(), is(notNullValue()));
-        IdMappingStatistics idMappingStatistics = queryResult.getIdMappingStatistics();
-        assertThat(idMappingStatistics.getFailedIds(), is(unmappedIds));
-        assertThat(idMappingStatistics.getSuggestedIds(), is(suggestedIds));
+        assertThat(queryResult.getExtraOptions(), is(notNullValue()));
+        ExtraOptions extraOptions = queryResult.getExtraOptions();
+        assertThat(extraOptions.getFailedIds(), is(unmappedIds));
+        assertThat(extraOptions.getSuggestedIds(), is(suggestedIds));
     }
 
     @Test
     void queryAllResultsSuccessfully() { // given
         List<IdMappingStringPair> mappingPairs = createMappingPairs(10);
         List<String> unmappedIds = createUnmappedIds(5);
-        List<String> suggestedIds = createSuggestedIds(2);
+        List<IdMappingStringPair> suggestedIds = createSuggestedIds(2);
         IdMappingResult mappingResult =
                 IdMappingResult.builder()
                         .mappedIds(mappingPairs)
@@ -73,10 +73,10 @@ class IdMappingPIRServiceTest {
 
         // then
         assertThat(queryResult.getContent().collect(Collectors.toList()), is(mappingPairs));
-        assertThat(queryResult.getIdMappingStatistics(), is(notNullValue()));
-        IdMappingStatistics idMappingStatistics = queryResult.getIdMappingStatistics();
-        assertThat(idMappingStatistics.getFailedIds(), is(unmappedIds));
-        assertThat(idMappingStatistics.getSuggestedIds(), is(suggestedIds));
+        assertThat(queryResult.getExtraOptions(), is(notNullValue()));
+        ExtraOptions extraOptions = queryResult.getExtraOptions();
+        assertThat(extraOptions.getFailedIds(), is(unmappedIds));
+        assertThat(extraOptions.getSuggestedIds(), is(suggestedIds));
     }
 
     private List<IdMappingStringPair> createMappingPairs(int count) {
@@ -91,9 +91,9 @@ class IdMappingPIRServiceTest {
                 .collect(Collectors.toList());
     }
 
-    private List<String> createSuggestedIds(int count) {
+    private List<IdMappingStringPair> createSuggestedIds(int count) {
         return IntStream.range(1, count)
-                .mapToObj(i -> "suggested " + i)
+                .mapToObj(i -> new IdMappingStringPair("fromSuggest " + i, "toSuggest " + i))
                 .collect(Collectors.toList());
     }
 

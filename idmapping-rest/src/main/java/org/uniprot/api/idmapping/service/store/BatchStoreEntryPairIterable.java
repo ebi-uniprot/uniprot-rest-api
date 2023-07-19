@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.store.datastore.UniProtStoreClient;
 

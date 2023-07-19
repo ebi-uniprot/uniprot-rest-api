@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
-import org.uniprot.api.common.repository.search.IdMappingStatistics;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
@@ -33,7 +33,7 @@ public class MessageConverterContext<T> {
     private Collection<Suggestion> suggestions;
     private boolean entityOnly;
     private boolean downloadContentDispositionHeader;
-    private IdMappingStatistics idMappingStatistics;
+    private ExtraOptions extraOptions;
     private Collection<ProblemPair> warnings;
     private boolean isLargeDownload;
     private boolean subsequence;
@@ -50,7 +50,7 @@ public class MessageConverterContext<T> {
                 .matchedFields(this.matchedFields)
                 .entityOnly(this.entityOnly)
                 .downloadContentDispositionHeader(downloadContentDispositionHeader)
-                .idMappingStatistics(this.idMappingStatistics)
+                .extraOptions(this.extraOptions)
                 .suggestions(this.suggestions)
                 .warnings(this.warnings)
                 .isLargeDownload(this.isLargeDownload)

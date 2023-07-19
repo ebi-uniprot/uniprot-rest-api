@@ -10,11 +10,12 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.uniprot.api.common.repository.search.IdMappingStatistics;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
+import org.uniprot.api.rest.output.FakePair;
 
 /**
  * Created 08/11/18
@@ -33,10 +34,10 @@ class MessageConverterContextTest {
         MessageConverterContextFactory.Resource resource =
                 MessageConverterContextFactory.Resource.UNIPROTKB;
         String fields = "field1,field2";
-        IdMappingStatistics idMappingStatistics =
-                IdMappingStatistics.builder()
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
                         .failedIds(List.of("id1"))
-                        .suggestedIds(List.of("id2"))
+                        .suggestedId(FakePair.builder().from("fid2").to("tid2").build())
                         .build();
         List<ProblemPair> warnings = List.of(new ProblemPair(1, "msg"));
         List<Suggestion> suggestions = List.of(Suggestion.builder().build());
@@ -55,7 +56,7 @@ class MessageConverterContextTest {
                         .isLargeDownload(true)
                         .entityOnly(true)
                         .downloadContentDispositionHeader(true)
-                        .idMappingStatistics(idMappingStatistics)
+                        .extraOptions(extraOptions)
                         .warnings(warnings)
                         .suggestions(suggestions)
                         .build();
@@ -72,7 +73,7 @@ class MessageConverterContextTest {
         assertThat(context.isLargeDownload(), is(true));
         assertThat(context.isEntityOnly(), is(true));
         assertThat(context.isDownloadContentDispositionHeader(), is(true));
-        assertThat(context.getIdMappingStatistics(), is(idMappingStatistics));
+        assertThat(context.getExtraOptions(), is(extraOptions));
         assertThat(context.getSuggestions(), is(suggestions));
         assertThat(context.getWarnings(), is(warnings));
     }
@@ -88,10 +89,10 @@ class MessageConverterContextTest {
         MessageConverterContextFactory.Resource resource =
                 MessageConverterContextFactory.Resource.UNIPROTKB;
         String fields = "field1,field2";
-        IdMappingStatistics idMappingStatistics =
-                IdMappingStatistics.builder()
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
                         .failedIds(List.of("id1"))
-                        .suggestedIds(List.of("id2"))
+                        .suggestedId(FakePair.builder().from("fid2").to("tid2").build())
                         .build();
         List<ProblemPair> warnings = List.of(new ProblemPair(1, "msg"));
         List<Suggestion> suggestions = List.of(Suggestion.builder().build());
@@ -110,7 +111,7 @@ class MessageConverterContextTest {
                         .isLargeDownload(true)
                         .entityOnly(true)
                         .downloadContentDispositionHeader(true)
-                        .idMappingStatistics(idMappingStatistics)
+                        .extraOptions(extraOptions)
                         .warnings(warnings)
                         .suggestions(suggestions)
                         .build();
@@ -129,7 +130,7 @@ class MessageConverterContextTest {
         assertThat(context.isLargeDownload(), is(true));
         assertThat(context.isEntityOnly(), is(true));
         assertThat(context.isDownloadContentDispositionHeader(), is(true));
-        assertThat(context.getIdMappingStatistics(), is(idMappingStatistics));
+        assertThat(context.getExtraOptions(), is(extraOptions));
         assertThat(context.getSuggestions(), is(suggestions));
         assertThat(context.getWarnings(), is(warnings));
     }

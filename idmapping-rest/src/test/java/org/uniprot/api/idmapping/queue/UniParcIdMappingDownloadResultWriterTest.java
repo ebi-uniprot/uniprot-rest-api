@@ -122,7 +122,7 @@ class UniParcIdMappingDownloadResultWriterTest {
                         .mappedIds(mappedIds)
                         .warning(warning)
                         .unmappedId("unm1")
-                        .suggestedId("sug1")
+                        .suggestedId(new IdMappingStringPair("fromSug1", "toSug1"))
                         .build();
 
         assertDoesNotThrow(
@@ -155,7 +155,9 @@ class UniParcIdMappingDownloadResultWriterTest {
 
         ArrayNode suggestedIds = (ArrayNode) jsonResult.findPath("suggestedIds");
         assertEquals(1, suggestedIds.size());
-        assertEquals("sug1", suggestedIds.get(0).asText());
+        JsonNode suugestNode = suggestedIds.get(0);
+        assertEquals("fromSug1", suugestNode.findValue("from").asText());
+        assertEquals("toSug1", suugestNode.findValue("to").asText());
 
         ArrayNode warnings = (ArrayNode) jsonResult.findPath("warnings");
         assertEquals(1, warnings.size());

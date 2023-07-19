@@ -23,11 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.search.IdMappingStatistics;
+import org.uniprot.api.common.repository.search.EntryPair;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
-import org.uniprot.api.idmapping.model.EntryPair;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
@@ -81,8 +81,8 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 StandardOpenOption.TRUNCATE_EXISTING);
                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
-            IdMappingStatistics idMappingStatistics =
-                    IdMappingStatistics.builder()
+            ExtraOptions extraOptions =
+                    ExtraOptions.builder()
                             .failedIds(idMappingResult.getUnmappedIds())
                             .suggestedIds(idMappingResult.getSuggestedIds())
                             .build();
@@ -90,7 +90,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
             context.setContentType(contentType);
-            context.setIdMappingStatistics(idMappingStatistics);
+            context.setExtraOptions(extraOptions);
             context.setWarnings(idMappingResult.getWarnings());
 
             if (SUPPORTED_RDF_MEDIA_TYPES.containsKey(contentType)) {

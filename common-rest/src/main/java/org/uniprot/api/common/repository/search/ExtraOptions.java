@@ -4,10 +4,11 @@ import java.util.Collection;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 
 @Getter
 @Builder
-public class IdMappingStatistics {
+public class ExtraOptions {
     private final Collection<String> failedIds;
-    private final Collection<String> suggestedIds;
+    @Singular private final Collection<EntryPair<String>> suggestedIds;
 }

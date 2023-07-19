@@ -484,7 +484,11 @@ class PIRResponseConverterTest {
         assertFalse(result.getSuggestedIds().isEmpty());
         assertEquals(2, result.getSuggestedIds().size());
         assertTrue(
-                result.getSuggestedIds().containsAll(List.of("UPI0000000001", "UniRef50_P12345")));
+                result.getSuggestedIds()
+                        .containsAll(
+                                List.of(
+                                        new IdMappingStringPair("From3", "UPI0000000001"),
+                                        new IdMappingStringPair("From4", "UniRef50_P12345"))));
         assertThat(result.getUnmappedIds(), is(emptyList()));
     }
 
@@ -548,7 +552,12 @@ class PIRResponseConverterTest {
                                         new IdMappingStringPair("From4", "UniRef50_P12345"))));
         assertTrue(result.getWarnings().isEmpty());
         assertEquals(2, result.getSuggestedIds().size());
-        assertTrue(result.getSuggestedIds().containsAll(List.of("UPI0000000001", "P00005")));
+        assertTrue(
+                result.getSuggestedIds()
+                        .containsAll(
+                                List.of(
+                                        new IdMappingStringPair("From3", "UPI0000000001"),
+                                        new IdMappingStringPair("From5", "P00005"))));
 
         assertThat(result.getUnmappedIds(), is(emptyList()));
     }
@@ -580,7 +589,12 @@ class PIRResponseConverterTest {
                                         new IdMappingStringPair("From2", "UPI0000000003"))));
         assertTrue(result.getWarnings().isEmpty());
         assertEquals(2, result.getSuggestedIds().size());
-        assertTrue(result.getSuggestedIds().containsAll(List.of("P21802", "UniRef50_P12345")));
+        assertTrue(
+                result.getSuggestedIds()
+                        .containsAll(
+                                List.of(
+                                        new IdMappingStringPair("From3", "P21802"),
+                                        new IdMappingStringPair("From4", "UniRef50_P12345"))));
 
         assertThat(result.getUnmappedIds(), is(List.of("From5")));
     }

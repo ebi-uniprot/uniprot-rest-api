@@ -21,11 +21,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.common.repository.search.IdMappingStatistics;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
+import org.uniprot.api.rest.output.FakePair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
@@ -292,18 +293,18 @@ class JsonMessageConverterTest {
     }
 
     @Test
-    void writeCanWriteOkayAndIdMappingStatisticsEntities() throws IOException {
+    void writeCanWriteOkayAndExtraOptionsEntities() throws IOException {
         List<UniProtKBEntry> entities = new ArrayList<>();
         entities.add(getEntity());
-        IdMappingStatistics idMappingStatistics =
-                IdMappingStatistics.builder()
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
                         .failedIds(List.of("id1"))
-                        .suggestedIds(List.of("id2"))
+                        .suggestedId(FakePair.builder().from("fromid2").to("toid2").build())
                         .build();
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
                         .fields("accession")
-                        .idMappingStatistics(idMappingStatistics)
+                        .extraOptions(extraOptions)
                         .build();
         log.debug("------- BEGIN: writeCanWriteOkayAndFailedEntities");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -314,17 +315,16 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"],\"suggestedIds\":[\"id2\"]}",
+                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"],\"suggestedIds\":[{\"from\":\"fromid2\",\"to\":\"toid2\"}]}",
                 result);
     }
 
     @Test
     void writeCanWriteOnlyFailedEntities() throws IOException {
-        IdMappingStatistics idMappingStatistics =
-                IdMappingStatistics.builder().failedIds(List.of("id1", "id2")).build();
+        ExtraOptions extraOptions = ExtraOptions.builder().failedIds(List.of("id1", "id2")).build();
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
-                        .idMappingStatistics(idMappingStatistics)
+                        .extraOptions(extraOptions)
                         .build();
         log.debug("------- BEGIN: writeCanWriteOnlyFailedEntities");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -339,11 +339,14 @@ class JsonMessageConverterTest {
 
     @Test
     void writeCanWriteOnlySuggestedIdsEntities() throws IOException {
-        IdMappingStatistics idMappingStatistics =
-                IdMappingStatistics.builder().suggestedIds(List.of("id3", "id4")).build();
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
+                        .suggestedId(FakePair.builder().from("fromid3").to("toid3").build())
+                        .suggestedId(FakePair.builder().from("fromid4").to("toid4").build())
+                        .build();
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
-                        .idMappingStatistics(idMappingStatistics)
+                        .extraOptions(extraOptions)
                         .build();
         log.debug("------- BEGIN: writeCanWriteOnlyFailedEntities");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -353,7 +356,9 @@ class JsonMessageConverterTest {
         writeAfter(messageContext, outputStream);
         String result = outputStream.toString("UTF-8");
         log.debug(result);
-        assertEquals("{\"results\":[],\"suggestedIds\":[\"id3\",\"id4\"]}", result);
+        assertEquals(
+                "{\"results\":[],\"suggestedIds\":[{\"from\":\"fromid3\",\"to\":\"toid3\"},{\"from\":\"fromid4\",\"to\":\"toid4\"}]}",
+                result);
     }
 
     @Test

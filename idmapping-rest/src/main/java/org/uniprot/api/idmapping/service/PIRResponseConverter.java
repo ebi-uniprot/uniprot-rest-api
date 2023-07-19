@@ -136,7 +136,7 @@ public class PIRResponseConverter {
         if (isValidIdPattern(to, pair.getTo())) {
             builder.mappedId(pair);
         } else {
-            builder.suggestedId(pair.getTo());
+            builder.suggestedId(pair);
         }
     }
 
