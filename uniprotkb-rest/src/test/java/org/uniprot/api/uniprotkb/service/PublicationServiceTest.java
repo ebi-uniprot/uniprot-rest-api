@@ -30,6 +30,7 @@ import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.PublicationSolrQueryConfig;
 import org.uniprot.core.citation.Literature;
+import org.uniprot.core.publication.MappedPublications;
 import org.uniprot.core.publication.UniProtKBMappedReference;
 import org.uniprot.core.publication.impl.MappedPublicationsBuilder;
 import org.uniprot.core.publication.impl.MappedSourceBuilder;
@@ -70,19 +71,19 @@ class PublicationServiceTest {
                                         .name(UniProtKBEntryType.SWISSPROT.getName())
                                         .build())
                         .build();
+
+        MappedPublications mappedPublications =
+                new MappedPublicationsBuilder().uniProtKBMappedReference(ref).build();
+
+        PublicationDocument publicationDocument =
+                PublicationDocument.builder()
+                        .publicationMappedReferences(asBinary(mappedPublications))
+                        .citationId("2")
+                        .build();
+
         QueryResult<PublicationDocument> pubDocs =
                 QueryResult.<PublicationDocument>builder()
-                        .content(
-                                Stream.of(
-                                        PublicationDocument.builder()
-                                                .publicationMappedReferences(
-                                                        asBinary(
-                                                                new MappedPublicationsBuilder()
-                                                                        .uniProtKBMappedReference(
-                                                                                ref)
-                                                                        .build()))
-                                                .citationId("2")
-                                                .build()))
+                        .content(Stream.of(publicationDocument))
                         .page(CursorPage.of(null, 1))
                         .facets(emptyList())
                         .build();
