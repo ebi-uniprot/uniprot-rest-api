@@ -39,7 +39,7 @@ public abstract class GroupByService<T> {
 
         } while (lastChildFacetCounts.size() == 1);
 
-        return getGroupByResult(lastChildFacetCounts, lastChildEntries, ancestors, query);
+        return getGroupByResult(lastChildFacetCounts, lastChildEntries, ancestors, parentId, query);
     }
 
     protected static boolean isTopLevelSearch(String parent) {
@@ -82,12 +82,14 @@ public abstract class GroupByService<T> {
             List<FacetField.Count> facetCounts,
             List<T> entries,
             List<T> ancestorEntries,
+            String parentId,
             String query);
 
     protected GroupByResult getGroupByResult(
             List<FacetField.Count> facetCounts,
             Map<String, T> idEntryMap,
             List<T> ancestorEntries,
+            String parentId,
             String query) {
         List<Group> groups =
                 facetCounts.stream()
@@ -96,9 +98,20 @@ public abstract class GroupByService<T> {
                         .collect(Collectors.toList());
         List<Ancestor> ancestors =
                 ancestorEntries.stream().map(this::getAncestor).collect(Collectors.toList());
+        Parent parent = getParentInfo(parentId, groups);
 
-        return new GroupByResult(ancestors, groups);
+        return new GroupByResult(ancestors, groups, parent);
     }
+
+    private Parent getParentInfo(String parentId, List<Group> groups) {
+        if (isTopLevelSearch(parentId)) {
+            return null;
+        }
+        long count = groups.stream().mapToLong(Group::getCount).sum();
+        return ParentImpl.builder().label(getLabel(getEntry(parentId))).count(count).build();
+    }
+
+    protected abstract T getEntry(String parentId);
 
     protected String getFacetId(FacetField.Count fc) {
         return fc.getName();

@@ -55,10 +55,16 @@ public class GroupByGOService extends GroupByService<GoRelation> {
             List<FacetField.Count> facetCounts,
             List<GoRelation> goRelations,
             List<GoRelation> ancestorEntries,
+            String parentId,
             String query) {
         Map<String, GoRelation> idEntryMap =
                 goRelations.stream().collect(Collectors.toMap(this::getId, Function.identity()));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, query);
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+    }
+
+    @Override
+    protected GoRelation getEntry(String parentId) {
+        return goService.getGoRelation(parentId).orElseThrow();
     }
 
     @Override

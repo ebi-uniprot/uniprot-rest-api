@@ -5,14 +5,20 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.FILTER_QUERY;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.FacetParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -212,6 +218,47 @@ class UniProtEntryServiceTest {
         assertEquals(2, entries.size());
         assertEquals(entry1, entries.get(0));
         assertEquals(entry2, entries.get(1));
+    }
+
+    @Test
+    void getFacets_filterIsoforms() {
+        QueryResponse queryResponse = mock(QueryResponse.class);
+        List<FacetField> facetFields = mock(List.class);
+        when(queryResponse.getFacetFields()).thenReturn(facetFields);
+        SearchFieldItem searchFieldItem = mock(SearchFieldItem.class);
+        when(searchFieldItem.getFieldName()).thenReturn("fieldName");
+        when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("is_isoform"))
+                .thenReturn(searchFieldItem);
+        when(repository.query(
+                        argThat(
+                                solrQuery ->
+                                        solrQuery.get(FacetParams.FACET).equals("true")
+                                                && solrQuery.get(DEF_TYPE).equals("edismax")
+                                                && solrQuery
+                                                        .get(FILTER_QUERY)
+                                                        .contains("fieldName"))))
+                .thenAnswer(invocation -> queryResponse);
+
+        List<FacetField> facets = entryService.getFacets("query", Map.of());
+
+        assertSame(facetFields, facets);
+    }
+
+    @Test
+    void getFacets() {
+        QueryResponse queryResponse = mock(QueryResponse.class);
+        List<FacetField> facetFields = mock(List.class);
+        when(queryResponse.getFacetFields()).thenReturn(facetFields);
+        when(repository.query(
+                        argThat(
+                                solrQuery ->
+                                        solrQuery.get(FacetParams.FACET).equals("true")
+                                                && solrQuery.get(DEF_TYPE).equals("edismax"))))
+                .thenAnswer(invocation -> queryResponse);
+
+        List<FacetField> facets = entryService.getFacets("O38XU3-3742170", Map.of());
+
+        assertSame(facetFields, facets);
     }
 
     @Test

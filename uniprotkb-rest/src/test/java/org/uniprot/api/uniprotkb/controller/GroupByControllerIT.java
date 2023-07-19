@@ -26,7 +26,8 @@ public abstract class GroupByControllerIT {
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
+                .andExpect(jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -40,7 +41,8 @@ public abstract class GroupByControllerIT {
                                 .param("parent", EMPTY_PARENT))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
+                .andExpect(jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -53,7 +55,8 @@ public abstract class GroupByControllerIT {
                         content()
                                 .string(
                                         containsStringIgnoringCase(
-                                                "query is a required parameter")));
+                                                "query is a required parameter")))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     protected void save(DataStoreManager.StoreType type, Document doc) {

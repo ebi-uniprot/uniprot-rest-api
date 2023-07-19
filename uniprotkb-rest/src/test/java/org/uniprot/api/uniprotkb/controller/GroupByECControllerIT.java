@@ -86,7 +86,8 @@ class GroupByECControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
+                .andExpect(jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -100,7 +101,8 @@ class GroupByECControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)));
+                .andExpect(jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -122,7 +124,8 @@ class GroupByECControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(EC_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(EC_LABEL_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -140,7 +143,8 @@ class GroupByECControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(EC_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(EC_LABEL_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -159,7 +163,9 @@ class GroupByECControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(EC_ID_1)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)));
+                .andExpect(jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(jsonPath("$.parent.label", is("ec_label_0")))
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -177,7 +183,8 @@ class GroupByECControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_0)))
                 .andExpect(jsonPath("$.ancestors[1].id", is(EC_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(EC_LABEL_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)));
+                .andExpect(jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(jsonPath("$.parent").doesNotExist());
     }
 
     @Test
@@ -193,7 +200,9 @@ class GroupByECControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors[0].id", is(EC_ID_1)))
                 .andExpect(jsonPath("$.ancestors[0].label", is(EC_LABEL_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)));
+                .andExpect(jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(jsonPath("$.parent.label", is("ec_label_0")))
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() {
