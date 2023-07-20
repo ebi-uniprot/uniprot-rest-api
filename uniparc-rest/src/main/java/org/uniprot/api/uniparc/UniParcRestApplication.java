@@ -12,7 +12,11 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 @SpringBootApplication
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, ErrorHandlerConfig.class})
 @ComponentScan(
-        basePackages = {"org.uniprot.api.uniparc", "org.uniprot.api.rest", "org.uniprot.api"})
+        basePackages = {
+            "org.uniprot.api.uniparc",
+            "org.uniprot.api.rest",
+            "org.uniprot.api.common.repository.stream.rdf"
+        })
 public class UniParcRestApplication {
     public static void main(String[] args) {
         SpringApplication.run(UniParcRestApplication.class, args);
