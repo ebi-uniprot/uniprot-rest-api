@@ -154,7 +154,10 @@ class UniProtEntryServiceTest {
         UniProtKBEntry entry2 =
                 new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
         QueryResult<UniProtDocument> solrDocs =
-                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 1, 2));
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(CursorPage.of("", 1, 2))
+                        .build();
         UniProtKBSearchRequest request = new UniProtKBSearchRequest();
         request.setQuery("field:value");
         request.setSize(10);
@@ -183,7 +186,10 @@ class UniProtEntryServiceTest {
         UniProtKBEntry entry2 =
                 new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
         QueryResult<UniProtDocument> solrDocs =
-                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 2));
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(CursorPage.of("", 2))
+                        .build();
         UniProtKBSearchRequest request = new UniProtKBSearchRequest();
         request.setQuery("field2:value");
         request.setSize(10);
@@ -289,7 +295,7 @@ class UniProtEntryServiceTest {
         doc1.active = true;
         Page page = CursorPage.of(null, 10, 1);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.of(doc1), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder().content(Stream.of(doc1)).page(page).build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         String result = entryService.findAccessionByProteinId(proteinId);
         assertNotNull(result);
@@ -310,7 +316,10 @@ class UniProtEntryServiceTest {
         doc2.accession = "DOC2";
         Page page = CursorPage.of(null, 10, 2);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(page)
+                        .build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         String result = entryService.findAccessionByProteinId(proteinId);
         assertNotNull(result);
@@ -330,7 +339,10 @@ class UniProtEntryServiceTest {
         doc2.accession = "DOC2";
         Page page = CursorPage.of(null, 10, 2);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(page)
+                        .build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         String result = entryService.findAccessionByProteinId(proteinId);
         assertNotNull(result);
@@ -351,7 +363,10 @@ class UniProtEntryServiceTest {
         doc2.accession = "DOC2";
         Page page = CursorPage.of(null, 10, 2);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(page)
+                        .build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         assertThrows(
                 ServiceException.class, () -> entryService.findAccessionByProteinId("PROTEIN_ID"));
@@ -361,7 +376,7 @@ class UniProtEntryServiceTest {
     void findAccessionByProteinIdNotFound() {
         Page page = CursorPage.of(null, 10, 0);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.empty(), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder().content(Stream.empty()).page(page).build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         assertThrows(
                 ResourceNotFoundException.class,

@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.queue;
 
 import org.springframework.stereotype.Component;
-import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 

@@ -78,7 +78,10 @@ class UniRefEntryLightServiceTest {
         UniRefDocument doc1 = UniRefDocument.builder().id("UniRef100_A0A001").build();
         UniRefDocument doc2 = UniRefDocument.builder().id("UniRef100_A0A002").build();
         QueryResult<UniRefDocument> solrResult =
-                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 10));
+                QueryResult.<UniRefDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(CursorPage.of("", 10))
+                        .build();
         UniRefSearchRequest searchRequest = new UniRefSearchRequest();
         searchRequest.setQuery("field:value");
         searchRequest.setFormat(LIST_MEDIA_TYPE_VALUE);
@@ -105,7 +108,10 @@ class UniRefEntryLightServiceTest {
         UniRefDocument doc2 = UniRefDocument.builder().id("UniRef100_A0A002").build();
         UniRefEntryLight entry2 = new UniRefEntryLightBuilder().id("UniRef100_A0A002").build();
         QueryResult<UniRefDocument> solrResult =
-                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 10));
+                QueryResult.<UniRefDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(CursorPage.of("", 10))
+                        .build();
         UniRefSearchRequest searchRequest = new UniRefSearchRequest();
         searchRequest.setQuery("field:value");
         searchRequest.setFormat(APPLICATION_JSON_VALUE);

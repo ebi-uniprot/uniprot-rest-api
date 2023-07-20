@@ -1,4 +1,4 @@
-package org.uniprot.api.idmapping.model;
+package org.uniprot.api.common.repository.search;
 
 import java.io.Serializable;
 

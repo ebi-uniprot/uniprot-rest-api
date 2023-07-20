@@ -129,7 +129,11 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
                 results.getContent().map(entryConverter).filter(Objects::nonNull);
         // filter the entries
         Stream<UniParcEntry> filtered = filterUniParcStream(converted, searchRequest);
-        return QueryResult.of(filtered, results.getPage(), results.getFacets());
+        return QueryResult.<UniParcEntry>builder()
+                .content(filtered)
+                .page(results.getPage())
+                .facets(results.getFacets())
+                .build();
     }
 
     public Stream<String> streamRdf(
@@ -192,7 +196,10 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         List<UniParcCrossReference> entries =
                 databases.subList(
                         cursorPage.getOffset().intValue(), CursorPage.getNextOffset(cursorPage));
-        return QueryResult.of(entries.stream(), cursorPage);
+        return QueryResult.<UniParcCrossReference>builder()
+                .content(entries.stream())
+                .page(cursorPage)
+                .build();
     }
 
     @Override

@@ -385,13 +385,13 @@ public class UniProtEntryService
                         .map(Document::getDocumentId)
                         .map(this::mapToThinEntry)
                         .filter(Objects::nonNull);
-        return QueryResult.of(
-                upEntries,
-                results.getPage(),
-                results.getFacets(),
-                results.getMatchedFields(),
-                null,
-                results.getSuggestions(),
-                warnings);
+        return QueryResult.<UniProtKBEntry>builder()
+                .content(upEntries)
+                .page(results.getPage())
+                .facets(results.getFacets())
+                .matchedFields(results.getMatchedFields())
+                .suggestions(results.getSuggestions())
+                .warnings(warnings)
+                .build();
     }
 }

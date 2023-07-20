@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.core.parser.tsv.EntityValueMapper;
 
 /**
