@@ -12,10 +12,6 @@
 	<artifactId>support-data-common</artifactId>
 	<description>UniProt support data lib</description>
 
-	<properties>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
