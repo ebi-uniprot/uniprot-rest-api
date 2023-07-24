@@ -1,18 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -27,6 +14,19 @@ import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService.TOP_LEVEL_KEYWORD_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByKeywordServiceTest {
@@ -135,7 +135,7 @@ class GroupByKeywordServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultMultiple(groupByResult, empty(), is(nullValue()));
+        assertGroupByResultMultiple(groupByResult, empty(), is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -151,7 +151,7 @@ class GroupByKeywordServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultC(groupByResult, empty(), is(nullValue()));
+        assertGroupByResultC(groupByResult, empty(), is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test
@@ -189,7 +189,8 @@ class GroupByKeywordServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorB()), is(nullValue()));
+        assertGroupByResultMultiple(groupByResult, contains(getAncestorB()),
+                is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -221,7 +222,8 @@ class GroupByKeywordServiceTest {
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertGroupByResultC(
-                groupByResult, contains(getAncestorA(), getAncestorB()), is(nullValue()));
+                groupByResult, contains(getAncestorA(), getAncestorB()),
+                is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test
@@ -261,7 +263,8 @@ class GroupByKeywordServiceTest {
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertGroupByResultMultiple(
-                groupByResult, contains(getAncestorB(), getAncestorD()), is(nullValue()));
+                groupByResult, contains(getAncestorB(), getAncestorD()),
+                is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -416,7 +419,7 @@ class GroupByKeywordServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD(), getAncestorE()),
-                is(nullValue()));
+                is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test

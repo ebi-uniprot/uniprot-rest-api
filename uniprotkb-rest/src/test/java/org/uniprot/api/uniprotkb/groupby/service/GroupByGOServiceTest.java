@@ -1,18 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -25,6 +12,19 @@ import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.groupby.service.go.GOService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByGOServiceTest {
@@ -117,7 +117,7 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
-        assertGroupByResultMultiple(groupByResult, empty(), is(nullValue()));
+        assertGroupByResultMultiple(groupByResult, empty(), is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -128,7 +128,7 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
-        assertGroupByResultC(groupByResult, empty(), is(nullValue()));
+        assertGroupByResultC(groupByResult, empty(), is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test
@@ -155,7 +155,8 @@ class GroupByGOServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorB()), is(nullValue()));
+        assertGroupByResultMultiple(groupByResult, contains(getAncestorB()),
+                is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -186,7 +187,8 @@ class GroupByGOServiceTest {
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
         assertGroupByResultC(
-                groupByResult, contains(getAncestorA(), getAncestorB()), is(nullValue()));
+                groupByResult, contains(getAncestorA(), getAncestorB()),
+                is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test
@@ -224,7 +226,8 @@ class GroupByGOServiceTest {
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_ID);
 
         assertGroupByResultMultiple(
-                groupByResult, contains(getAncestorB(), getAncestorD()), is(nullValue()));
+                groupByResult, contains(getAncestorB(), getAncestorD()),
+                is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -365,7 +368,7 @@ class GroupByGOServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD(), getAncestorE()),
-                is(nullValue()));
+                is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test
