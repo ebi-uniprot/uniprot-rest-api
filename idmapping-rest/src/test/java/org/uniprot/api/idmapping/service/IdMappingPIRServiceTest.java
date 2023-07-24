@@ -57,6 +57,28 @@ class IdMappingPIRServiceTest {
     }
 
     @Test
+    void queryEmptyPageSuccessfully() {
+        // given
+        IdMappingPageRequest pageRequest = new IdMappingPageRequest();
+        int pageSize = 3;
+        pageRequest.setSize(pageSize);
+        IdMappingResult mappingResult = IdMappingResult.builder().build();
+
+        // when
+        QueryResult<IdMappingStringPair> queryResult =
+                pirService.queryResultPage(pageRequest, mappingResult);
+        List<Object> emptyList = List.of();
+        // then
+        assertThat(
+                queryResult.getContent().collect(Collectors.toList()),
+                is(emptyList));
+        assertThat(queryResult.getExtraOptions(), is(notNullValue()));
+        ExtraOptions extraOptions = queryResult.getExtraOptions();
+        assertThat(extraOptions.getFailedIds(), is(emptyList));
+        assertThat(extraOptions.getSuggestedIds(), is(emptyList));
+    }
+
+    @Test
     void queryAllResultsSuccessfully() { // given
         List<IdMappingStringPair> mappingPairs = createMappingPairs(10);
         List<String> unmappedIds = createUnmappedIds(5);

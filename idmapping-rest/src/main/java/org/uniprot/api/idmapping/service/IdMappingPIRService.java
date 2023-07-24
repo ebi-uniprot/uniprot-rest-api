@@ -57,9 +57,13 @@ public abstract class IdMappingPIRService {
     }
 
     private ExtraOptions getExtraOptions(IdMappingResult result) {
-        return ExtraOptions.builder()
-                .failedIds(result.getUnmappedIds())
-                .suggestedIds(result.getSuggestedIds())
-                .build();
+        ExtraOptions.ExtraOptionsBuilder builder = ExtraOptions.builder();
+        if (result.getUnmappedIds() != null) {
+            builder.failedIds(result.getUnmappedIds());
+        }
+        if (result.getSuggestedIds() != null) {
+            builder.suggestedIds(result.getSuggestedIds());
+        }
+        return builder.build();
     }
 }
