@@ -28,7 +28,9 @@ public class GOClientImpl implements GOClient {
 
         String url = goApiPrefix + goId + "/children";
         GoTermResult result = restTemplate.getForObject(url, GoTermResult.class);
-        if (result == null || result.getResults().isEmpty() || result.getResults().get(0).getChildren() == null) {
+        if (result == null
+                || result.getResults().isEmpty()
+                || result.getResults().get(0).getChildren() == null) {
             return List.of();
         } else {
             return result.getResults().get(0).getChildren();
