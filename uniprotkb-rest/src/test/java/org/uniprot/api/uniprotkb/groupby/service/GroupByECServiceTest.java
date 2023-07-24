@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByECService.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -12,17 +23,6 @@ import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByECService.*;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByECServiceTest {
@@ -62,7 +62,8 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultMultiple(groupByResult, empty(), is(ParentImpl.builder().label(null).count(10022L).build()));
+        assertGroupByResultMultiple(
+                groupByResult, empty(), is(ParentImpl.builder().label(null).count(10022L).build()));
     }
 
     @Test
@@ -74,7 +75,8 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultC(groupByResult, empty(), is(ParentImpl.builder().label(null).count(9999L).build()));
+        assertGroupByResultC(
+                groupByResult, empty(), is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test
@@ -93,7 +95,9 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorB()),
+        assertGroupByResultMultiple(
+                groupByResult,
+                contains(getAncestorB()),
                 is(ParentImpl.builder().label(null).count(10022L).build()));
     }
 
@@ -113,7 +117,9 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorA(), getAncestorB()),
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorA(), getAncestorB()),
                 is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
@@ -137,7 +143,9 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorB(), getAncestorD()),
+        assertGroupByResultMultiple(
+                groupByResult,
+                contains(getAncestorB(), getAncestorD()),
                 is(ParentImpl.builder().label(null).count(10022L).build()));
     }
 
@@ -155,7 +163,9 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, ecIdB);
 
-        assertGroupByResultMultiple(groupByResult, empty(),
+        assertGroupByResultMultiple(
+                groupByResult,
+                empty(),
                 is(ParentImpl.builder().label(LABEL + ecIdB).count(10022L).build()));
     }
 
@@ -185,7 +195,9 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, ecIdA);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorB()),
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorB()),
                 is(ParentImpl.builder().label(LABEL + ecIdA).count(9999L).build()));
     }
 
@@ -207,7 +219,9 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, ecIdB);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorD()),
+        assertGroupByResultMultiple(
+                groupByResult,
+                contains(getAncestorD()),
                 is(ParentImpl.builder().label(LABEL + ecIdB).count(10022L).build()));
     }
 
@@ -231,7 +245,8 @@ class GroupByECServiceTest {
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertGroupByResultC(
-                groupByResult, contains(getAncestorB(), getAncestorD(), getAncestorE()),
+                groupByResult,
+                contains(getAncestorB(), getAncestorD(), getAncestorE()),
                 is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
@@ -252,7 +267,9 @@ class GroupByECServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, ecIdB);
 
-        assertGroupByResultC(groupByResult, contains(getAncestorD(), getAncestorE()),
+        assertGroupByResultC(
+                groupByResult,
+                contains(getAncestorD(), getAncestorE()),
                 is(ParentImpl.builder().label(LABEL + ecIdB).count(9999L).build()));
     }
 
@@ -290,14 +307,18 @@ class GroupByECServiceTest {
     }
 
     private static void assertGroupByResultMultiple(
-            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcher, Matcher<? super Parent> matcherParent) {
+            GroupByResult groupByResult,
+            Matcher<? super List<Ancestor>> matcher,
+            Matcher<? super Parent> matcherParent) {
         assertThat(groupByResult.getGroups(), contains(getGroupByResultA(), getGroupByResultC()));
         assertThat(groupByResult.getAncestors(), matcher);
         assertThat(groupByResult.getParent(), matcherParent);
     }
 
     private static void assertGroupByResultC(
-            GroupByResult groupByResult, Matcher<? super List<Ancestor>> matcher, Matcher<? super Parent> matcherParent) {
+            GroupByResult groupByResult,
+            Matcher<? super List<Ancestor>> matcher,
+            Matcher<? super Parent> matcherParent) {
         assertThat(groupByResult.getGroups(), contains(getGroupByResultC()));
         assertThat(groupByResult.getAncestors(), matcher);
         assertThat(groupByResult.getParent(), matcherParent);

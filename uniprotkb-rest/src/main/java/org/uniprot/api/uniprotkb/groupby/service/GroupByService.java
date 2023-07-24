@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.uniprot.api.uniprotkb.groupby.model.*;
-import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.uniprot.api.uniprotkb.groupby.model.*;
+import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
 public abstract class GroupByService<T> {
     private final UniProtEntryService uniProtEntryService;
@@ -105,8 +105,10 @@ public abstract class GroupByService<T> {
 
     private Parent getParentInfo(String parentId, List<Group> groups) {
         long count = groups.stream().mapToLong(Group::getCount).sum();
-        return ParentImpl.builder().label(isTopLevelSearch(parentId) ? null : getLabel(getEntry(parentId)))
-                .count(count).build();
+        return ParentImpl.builder()
+                .label(isTopLevelSearch(parentId) ? null : getLabel(getEntry(parentId)))
+                .count(count)
+                .build();
     }
 
     protected abstract T getEntry(String parentId);
