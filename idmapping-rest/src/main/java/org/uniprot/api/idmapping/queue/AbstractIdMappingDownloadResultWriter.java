@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.queue;
 
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 
@@ -81,11 +82,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 StandardOpenOption.TRUNCATE_EXISTING);
                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
-            ExtraOptions extraOptions =
-                    ExtraOptions.builder()
-                            .failedIds(idMappingResult.getUnmappedIds())
-                            .suggestedIds(idMappingResult.getSuggestedIds())
-                            .build();
+            ExtraOptions extraOptions = getExtraOptions(idMappingResult);
 
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());

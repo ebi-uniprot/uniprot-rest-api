@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.*;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
 
@@ -147,11 +148,7 @@ public abstract class BasicIdService<T, U> {
                 "Total time taken to call voldemort in ms {} for jobId {} in getMappedEntries",
                 (end - start),
                 jobId);
-        ExtraOptions extraOptions =
-                ExtraOptions.builder()
-                        .failedIds(mappingResult.getUnmappedIds())
-                        .suggestedIds(mappingResult.getSuggestedIds())
-                        .build();
+        ExtraOptions extraOptions = getExtraOptions(mappingResult);
 
         return QueryResult.<U>builder()
                 .content(result)

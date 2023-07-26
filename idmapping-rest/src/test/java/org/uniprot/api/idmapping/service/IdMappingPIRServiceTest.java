@@ -69,9 +69,7 @@ class IdMappingPIRServiceTest {
                 pirService.queryResultPage(pageRequest, mappingResult);
         List<Object> emptyList = List.of();
         // then
-        assertThat(
-                queryResult.getContent().collect(Collectors.toList()),
-                is(emptyList));
+        assertThat(queryResult.getContent().collect(Collectors.toList()), is(emptyList));
         assertThat(queryResult.getExtraOptions(), is(notNullValue()));
         ExtraOptions extraOptions = queryResult.getExtraOptions();
         assertThat(extraOptions.getFailedIds(), is(emptyList));
