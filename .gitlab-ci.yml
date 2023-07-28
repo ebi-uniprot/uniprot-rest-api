@@ -97,12 +97,14 @@ api:deploy:
 
 k8s:downstream:
   stage: bridge
-  trigger: uniprot/deployment/unp.ci.api.k8s
+  trigger:
+    project: uniprot/deployment/unp.ci.api.k8s
+    branch: master
   when: on_success
   variables:
     CI_PIPELINE_TASKS: build
     ARTIFACT: all-rest
     DEPLOY_ENV: dev
     VERSION: $UNIPROT_REST_VERSION
-  only:
-    - 'k8s-pipeline'
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "k8s-pipeline"'
