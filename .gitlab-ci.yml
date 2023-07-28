@@ -106,5 +106,5 @@ k8s:downstream:
     ARTIFACT: all-rest
     DEPLOY_ENV: dev
     VERSION: $UNIPROT_REST_VERSION
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "k8s-pipeline"'
+  only:
+    - k8s-pipeline
