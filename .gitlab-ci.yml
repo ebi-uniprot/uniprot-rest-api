@@ -13,6 +13,7 @@ variables:
   GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   JACOCO_AGGREGATE_REPORT: "jacoco-aggregate-report/target/site/jacoco-aggregate/jacoco.xml"
+  UNIPROT_REST_VERSION: ""
 
 services:
   - name: docker:dind
@@ -30,6 +31,7 @@ stages:
   - test
   - quality
   - deploy
+  - bridge
 
 api:settings:
   stage: setup
@@ -45,7 +47,7 @@ api:settings:
     paths:
       - ./${MAVEN_SETTINGS}
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
     - when: manual
       allow_failure: true
 
@@ -54,6 +56,8 @@ api:test:
   script:
     - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS} 2>&1'
     - 'echo "Maven install successful"'
+    - 'UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)'
+    - 'echo $UNIPROT_REST_VERSION'
     - 'mkdir -p ./jacoco-report'
     - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
     - 'rm -rfv ./*/target/*.jar'
@@ -67,7 +71,7 @@ api:test:
       junit:
         - ./*/target/surefire-reports/TEST-*.xml
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
     - when: manual
       allow_failure: true
 
@@ -78,7 +82,7 @@ api:sonar:
     - api:test
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
     - when: manual
       allow_failure: true
 
@@ -87,5 +91,17 @@ api:deploy:
   script: mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
   dependencies:
     - api:settings
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "k8s-pipeline"'
+
+k8s:downstream:
+  stage: bridge
+  trigger: uniprot/deployment/unp.ci.api.k8s/rest
+  when: on_success
+  variables:
+    CI_PIPELINE_TASKS: build
+    ARTIFACT: all-rest
+    DEPLOY_ENV: dev
+    VERSION: $UNIPROT_REST_VERSION
   only:
-    - master
+    - 'k8s-pipeline'
