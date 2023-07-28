@@ -32,6 +32,7 @@ stages:
   - quality
   - deploy
   - bridge
+  - deploy-to-k8s
 
 api:settings:
   stage: setup
@@ -96,7 +97,7 @@ api:deploy:
 
 k8s:downstream:
   stage: bridge
-  trigger: uniprot/deployment/unp.ci.api.k8s/-/tree/master/rest
+  trigger: uniprot/deployment/unp.ci.api.k8s
   when: on_success
   variables:
     CI_PIPELINE_TASKS: build
