@@ -27,7 +27,8 @@ public abstract class GroupByControllerIT {
                 .andDo(log())
                 .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.parent.label").doesNotExist())
+                .andExpect(jsonPath("$.parent.count", is(0)));
     }
 
     @Test
@@ -42,7 +43,8 @@ public abstract class GroupByControllerIT {
                 .andDo(log())
                 .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.parent.label").doesNotExist())
+                .andExpect(jsonPath("$.parent.count", is(0)));
     }
 
     @Test

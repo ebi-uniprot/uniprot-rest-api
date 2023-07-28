@@ -135,7 +135,8 @@ class GroupByKeywordServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultMultiple(groupByResult, empty(), is(nullValue()));
+        assertGroupByResultMultiple(
+                groupByResult, empty(), is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -151,7 +152,8 @@ class GroupByKeywordServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultC(groupByResult, empty(), is(nullValue()));
+        assertGroupByResultC(
+                groupByResult, empty(), is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test
@@ -189,7 +191,10 @@ class GroupByKeywordServiceTest {
 
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
-        assertGroupByResultMultiple(groupByResult, contains(getAncestorB()), is(nullValue()));
+        assertGroupByResultMultiple(
+                groupByResult,
+                contains(getAncestorB()),
+                is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -221,7 +226,9 @@ class GroupByKeywordServiceTest {
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertGroupByResultC(
-                groupByResult, contains(getAncestorA(), getAncestorB()), is(nullValue()));
+                groupByResult,
+                contains(getAncestorA(), getAncestorB()),
+                is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test
@@ -261,7 +268,9 @@ class GroupByKeywordServiceTest {
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, EMPTY_PARENT_ID);
 
         assertGroupByResultMultiple(
-                groupByResult, contains(getAncestorB(), getAncestorD()), is(nullValue()));
+                groupByResult,
+                contains(getAncestorB(), getAncestorD()),
+                is(ParentImpl.builder().label(null).count(10121L).build()));
     }
 
     @Test
@@ -416,7 +425,7 @@ class GroupByKeywordServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD(), getAncestorE()),
-                is(nullValue()));
+                is(ParentImpl.builder().label(null).count(9999L).build()));
     }
 
     @Test

@@ -104,11 +104,11 @@ public abstract class GroupByService<T> {
     }
 
     private Parent getParentInfo(String parentId, List<Group> groups) {
-        if (isTopLevelSearch(parentId)) {
-            return null;
-        }
         long count = groups.stream().mapToLong(Group::getCount).sum();
-        return ParentImpl.builder().label(getLabel(getEntry(parentId))).count(count).build();
+        return ParentImpl.builder()
+                .label(isTopLevelSearch(parentId) ? null : getLabel(getEntry(parentId)))
+                .count(count)
+                .build();
     }
 
     protected abstract T getEntry(String parentId);

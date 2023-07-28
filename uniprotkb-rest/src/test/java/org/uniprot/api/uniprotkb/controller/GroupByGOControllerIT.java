@@ -87,7 +87,8 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.parent.label").doesNotExist())
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -102,7 +103,8 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.groups[0].count", is(1)))
                 .andExpect(jsonPath("$.groups.size()", is(1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.parent.label").doesNotExist())
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -125,7 +127,8 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.parent.label").doesNotExist())
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -144,7 +147,8 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.parent.label").doesNotExist())
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -187,7 +191,8 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
                 .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(jsonPath("$.parent.label").doesNotExist())
+                .andExpect(jsonPath("$.parent.count", is(1)));
     }
 
     @Test
