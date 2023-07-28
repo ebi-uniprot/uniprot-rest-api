@@ -1,8 +1,11 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.GroupByECController.GROUP_BY_EC_RESOURCE;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByECService;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import javax.validation.constraints.Pattern;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniprotkb.controller.GroupByECController.GROUP_BY_EC_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 @RequestMapping(value = GROUP_BY_EC_RESOURCE)
 @RestController
-public class GroupByECController extends GroupByController {
-    static final String GROUP_BY_EC_RESOURCE = GROUP_BY_RESOURCE + "/ec";
+public class GroupByECController {
+    static final String GROUP_BY_EC_RESOURCE = (UNIPROTKB_RESOURCE + "/groups") + "/ec";
+    private static final String EC_ID_REGEX = "^\\d.[\\d-].[\\d-].[\\d-]";
     private final GroupByECService uniProtKBGroupByECService;
 
     @Autowired
@@ -26,7 +34,13 @@ public class GroupByECController extends GroupByController {
         this.uniProtKBGroupByECService = uniProtKBGroupByECService;
     }
 
-    @Override
+    @Tag(name = "uniprotkbgroup")
+    @Operation(summary = "List of groups w.r.t. to the given query and parent")
+    @ApiResponse(
+            content =
+            @Content(
+                    mediaType = APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = GroupByResult.class)))
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<GroupByResult> getGroups(
             @Parameter(
@@ -35,7 +49,10 @@ public class GroupByECController extends GroupByController {
                     @RequestParam(value = "query")
                     String query,
             @Parameter(description = "Name of the parent")
-                    @RequestParam(value = "parent", required = false)
+            @Pattern(regexp = EC_ID_REGEX,
+                    flags = {Pattern.Flag.CASE_INSENSITIVE},
+                    message = "The taxonomy id value should be a number")
+            @RequestParam(value = "parent", required = false)
                     String parent) {
         return new ResponseEntity<>(
                 uniProtKBGroupByECService.getGroupByResult(query, parent), HttpStatus.OK);
