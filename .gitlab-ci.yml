@@ -89,7 +89,7 @@ api:deploy:
   script:
   - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
   - $UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
-  - echo $UNIPROT_REST_VERSION
+  - echo "$UNIPROT_REST_VERSION"
   dependencies:
     - api:settings
   rules:
