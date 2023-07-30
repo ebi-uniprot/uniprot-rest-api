@@ -88,8 +88,10 @@ api:deploy:
   stage: deploy
   script:
   - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
-  - $UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
-  - echo "$UNIPROT_REST_VERSION"
+  - echo "UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)" >> deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env
   dependencies:
     - api:settings
   rules:
@@ -97,13 +99,15 @@ api:deploy:
 
 k8s:downstream:
   stage: bridge
+  dependencies:
+    - deploy
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: master
   variables:
-    CI_PIPELINE_TASKS: "build"
-    ARTIFACT: "all-rest"
-    VERSION: "$UNIPROT_REST_VERSION"
+    CI_PIPELINE_TASKS: 'build'
+    ARTIFACT: 'all-rest'
+    VERSION: '$UNIPROT_REST_VERSION'
   when: on_success
   rules:
     - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
