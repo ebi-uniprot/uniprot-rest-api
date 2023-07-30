@@ -56,8 +56,6 @@ api:test:
   script:
     - 'mvn $MAVEN_CLI_OPTS $UNIPROT_RESOURCES -P coverage -DfailIfNoTests=false install -s ${MAVEN_SETTINGS} 2>&1'
     - 'echo "Maven install successful"'
-    - 'UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)'
-    - 'echo $UNIPROT_REST_VERSION'
     - 'mkdir -p ./jacoco-report'
     - 'cp $JACOCO_AGGREGATE_REPORT ./jacoco-report/'
     - 'rm -rfv ./*/target/*.jar'
@@ -88,11 +86,14 @@ api:sonar:
 
 api:deploy:
   stage: deploy
-  script: mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
+  script:
+  - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
+  - $UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
+  - echo $UNIPROT_REST_VERSION
   dependencies:
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
 
 k8s:downstream:
   stage: bridge
@@ -102,5 +103,7 @@ k8s:downstream:
   variables:
     CI_PIPELINE_TASKS: "build"
     ARTIFACT: "all-rest"
-    VERSION: "1.0.26-SNAPSHOT"
+    VERSION: "$UNIPROT_REST_VERSION"
   when: on_success
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
