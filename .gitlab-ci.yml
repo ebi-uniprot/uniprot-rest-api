@@ -31,8 +31,7 @@ stages:
 #  - test
 #  - quality
 #  - deploy
-#  - bridge
-  - deploy-to-k8s
+  - bridge
 
 #api:settings:
 #  stage: setup
