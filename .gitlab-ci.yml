@@ -47,7 +47,7 @@ api:settings:
     paths:
       - ./${MAVEN_SETTINGS}
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
     - when: manual
       allow_failure: true
 
@@ -69,7 +69,7 @@ api:test:
       junit:
         - ./*/target/surefire-reports/TEST-*.xml
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
     - when: manual
       allow_failure: true
 
@@ -80,7 +80,7 @@ api:sonar:
     - api:test
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
     - when: manual
       allow_failure: true
 
