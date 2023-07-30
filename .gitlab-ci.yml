@@ -27,11 +27,11 @@ cache:
     - .sonar/cache
 
 stages:
-  - setup
-  - test
-  - quality
-  - deploy
-  - bridge
+#  - setup
+#  - test
+#  - quality
+#  - deploy
+#  - bridge
   - deploy-to-k8s
 
 api:settings:
@@ -93,15 +93,15 @@ api:deploy:
   dependencies:
     - api:settings
   rules:
-    - if: '$CI_COMMIT_BRANCH == "k8s-pipeline"'
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
 
 k8s:downstream:
   stage: bridge
-  trigger:
-    project: uniprot/deployment/unp.ci.api.k8s
-    branch: k8s-pipeline
+  trigger: uniprot/deployment/unp.ci.api.k8s
   when: on_success
   variables:
-    CI_PIPELINE_TASKS: build
-    ARTIFACT: all-rest
-    VERSION: $UNIPROT_REST_VERSION
+    CI_PIPELINE_TASKS: "build"
+    ARTIFACT: "all-rest"
+    VERSION: "$UNIPROT_REST_VERSION"
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline" || $CI_COMMIT_REF_NAME == "master"'
