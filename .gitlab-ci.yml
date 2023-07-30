@@ -96,9 +96,6 @@ api:deploy:
 
 k8s:downstream:
   stage: bridge
-  script:
-    - 'UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)'
-    - 'echo "$UNIPROT_REST_VERSION"'
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: master
