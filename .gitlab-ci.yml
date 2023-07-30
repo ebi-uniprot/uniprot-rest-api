@@ -100,7 +100,7 @@ api:deploy:
 k8s:downstream:
   stage: bridge
   dependencies:
-    - deploy
+    - api:deploy
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: master
