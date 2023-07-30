@@ -88,10 +88,10 @@ api:deploy:
   stage: deploy
   script:
   - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
-  - echo "UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)" >> deploy.env
+  - echo "UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)" >> variables.env
   artifacts:
     reports:
-      dotenv: deploy.env
+      dotenv: variables.env
   dependencies:
     - api:settings
   rules:
@@ -99,8 +99,9 @@ api:deploy:
 
 k8s:downstream:
   stage: bridge
-  dependencies:
-    - api:deploy
+  needs:
+    - job: api:deploy
+      artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: master
