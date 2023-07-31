@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.uniprotkb.controller.GroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import javax.validation.constraints.Pattern;
 
@@ -28,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 public class GroupByKeywordController extends GroupByController {
-    static final String GROUP_BY_KEYWORD_RESOURCE = (UNIPROTKB_RESOURCE + GROUPS) + "/keyword";
+    static final String GROUP_BY_KEYWORD_RESOURCE = GROUPS + "/keyword";
     private final GroupByKeywordService uniProtKBGroupByKeywordService;
     private static final String KEYWORD_ID_REGEX = "^KW-\\d{4}";
 

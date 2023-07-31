@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.uniprotkb.controller.GroupByGOController.GROUP_BY_GO_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import javax.validation.constraints.Pattern;
 
@@ -28,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 public class GroupByGOController extends GroupByController {
-    static final String GROUP_BY_GO_RESOURCE = (UNIPROTKB_RESOURCE + GROUPS) + "/go";
+    static final String GROUP_BY_GO_RESOURCE = GROUPS + "/go";
     private static final String GO_ID_REGEX = "^GO:\\d{7}$";
     private final GroupByGOService uniProtKBGroupByGoService;
 

@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.uniprotkb.controller.GroupByTaxonomyController.GROUP_BY_TAXONOMY_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import javax.validation.constraints.Pattern;
 
@@ -28,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 public class GroupByTaxonomyController extends GroupByController {
-    static final String GROUP_BY_TAXONOMY_RESOURCE = (UNIPROTKB_RESOURCE + GROUPS) + "/taxonomy";
+    static final String GROUP_BY_TAXONOMY_RESOURCE = GROUPS + "/taxonomy";
     private static final String TAXONOMY_ID_REGEX = "^\\d+$";
     private final GroupByTaxonomyService uniProtKBGroupByTaxonomyService;
 

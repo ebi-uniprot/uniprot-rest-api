@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.uniprotkb.controller.GroupByECController.GROUP_BY_EC_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import javax.validation.constraints.Pattern;
 
@@ -28,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 public class GroupByECController extends GroupByController {
-    static final String GROUP_BY_EC_RESOURCE = (UNIPROTKB_RESOURCE + GROUPS) + "/ec";
+    static final String GROUP_BY_EC_RESOURCE = GROUPS + "/ec";
     private static final String EC_ID_REGEX =
             "^([1-7])\\.("
                     + "((\\d{1,2})\\.(\\d{1,2})\\.(\\d{1,3}|n\\d{1,2}|-))|"
