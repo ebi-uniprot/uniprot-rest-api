@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,17 +31,6 @@ import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = GroupByController.class)
@@ -76,9 +76,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_0))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_0))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(EC_ID_0)))
                 .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_0)))
@@ -111,9 +109,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_2))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
