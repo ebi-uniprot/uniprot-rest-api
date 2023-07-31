@@ -31,7 +31,8 @@ stages:
   - test
   - quality
   - deploy
-  - bridge
+  - docker
+  - docker-deploy
 
 api:settings:
   stage: setup
@@ -98,7 +99,7 @@ api:deploy:
     - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
 
 k8s:downstream:
-  stage: bridge
+  stage: docker
   needs:
     - job: api:deploy
       artifacts: true
@@ -108,6 +109,21 @@ k8s:downstream:
   variables:
     CI_PIPELINE_TASKS: 'build'
     ARTIFACT: 'all-rest'
+    VERSION: '$UNIPROT_REST_VERSION'
+  when: on_success
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
+
+k8s:deploy:
+  stage: docker-deploy
+  needs:
+    - job: api:deploy
+      artifacts: true
+  trigger:
+    project: uniprot/deployment/unp.ci.api.k8s
+    branch: k8s-pipeline
+  variables:
+    CI_PIPELINE_TASKS: 'docker-deploy'
     VERSION: '$UNIPROT_REST_VERSION'
   when: on_success
   rules:
