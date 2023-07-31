@@ -1,11 +1,11 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.GroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-
-import javax.validation.constraints.Pattern;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.constraints.Pattern;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniprotkb.controller.GroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 @RequestMapping(value = GROUP_BY_KEYWORD_RESOURCE)
 @RestController
 @Validated
 public class GroupByKeywordController extends GroupByController {
-    static final String GROUP_BY_KEYWORD_RESOURCE = (UNIPROTKB_RESOURCE + "/groups") + "/keyword";
+    static final String GROUP_BY_KEYWORD_RESOURCE = (UNIPROTKB_RESOURCE + GROUPS) + "/keyword";
     private final GroupByKeywordService uniProtKBGroupByKeywordService;
     private static final String KEYWORD_ID_REGEX = "^KW-\\d{4}";
 
