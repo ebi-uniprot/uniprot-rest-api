@@ -240,6 +240,28 @@ public abstract class AbstractSearchControllerIT {
     }
 
     @Test
+    void searchQueryWithInvalidQueryFormatMultipleMiddleWildcardReturnBadRequest()
+            throws Exception {
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "pro*te*in")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "query parameter value can not have multiple middle wildcards. For example: pro*te*in.")));
+    }
+
+    @Test
     void searchQueryWithInvalidFieldNameReturnBadRequest() throws Exception {
         // when
         ResultActions response =

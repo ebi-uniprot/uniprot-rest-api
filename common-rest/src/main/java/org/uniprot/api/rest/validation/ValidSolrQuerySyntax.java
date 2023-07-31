@@ -15,6 +15,8 @@ import javax.validation.Payload;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.*;
+import org.springframework.util.StringUtils;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -27,7 +29,7 @@ import org.uniprot.core.util.Utils;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidSolrQuerySyntax {
 
-    String message() default "{search.invalid.syntax.query}";
+    String message() default "{search.invalid.query}";
 
     Class<?>[] groups() default {};
 
@@ -46,12 +48,53 @@ public @interface ValidSolrQuerySyntax {
                     QueryParser qp = new QueryParser("", new WhitespaceAnalyzer());
                     qp.setAllowLeadingWildcard(true);
                     queryString = replaceForwardSlashes(queryString);
-                    qp.parse(queryString);
+                    Query parsedQuery = qp.parse(queryString);
+                    if (!validateWildCard(parsedQuery)) {
+                        String errorMessage = "{search.invalid.query.wildcard}";
+                        context.disableDefaultConstraintViolation();
+                        context.buildConstraintViolationWithTemplate(errorMessage)
+                                .addConstraintViolation();
+                        isValid = false;
+                    }
                 } catch (ParseException e) {
                     isValid = false;
                 }
             }
             return isValid;
+        }
+
+        private boolean validateWildCard(Query inputQuery) {
+            boolean isValid = true;
+            if (inputQuery instanceof WildcardQuery) {
+                WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
+                String value = wildcardQuery.getTerm().text();
+                if (hasMultipleMiddleWildCards(value)) {
+                    isValid = false;
+                }
+            } else if (inputQuery instanceof BooleanQuery) {
+                BooleanQuery booleanQuery = (BooleanQuery) inputQuery;
+                for (BooleanClause clause : booleanQuery.clauses()) {
+                    if (!validateWildCard(clause.getQuery())) {
+                        isValid = false;
+                    }
+                }
+            }
+            return isValid;
+        }
+
+        private boolean hasMultipleMiddleWildCards(String value) {
+            String valueWithoutLeadingWildCard = stripWildCard(value);
+            return StringUtils.countOccurrencesOf(valueWithoutLeadingWildCard, "*") >= 2;
+        }
+
+        private static String stripWildCard(String value) {
+            while (value.startsWith("*")) {
+                value = value.substring(1);
+            }
+            while (value.endsWith("*")) {
+                value = value.substring(0, value.length() - 1);
+            }
+            return value;
         }
     }
 }
