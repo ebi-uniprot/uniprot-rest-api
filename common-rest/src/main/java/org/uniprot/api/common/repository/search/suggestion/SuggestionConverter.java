@@ -21,8 +21,10 @@ public class SuggestionConverter implements Converter<QueryResponse, List<Sugges
 
     @Override
     public List<Suggestion> convert(QueryResponse queryResponse) {
+        long resultHits = queryResponse.getResults().getNumFound();
         SpellCheckResponse spellCheckResponse = queryResponse.getSpellCheckResponse();
-        if (Utils.notNull(spellCheckResponse)
+        if (resultHits == 0L
+                && Utils.notNull(spellCheckResponse)
                 && Utils.notNullNotEmpty(spellCheckResponse.getCollatedResults())) {
             return spellCheckResponse.getCollatedResults().stream()
                     .map(this::getSuggestion)
