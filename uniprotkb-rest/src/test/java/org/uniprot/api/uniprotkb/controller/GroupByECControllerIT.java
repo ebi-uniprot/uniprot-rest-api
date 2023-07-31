@@ -78,8 +78,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
 
         mockMvc.perform(
                         get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_0)
-                                .param("parent", EMPTY_PARENT))
+                                .param("query", "organism_id:" + ORGANISM_ID_0))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(EC_ID_0)))
                 .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_0)))
@@ -95,7 +94,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
     void getGroupByEC_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(EC_ID_0)))
                 .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_0)))
@@ -114,8 +113,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
 
         mockMvc.perform(
                         get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_2)
-                                .param("parent", EMPTY_PARENT))
+                                .param("query", "organism_id:" + ORGANISM_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
@@ -135,7 +133,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
     void getGroupByEC_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2))
                 .andDo(print())
                 .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
@@ -176,7 +174,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
     void getGroupByEC_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
@@ -197,7 +195,7 @@ class GroupByECControllerIT extends GroupByControllerIT {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EC_ID_0))
-                .andDo(log())
+                .andDo(print())
                 .andExpect(jsonPath("$.groups[0].id", is(EC_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(EC_LABEL_2)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
