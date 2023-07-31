@@ -258,7 +258,8 @@ public abstract class AbstractSearchControllerIT {
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "query parameter value can not have multiple middle wildcards. For example: pro*te*in.")));
+                                        "We only allow one wildcard character (*) in the middle of a search term. "
+                                                + "Please check the help page for more information using wildcards for searches.")));
     }
 
     @Test
