@@ -1,9 +1,10 @@
 package org.uniprot.api.idmapping.service;
 
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.*;
+
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
@@ -54,16 +55,5 @@ public abstract class IdMappingPIRService {
                 .extraOptions(getExtraOptions(result))
                 .warnings(result.getWarnings())
                 .build();
-    }
-
-    private ExtraOptions getExtraOptions(IdMappingResult result) {
-        ExtraOptions.ExtraOptionsBuilder builder = ExtraOptions.builder();
-        if (result.getUnmappedIds() != null) {
-            builder.failedIds(result.getUnmappedIds());
-        }
-        if (result.getSuggestedIds() != null) {
-            builder.suggestedIds(result.getSuggestedIds());
-        }
-        return builder.build();
     }
 }
