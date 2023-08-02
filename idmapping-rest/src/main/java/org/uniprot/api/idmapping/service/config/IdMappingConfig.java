@@ -17,8 +17,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.web.client.RestTemplate;
+import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.RedisCacheMappingJobService;
+import org.uniprot.api.rest.request.HashGenerator;
 
 /**
  * Created 15/02/2021
@@ -30,6 +32,9 @@ import org.uniprot.api.idmapping.service.impl.RedisCacheMappingJobService;
 @ConfigurationProperties(prefix = "id.mapping.job")
 public class IdMappingConfig {
     private static final String PIR_ID_MAPPING_CACHE = "pirIDMappingCache";
+
+    @Value("${async.download.hash.salt}")
+    private String hashSalt;
 
     @Bean
     public RestTemplate idMappingRestTemplate(RestTemplateBuilder restTemplateBuilder) {
@@ -48,5 +53,11 @@ public class IdMappingConfig {
         CacheManager cacheManager = new RedissonSpringCacheManager(redissonClient, config);
         Cache mappingCache = cacheManager.getCache(PIR_ID_MAPPING_CACHE);
         return new RedisCacheMappingJobService(mappingCache);
+    }
+
+    @Bean
+    @Profile("asyncDownload")
+    public HashGenerator<IdMappingDownloadRequest> idMappingHashGenerator() {
+        return new HashGenerator<>(new IdMappingDownloadRequestToArrayConverter(), this.hashSalt);
     }
 }
