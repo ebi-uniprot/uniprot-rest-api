@@ -66,10 +66,11 @@ class TsvMessageConverterTest {
         assertNotNull(result);
         assertTrue(
                 result.contains(
-                        "Entry\tSite\tFunction [CC]\tSequence similarities\n"+
-                                "P00001\t"
+                        "Entry\tSite\tFunction [CC]\tSequence similarities\n"
+                                + "P00001\t"
                                 + "SITE sequence 1:2..8; /note=\"description value 123\"; "
                                 + "/evidence=\"ECO:0000269|PubMed:11389730\"\t"
-                                + "FUNCTION: [Isoform 4]: value. {ECO:0000269|PIRNR:PIRNR001360}."));
+                                + "FUNCTION: [Isoform 4]: value. {ECO:0000269|PIRNR:PIRNR001360}.\t"
+                                + "SIMILARITY: [Isoform 4]: value. {ECO:0000269|PIRNR:PIRNR001360}.; SIMILARITY: Belongs to the NSMF family."));
     }
 }
