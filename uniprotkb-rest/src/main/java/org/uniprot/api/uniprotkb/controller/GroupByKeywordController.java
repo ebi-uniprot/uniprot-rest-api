@@ -1,10 +1,11 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.GroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
-
-import javax.validation.constraints.Pattern;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.constraints.Pattern;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniprotkb.controller.GroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.KEYWORD_ID_REGEX;
 
 @RequestMapping(value = GROUP_BY_KEYWORD_RESOURCE)
 @RestController
@@ -29,7 +29,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class GroupByKeywordController extends GroupByController {
     static final String GROUP_BY_KEYWORD_RESOURCE = GROUPS + "/keyword";
     private final GroupByKeywordService uniProtKBGroupByKeywordService;
-    private static final String KEYWORD_ID_REGEX = "^KW-\\d{4}";
 
     @Autowired
     public GroupByKeywordController(GroupByKeywordService uniProtKBGroupByKeywordService) {
@@ -38,7 +37,7 @@ public class GroupByKeywordController extends GroupByController {
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @Tag(name = "uniprotkbgroup")
-    @Operation(summary = "List of groups w.r.t. to the given query and parent")
+    @Operation(summary = "List of groups with respect to to the given query and parent")
     @ApiResponse(
             content =
                     @Content(
@@ -54,10 +53,7 @@ public class GroupByKeywordController extends GroupByController {
                     @Pattern(
                             regexp = KEYWORD_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
-                            message =
-                                    "The parent keyword id value should be in "
-                                            + KEYWORD_ID_REGEX
-                                            + " format")
+                            message = "{groupby.keyword.invalid.id}")
                     @RequestParam(value = "parent", required = false)
                     String parent) {
         return new ResponseEntity<>(

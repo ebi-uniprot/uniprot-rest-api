@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import org.junit.jupiter.api.Test;
+import org.springframework.test.web.servlet.MockMvc;
+import org.uniprot.store.indexer.DataStoreManager;
+import org.uniprot.store.search.document.Document;
+
 import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.MockMvc;
-import org.uniprot.store.indexer.DataStoreManager;
-import org.uniprot.store.search.document.Document;
 
 public abstract class GroupByControllerIT {
     private static final String INVALID_ORGANISM_ID = "36";
