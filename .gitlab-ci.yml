@@ -105,7 +105,7 @@ k8s:downstream:
       artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
-    branch: master
+    branch: k8s-pipeline
   variables:
     CI_PIPELINE_TASKS: 'build'
     ARTIFACT: 'all-rest'
@@ -125,6 +125,7 @@ k8s:deploy:
   variables:
     CI_PIPELINE_TASKS: 'docker-deploy'
     VERSION: '$UNIPROT_REST_VERSION'
+    DEPLOY_ENV: 'dev'
   when: on_success
   rules:
     - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
