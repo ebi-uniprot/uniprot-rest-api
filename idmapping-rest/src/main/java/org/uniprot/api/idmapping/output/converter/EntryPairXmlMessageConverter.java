@@ -3,7 +3,7 @@ package org.uniprot.api.idmapping.output.converter;
 import javax.xml.bind.Marshaller;
 
 import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 
 /**

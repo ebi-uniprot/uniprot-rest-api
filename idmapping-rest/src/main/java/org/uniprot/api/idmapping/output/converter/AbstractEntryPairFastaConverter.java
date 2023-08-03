@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.uniprot.api.common.concurrency.Gatekeeper;
-import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.core.util.Utils;
 

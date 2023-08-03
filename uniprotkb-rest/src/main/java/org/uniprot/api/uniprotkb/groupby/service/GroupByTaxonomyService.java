@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.rest.request.taxonomy.TaxonomyStreamRequest;
-import org.uniprot.api.rest.service.taxonomy.TaxonomyService;
+import org.uniprot.api.support.data.common.taxonomy.request.TaxonomyStreamRequest;
+import org.uniprot.api.support.data.common.taxonomy.service.TaxonomyService;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -48,11 +48,17 @@ public class GroupByTaxonomyService extends GroupByService<TaxonomyEntry> {
             List<FacetField.Count> facetCounts,
             List<TaxonomyEntry> taxonomyEntries,
             List<TaxonomyEntry> ancestorEntries,
+            String parentId,
             String query) {
         Map<String, TaxonomyEntry> idEntryMap =
                 taxonomyEntries.stream()
                         .collect(Collectors.toMap(this::getId, Function.identity()));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, query);
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+    }
+
+    @Override
+    protected TaxonomyEntry getEntry(String parentId) {
+        return taxonomyService.findById(Long.parseLong(parentId));
     }
 
     @Override

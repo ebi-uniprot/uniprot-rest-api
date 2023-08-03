@@ -154,7 +154,7 @@ public abstract class BasicSearchController<T> {
             context.setEntityIds(accList);
         } else {
             context.setEntities(result.getContent());
-            context.setFailedIds(result.getFailedIds());
+            context.setExtraOptions(result.getExtraOptions());
             context.setWarnings(result.getWarnings());
         }
 

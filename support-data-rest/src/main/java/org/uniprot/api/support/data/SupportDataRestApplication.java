@@ -12,9 +12,9 @@ import org.uniprot.api.support.data.suggester.service.SuggesterServiceConfig;
 @Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, SuggesterServiceConfig.class})
 @ComponentScan(
         basePackages = {
-            "org.uniprot.api",
+            "org.uniprot.api.support.data",
             "org.uniprot.api.rest",
-            "org.uniprot.api.rest.validation"
+            "org.uniprot.api.common.repository.stream.rdf"
         })
 public class SupportDataRestApplication {
     public static void main(String[] args) {

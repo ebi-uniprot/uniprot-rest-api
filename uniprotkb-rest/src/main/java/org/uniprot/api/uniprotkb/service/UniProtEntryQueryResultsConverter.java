@@ -65,14 +65,14 @@ class UniProtEntryQueryResultsConverter {
                         .map(doc -> convertDoc(doc, filters))
                         .filter(Optional::isPresent)
                         .map(Optional::get);
-        return QueryResult.of(
-                upEntries,
-                results.getPage(),
-                results.getFacets(),
-                results.getMatchedFields(),
-                null,
-                results.getSuggestions(),
-                warnings);
+        return QueryResult.<UniProtKBEntry>builder()
+                .content(upEntries)
+                .page(results.getPage())
+                .facets(results.getFacets())
+                .matchedFields(results.getMatchedFields())
+                .suggestions(results.getSuggestions())
+                .warnings(warnings)
+                .build();
     }
 
     Optional<UniProtKBEntry> convertDoc(UniProtDocument doc, List<ReturnField> filters) {

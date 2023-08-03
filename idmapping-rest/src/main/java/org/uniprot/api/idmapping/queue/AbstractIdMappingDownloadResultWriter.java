@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.queue;
 
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
 
@@ -23,10 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.search.EntryPair;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
-import org.uniprot.api.idmapping.model.EntryPair;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
@@ -80,10 +82,13 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 StandardOpenOption.TRUNCATE_EXISTING);
                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
+            ExtraOptions extraOptions = getExtraOptions(idMappingResult);
+
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
             context.setContentType(contentType);
-            context.setFailedIds(idMappingResult.getUnmappedIds());
+            context.setExtraOptions(extraOptions);
+            context.setWarnings(idMappingResult.getWarnings());
 
             if (SUPPORTED_RDF_MEDIA_TYPES.containsKey(contentType)) {
                 Set<String> toIds = getToIds(idMappingResult);

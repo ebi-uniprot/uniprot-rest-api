@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SpellCheckResponse;
+import org.apache.solr.common.SolrDocumentList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.uniprot.core.util.Pair;
@@ -23,12 +24,16 @@ class SuggestionConverterTest {
     private QueryResponse mockQueryResponse;
     private SpellCheckResponse mockSpellCheckResponse;
 
+    private SolrDocumentList mockSolrDocList;
+
     @BeforeEach
     void setUp() {
         converter = new SuggestionConverter();
         mockQueryResponse = mock(QueryResponse.class);
         mockSpellCheckResponse = mock(SpellCheckResponse.class);
-
+        mockSolrDocList = mock(SolrDocumentList.class);
+        when(mockQueryResponse.getResults()).thenReturn(mockSolrDocList);
+        when(mockSolrDocList.getNumFound()).thenReturn(0L);
         when(mockQueryResponse.getSpellCheckResponse()).thenReturn(mockSpellCheckResponse);
     }
 
@@ -82,6 +87,21 @@ class SuggestionConverterTest {
 
         assertThat(suggestions.get(1).getQuery(), is(correctQuery1));
         assertThat(suggestions.get(1).getHits(), is(hit1));
+    }
+
+    @Test
+    void noSuggestionsReturnedWhenResultFound() {
+        // given --------------------------------------------------------------
+        String correctQuery = "bill";
+        long resultHist = 5L;
+        long suggestionHits = 1L;
+        when(mockSolrDocList.getNumFound()).thenReturn(resultHist);
+        simulateSuggestionsReturnedAre(List.of(new PairImpl<>(correctQuery, suggestionHits)));
+        // when --------------------------------------------------------------
+        List<Suggestion> suggestions = converter.convert(mockQueryResponse);
+
+        // then --------------------------------------------------------------
+        assertThat(suggestions, hasSize(0));
     }
 
     @SuppressWarnings("unchecked")

@@ -130,7 +130,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
             facets = null; // do not return facet in case of next page and facetFilter
         }
 
-        return QueryResult.of(entries, cursorPage, facets, null, null, null);
+        return QueryResult.<R>builder().content(entries).page(cursorPage).facets(facets).build();
     }
 
     protected Stream<R> streamEntries(List<String> idsInPage, IdsSearchRequest request) {

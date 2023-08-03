@@ -3,6 +3,7 @@ package org.uniprot.api.idmapping.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
 /**

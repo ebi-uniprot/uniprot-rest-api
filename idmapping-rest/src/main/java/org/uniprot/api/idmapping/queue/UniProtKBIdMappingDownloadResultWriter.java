@@ -43,7 +43,7 @@ public class UniProtKBIdMappingDownloadResultWriter
             MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory,
             StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RdfStreamer uniProtKBRDFStreamer,
+            RdfStreamer idMappingRdfStreamer,
             TaxonomyLineageService taxonomyLineageService,
             UniprotKBMappingRepository uniprotKBMappingRepository) {
         super(
@@ -51,7 +51,7 @@ public class UniProtKBIdMappingDownloadResultWriter
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
-                uniProtKBRDFStreamer,
+                idMappingRdfStreamer,
                 MessageConverterContextFactory.Resource.UNIPROTKB);
         this.taxonomyLineageService = taxonomyLineageService;
         this.uniprotKBMappingRepository = uniprotKBMappingRepository;

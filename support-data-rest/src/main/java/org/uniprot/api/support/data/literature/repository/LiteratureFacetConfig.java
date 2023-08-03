@@ -20,7 +20,7 @@ import org.uniprot.api.common.repository.search.facet.FacetProperty;
 @Component
 @Getter
 @Setter
-@PropertySource("classpath:facet.properties")
+@PropertySource("classpath:literature.facet.properties")
 @ConfigurationProperties(prefix = "facet")
 public class LiteratureFacetConfig extends FacetConfig {
 

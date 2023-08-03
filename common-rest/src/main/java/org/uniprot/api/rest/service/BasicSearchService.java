@@ -106,14 +106,13 @@ public abstract class BasicSearchService<D extends Document, R> {
         Stream<R> converted = convertDocumentsToEntries(request, results);
 
         Set<ProblemPair> warnings = getWarnings(request.getQuery(), Set.of());
-        return QueryResult.of(
-                converted,
-                results.getPage(),
-                results.getFacets(),
-                null,
-                null,
-                results.getSuggestions(),
-                warnings);
+        return QueryResult.<R>builder()
+                .content(converted)
+                .page(results.getPage())
+                .facets(results.getFacets())
+                .suggestions(results.getSuggestions())
+                .warnings(warnings)
+                .build();
     }
 
     protected Stream<R> convertDocumentsToEntries(SearchRequest request, QueryResult<D> results) {

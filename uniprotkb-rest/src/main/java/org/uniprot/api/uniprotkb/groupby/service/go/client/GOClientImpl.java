@@ -1,13 +1,13 @@
 package org.uniprot.api.uniprotkb.groupby.service.go.client;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.common.base.Strings;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class GOClientImpl implements GOClient {
@@ -28,10 +28,24 @@ public class GOClientImpl implements GOClient {
 
         String url = goApiPrefix + goId + "/children";
         GoTermResult result = restTemplate.getForObject(url, GoTermResult.class);
-        if (result == null || result.getResults().isEmpty()) {
+        if (result == null
+                || result.getResults().isEmpty()
+                || result.getResults().get(0).getChildren() == null) {
             return List.of();
         } else {
             return result.getResults().get(0).getChildren();
+        }
+    }
+
+    @Override
+    public Optional<GoRelation> getGoEntry(String goId) {
+        String url = goApiPrefix + goId + "/children";
+        GoTermResult result = restTemplate.getForObject(url, GoTermResult.class);
+        if (result == null || result.getResults().isEmpty()) {
+            return Optional.empty();
+        } else {
+            GoTerm goTerm = result.getResults().get(0);
+            return Optional.of(getGoRelation(goTerm.getId(), goTerm.getName()));
         }
     }
 

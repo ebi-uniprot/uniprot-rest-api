@@ -108,26 +108,21 @@ public class UniRefEntryLightService
                 getWarnings(
                         request.getQuery(), uniRefQueryProcessorConfig.getLeadingWildcardFields());
         if (!LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            QueryResult.QueryResultBuilder<UniRefEntryLight> builder =
+                    QueryResult.<UniRefEntryLight>builder()
+                            .page(result.getPage())
+                            .facets(result.getFacets())
+                            .suggestions(result.getSuggestions())
+                            .warnings(warnings);
             if (!unirefRequest.isComplete()) {
                 Stream<UniRefEntryLight> content =
                         result.getContent().map(this::removeOverLimitAndCleanMemberId);
-
-                result =
-                        QueryResult.of(
-                                content,
-                                result.getPage(),
-                                result.getFacets(),
-                                null,
-                                null,
-                                result.getSuggestions(),
-                                warnings);
+                builder.content(content);
             } else {
                 Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
-
-                result =
-                        QueryResult.of(
-                                content, result.getPage(), result.getFacets(), null, warnings);
+                builder.content(content);
             }
+            result = builder.build();
         }
         return result;
     }

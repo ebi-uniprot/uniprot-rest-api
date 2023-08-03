@@ -15,6 +15,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.model.*;
 import org.uniprot.api.idmapping.service.store.impl.UniParcBatchStoreEntryPairIterable;
 import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;

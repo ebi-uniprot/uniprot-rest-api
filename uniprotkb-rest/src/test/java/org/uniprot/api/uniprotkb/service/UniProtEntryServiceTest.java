@@ -5,14 +5,20 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.DEF_TYPE;
+import static org.uniprot.api.common.repository.search.SolrQueryConverter.FILTER_QUERY;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.solr.client.solrj.response.FacetField;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.FacetParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -148,7 +154,10 @@ class UniProtEntryServiceTest {
         UniProtKBEntry entry2 =
                 new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
         QueryResult<UniProtDocument> solrDocs =
-                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 1, 2));
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(CursorPage.of("", 1, 2))
+                        .build();
         UniProtKBSearchRequest request = new UniProtKBSearchRequest();
         request.setQuery("field:value");
         request.setSize(10);
@@ -177,7 +186,10 @@ class UniProtEntryServiceTest {
         UniProtKBEntry entry2 =
                 new UniProtKBEntryBuilder(acc2, acc2, UniProtKBEntryType.SWISSPROT).build();
         QueryResult<UniProtDocument> solrDocs =
-                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 2));
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(CursorPage.of("", 2))
+                        .build();
         UniProtKBSearchRequest request = new UniProtKBSearchRequest();
         request.setQuery("field2:value");
         request.setSize(10);
@@ -215,6 +227,47 @@ class UniProtEntryServiceTest {
     }
 
     @Test
+    void getFacets_filterIsoforms() {
+        QueryResponse queryResponse = mock(QueryResponse.class);
+        List<FacetField> facetFields = mock(List.class);
+        when(queryResponse.getFacetFields()).thenReturn(facetFields);
+        SearchFieldItem searchFieldItem = mock(SearchFieldItem.class);
+        when(searchFieldItem.getFieldName()).thenReturn("fieldName");
+        when(uniProtKBSearchFieldConfig.getSearchFieldItemByName("is_isoform"))
+                .thenReturn(searchFieldItem);
+        when(repository.query(
+                        argThat(
+                                solrQuery ->
+                                        solrQuery.get(FacetParams.FACET).equals("true")
+                                                && solrQuery.get(DEF_TYPE).equals("edismax")
+                                                && solrQuery
+                                                        .get(FILTER_QUERY)
+                                                        .contains("fieldName"))))
+                .thenAnswer(invocation -> queryResponse);
+
+        List<FacetField> facets = entryService.getFacets("query", Map.of());
+
+        assertSame(facetFields, facets);
+    }
+
+    @Test
+    void getFacets() {
+        QueryResponse queryResponse = mock(QueryResponse.class);
+        List<FacetField> facetFields = mock(List.class);
+        when(queryResponse.getFacetFields()).thenReturn(facetFields);
+        when(repository.query(
+                        argThat(
+                                solrQuery ->
+                                        solrQuery.get(FacetParams.FACET).equals("true")
+                                                && solrQuery.get(DEF_TYPE).equals("edismax"))))
+                .thenAnswer(invocation -> queryResponse);
+
+        List<FacetField> facets = entryService.getFacets("O38XU3-3742170", Map.of());
+
+        assertSame(facetFields, facets);
+    }
+
+    @Test
     void stream_in_non_list_format_with_voldemort_store_streamer_being_called() {
         mockSolrRequest();
         // when
@@ -242,7 +295,7 @@ class UniProtEntryServiceTest {
         doc1.active = true;
         Page page = CursorPage.of(null, 10, 1);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.of(doc1), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder().content(Stream.of(doc1)).page(page).build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         String result = entryService.findAccessionByProteinId(proteinId);
         assertNotNull(result);
@@ -263,7 +316,10 @@ class UniProtEntryServiceTest {
         doc2.accession = "DOC2";
         Page page = CursorPage.of(null, 10, 2);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(page)
+                        .build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         String result = entryService.findAccessionByProteinId(proteinId);
         assertNotNull(result);
@@ -283,7 +339,10 @@ class UniProtEntryServiceTest {
         doc2.accession = "DOC2";
         Page page = CursorPage.of(null, 10, 2);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(page)
+                        .build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         String result = entryService.findAccessionByProteinId(proteinId);
         assertNotNull(result);
@@ -304,7 +363,10 @@ class UniProtEntryServiceTest {
         doc2.accession = "DOC2";
         Page page = CursorPage.of(null, 10, 2);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.of(doc1, doc2), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(page)
+                        .build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         assertThrows(
                 ServiceException.class, () -> entryService.findAccessionByProteinId("PROTEIN_ID"));
@@ -314,7 +376,7 @@ class UniProtEntryServiceTest {
     void findAccessionByProteinIdNotFound() {
         Page page = CursorPage.of(null, 10, 0);
         QueryResult<UniProtDocument> queryResult =
-                QueryResult.of(Stream.empty(), page, null, null, null, null);
+                QueryResult.<UniProtDocument>builder().content(Stream.empty()).page(page).build();
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         assertThrows(
                 ResourceNotFoundException.class,

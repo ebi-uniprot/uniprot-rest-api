@@ -103,7 +103,12 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
                 getWarnings(
                         request.getQuery(),
                         literatureQueryProcessorConfig.getLeadingWildcardFields());
-        return QueryResult.of(converted, results.getPage(), results.getFacets(), null, warnings);
+        return QueryResult.<PublicationEntry>builder()
+                .content(converted)
+                .page(results.getPage())
+                .facets(results.getFacets())
+                .warnings(warnings)
+                .build();
     }
 
     public QueryResult<PublicationEntry> getPublicationsByUniProtAccession(

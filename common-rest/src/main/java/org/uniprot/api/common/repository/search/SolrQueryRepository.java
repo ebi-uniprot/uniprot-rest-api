@@ -75,7 +75,13 @@ public abstract class SolrQueryRepository<T extends Document> {
             List<TermInfo> termInfos = termInfoConverter.convert(solrResponse);
             List<Suggestion> suggestions = suggestionConverter.convert(solrResponse);
 
-            return QueryResult.of(resultList.stream(), page, facets, termInfos, null, suggestions);
+            return QueryResult.<T>builder()
+                    .content(resultList.stream())
+                    .page(page)
+                    .facets(facets)
+                    .matchedFields(termInfos)
+                    .suggestions(suggestions)
+                    .build();
         } catch (InvalidRequestException ire) {
             throw ire;
         } catch (Exception e) {

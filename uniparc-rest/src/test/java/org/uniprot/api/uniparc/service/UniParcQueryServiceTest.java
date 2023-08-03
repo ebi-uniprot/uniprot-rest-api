@@ -76,7 +76,10 @@ class UniParcQueryServiceTest {
         UniParcDocument doc2 =
                 new UniParcDocument.UniParcDocumentBuilder().upi("UPI0000000002").build();
         QueryResult<UniParcDocument> solrResult =
-                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 10));
+                QueryResult.<UniParcDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(CursorPage.of("", 10))
+                        .build();
         UniParcSearchRequest searchRequest = new UniParcSearchRequest();
         searchRequest.setQuery("field:value");
         searchRequest.setFormat(LIST_MEDIA_TYPE_VALUE);
@@ -105,7 +108,10 @@ class UniParcQueryServiceTest {
                 new UniParcDocument.UniParcDocumentBuilder().upi("UPI0000000002").build();
         UniParcEntry entry2 = new UniParcEntryBuilder().uniParcId("UPI0000000002").build();
         QueryResult<UniParcDocument> solrResult =
-                QueryResult.of(Stream.of(doc1, doc2), CursorPage.of("", 10));
+                QueryResult.<UniParcDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(CursorPage.of("", 10))
+                        .build();
         UniParcSearchRequest searchRequest = new UniParcSearchRequest();
         searchRequest.setQuery("field:value");
         searchRequest.setFormat(APPLICATION_JSON_VALUE);

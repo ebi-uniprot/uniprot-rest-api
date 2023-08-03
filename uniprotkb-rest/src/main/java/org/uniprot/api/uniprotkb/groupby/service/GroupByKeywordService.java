@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.rest.request.keyword.KeywordStreamRequest;
-import org.uniprot.api.rest.service.keyword.KeywordService;
+import org.uniprot.api.support.data.common.keyword.request.KeywordStreamRequest;
+import org.uniprot.api.support.data.common.keyword.service.KeywordService;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
@@ -45,10 +45,16 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
             List<FacetField.Count> facetCounts,
             List<KeywordEntry> keywordEntries,
             List<KeywordEntry> ancestorEntries,
+            String parentId,
             String query) {
         Map<String, KeywordEntry> idEntryMap =
                 keywordEntries.stream().collect(Collectors.toMap(this::getId, Function.identity()));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, query);
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+    }
+
+    @Override
+    protected KeywordEntry getEntry(String parentId) {
+        return keywordService.findByUniqueId(parentId);
     }
 
     @Override

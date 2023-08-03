@@ -24,10 +24,10 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.request.keyword.KeywordSearchRequest;
-import org.uniprot.api.rest.request.keyword.KeywordStreamRequest;
-import org.uniprot.api.rest.service.keyword.KeywordService;
 import org.uniprot.api.rest.validation.ValidReturnFields;
+import org.uniprot.api.support.data.common.keyword.request.KeywordSearchRequest;
+import org.uniprot.api.support.data.common.keyword.request.KeywordStreamRequest;
+import org.uniprot.api.support.data.common.keyword.service.KeywordService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.UniProtDataType;
 

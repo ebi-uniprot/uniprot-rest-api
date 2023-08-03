@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.*;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
 
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -146,8 +148,15 @@ public abstract class BasicIdService<T, U> {
                 "Total time taken to call voldemort in ms {} for jobId {} in getMappedEntries",
                 (end - start),
                 jobId);
+        ExtraOptions extraOptions = getExtraOptions(mappingResult);
 
-        return QueryResult.of(result, cursor, facets, mappingResult.getUnmappedIds(), warnings);
+        return QueryResult.<U>builder()
+                .content(result)
+                .page(cursor)
+                .facets(facets)
+                .extraOptions(extraOptions)
+                .warnings(warnings)
+                .build();
     }
 
     public Stream<U> streamEntries(
