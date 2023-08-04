@@ -11,4 +11,5 @@ import lombok.Singular;
 public class ExtraOptions {
     private final Collection<String> failedIds;
     @Singular private final Collection<EntryPair<String>> suggestedIds;
+    private Integer obsoleteCount;
 }

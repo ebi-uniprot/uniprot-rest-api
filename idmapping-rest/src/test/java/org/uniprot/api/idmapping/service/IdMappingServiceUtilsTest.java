@@ -12,12 +12,13 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 class IdMappingServiceUtilsTest {
 
     @Test
-    void getExtraOptionsEmptyLists() {
+    void getExtraOptionsWithoutValue() {
         IdMappingResult idmappingResult = IdMappingResult.builder().build();
         ExtraOptions result = IdMappingServiceUtils.getExtraOptions(idmappingResult);
         assertNotNull(result);
         assertEquals(result.getFailedIds(), List.of());
         assertEquals(result.getSuggestedIds(), List.of());
+        assertNull(result.getObsoleteCount());
     }
 
     @Test
@@ -25,12 +26,18 @@ class IdMappingServiceUtilsTest {
         List<String> failedIds = List.of("id1", "id2");
         List<IdMappingStringPair> suggestIds =
                 List.of(getMappingPair("id1"), getMappingPair("id2"));
+        Integer obsoleteCount = 10;
         IdMappingResult idmappingResult =
-                IdMappingResult.builder().unmappedIds(failedIds).suggestedIds(suggestIds).build();
+                IdMappingResult.builder()
+                        .unmappedIds(failedIds)
+                        .suggestedIds(suggestIds)
+                        .obsoleteCount(obsoleteCount)
+                        .build();
         ExtraOptions result = IdMappingServiceUtils.getExtraOptions(idmappingResult);
         assertNotNull(result);
         assertEquals(result.getFailedIds(), failedIds);
         assertEquals(result.getSuggestedIds(), suggestIds);
+        assertEquals(obsoleteCount, result.getObsoleteCount());
     }
 
     private IdMappingStringPair getMappingPair(String id) {

@@ -24,4 +24,6 @@ public class IdMappingResult implements Serializable {
     @Singular private List<IdMappingStringPair> mappedIds;
     @Singular private List<ProblemPair> warnings;
     @Singular private List<ProblemPair> errors;
+
+    private Integer obsoleteCount;
 }

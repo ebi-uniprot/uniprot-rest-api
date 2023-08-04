@@ -123,6 +123,7 @@ class UniParcIdMappingDownloadResultWriterTest {
                         .warning(warning)
                         .unmappedId("unm1")
                         .suggestedId(new IdMappingStringPair("fromSug1", "toSug1"))
+                        .obsoleteCount(1)
                         .build();
 
         assertDoesNotThrow(
@@ -155,10 +156,13 @@ class UniParcIdMappingDownloadResultWriterTest {
 
         ArrayNode suggestedIds = (ArrayNode) jsonResult.findPath("suggestedIds");
         assertEquals(1, suggestedIds.size());
-        JsonNode suugestNode = suggestedIds.get(0);
-        assertEquals("fromSug1", suugestNode.findValue("from").asText());
-        assertEquals("toSug1", suugestNode.findValue("to").asText());
+        JsonNode suggestNode = suggestedIds.get(0);
+        assertEquals("fromSug1", suggestNode.findValue("from").asText());
+        assertEquals("toSug1", suggestNode.findValue("to").asText());
 
+        JsonNode obsoleteCountNode = (JsonNode) jsonResult.findPath("obsoleteCount");
+        int obsoleteCount = obsoleteCountNode.asInt();
+        assertEquals(1, obsoleteCount);
         ArrayNode warnings = (ArrayNode) jsonResult.findPath("warnings");
         assertEquals(1, warnings.size());
         JsonNode warningNode = warnings.get(0);

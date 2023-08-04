@@ -99,7 +99,8 @@ public class IdMappingJobServiceImpl implements IdMappingJobService {
             JobTask jobTask =
                     canHandleInternally(request)
                             ? new SolrJobTask(idMappingJob, cacheService, idMappingRepository)
-                            : new PIRJobTask(idMappingJob, cacheService, pirService);
+                            : new PIRJobTask(
+                                    idMappingJob, cacheService, pirService, idMappingRepository);
             jobTaskExecutor.execute(jobTask);
         } else {
             IdMappingJob job = this.cacheService.get(jobId);

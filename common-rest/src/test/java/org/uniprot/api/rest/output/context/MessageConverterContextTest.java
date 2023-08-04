@@ -38,6 +38,7 @@ class MessageConverterContextTest {
                 ExtraOptions.builder()
                         .failedIds(List.of("id1"))
                         .suggestedId(FakePair.builder().from("fid2").to("tid2").build())
+                        .obsoleteCount(5)
                         .build();
         List<ProblemPair> warnings = List.of(new ProblemPair(1, "msg"));
         List<Suggestion> suggestions = List.of(Suggestion.builder().build());
@@ -93,6 +94,7 @@ class MessageConverterContextTest {
                 ExtraOptions.builder()
                         .failedIds(List.of("id1"))
                         .suggestedId(FakePair.builder().from("fid2").to("tid2").build())
+                        .obsoleteCount(10)
                         .build();
         List<ProblemPair> warnings = List.of(new ProblemPair(1, "msg"));
         List<Suggestion> suggestions = List.of(Suggestion.builder().build());

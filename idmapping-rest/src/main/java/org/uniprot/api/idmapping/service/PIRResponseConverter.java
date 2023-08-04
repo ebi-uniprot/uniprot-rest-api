@@ -67,7 +67,7 @@ public class PIRResponseConverter {
             Integer maxToUniProtIdsAllowed,
             Integer maxToIdsAllowed,
             ResponseEntity<String> response) {
-        IdMappingResult.IdMappingResultBuilder builder = IdMappingResult.builder();
+        IdMappingResult.IdMappingResultBuilder idMappingResultBuilder = IdMappingResult.builder();
         HttpStatus statusCode = response.getStatusCode();
         if (statusCode.equals(HttpStatus.OK)) {
             if (response.hasBody()) {
@@ -76,22 +76,29 @@ public class PIRResponseConverter {
                         .lines()
                         .filter(line -> !line.startsWith("Taxonomy ID:"))
                         .filter(Utils::notNullNotEmpty)
-                        //                        .filter(line -> !line.startsWith("MSG:"))
-                        .forEach(line -> convertLine(line, request, mappedRequestIds, builder));
+                        .forEach(
+                                line ->
+                                        convertLine(
+                                                line,
+                                                request,
+                                                mappedRequestIds,
+                                                idMappingResultBuilder));
                 // populate  error  if needed
                 Optional<ProblemPair> optError =
-                        getOptionalLimitError(maxToIdsAllowed, builder.build());
+                        getOptionalLimitError(maxToIdsAllowed, idMappingResultBuilder.build());
                 if (optError.isPresent()) {
-                    builder.clearMappedIds();
-                    builder.clearUnmappedIds();
-                    builder.error(optError.get());
+                    idMappingResultBuilder.clearMappedIds();
+                    idMappingResultBuilder.clearUnmappedIds();
+                    idMappingResultBuilder.error(optError.get());
                 } else {
                     // populate warning if needed
                     Optional<ProblemPair> optWarning =
                             getOptionalEnrichmentWarning(
-                                    request, maxToUniProtIdsAllowed, builder.build());
+                                    request,
+                                    maxToUniProtIdsAllowed,
+                                    idMappingResultBuilder.build());
                     if (optWarning.isPresent()) {
-                        builder.warning(optWarning.get());
+                        idMappingResultBuilder.warning(optWarning.get());
                     }
                 }
             }
@@ -99,7 +106,7 @@ public class PIRResponseConverter {
             throw new HttpServerErrorException(statusCode, "PIR id-mapping service error");
         }
 
-        return builder.build();
+        return idMappingResultBuilder.build();
     }
 
     private void convertLine(

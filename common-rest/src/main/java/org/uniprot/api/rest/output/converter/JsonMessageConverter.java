@@ -155,6 +155,11 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 if (notNullNotEmpty(extraOptions.getSuggestedIds())) {
                     writeJsonArray(generator, "suggestedIds", extraOptions.getSuggestedIds());
                 }
+
+                if (Objects.nonNull(extraOptions.getObsoleteCount())) {
+                    generator.writeFieldName("obsoleteCount");
+                    generator.writeObject(extraOptions.getObsoleteCount());
+                }
             }
 
             if (notNullNotEmpty(context.getSuggestions())) {
