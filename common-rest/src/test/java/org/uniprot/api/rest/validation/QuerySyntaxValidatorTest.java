@@ -28,9 +28,10 @@ class QuerySyntaxValidatorTest {
         "default query with escaped slash and forward slash, a\\/b/c, true",
         "single middle wildcards, def*ault value, true",
         "multiple middle wildcards, def*aul*t value, false",
-        "multiple middle wildcards 2, *def*aul*t* value, false",
-        "multiple middle wildcards 2, *def*aul*t* value, false",
-        "leading and trailing wildcard, *protein* value, true"
+        "leading and trailing wildcard, *protein* value, true",
+        "multiple leading, **defa*ult* value, true",
+        "multiple trailing, *defaul*t** value, true",
+        "multiple strip, **defaul*t** value, true"
     })
     void checkValidationUseCase(String desc, String queryString, String expected) {
         ValidSolrQuerySyntax.QuerySyntaxValidator validator =

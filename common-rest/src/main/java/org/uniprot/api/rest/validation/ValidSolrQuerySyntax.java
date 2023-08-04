@@ -49,7 +49,7 @@ public @interface ValidSolrQuerySyntax {
                     qp.setAllowLeadingWildcard(true);
                     queryString = replaceForwardSlashes(queryString);
                     Query parsedQuery = qp.parse(queryString);
-                    if (!validateWildCard(parsedQuery)) {
+                    if (!validateWildcard(parsedQuery)) {
                         String errorMessage = "{search.invalid.query.wildcard}";
                         context.disableDefaultConstraintViolation();
                         context.buildConstraintViolationWithTemplate(errorMessage)
@@ -63,18 +63,18 @@ public @interface ValidSolrQuerySyntax {
             return isValid;
         }
 
-        private boolean validateWildCard(Query inputQuery) {
+        private boolean validateWildcard(Query inputQuery) {
             boolean isValid = true;
             if (inputQuery instanceof WildcardQuery) {
                 WildcardQuery wildcardQuery = (WildcardQuery) inputQuery;
                 String value = wildcardQuery.getTerm().text();
-                if (hasMultipleMiddleWildCards(value)) {
+                if (hasMultipleMiddleAsteriskWildcard(value)) {
                     isValid = false;
                 }
             } else if (inputQuery instanceof BooleanQuery) {
                 BooleanQuery booleanQuery = (BooleanQuery) inputQuery;
                 for (BooleanClause clause : booleanQuery.clauses()) {
-                    if (!validateWildCard(clause.getQuery())) {
+                    if (!validateWildcard(clause.getQuery())) {
                         isValid = false;
                     }
                 }
@@ -82,12 +82,12 @@ public @interface ValidSolrQuerySyntax {
             return isValid;
         }
 
-        private boolean hasMultipleMiddleWildCards(String value) {
-            String valueWithoutLeadingWildCard = stripWildCard(value);
-            return StringUtils.countOccurrencesOf(valueWithoutLeadingWildCard, "*") >= 2;
+        private boolean hasMultipleMiddleAsteriskWildcard(String value) {
+            String strippedValue = stripWildcard(value);
+            return StringUtils.countOccurrencesOf(strippedValue, "*") >= 2;
         }
 
-        private static String stripWildCard(String value) {
+        private static String stripWildcard(String value) {
             while (value.startsWith("*")) {
                 value = value.substring(1);
             }
