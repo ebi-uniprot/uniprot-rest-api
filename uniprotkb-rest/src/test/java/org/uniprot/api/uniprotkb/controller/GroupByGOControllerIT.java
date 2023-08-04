@@ -43,11 +43,11 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     private static final String ORGANISM_ID_0 = "29";
     private static final String ORGANISM_ID_1 = "324";
     private static final String ORGANISM_ID_2 = "994";
-    private static final String GO_ID_0 = "GO:goId0";
+    private static final String GO_ID_0 = "GO:0000000";
     private static final String GO_NAME_0 = "goName0";
-    private static final String GO_ID_1 = "GO:goId1";
+    private static final String GO_ID_1 = "GO:0000001";
     private static final String GO_NAME_1 = "goName1";
-    private static final String GO_ID_2 = "GO:goId2";
+    private static final String GO_ID_2 = "GO:0000002";
     private static final String GO_NAME_2 = "goName2";
     public static final String PATH = "/uniprotkb/groups/go";
     @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
@@ -76,10 +76,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_0)
-                                .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_0))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(GO_ID_0)))
                 .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_0)))
@@ -95,7 +92,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     void getGroupByGO_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(GO_ID_0)))
                 .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_0)))
@@ -112,10 +109,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_2)
-                                .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
@@ -135,7 +129,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     void getGroupByGO_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
@@ -179,7 +173,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     void getGroupByGO_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
@@ -217,7 +211,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() {
-        mockGoRelation(GO_ID_0, GO_NAME_0, EMPTY_PARENT);
+        mockGoRelation(GO_ID_0, GO_NAME_0, null);
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, Set.of(removeGoPrefix(GO_ID_0)));
         mockGoRelation(GO_ID_1, GO_NAME_1, GO_ID_0);
         saveUniProtDocument(
@@ -248,7 +242,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
 
     @Override
     protected void prepareSingleRootNodeWithNoChildren() {
-        mockGoRelation(GO_ID_0, GO_NAME_0, EMPTY_PARENT);
+        mockGoRelation(GO_ID_0, GO_NAME_0, null);
         saveUniProtDocument(ACCESSION_0, ORGANISM_ID_0, Set.of(removeGoPrefix(GO_ID_0)));
     }
 

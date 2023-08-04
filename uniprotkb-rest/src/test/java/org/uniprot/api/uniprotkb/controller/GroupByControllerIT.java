@@ -12,18 +12,14 @@ import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.document.Document;
 
 public abstract class GroupByControllerIT {
-    protected static final String EMPTY_PARENT = "";
     private static final String INVALID_ORGANISM_ID = "36";
 
     @Test
-    void getGroupByKeyword_emptyResults() throws Exception {
+    void getGroupBy_emptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         getMockMvc()
-                .perform(
-                        get(getPath())
-                                .param("query", "organism_id:" + INVALID_ORGANISM_ID)
-                                .param("parent", EMPTY_PARENT))
+                .perform(get(getPath()).param("query", "organism_id:" + INVALID_ORGANISM_ID))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)))
@@ -32,14 +28,11 @@ public abstract class GroupByControllerIT {
     }
 
     @Test
-    void getGroupByKeyword_whenFreeFormQueryAndEmptyResults() throws Exception {
+    void getGroupBy_whenFreeFormQueryAndEmptyResults() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
         getMockMvc()
-                .perform(
-                        get(getPath())
-                                .param("query", INVALID_ORGANISM_ID)
-                                .param("parent", EMPTY_PARENT))
+                .perform(get(getPath()).param("query", INVALID_ORGANISM_ID))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups.size()", is(0)))
                 .andExpect(jsonPath("$.ancestors.size()", is(0)))
@@ -48,9 +41,9 @@ public abstract class GroupByControllerIT {
     }
 
     @Test
-    void getGroupByKeyword_whenQueryNotSpecified() throws Exception {
+    void getGroupBy_whenQueryNotSpecified() throws Exception {
         getMockMvc()
-                .perform(get(getPath()).param("parent", EMPTY_PARENT))
+                .perform(get(getPath()))
                 .andDo(log())
                 .andExpect(status().isBadRequest())
                 .andExpect(
@@ -58,6 +51,16 @@ public abstract class GroupByControllerIT {
                                 .string(
                                         containsStringIgnoringCase(
                                                 "query is a required parameter")))
+                .andExpect(jsonPath("$.parent").doesNotExist());
+    }
+
+    @Test
+    void getGroupBy_invalidParent() throws Exception {
+        getMockMvc()
+                .perform(get(getPath()).param("query", "*").param("parent", "invalid-parent"))
+                .andDo(log())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(containsStringIgnoringCase("id value should be")))
                 .andExpect(jsonPath("$.parent").doesNotExist());
     }
 

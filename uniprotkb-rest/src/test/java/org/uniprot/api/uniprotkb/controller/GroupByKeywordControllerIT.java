@@ -45,15 +45,15 @@ class GroupByKeywordControllerIT extends GroupByControllerIT {
     private static final String ORGANISM_ID_0 = "29";
     private static final String ORGANISM_ID_1 = "324";
     private static final String ORGANISM_ID_2 = "994";
-    private static final String KEYWORD_ID_0 = "keywordId0";
+    private static final String KEYWORD_ID_0 = "KW-0000";
     private static final String KEYWORD_NAME_0 = "keywordName0";
-    private static final String KEYWORD_ID_1 = "keywordId1";
+    private static final String KEYWORD_ID_1 = "KW-0001";
     private static final String KEYWORD_NAME_1 = "keywordName1";
-    private static final String KEYWORD_ID_2 = "keywordId2";
+    private static final String KEYWORD_ID_2 = "KW-0002";
     private static final String KEYWORD_NAME_2 = "keywordName2";
-    private static final String KEYWORD_ID_3 = "keywordId3";
+    private static final String KEYWORD_ID_3 = "KW-0003";
     private static final String KEYWORD_NAME_3 = "keywordName3";
-    private static final String KEYWORD_ID_4 = "keywordId4";
+    private static final String KEYWORD_ID_4 = "KW-0004";
     private static final String KEYWORD_NAME_4 = "keywordName4";
     public static final String PATH = "/uniprotkb/groups/keyword";
     @RegisterExtension static DataStoreManager dataStoreManager = new DataStoreManager();
@@ -86,10 +86,7 @@ class GroupByKeywordControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_0)
-                                .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_0))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_0)))
                 .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_0)))
@@ -105,7 +102,7 @@ class GroupByKeywordControllerIT extends GroupByControllerIT {
     void getGroupByKeyword_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_0)))
                 .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_0)))
@@ -122,10 +119,7 @@ class GroupByKeywordControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + ORGANISM_ID_2)
-                                .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
@@ -145,7 +139,7 @@ class GroupByKeywordControllerIT extends GroupByControllerIT {
     void getGroupByKeyword_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
@@ -186,7 +180,7 @@ class GroupByKeywordControllerIT extends GroupByControllerIT {
     void getGroupByKeyword_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", KEYWORD_ID_2).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", KEYWORD_ID_2))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(KEYWORD_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(KEYWORD_NAME_2)))
