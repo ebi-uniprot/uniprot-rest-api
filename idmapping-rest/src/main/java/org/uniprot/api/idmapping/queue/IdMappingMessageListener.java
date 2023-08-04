@@ -60,27 +60,28 @@ public class IdMappingMessageListener extends AbstractMessageListener implements
     protected void processMessage(Message message, DownloadJob downloadJob) {
         IdMappingDownloadRequest request =
                 (IdMappingDownloadRequest) this.converter.fromMessage(message);
-        String jobId = downloadJob.getId();
+        String asyncDownloadJobId = downloadJob.getId();
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
 
-        IdMappingJob idMappingJob = idMappingJobCacheService.getCompletedJobAsResource(jobId);
+        IdMappingJob idMappingJob =
+                idMappingJobCacheService.getCompletedJobAsResource(request.getJobId());
 
         Path resultFile =
                 Paths.get(
                         downloadConfigProperties.getResultFilesFolder(),
-                        jobId + FileType.GZIP.getExtension());
+                        asyncDownloadJobId + FileType.GZIP.getExtension());
         // run the job if it has errored out
         if (isJobSeenBefore(downloadJob, resultFile)) {
             if (downloadJob.getStatus() == JobStatus.RUNNING) {
-                log.warn("The job {} is running by other thread", jobId);
+                log.warn("The job {} is running by other thread", asyncDownloadJobId);
             } else {
-                log.info("The job {} is already processed", jobId);
+                log.info("The job {} is already processed", asyncDownloadJobId);
                 updateDownloadJob(message, downloadJob, JobStatus.FINISHED);
             }
         } else {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
-            writeResult(request, idMappingJob, jobId, contentType);
-            updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
+            writeResult(request, idMappingJob, asyncDownloadJobId, contentType);
+            updateDownloadJob(message, downloadJob, JobStatus.FINISHED, asyncDownloadJobId);
         }
     }
 

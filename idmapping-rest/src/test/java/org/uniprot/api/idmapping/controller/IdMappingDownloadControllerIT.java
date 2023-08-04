@@ -96,6 +96,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
 @ContextConfiguration(classes = {IdMappingREST.class})
@@ -330,30 +331,31 @@ public class IdMappingDownloadControllerIT {
 
     @Test
     void downloadCanGetJobDetails() throws Exception {
-        String jobId = "JOB_ID_DETAILS";
+        String idMappingJobId = "JOB_ID_DETAILS";
+        String asynchJobId = "0ec030e6ab2ee90d179cb5f9268e9daa98eaa67a";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
         mappedIds.add(new IdMappingStringPair("P10002", "UPI0000283A02"));
-        cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, mappedIds);
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, mappedIds);
 
         ResultActions response =
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", jobId)
+                                .param("jobId", idMappingJobId)
                                 .param("format", "json")
                                 .param("fields", "accession"));
         // then
         response.andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
+                .andExpect(jsonPath("$.jobId", is(asynchJobId)));
 
-        await().until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
+        await().until(jobProcessed(asynchJobId), isEqual(JobStatus.FINISHED));
 
         response =
                 mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT, jobId)
+                        get(JOB_DETAILS_ENDPOINT, asynchJobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -362,19 +364,20 @@ public class IdMappingDownloadControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.redirectURL",
-                                is("https://localhost/idmapping/download/results/" + jobId)))
+                                is("https://localhost/idmapping/download/results/" + asynchJobId)))
                 .andExpect(jsonPath("$.fields", is("accession")))
                 .andExpect(jsonPath("$.format", is(APPLICATION_JSON_VALUE)));
     }
 
     @Test
     void downloadCanGetJobDetailsWithError() throws Exception {
-        String jobId = "JOB_ID_DETAILS_ERROR";
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
 
-        cacheIdMappingJob(jobId, "UniParc", JobStatus.FINISHED, List.of());
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         DownloadJob downloadJob =
                 DownloadJob.builder()
-                        .id(jobId)
+                        .id(asyncJobId)
                         .status(JobStatus.ERROR)
                         .error("Error message")
                         .build();
@@ -384,17 +387,17 @@ public class IdMappingDownloadControllerIT {
                 mockMvc.perform(
                         post(JOB_SUBMIT_ENDPOINT)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("jobId", jobId)
+                                .param("jobId", idMappingJobId)
                                 .param("format", "json")
                                 .param("fields", "accession"));
         // then
         response.andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)));
 
         response =
                 mockMvc.perform(
-                        get(JOB_DETAILS_ENDPOINT, jobId)
+                        get(JOB_DETAILS_ENDPOINT, asyncJobId)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -546,6 +549,7 @@ public class IdMappingDownloadControllerIT {
     void uniParcDownloadJobSubmittedSuccessfully() throws Exception {
         // when
         String jobId = "UNIPARC_JOB_SUCCESS";
+        String asyncJobId = "aac4dca9f543088cce4b400aed297ed115b64af1";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UPI0000283A01"));
@@ -564,11 +568,15 @@ public class IdMappingDownloadControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)));
 
-        await().until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
+        await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
-                Path.of(this.resultFolder + File.separator + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        this.resultFolder
+                                + File.separator
+                                + asyncJobId
+                                + FileType.GZIP.getExtension());
         assertTrue(Files.exists(resultFilePath));
         JsonNode jsonResult =
                 MAPPER.readTree(
@@ -616,13 +624,19 @@ public class IdMappingDownloadControllerIT {
                                 .param("format", format));
         // then
         response.andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+
+        String jobResponse = response.andReturn().getResponse().getContentAsString();
+        String asyncJobId = JsonPath.read(jobResponse, "$.jobId");
 
         await().atMost(200, TimeUnit.SECONDS)
-                .until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
+                .until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
-                Path.of(this.resultFolder + File.separator + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        this.resultFolder
+                                + File.separator
+                                + asyncJobId
+                                + FileType.GZIP.getExtension());
         assertTrue(Files.exists(resultFilePath));
 
         InputStream inputStream =
@@ -759,6 +773,7 @@ public class IdMappingDownloadControllerIT {
     void unirefDownloadJobSubmittedSuccessfully() throws Exception {
         // when
         String jobId = "UNIREF_JOB_SUCCESS";
+        String asyncJobId = "441c3ff4b48904378071ce766b0973c94f17d8fd";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P10001", "UniRef90_P03901"));
@@ -777,11 +792,15 @@ public class IdMappingDownloadControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)));
 
-        await().until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
+        await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
-                Path.of(this.resultFolder + File.separator + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        this.resultFolder
+                                + File.separator
+                                + asyncJobId
+                                + FileType.GZIP.getExtension());
         assertTrue(Files.exists(resultFilePath));
         JsonNode jsonResult =
                 MAPPER.readTree(
@@ -829,13 +848,19 @@ public class IdMappingDownloadControllerIT {
                                 .param("format", format));
         // then
         response.andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+
+        String jobResponse = response.andReturn().getResponse().getContentAsString();
+        String asyncJobId = JsonPath.read(jobResponse, "$.jobId");
 
         await().atMost(200, TimeUnit.SECONDS)
-                .until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
+                .until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
-                Path.of(this.resultFolder + File.separator + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        this.resultFolder
+                                + File.separator
+                                + asyncJobId
+                                + FileType.GZIP.getExtension());
         assertTrue(Files.exists(resultFilePath));
 
         InputStream inputStream =
@@ -972,6 +997,7 @@ public class IdMappingDownloadControllerIT {
     void uniProtKBDownloadJobSubmittedSuccessfully() throws Exception {
         // when
         String jobId = "UNIPROTKB_JOB_SUCCESS";
+        String asyncJobId = "608f212e45a8054809bd179b803029494d72418c";
 
         List<IdMappingStringPair> mappedIds = new ArrayList<>();
         mappedIds.add(new IdMappingStringPair("P00001", "P00001"));
@@ -990,11 +1016,15 @@ public class IdMappingDownloadControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)));
 
-        await().until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
+        await().until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
-                Path.of(this.resultFolder + File.separator + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        this.resultFolder
+                                + File.separator
+                                + asyncJobId
+                                + FileType.GZIP.getExtension());
         assertTrue(Files.exists(resultFilePath));
         JsonNode jsonResult =
                 MAPPER.readTree(
@@ -1042,13 +1072,19 @@ public class IdMappingDownloadControllerIT {
                                 .param("format", format));
         // then
         response.andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobId", is(jobId)));
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+
+        String jobResponse = response.andReturn().getResponse().getContentAsString();
+        String asyncJobId = JsonPath.read(jobResponse, "$.jobId");
 
         await().atMost(200, TimeUnit.SECONDS)
-                .until(jobProcessed(jobId), isEqual(JobStatus.FINISHED));
+                .until(jobProcessed(asyncJobId), isEqual(JobStatus.FINISHED));
         Path resultFilePath =
-                Path.of(this.resultFolder + File.separator + jobId + FileType.GZIP.getExtension());
+                Path.of(
+                        this.resultFolder
+                                + File.separator
+                                + asyncJobId
+                                + FileType.GZIP.getExtension());
         assertTrue(Files.exists(resultFilePath));
 
         InputStream inputStream =

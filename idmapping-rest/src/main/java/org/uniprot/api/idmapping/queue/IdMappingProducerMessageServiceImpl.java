@@ -18,6 +18,7 @@ import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.request.HashGenerator;
 
 @Service
 @Slf4j
@@ -27,34 +28,37 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
     private final RabbitTemplate rabbitTemplate;
     private final MessageConverter converter;
     private final DownloadJobRepository jobRepository;
+    private final HashGenerator<IdMappingDownloadRequest> idMappingHashGenerator;
     private static final String JOB_ID = "jobId";
 
     public IdMappingProducerMessageServiceImpl(
             MessageConverter converter,
             RabbitTemplate rabbitTemplate,
-            DownloadJobRepository downloadJobRepository) {
+            DownloadJobRepository downloadJobRepository,
+            HashGenerator<IdMappingDownloadRequest> idMappingHashGenerator) {
         this.rabbitTemplate = rabbitTemplate;
         this.converter = converter;
         this.jobRepository = downloadJobRepository;
+        this.idMappingHashGenerator = idMappingHashGenerator;
     }
 
     @Override
     public String sendMessage(IdMappingDownloadRequest downloadRequest) {
         MessageProperties messageHeader = new MessageProperties();
-        String jobId = downloadRequest.getJobId();
-        messageHeader.setHeader(JOB_ID, jobId);
+        String asyncDownloadJobId = idMappingHashGenerator.generateHash(downloadRequest);
+        messageHeader.setHeader(JOB_ID, asyncDownloadJobId);
 
         if (Objects.isNull(downloadRequest.getFormat())) {
             downloadRequest.setFormat(APPLICATION_JSON_VALUE);
         }
 
-        if (!this.jobRepository.existsById(jobId)) {
-            doSendMessage(downloadRequest, messageHeader);
-            log.info("Message with jobId {} ready to be processed", jobId);
+        if (!this.jobRepository.existsById(asyncDownloadJobId)) {
+            doSendMessage(downloadRequest, messageHeader, asyncDownloadJobId);
+            log.info("Message with jobId {} ready to be processed", asyncDownloadJobId);
         } else {
-            alreadyProcessed(jobId);
+            alreadyProcessed(asyncDownloadJobId);
         }
-        return jobId;
+        return asyncDownloadJobId;
     }
 
     @Override
@@ -63,26 +67,28 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
     }
 
     private void doSendMessage(
-            IdMappingDownloadRequest downloadRequest, MessageProperties messageHeader) {
-        String jobId = downloadRequest.getJobId();
+            IdMappingDownloadRequest downloadRequest,
+            MessageProperties messageHeader,
+            String asyncDownloadJobId) {
         Message message = converter.toMessage(downloadRequest, messageHeader);
         // write to redis and put on queue
-        createDownloadJob(downloadRequest);
-        log.info("Message with jobId {} created in redis", jobId);
+        createDownloadJob(downloadRequest, asyncDownloadJobId);
+        log.info("Message with jobId {} created in redis", asyncDownloadJobId);
         try {
             this.rabbitTemplate.send(message);
-            log.info("Message with jobId sent to download queue {}", jobId);
+            log.info("Message with jobId sent to download queue {}", asyncDownloadJobId);
         } catch (AmqpException amqpException) {
             log.error("Unable to send message to the queue with exception", amqpException);
-            this.jobRepository.deleteById(jobId);
+            this.jobRepository.deleteById(asyncDownloadJobId);
             throw amqpException;
         }
     }
 
-    private void createDownloadJob(IdMappingDownloadRequest downloadRequest) {
+    private void createDownloadJob(
+            IdMappingDownloadRequest downloadRequest, String asyncDownloadJobId) {
         DownloadJob.DownloadJobBuilder jobBuilder = DownloadJob.builder();
         LocalDateTime now = LocalDateTime.now();
-        jobBuilder.id(downloadRequest.getJobId()).status(JobStatus.NEW);
+        jobBuilder.id(asyncDownloadJobId).status(JobStatus.NEW);
         jobBuilder
                 .fields(downloadRequest.getFields())
                 .format(downloadRequest.getFormat())
