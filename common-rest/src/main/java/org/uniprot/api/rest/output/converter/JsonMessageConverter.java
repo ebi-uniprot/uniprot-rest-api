@@ -157,8 +157,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 }
 
                 if (Objects.nonNull(extraOptions.getObsoleteCount())) {
-                    generator.writeFieldName("obsoleteCount");
-                    generator.writeObject(extraOptions.getObsoleteCount());
+                    writeJsonObject(generator, "obsoleteCount", extraOptions.getObsoleteCount());
                 }
             }
 
@@ -221,6 +220,12 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             writeElement(generator, matchedField);
         }
         generator.writeEndArray();
+    }
+
+    private static void writeJsonObject(
+            JsonGenerator generator, String fieldName, Object fieldValue) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeObject(fieldValue);
     }
 
     private void writeElement(JsonGenerator generator, Object facet) {
