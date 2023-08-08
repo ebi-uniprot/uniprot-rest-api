@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.controller.ControllerITUtils.CACHE_VALUE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +54,7 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageR
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
@@ -149,7 +152,15 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder(
                                         "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
-                                        "P00007", "P00008", "P00009", "P00010")));
+                                        "P00007", "P00008", "P00009", "P00010")))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, CACHE_VALUE))
+                .andExpect(
+                        header().stringValues(
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE));
     }
 
     @Test
