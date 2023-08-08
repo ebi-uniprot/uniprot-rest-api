@@ -5,12 +5,14 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
 
@@ -47,6 +49,7 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,6 +71,14 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
+                .andExpect(
+                        header().stringValues(
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.url").exists())
                 .andExpect(jsonPath("$.messages", contains("'query' is a required parameter")));
     }
@@ -85,6 +96,14 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
+                .andExpect(
+                        header().stringValues(
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist());
         verifyIdsAndResultFiles(jobId);
@@ -128,7 +147,6 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         "P00014", "P00013", "P00010", "P00009", "P00008", "P00007", "P00006",
                         "P00005", "P00004", "P00003", "P00002", "P00001"));
         // verify result file
-
         Path resultFilePath =
                 Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
         Assertions.assertTrue(Files.exists(resultFilePath));

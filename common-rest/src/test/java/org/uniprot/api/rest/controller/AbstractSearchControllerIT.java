@@ -160,7 +160,6 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(jsonPath("$.messages.*", contains("'query' is a required parameter")));
     }
 

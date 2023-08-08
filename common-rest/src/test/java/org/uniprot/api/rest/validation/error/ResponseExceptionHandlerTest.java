@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -45,13 +46,14 @@ class ResponseExceptionHandlerTest {
     void handleInternalServerErrorWithDebug() {
         // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
         Mockito.when(request.getParameter("debugError")).thenReturn("true");
         NullPointerException causedBy = new NullPointerException("Null Pointer");
         Throwable error = new Throwable("Throwable error message", causedBy);
 
         ResponseEntity<ErrorInfo> responseEntity =
-                errorHandler.handleInternalServerError(error, request);
+                errorHandler.handleInternalServerError(error, request, response);
 
         // then
         assertNotNull(responseEntity);
