@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.service;
 
 import static org.uniprot.api.common.repository.search.SolrQueryConverter.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.request.UniProtKBRequestUtil.DASH;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -345,6 +346,11 @@ public class UniProtEntryService
         UniProtKBEntryBuilder builder =
                 new UniProtKBEntryBuilder(accession, accession, UniProtKBEntryType.SWISSPROT);
         return builder.build();
+    }
+
+    @Override
+    protected boolean hasIsoformIds(List<String> ids) {
+        return ids.stream().anyMatch(id -> id.contains(DASH));
     }
 
     private void addIsoformFilter(SolrRequest solrRequest) {
