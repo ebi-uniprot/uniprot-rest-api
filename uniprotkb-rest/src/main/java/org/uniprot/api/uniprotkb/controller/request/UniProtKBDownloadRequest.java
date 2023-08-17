@@ -9,12 +9,14 @@ import lombok.EqualsAndHashCode;
 
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
+import org.uniprot.api.rest.validation.CustomConstraintGroup;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
+import org.uniprot.api.rest.validation.ValidDownloadRequest;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ValidDownloadRequest(groups = CustomConstraintGroup.class)
 public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements DownloadRequest {
-
     @ValidAsyncDownloadFormats(
             formats = {
                 TSV_MEDIA_TYPE_VALUE,

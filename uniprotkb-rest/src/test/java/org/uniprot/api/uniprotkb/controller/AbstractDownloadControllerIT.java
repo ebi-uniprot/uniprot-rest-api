@@ -50,6 +50,7 @@ import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
+import org.uniprot.api.rest.validation.ValidDownloadRequest;
 import org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -166,8 +167,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
     void submitJobAllFormat(String format) throws Exception {
         // when
         String query = "reviewed:true";
-        String fields = "accession,rhea";
-        String jobId = callRunAPIAndVerify(query, fields, null, format, false);
+        String jobId = callRunAPIAndVerify(query, null, null, format, false);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         if ("h5".equals(format) || "application/x-hdf5".equals(format)) {
@@ -621,14 +621,67 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
 
     @Test
     void submitJob_H5_Format_With_Isoform_Aborted() throws Exception {
-        String query = "reviewed:true";
+        String query = "*:*";
         MediaType format = HDF5_MEDIA_TYPE;
-        String jobId = callRunAPIAndVerify(query, "accession", null, format.toString(), true);
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), true);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.ABORTED));
         // id file should not exist yet
         Path resultFilePath = Path.of(this.idsFolder + "/" + jobId);
         Assertions.assertFalse(Files.exists(resultFilePath));
+    }
+
+    @ParameterizedTest(name = "[{index}] format {0}")
+    @MethodSource("getFormatsWithoutProjection")
+    void submitJobWithFieldsNotSupported(String format) throws Exception {
+        // when
+        String query = "*:*";
+        String fields = "accession,rhea";
+        ResultActions resultActions =
+                callPostJobStatus(query, fields, null, format.toString(), false);
+        resultActions
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                contains("'fields' are not supported for 'format' " + format)));
+    }
+
+    /**
+     * Tests that class level validation is called after field level validation. It also tests that
+     * class level validation (see annotation on {@link
+     * org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest} ) is not called if the
+     * fields validation is failed.
+     *
+     * @throws Exception
+     */
+    @Test
+    void submitJobWithInvalidFields() throws Exception {
+        String query = "*:*";
+        String fields = "randomfield1,randomfield2";
+        String format = "xml";
+        ResultActions resultActions = callPostJobStatus(query, fields, null, format, false);
+        resultActions
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                containsInAnyOrder(
+                                        "Invalid fields parameter value 'randomfield1'",
+                                        "Invalid fields parameter value 'randomfield2'")))
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                not(
+                                        contains(
+                                                "'fields' are not supported for 'format' "
+                                                        + format))));
     }
 
     protected JobStatus getJobStatus(String jobId) throws Exception {
@@ -733,5 +786,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniProtKBDown
                         "h5")
                 .stream()
                 .map(Arguments::of);
+    }
+
+    private Stream<Arguments> getFormatsWithoutProjection() {
+        return ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().map(Arguments::of);
     }
 }

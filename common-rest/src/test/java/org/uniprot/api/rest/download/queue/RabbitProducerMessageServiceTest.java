@@ -4,8 +4,6 @@ import static org.assertj.core.api.Fail.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import lombok.Data;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +18,7 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.FakeDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,15 +81,5 @@ class RabbitProducerMessageServiceTest {
             verify(jobRepository, times(1)).save(any(DownloadJob.class));
             verify(jobRepository, times(1)).deleteById(any());
         }
-    }
-
-    @Data
-    class FakeDownloadRequest implements DownloadRequest {
-        private String query = "dummy";
-        private String fields;
-        private String sort;
-        private String download;
-        private String format;
-        private boolean isLargeSolrStreamRestricted;
     }
 }
