@@ -1,7 +1,6 @@
 package org.uniprot.api.rest.service;
 
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.request.UniProtKBRequestUtil.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -194,7 +193,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
                 || hasIsoformIds;
     }
 
-    private boolean hasIsoformIds(List<String> ids) {
-        return ids.stream().anyMatch(id -> id.contains(DASH));
+    protected boolean hasIsoformIds(List<String> ids) {
+        return false;
     }
 }
