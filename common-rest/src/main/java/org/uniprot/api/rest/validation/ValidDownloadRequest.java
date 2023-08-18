@@ -53,6 +53,7 @@ public @interface ValidDownloadRequest {
     class DownloadRequestValidator
             implements ConstraintValidator<ValidDownloadRequest, DownloadRequest> {
 
+        private static final String FORMAT_STR = "format";
         private String message;
 
         @Override
@@ -66,17 +67,17 @@ public @interface ValidDownloadRequest {
                 DownloadRequest downloadRequest, ConstraintValidatorContext context) {
             boolean isValid = true;
             try {
-                String fields = BeanUtils.getProperty(downloadRequest, "fields");
+                String fields = getPassedParamValue(downloadRequest, "fields");
                 if (Utils.notNullNotEmpty(fields)) {
                     if (isPassedWithInvalidFormat(downloadRequest)) {
                         ConstraintValidatorContextImpl contextImpl =
                                 (ConstraintValidatorContextImpl) context;
                         buildInvalidParamFieldsErrorMessage(
-                                getPassedFormat(downloadRequest), contextImpl);
+                                getPassedParamValue(downloadRequest, FORMAT_STR), contextImpl);
                         isValid = false;
                     }
 
-                    if (!isValid && context != null) {
+                    if (!isValid) {
                         context.disableDefaultConstraintViolation();
                     }
                 }
@@ -108,21 +109,21 @@ public @interface ValidDownloadRequest {
 
         private String getPassedOrDefaultFormat(DownloadRequest downloadRequest)
                 throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-            String format = getPassedFormat(downloadRequest);
+            String format = getPassedParamValue(downloadRequest, FORMAT_STR);
             if (Utils.nullOrEmpty(format)) {
                 format = APPLICATION_JSON_VALUE;
             }
             return format;
         }
 
-        private String getPassedFormat(DownloadRequest downloadRequest)
+        private String getPassedParamValue(DownloadRequest downloadRequest, String paramName)
                 throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-            return BeanUtils.getProperty(downloadRequest, "format");
+            return BeanUtils.getProperty(downloadRequest, paramName);
         }
 
         void buildInvalidParamFieldsErrorMessage(
                 String format, ConstraintValidatorContextImpl contextImpl) {
-            contextImpl.addMessageParameter("format", format);
+            contextImpl.addMessageParameter(FORMAT_STR, format);
             contextImpl.buildConstraintViolationWithTemplate(message).addConstraintViolation();
         }
     }
