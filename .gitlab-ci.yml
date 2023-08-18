@@ -48,7 +48,7 @@ api:settings:
     paths:
       - ./${MAVEN_SETTINGS}
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
+    - if: '$CI_COMMIT_REF_NAME == "master"'
     - when: manual
       allow_failure: true
 
@@ -70,7 +70,7 @@ api:test:
       junit:
         - ./*/target/surefire-reports/TEST-*.xml
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
+    - if: '$CI_COMMIT_REF_NAME == "master"'
     - when: manual
       allow_failure: true
 
@@ -81,7 +81,7 @@ api:sonar:
     - api:test
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
+    - if: '$CI_COMMIT_REF_NAME == "master"'
     - when: manual
       allow_failure: true
 
@@ -96,7 +96,7 @@ api:deploy:
   dependencies:
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
+    - if: '$CI_COMMIT_REF_NAME == "master"'
 
 k8s:downstream:
   stage: docker
@@ -105,14 +105,14 @@ k8s:downstream:
       artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
-    branch: k8s-pipeline
+    branch: master
   variables:
     CI_PIPELINE_TASKS: 'build'
     ARTIFACT: 'all-rest'
     VERSION: '$UNIPROT_REST_VERSION'
   when: on_success
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
+    - if: '$CI_COMMIT_REF_NAME == "master"'
 
 k8s:deploy:
   stage: docker-deploy
@@ -121,11 +121,11 @@ k8s:deploy:
       artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
-    branch: k8s-pipeline
+    branch: master
   variables:
     CI_PIPELINE_TASKS: 'docker-deploy'
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
   when: on_success
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "k8s-pipeline"'
+    - if: '$CI_COMMIT_REF_NAME == "master"'
