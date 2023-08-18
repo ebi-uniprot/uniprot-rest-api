@@ -9,9 +9,21 @@ import org.uniprot.api.rest.request.FakeDownloadRequest;
 class ValidDownloadRequestTest {
 
     @Test
-    void when_fields_passed_then_invalid_request() {
+    void when_fields_passed_with_supported_format_then_valid_request() {
         FakeDownloadRequest downloadRequest = new FakeDownloadRequest();
-        downloadRequest.setFormat(ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.get(0));
+        downloadRequest.setFormat("json");
+        downloadRequest.setFields("field1,field2");
+        FakeDownloadRequestValidator validator = new FakeDownloadRequestValidator();
+        boolean result = validator.isValid(downloadRequest, null);
+        assertTrue(result);
+        assertNull(validator.errorMessage);
+    }
+
+    @Test
+    void when_fields_passed_with_unsupported_format_then_invalid_request() {
+        FakeDownloadRequest downloadRequest = new FakeDownloadRequest();
+        downloadRequest.setFormat(
+                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().findFirst().get());
         downloadRequest.setFields("field1,field2");
         FakeDownloadRequestValidator validator = new FakeDownloadRequestValidator();
         boolean result = validator.isValid(downloadRequest, null);
@@ -22,7 +34,8 @@ class ValidDownloadRequestTest {
     @Test
     void when_fields_null_then_valid_request() {
         FakeDownloadRequest downloadRequest = new FakeDownloadRequest();
-        downloadRequest.setFormat(ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.get(0));
+        downloadRequest.setFormat(
+                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().findFirst().get());
         downloadRequest.setFields(null);
         FakeDownloadRequestValidator validator = new FakeDownloadRequestValidator();
         boolean result = validator.isValid(downloadRequest, null);
@@ -33,7 +46,8 @@ class ValidDownloadRequestTest {
     @Test
     void when_fields_empty_then_valid_request() {
         FakeDownloadRequest downloadRequest = new FakeDownloadRequest();
-        downloadRequest.setFormat(ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.get(0));
+        downloadRequest.setFormat(
+                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().findFirst().get());
         downloadRequest.setFields("");
         FakeDownloadRequestValidator validator = new FakeDownloadRequestValidator();
         boolean result = validator.isValid(downloadRequest, null);
