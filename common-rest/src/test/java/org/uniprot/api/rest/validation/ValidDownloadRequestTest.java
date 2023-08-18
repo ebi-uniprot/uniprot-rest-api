@@ -23,7 +23,7 @@ class ValidDownloadRequestTest {
     void when_fields_passed_with_unsupported_format_then_invalid_request() {
         FakeDownloadRequest downloadRequest = new FakeDownloadRequest();
         downloadRequest.setFormat(
-                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().findFirst().get());
+                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.iterator().next());
         downloadRequest.setFields("field1,field2");
         FakeDownloadRequestValidator validator = new FakeDownloadRequestValidator();
         boolean result = validator.isValid(downloadRequest, null);
@@ -35,7 +35,7 @@ class ValidDownloadRequestTest {
     void when_fields_null_then_valid_request() {
         FakeDownloadRequest downloadRequest = new FakeDownloadRequest();
         downloadRequest.setFormat(
-                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().findFirst().get());
+                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.iterator().next());
         downloadRequest.setFields(null);
         FakeDownloadRequestValidator validator = new FakeDownloadRequestValidator();
         boolean result = validator.isValid(downloadRequest, null);
@@ -47,7 +47,7 @@ class ValidDownloadRequestTest {
     void when_fields_empty_then_valid_request() {
         FakeDownloadRequest downloadRequest = new FakeDownloadRequest();
         downloadRequest.setFormat(
-                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().findFirst().get());
+                ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.iterator().next());
         downloadRequest.setFields("");
         FakeDownloadRequestValidator validator = new FakeDownloadRequestValidator();
         boolean result = validator.isValid(downloadRequest, null);
