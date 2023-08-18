@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.validation;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.lang.annotation.ElementType;
@@ -8,7 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
+import java.util.Set;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -19,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.springframework.http.MediaType;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -31,11 +31,11 @@ import org.uniprot.core.util.Utils;
 public @interface ValidDownloadRequest {
 
     /** formats where 'fields' param doesn't make sense and hence not allowed */
-    List<String> FORMATS_WITH_NO_PROJECTION =
-            List.of(
+    Set<String> FORMATS_WITH_NO_PROJECTION =
+            Set.of(
                     FF_MEDIA_TYPE_VALUE,
                     LIST_MEDIA_TYPE_VALUE,
-                    MediaType.APPLICATION_XML_VALUE,
+                    APPLICATION_XML_VALUE,
                     FASTA_MEDIA_TYPE_VALUE,
                     GFF_MEDIA_TYPE_VALUE,
                     RDF_MEDIA_TYPE_VALUE,
@@ -68,16 +68,11 @@ public @interface ValidDownloadRequest {
             try {
                 String fields = BeanUtils.getProperty(downloadRequest, "fields");
                 if (Utils.notNullNotEmpty(fields)) {
-                    ConstraintValidatorContextImpl contextImpl =
-                            (ConstraintValidatorContextImpl) context;
-
-                    String format = getPassedOrDefaultFormat(downloadRequest);
-
-                    String type = getMediaTypeFromShortName(format);
-
-                    if (FORMATS_WITH_NO_PROJECTION.contains(format)
-                            || FORMATS_WITH_NO_PROJECTION.contains(type)) {
-                        buildInvalidParamFieldsErrorMessage(format, contextImpl);
+                    if (isPassedWithInvalidFormat(downloadRequest)) {
+                        ConstraintValidatorContextImpl contextImpl =
+                                (ConstraintValidatorContextImpl) context;
+                        buildInvalidParamFieldsErrorMessage(
+                                getPassedFormat(downloadRequest), contextImpl);
                         isValid = false;
                     }
 
@@ -93,6 +88,14 @@ public @interface ValidDownloadRequest {
             return isValid;
         }
 
+        private boolean isPassedWithInvalidFormat(DownloadRequest downloadRequest)
+                throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+            String format = getPassedOrDefaultFormat(downloadRequest);
+            String type = getMediaTypeFromShortName(format);
+            return FORMATS_WITH_NO_PROJECTION.contains(format)
+                    || FORMATS_WITH_NO_PROJECTION.contains(type);
+        }
+
         private static String getMediaTypeFromShortName(String format) {
             String type;
             try {
@@ -105,11 +108,16 @@ public @interface ValidDownloadRequest {
 
         private String getPassedOrDefaultFormat(DownloadRequest downloadRequest)
                 throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-            String format = BeanUtils.getProperty(downloadRequest, "format");
+            String format = getPassedFormat(downloadRequest);
             if (Utils.nullOrEmpty(format)) {
                 format = APPLICATION_JSON_VALUE;
             }
             return format;
+        }
+
+        private String getPassedFormat(DownloadRequest downloadRequest)
+                throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+            return BeanUtils.getProperty(downloadRequest, "format");
         }
 
         void buildInvalidParamFieldsErrorMessage(
