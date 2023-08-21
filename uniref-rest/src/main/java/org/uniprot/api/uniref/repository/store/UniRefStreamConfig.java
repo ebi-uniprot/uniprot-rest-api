@@ -68,6 +68,28 @@ public class UniRefStreamConfig {
     }
 
     @Bean
+    public StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig(
+            UniRefLightStoreClient uniRefLightStoreClient,
+            TupleStreamTemplate tupleStreamTemplate,
+            StreamerConfigProperties streamConfig,
+            TupleStreamDocumentIdStream documentIdStream) {
+
+        RetryPolicy<Object> storeRetryPolicy =
+                new RetryPolicy<>()
+                        .handle(IOException.class)
+                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
+                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
+
+        return StoreStreamerConfig.<UniRefEntryLight>builder()
+                .streamConfig(streamConfig)
+                .storeClient(uniRefLightStoreClient)
+                .tupleStreamTemplate(tupleStreamTemplate)
+                .storeFetchRetryPolicy(storeRetryPolicy)
+                .documentIdStream(documentIdStream)
+                .build();
+    }
+
+    @Bean
     @ConfigurationProperties(prefix = "streamer.uniref")
     public StreamerConfigProperties resultsConfigProperties() {
         return new StreamerConfigProperties();
