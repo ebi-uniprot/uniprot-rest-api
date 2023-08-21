@@ -23,13 +23,13 @@ public class CrossRefITUtils {
         CrossRefEntry crossRefEntry =
                 entryBuilder
                         .id(accession)
-                        .abbrev("TIGRFAMs" + suffix)
-                        .name("TIGRFAMs; a protein family database" + suffix)
+                        .abbrev("NCBIfam" + suffix)
+                        .name("NCBIfam; a protein family database" + suffix)
                         .pubMedId("17151080" + suffix)
                         .doiId("10.1093/nar/gkl1043" + suffix)
                         .linkType("Explicit" + suffix)
-                        .server("http://tigrfams.jcvi.org/cgi-bin/index.cgi" + suffix)
-                        .dbUrl("http://tigrfams.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s" + suffix)
+                        .server("http://ncbifam.jcvi.org/cgi-bin/index.cgi" + suffix)
+                        .dbUrl("http://ncbifam.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s" + suffix)
                         .category("Family and domain databases" + suffix)
                         .statistics(statistics)
                         .build();
