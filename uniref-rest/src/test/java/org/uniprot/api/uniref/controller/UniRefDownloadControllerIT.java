@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.uniprot.api.uniref.controller.TestUtils.uncompressFile;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
+import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.repository.DataStoreTestConfig;
 import org.uniprot.store.search.SolrCollection;
 
@@ -48,19 +50,23 @@ import com.jayway.jsonpath.JsonPath;
 @WebMvcTest({UniRefDownloadController.class})
 @ContextConfiguration(
         classes = {
-            DataStoreTestConfig.class,
-            ErrorHandlerConfig.class,
-            AsyncDownloadTestConfig.class,
-            RedisConfiguration.class
+                DataStoreTestConfig.class,
+                UniRefRestApplication.class,
+                ErrorHandlerConfig.class,
+                AsyncDownloadTestConfig.class,
+                RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
-    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired
+    private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
 
-    @Autowired private DownloadJobRepository downloadJobRepository;
+    @Autowired
+    private DownloadJobRepository downloadJobRepository;
 
     @Override
     protected void verifyIdsAndResultFiles(String jobId) throws IOException {
@@ -74,12 +80,10 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
-        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
+        List<String> ids = JsonPath.read(resultsJson, "$.results.*.id");
         Assertions.assertTrue(
-                List.of(
-                                "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
-                                "P00007", "P00008", "P00009", "P00010", "P00013", "P00014")
-                        .containsAll(primaryAccessions));
+                List.of("UniRef100_P03901", "UniRef100_P03902", "UniRef100_P03903", "UniRef100_P03904", "UniRef50_P03901", "UniRef50_P03902", "UniRef50_P03903", "UniRef50_P03904", "UniRef90_P03901", "UniRef90_P03902", "UniRef90_P03903", "UniRef90_P03904")
+                        .containsAll(ids));
     }
 
     @Override
@@ -91,9 +95,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
         Assertions.assertNotNull(ids);
         Assertions.assertTrue(
                 ids.containsAll(
-                        List.of(
-                                "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
-                                "P00007", "P00008", "P00009", "P00010")));
+                        List.of("UniRef100_P03901", "UniRef100_P03902", "UniRef100_P03903", "UniRef100_P03904", "UniRef50_P03901", "UniRef50_P03902", "UniRef50_P03903", "UniRef50_P03904", "UniRef90_P03901", "UniRef90_P03902", "UniRef90_P03903", "UniRef90_P03904")));
     }
 
     @ParameterizedTest
@@ -120,7 +122,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
-        return List.of(SolrCollection.uniprot, SolrCollection.taxonomy);
+        return List.of(SolrCollection.uniref);
     }
 
     @Override

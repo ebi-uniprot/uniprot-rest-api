@@ -29,8 +29,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
- * @author sahmad
- * @created 21/11/2022
+ * @author tibrahim
+ * @created 14/08/2023
  */
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)

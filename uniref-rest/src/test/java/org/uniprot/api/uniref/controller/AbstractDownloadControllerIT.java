@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
@@ -59,7 +58,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     @Test
     void submitJobWithoutQueryFailure() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
-        ResultActions resultActions = callPostJobStatus(null, null, null, format.toString(), false);
+        ResultActions resultActions = callPostJobStatus(null, null, null, format.toString());
         resultActions
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -72,7 +71,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     void submitJobWithStarQuerySuccess() throws Exception {
         String query = "*:*";
         MediaType format = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
@@ -90,12 +89,12 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     void submitJobStarQueryMoreThanOnceShouldProcessOnlyOnceSuccess() throws Exception {
         String query = "*";
         MediaType format = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().atMost(20, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         Optional<DownloadJob> optJob1 = getDownloadJobRepository().findById(jobId);
-        String newJobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
+        String newJobId = callRunAPIAndVerify(query, null, null, format.toString());
         assertNotNull(newJobId);
         assertEquals(jobId, newJobId);
         Optional<DownloadJob> optJob2 = getDownloadJobRepository().findById(jobId);
@@ -107,9 +106,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     @Test
     void submitJobWithSort() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
-        String query = "content:*";
-        String sort = "accession desc";
-        String jobId = callRunAPIAndVerify(query, null, sort, format.toString(), false);
+        String query = "identity:*";
+        String sort = "id desc";
+        String jobId = callRunAPIAndVerify(query, null, sort, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         // then
@@ -120,10 +119,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         Assertions.assertNotNull(ids);
         MatcherAssert.assertThat(
                 ids,
-                contains(
-                        "P00014", "P00013", "P00010", "P00009", "P00008", "P00007", "P00006",
-                        "P00005", "P00004", "P00003", "P00002", "P00001"));
-        // verify result file
+                contains("UniRef90_P03904", "UniRef90_P03903", "UniRef90_P03902", "UniRef90_P03901", "UniRef50_P03904", "UniRef50_P03903", "UniRef50_P03902", "UniRef50_P03901", "UniRef100_P03904", "UniRef100_P03903", "UniRef100_P03902", "UniRef100_P03901"));
 
         Path resultFilePath =
                 Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
@@ -131,21 +127,19 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         String resultsJson = Files.readString(unzippedFile);
-        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
+        List<String> resultIds = JsonPath.read(resultsJson, "$.results.*.id");
         MatcherAssert.assertThat(
-                primaryAccessions,
-                contains(
-                        "P00014", "P00013", "P00010", "P00009", "P00008", "P00007", "P00006",
-                        "P00005", "P00004", "P00003", "P00002", "P00001"));
+                resultIds,
+                contains("UniRef90_P03904", "UniRef90_P03903", "UniRef90_P03902", "UniRef90_P03901", "UniRef50_P03904", "UniRef50_P03903", "UniRef50_P03902", "UniRef50_P03901", "UniRef100_P03904", "UniRef100_P03903", "UniRef100_P03902", "UniRef100_P03901"));
     }
 
     @ParameterizedTest(name = "[{index}] format {0}")
     @MethodSource("getSupportedFormats")
     void submitJobAllFormat(String format) throws Exception {
         // when
-        String query = "reviewed:true";
-        String fields = "accession,rhea";
-        String jobId = callRunAPIAndVerify(query, fields, null, format, false);
+        String query = "Human";
+        String fields = "id,name";
+        String jobId = callRunAPIAndVerify(query, fields, null, format);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().atMost(30, SECONDS).until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
@@ -155,9 +149,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     @Test
     void submitJobWithoutFormatDefaultsToJson() throws Exception {
         // when
-        String query = "content:*";
-        String fields = "accession";
-        String jobId = callRunAPIAndVerify(query, fields, null, null, false);
+        String query = "identity:*";
+        String fields = "id";
+        String jobId = callRunAPIAndVerify(query, fields, null, null);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
@@ -167,10 +161,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     @Test
     void submitJobUnsupportedFormatFailure() throws Exception {
         // when
-        MediaType format = UniProtMediaType.valueOf(XLS_MEDIA_TYPE_VALUE);
-        String query = "content:*";
-        String fields = "accession,rhea";
-        ResultActions response = callPostJobStatus(query, fields, null, format.toString(), false);
+        MediaType format = UniProtMediaType.valueOf(GFF_MEDIA_TYPE_VALUE);
+        String query = "identity:*";
+        String fields = "id,name";
+        ResultActions response = callPostJobStatus(query, fields, null, format.toString());
 
         // then
         response.andDo(log())
@@ -180,14 +174,14 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
                         jsonPath(
                                 "$.messages.*",
                                 Matchers.contains(
-                                        "Invalid format received, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'. Expected one of [text/plain;format=tsv, application/json, text/plain;format=flatfile, text/plain;format=list, application/xml, text/plain;format=fasta, text/plain;format=gff, application/rdf+xml, text/turtle, application/n-triples, application/x-hdf5].")));
+                                        "Invalid format received, 'text/plain;format=gff'. Expected one of [text/plain;format=fasta, text/plain;format=tsv, application/json, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/plain;format=list].")));
     }
 
     @Test
     void submitJobWithBadQuery() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "random:field";
-        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false);
+        ResultActions response = callPostJobStatus(query, null, null, format.toString());
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -199,10 +193,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     @Test
     void submitJobWithBadField() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
-        String query = "content:*";
+        String query = "identity:*";
         String fields = "something,else";
 
-        ResultActions response = callPostJobStatus(query, fields, null, format.toString(), false);
+        ResultActions response = callPostJobStatus(query, fields, null, format.toString());
 
         // then
         response.andDo(log())
@@ -219,10 +213,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     @Test
     void submitJobWithBadSort() throws Exception {
         MediaType format = MediaType.APPLICATION_JSON;
-        String query = "content:*";
+        String query = "identity:*";
         String sort = "something desc";
 
-        ResultActions response = callPostJobStatus(query, null, sort, format.toString(), false);
+        ResultActions response = callPostJobStatus(query, null, sort, format.toString());
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
@@ -363,9 +357,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
 
     @Test
     void runQueryWhichReturnsEmptyResult() throws Exception {
-        String query = "content:khansamatola";
+        String query = "identity:noid";
         MediaType format = MediaType.APPLICATION_JSON;
-        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString());
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
@@ -397,9 +391,9 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     @Test
     void runJobWithFieldsJsonAndVerify() throws Exception {
         // when
-        String query = "content:FGFR";
-        String fields = "accession,id,gene_names";
-        String jobId = callRunAPIAndVerify(query, fields, null, "json", false);
+        String query = "Human";
+        String fields = "id,name,organism";
+        String jobId = callRunAPIAndVerify(query, fields, null, "json");
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
@@ -412,24 +406,24 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
-        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
-        Assertions.assertEquals(12, primaryAccessions.size());
-        List<String> uniRefIds = JsonPath.read(resultsJson, "$.results.*.uniRefId");
+        List<String> ids = JsonPath.read(resultsJson, "$.results.*.id");
+        Assertions.assertEquals(12, ids.size());
+        List<String> uniRefIds = JsonPath.read(resultsJson, "$.results.*.name");
         Assertions.assertEquals(12, uniRefIds.size());
-        List<String> genes = JsonPath.read(resultsJson, "$.results.*.genes");
-        Assertions.assertEquals(12, genes.size());
-        List<String> comments = JsonPath.read(resultsJson, "$.results.*.comments");
-        Assertions.assertEquals(0, comments.size());
-        List<String> organisms = JsonPath.read(resultsJson, "$.results.*.organism");
-        Assertions.assertEquals(0, organisms.size());
+        List<String> representativeMember = JsonPath.read(resultsJson, "$.results.*.representativeMember");
+        Assertions.assertEquals(12, representativeMember.size());
+        List<String> members = JsonPath.read(resultsJson, "$.results.*.members");
+        Assertions.assertEquals(12, members.size());
+        List<String> organisms = JsonPath.read(resultsJson, "$.results.*.organisms");
+        Assertions.assertEquals(12, organisms.size());
     }
 
     @Test
     void runJobWithFieldsTSVAndVerify() throws Exception {
         // when
-        String query = "content:FGFR";
-        String fields = "accession,id,gene_names";
-        String jobId = callRunAPIAndVerify(query, fields, null, "tsv", false);
+        String query = "Human";
+        String fields = "id,name,organism";
+        String jobId = callRunAPIAndVerify(query, fields, null, "tsv");
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
@@ -444,57 +438,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         String tsvString = Files.readString(unzippedFile);
         String[] rows = tsvString.split("\n");
         Assertions.assertEquals(13, rows.length);
-        Assertions.assertEquals("Entry\tEntry Name\tGene Names", rows[0]);
-    }
-
-    @Test
-    void submitJobWithTaxonomyReturnField() throws Exception {
-        // when
-        String query = "content:*";
-        String fields = "accession,lineage";
-        String jobId = callRunAPIAndVerify(query, fields, null, null, false);
-        // then
-        await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
-        getAndVerifyDetails(jobId);
-        // verify result file
-        Path resultFilePath =
-                Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
-        Assertions.assertTrue(Files.exists(resultFilePath));
-        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
-        uncompressFile(resultFilePath, unzippedFile);
-        Assertions.assertTrue(Files.exists(unzippedFile));
-        String resultsJson = Files.readString(unzippedFile);
-        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
-        Assertions.assertEquals(12, primaryAccessions.size());
-        List<String> lineages = JsonPath.read(resultsJson, "$.results.*.lineages");
-        Assertions.assertFalse(lineages.isEmpty());
-        Assertions.assertEquals(12, lineages.size());
-    }
-
-    @Test
-    void submitJobWithIncludeIsoformFlag() throws Exception {
-        // when
-        String query = "content:*";
-        String fields = "accession";
-        String jobId = callRunAPIAndVerify(query, fields, null, null, true);
-        // then
-        await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
-        getAndVerifyDetails(jobId);
-        // verify result file
-        Path resultFilePath =
-                Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
-        Assertions.assertTrue(Files.exists(resultFilePath));
-        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
-        uncompressFile(resultFilePath, unzippedFile);
-        Assertions.assertTrue(Files.exists(unzippedFile));
-        String resultsJson = Files.readString(unzippedFile);
-        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
-        Assertions.assertEquals(14, primaryAccessions.size());
-        Assertions.assertTrue(primaryAccessions.contains("P00001"));
-        Assertions.assertTrue(primaryAccessions.contains("P00011-2"));
-        Assertions.assertTrue(primaryAccessions.contains("P00012-2"));
+        Assertions.assertEquals("Cluster ID\tCluster Name\tOrganisms", rows[0]);
     }
 
     protected JobStatus getJobStatus(String jobId) throws Exception {
@@ -522,10 +466,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     }
 
     protected String callRunAPIAndVerify(
-            String query, String fields, String sort, String format, boolean includeIsoform)
+            String query, String fields, String sort, String format)
             throws Exception {
 
-        ResultActions response = callPostJobStatus(query, fields, sort, format, includeIsoform);
+        ResultActions response = callPostJobStatus(query, fields, sort, format);
 
         // then
         response.andDo(log())
@@ -539,7 +483,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     }
 
     private ResultActions callPostJobStatus(
-            String query, String fields, String sort, String format, boolean includeIsoform)
+            String query, String fields, String sort, String format)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
@@ -547,8 +491,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
                         .param("query", query)
                         .param("fields", fields)
                         .param("sort", sort)
-                        .param("format", Objects.isNull(format) ? null : format)
-                        .param("includeIsoform", String.valueOf(includeIsoform));
+                        .param("format", Objects.isNull(format) ? null : format);
         ResultActions response = this.mockMvc.perform(requestBuilder);
         return response;
     }
@@ -582,18 +525,12 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
 
     private Stream<Arguments> getSupportedFormats() {
         return List.of(
-                        "xml",
                         "json",
-                        TSV_MEDIA_TYPE_VALUE,
-                        FF_MEDIA_TYPE_VALUE,
-                        LIST_MEDIA_TYPE_VALUE,
-                        APPLICATION_XML_VALUE,
-                        APPLICATION_JSON_VALUE,
                         FASTA_MEDIA_TYPE_VALUE,
-                        GFF_MEDIA_TYPE_VALUE,
-                        RDF_MEDIA_TYPE_VALUE,
-                        TURTLE_MEDIA_TYPE_VALUE,
-                        N_TRIPLES_MEDIA_TYPE_VALUE)
+                        TSV_MEDIA_TYPE_VALUE,
+                        APPLICATION_JSON_VALUE,
+                        XLS_MEDIA_TYPE_VALUE,
+                        LIST_MEDIA_TYPE_VALUE)
                 .stream()
                 .map(Arguments::of);
     }

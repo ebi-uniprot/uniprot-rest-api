@@ -14,16 +14,6 @@ import org.uniprot.core.flatfile.parser.impl.entry.EntryObjectConverter;
 
 /** Contains utility methods that aid in testing */
 public final class TestUtils {
-    private static final SupportingDataMap dataMap =
-            new SupportingDataMapImpl("keywlist.txt", "humdisease.txt", null, null);
-    private static final EntryObjectConverter entryObjectConverter =
-            new EntryObjectConverter(dataMap, true);
-
-    private TestUtils() {}
-
-    static InputStream getResourceAsStream(String resourcePath) {
-        return TestUtils.class.getResourceAsStream(resourcePath);
-    }
 
     public static void uncompressFile(Path zippedFile, Path unzippedFile) throws IOException {
         InputStream fin = Files.newInputStream(zippedFile);

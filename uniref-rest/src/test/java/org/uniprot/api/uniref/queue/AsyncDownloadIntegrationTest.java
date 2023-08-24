@@ -4,7 +4,7 @@ import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.b
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
 import static org.uniprot.api.uniref.controller.TestUtils.uncompressFile;
 
 import java.io.IOException;
@@ -44,6 +44,7 @@ import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
@@ -62,108 +63,81 @@ import com.jayway.jsonpath.JsonPath;
 @ActiveProfiles(profiles = {"offline", "asyncDownload", "integration"})
 @EnableConfigurationProperties
 @PropertySource("classpath:application.properties")
-@ContextConfiguration(
-        classes = {
-            DataStoreTestConfig.class,
-            UniRefRestApplication.class,
-            UniRefStoreConfig.class,
-            AsyncDownloadTestConfig.class,
-            RedisConfiguration.class
-        })
+@ContextConfiguration(classes = {DataStoreTestConfig.class, UniRefRestApplication.class, UniRefStoreConfig.class, AsyncDownloadTestConfig.class, RedisConfiguration.class})
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest({UniRefDownloadController.class})
 @AutoConfigureWebClient
 public class AsyncDownloadIntegrationTest extends AbstractUniRefDownloadIT {
-    @Autowired private TupleStreamTemplate tupleStreamTemplate;
-    @Autowired private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
+    @Autowired
+    private FacetTupleStreamTemplate facetTupleStreamTemplate;
+    @Autowired
+    private HashGenerator<DownloadRequest> hashGenerator;
 
     @SpyBean
-    private DownloadJobRepository
-            downloadJobRepository; // RedisRepository with inMemory redis server
-    // TODO: uncomment when listener is ready
-    //    @SpyBean private UniProtKBMessageListener uniProtKBMessageListener;
-    @SpyBean private ProducerMessageService messageService;
-
-    @SpyBean private MessageConverter messageConverter;
-
-    @Autowired private HashGenerator<DownloadRequest> hashGenerator;
+    private DownloadJobRepository downloadJobRepository;
+    @SpyBean
+    private UniRefMessageListener uniRefMessageListener;
+    @SpyBean
+    private ProducerMessageService messageService;
+    @SpyBean
+    private MessageConverter messageConverter;
 
     @Value("${async.download.retryMaxCount}")
     private int maxRetry;
 
     @Test
     void sendAndProcessDownloadMessageSuccessfully() throws IOException {
-        String query = "content:P";
+        String query = "identity:*";
         MediaType format = MediaType.APPLICATION_JSON;
         UniRefDownloadRequest request = createDownloadRequest(query, format);
         String jobId = this.messageService.sendMessage(request);
-        // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
-        // redis entry created
         await().until(jobCreatedInRedis(jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(jobId));
-        //        verifyMessageListener(1, 0, 1);
+        verifyMessageListener(1, 0, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false);
         verifyIdsAndResultFiles(jobId);
     }
 
     @Test
     void sendAndProcessMessageSuccessfullyAfterRetry() throws IOException {
-        doThrow(new RuntimeException("Forced exception for testing on call converter.fromMessage"))
-                .doCallRealMethod()
-                .when(this.messageConverter)
-                .fromMessage(any());
-        String query = "reviewed:true";
+        doThrow(new RuntimeException("Forced exception for testing on call converter.fromMessage")).doCallRealMethod().when(this.messageConverter).fromMessage(any());
+        String query = "identity:*";
         MediaType format = MediaType.APPLICATION_JSON;
         UniRefDownloadRequest request = createDownloadRequest(query, format);
         String jobId = this.messageService.sendMessage(request);
-        // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(jobId));
-        // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
-        // after certain delay the job should be reprocessed
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(jobId));
-        // TODO: uncomment when listener is ready
-        //        verifyMessageListener(2, 1, 1);
+        verifyMessageListener(2, 1, 1);
         verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true);
         verifyIdsAndResultFiles(jobId);
     }
 
     @ParameterizedTest(name = "[{index}] type {0}")
     @MethodSource("getSupportedTypes")
-    void sendAndProcessMessageFailAfterMaximumRetry(MediaType format, Integer rejectedMsgCount)
-            throws IOException {
-        String query = "accession:P12345";
+    void sendAndProcessMessageFailAfterMaximumRetry(MediaType format, Integer rejectedMsgCount) throws IOException {
+        String query = "id:UniRef100_UPI00001109EE";
         UniRefDownloadRequest request = createDownloadRequest(query, format);
-        // TODO: uncomment when listener is ready
-        //        when(this.uniProtKBMessageListener.streamIds(request))
-        //                .thenThrow(
-        //                        new MessageListenerException(
-        //                                "Forced exception in streamIds to test max retry"));
-        // send request to queue
+        when(this.uniRefMessageListener.streamIds(request)).thenThrow(new MessageListenerException("Forced exception in streamIds to test max retry"));
         String jobId = this.messageService.sendMessage(request);
-        // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(jobId));
         await().until(jobRetriedMaximumTimes(jobId));
-        // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
-        // after certain delay the job should be reprocessed
-        await().until(
-                        getMessageCountInQueue(this.rejectedQueue),
-                        Matchers.greaterThanOrEqualTo(rejectedMsgCount));
+        await().until(getMessageCountInQueue(this.rejectedQueue), Matchers.greaterThanOrEqualTo(rejectedMsgCount));
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
 
     @Test
-    void sendAndProcessMessageWithUnhandledExceptionShouldBeDiscarded()
-            throws InterruptedException, IOException {
-        // when
+    void sendAndProcessMessageWithUnhandledExceptionShouldBeDiscarded() throws IOException {
         MediaType format = MediaType.APPLICATION_JSON;
         String query = "field:value";
         UniRefDownloadRequest request = new UniRefDownloadRequest();
@@ -171,21 +145,16 @@ public class AsyncDownloadIntegrationTest extends AbstractUniRefDownloadIT {
         request.setLargeSolrStreamRestricted(false);
         request.setFormat(format.toString());
         String jobId = this.hashGenerator.generateHash(request);
-        IllegalArgumentException ile =
-                new IllegalArgumentException(
-                        "Forced exception in streamIds to test max retry with unhandled exception");
-        // TODO: uncomment when listener is ready
-        //        when(this.uniProtKBMessageListener.streamIds(request)).thenThrow(ile);
-        //        doThrow(new MessageListenerException("Forcing to throw unexpected exception"))
-        //                .when(this.uniProtKBMessageListener)
-        //                .dummyMethodForTesting(jobId, JobStatus.ERROR);
+        IllegalArgumentException ile = new IllegalArgumentException("Forced exception in streamIds to test max retry with unhandled exception");
+        when(this.uniRefMessageListener.streamIds(request)).thenThrow(ile);
+        doThrow(new MessageListenerException("Forcing to throw unexpected exception")).when(this.uniRefMessageListener).dummyMethodForTesting(jobId, JobStatus.ERROR);
         this.messageService.sendMessage(request);
         verify(this.messageService, never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(jobId));
         await().until(getJobRetriedCount(jobId), Matchers.equalTo(2));
         await().until(getMessageCountInQueue(this.rejectedQueue), equalTo(1));
-        //        verify(this.uniProtKBMessageListener, atLeast(3)).onMessage(any());
+        verify(this.uniRefMessageListener, atLeast(3)).onMessage(any());
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
@@ -198,15 +167,12 @@ public class AsyncDownloadIntegrationTest extends AbstractUniRefDownloadIT {
         return request;
     }
 
-    private void verifyRedisEntry(
-            String query, String jobId, List<JobStatus> statuses, int retryCount, boolean isError) {
+    private void verifyRedisEntry(String query, String jobId, List<JobStatus> statuses, int retryCount, boolean isError) {
         Optional<DownloadJob> optDownloadJob = this.downloadJobRepository.findById(jobId);
         assertTrue(optDownloadJob.isPresent());
         assertEquals(jobId, optDownloadJob.get().getId());
         assertEquals(query, optDownloadJob.get().getQuery());
-        assertAll(
-                () -> assertNull(optDownloadJob.get().getSort()),
-                () -> assertNull(optDownloadJob.get().getFields()));
+        assertAll(() -> assertNull(optDownloadJob.get().getSort()), () -> assertNull(optDownloadJob.get().getFields()));
         assertEquals(retryCount, optDownloadJob.get().getRetried());
         assertTrue(statuses.contains(optDownloadJob.get().getStatus()));
         assertEquals(isError, Objects.nonNull(optDownloadJob.get().getError()));
@@ -216,51 +182,33 @@ public class AsyncDownloadIntegrationTest extends AbstractUniRefDownloadIT {
         } else {
             assertNull(optDownloadJob.get().getResultFile());
         }
-        assertAll(
-                () -> assertNotNull(optDownloadJob.get().getCreated()),
-                () -> assertNotNull(optDownloadJob.get().getUpdated()));
+        assertAll(() -> assertNotNull(optDownloadJob.get().getCreated()), () -> assertNotNull(optDownloadJob.get().getUpdated()));
     }
 
-    //    private void verifyMessageListener(int timesOnMessage, int timesAddHeader, int
-    // timesStreamIds) {
-    //        //        await().atMost(20, SECONDS).until(getMessageCountInQueue(downloadQueue),
-    //        // equalTo(0));
-    //        verify(this.uniProtKBMessageListener, atLeast(timesOnMessage)).onMessage(any());
-    //        verify(this.uniProtKBMessageListener, atLeast(timesAddHeader))
-    //                .addAdditionalHeaders(any(), any());
-    //        verify(this.uniProtKBMessageListener, atLeast(timesStreamIds)).streamIds(any());
-    //    }
+    private void verifyMessageListener(int timesOnMessage, int timesAddHeader, int timesStreamIds) {
+        verify(this.uniRefMessageListener, atLeast(timesOnMessage)).onMessage(any());
+        verify(this.uniRefMessageListener, atLeast(timesAddHeader)).addAdditionalHeaders(any(), any());
+        verify(this.uniRefMessageListener, atLeast(timesStreamIds)).streamIds(any());
+    }
 
     private Callable<Boolean> jobCreatedInRedis(String jobId) {
         return () -> this.downloadJobRepository.existsById(jobId);
     }
 
     private Callable<Boolean> jobFinished(String jobId) {
-        return () ->
-                this.downloadJobRepository.existsById(jobId)
-                        && this.downloadJobRepository.findById(jobId).get().getStatus()
-                                == JobStatus.FINISHED;
+        return () -> this.downloadJobRepository.existsById(jobId) && this.downloadJobRepository.findById(jobId).get().getStatus() == JobStatus.FINISHED;
     }
 
     private Callable<Boolean> jobErrored(String jobId) {
-        return () ->
-                this.downloadJobRepository.existsById(jobId)
-                        && this.downloadJobRepository.findById(jobId).get().getStatus()
-                                == JobStatus.ERROR;
+        return () -> this.downloadJobRepository.existsById(jobId) && this.downloadJobRepository.findById(jobId).get().getStatus() == JobStatus.ERROR;
     }
 
     private Callable<Boolean> jobUnfinished(String jobId) {
-        return () ->
-                this.downloadJobRepository.existsById(jobId)
-                        && this.downloadJobRepository.findById(jobId).get().getStatus()
-                                == JobStatus.UNFINISHED;
+        return () -> this.downloadJobRepository.existsById(jobId) && this.downloadJobRepository.findById(jobId).get().getStatus() == JobStatus.UNFINISHED;
     }
 
     private Callable<Boolean> jobRunning(String jobId) {
-        return () ->
-                this.downloadJobRepository.existsById(jobId)
-                        && this.downloadJobRepository.findById(jobId).get().getStatus()
-                                == JobStatus.RUNNING;
+        return () -> this.downloadJobRepository.existsById(jobId) && this.downloadJobRepository.findById(jobId).get().getStatus() == JobStatus.RUNNING;
     }
 
     private Callable<Boolean> jobRetriedMaximumTimes(String jobId) {
@@ -300,8 +248,8 @@ public class AsyncDownloadIntegrationTest extends AbstractUniRefDownloadIT {
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
         Assertions.assertNotNull(resultsJson);
-        List<String> primaryAccessions = JsonPath.read(resultsJson, "$.results.*.primaryAccession");
-        Assertions.assertNotNull(primaryAccessions);
+        List<String> ids = JsonPath.read(resultsJson, "$.results.*.id");
+        Assertions.assertNotNull(ids);
     }
 
     private void verifyIdsFile(String jobId) throws IOException {
@@ -322,7 +270,7 @@ public class AsyncDownloadIntegrationTest extends AbstractUniRefDownloadIT {
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
-        return List.of(SolrCollection.uniprot, SolrCollection.taxonomy);
+        return List.of(SolrCollection.uniref);
     }
 
     @Override
@@ -341,7 +289,6 @@ public class AsyncDownloadIntegrationTest extends AbstractUniRefDownloadIT {
     }
 
     private Stream<Arguments> getSupportedTypes() {
-        return Stream.of(
-                Arguments.of(MediaType.APPLICATION_JSON, 1), Arguments.of(HDF5_MEDIA_TYPE, 2));
+        return Stream.of(Arguments.of(MediaType.APPLICATION_JSON, 1), Arguments.of(FASTA_MEDIA_TYPE, 2));
     }
 }

@@ -95,14 +95,12 @@ public abstract class AbstractUniRefDownloadIT extends AbstractStreamControllerI
 
     @Autowired private SolrClient solrClient;
 
-    @Autowired private TaxonomyLineageRepository taxRepository;
-
     @Autowired protected AmqpAdmin amqpAdmin;
 
     @Autowired
     private UniProtStoreClient<UniRefEntryLight> storeClient; // in memory voldemort store client
 
-    @MockBean(name = "uniProtRdfRestTemplate")
+    @MockBean(name = "unirefRdfRestTemplate")
     private RestTemplate restTemplate;
 
     @BeforeAll
@@ -110,19 +108,12 @@ public abstract class AbstractUniRefDownloadIT extends AbstractStreamControllerI
         ReflectionTestUtils.setField(unirefQueryRepository, "solrClient", cloudSolrClient);
         prepareDownloadFolders();
         saveEntries();
-
-        // for the following tests, ensure the number of hits
-        // for each query is less than the maximum number allowed
-        // to be streamed (configured in {@link
-        // org.uniprot.api.common.repository.store.StreamerConfigProperties})
         long queryHits = 100L;
         QueryResponse response = mock(QueryResponse.class);
         SolrDocumentList results = mock(SolrDocumentList.class);
         when(results.getNumFound()).thenReturn(queryHits);
         when(response.getResults()).thenReturn(results);
         when(solrClient.query(anyString(), any())).thenReturn(response);
-
-        ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
     }
 
     @BeforeEach
@@ -180,27 +171,5 @@ public abstract class AbstractUniRefDownloadIT extends AbstractStreamControllerI
         UniRefDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
         storeClient.saveEntry(entryLight);
-    }
-
-    private void saveTaxonomyEntry(long taxId) throws Exception {
-        TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
-        TaxonomyEntry taxonomyEntry =
-                entryBuilder
-                        .taxonId(taxId)
-                        .rank(TaxonomyRank.SPECIES)
-                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 1).build())
-                        .lineagesAdd(new TaxonomyLineageBuilder().taxonId(taxId + 2).build())
-                        .build();
-        byte[] taxonomyObj =
-                TaxonomyJsonConfig.getInstance()
-                        .getFullObjectMapper()
-                        .writeValueAsBytes(taxonomyEntry);
-
-        TaxonomyDocument.TaxonomyDocumentBuilder docBuilder =
-                TaxonomyDocument.builder()
-                        .taxId(taxId)
-                        .id(String.valueOf(taxId))
-                        .taxonomyObj(taxonomyObj);
-        cloudSolrClient.addBean(SolrCollection.taxonomy.name(), docBuilder.build());
     }
 }

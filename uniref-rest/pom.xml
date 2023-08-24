@@ -16,6 +16,7 @@
 	<properties>
 		<awaitility.version>4.2.0</awaitility.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
+		<dev.jna.version>5.8.0</dev.jna.version>
 	</properties>
 
 	<dependencies>
@@ -122,6 +123,12 @@
 			<groupId>org.testcontainers</groupId>
 			<artifactId>rabbitmq</artifactId>
 			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>${dev.jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

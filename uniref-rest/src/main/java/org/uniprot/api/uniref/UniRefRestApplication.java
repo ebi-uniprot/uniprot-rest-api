@@ -17,7 +17,7 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
             "org.uniprot.api.rest",
             "org.uniprot.api.common.repository.stream.rdf",
             "org.uniprot.api.common.repository.stream.store.uniprotkb",
-            "org.uniprot.api.common.repository.stream.store.uniref"
+            "org.uniprot.api.common.repository.stream.store.uniref",
         })
 public class UniRefRestApplication {
     public static void main(String[] args) {

@@ -30,8 +30,8 @@ import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
 
 /**
- * @author sahmad
- * @created 22/11/2022
+ * @author tibrahim
+ * @created 16/08/2023
  */
 @Profile({"live", "asyncDownload"})
 @Service("DownloadListener")
