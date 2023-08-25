@@ -8,9 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.uniprot.core.flatfile.parser.SupportingDataMap;
-import org.uniprot.core.flatfile.parser.impl.SupportingDataMapImpl;
-import org.uniprot.core.flatfile.parser.impl.entry.EntryObjectConverter;
 
 /** Contains utility methods that aid in testing */
 public final class TestUtils {

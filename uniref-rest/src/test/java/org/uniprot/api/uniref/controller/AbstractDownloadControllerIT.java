@@ -119,7 +119,19 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         Assertions.assertNotNull(ids);
         MatcherAssert.assertThat(
                 ids,
-                contains("UniRef90_P03904", "UniRef90_P03903", "UniRef90_P03902", "UniRef90_P03901", "UniRef50_P03904", "UniRef50_P03903", "UniRef50_P03902", "UniRef50_P03901", "UniRef100_P03904", "UniRef100_P03903", "UniRef100_P03902", "UniRef100_P03901"));
+                contains(
+                        "UniRef90_P03904",
+                        "UniRef90_P03903",
+                        "UniRef90_P03902",
+                        "UniRef90_P03901",
+                        "UniRef50_P03904",
+                        "UniRef50_P03903",
+                        "UniRef50_P03902",
+                        "UniRef50_P03901",
+                        "UniRef100_P03904",
+                        "UniRef100_P03903",
+                        "UniRef100_P03902",
+                        "UniRef100_P03901"));
 
         Path resultFilePath =
                 Path.of(this.resultFolder + "/" + jobId + FileType.GZIP.getExtension());
@@ -130,7 +142,19 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         List<String> resultIds = JsonPath.read(resultsJson, "$.results.*.id");
         MatcherAssert.assertThat(
                 resultIds,
-                contains("UniRef90_P03904", "UniRef90_P03903", "UniRef90_P03902", "UniRef90_P03901", "UniRef50_P03904", "UniRef50_P03903", "UniRef50_P03902", "UniRef50_P03901", "UniRef100_P03904", "UniRef100_P03903", "UniRef100_P03902", "UniRef100_P03901"));
+                contains(
+                        "UniRef90_P03904",
+                        "UniRef90_P03903",
+                        "UniRef90_P03902",
+                        "UniRef90_P03901",
+                        "UniRef50_P03904",
+                        "UniRef50_P03903",
+                        "UniRef50_P03902",
+                        "UniRef50_P03901",
+                        "UniRef100_P03904",
+                        "UniRef100_P03903",
+                        "UniRef100_P03902",
+                        "UniRef100_P03901"));
     }
 
     @ParameterizedTest(name = "[{index}] format {0}")
@@ -410,7 +434,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         Assertions.assertEquals(12, ids.size());
         List<String> uniRefIds = JsonPath.read(resultsJson, "$.results.*.name");
         Assertions.assertEquals(12, uniRefIds.size());
-        List<String> representativeMember = JsonPath.read(resultsJson, "$.results.*.representativeMember");
+        List<String> representativeMember =
+                JsonPath.read(resultsJson, "$.results.*.representativeMember");
         Assertions.assertEquals(12, representativeMember.size());
         List<String> members = JsonPath.read(resultsJson, "$.results.*.members");
         Assertions.assertEquals(12, members.size());
@@ -465,8 +490,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         return this.mockMvc.perform(requestBuilder);
     }
 
-    protected String callRunAPIAndVerify(
-            String query, String fields, String sort, String format)
+    protected String callRunAPIAndVerify(String query, String fields, String sort, String format)
             throws Exception {
 
         ResultActions response = callPostJobStatus(query, fields, sort, format);
@@ -482,8 +506,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
         return jobId;
     }
 
-    private ResultActions callPostJobStatus(
-            String query, String fields, String sort, String format)
+    private ResultActions callPostJobStatus(String query, String fields, String sort, String format)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")

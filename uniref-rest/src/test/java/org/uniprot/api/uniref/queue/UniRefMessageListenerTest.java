@@ -1,5 +1,15 @@
 package org.uniprot.api.uniref.queue;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,16 +32,6 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 @ExtendWith({MockitoExtension.class})
 public class UniRefMessageListenerTest {
     @Mock private MessageConverter converter;
@@ -46,8 +46,7 @@ public class UniRefMessageListenerTest {
 
     @InjectMocks private UniRefMessageListener uniRefMessageListener;
 
-    @Mock
-    RabbitTemplate rabbitTemplate;
+    @Mock RabbitTemplate rabbitTemplate;
 
     @Test
     void testOnMessage() throws IOException {
@@ -135,8 +134,7 @@ public class UniRefMessageListenerTest {
                 MessageBuilder.withBody("test".getBytes()).setHeader("jobId", "12345").build();
         MessageListenerException mle =
                 new MessageListenerException("This is a test exception messsage");
-        Message messageWithHeaders =
-                this.uniRefMessageListener.addAdditionalHeaders(message, mle);
+        Message messageWithHeaders = this.uniRefMessageListener.addAdditionalHeaders(message, mle);
         Assertions.assertNotNull(messageWithHeaders);
         Assertions.assertEquals(message.getBody(), messageWithHeaders.getBody());
         Assertions.assertEquals(1, message.getMessageProperties().getHeaders().size());
@@ -152,6 +150,8 @@ public class UniRefMessageListenerTest {
                                 .getMessageProperties()
                                 .getHeader(AbstractMessageListener.CURRENT_RETRIED_COUNT_HEADER));
         Assertions.assertNotNull(
-                messageWithHeaders.getMessageProperties().getHeader(AbstractMessageListener.CURRENT_RETRIED_ERROR_HEADER));
+                messageWithHeaders
+                        .getMessageProperties()
+                        .getHeader(AbstractMessageListener.CURRENT_RETRIED_ERROR_HEADER));
     }
 }

@@ -1,7 +1,6 @@
 package org.uniprot.api.uniref.request;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import lombok.Data;
@@ -17,11 +16,11 @@ public class UniRefDownloadRequest extends UniRefStreamRequest implements Downlo
 
     @ValidAsyncDownloadFormats(
             formats = {
-                    FASTA_MEDIA_TYPE_VALUE,
-                    TSV_MEDIA_TYPE_VALUE,
-                    APPLICATION_JSON_VALUE,
-                    XLS_MEDIA_TYPE_VALUE,
-                    LIST_MEDIA_TYPE_VALUE
+                FASTA_MEDIA_TYPE_VALUE,
+                TSV_MEDIA_TYPE_VALUE,
+                APPLICATION_JSON_VALUE,
+                XLS_MEDIA_TYPE_VALUE,
+                LIST_MEDIA_TYPE_VALUE
             })
     private String format;
 
