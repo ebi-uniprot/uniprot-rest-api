@@ -126,6 +126,7 @@ k8s:deploy:
     CI_PIPELINE_TASKS: 'docker-deploy'
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
+    RELEASE_NAME: '2023_04'
   when: on_success
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
