@@ -31,7 +31,7 @@ stages:
   - test
   - quality
   - deploy
-  - docker
+  - docker-build
   - docker-deploy
 
 api:settings:
@@ -99,7 +99,7 @@ api:deploy:
     - if: '$CI_COMMIT_REF_NAME == "master"'
 
 k8s:downstream:
-  stage: docker
+  stage: docker-build
   needs:
     - job: api:deploy
       artifacts: true
@@ -129,5 +129,7 @@ k8s:deploy:
     ARTIFACT: 'all-rest'
     RELEASE_NAME: '2023_04'
   when: on_success
+  dependencies:
+    - k8s:downstream
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
