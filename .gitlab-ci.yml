@@ -119,6 +119,8 @@ k8s:docker-deploy:
   needs:
     - job: k8s:docker-build
       artifacts: true
+    - job: api:deploy
+      artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: master
