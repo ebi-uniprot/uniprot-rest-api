@@ -101,7 +101,7 @@ mvn:deploy:
 k8s:docker-build:
   stage: docker-build
   needs:
-    - job: api:deploy
+    - job: mvn:deploy
       artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
@@ -119,7 +119,7 @@ k8s:helm-install:
   needs:
     - job: k8s:docker-build
       artifacts: true
-    - job: api:deploy
+    - job: mvn:deploy
       artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
