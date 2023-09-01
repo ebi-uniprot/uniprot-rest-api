@@ -98,7 +98,7 @@ api:deploy:
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
 
-k8s:downstream:
+k8s:docker-build:
   stage: docker-build
   needs:
     - job: api:deploy
@@ -114,12 +114,10 @@ k8s:downstream:
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
 
-k8s:deploy:
+k8s:docker-deploy:
   stage: docker-deploy
   needs:
-    - job: api:deploy
-      artifacts: true
-    - job: k8s:downstream
+    - job: k8s:docker-build
       artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
