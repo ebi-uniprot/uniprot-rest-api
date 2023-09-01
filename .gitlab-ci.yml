@@ -30,7 +30,7 @@ stages:
   - setup
   - test
   - quality
-  - deploy
+  - mvn-deploy
   - docker-build
   - docker-deploy
 
@@ -86,7 +86,7 @@ api:sonar:
       allow_failure: true
 
 api:deploy:
-  stage: deploy
+  stage: mvn-deploy
   script:
   - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
   - echo "UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)" >> variables.env
