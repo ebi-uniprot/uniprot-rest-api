@@ -32,7 +32,7 @@ stages:
   - quality
   - mvn-deploy
   - docker-build
-  - docker-deploy
+  - helm-install
 
 api:settings:
   stage: setup
@@ -85,7 +85,7 @@ api:sonar:
     - when: manual
       allow_failure: true
 
-api:deploy:
+mvn:deploy:
   stage: mvn-deploy
   script:
   - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
@@ -114,8 +114,8 @@ k8s:docker-build:
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
 
-k8s:docker-deploy:
-  stage: docker-deploy
+k8s:helm-install:
+  stage: helm-install
   needs:
     - job: k8s:docker-build
       artifacts: true
@@ -125,7 +125,7 @@ k8s:docker-deploy:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: master
   variables:
-    CI_PIPELINE_TASKS: 'docker-deploy'
+    CI_PIPELINE_TASKS: 'helm-install-rest'
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
     ARTIFACT: 'all-rest'

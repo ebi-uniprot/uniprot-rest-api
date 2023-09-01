@@ -575,7 +575,6 @@ public abstract class AbstractSearchControllerIT {
 
         for (String path : paths) {
             String returnFieldValidatePath = "$.results[*]." + path;
-            log.info("ReturnField:" + name + " Validation Path: " + returnFieldValidatePath);
             resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }
     }
