@@ -20,7 +20,10 @@ public class UniRefDownloadRequest extends UniRefStreamRequest implements Downlo
                 TSV_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE
+                LIST_MEDIA_TYPE_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     private String format;
 

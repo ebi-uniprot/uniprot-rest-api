@@ -10,6 +10,7 @@ import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
+import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 
 public abstract class BasicDownloadController {
@@ -64,5 +65,29 @@ public abstract class BasicDownloadController {
         return index == -1
                 ? url.substring(0, url.indexOf("details")).replaceFirst("http://", "https://")
                 : url.substring(0, index).replaceFirst("http://", "https://");
+    }
+
+    protected ResponseEntity<DownloadJobDetailResponse> getDownloadJobDetails(
+            String requestURL, DownloadJob job) {
+        DownloadJobDetailResponse detailResponse = new DownloadJobDetailResponse();
+        detailResponse.setQuery(job.getQuery());
+        detailResponse.setFields(job.getFields());
+        detailResponse.setSort(job.getSort());
+        detailResponse.setFormat(job.getFormat());
+        if (JobStatus.FINISHED == job.getStatus()) {
+            detailResponse.setRedirectURL(
+                    constructDownloadRedirectUrl(job.getResultFile(), requestURL));
+        } else if (JobStatus.ERROR == job.getStatus()) {
+            ProblemPair error =
+                    new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), job.getError());
+            detailResponse.setErrors(List.of(error));
+        } else if (JobStatus.ABORTED == job.getStatus()) {
+            ProblemPair error =
+                    new ProblemPair(
+                            PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode(), job.getError());
+            detailResponse.setErrors(List.of(error));
+        }
+
+        return ResponseEntity.ok(detailResponse);
     }
 }

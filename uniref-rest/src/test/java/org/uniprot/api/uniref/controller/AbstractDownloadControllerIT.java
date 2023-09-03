@@ -10,8 +10,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.uniref.controller.TestUtils.uncompressFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -185,7 +185,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
     @Test
     void submitJobUnsupportedFormatFailure() throws Exception {
         // when
-        MediaType format = UniProtMediaType.valueOf(GFF_MEDIA_TYPE_VALUE);
+        MediaType format = UniProtMediaType.valueOf(OBO_MEDIA_TYPE_VALUE);
         String query = "identity:*";
         String fields = "id,name";
         ResultActions response = callPostJobStatus(query, fields, null, format.toString());
@@ -198,7 +198,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
                         jsonPath(
                                 "$.messages.*",
                                 Matchers.contains(
-                                        "Invalid format received, 'text/plain;format=gff'. Expected one of [text/plain;format=fasta, text/plain;format=tsv, application/json, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/plain;format=list].")));
+                                        "Invalid format received, 'text/plain;format=obo'. Expected one of [text/plain;format=fasta, text/plain;format=tsv, application/json, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/plain;format=list, application/rdf+xml, text/turtle, application/n-triples].")));
     }
 
     @Test
@@ -553,7 +553,10 @@ public abstract class AbstractDownloadControllerIT extends AbstractUniRefDownloa
                         TSV_MEDIA_TYPE_VALUE,
                         APPLICATION_JSON_VALUE,
                         XLS_MEDIA_TYPE_VALUE,
-                        LIST_MEDIA_TYPE_VALUE)
+                        LIST_MEDIA_TYPE_VALUE,
+                        RDF_MEDIA_TYPE_VALUE,
+                        TURTLE_MEDIA_TYPE_VALUE,
+                        N_TRIPLES_MEDIA_TYPE_VALUE)
                 .stream()
                 .map(Arguments::of);
     }

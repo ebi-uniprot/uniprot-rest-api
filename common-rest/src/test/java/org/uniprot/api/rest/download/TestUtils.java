@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.controller;
+package org.uniprot.api.rest.download;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

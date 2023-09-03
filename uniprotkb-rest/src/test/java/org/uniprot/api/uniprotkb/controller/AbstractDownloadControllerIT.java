@@ -11,8 +11,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.uniprotkb.controller.TestUtils.uncompressFile;
 
 import java.io.IOException;
 import java.nio.file.Files;

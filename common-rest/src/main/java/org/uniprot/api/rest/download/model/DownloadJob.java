@@ -20,7 +20,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
  *     redis-cli 2. to get the data for a hash run hgetall
  *     AsyncDownloadJob:1e8e33be0c54af8ba15db116e2e6c63b26acd7cd
  */
-@RedisHash("AsyncDownloadJob")
+@RedisHash("#{@redisConfiguration.getRedisHashValue()}")
 @Data
 @Builder
 public class DownloadJob implements Serializable {

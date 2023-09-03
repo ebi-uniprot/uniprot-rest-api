@@ -6,7 +6,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.uniref.controller.TestUtils.uncompressFile;
+import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 
 import java.io.IOException;
 import java.nio.file.Files;

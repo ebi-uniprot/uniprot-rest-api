@@ -23,6 +23,14 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 @Profile({"asyncDownload"})
 @EnableRedisRepositories(basePackages = "org.uniprot.api.rest.download.repository")
 public class RedisConfiguration {
+
+    @Value("${redis.hash.value}")
+    private String redisHashValue;
+
+    public String getRedisHashValue() {
+        return redisHashValue;
+    }
+
     @Bean
     public RedissonConnectionFactory redissonConnectionFactory(RedissonClient redisson) {
         return new RedissonConnectionFactory(redisson);
