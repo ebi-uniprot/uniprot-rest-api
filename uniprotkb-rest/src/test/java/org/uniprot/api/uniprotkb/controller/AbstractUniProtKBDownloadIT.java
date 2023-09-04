@@ -6,9 +6,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -22,7 +19,6 @@ import org.mockito.Mockito;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -34,7 +30,7 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
-import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.controller.AbstractDownloadIT;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
@@ -58,7 +54,7 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControllerIT {
+public abstract class AbstractUniProtKBDownloadIT extends AbstractDownloadIT {
     protected int totalNonIsoformEntries;
 
     static RabbitMQContainer rabbitMQContainer =
@@ -78,24 +74,6 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
                 "uniprot.redis.port", String.valueOf(redisContainer.getFirstMappedPort()));
         propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
     }
-
-    @Value("${download.idFilesFolder}")
-    protected String idsFolder;
-
-    @Value("${download.resultFilesFolder}")
-    protected String resultFolder;
-
-    @Value("${async.download.queueName}")
-    protected String downloadQueue;
-
-    @Value("${async.download.retryQueueName}")
-    protected String retryQueue;
-
-    @Value(("${async.download.rejectedQueueName}"))
-    protected String rejectedQueue;
-
-    @Value(("${async.download.embeddings.queueName}"))
-    protected String embeddingsQueue;
 
     @Autowired private UniprotQueryRepository uniprotQueryRepository;
 
@@ -150,11 +128,6 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
-    private void prepareDownloadFolders() throws IOException {
-        Files.createDirectories(Path.of(this.idsFolder));
-        Files.createDirectories(Path.of(this.resultFolder));
-    }
-
     @AfterAll
     public void cleanUpData() throws Exception {
         cleanUpFolder(this.idsFolder);
@@ -169,19 +142,7 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractStreamControll
 
     protected abstract DownloadJobRepository getDownloadJobRepository();
 
-    private void cleanUpFolder(String folder) throws IOException {
-        Files.list(Path.of(folder))
-                .forEach(
-                        path -> {
-                            try {
-                                Files.delete(path);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-    }
-
-    private void saveEntries() throws Exception {
+    protected void saveEntries() throws Exception {
         int i = 1;
         for (; i <= 10; i++) {
             saveEntry(i, "");

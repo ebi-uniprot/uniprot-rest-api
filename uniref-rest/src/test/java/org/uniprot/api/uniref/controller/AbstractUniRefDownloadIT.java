@@ -6,10 +6,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
@@ -19,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -30,7 +25,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
-import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.controller.AbstractDownloadIT;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniref.repository.UniRefQueryRepository;
 import org.uniprot.core.uniref.UniRefEntry;
@@ -47,7 +42,7 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniref.UniRefDocument;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractUniRefDownloadIT extends AbstractStreamControllerIT {
+public abstract class AbstractUniRefDownloadIT extends AbstractDownloadIT {
     static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
     static GenericContainer<?> redisContainer =
@@ -65,21 +60,6 @@ public abstract class AbstractUniRefDownloadIT extends AbstractStreamControllerI
                 "uniprot.redis.port", String.valueOf(redisContainer.getFirstMappedPort()));
         propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
     }
-
-    @Value("${download.idFilesFolder}")
-    protected String idsFolder;
-
-    @Value("${download.resultFilesFolder}")
-    protected String resultFolder;
-
-    @Value("${async.download.queueName}")
-    protected String downloadQueue;
-
-    @Value("${async.download.retryQueueName}")
-    protected String retryQueue;
-
-    @Value(("${async.download.rejectedQueueName}"))
-    protected String rejectedQueue;
 
     @Autowired private UniRefQueryRepository unirefQueryRepository;
 
@@ -115,11 +95,6 @@ public abstract class AbstractUniRefDownloadIT extends AbstractStreamControllerI
         when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
-    private void prepareDownloadFolders() throws IOException {
-        Files.createDirectories(Path.of(this.idsFolder));
-        Files.createDirectories(Path.of(this.resultFolder));
-    }
-
     @AfterAll
     public void cleanUpData() throws Exception {
         cleanUpFolder(this.idsFolder);
@@ -134,19 +109,7 @@ public abstract class AbstractUniRefDownloadIT extends AbstractStreamControllerI
 
     protected abstract DownloadJobRepository getDownloadJobRepository();
 
-    private void cleanUpFolder(String folder) throws IOException {
-        Files.list(Path.of(folder))
-                .forEach(
-                        path -> {
-                            try {
-                                Files.delete(path);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-    }
-
-    private void saveEntries() throws Exception {
+    protected void saveEntries() throws Exception {
         for (int i = 1; i <= 4; i++) {
             saveEntry(i, UniRefType.UniRef50);
             saveEntry(i, UniRefType.UniRef90);
