@@ -24,11 +24,11 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 @EnableRedisRepositories(basePackages = "org.uniprot.api.rest.download.repository")
 public class RedisConfiguration {
 
-    @Value("${redis.hash.value}")
-    private String redisHashValue;
+    @Value("${redis.hash.prefix}")
+    private String redisHashPrefix;
 
-    public String getRedisHashValue() {
-        return redisHashValue;
+    public String getRedisHashPrefix() {
+        return redisHashPrefix;
     }
 
     @Bean
