@@ -15,7 +15,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
-import org.uniprot.api.common.exception.ImportantMessageServiceException;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -231,15 +231,24 @@ public class UniProtEntryService
                                     .collect(Collectors.toList());
                 }
                 if (docResult.size() > 1) {
-                    throw new ImportantMessageServiceException(
-                            "Multiple accessions found for id: " + proteinId);
+                    String duplicatedAccessions =
+                            docResult.stream()
+                                    .map(UniProtDocument::getDocumentId)
+                                    .collect(Collectors.joining(", "));
+
+                    throw new InvalidRequestException(
+                            "This protein ID '"
+                                    + proteinId
+                                    + "' is now obsolete. Please refer to the accessions derived from this protein ID ("
+                                    + duplicatedAccessions
+                                    + ").");
                 } else {
                     return docResult.get(0).accession;
                 }
             } else {
                 throw new ResourceNotFoundException("{search.not.found}");
             }
-        } catch (ResourceNotFoundException e) {
+        } catch (ResourceNotFoundException | InvalidRequestException e) {
             throw e;
         } catch (Exception e) {
             String message = "Could not get protein id for: [" + proteinId + "]";
