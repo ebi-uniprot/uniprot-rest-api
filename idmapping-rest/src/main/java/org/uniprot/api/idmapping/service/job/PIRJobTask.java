@@ -22,6 +22,7 @@ import org.uniprot.store.search.SolrCollection;
 
 @Slf4j
 public class PIRJobTask extends JobTask {
+    private static final int BATCH_SIZE = 100_000;
     private final IdMappingPIRService pirService;
 
     private final IdMappingRepository idMappingRepository;
@@ -46,8 +47,8 @@ public class PIRJobTask extends JobTask {
                     && Objects.nonNull(job.getIdMappingRequest())
                     && IdMappingFieldConfig.UNIPROTKB_STR.equals(
                             job.getIdMappingRequest().getTo())) {
-                int batchSize = 100_000;
-                Integer obsoleteUniProtCount = getObsoleteUniProtEntryCount(result, batchSize);
+
+                Integer obsoleteUniProtCount = getObsoleteUniProtEntryCount(result, BATCH_SIZE);
                 result.setObsoleteCount(obsoleteUniProtCount);
             }
             return result;
