@@ -225,10 +225,11 @@ public class UniProtEntryService
                 List<UniProtDocument> docResult =
                         queryResult.getContent().collect(Collectors.toList());
                 if (docResult.size() > 1) {
-                    List<UniProtDocument> filteredResult = docResult.stream()
-                            .filter(doc -> doc.active != null && doc.active)
-                            .filter(doc -> proteinId.equalsIgnoreCase(doc.id.get(0)))
-                            .collect(Collectors.toList());
+                    List<UniProtDocument> filteredResult =
+                            docResult.stream()
+                                    .filter(doc -> doc.active != null && doc.active)
+                                    .filter(doc -> proteinId.equalsIgnoreCase(doc.id.get(0)))
+                                    .collect(Collectors.toList());
 
                     if (filteredResult.isEmpty()) {
                         // in this case all found documents are obsolete from tracked id

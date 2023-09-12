@@ -600,10 +600,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(
-                        header().string(
-                                HttpHeaders.LOCATION,
-                                "/uniprotkb/P21802?from=OBS_ID"));
+                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=OBS_ID"));
     }
 
     @Test
