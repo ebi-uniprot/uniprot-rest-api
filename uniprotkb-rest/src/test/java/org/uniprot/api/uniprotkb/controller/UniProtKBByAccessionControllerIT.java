@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hamcrest.Matcher;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -66,6 +67,7 @@ import org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import org.uniprot.store.indexer.uniprotkb.processor.InactiveEntryConverter;
 import org.uniprot.store.search.SolrCollection;
+import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 /** @author lgonzales */
@@ -575,6 +577,66 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                         header().string(
                                         HttpHeaders.LOCATION,
                                         "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
+    }
+
+    @Test
+    void searchWithObsoleteIDRedirectToAccession() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>());
+        UniProtDocument doc = uniProtEntryConverter.convert(entry);
+        doc.id.add("OBS_ID"); // first id is primary, all the others added are obsolete.
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "OBS_ID")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+                .andExpect(
+                        header().string(
+                                HttpHeaders.LOCATION,
+                                "/uniprotkb/P21802?from=OBS_ID"));
+    }
+
+    @Test
+    @Tag("TRM-29946")
+    void searchWithDemergedObsoleteIDReturnsBadRequest() throws Exception {
+        // given
+        UniProtEntryConverter uniProtEntryConverter = new UniProtEntryConverter(new HashMap<>());
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        UniProtDocument doc1 = uniProtEntryConverter.convert(entry);
+        doc1.id.add("YK29_YEAST"); // adding obsolete id.
+
+        entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.TR);
+        UniProtDocument doc2 = uniProtEntryConverter.convert(entry);
+        doc2.id.add("YK29_YEAST"); // adding obsolete id.
+
+        getStoreManager().saveDocs(DataStoreManager.StoreType.UNIPROT, doc1, doc2);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "YK29_YEAST")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid request received. This protein ID 'YK29_YEAST' is now obsolete. Please refer to the accessions derived from this protein ID (F1Q0X3, P21802).")));
     }
 
     @Test

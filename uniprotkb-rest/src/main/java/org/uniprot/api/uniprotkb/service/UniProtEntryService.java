@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
@@ -224,24 +225,32 @@ public class UniProtEntryService
                 List<UniProtDocument> docResult =
                         queryResult.getContent().collect(Collectors.toList());
                 if (docResult.size() > 1) {
-                    docResult =
-                            docResult.stream()
-                                    .filter(doc -> doc.active != null && doc.active)
-                                    .filter(doc -> proteinId.equalsIgnoreCase(doc.id.get(0)))
-                                    .collect(Collectors.toList());
-                }
-                if (docResult.size() > 1) {
-                    String duplicatedAccessions =
-                            docResult.stream()
-                                    .map(UniProtDocument::getDocumentId)
-                                    .collect(Collectors.joining(", "));
+                    List<UniProtDocument> filteredResult = docResult.stream()
+                            .filter(doc -> doc.active != null && doc.active)
+                            .filter(doc -> proteinId.equalsIgnoreCase(doc.id.get(0)))
+                            .collect(Collectors.toList());
 
-                    throw new InvalidRequestException(
-                            "This protein ID '"
-                                    + proteinId
-                                    + "' is now obsolete. Please refer to the accessions derived from this protein ID ("
-                                    + duplicatedAccessions
-                                    + ").");
+                    if (filteredResult.isEmpty()) {
+                        // in this case all found documents are obsolete from tracked id
+                        String duplicatedAccessions =
+                                docResult.stream()
+                                        .map(UniProtDocument::getDocumentId)
+                                        .collect(Collectors.joining(", "));
+
+                        throw new InvalidRequestException(
+                                "This protein ID '"
+                                        + proteinId
+                                        + "' is now obsolete. Please refer to the accessions derived from this protein ID ("
+                                        + duplicatedAccessions
+                                        + ").");
+                    } else {
+                        docResult = filteredResult;
+                    }
+                }
+
+                if (docResult.size() > 1) {
+                    throw new ImportantMessageServiceException(
+                            "Multiple accessions found for id: " + proteinId);
                 } else {
                     return docResult.get(0).accession;
                 }
