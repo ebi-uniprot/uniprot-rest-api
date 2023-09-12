@@ -1,37 +1,25 @@
-package org.uniprot.api.uniprotkb.controller;
+package org.uniprot.api.uniprotkb.utils;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.RabbitMQContainer;
-import org.testcontainers.lifecycle.Startables;
-import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
-import org.uniprot.api.rest.controller.AbstractDownloadIT;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
@@ -53,33 +41,13 @@ import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractUniProtKBDownloadIT extends AbstractDownloadIT {
-    protected int totalNonIsoformEntries;
+public class UniProtKBAsyncDownloadUtils {
 
-    static RabbitMQContainer rabbitMQContainer =
-            new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
-    static GenericContainer<?> redisContainer =
-            new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
+    public static int totalNonIsoformEntries;
 
-    @DynamicPropertySource
-    public static void setUpThings(DynamicPropertyRegistry propertyRegistry) {
-        Startables.deepStart(rabbitMQContainer, redisContainer).join();
-        assertTrue(rabbitMQContainer.isRunning());
-        assertTrue(redisContainer.isRunning());
-        propertyRegistry.add("spring.amqp.rabbit.port", rabbitMQContainer::getFirstMappedPort);
-        propertyRegistry.add("spring.amqp.rabbit.host", rabbitMQContainer::getHost);
-        System.setProperty("uniprot.redis.host", redisContainer.getHost());
-        System.setProperty(
-                "uniprot.redis.port", String.valueOf(redisContainer.getFirstMappedPort()));
-        propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
-    }
-
-    @Autowired private UniprotQueryRepository uniprotQueryRepository;
-
-    private static final UniProtKBEntry TEMPLATE_ENTRY =
+    public static final UniProtKBEntry TEMPLATE_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
-    private final UniProtEntryConverter documentConverter =
+    public static final UniProtEntryConverter documentConverter =
             new UniProtEntryConverter(
                     TaxonomyRepoMocker.getTaxonomyRepo(),
                     Mockito.mock(GORepo.class),
@@ -88,26 +56,23 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractDownloadIT {
                     mock(ECRepo.class),
                     new HashMap<>());
 
-    @Autowired
-    @Qualifier("uniProtKBSolrClient")
-    private SolrClient solrClient;
+    public static void setUp(RestTemplate restTemplate) {
+        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
+        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
+    }
 
-    @Autowired private TaxonomyLineageRepository taxRepository;
-
-    @Autowired protected AmqpAdmin amqpAdmin;
-
-    @Autowired
-    private UniProtStoreClient<UniProtKBEntry> storeClient; // in memory voldemort store client
-
-    @MockBean(name = "uniProtRdfRestTemplate")
-    private RestTemplate restTemplate;
-
-    @BeforeAll
-    public void saveEntriesInSolrAndStore() throws Exception {
+    public static void saveEntriesInSolrAndStore(
+            UniprotQueryRepository uniprotQueryRepository,
+            CloudSolrClient cloudSolrClient,
+            SolrClient solrClient,
+            UniProtStoreClient<UniProtKBEntry> storeClient,
+            TaxonomyLineageRepository taxRepository,
+            String idsFolder,
+            String resultFolder)
+            throws Exception {
         ReflectionTestUtils.setField(uniprotQueryRepository, "solrClient", cloudSolrClient);
-        prepareDownloadFolders();
-        saveEntries();
-
+        prepareDownloadFolders(idsFolder, resultFolder);
+        saveEntries(cloudSolrClient, storeClient);
         // for the following tests, ensure the number of hits
         // for each query is less than the maximum number allowed
         // to be streamed (configured in {@link
@@ -122,46 +87,39 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractDownloadIT {
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
     }
 
-    @BeforeEach
-    void setUp() {
-        when(restTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        when(restTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-    }
-
-    @AfterAll
-    public void cleanUpData() throws Exception {
-        cleanUpFolder(this.idsFolder);
-        cleanUpFolder(this.resultFolder);
-        getDownloadJobRepository().deleteAll();
-        this.amqpAdmin.purgeQueue(rejectedQueue, true);
-        this.amqpAdmin.purgeQueue(downloadQueue, true);
-        this.amqpAdmin.purgeQueue(retryQueue, true);
-        rabbitMQContainer.stop();
-        redisContainer.stop();
-    }
-
-    protected abstract DownloadJobRepository getDownloadJobRepository();
-
-    protected void saveEntries() throws Exception {
+    public static void saveEntries(
+            CloudSolrClient cloudSolrClient, UniProtStoreClient<UniProtKBEntry> storeClient)
+            throws Exception {
         int i = 1;
         for (; i <= 10; i++) {
-            saveEntry(i, "");
+            saveEntry(cloudSolrClient, i, "", storeClient);
         }
-        saveEntry(i++, "-2");
-        saveEntry(i++, "-2");
-        saveEntry(i++, "", false);
-        saveEntry(i, "", false);
+        saveEntry(cloudSolrClient, i++, "-2", storeClient);
+        saveEntry(cloudSolrClient, i++, "-2", storeClient);
+        saveEntry(cloudSolrClient, i++, "", false, storeClient);
+        saveEntry(cloudSolrClient, i, "", false, storeClient);
         totalNonIsoformEntries = i - 2;
         cloudSolrClient.commit(SolrCollection.uniprot.name());
-        saveTaxonomyEntry(9606L);
+        saveTaxonomyEntry(cloudSolrClient, 9606L);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
     }
 
-    private void saveEntry(int i, String isoFormString) throws Exception {
-        saveEntry(i, isoFormString, true);
+    public static void saveEntry(
+            CloudSolrClient cloudSolrClient,
+            int i,
+            String isoFormString,
+            UniProtStoreClient<UniProtKBEntry> storeClient)
+            throws Exception {
+        saveEntry(cloudSolrClient, i, isoFormString, true, storeClient);
     }
 
-    private void saveEntry(int i, String isoFormString, boolean reviewed) throws Exception {
+    public static void saveEntry(
+            CloudSolrClient cloudSolrClient,
+            int i,
+            String isoFormString,
+            boolean reviewed,
+            UniProtStoreClient<UniProtKBEntry> storeClient)
+            throws Exception {
         UniProtKBEntryBuilder entryBuilder = UniProtKBEntryBuilder.from(TEMPLATE_ENTRY);
         String acc = String.format("P%05d", i) + isoFormString;
         entryBuilder.primaryAccession(acc);
@@ -177,7 +135,8 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractDownloadIT {
         storeClient.saveEntry(uniProtKBEntry);
     }
 
-    private void saveTaxonomyEntry(long taxId) throws Exception {
+    public static void saveTaxonomyEntry(CloudSolrClient cloudSolrClient, long taxId)
+            throws Exception {
         TaxonomyEntryBuilder entryBuilder = new TaxonomyEntryBuilder();
         TaxonomyEntry taxonomyEntry =
                 entryBuilder
@@ -197,5 +156,11 @@ public abstract class AbstractUniProtKBDownloadIT extends AbstractDownloadIT {
                         .id(String.valueOf(taxId))
                         .taxonomyObj(taxonomyObj);
         cloudSolrClient.addBean(SolrCollection.taxonomy.name(), docBuilder.build());
+    }
+
+    public static void prepareDownloadFolders(String idsFolder, String resultFolder)
+            throws IOException {
+        Files.createDirectories(Path.of(idsFolder));
+        Files.createDirectories(Path.of(resultFolder));
     }
 }

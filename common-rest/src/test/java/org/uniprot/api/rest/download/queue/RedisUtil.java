@@ -69,7 +69,27 @@ public class RedisUtil {
         };
     }
 
+    public static Callable<Boolean> verifyJobRetriedCountIsEqualToGivenCount(
+            DownloadJobRepository downloadJobRepository, String jobId, int givenCount) {
+        return () -> {
+            Optional<DownloadJob> optJob = downloadJobRepository.findById(jobId);
+            if (optJob.isPresent()) {
+                return (optJob.get().getRetried() == givenCount);
+            }
+            return false;
+        };
+    }
+
     public static Callable<Integer> getMessageCountInQueue(AmqpAdmin amqpAdmin, String queueName) {
         return () -> (Integer) amqpAdmin.getQueueProperties(queueName).get("QUEUE_MESSAGE_COUNT");
+    }
+
+    public static Callable<Boolean> verifyMessageCountIsThanOrEqualToRejectedCount(
+            AmqpAdmin amqpAdmin, String queueName, int rejectedMsgCount) {
+        return () -> {
+            int count =
+                    (Integer) amqpAdmin.getQueueProperties(queueName).get("QUEUE_MESSAGE_COUNT");
+            return count >= rejectedMsgCount;
+        };
     }
 }
