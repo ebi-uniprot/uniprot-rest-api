@@ -221,49 +221,52 @@ public class UniProtEntryService
                             .rows(NumberUtils.INTEGER_TWO)
                             .build();
             QueryResult<UniProtDocument> queryResult = repository.searchPage(solrRequest, null);
-            if (queryResult.getPage().getTotalElements() > 0) {
-                List<UniProtDocument> docResult =
-                        queryResult.getContent().collect(Collectors.toList());
-                if (docResult.size() > 1) {
-                    List<UniProtDocument> filteredResult =
-                            docResult.stream()
-                                    .filter(doc -> doc.active != null && doc.active)
-                                    .filter(doc -> proteinId.equalsIgnoreCase(doc.id.get(0)))
-                                    .collect(Collectors.toList());
-
-                    if (filteredResult.isEmpty()) {
-                        // in this case all found documents are obsolete from tracked id
-                        String duplicatedAccessions =
-                                docResult.stream()
-                                        .map(UniProtDocument::getDocumentId)
-                                        .collect(Collectors.joining(", "));
-
-                        throw new InvalidRequestException(
-                                "This protein ID '"
-                                        + proteinId
-                                        + "' is now obsolete. Please refer to the accessions derived from this protein ID ("
-                                        + duplicatedAccessions
-                                        + ").");
-                    } else {
-                        docResult = filteredResult;
-                    }
-                }
-
-                if (docResult.size() > 1) {
-                    throw new ImportantMessageServiceException(
-                            "Multiple accessions found for id: " + proteinId);
-                } else {
-                    return docResult.get(0).accession;
-                }
-            } else {
+            if (queryResult.getPage().getTotalElements() == 0) {
                 throw new ResourceNotFoundException("{search.not.found}");
             }
+            List<UniProtDocument> solrDocResults =
+                    queryResult.getContent().collect(Collectors.toList());
+
+            if (solrDocResults.size() > 1) {
+                solrDocResults = filterAndHandleObsoleteIds(proteinId, solrDocResults);
+            }
+
+            if (solrDocResults.size() > 1) {
+                throw new ImportantMessageServiceException(
+                        "Multiple accessions found for id: " + proteinId);
+            }
+            return solrDocResults.get(0).accession;
         } catch (ResourceNotFoundException | InvalidRequestException e) {
             throw e;
         } catch (Exception e) {
             String message = "Could not get protein id for: [" + proteinId + "]";
             throw new ServiceException(message, e);
         }
+    }
+
+    private List<UniProtDocument> filterAndHandleObsoleteIds(
+            String proteinId, List<UniProtDocument> docResult) {
+        List<UniProtDocument> primaryIdsResults =
+                docResult.stream()
+                        .filter(doc -> doc.active != null && doc.active)
+                        .filter(doc -> proteinId.equalsIgnoreCase(doc.id.get(0)))
+                        .collect(Collectors.toList());
+
+        if (primaryIdsResults.isEmpty()) {
+            // in this case all found documents are obsolete
+            String duplicatedAccessions =
+                    docResult.stream()
+                            .map(UniProtDocument::getDocumentId)
+                            .collect(Collectors.joining(", "));
+
+            throw new InvalidRequestException(
+                    "This protein ID '"
+                            + proteinId
+                            + "' is now obsolete. Please refer to the accessions derived from this protein ID ("
+                            + duplicatedAccessions
+                            + ").");
+        }
+        return primaryIdsResults;
     }
 
     public Stream<String> streamRdf(
