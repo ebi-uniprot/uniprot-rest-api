@@ -1,10 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
@@ -13,6 +8,11 @@ import org.uniprot.api.support.data.common.keyword.service.KeywordService;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupByKeywordService extends GroupByService<KeywordEntry> {
@@ -46,15 +46,16 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
             List<KeywordEntry> keywordEntries,
             List<KeywordEntry> ancestorEntries,
             String parentId,
+            List<FacetField.Count> parentFacetCounts,
             String query) {
         Map<String, KeywordEntry> idEntryMap =
                 keywordEntries.stream().collect(Collectors.toMap(this::getId, Function.identity()));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, parentFacetCounts, query);
     }
 
     @Override
-    protected KeywordEntry getEntry(String parentId) {
-        return keywordService.findByUniqueId(parentId);
+    protected KeywordEntry getEntryId(String id) {
+        return keywordService.findByUniqueId(id);
     }
 
     @Override

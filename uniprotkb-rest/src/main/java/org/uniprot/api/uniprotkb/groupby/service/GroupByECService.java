@@ -1,8 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
@@ -10,6 +7,9 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupByECService extends GroupByService<String> {
@@ -24,6 +24,25 @@ public class GroupByECService extends GroupByService<String> {
     public GroupByECService(ECService ecService, UniProtEntryService uniProtEntryService) {
         super(uniProtEntryService);
         this.ecService = ecService;
+    }
+
+    @Override
+    List<String> getInitialEntries(String parentId) {
+        if (!isTopLevelSearch(parentId)) {
+            String shortFormParent = getShortFormEc(parentId);
+            return shortFormParent.contains(TOKEN_REGEX) ? List.of(shortFormParent.split(TOKEN_REGEX)[0]) : List.of();
+        }
+        return getChildEntries(parentId);
+    }
+
+    @Override
+    List<FacetField.Count> getInitialFacetCounts(String parentId, String query, List<String> entries) {
+        if (isTopLevelSearch(parentId)) {
+            return getFacetCounts(query, entries);
+        }
+        String shortFormParent = getShortFormEc(parentId);
+        List<FacetField.Count> facetCounts = getFacetCounts(query, entries);
+        return facetCounts.stream().filter(facetCount -> shortFormParent.equals(facetCount.getName())).collect(Collectors.toList());
     }
 
     @Override
@@ -71,7 +90,7 @@ public class GroupByECService extends GroupByService<String> {
             List<FacetField.Count> facetCounts) {
         if (!facetCounts.isEmpty()) {
             String facetId = getFacetId(facetCounts.get(0));
-            if (!Objects.equals(parent, facetId)) {
+            if (!Objects.equals(getShortFormEc(parent), facetId)) {
                 ancestors.add(getFullEc(facetId));
             }
         }
@@ -83,6 +102,7 @@ public class GroupByECService extends GroupByService<String> {
             List<String> ecs,
             List<String> ancestorEntries,
             String parentId,
+            List<FacetField.Count> parentFacetCounts,
             String query) {
         Map<String, String> idEntryMap =
                 facetCounts.stream()
@@ -90,12 +110,12 @@ public class GroupByECService extends GroupByService<String> {
                                 Collectors.toMap(
                                         FacetField.Count::getName,
                                         count -> this.getFullEc(count.getName())));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, parentFacetCounts, query);
     }
 
     @Override
-    protected String getEntry(String parentId) {
-        return parentId;
+    protected String getEntryId(String id) {
+        return id;
     }
 
     private String getShortFormEc(String fullEc) {

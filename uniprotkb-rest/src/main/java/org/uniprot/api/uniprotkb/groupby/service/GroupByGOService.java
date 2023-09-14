@@ -1,10 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
@@ -13,6 +8,12 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.go.GOService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupByGOService extends GroupByService<GoRelation> {
@@ -41,6 +42,11 @@ public class GroupByGOService extends GroupByService<GoRelation> {
     }
 
     @Override
+    protected boolean equalIds(String parent, String facetId) {
+        return Objects.equals(addGoPrefix(parent), facetId);
+    }
+
+    @Override
     protected String getId(GoRelation entry) {
         return entry.getId();
     }
@@ -55,16 +61,16 @@ public class GroupByGOService extends GroupByService<GoRelation> {
             List<FacetField.Count> facetCounts,
             List<GoRelation> goRelations,
             List<GoRelation> ancestorEntries,
-            String parentId,
+            String parentId, List<FacetField.Count> parentFacetCounts,
             String query) {
         Map<String, GoRelation> idEntryMap =
                 goRelations.stream().collect(Collectors.toMap(this::getId, Function.identity()));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, parentFacetCounts, query);
     }
 
     @Override
-    protected GoRelation getEntry(String parentId) {
-        return goService.getGoRelation(parentId).orElseThrow();
+    protected GoRelation getEntryId(String id) {
+        return goService.getGoRelation(id).orElseThrow();
     }
 
     @Override
