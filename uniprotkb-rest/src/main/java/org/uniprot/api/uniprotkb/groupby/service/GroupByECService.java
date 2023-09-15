@@ -1,8 +1,5 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
@@ -12,6 +9,9 @@ import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Service
 public class GroupByECService extends GroupByService<String> {
     public static final String REGEX_SUFFIX = "[0-9]+";
@@ -20,6 +20,7 @@ public class GroupByECService extends GroupByService<String> {
     public static final String EC = "ec";
     public static final String FACET_MIN_COUNT = "1";
     public static final int MAX_TOKEN_COUNT = 4;
+    public static final String TOKEN = ".";
     private final ECService ecService;
 
     public GroupByECService(ECService ecService, UniProtEntryService uniProtEntryService) {
@@ -31,7 +32,7 @@ public class GroupByECService extends GroupByService<String> {
     List<String> getInitialEntries(String parentId) {
         if (!isTopLevelSearch(parentId)) {
             String shortFormParent = getShortFormEc(parentId);
-            return shortFormParent.contains(TOKEN_REGEX)
+            return shortFormParent.contains(TOKEN)
                     ? List.of(shortFormParent.split(TOKEN_REGEX)[0])
                     : List.of();
         }
