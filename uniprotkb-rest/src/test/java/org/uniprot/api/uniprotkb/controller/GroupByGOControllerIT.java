@@ -1,16 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +20,18 @@ import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(controllers = GroupByController.class)
@@ -149,6 +150,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     void getGroupByGO_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
         GoRelation goRelation = new GoRelation();
+        goRelation.setId(GO_ID_0);
         goRelation.setName(GO_NAME_0);
         when(goClient.getGoEntry(GO_ID_0)).thenReturn(Optional.of(goRelation));
 
@@ -156,7 +158,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
                         get(PATH)
                                 .param("query", "organism_id:" + ORGANISM_ID_2)
                                 .param("parent", GO_ID_0))
-                .andDo(log())
+                .andDo(print())
                 .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
                 .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
                 .andExpect(jsonPath("$.groups[0].expandable", is(false)))
@@ -193,6 +195,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     void getGroupByGO_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
         GoRelation goRelation = new GoRelation();
+        goRelation.setId(GO_ID_0);
         goRelation.setName(GO_NAME_0);
         when(goClient.getGoEntry(GO_ID_0)).thenReturn(Optional.of(goRelation));
 

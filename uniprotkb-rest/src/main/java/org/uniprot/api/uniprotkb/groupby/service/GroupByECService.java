@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.springframework.stereotype.Service;
@@ -30,19 +31,24 @@ public class GroupByECService extends GroupByService<String> {
     List<String> getInitialEntries(String parentId) {
         if (!isTopLevelSearch(parentId)) {
             String shortFormParent = getShortFormEc(parentId);
-            return shortFormParent.contains(TOKEN_REGEX) ? List.of(shortFormParent.split(TOKEN_REGEX)[0]) : List.of();
+            return shortFormParent.contains(TOKEN_REGEX)
+                    ? List.of(shortFormParent.split(TOKEN_REGEX)[0])
+                    : List.of();
         }
         return getChildEntries(parentId);
     }
 
     @Override
-    List<FacetField.Count> getInitialFacetCounts(String parentId, String query, List<String> entries) {
+    List<FacetField.Count> getInitialFacetCounts(
+            String parentId, String query, List<String> entries) {
         if (isTopLevelSearch(parentId)) {
             return getFacetCounts(query, entries);
         }
         String shortFormParent = getShortFormEc(parentId);
         List<FacetField.Count> facetCounts = getFacetCounts(query, entries);
-        return facetCounts.stream().filter(facetCount -> shortFormParent.equals(facetCount.getName())).collect(Collectors.toList());
+        return facetCounts.stream()
+                .filter(facetCount -> shortFormParent.equals(facetCount.getName()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -110,17 +116,18 @@ public class GroupByECService extends GroupByService<String> {
                                 Collectors.toMap(
                                         FacetField.Count::getName,
                                         count -> this.getFullEc(count.getName())));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, parentFacetCounts, query);
+        return getGroupByResult(
+                facetCounts, idEntryMap, ancestorEntries, parentId, parentFacetCounts, query);
     }
 
     @Override
-    protected String getEntryId(String id) {
+    protected String getEntryById(String id) {
         return id;
     }
 
     private String getShortFormEc(String fullEc) {
         String temp = fullEc;
-        while (temp.endsWith(DASH)) {
+        while (StringUtils.isNotEmpty(temp) && temp.endsWith(DASH)) {
             temp = temp.substring(0, temp.length() - 2);
         }
         return temp;

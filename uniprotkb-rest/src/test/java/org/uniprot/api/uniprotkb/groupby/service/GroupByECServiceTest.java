@@ -1,5 +1,16 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByECService.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -12,17 +23,6 @@ import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByECService.*;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByECServiceTest {
@@ -40,10 +40,8 @@ class GroupByECServiceTest {
     private static String ecIdD = "";
     private static String ecIdE = "";
     private static final String SOME_QUERY = "someQuery";
-    @Mock
-    private ECService ecService;
-    @Mock
-    private UniProtEntryService uniProtEntryService;
+    @Mock private ECService ecService;
+    @Mock private UniProtEntryService uniProtEntryService;
     private GroupByECService service;
 
     @BeforeEach
@@ -105,7 +103,7 @@ class GroupByECServiceTest {
 
     @Test
     void
-    getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         ecIdA = "1.-.-.-";
         ecIdB = "1.1.-.-";
         ecIdC = "1.1.1.-";
@@ -127,7 +125,7 @@ class GroupByECServiceTest {
 
     @Test
     void
-    getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         ecIdB = "1.-.-.-";
         ecIdD = "1.1.-.-";
         ecIdA = "1.1.1.-";
@@ -209,7 +207,7 @@ class GroupByECServiceTest {
 
     @Test
     void
-    getGroupByResults_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
         ecIdB = "1.-.-.-";
         ecIdD = "1.1.-.-";
         ecIdA = "1.1.1.-";

@@ -1,5 +1,17 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -13,18 +25,6 @@ import org.uniprot.api.support.data.common.taxonomy.service.TaxonomyService;
 import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService.TOP_LEVEL_TAXONOMY_PARENT_QUERY;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByTaxonomyServiceTest {

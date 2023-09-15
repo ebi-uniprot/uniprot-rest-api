@@ -1,5 +1,18 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
 import org.hamcrest.Matcher;
@@ -12,19 +25,6 @@ import org.uniprot.api.uniprotkb.groupby.model.*;
 import org.uniprot.api.uniprotkb.groupby.service.go.GOService;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.uniprot.api.uniprotkb.groupby.service.GroupByGOService.GO_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 class GroupByGOServiceTest {
@@ -66,10 +66,8 @@ class GroupByGOServiceTest {
             getFacetFields(GO_ID_E, GO_COUNT_E);
     private static final List<FacetField> MULTIPLE_GO_FACET_COUNTS = getMultipleFields();
     private static final String SOME_QUERY = "someQuery";
-    @Mock
-    private GOService goService;
-    @Mock
-    private UniProtEntryService uniProtEntryService;
+    @Mock private GOService goService;
+    @Mock private UniProtEntryService uniProtEntryService;
 
     private GroupByGOService service;
 
@@ -103,16 +101,16 @@ class GroupByGOServiceTest {
         when(goService.getChildren(EMPTY_ID))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
         when(goService.getChildren(
-                argThat(
-                        arg ->
-                                arg != null
-                                        && Set.of(
-                                                addGoPrefix(GO_ID_A),
-                                                addGoPrefix(GO_ID_F))
-                                        .contains(arg))))
+                        argThat(
+                                arg ->
+                                        arg != null
+                                                && Set.of(
+                                                                addGoPrefix(GO_ID_A),
+                                                                addGoPrefix(GO_ID_F))
+                                                        .contains(arg))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_B));
         when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
@@ -141,18 +139,18 @@ class GroupByGOServiceTest {
         when(goService.getChildren(addGoPrefix(GO_ID_B)))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
         when(goService.getChildren(
-                argThat(
-                        argument ->
-                                argument != null
-                                        && Set.of(
-                                                addGoPrefix(GO_ID_A),
-                                                addGoPrefix(GO_ID_F))
-                                        .contains(argument))))
+                        argThat(
+                                argument ->
+                                        argument != null
+                                                && Set.of(
+                                                                addGoPrefix(GO_ID_A),
+                                                                addGoPrefix(GO_ID_F))
+                                                        .contains(argument))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_E));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
@@ -167,7 +165,7 @@ class GroupByGOServiceTest {
 
     @Test
     void
-    getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilEdge() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -200,7 +198,7 @@ class GroupByGOServiceTest {
 
     @Test
     void
-    getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenNoParentSpecifiedAndSingleRootNodeWithSingleChild_traverseUntilANodeWithMultipleChildren() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -225,7 +223,7 @@ class GroupByGOServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
@@ -243,15 +241,15 @@ class GroupByGOServiceTest {
         when(goService.getChildren(argThat(argument -> addGoPrefix(GO_ID_B).equals(argument))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_A, GO_ENTRY_C, GO_ENTRY_F));
         when(goService.getChildren(
-                argThat(
-                        argument ->
-                                Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F))
-                                        .contains(argument))))
+                        argThat(
+                                argument ->
+                                        Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F))
+                                                .contains(argument))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_E));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);
@@ -277,7 +275,9 @@ class GroupByGOServiceTest {
         GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, GO_ID_C);
 
         assertGroupByResultC(
-                groupByResult, empty(), is(ParentImpl.builder().label(GO_LABEL_C).count(9999L).build()));
+                groupByResult,
+                empty(),
+                is(ParentImpl.builder().label(GO_LABEL_C).count(9999L).build()));
     }
 
     @Test
@@ -312,7 +312,7 @@ class GroupByGOServiceTest {
 
     @Test
     void
-    getGroupByResults_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
+            getGroupByResults_whenParentSpecifiedAndSingleChildWithMultipleChildren_traverseUntilANodeWithMultipleChildren() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -334,7 +334,7 @@ class GroupByGOServiceTest {
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
-                SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
+                        SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_E)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_E);

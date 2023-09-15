@@ -21,7 +21,8 @@ public abstract class GroupByService<T> {
     public GroupByResult getGroupByResult(String query, String parentId) {
         List<T> ancestors = new LinkedList<>();
         List<T> lastChildEntries = getInitialEntries(parentId);
-        List<FacetField.Count> parentFacetCounts = getInitialFacetCounts(parentId, query, lastChildEntries);
+        List<FacetField.Count> parentFacetCounts =
+                getInitialFacetCounts(parentId, query, lastChildEntries);
         List<FacetField.Count> lastChildFacetCounts = parentFacetCounts;
 
         while (lastChildFacetCounts.size() == 1) {
@@ -38,7 +39,13 @@ public abstract class GroupByService<T> {
             }
         }
 
-        return getGroupByResult(lastChildFacetCounts, lastChildEntries, ancestors, parentId, parentFacetCounts, query);
+        return getGroupByResult(
+                lastChildFacetCounts,
+                lastChildEntries,
+                ancestors,
+                parentId,
+                parentFacetCounts,
+                query);
     }
 
     protected static boolean isTopLevelSearch(String parent) {
@@ -65,7 +72,7 @@ public abstract class GroupByService<T> {
 
     List<T> getInitialEntries(String parentId) {
         if (!isTopLevelSearch(parentId)) {
-            return List.of(getEntryId(parentId));
+            return List.of(getEntryById(parentId));
         }
         return getChildEntries(parentId);
     }
@@ -122,12 +129,12 @@ public abstract class GroupByService<T> {
     private Parent getParentInfo(String parentId, List<FacetField.Count> parentFacetCounts) {
         long count = parentFacetCounts.stream().mapToLong(FacetField.Count::getCount).sum();
         return ParentImpl.builder()
-                .label(isTopLevelSearch(parentId) ? null : getLabel(getEntryId(parentId)))
+                .label(isTopLevelSearch(parentId) ? null : getLabel(getEntryById(parentId)))
                 .count(count)
                 .build();
     }
 
-    protected abstract T getEntryId(String id);
+    protected abstract T getEntryById(String id);
 
     protected String getFacetId(FacetField.Count fc) {
         return fc.getName();
