@@ -1,8 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
@@ -32,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +61,7 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.validation.ValidDownloadRequest;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener;
@@ -276,6 +277,25 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         Assertions.assertTrue(primaryAccessions.contains("P00012-2"));
     }
 
+    @ParameterizedTest(name = "[{index}] format {0}")
+    @MethodSource("getFormatsWithoutProjection")
+    void submitJobWithFieldsNotSupported(String format) throws Exception {
+        // when
+        String query = "*:*";
+        String fields = "accession,rhea";
+        ResultActions resultActions =
+                callPostJobStatus(query, fields, null, format.toString(), false);
+        resultActions
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                contains("'fields' are not supported for 'format' " + format)));
+    }
+
     @Test
     void submitJob_H5_Format_Success() throws Exception {
         String query = "reviewed:true";
@@ -304,9 +324,9 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Test
     void submitJob_H5_Format_With_Isoform_Aborted() throws Exception {
-        String query = "reviewed:true";
+        String query = "reviewed:true AND gene:*";
         MediaType format = HDF5_MEDIA_TYPE;
-        String jobId = callRunAPIAndVerify(query, "accession", null, format.toString(), true);
+        String jobId = callRunAPIAndVerify(query, null, null, format.toString(), true);
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(isJobAborted(jobId));
         // id file should not exist yet
@@ -407,6 +427,10 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
                 .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
+    private Stream<Arguments> getFormatsWithoutProjection() {
+        return ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().map(Arguments::of);
+    }
+
     @Override
     protected MockMvc getMockMvcObject() {
         return this.mockMvc;
@@ -462,11 +486,6 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Override
     protected String getSubmitJobAllFormatQuery() {
         return "reviewed:true";
-    }
-
-    @Override
-    protected String getSubmitJobAllFormatQueryFields() {
-        return "accession,rhea";
     }
 
     @Override

@@ -307,11 +307,6 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Override
-    protected String getSubmitJobAllFormatQueryFields() {
-        return "id,name";
-    }
-
-    @Override
     protected MediaType getUnsupportedFormat() {
         return UniProtMediaType.valueOf(OBO_MEDIA_TYPE_VALUE);
     }

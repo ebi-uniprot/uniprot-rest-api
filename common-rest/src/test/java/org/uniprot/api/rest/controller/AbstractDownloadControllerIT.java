@@ -12,9 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +45,6 @@ import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.validation.ValidDownloadRequest;
-import org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -153,8 +151,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected void submitJobAllFormat(String format) throws Exception {
         // when
         String query = getSubmitJobAllFormatQuery();
-        String fields = getSubmitJobAllFormatQueryFields();
-        String jobId = callRunAPIAndVerify(query, fields, null, format, false);
+        String jobId = callRunAPIAndVerify(query, null, null, format, false);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         if ("h5".equals(format) || "application/x-hdf5".equals(format)) {
@@ -425,25 +422,6 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         Assertions.assertEquals(getRunJobHeaderWithFieldsTSV(), rows[0]);
     }
 
-    @ParameterizedTest(name = "[{index}] format {0}")
-    @MethodSource("getFormatsWithoutProjection")
-    void submitJobWithFieldsNotSupported(String format) throws Exception {
-        // when
-        String query = "*:*";
-        String fields = "accession,rhea";
-        ResultActions resultActions =
-                callPostJobStatus(query, fields, null, format.toString(), false);
-        resultActions
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(
-                        jsonPath(
-                                "$.messages",
-                                contains("'fields' are not supported for 'format' " + format)));
-    }
-
     /**
      * Tests that class level validation is called after field level validation. It also tests that
      * class level validation (see annotation on {@link
@@ -456,7 +434,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     void submitJobWithInvalidFields() throws Exception {
         String query = "*:*";
         String fields = "randomfield1,randomfield2";
-        String format = "xml";
+        String format = "fasta";
         ResultActions resultActions = callPostJobStatus(query, fields, null, format, false);
         resultActions
                 .andDo(log())
@@ -573,8 +551,6 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
 
     protected abstract String getSubmitJobAllFormatQuery();
 
-    protected abstract String getSubmitJobAllFormatQueryFields();
-
     protected abstract MediaType getUnsupportedFormat();
 
     protected abstract String getUnsupportedFormatErrorMsg();
@@ -592,8 +568,4 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected abstract String getResultIdStringToMatch();
 
     protected abstract String submitJobWithoutFormatDefaultsToJsonGetField();
-
-    private Stream<Arguments> getFormatsWithoutProjection() {
-        return ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().map(Arguments::of);
-    }
 }
