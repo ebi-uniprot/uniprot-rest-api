@@ -98,4 +98,69 @@ class PIRJobTaskTest {
         assertEquals(3, idmappingResult.getMappedIds().size());
         assertEquals(2, idmappingResult.getObsoleteCount());
     }
+
+    @Test
+    void testGetObsoleteUniProtEntryCountBatchingWithLastBatchLessThanBatchSize() throws SolrServerException, IOException {
+        // when
+        IdMappingRepository repo = mock(IdMappingRepository.class);
+        PIRJobTask pirJobTask = new PIRJobTask(null, null, null, repo);
+        IdMappingResult.IdMappingResultBuilder resultBuilder = IdMappingResult.builder();
+        List<IdMappingStringPair> allPairs =
+                List.of(
+                        new IdMappingStringPair("P00000", "P00000"),
+                        new IdMappingStringPair("P00001", "P00001"),
+                        new IdMappingStringPair("P00002", "P00002"),
+                        new IdMappingStringPair("P00003", "P00003"),
+                        new IdMappingStringPair("P00004", "P00004"));
+        List<IdMappingStringPair> obsoletePairs1 =
+                List.of(
+                        new IdMappingStringPair("P00000", "P00000"),
+                        new IdMappingStringPair("P00001", "P00001"));
+        List<IdMappingStringPair> obsoletePairs2 =
+                List.of(new IdMappingStringPair("P00004", "P00004"));
+        when(repo.getAllMappingIds(
+                        SolrCollection.uniprot, List.of("P00000", "P00001"), "active:false"))
+                .thenReturn(obsoletePairs1);
+        when(repo.getAllMappingIds(
+                        SolrCollection.uniprot, List.of("P00002", "P00003"), "active:false"))
+                .thenReturn(List.of());
+        when(repo.getAllMappingIds(SolrCollection.uniprot, List.of("P00004"), "active:false"))
+                .thenReturn(obsoletePairs2);
+        resultBuilder.mappedIds(allPairs);
+        IdMappingResult result = resultBuilder.build();
+        // then
+        int batchSize = 2;
+        Integer obsoleteCount = pirJobTask.getObsoleteUniProtEntryCount(result, batchSize);
+        assertEquals(3, obsoleteCount);
+    }
+
+    @Test
+    void testGetObsoleteUniProtEntryCountBatchingWithLastBatchSameAsBatchSize() throws SolrServerException, IOException {
+        // when
+        IdMappingRepository repo = mock(IdMappingRepository.class);
+        PIRJobTask pirJobTask = new PIRJobTask(null, null, null, repo);
+        IdMappingResult.IdMappingResultBuilder resultBuilder = IdMappingResult.builder();
+        List<IdMappingStringPair> allPairs =
+                List.of(
+                        new IdMappingStringPair("P00000", "P00000"),
+                        new IdMappingStringPair("P00001", "P00001"),
+                        new IdMappingStringPair("P00002", "P00002"),
+                        new IdMappingStringPair("P00003", "P00003"));
+        List<IdMappingStringPair> obsoletePairs1 =
+                List.of(
+                        new IdMappingStringPair("P00000", "P00000"),
+                        new IdMappingStringPair("P00001", "P00001"));
+        when(repo.getAllMappingIds(
+                SolrCollection.uniprot, List.of("P00000", "P00001"), "active:false"))
+                .thenReturn(obsoletePairs1);
+        when(repo.getAllMappingIds(
+                SolrCollection.uniprot, List.of("P00002", "P00003"), "active:false"))
+                .thenReturn(List.of(new IdMappingStringPair("P00003", "P00003")));
+        resultBuilder.mappedIds(allPairs);
+        IdMappingResult result = resultBuilder.build();
+        // then
+        int batchSize = 2;
+        Integer obsoleteCount = pirJobTask.getObsoleteUniProtEntryCount(result, batchSize);
+        assertEquals(3, obsoleteCount);
+    }
 }

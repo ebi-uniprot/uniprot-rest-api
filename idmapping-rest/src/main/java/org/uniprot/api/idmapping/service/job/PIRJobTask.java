@@ -1,8 +1,7 @@
 package org.uniprot.api.idmapping.service.job;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,7 @@ import org.uniprot.store.search.SolrCollection;
 
 @Slf4j
 public class PIRJobTask extends JobTask {
+    private static final int BATCH_SIZE = 100_000;
     private final IdMappingPIRService pirService;
 
     private final IdMappingRepository idMappingRepository;
@@ -48,7 +48,7 @@ public class PIRJobTask extends JobTask {
                     && IdMappingFieldConfig.UNIPROTKB_STR.equals(
                             job.getIdMappingRequest().getTo())) {
 
-                Integer obsoleteUniProtCount = getObsoleteUniProtEntryCount(result);
+                Integer obsoleteUniProtCount = getObsoleteUniProtEntryCount(result, BATCH_SIZE);
                 result.setObsoleteCount(obsoleteUniProtCount);
             }
             return result;
@@ -73,15 +73,20 @@ public class PIRJobTask extends JobTask {
         }
     }
 
-    private Integer getObsoleteUniProtEntryCount(IdMappingResult result)
+    Integer getObsoleteUniProtEntryCount(IdMappingResult result, int batchSize)
             throws SolrServerException, IOException {
         List<String> accessions =
                 result.getMappedIds().stream()
                         .map(IdMappingStringPair::getTo)
                         .collect(Collectors.toList());
-        List<IdMappingStringPair> obsoleteIdPairs =
-                this.idMappingRepository.getAllMappingIds(
-                        SolrCollection.uniprot, accessions, "active:false");
+        Set<IdMappingStringPair> obsoleteIdPairs = new HashSet<>();
+        for (int i = 0; i < accessions.size(); i += batchSize) {
+            List<String> batch = accessions.subList(i, Math.min(i + batchSize, accessions.size()));
+            obsoleteIdPairs.addAll(
+                    this.idMappingRepository.getAllMappingIds(
+                            SolrCollection.uniprot, batch, "active:false"));
+        }
+
         return obsoleteIdPairs.size();
     }
 }
