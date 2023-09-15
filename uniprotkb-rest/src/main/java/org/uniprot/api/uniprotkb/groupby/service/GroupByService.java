@@ -1,15 +1,15 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.response.FacetField;
+import org.uniprot.api.uniprotkb.groupby.model.*;
+import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.uniprot.api.uniprotkb.groupby.model.*;
-import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
 public abstract class GroupByService<T> {
     private final UniProtEntryService uniProtEntryService;
@@ -56,7 +56,7 @@ public abstract class GroupByService<T> {
             List<T> ancestors, List<T> entries, String parent, List<FacetField.Count> facetCounts) {
         if (!facetCounts.isEmpty()) {
             String facetId = getFacetId(facetCounts.get(0));
-            if (!equalIds(parent, facetId) && !entries.isEmpty()) {
+            if (!areEqualIds(parent, facetId) && !entries.isEmpty()) {
                 ancestors.add(
                         entries.stream()
                                 .filter(t -> facetId.equals(getId(t)))
@@ -66,7 +66,7 @@ public abstract class GroupByService<T> {
         }
     }
 
-    protected boolean equalIds(String parent, String facetId) {
+    protected boolean areEqualIds(String parent, String facetId) {
         return Objects.equals(parent, facetId);
     }
 

@@ -42,7 +42,7 @@ public class GroupByGOService extends GroupByService<GoRelation> {
     }
 
     @Override
-    protected boolean equalIds(String parent, String facetId) {
+    protected boolean areEqualIds(String parent, String facetId) {
         return Objects.equals(addGoPrefix(parent), facetId);
     }
 
