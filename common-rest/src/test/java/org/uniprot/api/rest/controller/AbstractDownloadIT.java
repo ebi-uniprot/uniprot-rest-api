@@ -2,10 +2,14 @@ package org.uniprot.api.rest.controller;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.amqp.core.AmqpAdmin;
@@ -62,6 +66,20 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
     protected void prepareDownloadFolders() throws IOException {
         Files.createDirectories(Path.of(this.idsFolder));
         Files.createDirectories(Path.of(this.resultFolder));
+    }
+
+    protected void uncompressFile(Path zippedFile, Path unzippedFile) throws IOException {
+        InputStream fin = Files.newInputStream(zippedFile);
+        BufferedInputStream in = new BufferedInputStream(fin);
+        OutputStream out = Files.newOutputStream(unzippedFile);
+        GzipCompressorInputStream gzIn = new GzipCompressorInputStream(in);
+        final byte[] buffer = new byte[1024];
+        int n = 0;
+        while (-1 != (n = gzIn.read(buffer))) {
+            out.write(buffer, 0, n);
+        }
+        out.close();
+        gzIn.close();
     }
 
     protected void cleanUpFolder(String folder) throws IOException {

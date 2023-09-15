@@ -6,10 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.uniprot.api.rest.controller.AbstractStreamControllerIT.SAMPLE_RDF;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -45,12 +41,9 @@ public class UniRefAsyncDownloadUtils {
             UniRefQueryRepository unirefQueryRepository,
             CloudSolrClient cloudSolrClient,
             SolrClient solrClient,
-            UniProtStoreClient<UniRefEntryLight> storeClient,
-            String idsFolder,
-            String resultFolder)
+            UniProtStoreClient<UniRefEntryLight> storeClient)
             throws Exception {
         ReflectionTestUtils.setField(unirefQueryRepository, "solrClient", cloudSolrClient);
-        prepareDownloadFolders(idsFolder, resultFolder);
         saveEntries(cloudSolrClient, storeClient);
         long queryHits = 100L;
         QueryResponse response = mock(QueryResponse.class);
@@ -85,11 +78,5 @@ public class UniRefAsyncDownloadUtils {
         UniRefDocument doc = documentConverter.convert(xmlEntry);
         cloudSolrClient.addBean(SolrCollection.uniref.name(), doc);
         storeClient.saveEntry(entryLight);
-    }
-
-    public static void prepareDownloadFolders(String idsFolder, String resultFolder)
-            throws IOException {
-        Files.createDirectories(Path.of(idsFolder));
-        Files.createDirectories(Path.of(resultFolder));
     }
 }

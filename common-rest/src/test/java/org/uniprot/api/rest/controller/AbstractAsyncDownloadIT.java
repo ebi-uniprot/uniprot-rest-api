@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doThrow;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 import static org.uniprot.api.rest.download.queue.RedisUtil.*;
 
 import java.io.IOException;

@@ -68,7 +68,7 @@ import org.uniprot.store.search.SolrCollection;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest({UniProtKBDownloadController.class})
 @AutoConfigureWebClient
-public class UniProtKBAsyncDownloadIntegrationTest extends AbstractAsyncDownloadIT {
+public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Value("${async.download.embeddings.maxEntryCount}")
     protected long maxEntryCount;
@@ -91,14 +91,9 @@ public class UniProtKBAsyncDownloadIntegrationTest extends AbstractAsyncDownload
 
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
+        prepareDownloadFolders();
         saveEntriesInSolrAndStore(
-                uniprotQueryRepository,
-                cloudSolrClient,
-                solrClient,
-                storeClient,
-                taxRepository,
-                idsFolder,
-                resultFolder);
+                uniprotQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
     }
 
     @BeforeEach

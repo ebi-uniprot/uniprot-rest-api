@@ -66,12 +66,9 @@ public class UniProtKBAsyncDownloadUtils {
             CloudSolrClient cloudSolrClient,
             SolrClient solrClient,
             UniProtStoreClient<UniProtKBEntry> storeClient,
-            TaxonomyLineageRepository taxRepository,
-            String idsFolder,
-            String resultFolder)
+            TaxonomyLineageRepository taxRepository)
             throws Exception {
         ReflectionTestUtils.setField(uniprotQueryRepository, "solrClient", cloudSolrClient);
-        prepareDownloadFolders(idsFolder, resultFolder);
         saveEntries(cloudSolrClient, storeClient);
         // for the following tests, ensure the number of hits
         // for each query is less than the maximum number allowed

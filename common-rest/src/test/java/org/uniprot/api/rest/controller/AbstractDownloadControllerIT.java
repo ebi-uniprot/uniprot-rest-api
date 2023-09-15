@@ -13,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
-import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -44,7 +44,6 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
-import org.uniprot.api.rest.validation.ValidDownloadRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -166,8 +165,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected void submitJobWithoutFormatDefaultsToJson() throws Exception {
         // when
         String query = submitJobWithQuery();
-        String fields = submitJobWithoutFormatDefaultsToJsonGetField();
-        String jobId = callRunAPIAndVerify(query, fields, null, null, false);
+        String jobId = callRunAPIAndVerify(query, null, null, null, false);
         // then
         await().until(() -> getDownloadJobRepository().existsById(jobId));
         await().until(isJobFinished(jobId));
@@ -179,8 +177,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         // when
         MediaType format = getUnsupportedFormat();
         String query = submitJobWithQuery();
-        String fields = getSubmitJobUnsupportedFormatFailureFields();
-        ResultActions response = callPostJobStatus(query, fields, null, format.toString(), false);
+        ResultActions response = callPostJobStatus(query, null, null, format.toString(), false);
 
         // then
         response.andDo(log())
@@ -456,6 +453,28 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                                                         + format))));
     }
 
+    @ParameterizedTest
+    @EnumSource(
+            value = JobStatus.class,
+            names = {"PROCESSING", "UNFINISHED"})
+    void statusInProcessingOrUnFinishedReturnsRunning(JobStatus status) throws Exception {
+        String jobId = UUID.randomUUID().toString();
+        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
+        DownloadJob job = builder.id(jobId).status(status).build();
+        DownloadJobRepository repo = getDownloadJobRepository();
+        repo.save(job);
+        await().until(() -> repo.existsById(jobId));
+
+        ResultActions response = callGetJobStatus(jobId);
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobStatus", is(JobStatus.RUNNING.toString())))
+                .andExpect(jsonPath("$.errors").doesNotExist());
+    }
+
     protected JobStatus getJobStatus(String jobId) throws Exception {
         ResultActions response = callGetJobStatus(jobId);
         // then
@@ -555,8 +574,6 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
 
     protected abstract String getUnsupportedFormatErrorMsg();
 
-    protected abstract String getSubmitJobUnsupportedFormatFailureFields();
-
     protected abstract String getRunQueryWhichReturnsEmptyResult();
 
     protected abstract String getQueryForJSONAndTSVRunJobWithFields();
@@ -566,6 +583,4 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected abstract String getRunJobHeaderWithFieldsTSV();
 
     protected abstract String getResultIdStringToMatch();
-
-    protected abstract String submitJobWithoutFormatDefaultsToJsonGetField();
 }

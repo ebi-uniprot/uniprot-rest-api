@@ -12,7 +12,6 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.api.common.repository.stream.store.uniref.UniRefBatchStoreIterable;
 import org.uniprot.api.rest.download.AbstractDownloadResultWriter;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -45,7 +44,7 @@ public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<Uni
     @Override
     public BatchStoreIterable<UniRefEntryLight> getBatchStoreIterable(
             Iterator<String> idsIterator, StoreRequest storeRequest) {
-        return new UniRefBatchStoreIterable(
+        return new BatchStoreIterable<>(
                 idsIterator,
                 storeStreamerConfig.getStoreClient(),
                 storeStreamerConfig.getStoreFetchRetryPolicy(),

@@ -17,34 +17,17 @@ public class RedisUtil {
 
     public static Callable<Boolean> jobFinished(
             DownloadJobRepository downloadJobRepository, String jobId) {
-        return () ->
-                downloadJobRepository.existsById(jobId)
-                        && downloadJobRepository.findById(jobId).get().getStatus()
-                                == JobStatus.FINISHED;
+        return jobStatus(downloadJobRepository, jobId, JobStatus.FINISHED);
     }
 
     public static Callable<Boolean> jobErrored(
             DownloadJobRepository downloadJobRepository, String jobId) {
-        return () ->
-                downloadJobRepository.existsById(jobId)
-                        && downloadJobRepository.findById(jobId).get().getStatus()
-                                == JobStatus.ERROR;
+        return jobStatus(downloadJobRepository, jobId, JobStatus.ERROR);
     }
 
     public static Callable<Boolean> jobUnfinished(
             DownloadJobRepository downloadJobRepository, String jobId) {
-        return () ->
-                downloadJobRepository.existsById(jobId)
-                        && downloadJobRepository.findById(jobId).get().getStatus()
-                                == JobStatus.UNFINISHED;
-    }
-
-    public static Callable<Boolean> jobRunning(
-            DownloadJobRepository downloadJobRepository, String jobId) {
-        return () ->
-                downloadJobRepository.existsById(jobId)
-                        && downloadJobRepository.findById(jobId).get().getStatus()
-                                == JobStatus.RUNNING;
+        return jobStatus(downloadJobRepository, jobId, JobStatus.UNFINISHED);
     }
 
     public static Callable<Boolean> jobRetriedMaximumTimes(
@@ -55,17 +38,6 @@ public class RedisUtil {
                 return optJob.get().getRetried() == maxRetry;
             }
             return false;
-        };
-    }
-
-    public static Callable<Integer> getJobRetriedCount(
-            DownloadJobRepository downloadJobRepository, String jobId) {
-        return () -> {
-            Optional<DownloadJob> optJob = downloadJobRepository.findById(jobId);
-            if (optJob.isPresent()) {
-                return optJob.get().getRetried();
-            }
-            return 0;
         };
     }
 
@@ -91,5 +63,12 @@ public class RedisUtil {
                     (Integer) amqpAdmin.getQueueProperties(queueName).get("QUEUE_MESSAGE_COUNT");
             return count >= rejectedMsgCount;
         };
+    }
+
+    private static Callable<Boolean> jobStatus(
+            DownloadJobRepository downloadJobRepository, String jobId, JobStatus status) {
+        return () ->
+                downloadJobRepository.existsById(jobId)
+                        && downloadJobRepository.findById(jobId).get().getStatus() == status;
     }
 }

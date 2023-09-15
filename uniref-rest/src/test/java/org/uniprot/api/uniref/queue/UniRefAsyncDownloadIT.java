@@ -54,9 +54,7 @@ import org.uniprot.store.search.SolrCollection;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @WebMvcTest({UniRefDownloadController.class})
 @AutoConfigureWebClient
-public class UniRefAsyncDownloadIntegrationTest extends AbstractAsyncDownloadIT {
-
-    // TODO: Add test data creation from AbstractUniRefDownloadIT
+public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @SpyBean private UniRefMessageListener uniRefMessageListener;
 
@@ -72,13 +70,8 @@ public class UniRefAsyncDownloadIntegrationTest extends AbstractAsyncDownloadIT 
 
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
-        saveEntriesInSolrAndStore(
-                unirefQueryRepository,
-                cloudSolrClient,
-                solrClient,
-                storeClient,
-                idsFolder,
-                resultFolder);
+        prepareDownloadFolders();
+        saveEntriesInSolrAndStore(unirefQueryRepository, cloudSolrClient, solrClient, storeClient);
     }
 
     @BeforeEach

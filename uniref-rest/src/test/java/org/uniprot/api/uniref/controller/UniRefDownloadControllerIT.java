@@ -2,14 +2,9 @@ package org.uniprot.api.uniref.controller;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.uniref.utils.UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore;
 import static org.uniprot.api.uniref.utils.UniRefAsyncDownloadUtils.setUp;
@@ -20,7 +15,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,15 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,7 +40,6 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractDownloadControllerIT;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
-import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
@@ -97,40 +86,13 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
-        saveEntriesInSolrAndStore(
-                unirefQueryRepository,
-                cloudSolrClient,
-                solrClient,
-                storeClient,
-                idsFolder,
-                resultFolder);
+        prepareDownloadFolders();
+        saveEntriesInSolrAndStore(unirefQueryRepository, cloudSolrClient, solrClient, storeClient);
     }
 
     @BeforeEach
     void setUpRestTemplate() {
         setUp(restTemplate);
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-            value = JobStatus.class,
-            names = {"PROCESSING", "UNFINISHED"})
-    void statusInProcessingOrUnFinishedReturnsRunning(JobStatus status) throws Exception {
-        String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
-        DownloadJob job = builder.id(jobId).status(status).build();
-        DownloadJobRepository repo = getDownloadJobRepository();
-        repo.save(job);
-        await().until(() -> repo.existsById(jobId));
-
-        ResultActions response = callGetJobStatus(jobId);
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobStatus", is(JobStatus.RUNNING.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist());
     }
 
     @Test
@@ -317,11 +279,6 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Override
-    protected String getSubmitJobUnsupportedFormatFailureFields() {
-        return "id,name";
-    }
-
-    @Override
     protected String getRunQueryWhichReturnsEmptyResult() {
         return "identity:noid";
     }
@@ -344,11 +301,6 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @Override
     protected String getResultIdStringToMatch() {
         return "$.results.*.id";
-    }
-
-    @Override
-    protected String submitJobWithoutFormatDefaultsToJsonGetField() {
-        return "id";
     }
 
     protected DownloadJobRepository getDownloadJobRepository() {

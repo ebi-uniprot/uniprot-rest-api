@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.*;
 
@@ -30,7 +29,6 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -109,14 +107,9 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
+        prepareDownloadFolders();
         saveEntriesInSolrAndStore(
-                uniprotQueryRepository,
-                cloudSolrClient,
-                solrClient,
-                storeClient,
-                taxRepository,
-                idsFolder,
-                resultFolder);
+                uniprotQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
     }
 
     @BeforeEach
@@ -405,28 +398,6 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
                                 "P00007", "P00008", "P00009", "P00010")));
     }
 
-    @ParameterizedTest
-    @EnumSource(
-            value = JobStatus.class,
-            names = {"PROCESSING", "UNFINISHED"})
-    void statusInProcessingOrUnFinishedReturnsRunning(JobStatus status) throws Exception {
-        String jobId = UUID.randomUUID().toString();
-        DownloadJob.DownloadJobBuilder builder = DownloadJob.builder();
-        DownloadJob job = builder.id(jobId).status(status).build();
-        DownloadJobRepository repo = getDownloadJobRepository();
-        repo.save(job);
-        await().until(() -> repo.existsById(jobId));
-
-        ResultActions response = callGetJobStatus(jobId);
-
-        // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobStatus", is(JobStatus.RUNNING.toString())))
-                .andExpect(jsonPath("$.errors").doesNotExist());
-    }
-
     private Stream<Arguments> getFormatsWithoutProjection() {
         return ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().map(Arguments::of);
     }
@@ -499,11 +470,6 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     }
 
     @Override
-    protected String getSubmitJobUnsupportedFormatFailureFields() {
-        return "accession,rhea";
-    }
-
-    @Override
     protected String getRunQueryWhichReturnsEmptyResult() {
         return "content:khansamatola";
     }
@@ -526,11 +492,6 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Override
     protected String getResultIdStringToMatch() {
         return "$.results.*.primaryAccession";
-    }
-
-    @Override
-    protected String submitJobWithoutFormatDefaultsToJsonGetField() {
-        return "accession";
     }
 
     protected DownloadJobRepository getDownloadJobRepository() {
