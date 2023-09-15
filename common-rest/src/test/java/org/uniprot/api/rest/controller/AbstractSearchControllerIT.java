@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
@@ -53,6 +54,7 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -109,7 +111,14 @@ public abstract class AbstractSearchControllerIT {
                         .andExpect(status().is(HttpStatus.OK.value()))
                         .andExpect(header().string(HttpHeaders.CACHE_CONTROL, CACHE_VALUE))
                         .andExpect(
-                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE));
+                                header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                        .andExpect(
+                                header().stringValues(
+                                                HttpHeaders.VARY,
+                                                ACCEPT,
+                                                ACCEPT_ENCODING,
+                                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -141,7 +150,14 @@ public abstract class AbstractSearchControllerIT {
                         .andExpect(header().string(HttpHeaders.CACHE_CONTROL, CACHE_VALUE))
                         .andExpect(
                                 header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                        .andExpect(header().string(X_TOTAL_RESULTS, "0"));
+                        .andExpect(header().string(X_TOTAL_RESULTS, "0"))
+                        .andExpect(
+                                header().stringValues(
+                                                HttpHeaders.VARY,
+                                                ACCEPT,
+                                                ACCEPT_ENCODING,
+                                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE));
 
         for (ResultMatcher resultMatcher : queryParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -160,7 +176,6 @@ public abstract class AbstractSearchControllerIT {
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
                 .andExpect(jsonPath("$.messages.*", contains("'query' is a required parameter")));
     }
 
@@ -237,6 +252,29 @@ public abstract class AbstractSearchControllerIT {
                 .andExpect(
                         jsonPath(
                                 "$.messages.*", contains("query parameter has an invalid syntax")));
+    }
+
+    @Test
+    void searchQueryWithInvalidQueryFormatMultipleMiddleWildcardReturnBadRequest()
+            throws Exception {
+
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(getSearchRequestPath())
+                                .param("query", "pro*te*in")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "We only allow one wildcard character (*) in the middle of a search term. "
+                                                + "Please check the help page for more information using wildcards for searches.")));
     }
 
     @Test
@@ -537,7 +575,6 @@ public abstract class AbstractSearchControllerIT {
 
         for (String path : paths) {
             String returnFieldValidatePath = "$.results[*]." + path;
-            log.info("ReturnField:" + name + " Validation Path: " + returnFieldValidatePath);
             resultActions.andExpect(jsonPath(returnFieldValidatePath).hasJsonPath());
         }
     }

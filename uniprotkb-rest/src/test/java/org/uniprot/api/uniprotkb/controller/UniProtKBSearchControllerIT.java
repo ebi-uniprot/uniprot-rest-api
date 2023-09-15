@@ -1510,7 +1510,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
     }
 
     @Test
-    void searchGeneNameWithLeadingWildcardSuccess() throws Exception {
+    void searchGeneNameWithLeadingWildcardAndSingleMiddleWildcardSuccess() throws Exception {
         // given
         UniProtKBEntry canonicalEntry =
                 UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
@@ -1520,7 +1520,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=gene:*GFR2")
+                                get(SEARCH_RESOURCE + "?query=gene:*GFR*2")
                                         .header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then

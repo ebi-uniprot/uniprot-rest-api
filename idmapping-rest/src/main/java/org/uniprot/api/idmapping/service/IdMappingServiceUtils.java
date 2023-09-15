@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.service;
 
+import java.util.Objects;
+
 import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 
@@ -13,6 +15,11 @@ public class IdMappingServiceUtils {
         if (result.getSuggestedIds() != null) {
             builder.suggestedIds(result.getSuggestedIds());
         }
+
+        if (Objects.nonNull(result.getObsoleteCount())) {
+            builder.obsoleteCount(result.getObsoleteCount());
+        }
+
         return builder.build();
     }
 }

@@ -155,6 +155,10 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
                 if (notNullNotEmpty(extraOptions.getSuggestedIds())) {
                     writeJsonArray(generator, "suggestedIds", extraOptions.getSuggestedIds());
                 }
+
+                if (Objects.nonNull(extraOptions.getObsoleteCount())) {
+                    writeJsonObject(generator, "obsoleteCount", extraOptions.getObsoleteCount());
+                }
             }
 
             if (notNullNotEmpty(context.getSuggestions())) {
@@ -216,6 +220,12 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
             writeElement(generator, matchedField);
         }
         generator.writeEndArray();
+    }
+
+    private static void writeJsonObject(
+            JsonGenerator generator, String fieldName, Object fieldValue) throws IOException {
+        generator.writeFieldName(fieldName);
+        generator.writeObject(fieldValue);
     }
 
     private void writeElement(JsonGenerator generator, Object facet) {

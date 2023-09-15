@@ -7,9 +7,9 @@ import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.D
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.rest.controller.BasicDownloadController;
 import org.uniprot.api.rest.download.model.DownloadJob;
@@ -19,6 +19,7 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
+import org.uniprot.api.rest.validation.CustomConstraintGroupSequence;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +46,8 @@ public class UniProtKBDownloadController extends BasicDownloadController {
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<JobSubmitResponse> submitJob(
-            @Valid @ModelAttribute UniProtKBDownloadRequest request) {
+            @Validated(CustomConstraintGroupSequence.class) @ModelAttribute
+                    UniProtKBDownloadRequest request) {
         String jobId = this.messageService.sendMessage(request);
         return ResponseEntity.ok(new JobSubmitResponse(jobId));
     }

@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -370,6 +371,35 @@ class UniProtEntryServiceTest {
         Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
         assertThrows(
                 ServiceException.class, () -> entryService.findAccessionByProteinId("PROTEIN_ID"));
+    }
+
+    @Test
+    void findAccessionByObsoleteProteinIdWithMultipleEntries() {
+        String obsoleteProteinId = "PROTEIN_ID";
+        UniProtDocument doc1 = new UniProtDocument();
+        doc1.accession = "ACC1";
+        doc1.id.add("PRIMARY_ID1");
+        doc1.id.add(obsoleteProteinId);
+        doc1.active = true;
+        UniProtDocument doc2 = new UniProtDocument();
+        doc2.id.add("PRIMARY_ID2");
+        doc2.id.add(obsoleteProteinId);
+        doc2.active = true;
+        doc2.accession = "ACC2";
+        Page page = CursorPage.of(null, 10, 2);
+        QueryResult<UniProtDocument> queryResult =
+                QueryResult.<UniProtDocument>builder()
+                        .content(Stream.of(doc1, doc2))
+                        .page(page)
+                        .build();
+        Mockito.when(repository.searchPage(any(), any())).thenReturn(queryResult);
+        InvalidRequestException exception =
+                assertThrows(
+                        InvalidRequestException.class,
+                        () -> entryService.findAccessionByProteinId("PROTEIN_ID"));
+        assertEquals(
+                "This protein ID 'PROTEIN_ID' is now obsolete. Please refer to the accessions derived from this protein ID (ACC1, ACC2).",
+                exception.getMessage());
     }
 
     @Test

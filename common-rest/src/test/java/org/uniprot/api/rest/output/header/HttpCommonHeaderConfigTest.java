@@ -79,16 +79,15 @@ class HttpCommonHeaderConfigTest {
     }
 
     @Test
-    void noCacheHeadersAddedForBadRequestResponse() {
+    void cacheHeadersAddedForBadRequestResponse() {
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        when(mockRequest.getServletPath()).thenReturn("/uniprotkb/accession/P12345");
+        when(mockRequest.getRequestURI()).thenReturn("/uniprotkb/accession/P12345");
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
         when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_BAD_REQUEST);
 
         config.handleGatewayCaching(mockRequest, mockResponse);
 
-        verify(mockResponse).addHeader(CACHE_CONTROL, NO_CACHE);
-        verify(mockResponse, never()).addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + MAX_AGE);
+        verify(mockResponse).addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + MAX_AGE);
         verify(mockResponse).addHeader(VARY, ACCEPT);
         verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
         verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
@@ -98,7 +97,7 @@ class HttpCommonHeaderConfigTest {
     @Test
     void noCacheHeadersAddedForNonCacheablePaths() {
         HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-        when(mockRequest.getServletPath()).thenReturn("/idmapping/run/12345");
+        when(mockRequest.getRequestURI()).thenReturn("/idmapping/run/12345");
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
         when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_OK);
 
@@ -142,5 +141,21 @@ class HttpCommonHeaderConfigTest {
         assertThat(
                 mutableRequest.getHeader(HttpHeaders.ACCEPT_ENCODING),
                 is(FileType.GZIP.getFileType()));
+    }
+
+    @Test
+    void noCacheHeadersAddedForServerError() {
+        HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+        when(mockRequest.getRequestURI()).thenReturn("/uniprotkb/accession/P00000");
+        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+        when(mockResponse.getStatus()).thenReturn(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+        config.handleGatewayCaching(mockRequest, mockResponse);
+
+        verify(mockResponse).addHeader(CACHE_CONTROL, NO_CACHE);
+        verify(mockResponse).addHeader(VARY, ACCEPT);
+        verify(mockResponse).addHeader(VARY, ACCEPT_ENCODING);
+        verify(mockResponse).addHeader(VARY, X_UNIPROT_RELEASE);
+        verify(mockResponse).addHeader(VARY, X_API_DEPLOYMENT_DATE);
     }
 }

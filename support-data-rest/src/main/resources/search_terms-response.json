@@ -2752,12 +2752,12 @@
             "valuePrefix": "supfam"
           },
           {
-            "id": "id_xref_tigrfams",
-            "label": "TIGRFAMs",
+            "id": "id_xref_ncbifam",
+            "label": "NCBIfam",
             "itemType": "database",
             "term": "xref",
             "dataType": "string",
-            "valuePrefix": "tigrfams"
+            "valuePrefix": "ncbifam"
           },
           {
             "id": "id_xref_prosite",

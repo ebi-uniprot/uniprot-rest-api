@@ -99,7 +99,7 @@ DR   Pfam; PF18072; FGAR-AT_linker; 1.
 DR   PIRSF; PIRSF001587; FGAM_synthase_II; 1.
 DR   SUPFAM; SSF55326; SSF55326; 2.
 DR   SUPFAM; SSF56042; SSF56042; 2.
-DR   TIGRFAMs; TIGR01736; FGAM_synth_II; 1.
+DR   NCBIfam; NF01736; FGAM_synth_II; 1.
 PE   3: Inferred from homology;
 KW   ATP-binding; Cytoplasm; Ligase; Magnesium; Metal-binding;
 KW   Nucleotide-binding; Purine biosynthesis; Reference proteome.

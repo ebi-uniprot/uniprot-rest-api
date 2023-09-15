@@ -25,12 +25,24 @@ public class IdMappingRepository {
     public List<IdMappingStringPair> getAllMappingIds(
             SolrCollection collection, List<String> searchIds)
             throws SolrServerException, IOException {
+        String starQuery = "*:*";
+        return getAllMappingIds(collection, searchIds, starQuery);
+    }
+
+    public List<IdMappingStringPair> getAllMappingIds(
+            SolrCollection collection, List<String> searchIds, String query)
+            throws SolrServerException, IOException {
         switch (collection) {
             case uniprot:
                 return getAllMatchingIds(
-                        uniProtKBSolrClient, collection, "all_ids", "accession_id", searchIds);
+                        uniProtKBSolrClient,
+                        collection,
+                        "accession_id",
+                        "accession_id",
+                        searchIds,
+                        query);
             case uniparc:
-                return getAllMatchingIds(solrClient, collection, "upi", "upi", searchIds);
+                return getAllMatchingIds(solrClient, collection, "upi", "upi", searchIds, query);
             case uniref:
                 // uniref id is big (23 char e-g UniRef100_UPI0000072840) 100_000 can not fit in
                 // single request
@@ -42,7 +54,8 @@ public class IdMappingRepository {
                                 collection,
                                 unirefSolrIdField,
                                 unirefSolrIdField,
-                                searchIds.subList(0, sublistSize));
+                                searchIds.subList(0, sublistSize),
+                                query);
                 if (searchIds.size() > sublistSize) {
                     unirefSolrMappingList.addAll(
                             getAllMatchingIds(
@@ -50,7 +63,8 @@ public class IdMappingRepository {
                                     collection,
                                     unirefSolrIdField,
                                     unirefSolrIdField,
-                                    searchIds.subList(sublistSize, searchIds.size())));
+                                    searchIds.subList(sublistSize, searchIds.size()),
+                                    query));
                 }
                 return unirefSolrMappingList;
             default:
@@ -63,13 +77,14 @@ public class IdMappingRepository {
             SolrCollection collection,
             String searchField,
             String idField,
-            List<String> searchIds)
+            List<String> searchIds,
+            String query)
             throws SolrServerException, IOException {
 
         var filteredTermQueryWithIds =
                 String.format("({!terms f=%s}%s)", searchField, String.join(",", searchIds));
         var queryParamsMap = new HashMap<String, String>();
-        queryParamsMap.put("q", "*:*");
+        queryParamsMap.put("q", query);
         queryParamsMap.put("fl", searchField + "," + idField);
         queryParamsMap.put("start", "0");
         queryParamsMap.put("rows", String.valueOf(searchIds.size()));

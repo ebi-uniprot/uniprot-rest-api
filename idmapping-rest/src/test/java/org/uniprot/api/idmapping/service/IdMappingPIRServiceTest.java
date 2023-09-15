@@ -1,7 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
@@ -40,6 +39,7 @@ class IdMappingPIRServiceTest {
                         .mappedIds(mappingPairs)
                         .unmappedIds(unmappedIds)
                         .suggestedIds(suggestedIds)
+                        .obsoleteCount(10)
                         .build();
 
         // when
@@ -54,6 +54,7 @@ class IdMappingPIRServiceTest {
         ExtraOptions extraOptions = queryResult.getExtraOptions();
         assertThat(extraOptions.getFailedIds(), is(unmappedIds));
         assertThat(extraOptions.getSuggestedIds(), is(suggestedIds));
+        assertThat(extraOptions.getObsoleteCount(), is(10));
     }
 
     @Test
@@ -74,6 +75,7 @@ class IdMappingPIRServiceTest {
         ExtraOptions extraOptions = queryResult.getExtraOptions();
         assertThat(extraOptions.getFailedIds(), is(emptyList));
         assertThat(extraOptions.getSuggestedIds(), is(emptyList));
+        assertThat(extraOptions.getObsoleteCount(), is(nullValue()));
     }
 
     @Test
@@ -86,6 +88,7 @@ class IdMappingPIRServiceTest {
                         .mappedIds(mappingPairs)
                         .unmappedIds(unmappedIds)
                         .suggestedIds(suggestedIds)
+                        .obsoleteCount(3)
                         .build();
 
         // when
@@ -97,6 +100,7 @@ class IdMappingPIRServiceTest {
         ExtraOptions extraOptions = queryResult.getExtraOptions();
         assertThat(extraOptions.getFailedIds(), is(unmappedIds));
         assertThat(extraOptions.getSuggestedIds(), is(suggestedIds));
+        assertThat(extraOptions.getObsoleteCount(), is(3));
     }
 
     private List<IdMappingStringPair> createMappingPairs(int count) {

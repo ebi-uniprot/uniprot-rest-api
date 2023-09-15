@@ -79,10 +79,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + TAX_ID_0_STRING)
-                                .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + TAX_ID_0_STRING))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_0)))
@@ -98,7 +95,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
     void getGroupByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", TAX_ID_0_STRING).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", TAX_ID_0_STRING))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
                 .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_0)))
@@ -115,10 +112,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(
-                        get(PATH)
-                                .param("query", "organism_id:" + TAX_ID_2_STRING)
-                                .param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", "organism_id:" + TAX_ID_2_STRING))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
@@ -138,7 +132,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
     void getGroupByTaxonomy_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", TAX_ID_2_STRING).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", TAX_ID_2_STRING))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
@@ -179,7 +173,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
     void getGroupByTaxonomy_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", EMPTY_PARENT))
+        mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING))
                 .andDo(log())
                 .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
                 .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))

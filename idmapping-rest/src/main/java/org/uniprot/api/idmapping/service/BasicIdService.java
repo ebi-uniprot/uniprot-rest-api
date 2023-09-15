@@ -120,7 +120,7 @@ public abstract class BasicIdService<T, U> {
             SolrStreamFacetResponse solrStreamResponse =
                     searchBySolrStream(toIds, searchRequest, includeIsoform);
             long end = System.currentTimeMillis();
-            log.info(
+            log.debug(
                     "Time taken to search solr in ms {} for jobId {} in getMappedEntries",
                     (end - start),
                     jobId);
@@ -144,7 +144,7 @@ public abstract class BasicIdService<T, U> {
         long start = System.currentTimeMillis();
         Stream<U> result = getPagedEntries(mappedIds, cursor, searchRequest.getFields());
         long end = System.currentTimeMillis();
-        log.info(
+        log.debug(
                 "Total time taken to call voldemort in ms {} for jobId {} in getMappedEntries",
                 (end - start),
                 jobId);
@@ -222,7 +222,7 @@ public abstract class BasicIdService<T, U> {
             SolrStreamFacetResponse solrStreamResponse =
                     searchBySolrStream(toIds, searchRequest, includeIsoform);
             long end = System.currentTimeMillis();
-            log.info(
+            log.debug(
                     "Time taken to search solr in ms {} for jobId {} in streamFilterAndSortEntries",
                     (end - start),
                     jobId);

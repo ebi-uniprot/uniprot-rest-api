@@ -1,13 +1,14 @@
 package org.uniprot.api.uniprotkb.groupby.service.go.client;
 
-import com.google.common.base.Strings;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.google.common.base.Strings;
 
 @Component
 public class GOClientImpl implements GOClient {

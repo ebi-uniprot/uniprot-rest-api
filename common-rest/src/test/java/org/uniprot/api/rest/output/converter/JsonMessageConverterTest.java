@@ -300,6 +300,7 @@ class JsonMessageConverterTest {
                 ExtraOptions.builder()
                         .failedIds(List.of("id1"))
                         .suggestedId(FakePair.builder().from("fromid2").to("toid2").build())
+                        .obsoleteCount(10)
                         .build();
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
@@ -315,7 +316,7 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"],\"suggestedIds\":[{\"from\":\"fromid2\",\"to\":\"toid2\"}]}",
+                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"],\"suggestedIds\":[{\"from\":\"fromid2\",\"to\":\"toid2\"}],\"obsoleteCount\":10}",
                 result);
     }
 
@@ -445,6 +446,24 @@ class JsonMessageConverterTest {
         log.debug(result);
         assertEquals(
                 "{\"results\":[],\"error\":\"Error encountered when streaming data.\"}", result);
+    }
+
+    @Test
+    void writeCanWriteOnlyObsoleteCount() throws IOException {
+        ExtraOptions extraOptions = ExtraOptions.builder().obsoleteCount(15).build();
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .extraOptions(extraOptions)
+                        .build();
+        log.debug("------- BEGIN: writeCanWriteOnlyFailedEntities");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+        jsonMessageConverter.writeEntities(
+                Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
+        writeAfter(messageContext, outputStream);
+        String result = outputStream.toString("UTF-8");
+        log.debug(result);
+        assertEquals("{\"results\":[],\"obsoleteCount\":15}", result);
     }
 
     private void writeBefore(

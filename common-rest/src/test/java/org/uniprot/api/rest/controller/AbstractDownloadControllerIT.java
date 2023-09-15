@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
@@ -12,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.rest.download.TestUtils.uncompressFile;
+import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,6 +44,9 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
+import org.uniprot.api.rest.validation.ValidDownloadRequest;
+import org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -59,6 +65,14 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
+                .andExpect(
+                        header().stringValues(
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.url").exists())
                 .andExpect(jsonPath("$.messages", contains("'query' is a required parameter")));
     }
@@ -76,6 +90,14 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, NO_CACHE_VALUE))
+                .andExpect(
+                        header().stringValues(
+                                        HttpHeaders.VARY,
+                                        ACCEPT,
+                                        ACCEPT_ENCODING,
+                                        HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                        HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE))
                 .andExpect(jsonPath("$.jobStatus", equalTo(JobStatus.FINISHED.toString())))
                 .andExpect(jsonPath("$.errors").doesNotExist());
         verifyIdsAndResultFiles(jobId);
@@ -403,6 +425,59 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         Assertions.assertEquals(getRunJobHeaderWithFieldsTSV(), rows[0]);
     }
 
+    @ParameterizedTest(name = "[{index}] format {0}")
+    @MethodSource("getFormatsWithoutProjection")
+    void submitJobWithFieldsNotSupported(String format) throws Exception {
+        // when
+        String query = "*:*";
+        String fields = "accession,rhea";
+        ResultActions resultActions =
+                callPostJobStatus(query, fields, null, format.toString(), false);
+        resultActions
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                contains("'fields' are not supported for 'format' " + format)));
+    }
+
+    /**
+     * Tests that class level validation is called after field level validation. It also tests that
+     * class level validation (see annotation on {@link
+     * org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest} ) is not called if the
+     * fields validation is failed.
+     *
+     * @throws Exception
+     */
+    @Test
+    void submitJobWithInvalidFields() throws Exception {
+        String query = "*:*";
+        String fields = "randomfield1,randomfield2";
+        String format = "xml";
+        ResultActions resultActions = callPostJobStatus(query, fields, null, format, false);
+        resultActions
+                .andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.url").exists())
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                containsInAnyOrder(
+                                        "Invalid fields parameter value 'randomfield1'",
+                                        "Invalid fields parameter value 'randomfield2'")))
+                .andExpect(
+                        jsonPath(
+                                "$.messages",
+                                not(
+                                        contains(
+                                                "'fields' are not supported for 'format' "
+                                                        + format))));
+    }
+
     protected JobStatus getJobStatus(String jobId) throws Exception {
         ResultActions response = callGetJobStatus(jobId);
         // then
@@ -517,4 +592,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     protected abstract String getResultIdStringToMatch();
 
     protected abstract String submitJobWithoutFormatDefaultsToJsonGetField();
+
+    private Stream<Arguments> getFormatsWithoutProjection() {
+        return ValidDownloadRequest.FORMATS_WITH_NO_PROJECTION.stream().map(Arguments::of);
+    }
 }
