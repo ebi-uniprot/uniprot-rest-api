@@ -24,8 +24,8 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.queue.AbstractMessageListener;
 import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
+import org.uniprot.api.rest.download.queue.BasicAbstractMessageListener;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -148,10 +148,11 @@ public class UniRefMessageListenerTest {
                 (Integer)
                         messageWithHeaders
                                 .getMessageProperties()
-                                .getHeader(AbstractMessageListener.CURRENT_RETRIED_COUNT_HEADER));
+                                .getHeader(
+                                        BasicAbstractMessageListener.CURRENT_RETRIED_COUNT_HEADER));
         Assertions.assertNotNull(
                 messageWithHeaders
                         .getMessageProperties()
-                        .getHeader(AbstractMessageListener.CURRENT_RETRIED_ERROR_HEADER));
+                        .getHeader(BasicAbstractMessageListener.CURRENT_RETRIED_ERROR_HEADER));
     }
 }

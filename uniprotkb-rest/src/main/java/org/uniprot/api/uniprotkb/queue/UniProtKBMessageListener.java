@@ -1,9 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +18,9 @@ import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.queue.AbstractMessageListener;
-import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
-import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.download.queue.MessageListenerException;
+import org.uniprot.api.rest.download.queue.*;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
@@ -45,11 +38,8 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 public class UniProtKBMessageListener extends AbstractMessageListener implements MessageListener {
     public static final String H5_LIMIT_EXCEED_MSG =
             "Embeddings Limit Exceeded. Embeddings download must be under %s entries. Current download: %s";
-    private static final String DATA_TYPE = "uniprotkb";
-    private final MessageConverter converter;
+    private static final String UNIPROTKB_DATA_TYPE = "uniprotkb";
     private final UniProtEntryService service;
-    private final DownloadConfigProperties downloadConfigProperties;
-    private final DownloadResultWriter downloadResultWriter;
     private final EmbeddingsQueueConfigProperties embeddingsQueueConfigProps;
 
     public UniProtKBMessageListener(
@@ -62,43 +52,28 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             RabbitTemplate rabbitTemplate,
             EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties) {
         super(
+                converter,
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
+                downloadResultWriter,
                 rabbitTemplate);
-        this.converter = converter;
         this.service = service;
-        this.downloadConfigProperties = downloadConfigProperties;
-        this.downloadResultWriter = downloadResultWriter;
         this.embeddingsQueueConfigProps = embeddingsQueueConfigProperties;
     }
 
-    protected void processMessage(Message message, DownloadJob downloadJob) {
-        UniProtKBDownloadRequest request =
-                (UniProtKBDownloadRequest) this.converter.fromMessage(message);
+    @Override
+    protected void updateStatusAndWriteResult(
+            Message message, DownloadJob downloadJob, DownloadRequest request, Path idsFile) {
         String jobId = downloadJob.getId();
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
-        Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
-        Path resultFile =
-                Paths.get(
-                        downloadConfigProperties.getResultFilesFolder(),
-                        jobId + FileType.GZIP.getExtension());
-        // run the job if it has errored out
-        if (isJobSeenBefore(downloadJob, idsFile, resultFile)) {
-            if (downloadJob.getStatus() == JobStatus.RUNNING) {
-                log.warn("The job {} is running by other thread", jobId);
-            } else {
-                log.info("The job {} is already processed", jobId);
-                updateDownloadJob(message, downloadJob, JobStatus.FINISHED);
-            }
+        updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
+        if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
+            processH5Message(
+                    message, (UniProtKBDownloadRequest) request, downloadJob, idsFile, jobId);
         } else {
-            updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
-            if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
-                processH5Message(message, request, downloadJob, idsFile, jobId);
-            } else {
-                writeResult(request, idsFile, jobId, contentType);
-                updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
-            }
+            writeResult(request, idsFile, jobId, contentType);
+            updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
         }
     }
 
@@ -136,33 +111,22 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         searchRequest.setIncludeIsoform(request.getIncludeIsoform());
         searchRequest.setSize(0);
         QueryResult<UniProtKBEntry> searchResults = service.search(searchRequest);
-        Long totalHits = searchResults.getPage().getTotalElements();
-        return totalHits;
+        return searchResults.getPage().getTotalElements();
     }
 
-    private void writeResult(
-            DownloadRequest request, Path idsFile, String jobId, MediaType contentType) {
-        try {
-            writeSolrResult(request, idsFile, jobId);
-            StoreRequest storeRequest = service.buildStoreRequest(request);
-            downloadResultWriter.writeResult(
-                    request, idsFile, jobId, contentType, storeRequest, DATA_TYPE);
-            log.info("Voldemort results saved for job {}", jobId);
-        } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId);
-            throw new MessageListenerException(ex);
-        }
+    @Override
+    protected StoreRequest getStoreRequest(DownloadRequest request) {
+        return service.buildStoreRequest(request);
     }
 
-    private void writeSolrResult(DownloadRequest request, Path idsFile, String jobId)
-            throws IOException {
-        Stream<String> ids = streamIds(request);
-        saveIdsInTempFile(idsFile, ids);
-        log.info("Solr ids saved for job {}", jobId);
-    }
-
-    Stream<String> streamIds(DownloadRequest request) {
+    @Override
+    protected Stream<String> streamIds(DownloadRequest request) {
         return service.streamIds(request);
+    }
+
+    @Override
+    protected String getDataType() {
+        return UNIPROTKB_DATA_TYPE;
     }
 
     private void sendMessageToEmbeddingsQueue(String jobId) {

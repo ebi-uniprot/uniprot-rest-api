@@ -35,7 +35,7 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.queue.AbstractMessageListener;
+import org.uniprot.api.rest.download.queue.BasicAbstractMessageListener;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -69,7 +69,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
 
     protected abstract Stream<Arguments> getSupportedTypes();
 
-    protected abstract AbstractMessageListener getMessageListener();
+    protected abstract BasicAbstractMessageListener getMessageListener();
 
     protected abstract String getMessageSuccessQuery();
 

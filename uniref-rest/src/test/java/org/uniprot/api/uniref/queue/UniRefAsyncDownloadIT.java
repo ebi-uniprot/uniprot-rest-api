@@ -27,7 +27,7 @@ import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.rest.controller.AbstractAsyncDownloadIT;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
-import org.uniprot.api.rest.download.queue.AbstractMessageListener;
+import org.uniprot.api.rest.download.queue.BasicAbstractMessageListener;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.controller.UniRefDownloadController;
@@ -109,7 +109,7 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     }
 
     @Override
-    protected AbstractMessageListener getMessageListener() {
+    protected BasicAbstractMessageListener getMessageListener() {
         return this.uniRefMessageListener;
     }
 

@@ -38,7 +38,7 @@ import org.uniprot.api.rest.controller.AbstractAsyncDownloadIT;
 import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.queue.AbstractMessageListener;
+import org.uniprot.api.rest.download.queue.BasicAbstractMessageListener;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -173,7 +173,7 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     }
 
     @Override
-    protected AbstractMessageListener getMessageListener() {
+    protected BasicAbstractMessageListener getMessageListener() {
         return this.uniProtKBMessageListener;
     }
 
