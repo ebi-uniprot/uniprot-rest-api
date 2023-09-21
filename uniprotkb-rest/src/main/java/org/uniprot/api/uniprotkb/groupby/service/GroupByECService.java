@@ -1,5 +1,8 @@
 package org.uniprot.api.uniprotkb.groupby.service;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
@@ -8,9 +11,6 @@ import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.ec.ECService;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.cv.ec.ECEntry;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class GroupByECService extends GroupByService<String> {
