@@ -14,4 +14,6 @@ public class UniParcStoreConfigProperties {
     private String host;
     private int numberOfConnections;
     private String storeName;
+
+    private boolean brotliEnabled;
 }

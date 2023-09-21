@@ -148,6 +148,7 @@ public class UniProtKBIdMappingResultsConfig {
         VoldemortClient<UniProtKBEntry> client =
                 new VoldemortRemoteUniProtKBEntryStore(
                         storeConfigProperties.getNumberOfConnections(),
+                        storeConfigProperties.isBrotliEnabled(),
                         storeConfigProperties.getStoreName(),
                         storeConfigProperties.getHost());
         return new UniProtStoreClient<>(client);

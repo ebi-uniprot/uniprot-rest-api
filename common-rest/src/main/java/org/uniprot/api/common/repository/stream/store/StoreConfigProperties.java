@@ -11,4 +11,6 @@ public class StoreConfigProperties {
     private String host;
     private int numberOfConnections;
     private String storeName;
+
+    private boolean brotliEnabled;
 }
