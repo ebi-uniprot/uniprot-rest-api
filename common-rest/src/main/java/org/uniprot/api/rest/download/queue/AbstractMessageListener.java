@@ -20,7 +20,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 
 @Slf4j
-public abstract class AbstractMessageListener extends BasicAbstractMessageListener {
+public abstract class AbstractMessageListener extends BaseAbstractMessageListener {
 
     private final MessageConverter converter;
     private final DownloadResultWriter downloadResultWriter;
@@ -80,7 +80,7 @@ public abstract class AbstractMessageListener extends BasicAbstractMessageListen
     protected void writeSolrResult(DownloadRequest request, Path idsFile, String jobId)
             throws IOException {
         Stream<String> ids = streamIds(request);
-        saveIdsInTempFile(idsFile, ids);
+        writeIdentifiers(idsFile, ids);
         log.info("Solr ids saved for job {}", jobId);
     }
 

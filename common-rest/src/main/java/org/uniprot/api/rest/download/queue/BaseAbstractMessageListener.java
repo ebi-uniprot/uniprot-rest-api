@@ -22,7 +22,7 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 
 @Slf4j
-public abstract class BasicAbstractMessageListener implements MessageListener {
+public abstract class BaseAbstractMessageListener implements MessageListener {
 
     public static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     public static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
@@ -36,7 +36,7 @@ public abstract class BasicAbstractMessageListener implements MessageListener {
 
     protected final RabbitTemplate rabbitTemplate;
 
-    public BasicAbstractMessageListener(
+    public BaseAbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
             AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
@@ -93,6 +93,28 @@ public abstract class BasicAbstractMessageListener implements MessageListener {
         }
     }
 
+    public Message addAdditionalHeaders(Message message, Exception ex) {
+        MessageBuilder builder = MessageBuilder.fromMessage(message);
+        Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
+        if (Objects.nonNull(retryCount)) {
+            retryCount++;
+        } else {
+            retryCount = 1;
+        }
+
+        String stackTrace =
+                Arrays.stream(ex.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.joining("\n"));
+        builder.setHeader(CURRENT_RETRIED_COUNT_HEADER, retryCount);
+        builder.setHeader(CURRENT_RETRIED_ERROR_HEADER, stackTrace);
+        return builder.build();
+    }
+
+    public void dummyMethodForTesting(String jobId, JobStatus jobStatus) {
+        // do nothing
+    }
+
     protected abstract void processMessage(Message message, DownloadJob downloadJob);
 
     protected static boolean isJobSeenBefore(
@@ -102,7 +124,7 @@ public abstract class BasicAbstractMessageListener implements MessageListener {
                 && downloadJob.getStatus() != JobStatus.ERROR;
     }
 
-    protected void saveIdsInTempFile(Path filePath, Stream<String> ids) throws IOException {
+    protected void writeIdentifiers(Path filePath, Stream<String> ids) throws IOException {
         Iterable<String> source = ids::iterator;
         Files.write(filePath, source, StandardOpenOption.CREATE);
     }
@@ -136,6 +158,29 @@ public abstract class BasicAbstractMessageListener implements MessageListener {
             downloadJob.setResultFile(resultFile);
             this.jobRepository.save(downloadJob);
             dummyMethodForTesting(downloadJob.getId(), jobStatus);
+        }
+    }
+
+    protected void logMessageAndDeleteFile(Exception ex, String jobId) {
+        log.warn("Unable to write file due to error for job id {}", jobId);
+        log.warn(ex.getMessage());
+        Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
+        deleteFile(idsFile, jobId);
+        String resultFileName = jobId + "." + FileType.GZIP.getExtension();
+        Path resultFile =
+                Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
+        deleteFile(resultFile, jobId);
+    }
+
+    protected static void deleteFile(Path file, String jobId) {
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            log.warn(
+                    "Unable to delete file {} during IOException failure for job id {}",
+                    file.toFile().getName(),
+                    jobId);
+            throw new MessageListenerException(e);
         }
     }
 
@@ -212,50 +257,5 @@ public abstract class BasicAbstractMessageListener implements MessageListener {
                     .toString();
         }
         return null;
-    }
-
-    public Message addAdditionalHeaders(Message message, Exception ex) {
-        MessageBuilder builder = MessageBuilder.fromMessage(message);
-        Integer retryCount = message.getMessageProperties().getHeader(CURRENT_RETRIED_COUNT_HEADER);
-        if (Objects.nonNull(retryCount)) {
-            retryCount++;
-        } else {
-            retryCount = 1;
-        }
-
-        String stackTrace =
-                Arrays.stream(ex.getStackTrace())
-                        .map(StackTraceElement::toString)
-                        .collect(Collectors.joining("\n"));
-        builder.setHeader(CURRENT_RETRIED_COUNT_HEADER, retryCount);
-        builder.setHeader(CURRENT_RETRIED_ERROR_HEADER, stackTrace);
-        return builder.build();
-    }
-
-    public void dummyMethodForTesting(String jobId, JobStatus jobStatus) {
-        // do nothing
-    }
-
-    protected void logMessageAndDeleteFile(Exception ex, String jobId) {
-        log.warn("Unable to write file due to error for job id {}", jobId);
-        log.warn(ex.getMessage());
-        Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
-        deleteFile(idsFile, jobId);
-        String resultFileName = jobId + "." + FileType.GZIP.getExtension();
-        Path resultFile =
-                Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
-        deleteFile(resultFile, jobId);
-    }
-
-    protected static void deleteFile(Path file, String jobId) {
-        try {
-            Files.deleteIfExists(file);
-        } catch (IOException e) {
-            log.warn(
-                    "Unable to delete file {} during IOException failure for job id {}",
-                    file.toFile().getName(),
-                    jobId);
-            throw new MessageListenerException(e);
-        }
     }
 }

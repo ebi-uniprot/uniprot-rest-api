@@ -20,7 +20,7 @@ import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
-import org.uniprot.api.rest.download.queue.BasicAbstractMessageListener;
+import org.uniprot.api.rest.download.queue.BaseAbstractMessageListener;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -30,7 +30,7 @@ import org.uniprot.api.rest.output.context.FileType;
 @Slf4j
 @Profile({"live", "asyncDownload"})
 @Service("DownloadListener")
-public class IdMappingMessageListener extends BasicAbstractMessageListener
+public class IdMappingMessageListener extends BaseAbstractMessageListener
         implements MessageListener {
 
     private final MessageConverter converter;
