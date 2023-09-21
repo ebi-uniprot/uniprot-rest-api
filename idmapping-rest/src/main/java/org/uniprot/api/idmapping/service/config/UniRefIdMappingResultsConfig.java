@@ -120,6 +120,7 @@ public class UniRefIdMappingResultsConfig {
         VoldemortClient<UniRefEntryLight> client =
                 new VoldemortRemoteUniRefEntryLightStore(
                         uniRefLightStoreConfigProperties.getNumberOfConnections(),
+                        uniRefLightStoreConfigProperties.isBrotliEnabled(),
                         uniRefLightStoreConfigProperties.getStoreName(),
                         uniRefLightStoreConfigProperties.getHost());
         return new UniProtStoreClient<>(client);

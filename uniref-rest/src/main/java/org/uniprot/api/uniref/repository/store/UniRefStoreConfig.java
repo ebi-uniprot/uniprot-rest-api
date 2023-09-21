@@ -32,6 +32,7 @@ public class UniRefStoreConfig {
         VoldemortClient<RepresentativeMember> client =
                 new VoldemortRemoteUniRefMemberStore(
                         unirefStoreConfigProperties.getNumberOfConnections(),
+                        unirefStoreConfigProperties.isBrotliEnabled(),
                         unirefStoreConfigProperties.getStoreName(),
                         unirefStoreConfigProperties.getHost());
         return new UniRefMemberStoreClient(
@@ -45,6 +46,7 @@ public class UniRefStoreConfig {
         VoldemortClient<UniRefEntryLight> client =
                 new VoldemortRemoteUniRefEntryLightStore(
                         lightStoreConfigProperties.getNumberOfConnections(),
+                        lightStoreConfigProperties.isBrotliEnabled(),
                         lightStoreConfigProperties.getStoreName(),
                         lightStoreConfigProperties.getHost());
         return new UniRefLightStoreClient(client);
