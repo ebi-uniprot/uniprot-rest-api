@@ -39,6 +39,7 @@ class GroupByKeywordServiceTest {
     private static final String KEYWORD_ID_F = "13";
     public static final String PARENT_KEYWORD_ID_A = ("parent:" + KEYWORD_ID_A);
     public static final String PARENT_KEYWORD_ID_B = ("parent:" + KEYWORD_ID_B);
+    public static final String PARENT_KEYWORD_ID_C = ("parent:" + KEYWORD_ID_C);
     public static final String PARENT_KEYWORD_ID_D = ("parent:" + KEYWORD_ID_D);
     public static final String PARENT_KEYWORD_ID_E = ("parent:" + KEYWORD_ID_E);
     public static final String PARENT_KEYWORD_ID_F = ("parent:" + KEYWORD_ID_F);
@@ -194,7 +195,7 @@ class GroupByKeywordServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorB()),
-                is(ParentImpl.builder().label(null).count(10121L).build()));
+                is(ParentImpl.builder().label(null).count(KEYWORD_COUNT_B).build()));
     }
 
     @Test
@@ -228,7 +229,7 @@ class GroupByKeywordServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorA(), getAncestorB()),
-                is(ParentImpl.builder().label(null).count(9999L).build()));
+                is(ParentImpl.builder().label(null).count(KEYWORD_COUNT_A).build()));
     }
 
     @Test
@@ -270,7 +271,7 @@ class GroupByKeywordServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD()),
-                is(ParentImpl.builder().label(null).count(10121L).build()));
+                is(ParentImpl.builder().label(null).count(KEYWORD_COUNT_B).build()));
     }
 
     @Test
@@ -290,6 +291,8 @@ class GroupByKeywordServiceTest {
                                                 && Set.of(PARENT_KEYWORD_ID_A, PARENT_KEYWORD_ID_F)
                                                         .contains(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(KEYWORD_ENTRY_E));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(
                         SOME_QUERY,
                         getFacetFields(KEYWORD_ID_A + "," + KEYWORD_ID_C + "," + KEYWORD_ID_F)))
@@ -303,23 +306,25 @@ class GroupByKeywordServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 empty(),
-                is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(10121L).build()));
+                is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(KEYWORD_COUNT_B).build()));
     }
 
     @Test
     void getGroupByResults_whenParentSpecifiedAndNoChildNodes() {
         when(keywordService.stream(
-                        argThat(argument -> PARENT_KEYWORD_ID_A.equals(argument.getQuery()))))
+                        argThat(argument -> PARENT_KEYWORD_ID_C.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of());
-        when(keywordService.findByUniqueId(KEYWORD_ID_A)).thenReturn(KEYWORD_ENTRY_A);
+        when(keywordService.findByUniqueId(KEYWORD_ID_C)).thenReturn(KEYWORD_ENTRY_C);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_C);
+        when(keywordService.findByUniqueId(KEYWORD_ID_C)).thenReturn(KEYWORD_ENTRY_C);
 
-        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_A);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, KEYWORD_ID_C);
 
-        assertThat(groupByResult.getGroups(), empty());
-        assertThat(groupByResult.getAncestors(), empty());
-        assertThat(
-                groupByResult.getParent(),
-                is(ParentImpl.builder().label(KEYWORD_LABEL_A).count(0L).build()));
+        assertGroupByResultC(
+                groupByResult,
+                empty(),
+                is(ParentImpl.builder().label(KEYWORD_LABEL_C).count(9999L).build()));
     }
 
     @Test
@@ -337,6 +342,8 @@ class GroupByKeywordServiceTest {
                             }
                             return Stream.of();
                         });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_A)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_A);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_C)))
@@ -348,7 +355,7 @@ class GroupByKeywordServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB()),
-                is(ParentImpl.builder().label(KEYWORD_LABEL_A).count(9999L).build()));
+                is(ParentImpl.builder().label(KEYWORD_LABEL_A).count(KEYWORD_COUNT_A).build()));
     }
 
     @Test
@@ -371,6 +378,8 @@ class GroupByKeywordServiceTest {
                             }
                             return Stream.of();
                         });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_D)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
@@ -386,11 +395,11 @@ class GroupByKeywordServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorD()),
-                is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(10121L).build()));
+                is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(KEYWORD_COUNT_B).build()));
     }
 
     @Test
-    void getGroupByResult_whenParentNotSpecifiedAndOnlyOneChildExistsInFacets() {
+    void getGroupByResult_whenNoParentSpecifiedAndOnlyOneChildExistsInFacets() {
         when(keywordService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -425,7 +434,7 @@ class GroupByKeywordServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD(), getAncestorE()),
-                is(ParentImpl.builder().label(null).count(9999L).build()));
+                is(ParentImpl.builder().label(null).count(KEYWORD_COUNT_B).build()));
     }
 
     @Test
@@ -446,6 +455,8 @@ class GroupByKeywordServiceTest {
                             }
                             return Stream.of();
                         });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_B)))
+                .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(KEYWORD_ID_D)))
                 .thenReturn(SINGLE_KEYWORD_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
@@ -460,7 +471,7 @@ class GroupByKeywordServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorD(), getAncestorE()),
-                is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(9999L).build()));
+                is(ParentImpl.builder().label(KEYWORD_LABEL_B).count(KEYWORD_COUNT_B).build()));
     }
 
     private static Map<String, String> getFacetFields(String facetItems) {

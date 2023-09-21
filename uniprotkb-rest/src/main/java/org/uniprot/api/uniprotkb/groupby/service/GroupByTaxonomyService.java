@@ -49,16 +49,18 @@ public class GroupByTaxonomyService extends GroupByService<TaxonomyEntry> {
             List<TaxonomyEntry> taxonomyEntries,
             List<TaxonomyEntry> ancestorEntries,
             String parentId,
+            List<FacetField.Count> parentFacetCounts,
             String query) {
         Map<String, TaxonomyEntry> idEntryMap =
                 taxonomyEntries.stream()
                         .collect(Collectors.toMap(this::getId, Function.identity()));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+        return getGroupByResult(
+                facetCounts, idEntryMap, ancestorEntries, parentId, parentFacetCounts, query);
     }
 
     @Override
-    protected TaxonomyEntry getEntry(String parentId) {
-        return taxonomyService.findById(Long.parseLong(parentId));
+    protected TaxonomyEntry getEntryById(String id) {
+        return taxonomyService.findById(Long.parseLong(id));
     }
 
     @Override

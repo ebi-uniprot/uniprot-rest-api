@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.groupby.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,11 @@ public class GroupByGOService extends GroupByService<GoRelation> {
     }
 
     @Override
+    protected boolean areEqualIds(String parent, String facetId) {
+        return Objects.equals(addGoPrefix(parent), facetId);
+    }
+
+    @Override
     protected String getId(GoRelation entry) {
         return entry.getId();
     }
@@ -56,15 +62,17 @@ public class GroupByGOService extends GroupByService<GoRelation> {
             List<GoRelation> goRelations,
             List<GoRelation> ancestorEntries,
             String parentId,
+            List<FacetField.Count> parentFacetCounts,
             String query) {
         Map<String, GoRelation> idEntryMap =
                 goRelations.stream().collect(Collectors.toMap(this::getId, Function.identity()));
-        return getGroupByResult(facetCounts, idEntryMap, ancestorEntries, parentId, query);
+        return getGroupByResult(
+                facetCounts, idEntryMap, ancestorEntries, parentId, parentFacetCounts, query);
     }
 
     @Override
-    protected GoRelation getEntry(String parentId) {
-        return goService.getGoRelation(parentId).orElseThrow();
+    protected GoRelation getEntryById(String id) {
+        return goService.getGoRelation(id).orElseThrow();
     }
 
     @Override

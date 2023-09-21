@@ -160,7 +160,7 @@ class GroupByGOServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorB()),
-                is(ParentImpl.builder().label(null).count(10121L).build()));
+                is(ParentImpl.builder().label(null).count(GO_COUNT_B).build()));
     }
 
     @Test
@@ -193,7 +193,7 @@ class GroupByGOServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorA(), getAncestorB()),
-                is(ParentImpl.builder().label(null).count(9999L).build()));
+                is(ParentImpl.builder().label(null).count(GO_COUNT_A).build()));
     }
 
     @Test
@@ -233,7 +233,7 @@ class GroupByGOServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD()),
-                is(ParentImpl.builder().label(null).count(10121L).build()));
+                is(ParentImpl.builder().label(null).count(GO_COUNT_B).build()));
     }
 
     @Test
@@ -246,6 +246,8 @@ class GroupByGOServiceTest {
                                         Set.of(addGoPrefix(GO_ID_A), addGoPrefix(GO_ID_F))
                                                 .contains(argument))))
                 .thenAnswer(invocation -> List.of(GO_ENTRY_E));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(
                         SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_C + "," + GO_ID_F)))
                 .thenReturn(MULTIPLE_GO_FACET_COUNTS);
@@ -258,22 +260,24 @@ class GroupByGOServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 empty(),
-                is(ParentImpl.builder().label(GO_LABEL_B).count(10121L).build()));
+                is(ParentImpl.builder().label(GO_LABEL_B).count(GO_COUNT_B).build()));
     }
 
     @Test
     void getGroupByResults_whenParentSpecifiedAndNoChildNodes() {
-        when(goService.getChildren(argThat(argument -> addGoPrefix(GO_ID_A).equals(argument))))
+        when(goService.getChildren(argThat(argument -> addGoPrefix(GO_ID_C).equals(argument))))
                 .thenAnswer(invocation -> List.of());
-        when(goService.getGoRelation(GO_ID_A)).thenReturn(Optional.of(GO_ENTRY_A));
+        when(goService.getGoRelation(GO_ID_C)).thenReturn(Optional.of(GO_ENTRY_C));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_C);
+        when(goService.getGoRelation(GO_ID_C)).thenReturn(Optional.of(GO_ENTRY_C));
 
-        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, GO_ID_A);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, GO_ID_C);
 
-        assertThat(groupByResult.getGroups(), empty());
-        assertThat(groupByResult.getAncestors(), empty());
-        assertThat(
-                groupByResult.getParent(),
-                is(ParentImpl.builder().label(GO_LABEL_A).count(0L).build()));
+        assertGroupByResultC(
+                groupByResult,
+                empty(),
+                is(ParentImpl.builder().label(GO_LABEL_C).count(9999L).build()));
     }
 
     @Test
@@ -290,6 +294,8 @@ class GroupByGOServiceTest {
                             }
                             return List.of();
                         });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_A);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_C)))
@@ -301,7 +307,7 @@ class GroupByGOServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB()),
-                is(ParentImpl.builder().label(GO_LABEL_A).count(9999L).build()));
+                is(ParentImpl.builder().label(GO_LABEL_A).count(GO_COUNT_A).build()));
     }
 
     @Test
@@ -323,6 +329,8 @@ class GroupByGOServiceTest {
                             }
                             return List.of();
                         });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
@@ -337,11 +345,11 @@ class GroupByGOServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorD()),
-                is(ParentImpl.builder().label(GO_LABEL_B).count(10121L).build()));
+                is(ParentImpl.builder().label(GO_LABEL_B).count(GO_COUNT_B).build()));
     }
 
     @Test
-    void getGroupByResult_whenParentNotSpecifiedAndOnlyOneChildExistsInFacets() {
+    void getGroupByResult_whenNoParentSpecifiedAndOnlyOneChildExistsInFacets() {
         when(goService.getChildren(any()))
                 .thenAnswer(
                         invocation -> {
@@ -374,7 +382,7 @@ class GroupByGOServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD(), getAncestorE()),
-                is(ParentImpl.builder().label(null).count(9999L).build()));
+                is(ParentImpl.builder().label(null).count(GO_COUNT_B).build()));
     }
 
     @Test
@@ -394,6 +402,8 @@ class GroupByGOServiceTest {
                             }
                             return List.of();
                         });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_B)))
+                .thenReturn(SINGLE_GO_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_D)))
                 .thenReturn(SINGLE_GO_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(GO_ID_A + "," + GO_ID_E)))
@@ -407,7 +417,7 @@ class GroupByGOServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorD(), getAncestorE()),
-                is(ParentImpl.builder().label(GO_LABEL_B).count(9999L).build()));
+                is(ParentImpl.builder().label(GO_LABEL_B).count(GO_COUNT_B).build()));
     }
 
     private static String addGoPrefix(String goId) {

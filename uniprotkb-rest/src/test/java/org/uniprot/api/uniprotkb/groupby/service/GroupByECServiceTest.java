@@ -98,7 +98,7 @@ class GroupByECServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorB()),
-                is(ParentImpl.builder().label(null).count(10022L).build()));
+                is(ParentImpl.builder().label(null).count(EC_COUNT_B).build()));
     }
 
     @Test
@@ -120,7 +120,7 @@ class GroupByECServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorA(), getAncestorB()),
-                is(ParentImpl.builder().label(null).count(9999L).build()));
+                is(ParentImpl.builder().label(null).count(EC_COUNT_A).build()));
     }
 
     @Test
@@ -146,7 +146,7 @@ class GroupByECServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD()),
-                is(ParentImpl.builder().label(null).count(10022L).build()));
+                is(ParentImpl.builder().label(null).count(EC_COUNT_B).build()));
     }
 
     @Test
@@ -155,6 +155,8 @@ class GroupByECServiceTest {
         ecIdA = "1.1.-.-";
         ecIdC = "1.2.-.-";
         ecIdE = "1.1.1.-";
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of())))
+                .thenReturn(getFacetFields(ecIdB, EC_COUNT_B));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1"))))
                 .thenReturn(getMultipleFacetFields());
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1"))))
@@ -166,7 +168,7 @@ class GroupByECServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 empty(),
-                is(ParentImpl.builder().label(LABEL + ecIdB).count(10022L).build()));
+                is(ParentImpl.builder().label(LABEL + ecIdB).count(EC_COUNT_B).build()));
     }
 
     @Test
@@ -187,6 +189,8 @@ class GroupByECServiceTest {
         ecIdA = "1.-.-.-";
         ecIdB = "1.1.-.-";
         ecIdC = "1.1.1.-";
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of())))
+                .thenReturn(getFacetFields(ecIdA, EC_COUNT_A));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1"))))
                 .thenReturn(getFacetFields(ecIdB, EC_COUNT_B));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1"))))
@@ -198,7 +202,7 @@ class GroupByECServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB()),
-                is(ParentImpl.builder().label(LABEL + ecIdA).count(9999L).build()));
+                is(ParentImpl.builder().label(LABEL + ecIdA).count(EC_COUNT_A).build()));
     }
 
     @Test
@@ -209,6 +213,8 @@ class GroupByECServiceTest {
         ecIdA = "1.1.1.-";
         ecIdC = "1.1.2.-";
         ecIdE = "1.1.1.1";
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of())))
+                .thenReturn(getFacetFields(ecIdB, EC_COUNT_B));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1"))))
                 .thenReturn(getFacetFields(ecIdD, EC_COUNT_D));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1"))))
@@ -222,11 +228,11 @@ class GroupByECServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorD()),
-                is(ParentImpl.builder().label(LABEL + ecIdB).count(10022L).build()));
+                is(ParentImpl.builder().label(LABEL + ecIdB).count(EC_COUNT_B).build()));
     }
 
     @Test
-    void getGroupByResult_whenParentNotSpecifiedAndOnlyOneChildExistsInFacets() {
+    void getGroupByResult_whenNoParentSpecifiedAndOnlyOneChildExistsInFacets() {
         ecIdB = "1.-.-.-";
         ecIdD = "1.1.-.-";
         ecIdA = "1.1.1.-";
@@ -247,7 +253,7 @@ class GroupByECServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD(), getAncestorE()),
-                is(ParentImpl.builder().label(null).count(9999L).build()));
+                is(ParentImpl.builder().label(null).count(EC_COUNT_B).build()));
     }
 
     @Test
@@ -257,6 +263,8 @@ class GroupByECServiceTest {
         ecIdA = "1.1.1.-";
         ecIdE = "1.1.2.-";
         ecIdC = "1.1.2.1";
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of())))
+                .thenReturn(getFacetFields(ecIdB, EC_COUNT_B));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1"))))
                 .thenReturn(getFacetFields(ecIdD, EC_COUNT_D));
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(List.of("1", "1"))))
@@ -270,7 +278,7 @@ class GroupByECServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorD(), getAncestorE()),
-                is(ParentImpl.builder().label(LABEL + ecIdB).count(9999L).build()));
+                is(ParentImpl.builder().label(LABEL + ecIdB).count(EC_COUNT_B).build()));
     }
 
     private List<FacetField> getFacetFields(String id, long count) {

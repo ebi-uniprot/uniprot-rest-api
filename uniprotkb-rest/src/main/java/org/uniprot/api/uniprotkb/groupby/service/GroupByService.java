@@ -19,12 +19,14 @@ public abstract class GroupByService<T> {
     }
 
     public GroupByResult getGroupByResult(String query, String parentId) {
-        List<FacetField.Count> lastChildFacetCounts = List.of();
-        List<T> lastChildEntries = List.of();
-        String currentId = parentId;
         List<T> ancestors = new LinkedList<>();
+        List<T> lastChildEntries = getInitialEntries(parentId);
+        List<FacetField.Count> parentFacetCounts =
+                getInitialFacetCounts(parentId, query, lastChildEntries);
+        List<FacetField.Count> lastChildFacetCounts = parentFacetCounts;
 
-        do {
+        while (lastChildFacetCounts.size() == 1) {
+            String currentId = lastChildFacetCounts.get(0).getName();
             List<T> childEntries = getChildEntries(currentId);
             List<FacetField.Count> childFacetCounts = getFacetCounts(query, childEntries);
 
@@ -32,14 +34,18 @@ public abstract class GroupByService<T> {
                 addToAncestors(ancestors, lastChildEntries, parentId, lastChildFacetCounts);
                 lastChildFacetCounts = childFacetCounts;
                 lastChildEntries = childEntries;
-                currentId = lastChildFacetCounts.get(0).getName();
             } else {
                 break;
             }
+        }
 
-        } while (lastChildFacetCounts.size() == 1);
-
-        return getGroupByResult(lastChildFacetCounts, lastChildEntries, ancestors, parentId, query);
+        return getGroupByResult(
+                lastChildFacetCounts,
+                lastChildEntries,
+                ancestors,
+                parentId,
+                parentFacetCounts,
+                query);
     }
 
     protected static boolean isTopLevelSearch(String parent) {
@@ -50,7 +56,7 @@ public abstract class GroupByService<T> {
             List<T> ancestors, List<T> entries, String parent, List<FacetField.Count> facetCounts) {
         if (!facetCounts.isEmpty()) {
             String facetId = getFacetId(facetCounts.get(0));
-            if (!Objects.equals(parent, facetId) && !entries.isEmpty()) {
+            if (!areEqualIds(parent, facetId) && !entries.isEmpty()) {
                 ancestors.add(
                         entries.stream()
                                 .filter(t -> facetId.equals(getId(t)))
@@ -60,7 +66,22 @@ public abstract class GroupByService<T> {
         }
     }
 
-    private List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
+    protected boolean areEqualIds(String parent, String facetId) {
+        return Objects.equals(parent, facetId);
+    }
+
+    List<T> getInitialEntries(String parentId) {
+        if (!isTopLevelSearch(parentId)) {
+            return List.of(getEntryById(parentId));
+        }
+        return getChildEntries(parentId);
+    }
+
+    List<FacetField.Count> getInitialFacetCounts(String parentId, String query, List<T> entries) {
+        return getFacetCounts(query, entries);
+    }
+
+    protected List<FacetField.Count> getFacetCounts(String query, List<T> entries) {
         List<FacetField> facetFields =
                 uniProtEntryService.getFacets(query, getFacetParams(entries));
 
@@ -83,6 +104,7 @@ public abstract class GroupByService<T> {
             List<T> entries,
             List<T> ancestorEntries,
             String parentId,
+            List<FacetField.Count> parentFacetCounts,
             String query);
 
     protected GroupByResult getGroupByResult(
@@ -90,6 +112,7 @@ public abstract class GroupByService<T> {
             Map<String, T> idEntryMap,
             List<T> ancestorEntries,
             String parentId,
+            List<FacetField.Count> parentFacetCounts,
             String query) {
         List<Group> groups =
                 facetCounts.stream()
@@ -98,20 +121,20 @@ public abstract class GroupByService<T> {
                         .collect(Collectors.toList());
         List<Ancestor> ancestors =
                 ancestorEntries.stream().map(this::getAncestor).collect(Collectors.toList());
-        Parent parent = getParentInfo(parentId, groups);
+        Parent parent = getParentInfo(parentId, parentFacetCounts);
 
         return new GroupByResult(ancestors, groups, parent);
     }
 
-    private Parent getParentInfo(String parentId, List<Group> groups) {
-        long count = groups.stream().mapToLong(Group::getCount).sum();
+    private Parent getParentInfo(String parentId, List<FacetField.Count> parentFacetCounts) {
+        long count = parentFacetCounts.stream().mapToLong(FacetField.Count::getCount).sum();
         return ParentImpl.builder()
-                .label(isTopLevelSearch(parentId) ? null : getLabel(getEntry(parentId)))
+                .label(isTopLevelSearch(parentId) ? null : getLabel(getEntryById(parentId)))
                 .count(count)
                 .build();
     }
 
-    protected abstract T getEntry(String parentId);
+    protected abstract T getEntryById(String id);
 
     protected String getFacetId(FacetField.Count fc) {
         return fc.getName();
