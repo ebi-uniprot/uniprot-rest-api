@@ -31,8 +31,7 @@ stages:
   - test
   - quality
   - mvn-deploy
-  - docker-build
-  - helm-install
+  - docker-build-deploy
 
 api:settings:
   stage: setup
@@ -98,8 +97,8 @@ mvn:deploy:
   rules:
     - if: '$CI_COMMIT_REF_NAME == "master"'
 
-k8s:docker-build:
-  stage: docker-build
+k8s:docker-build-deploy:
+  stage: docker-build-deploy
   needs:
     - job: mvn:deploy
       artifacts: true
@@ -107,28 +106,10 @@ k8s:docker-build:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: master
   variables:
-    CI_PIPELINE_TASKS: 'build'
+    CI_PIPELINE_TASKS: 'build,helm-install-rest'
     ARTIFACT: 'all-rest'
-    VERSION: '$UNIPROT_REST_VERSION'
-  when: on_success
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-
-k8s:helm-install:
-  stage: helm-install
-  needs:
-    - job: k8s:docker-build
-      artifacts: true
-    - job: mvn:deploy
-      artifacts: true
-  trigger:
-    project: uniprot/deployment/unp.ci.api.k8s
-    branch: master
-  variables:
-    CI_PIPELINE_TASKS: 'helm-install-rest'
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
-    ARTIFACT: 'all-rest'
     RELEASE_NAME: '2023_04'
   when: on_success
   rules:
