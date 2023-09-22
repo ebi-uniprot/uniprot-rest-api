@@ -19,6 +19,7 @@ import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
         basePackages = {
             "org.uniprot.api.idmapping",
             "org.uniprot.api.rest",
+            "org.uniprot.api.common.repository.stream.rdf",
             "org.uniprot.api.common.repository.stream.store.uniprotkb"
         })
 public class IdMappingREST {

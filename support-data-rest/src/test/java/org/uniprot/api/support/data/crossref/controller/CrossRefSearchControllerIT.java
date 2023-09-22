@@ -135,7 +135,7 @@ class CrossRefSearchControllerIT extends AbstractSearchWithFacetControllerIT {
     @Test
     void testGetByPartOfName() throws Exception {
         saveEntry(1234);
-        String namePart = "TIGRFAMs";
+        String namePart = "NCBIfam";
         // when
         ResultActions response =
                 getMockMvc()

@@ -6,8 +6,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.UniRefType;
+import org.uniprot.core.uniref.impl.UniRefEntryBuilder;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
 import org.uniprot.core.xml.uniref.UniRefEntryLightConverter;
@@ -60,6 +62,11 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     private static final String TEST_IDS =
             "UniRef50_P03901,UniRef90_P03901,UniRef100_P03901,UniRef50_P03902,"
                     + "UniRef90_P03902,UniRef100_P03902,UniRef50_P03903,UniRef90_P03903,UniRef100_P03903,UniRef50_P03904";
+
+    private static final String MIXED_TEST_IDS =
+            "UniRef50_P03901,UniRef90_P03901,UniRef100_P03901,"
+                    + "UniRef50_P03905-1,UniRef90_P03905-1,UniRef100_P03905-1";
+
     private static final String[] TEST_IDS_ARRAY = {
         "UniRef50_P03901",
         "UniRef90_P03901",
@@ -84,6 +91,16 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
         "UniRef90_P03902",
         "UniRef90_P03903"
     };
+
+    private static final String[] MIXED_TEST_IDS_ARRAY = {
+        "UniRef50_P03901",
+        "UniRef90_P03901",
+        "UniRef100_P03901",
+        "UniRef50_P03905-1",
+        "UniRef90_P03905-1",
+        "UniRef100_P03905-1"
+    };
+
     private static final String MISSING_ID1 = "UniRef50_P00000";
     private static final String MISSING_ID2 = "UniRef90_Q00000";
 
@@ -100,16 +117,32 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     }
 
     private void saveEntries() throws Exception {
-        for (int i = 1; i <= 4; i++) {
+        int i;
+        for (i = 1; i <= 4; i++) {
             saveEntry(i, UniRefType.UniRef50);
             saveEntry(i, UniRefType.UniRef90);
             saveEntry(i, UniRefType.UniRef100);
         }
+        // save few uniref with isoform uniprotkb accession
+        saveEntry(i, UniRefType.UniRef50, true);
+        saveEntry(i, UniRefType.UniRef90, true);
+        saveEntry(i, UniRefType.UniRef100, true);
         cloudSolrClient.commit(SolrCollection.uniref.name());
     }
 
     private void saveEntry(int i, UniRefType type) throws Exception {
+        saveEntry(i, type, false);
+    }
+
+    private void saveEntry(int i, UniRefType type, boolean isoform) throws Exception {
         UniRefEntry entry = UniRefEntryMocker.createEntry(i, type);
+        if (isoform) {
+            String entryId = entry.getId().getValue();
+            UniRefEntryBuilder entryBuilder = UniRefEntryBuilder.from(entry);
+            entryBuilder.id(entryId + "-1");
+            entryBuilder.memberCount(entry.getMemberCount());
+            entry = entryBuilder.build();
+        }
         UniRefEntryConverter converter = new UniRefEntryConverter();
         Entry xmlEntry = converter.toXml(entry);
         UniRefEntryLightConverter unirefLightConverter = new UniRefEntryLightConverter();
@@ -169,6 +202,24 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
                                         "The 'id' value has invalid format. It should be a valid UniRef Cluster id",
                                         "'invalid' is not a valid search field")))
                 .andExpect(jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
+    void getByIdsWithUniProtKBIsoformSuccess() throws Exception {
+        // when
+        ResultActions response =
+                mockMvc.perform(
+                        get(GET_BY_IDS_PATH)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("ids", MIXED_TEST_IDS)
+                                .param("size", "10"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(6)))
+                .andExpect(jsonPath("$.results.*.id", contains(MIXED_TEST_IDS_ARRAY)));
     }
 
     @Override
@@ -382,5 +433,12 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected UniProtDataType getUniProtDataType() {
         return UniProtDataType.UNIREF;
+    }
+
+    @Override
+    public String getContentDisposition() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+        return "uniref_" + now.format(dateTimeFormatter);
     }
 }

@@ -20,6 +20,10 @@ import org.uniprot.core.util.Utils;
  * @author Edd
  */
 public class HeaderFactory {
+
+    private static final String QUERY_STRING_MULTIPLE_UNDERSCORE_REGEX = "_{2,10}";
+    private static final String UNDERSCORE = "_";
+
     private HeaderFactory() {}
 
     public static HttpHeaders createHttpSearchHeader(MediaType mediaType) {
@@ -42,23 +46,39 @@ public class HeaderFactory {
 
     private static String getContentDispositionFileName(
             MessageConverterContext context, HttpServletRequest request, MediaType mediaType) {
+        String fileName = "";
+        String queryString = "";
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
         String suffix =
-                "."
+                UNDERSCORE
+                        + now.format(dateTimeFormatter)
+                        + "."
                         + UniProtMediaType.getFileExtension(mediaType)
                         + context.getFileType().getExtension();
-
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH.mm.ss.SS");
-        String queryString;
-        if (Utils.notNullNotEmpty(request.getQueryString())) {
-            queryString = request.getQueryString().replaceAll("[^A-Za-z0-9]", "_");
-            if (queryString.length() > 60) {
-                queryString = queryString.substring(0, 60);
+        String requestContext = getRequestContext(request);
+        if (Utils.notNullNotEmpty(request.getParameter("query"))) {
+            queryString =
+                    request.getParameter("query")
+                            .replaceAll("[^A-Za-z0-9]", UNDERSCORE)
+                            .replaceAll(QUERY_STRING_MULTIPLE_UNDERSCORE_REGEX, UNDERSCORE);
+            if (queryString.length() > 30) {
+                queryString = queryString.substring(0, 30);
+            } else if (queryString.equals(UNDERSCORE)) {
+                queryString = "all";
             }
-            queryString += "-" + now.format(dateTimeFormatter);
-        } else {
-            queryString = now.format(dateTimeFormatter);
         }
-        return "uniprot-" + queryString + suffix;
+        fileName = requestContext + UNDERSCORE + queryString + suffix;
+        fileName = fileName.replaceAll(QUERY_STRING_MULTIPLE_UNDERSCORE_REGEX, UNDERSCORE);
+        return fileName;
+    }
+
+    private static String getRequestContext(HttpServletRequest request) {
+        String requestContext = "";
+        String requestURI = request.getRequestURI();
+        if (requestURI != null) {
+            requestContext = requestURI.split("/")[1];
+        }
+        return requestContext;
     }
 }

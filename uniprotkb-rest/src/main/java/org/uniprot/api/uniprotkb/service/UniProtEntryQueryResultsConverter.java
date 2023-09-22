@@ -65,14 +65,14 @@ class UniProtEntryQueryResultsConverter {
                         .map(doc -> convertDoc(doc, filters))
                         .filter(Optional::isPresent)
                         .map(Optional::get);
-        return QueryResult.of(
-                upEntries,
-                results.getPage(),
-                results.getFacets(),
-                results.getMatchedFields(),
-                null,
-                results.getSuggestions(),
-                warnings);
+        return QueryResult.<UniProtKBEntry>builder()
+                .content(upEntries)
+                .page(results.getPage())
+                .facets(results.getFacets())
+                .matchedFields(results.getMatchedFields())
+                .suggestions(results.getSuggestions())
+                .warnings(warnings)
+                .build();
     }
 
     Optional<UniProtKBEntry> convertDoc(UniProtDocument doc, List<ReturnField> filters) {
@@ -122,7 +122,11 @@ class UniProtEntryQueryResultsConverter {
             mergeDemergeList.addAll(Arrays.asList(reasonItems[1].split(",")));
         }
 
-        UniProtKBId uniProtkbId = new UniProtKBIdBuilder(doc.id).build();
+        String id = "";
+        if (Utils.notNullNotEmpty(doc.id)) {
+            id = doc.id.get(0);
+        }
+        UniProtKBId uniProtkbId = new UniProtKBIdBuilder(id).build();
         EntryInactiveReason inactiveReason =
                 new EntryInactiveReasonBuilder()
                         .type(type)

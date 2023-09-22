@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.uniprot</groupId>
 		<artifactId>uniprot-rest-api</artifactId>
-		<version>1.0.24-SNAPSHOT</version>
+		<version>1.0.27-SNAPSHOT</version>
 	</parent>
 	<artifactId>uniprotkb-rest</artifactId>
 
@@ -62,7 +62,11 @@
 			<artifactId>common-rest</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>support-data-common</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>core-domain</artifactId>

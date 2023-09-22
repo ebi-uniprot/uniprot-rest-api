@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.http.*;
@@ -27,6 +28,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
+import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Utils;
 
@@ -105,7 +107,7 @@ public abstract class BasicSearchController<T> {
         return responseBuilder.headers(createHttpSearchHeader(contentType)).body(context);
     }
 
-    protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRDF(
+    protected ResponseEntity<MessageConverterContext<T>> getEntityResponseRdf(
             String entity, MediaType contentType, HttpServletRequest request) {
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFileType(getBestFileTypeFromRequest(request));
@@ -152,7 +154,7 @@ public abstract class BasicSearchController<T> {
             context.setEntityIds(accList);
         } else {
             context.setEntities(result.getContent());
-            context.setFailedIds(result.getFailedIds());
+            context.setExtraOptions(result.getExtraOptions());
             context.setWarnings(result.getWarnings());
         }
 
@@ -162,9 +164,20 @@ public abstract class BasicSearchController<T> {
             headers = createHttpDownloadHeader(context, request);
         }
 
-        this.eventPublisher.publishEvent(
-                new PaginatedResultsEvent(this, request, response, result.getPageAndClean()));
+        ApplicationEvent paginatedResultEvent =
+                new PaginatedResultsEvent(this, request, response, result.getPageAndClean());
+        publishPaginationEvent(paginatedResultEvent);
         return ResponseEntity.ok().headers(headers).body(context);
+    }
+
+    /**
+     * This is to suppress a false positive sonar failure Sonar error says: "Logging should not be
+     * vulnerable to injection attacks" This line does not log anything, this is why we added
+     * suppress below
+     */
+    @SuppressWarnings("javasecurity:S5145")
+    private void publishPaginationEvent(ApplicationEvent paginatedResultEvent) {
+        this.eventPublisher.publishEvent(paginatedResultEvent);
     }
 
     protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> stream(
@@ -190,7 +203,7 @@ public abstract class BasicSearchController<T> {
         return getDeferredResultResponseEntity(contextSupplier, request);
     }
 
-    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> streamRDF(
+    protected DeferredResult<ResponseEntity<MessageConverterContext<T>>> streamRdf(
             Supplier<Stream<String>> rdfStreamSupplier,
             StreamRequest streamRequest,
             MediaType contentType,
@@ -266,9 +279,17 @@ public abstract class BasicSearchController<T> {
         return FileType.bestFileTypeMatch(encoding);
     }
 
-    protected boolean isRDFAccept(HttpServletRequest request) {
+    protected Optional<String> getAcceptedRdfContentType(HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        return contentType.equals(RDF_MEDIA_TYPE);
+        if (UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES.containsKey(contentType)) {
+            return Optional.of(SUPPORTED_RDF_MEDIA_TYPES.get(contentType));
+        }
+        return Optional.empty();
+    }
+
+    protected void setBasicRequestFormat(BasicRequest basicRequest, HttpServletRequest request) {
+        MediaType mediaType = getAcceptHeader(request);
+        basicRequest.setFormat(mediaType.toString());
     }
 
     protected MessageConverterContext<T> createStreamContext(

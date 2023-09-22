@@ -3,10 +3,12 @@ package org.uniprot.api.rest.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.controller.ControllerITUtils.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,7 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.SolrCollection;
@@ -68,10 +71,18 @@ public abstract class AbstractGetByIdControllerIT {
         ResultActions resultActions =
                 response.andDo(log())
                         .andExpect(status().is(HttpStatus.OK.value()))
+                        .andExpect(header().string(HttpHeaders.CACHE_CONTROL, CACHE_VALUE))
                         .andExpect(
                                 header().string(
                                                 HttpHeaders.CONTENT_TYPE,
-                                                MediaType.APPLICATION_JSON_VALUE));
+                                                MediaType.APPLICATION_JSON_VALUE))
+                        .andExpect(
+                                header().stringValues(
+                                                HttpHeaders.VARY,
+                                                ACCEPT,
+                                                ACCEPT_ENCODING,
+                                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE));
 
         for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -95,7 +106,14 @@ public abstract class AbstractGetByIdControllerIT {
                         .andExpect(
                                 header().string(
                                                 HttpHeaders.CONTENT_TYPE,
-                                                MediaType.APPLICATION_JSON_VALUE));
+                                                MediaType.APPLICATION_JSON_VALUE))
+                        .andExpect(
+                                header().stringValues(
+                                                HttpHeaders.VARY,
+                                                ACCEPT,
+                                                ACCEPT_ENCODING,
+                                                HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
+                                                HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE));
 
         for (ResultMatcher resultMatcher : idParameter.getResultMatchers()) {
             resultActions.andExpect(resultMatcher);
@@ -330,7 +348,7 @@ public abstract class AbstractGetByIdControllerIT {
         assertThat(contentTypeParam, notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), notNullValue());
         assertThat(contentTypeParam.getContentTypeParams(), not(empty()));
-        ControllerITUtils.verifyIdContentTypes(
+        verifyIdContentTypes(
                 getIdRequestPath(),
                 requestMappingHandlerMapping,
                 contentTypeParam.getContentTypeParams());

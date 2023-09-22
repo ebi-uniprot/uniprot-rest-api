@@ -71,6 +71,9 @@ public class HelpCentreSearchRequest implements SearchRequest {
     @Parameter(hidden = true)
     private String type;
 
+    @Parameter(hidden = true)
+    private String format;
+
     public String getFields() {
         String result = fields;
         if (Utils.nullOrEmpty(result)) {

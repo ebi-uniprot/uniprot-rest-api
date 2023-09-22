@@ -2,6 +2,7 @@ package org.uniprot.api.rest.service;
 
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LEADING_WILDCARD_IGNORED;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -15,13 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.exception.ServiceException;
-import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.common.repository.search.SolrQueryConfig;
-import org.uniprot.api.common.repository.search.SolrQueryRepository;
-import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.search.*;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -104,16 +102,21 @@ public abstract class BasicSearchService<D extends Document, R> {
     public QueryResult<R> search(SearchRequest request) {
         SolrRequest solrRequest = createSearchSolrRequest(request);
         QueryResult<D> results = repository.searchPage(solrRequest, request.getCursor());
-        Stream<R> converted = results.getContent().map(entryConverter).filter(Objects::nonNull);
+
+        Stream<R> converted = convertDocumentsToEntries(request, results);
+
         Set<ProblemPair> warnings = getWarnings(request.getQuery(), Set.of());
-        return QueryResult.of(
-                converted,
-                results.getPage(),
-                results.getFacets(),
-                null,
-                null,
-                results.getSuggestions(),
-                warnings);
+        return QueryResult.<R>builder()
+                .content(converted)
+                .page(results.getPage())
+                .facets(results.getFacets())
+                .suggestions(results.getSuggestions())
+                .warnings(warnings)
+                .build();
+    }
+
+    protected Stream<R> convertDocumentsToEntries(SearchRequest request, QueryResult<D> results) {
+        return results.getContent().map(entryConverter).filter(Objects::nonNull);
     }
 
     public Stream<R> stream(StreamRequest request) {
@@ -212,7 +215,7 @@ public abstract class BasicSearchService<D extends Document, R> {
         return requestBuilder;
     }
 
-    private String getQueryFields(String query) {
+    protected String getQueryFields(String query) {
         String queryFields = "";
         Optional<String> optimisedQueryField = validateOptimisableField(query);
         if (optimisedQueryField.isPresent()) {
@@ -234,20 +237,27 @@ public abstract class BasicSearchService<D extends Document, R> {
         return this.solrBatchSize == null ? DEFAULT_SOLR_BATCH_SIZE : this.solrBatchSize;
     }
 
-    public Stream<String> streamRDF(StreamRequest streamRequest) {
+    public Stream<String> streamRdf(StreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, queryBoosts)
                         .rows(getDefaultBatchSize())
                         .totalRows(Integer.MAX_VALUE)
                         .build();
-        return getRDFStreamer().idsToRDFStoreStream(solrRequest);
+        List<String> idStream =
+                getDocumentIdStream().fetchIds(solrRequest).collect(Collectors.toList());
+        return getRdfStreamer().stream(idStream.stream(), dataType, format);
     }
 
-    public String getRDFXml(String id) {
-        return getRDFStreamer().streamRDFXML(Stream.of(id)).collect(Collectors.joining());
+    protected DefaultDocumentIdStream<D> getDocumentIdStream() {
+        throw new UnsupportedOperationException("Override this method");
     }
 
-    protected RDFStreamer getRDFStreamer() {
+    public String getRdf(String id, String dataType, String format) {
+        return getRdfStreamer().stream(Stream.of(id), dataType, format)
+                .collect(Collectors.joining());
+    }
+
+    protected RdfStreamer getRdfStreamer() {
         throw new UnsupportedOperationException("Override this method");
     }
 

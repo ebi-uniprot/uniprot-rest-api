@@ -52,11 +52,15 @@ public class UniRefMessageConverterConfig {
 
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXlsConverter());
+                converters.add(new ErrorMessageTurtleConverter());
+                converters.add(new ErrorMessageNTriplesConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter(downloadGatekeeper));
                 converters.add(new UniRefLightFastaMessageConverter(downloadGatekeeper));
                 converters.add(new UniRefFastaMessageConverter(downloadGatekeeper));
-                converters.add(new RDFMessageConverter(downloadGatekeeper));
+                converters.add(new RdfMessageConverter(downloadGatekeeper));
+                converters.add(new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(new NTriplesMessageConverter(downloadGatekeeper));
                 converters.add(
                         new TsvMessageConverter<>(
                                 UniRefEntryLight.class,
@@ -124,7 +128,9 @@ public class UniRefMessageConverterConfig {
                         uniRefLightContext(FASTA_MEDIA_TYPE),
                         uniRefLightContext(TSV_MEDIA_TYPE),
                         uniRefLightContext(XLS_MEDIA_TYPE),
-                        uniRefLightContext(RDF_MEDIA_TYPE))
+                        uniRefLightContext(RDF_MEDIA_TYPE),
+                        uniRefLightContext(TURTLE_MEDIA_TYPE),
+                        uniRefLightContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -154,7 +160,9 @@ public class UniRefMessageConverterConfig {
                         uniRefContext(FASTA_MEDIA_TYPE),
                         uniRefContext(TSV_MEDIA_TYPE),
                         uniRefContext(XLS_MEDIA_TYPE),
-                        uniRefContext(RDF_MEDIA_TYPE))
+                        uniRefContext(RDF_MEDIA_TYPE),
+                        uniRefContext(TURTLE_MEDIA_TYPE),
+                        uniRefContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

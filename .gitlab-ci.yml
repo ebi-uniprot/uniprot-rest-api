@@ -13,6 +13,7 @@ variables:
   GIT_DEPTH: 0 # Tells git to fetch all the branches of the project, required by the analysis task
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   JACOCO_AGGREGATE_REPORT: "jacoco-aggregate-report/target/site/jacoco-aggregate/jacoco.xml"
+  UNIPROT_REST_VERSION: ""
 
 services:
   - name: docker:dind
@@ -29,7 +30,9 @@ stages:
   - setup
   - test
   - quality
-  - deploy
+  - mvn-deploy
+  - docker-build
+  - helm-install
 
 api:settings:
   stage: setup
@@ -82,10 +85,51 @@ api:sonar:
     - when: manual
       allow_failure: true
 
-api:deploy:
-  stage: deploy
-  script: mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
+mvn:deploy:
+  stage: mvn-deploy
+  script:
+  - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
+  - echo "UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)" >> variables.env
+  artifacts:
+    reports:
+      dotenv: variables.env
   dependencies:
     - api:settings
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+
+k8s:docker-build:
+  stage: docker-build
+  needs:
+    - job: mvn:deploy
+      artifacts: true
+  trigger:
+    project: uniprot/deployment/unp.ci.api.k8s
+    branch: master
+  variables:
+    CI_PIPELINE_TASKS: 'build'
+    ARTIFACT: 'all-rest'
+    VERSION: '$UNIPROT_REST_VERSION'
+  when: on_success
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+
+k8s:helm-install:
+  stage: helm-install
+  needs:
+    - job: k8s:docker-build
+      artifacts: true
+    - job: mvn:deploy
+      artifacts: true
+  trigger:
+    project: uniprot/deployment/unp.ci.api.k8s
+    branch: master
+  variables:
+    CI_PIPELINE_TASKS: 'helm-install-rest'
+    VERSION: '$UNIPROT_REST_VERSION'
+    DC: 'DEV'
+    ARTIFACT: 'all-rest'
+    RELEASE_NAME: '2023_04'
+  when: on_success
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'

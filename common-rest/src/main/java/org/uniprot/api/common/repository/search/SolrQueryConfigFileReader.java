@@ -61,7 +61,7 @@ public class SolrQueryConfigFileReader {
         loader = new DefaultResourceLoader();
 
         String location = getConfigLocation();
-        log.info("Loading Solr query config [" + location + "]...");
+        log.debug("Loading Solr query config [" + location + "]...");
         // try to query config from file first, then try from classpath
         Stream<String> lines =
                 getConfigAsStringStream("file:" + location)
@@ -91,14 +91,14 @@ public class SolrQueryConfigFileReader {
                 queryConfigType = parsedType;
             }
         }
-        log.info("Loaded Solr query config.");
+        log.debug("Loaded Solr query config.");
     }
 
     private void logSizeOfConfigFile(String[] linesArr) {
         if (linesArr.length == 0) {
             log.warn("Solr query config is EMPTY");
         } else {
-            log.info("Solr query config contains {} lines", linesArr.length);
+            log.debug("Solr query config contains {} lines", linesArr.length);
         }
     }
 
@@ -116,7 +116,7 @@ public class SolrQueryConfigFileReader {
         Resource resource = loader.getResource(resourceLocation);
         if (resource.exists()) {
             try {
-                log.info("Reading query config from [{}]", resource.getURI());
+                log.debug("Reading query config from [{}]", resource.getURI());
                 return Optional.of(
                         new BufferedReader(new InputStreamReader(resource.getInputStream()))
                                 .lines());

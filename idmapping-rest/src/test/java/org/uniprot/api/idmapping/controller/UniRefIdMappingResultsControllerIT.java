@@ -1,9 +1,6 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -12,14 +9,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.*;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.saveEntries;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.provider.Arguments;
@@ -27,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,7 +46,7 @@ import org.uniprot.api.idmapping.controller.utils.JobOperation;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
@@ -60,7 +59,7 @@ import org.uniprot.store.search.SolrCollection;
  * @author lgonzales
  * @since 26/02/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniRefIdMappingResultsController.class)
 @AutoConfigureWebClient
@@ -90,7 +89,8 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
 
     @Autowired private JobOperation uniRefIdMappingJobOp;
 
-    @Autowired private RestTemplate uniRefRestTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate uniRefRestTemplate;
 
     @Override
     protected List<SolrCollection> getSolrCollections() {
@@ -152,10 +152,13 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
+        saveEntries(cloudSolrClient, storeClient);
+    }
+
+    @BeforeEach
+    void setUp() {
         when(uniRefRestTemplate.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
         when(uniRefRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-
-        saveEntries(cloudSolrClient, storeClient);
     }
 
     @Test
@@ -204,7 +207,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
     }
 
     @Test
-    void streamRDFCanReturnSuccess() throws Exception {
+    void streamRdfCanReturnSuccess() throws Exception {
         // when
         IdMappingJob job = getJobOperation().createAndPutJobInCache();
         ;
@@ -219,7 +222,7 @@ class UniRefIdMappingResultsControllerIT extends AbstractIdMappingResultsControl
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIREF_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RdfPrologs.UNIREF_PROLOG)))
                 .andExpect(
                         content()
                                 .string(

@@ -2,6 +2,8 @@ package org.uniprot.api.idmapping.model;
 
 import lombok.*;
 
+import org.uniprot.api.common.repository.search.EntryPair;
+
 /**
  * Created 16/02/2021
  *

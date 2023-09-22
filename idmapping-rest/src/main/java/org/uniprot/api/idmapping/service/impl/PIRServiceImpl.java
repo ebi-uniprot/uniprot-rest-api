@@ -4,6 +4,8 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 import static org.uniprot.store.config.idmapping.IdMappingFieldConfig.ACC_ID_STR;
 
 import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -51,6 +53,11 @@ public class PIRServiceImpl extends IdMappingPIRService {
                                     .getSearchFieldItemByName("accession_id")
                                     .getValidRegex()
                             + "(\\[[0-9]+\\-[0-9]+\\]|\\.[0-9]+)");
+    public static final Pattern UNIPROTKB_ACCESSION_REGEX =
+            Pattern.compile(
+                    SearchFieldConfigFactory.getSearchFieldConfig(UniProtDataType.UNIPROTKB)
+                            .getSearchFieldItemByName("accession_id")
+                            .getValidRegex());
 
     public final String pirIdMappingUrl;
     private final RestTemplate restTemplate;
@@ -109,10 +116,11 @@ public class PIRServiceImpl extends IdMappingPIRService {
     String getIdsFromRequest(IdMappingJobRequest request) {
         String ids = String.join(",", request.getIds());
         if (request.getFrom().equals(ACC_ID_STR)) {
-            ids =
+            Set<String> uniqueIds =
                     Arrays.stream(ids.split(","))
                             .map(this::cleanIdBeforeSubmit)
-                            .collect(Collectors.joining(","));
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
+            ids = String.join(",", uniqueIds);
         }
         return ids;
     }
@@ -126,6 +134,9 @@ public class PIRServiceImpl extends IdMappingPIRService {
             if (id.contains("[")) {
                 result = id.substring(0, id.indexOf("["));
             }
+        } else if (id.contains("_")
+                && UNIPROTKB_ACCESSION_REGEX.matcher(id.split("_")[0]).matches()) {
+            result = id.substring(0, id.indexOf("_"));
         }
         return result.strip();
     }

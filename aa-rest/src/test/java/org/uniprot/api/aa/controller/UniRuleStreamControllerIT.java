@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
@@ -70,6 +72,13 @@ class UniRuleStreamControllerIT extends AbstractSolrStreamControllerIT {
     @Override
     protected String getStreamPath() {
         return "/unirule/stream";
+    }
+
+    @Override
+    public String getContentDisposition() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+        return "unirule_all_" + now.format(dateTimeFormatter);
     }
 
     @Override

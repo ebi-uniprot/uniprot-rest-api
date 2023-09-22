@@ -3,8 +3,10 @@ package org.uniprot.api.rest.request;
 import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.store.search.SolrQueryUtil;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
@@ -27,8 +29,8 @@ public class UniProtKBRequestUtil {
             Pattern.compile(FieldRegexConstants.CLEAN_QUERY_REGEX);
 
     private static final Pattern ACCESSION_REGEX_ISOFORM =
-            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX_ISOFORM);
-    private static final String DASH = "-";
+            Pattern.compile(FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX);
+    public static final String DASH = "-";
 
     public static boolean needsToFilterIsoform(
             String accessionIdField,
@@ -66,5 +68,15 @@ public class UniProtKBRequestUtil {
             }
         }
         return response;
+    }
+
+    public static String parseFormat(String format) {
+        String longFormat;
+        try {
+            longFormat = UniProtMediaType.getMediaTypeForFileExtension(format).toString();
+        } catch (IllegalArgumentException ile) {
+            longFormat = null;
+        }
+        return Objects.nonNull(longFormat) ? longFormat : format;
     }
 }

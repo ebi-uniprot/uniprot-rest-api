@@ -15,6 +15,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.model.*;
 import org.uniprot.api.idmapping.service.store.impl.UniParcBatchStoreEntryPairIterable;
 import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
@@ -93,7 +94,8 @@ class BatchStoreEntryPairIterableTest {
     @Test
     void testLoggingUniProtKB() {
         BatchStoreEntryPairIterable<UniProtKBEntryPair, UniProtKBEntry> iterable =
-                new UniProtKBBatchStoreEntryPairIterable(List.of(), 10, null, null, null, false);
+                new UniProtKBBatchStoreEntryPairIterable(
+                        List.of(), 10, null, null, null, null, false);
         iterable.logTiming(1, 2, 3);
         assertNotNull(iterable);
     }

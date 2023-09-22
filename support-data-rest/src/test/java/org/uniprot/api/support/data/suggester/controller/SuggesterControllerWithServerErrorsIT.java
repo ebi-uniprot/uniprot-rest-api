@@ -20,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +33,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
@@ -63,30 +61,6 @@ class SuggesterControllerWithServerErrorsIT {
     @Autowired private SolrClient solrClient;
 
     @Autowired private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    @Qualifier("xrefRDFRestTemplate")
-    private RestTemplate xrefRestTemplate;
-
-    @Autowired
-    @Qualifier("diseaseRDFRestTemplate")
-    private RestTemplate diseaseRestTemplate;
-
-    @Autowired
-    @Qualifier("keywordRDFRestTemplate")
-    private RestTemplate keywordRDFRestTemplate;
-
-    @Autowired
-    @Qualifier("taxonomyRDFRestTemplate")
-    private RestTemplate taxonomyRDFRestTemplate;
-
-    @Autowired
-    @Qualifier("locationRDFRestTemplate")
-    private RestTemplate locationRDFRestTemplate;
-
-    @Autowired
-    @Qualifier("literatureRDFRestTemplate")
-    private RestTemplate literatureRDFRestTemplate;
 
     private MockMvc mockMvc;
 
@@ -140,36 +114,6 @@ class SuggesterControllerWithServerErrorsIT {
                     return solrQuery;
                 }
             };
-        }
-
-        @Bean(name = "xrefRDFRestTemplate")
-        public RestTemplate xrefRestTemplate() {
-            return mock(RestTemplate.class);
-        }
-
-        @Bean(name = "diseaseRDFRestTemplate")
-        public RestTemplate diseaseRestTemplate() {
-            return mock(RestTemplate.class);
-        }
-
-        @Bean(name = "keywordRDFRestTemplate")
-        public RestTemplate keywordRDFRestTemplate() {
-            return mock(RestTemplate.class);
-        }
-
-        @Bean(name = "taxonomyRDFRestTemplate")
-        public RestTemplate taxonomyRDFRestTemplate() {
-            return mock(RestTemplate.class);
-        }
-
-        @Bean(name = "locationRDFRestTemplate")
-        public RestTemplate locationRDFRestTemplate() {
-            return mock(RestTemplate.class);
-        }
-
-        @Bean(name = "literatureRDFRestTemplate")
-        public RestTemplate literaturesRDFRestTemplate() {
-            return mock(RestTemplate.class);
         }
     }
 }

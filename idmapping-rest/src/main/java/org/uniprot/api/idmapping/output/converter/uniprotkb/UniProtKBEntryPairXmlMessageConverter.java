@@ -34,8 +34,12 @@ public class UniProtKBEntryPairXmlMessageConverter
     }
 
     @Override
-    protected Entry toXml(UniProtKBEntryPair entity) {
-        return XML_CONVERTER.get().toXml(entity.getTo());
+    protected Entry toXml(UniProtKBEntryPair entryPair) {
+        Entry result = null;
+        if (entryPair.getTo().isActive()) {
+            result = XML_CONVERTER.get().toXml(entryPair.getTo());
+        }
+        return result;
     }
 
     @Override

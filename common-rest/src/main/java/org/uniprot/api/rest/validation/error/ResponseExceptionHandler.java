@@ -2,12 +2,11 @@ package org.uniprot.api.rest.validation.error;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.springframework.http.HttpHeaders.CACHE_CONTROL;
 import static org.uniprot.api.rest.output.UniProtMediaType.DEFAULT_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.UNKNOWN_MEDIA_TYPE;
 import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.ERROR_MESSAGE_ATTRIBUTE;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.addDebugError;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.getBadRequestResponseEntity;
-import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.getContentTypeFromRequest;
+import static org.uniprot.api.rest.validation.error.ResponseExceptionHelper.*;
 import static org.uniprot.core.util.Utils.nullOrEmpty;
 
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -42,6 +42,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.uniprot.api.common.exception.*;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
 import org.uniprot.api.rest.output.converter.StopStreamException;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
 
@@ -125,7 +126,7 @@ public class ResponseExceptionHandler {
      */
     @ExceptionHandler({QueryRetrievalException.class, ServiceException.class, Throwable.class})
     public ResponseEntity<ErrorInfo> handleInternalServerError(
-            Throwable ex, HttpServletRequest request) {
+            Throwable ex, HttpServletRequest request, HttpServletResponse response) {
         String url = Encode.forHtml(request.getRequestURL().toString());
         String queryString = Encode.forHtml(request.getQueryString());
         String urlAndParams = queryString == null ? url : url + '?' + queryString;
@@ -136,7 +137,7 @@ public class ResponseExceptionHandler {
         addDebugError(request, ex, messages);
 
         ErrorInfo error = new ErrorInfo(url, messages);
-
+        response.setHeader(CACHE_CONTROL, HttpCommonHeaderConfig.NO_CACHE);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(getContentTypeFromRequest(request))
                 .body(error);
@@ -313,5 +314,13 @@ public class ResponseExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .contentType(getContentTypeFromRequest(request))
                 .body(error);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorInfo> handleIllegalArgumentException(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(getContentTypeFromRequest(request))
+                .body(new ErrorInfo(request.getRequestURL().toString(), List.of(ex.getMessage())));
     }
 }

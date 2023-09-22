@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.service.store.impl;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +28,20 @@ public class UniParcBatchStoreEntryPairIterable
         super(sourceIterable, batchSize, storeClient, retryPolicy);
     }
 
+    public UniParcBatchStoreEntryPairIterable(
+            Iterator<IdMappingStringPair> sourceIterator,
+            int batchSize,
+            UniProtStoreClient<UniParcEntry> storeClient,
+            RetryPolicy<Object> retryPolicy) {
+        super(sourceIterator, batchSize, storeClient, retryPolicy);
+    }
+
     @Override
     protected UniParcEntryPair convertToPair(
             IdMappingStringPair mId, Map<String, UniParcEntry> idEntryMap) {
         return UniParcEntryPair.builder()
                 .from(mId.getFrom())
-                .to(idEntryMap.get(mId.getTo()))
+                .to(idEntryMap.getOrDefault(mId.getTo(), null))
                 .build();
     }
 

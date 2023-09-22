@@ -48,4 +48,7 @@ public class SubcellularLocationBasicRequest {
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
     private String fields;
+
+    @Parameter(hidden = true)
+    private String format;
 }

@@ -25,4 +25,7 @@ public class UniParcGetByIdRequest {
     @Parameter(description = "Comma separated list of taxonomy Ids")
     @ValidCommaSeparatedItemsLength(maxLength = 100)
     private String taxonIds;
+
+    @Parameter(hidden = true)
+    private String format;
 }

@@ -83,20 +83,25 @@ public class UniParcIdMappingResultsConfig {
 
     @Bean("uniParcEntryStoreStreamer")
     public StoreStreamer<UniParcEntry> uniParcEntryStoreStreamer(
+            @Qualifier("uniParcStoreStreamerConfig")
+                    StoreStreamerConfig<UniParcEntry> uniParcStoreStreamerConfig) {
+        return new StoreStreamer<>(uniParcStoreStreamerConfig);
+    }
+
+    @Bean("uniParcStoreStreamerConfig")
+    public StoreStreamerConfig<UniParcEntry> uniParcStoreStreamerConfig(
             @Qualifier("uniParcStoreClient") UniProtStoreClient<UniParcEntry> storeClient,
             @Qualifier("uniParcTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig,
             @Qualifier("uniParcDocumentIdStream") TupleStreamDocumentIdStream documentIdStream,
             @Qualifier("uniParcStoreRetryPolicy") RetryPolicy<Object> uniParcStoreRetryPolicy) {
-        StoreStreamerConfig<UniParcEntry> storeStreamerConfig =
-                StoreStreamerConfig.<UniParcEntry>builder()
-                        .streamConfig(streamConfig)
-                        .storeClient(storeClient)
-                        .tupleStreamTemplate(tupleStreamTemplate)
-                        .storeFetchRetryPolicy(uniParcStoreRetryPolicy)
-                        .documentIdStream(documentIdStream)
-                        .build();
-        return new StoreStreamer<>(storeStreamerConfig);
+        return StoreStreamerConfig.<UniParcEntry>builder()
+                .streamConfig(streamConfig)
+                .storeClient(storeClient)
+                .tupleStreamTemplate(tupleStreamTemplate)
+                .storeFetchRetryPolicy(uniParcStoreRetryPolicy)
+                .documentIdStream(documentIdStream)
+                .build();
     }
 
     @Bean("uniParcStoreRetryPolicy")
@@ -115,6 +120,7 @@ public class UniParcIdMappingResultsConfig {
         VoldemortClient<UniParcEntry> client =
                 new VoldemortRemoteUniParcEntryStore(
                         uniParcStoreConfigProperties.getNumberOfConnections(),
+                        uniParcStoreConfigProperties.isBrotliEnabled(),
                         uniParcStoreConfigProperties.getStoreName(),
                         uniParcStoreConfigProperties.getHost());
         return new UniProtStoreClient<>(client);

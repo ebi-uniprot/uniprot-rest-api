@@ -8,8 +8,8 @@ import java.nio.ByteBuffer;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,10 +23,10 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.keyword.repository.KeywordRepository;
+import org.uniprot.api.support.data.common.keyword.repository.KeywordRepository;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.core.cv.keyword.KeywordId;
 import org.uniprot.core.cv.keyword.impl.KeywordEntryBuilder;
@@ -49,8 +49,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
         })
 public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
 
-    @Autowired
-    @Qualifier("keywordRDFRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final String KEYWORD_ACCESSION = "KW-0005";
@@ -117,8 +116,8 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.KEYWORD_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.KEYWORD_PROLOG;
     }
 
     @Override
@@ -234,6 +233,22 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.TURTLE_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.OBO_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.OBO_MEDIA_TYPE))
@@ -291,6 +306,24 @@ public class KeywordGetIdControllerIT extends AbstractGetByIdWithTypeExtensionCo
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The keyword id value has invalid format")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The keyword id value has invalid format")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

@@ -83,21 +83,25 @@ public class UniRefIdMappingResultsConfig {
 
     @Bean("uniRefEntryStoreStreamer")
     public StoreStreamer<UniRefEntryLight> uniRefEntryStoreStreamer(
+            @Qualifier("uniRefStoreStreamerConfig")
+                    StoreStreamerConfig<UniRefEntryLight> uniRefStoreStreamerConfig) {
+        return new StoreStreamer<>(uniRefStoreStreamerConfig);
+    }
+
+    @Bean("uniRefStoreStreamerConfig")
+    public StoreStreamerConfig<UniRefEntryLight> uniRefStoreStreamerConfig(
             @Qualifier("uniRefLightStoreClient") UniProtStoreClient<UniRefEntryLight> storeClient,
             @Qualifier("uniRefTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig,
             @Qualifier("uniRefDocumentIdStream") TupleStreamDocumentIdStream documentIdStream,
             @Qualifier("uniRefStoreRetryPolicy") RetryPolicy<Object> uniRefStoreRetryPolicy) {
-
-        StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig =
-                StoreStreamerConfig.<UniRefEntryLight>builder()
-                        .streamConfig(streamConfig)
-                        .storeClient(storeClient)
-                        .tupleStreamTemplate(tupleStreamTemplate)
-                        .storeFetchRetryPolicy(uniRefStoreRetryPolicy)
-                        .documentIdStream(documentIdStream)
-                        .build();
-        return new StoreStreamer<>(storeStreamerConfig);
+        return StoreStreamerConfig.<UniRefEntryLight>builder()
+                .streamConfig(streamConfig)
+                .storeClient(storeClient)
+                .tupleStreamTemplate(tupleStreamTemplate)
+                .storeFetchRetryPolicy(uniRefStoreRetryPolicy)
+                .documentIdStream(documentIdStream)
+                .build();
     }
 
     @Bean("uniRefStoreRetryPolicy")
@@ -116,6 +120,7 @@ public class UniRefIdMappingResultsConfig {
         VoldemortClient<UniRefEntryLight> client =
                 new VoldemortRemoteUniRefEntryLightStore(
                         uniRefLightStoreConfigProperties.getNumberOfConnections(),
+                        uniRefLightStoreConfigProperties.isBrotliEnabled(),
                         uniRefLightStoreConfigProperties.getStoreName(),
                         uniRefLightStoreConfigProperties.getHost());
         return new UniProtStoreClient<>(client);

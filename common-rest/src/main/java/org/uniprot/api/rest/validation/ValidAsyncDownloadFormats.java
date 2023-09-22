@@ -55,19 +55,19 @@ public @interface ValidAsyncDownloadFormats {
         }
 
         @Override
-        public boolean isValid(String value, ConstraintValidatorContext context) {
+        public boolean isValid(String format, ConstraintValidatorContext context) {
             boolean isValid = true;
-            if (Utils.notNullNotEmpty(value)) {
+            if (Utils.notNullNotEmpty(format)) {
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;
                 String type;
                 try {
-                    type = UniProtMediaType.getMediaTypeForFileExtension(value).toString();
+                    type = UniProtMediaType.getMediaTypeForFileExtension(format).toString();
                 } catch (IllegalArgumentException ile) {
                     type = "";
                 }
-                if (!getFormats().contains(value) && !getFormats().contains(type)) {
-                    buildUnsupportedFormatErrorMessage(value, contextImpl);
+                if (!getFormats().contains(format) && !getFormats().contains(type)) {
+                    buildUnsupportedFormatErrorMessage(format, contextImpl);
                     isValid = false;
                 }
 

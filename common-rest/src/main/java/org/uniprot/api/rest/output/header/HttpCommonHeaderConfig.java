@@ -39,8 +39,8 @@ public class HttpCommonHeaderConfig {
 
     public static final String DOWNLOAD_RUN_SUFFIX = "/download/run";
 
+    public static final String NO_CACHE = "no-cache";
     static final String PUBLIC_MAX_AGE = "public, max-age=";
-    static final String NO_CACHE = "no-cache";
     private final ServiceInfoConfig.ServiceInfo serviceInfo;
     private final HttpServletRequestContentTypeMutator requestContentTypeMutator;
 
@@ -110,17 +110,17 @@ public class HttpCommonHeaderConfig {
         boolean requiresCachingHeaders = true;
         for (Pattern pattern : serviceInfo.getNonCacheablePaths()) {
             if (Utils.notNull(request)
-                    && Utils.notNullNotEmpty(request.getServletPath())
-                    && pattern.matcher(request.getServletPath()).matches()) {
+                    && Utils.notNullNotEmpty(request.getRequestURI())
+                    && pattern.matcher(request.getRequestURI()).matches()) {
                 requiresCachingHeaders = false;
                 break;
             }
         }
-        if (requiresCachingHeaders) {
+        if (requiresCachingHeaders && response.getStatus() < 500) {
             // request gateway caching
             response.addHeader(CACHE_CONTROL, PUBLIC_MAX_AGE + serviceInfo.getMaxAgeInSeconds());
         } else {
-            // explictly assert to any gate-way cache that we do not want caching
+            // explicitly assert to any gate-way cache that we do not want caching
             response.addHeader(CACHE_CONTROL, NO_CACHE);
         }
 

@@ -1,10 +1,10 @@
 package org.uniprot.api.support.data.crossref.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.DefaultDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.rest.service.BasicSearchService;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.support.data.crossref.repository.CrossRefRepository;
@@ -23,7 +23,8 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
     public static final String CROSS_REF_ID_FIELD = "id";
     private final UniProtQueryProcessorConfig crossRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
+    private final DefaultDocumentIdStream<CrossRefDocument> documentIdStream;
 
     public CrossRefService(
             CrossRefRepository crossRefRepository,
@@ -33,7 +34,8 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
             SolrQueryConfig crossRefSolrQueryConf,
             UniProtQueryProcessorConfig crossRefQueryProcessorConfig,
             SearchFieldConfig crossRefSearchFieldConfig,
-            @Qualifier("xrefRDFStreamer") RDFStreamer xrefRDFStreamer) {
+            DefaultDocumentIdStream<CrossRefDocument> documentIdStream,
+            RdfStreamer supportDataRdfStreamer) {
         super(
                 crossRefRepository,
                 toCrossRefEntryConverter,
@@ -42,7 +44,8 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
                 crossRefFacetConfig);
         this.crossRefQueryProcessorConfig = crossRefQueryProcessorConfig;
         this.searchFieldConfig = crossRefSearchFieldConfig;
-        this.rdfStreamer = xrefRDFStreamer;
+        this.documentIdStream = documentIdStream;
+        this.rdfStreamer = supportDataRdfStreamer;
     }
 
     @Override
@@ -56,7 +59,12 @@ public class CrossRefService extends BasicSearchService<CrossRefDocument, CrossR
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
+    protected DefaultDocumentIdStream<CrossRefDocument> getDocumentIdStream() {
+        return documentIdStream;
+    }
+
+    @Override
+    protected RdfStreamer getRdfStreamer() {
         return this.rdfStreamer;
     }
 }

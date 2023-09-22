@@ -1,6 +1,7 @@
 package org.uniprot.api.idmapping.service;
 
 import static java.util.Arrays.asList;
+import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.UNIPROTKB_ACCESSION_REGEX;
 import static org.uniprot.api.idmapping.service.impl.PIRServiceImpl.UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LIMIT_EXCEED_ERROR;
@@ -44,6 +45,9 @@ public class PIRResponseConverter {
                             .getSearchFieldItemByName("accession_id")
                             .getValidRegex());
     private static final String NO_MATCHES_PIR_RESPONSE = "MSG: 200 -- No Matches.";
+    public static final String SEQ_SEP = "[";
+    public static final String VERSION_SEP = ".";
+    public static final String ID_SEP = "_";
 
     static boolean isValidIdPattern(String to, String toValue) {
         to = to.strip();
@@ -63,31 +67,38 @@ public class PIRResponseConverter {
             Integer maxToUniProtIdsAllowed,
             Integer maxToIdsAllowed,
             ResponseEntity<String> response) {
-        IdMappingResult.IdMappingResultBuilder builder = IdMappingResult.builder();
+        IdMappingResult.IdMappingResultBuilder idMappingResultBuilder = IdMappingResult.builder();
         HttpStatus statusCode = response.getStatusCode();
         if (statusCode.equals(HttpStatus.OK)) {
             if (response.hasBody()) {
-                Map<String, String> mappedRequestIds = getMappedRequestIds(request);
+                Map<String, Set<String>> mappedRequestIds = getMappedRequestIds(request);
                 response.getBody()
                         .lines()
                         .filter(line -> !line.startsWith("Taxonomy ID:"))
                         .filter(Utils::notNullNotEmpty)
-                        //                        .filter(line -> !line.startsWith("MSG:"))
-                        .forEach(line -> convertLine(line, request, mappedRequestIds, builder));
+                        .forEach(
+                                line ->
+                                        convertLine(
+                                                line,
+                                                request,
+                                                mappedRequestIds,
+                                                idMappingResultBuilder));
                 // populate  error  if needed
                 Optional<ProblemPair> optError =
-                        getOptionalLimitError(maxToIdsAllowed, builder.build());
+                        getOptionalLimitError(maxToIdsAllowed, idMappingResultBuilder.build());
                 if (optError.isPresent()) {
-                    builder.clearMappedIds();
-                    builder.clearUnmappedIds();
-                    builder.error(optError.get());
+                    idMappingResultBuilder.clearMappedIds();
+                    idMappingResultBuilder.clearUnmappedIds();
+                    idMappingResultBuilder.error(optError.get());
                 } else {
                     // populate warning if needed
                     Optional<ProblemPair> optWarning =
                             getOptionalEnrichmentWarning(
-                                    request, maxToUniProtIdsAllowed, builder.build());
+                                    request,
+                                    maxToUniProtIdsAllowed,
+                                    idMappingResultBuilder.build());
                     if (optWarning.isPresent()) {
-                        builder.warning(optWarning.get());
+                        idMappingResultBuilder.warning(optWarning.get());
                     }
                 }
             }
@@ -95,13 +106,13 @@ public class PIRResponseConverter {
             throw new HttpServerErrorException(statusCode, "PIR id-mapping service error");
         }
 
-        return builder.build();
+        return idMappingResultBuilder.build();
     }
 
     private void convertLine(
             String line,
             IdMappingJobRequest request,
-            Map<String, String> mappedId,
+            Map<String, Set<String>> mappedIds,
             IdMappingResult.IdMappingResultBuilder builder) {
         if (line.startsWith("MSG:")) {
             if (line.endsWith(NO_MATCHES_PIR_RESPONSE)) {
@@ -109,38 +120,62 @@ public class PIRResponseConverter {
             }
         } else {
             String[] rowParts = line.split("\t");
+            Set<String> fromValues = getFromValue(mappedIds, rowParts[0]);
             if (rowParts.length == 1) {
-                builder.unmappedId(getFromValue(mappedId, rowParts[0]));
+                fromValues.stream().forEach(builder::unmappedId);
             } else {
-                String fromValue = getFromValue(mappedId, rowParts[0]);
-                Arrays.stream(rowParts[1].split(";"))
-                        // filter based on valid to
-                        .filter(toValue -> isValidIdPattern(request.getTo(), toValue))
-                        .map(
-                                toValue ->
-                                        IdMappingStringPair.builder()
-                                                .from(fromValue)
-                                                .to(toValue)
-                                                .build())
-                        .forEach(builder::mappedId);
+                for (String fromValue : fromValues) {
+                    Arrays.stream(rowParts[1].split(";"))
+                            .map(
+                                    toValue ->
+                                            IdMappingStringPair.builder()
+                                                    .from(fromValue)
+                                                    .to(toValue)
+                                                    .build())
+                            .forEach(pair -> convertIdMappingPair(request.getTo(), pair, builder));
+                }
             }
         }
     }
 
-    private String getFromValue(Map<String, String> mappedIds, String fromValue) {
-        return mappedIds.getOrDefault(fromValue, fromValue);
+    private void convertIdMappingPair(
+            String to, IdMappingStringPair pair, IdMappingResult.IdMappingResultBuilder builder) {
+        if (isValidIdPattern(to, pair.getTo())) {
+            builder.mappedId(pair);
+        } else {
+            builder.suggestedId(pair);
+        }
     }
 
-    Map<String, String> getMappedRequestIds(IdMappingJobRequest request) {
-        Map<String, String> mappedIds = new HashMap<>();
+    private Set<String> getFromValue(Map<String, Set<String>> mappedIds, String fromValue) {
+        return mappedIds.getOrDefault(fromValue, Set.of(fromValue));
+    }
+
+    Map<String, Set<String>> getMappedRequestIds(IdMappingJobRequest request) {
+        Map<String, Set<String>> mappedIds = new HashMap<>();
         if (ACC_ID_STR.equals(request.getFrom())
-                && (request.getIds().contains("[") || request.getIds().contains("."))) {
+                && (request.getIds().contains(SEQ_SEP)
+                        || request.getIds().contains(VERSION_SEP)
+                        || request.getIds().contains(ID_SEP))) {
             String ids = String.join(",", request.getIds());
             mappedIds =
                     Arrays.stream(ids.split(","))
                             .map(this::getMappedId)
                             .filter(Objects::nonNull)
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                            .collect(
+                                    Collectors.groupingBy(
+                                            Map.Entry::getKey,
+                                            Collectors.mapping(
+                                                    Map.Entry::getValue,
+                                                    Collectors.toCollection(LinkedHashSet::new))));
+            // remove more than one versions from values
+            mappedIds.replaceAll(
+                    (key, values) -> {
+                        String firstValue = new ArrayList<>(values).get(0);
+                        return (firstValue.contains(VERSION_SEP))
+                                ? Set.of(firstValue.substring(0, firstValue.indexOf(VERSION_SEP)))
+                                : values;
+                    });
         }
         return mappedIds;
     }
@@ -148,12 +183,16 @@ public class PIRResponseConverter {
     private Map.Entry<String, String> getMappedId(String id) {
         Map.Entry<String, String> result = null;
         if (UNIPROTKB_ACCESSION_WITH_SEQUENCE_OR_VERSION.matcher(id).matches()) {
-            if (id.contains(".")) {
-                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(".")), id);
+            if (id.contains(VERSION_SEP)) {
+                result =
+                        new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(VERSION_SEP)), id);
             }
-            if (id.contains("[")) {
-                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf("[")), id);
+            if (id.contains(SEQ_SEP)) {
+                result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(SEQ_SEP)), id);
             }
+        } else if (id.contains(ID_SEP)
+                && UNIPROTKB_ACCESSION_REGEX.matcher(id.split(ID_SEP)[0]).matches()) {
+            result = new AbstractMap.SimpleEntry<>(id.substring(0, id.indexOf(ID_SEP)), id);
         }
         return result;
     }

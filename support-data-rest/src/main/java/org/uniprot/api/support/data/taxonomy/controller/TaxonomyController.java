@@ -25,10 +25,10 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.support.data.taxonomy.request.GetByTaxonIdsRequest;
-import org.uniprot.api.support.data.taxonomy.request.TaxonomySearchRequest;
-import org.uniprot.api.support.data.taxonomy.request.TaxonomyStreamRequest;
-import org.uniprot.api.support.data.taxonomy.service.TaxonomyService;
+import org.uniprot.api.support.data.common.taxonomy.request.GetByTaxonIdsRequest;
+import org.uniprot.api.support.data.common.taxonomy.request.TaxonomySearchRequest;
+import org.uniprot.api.support.data.common.taxonomy.request.TaxonomyStreamRequest;
+import org.uniprot.api.support.data.common.taxonomy.service.TaxonomyService;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyInactiveReasonType;
 import org.uniprot.store.config.UniProtDataType;
@@ -49,7 +49,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/taxonomy")
 @Validated
 public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
-
+    private static final String DATA_TYPE = "taxonomy";
     private final TaxonomyService taxonomyService;
     private static final String TAXONOMY_ID_REGEX = "^[0-9]+$";
 
@@ -91,7 +91,9 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<TaxonomyEntry>> getById(
             @Parameter(description = "Taxon id to find")
@@ -107,9 +109,11 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        if (isRDFAccept(request)) {
-            String result = this.taxonomyService.getRDFXml(taxonId);
-            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String result =
+                    this.taxonomyService.getRdf(taxonId, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
         TaxonomyEntry taxonomyEntry = this.taxonomyService.findById(Long.parseLong(taxonId));
         return super.getEntityResponse(taxonomyEntry, fields, request);
@@ -214,16 +218,21 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
                 LIST_MEDIA_TYPE_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
             @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
-            return super.streamRDF(
-                    () -> taxonomyService.streamRDF(streamRequest),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () ->
+                            taxonomyService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

@@ -15,7 +15,7 @@ import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
@@ -70,7 +70,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
             UniprotKBMappingRepository repository,
             UniProtKBFacetConfig facetConfig,
-            RDFStreamer uniProtKBRDFStreamer,
+            RdfStreamer idMappingRdfStreamer,
             UniProtStoreClient<UniProtKBEntry> storeClient,
             SolrQueryConfig uniProtKBSolrQueryConf,
             TaxonomyLineageService lineageService) {
@@ -78,7 +78,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 storeStreamer,
                 tupleStream,
                 facetConfig,
-                uniProtKBRDFStreamer,
+                idMappingRdfStreamer,
                 uniProtKBSolrQueryConf);
         this.streamConfig = streamConfig;
         this.storeClient = storeClient;
@@ -106,7 +106,9 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
     @Override
     protected Stream<UniProtKBEntry> getEntries(List<String> toIds, String fields) {
         StoreRequest storeRequest =
-                StoreRequest.builder().addLineage(isLineageAllowed(fields)).build();
+                StoreRequest.builder()
+                        .addLineage(isLineageAllowed(fields, returnFieldConfig))
+                        .build();
         return this.storeStreamer.streamEntries(toIds, storeRequest);
     }
 
@@ -153,7 +155,8 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                         storeClient,
                         storeFetchRetryPolicy,
                         lineageService,
-                        isLineageAllowed(fields));
+                        repository,
+                        isLineageAllowed(fields, returnFieldConfig));
         return StreamSupport.stream(batchIterable.spliterator(), false).flatMap(Collection::stream);
     }
 
@@ -167,7 +170,7 @@ public class UniProtKBIdService extends BasicIdService<UniProtKBEntry, UniProtKB
                 streamRequest, mappedIds, kbIdMappingStreamRequest.isIncludeIsoform(), jobId);
     }
 
-    boolean isLineageAllowed(String fields) {
+    public static boolean isLineageAllowed(String fields, ReturnFieldConfig returnFieldConfig) {
         List<ReturnField> fieldList = OutputFieldsParser.parse(fields, returnFieldConfig);
         return fieldList.stream()
                 .map(ReturnField::getName)

@@ -14,6 +14,10 @@ public interface BasicRequest {
 
     String getSort();
 
+    String getFormat();
+
+    void setFormat(String format);
+
     default boolean hasFields() {
         return Utils.notNullNotEmpty(getFields());
     }

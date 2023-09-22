@@ -31,12 +31,13 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.rest.controller.ControllerITUtils;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 
 /**
  * @author sahmad
  * @created 03/03/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {IdMappingREST.class})
 @WebMvcTest(IdMappingResultsController.class)
 @AutoConfigureWebClient
@@ -66,9 +67,10 @@ class IdMappingStreamControllerIT extends AbstractIdMappingPIRResultsControllerI
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\"idmapping_")))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, containsString("max-age")))
+                .andExpect(
+                        header().string(HttpHeaders.CACHE_CONTROL, HttpCommonHeaderConfig.NO_CACHE))
                 .andExpect(content().contentTypeCompatibleWith(mediaType))
                 .andExpect(content().string(not(containsString("facets"))));
     }

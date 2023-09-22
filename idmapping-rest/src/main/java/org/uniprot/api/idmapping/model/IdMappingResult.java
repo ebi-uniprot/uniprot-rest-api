@@ -20,7 +20,10 @@ public class IdMappingResult implements Serializable {
 
     private static final long serialVersionUID = -3638209244179967840L;
     @Singular private List<String> unmappedIds;
+    @Singular private List<IdMappingStringPair> suggestedIds;
     @Singular private List<IdMappingStringPair> mappedIds;
     @Singular private List<ProblemPair> warnings;
     @Singular private List<ProblemPair> errors;
+
+    private Integer obsoleteCount;
 }

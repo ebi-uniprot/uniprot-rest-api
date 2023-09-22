@@ -43,6 +43,8 @@ public class MessageConverterConfig {
 
                 converters.add(index++, new ErrorMessageConverter());
                 converters.add(index++, new ErrorMessageXlsConverter());
+                converters.add(index++, new ErrorMessageTurtleConverter());
+                converters.add(index++, new ErrorMessageNTriplesConverter());
                 converters.add(index++, new ListMessageConverter(downloadGatekeeper));
 
                 ReturnFieldConfig litReturnConfig =
@@ -184,7 +186,9 @@ public class MessageConverterConfig {
                                         UniProtDataType.CROSSREF),
                                 downloadGatekeeper);
                 converters.add(index++, xrefJsonConverter);
-                converters.add(index, new RDFMessageConverter(downloadGatekeeper));
+                converters.add(index, new RdfMessageConverter(downloadGatekeeper));
+                converters.add(index, new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(index, new NTriplesMessageConverter(downloadGatekeeper));
             }
         };
     }

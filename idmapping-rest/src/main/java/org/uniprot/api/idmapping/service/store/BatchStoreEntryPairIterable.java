@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.uniprot.api.idmapping.model.EntryPair;
+import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.store.datastore.UniProtStoreClient;
 
@@ -35,6 +35,17 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
             RetryPolicy<Object> retryPolicy) {
         this.batchSize = batchSize;
         this.sourceIterator = sourceIterable.iterator();
+        this.storeClient = storeClient;
+        this.retryPolicy = retryPolicy;
+    }
+
+    public BatchStoreEntryPairIterable(
+            Iterator<IdMappingStringPair> sourceIterator,
+            int batchSize,
+            UniProtStoreClient<S> storeClient,
+            RetryPolicy<Object> retryPolicy) {
+        this.batchSize = batchSize;
+        this.sourceIterator = sourceIterator;
         this.storeClient = storeClient;
         this.retryPolicy = retryPolicy;
     }
@@ -79,8 +90,8 @@ public abstract class BatchStoreEntryPairIterable<T extends EntryPair<S>, S>
 
         // id mapping pairs -> Ts
         return batch.stream()
-                .filter(mId -> idEntryMap.containsKey(mId.getTo()))
                 .map(mId -> convertToPair(mId, idEntryMap))
+                .filter(pair -> pair.getTo() != null)
                 .collect(Collectors.toList());
     }
 

@@ -14,6 +14,7 @@ public interface DownloadResultWriter {
             Path idFile,
             String jobId,
             MediaType contentType,
-            StoreRequest storeRequest)
+            StoreRequest storeRequest,
+            String type)
             throws IOException;
 }

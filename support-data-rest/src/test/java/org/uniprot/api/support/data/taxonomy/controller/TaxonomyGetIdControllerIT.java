@@ -6,13 +6,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.*;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,10 +30,10 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
+import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyInactiveReasonType;
@@ -57,8 +57,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
         })
 class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControllerIT {
 
-    @Autowired
-    @Qualifier("taxonomyRDFRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final String TAX_ID = "9606";
@@ -239,8 +238,8 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControll
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.TAXONOMY_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.TAXONOMY_PROLOG;
     }
 
     @Override
@@ -357,6 +356,22 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControll
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.TURTLE_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -401,6 +416,24 @@ class TaxonomyGetIdControllerIT extends AbstractGetByIdWithTypeExtensionControll
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The taxonomy id value should be a number")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The taxonomy id value should be a number")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

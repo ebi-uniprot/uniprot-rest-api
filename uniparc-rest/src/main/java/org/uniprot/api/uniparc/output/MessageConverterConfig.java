@@ -3,11 +3,7 @@ package org.uniprot.api.uniparc.output;
 import static java.util.Arrays.asList;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 
@@ -50,6 +46,8 @@ public class MessageConverterConfig {
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
                 converters.add(new ErrorMessageConverter());
                 converters.add(new ErrorMessageXlsConverter());
+                converters.add(new ErrorMessageTurtleConverter());
+                converters.add(new ErrorMessageNTriplesConverter());
                 converters.add(new ErrorMessageXMLConverter()); // to handle xml error messages
                 converters.add(new ListMessageConverter(downloadGatekeeper));
 
@@ -78,7 +76,9 @@ public class MessageConverterConfig {
                                 downloadGatekeeper);
                 converters.add(0, uniparcJsonConverter);
                 converters.add(1, new UniParcXmlMessageConverter("", downloadGatekeeper));
-                converters.add(new RDFMessageConverter(downloadGatekeeper));
+                converters.add(new RdfMessageConverter(downloadGatekeeper));
+                converters.add(new TurtleMessageConverter(downloadGatekeeper));
+                converters.add(new NTriplesMessageConverter(downloadGatekeeper));
                 // ####################### UniParcCrossReference ###################
                 ReturnFieldConfig uniParcCrossRefReturnField =
                         ReturnFieldConfigFactory.getReturnFieldConfig(
@@ -118,7 +118,9 @@ public class MessageConverterConfig {
                         uniParcContext(FASTA_MEDIA_TYPE),
                         uniParcContext(TSV_MEDIA_TYPE),
                         uniParcContext(XLS_MEDIA_TYPE),
-                        uniParcContext(RDF_MEDIA_TYPE))
+                        uniParcContext(RDF_MEDIA_TYPE),
+                        uniParcContext(TURTLE_MEDIA_TYPE),
+                        uniParcContext(N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

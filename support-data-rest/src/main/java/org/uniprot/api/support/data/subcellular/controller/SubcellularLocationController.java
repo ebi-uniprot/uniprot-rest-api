@@ -1,12 +1,7 @@
 package org.uniprot.api.support.data.subcellular.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.SUBCELLULAR_LOCATION;
 
 import java.util.Optional;
@@ -22,13 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -62,7 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/locations")
 @Validated
 public class SubcellularLocationController extends BasicSearchController<SubcellularLocationEntry> {
-
+    private static final String DATA_TYPE = "locations";
     private final SubcellularLocationService subcellularLocationService;
     private static final String SUBCELLULAR_LOCATION_ID_REGEX = "^SL-[0-9]{4}";
 
@@ -109,7 +98,9 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> getById(
             @Parameter(description = "Subcellular location id to find")
@@ -125,9 +116,12 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                     String fields,
             HttpServletRequest request) {
 
-        if (isRDFAccept(request)) {
-            String result = this.subcellularLocationService.getRDFXml(id);
-            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String result =
+                    this.subcellularLocationService.getRdf(
+                            id, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
 
         SubcellularLocationEntry subcellularLocationEntry =
@@ -202,16 +196,21 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>> stream(
             @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
-            return super.streamRDF(
-                    () -> subcellularLocationService.streamRDF(streamRequest),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () ->
+                            subcellularLocationService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

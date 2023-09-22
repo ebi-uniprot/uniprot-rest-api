@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.service;
 
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.*;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.FACET_WARNING;
 
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.uniprot.api.common.exception.InvalidRequestException;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -28,7 +30,7 @@ import org.uniprot.api.common.repository.search.facet.SolrStreamFacetResponse;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.solrstream.SolrStreamFacetRequest;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
@@ -48,7 +50,7 @@ public abstract class BasicIdService<T, U> {
     protected final StoreStreamer<T> storeStreamer;
     private final FacetTupleStreamTemplate tupleStream;
     private final FacetTupleStreamConverter facetTupleStreamConverter;
-    private final RDFStreamer rdfStreamer;
+    private final RdfStreamer rdfStreamer;
     private final SolrQueryConfig queryConfig;
     private final FacetConfig facetConfig;
 
@@ -73,7 +75,7 @@ public abstract class BasicIdService<T, U> {
             StoreStreamer<T> storeStreamer,
             FacetTupleStreamTemplate tupleStream,
             FacetConfig facetConfig,
-            RDFStreamer rdfStreamer,
+            RdfStreamer rdfStreamer,
             SolrQueryConfig queryConfig) {
         this.storeStreamer = storeStreamer;
         this.tupleStream = tupleStream;
@@ -118,7 +120,7 @@ public abstract class BasicIdService<T, U> {
             SolrStreamFacetResponse solrStreamResponse =
                     searchBySolrStream(toIds, searchRequest, includeIsoform);
             long end = System.currentTimeMillis();
-            log.info(
+            log.debug(
                     "Time taken to search solr in ms {} for jobId {} in getMappedEntries",
                     (end - start),
                     jobId);
@@ -142,12 +144,19 @@ public abstract class BasicIdService<T, U> {
         long start = System.currentTimeMillis();
         Stream<U> result = getPagedEntries(mappedIds, cursor, searchRequest.getFields());
         long end = System.currentTimeMillis();
-        log.info(
+        log.debug(
                 "Total time taken to call voldemort in ms {} for jobId {} in getMappedEntries",
                 (end - start),
                 jobId);
+        ExtraOptions extraOptions = getExtraOptions(mappingResult);
 
-        return QueryResult.of(result, cursor, facets, mappingResult.getUnmappedIds(), warnings);
+        return QueryResult.<U>builder()
+                .content(result)
+                .page(cursor)
+                .facets(facets)
+                .extraOptions(extraOptions)
+                .warnings(warnings)
+                .build();
     }
 
     public Stream<U> streamEntries(
@@ -157,8 +166,12 @@ public abstract class BasicIdService<T, U> {
         return streamEntries(mappedIds, streamRequest.getFields());
     }
 
-    public Stream<String> streamRDF(
-            StreamRequest streamRequest, IdMappingResult mappingResult, String jobId) {
+    public Stream<String> streamRdf(
+            StreamRequest streamRequest,
+            IdMappingResult mappingResult,
+            String jobId,
+            String dataType,
+            String format) {
         List<IdMappingStringPair> fromToPairs =
                 streamFilterAndSortEntries(streamRequest, mappingResult.getMappedIds(), jobId);
         // get unique entry ids
@@ -167,7 +180,7 @@ public abstract class BasicIdService<T, U> {
                 .filter(ft -> !entryIds.contains(ft.getTo()))
                 .forEach(ft -> entryIds.add(ft.getTo()));
 
-        return this.rdfStreamer.streamRDFXML(entryIds.stream());
+        return this.rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     protected abstract U convertToPair(IdMappingStringPair mId, Map<String, T> idEntryMap);
@@ -209,7 +222,7 @@ public abstract class BasicIdService<T, U> {
             SolrStreamFacetResponse solrStreamResponse =
                     searchBySolrStream(toIds, searchRequest, includeIsoform);
             long end = System.currentTimeMillis();
-            log.info(
+            log.debug(
                     "Time taken to search solr in ms {} for jobId {} in streamFilterAndSortEntries",
                     (end - start),
                     jobId);
@@ -375,6 +388,7 @@ public abstract class BasicIdService<T, U> {
         private final String sort;
         private final String fields;
         private Integer size;
+        private String format;
 
         @Override
         public void setSize(Integer size) {
@@ -386,7 +400,13 @@ public abstract class BasicIdService<T, U> {
                     .fields(streamRequest.getFields())
                     .query(streamRequest.getQuery())
                     .sort(streamRequest.getSort())
+                    .format(streamRequest.getFormat())
                     .build();
+        }
+
+        @Override
+        public void setFormat(String format) {
+            // do nothing
         }
     }
 }

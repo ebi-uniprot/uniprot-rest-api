@@ -4,19 +4,19 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
-import java.util.Objects;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.rest.request.UniProtKBRequestUtil;
+import org.uniprot.api.rest.validation.CustomConstraintGroup;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
+import org.uniprot.api.rest.validation.ValidDownloadRequest;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ValidDownloadRequest(groups = CustomConstraintGroup.class)
 public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements DownloadRequest {
-
     @ValidAsyncDownloadFormats(
             formats = {
                 TSV_MEDIA_TYPE_VALUE,
@@ -26,17 +26,14 @@ public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements 
                 APPLICATION_XML_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
                 GFF_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE,
+                HDF5_MEDIA_TYPE_VALUE
             })
     private String format;
 
     public void setFormat(String format) {
-        String longFormat;
-        try {
-            longFormat = UniProtMediaType.getMediaTypeForFileExtension(format).toString();
-        } catch (IllegalArgumentException ile) {
-            longFormat = null;
-        }
-        this.format = Objects.nonNull(longFormat) ? longFormat : format;
+        this.format = UniProtKBRequestUtil.parseFormat(format);
     }
 }

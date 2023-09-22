@@ -15,6 +15,9 @@ import org.uniprot.api.rest.controller.param.ContentTypeParam;
 /** @author lgonzales */
 public class ControllerITUtils {
 
+    public static final String CACHE_VALUE = "public, max-age=3600";
+    public static final String NO_CACHE_VALUE = "no-cache";
+
     static void verifyContentTypes(
             String requestPath,
             RequestMappingHandlerMapping requestMappingHandlerMapping,

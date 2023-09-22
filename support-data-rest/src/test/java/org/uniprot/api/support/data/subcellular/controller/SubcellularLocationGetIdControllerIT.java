@@ -6,8 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -21,7 +21,7 @@ import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
 import org.uniprot.api.support.data.subcellular.repository.SubcellularLocationRepository;
@@ -48,8 +48,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class SubcellularLocationGetIdControllerIT
         extends AbstractGetByIdWithTypeExtensionControllerIT {
 
-    @Autowired
-    @Qualifier("locationRDFRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final String SUBCELL_ACCESSION = "SL-0005";
@@ -118,8 +117,8 @@ public class SubcellularLocationGetIdControllerIT
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.SUBCELLULAR_LOCATION_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.SUBCELLULAR_LOCATION_PROLOG;
     }
 
     @Override
@@ -262,6 +261,22 @@ public class SubcellularLocationGetIdControllerIT
                                     .resultMatcher(
                                             content().contentType(UniProtMediaType.RDF_MEDIA_TYPE))
                                     .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.TURTLE_MEDIA_TYPE))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .contentType(
+                                                            UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
+                                    .build())
                     .build();
         }
 
@@ -315,6 +330,24 @@ public class SubcellularLocationGetIdControllerIT
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The subcellular location id value has invalid format")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            content()
+                                                    .string(
+                                                            containsString(
+                                                                    "The subcellular location id value has invalid format")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(

@@ -13,6 +13,7 @@ import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.EntryInactiveReasonBuilder;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
+import org.uniprot.core.util.Utils;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
@@ -39,9 +40,12 @@ public class UniprotKBMappingRepository {
                 } else {
                     EntryInactiveReasonBuilder inactiveReasonBuilder =
                             new EntryInactiveReasonBuilder().type(InactiveReasonType.DELETED);
+                    String id = "";
+                    if (Utils.notNullNotEmpty(document.id)) {
+                        id = document.id.get(0);
+                    }
                     result =
-                            new UniProtKBEntryBuilder(
-                                            accession, document.id, inactiveReasonBuilder.build())
+                            new UniProtKBEntryBuilder(accession, id, inactiveReasonBuilder.build())
                                     .build();
                 }
             }

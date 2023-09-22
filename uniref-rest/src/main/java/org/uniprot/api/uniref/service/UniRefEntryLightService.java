@@ -1,5 +1,7 @@
 package org.uniprot.api.uniref.service;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +16,8 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.rdf.RDFStreamer;
+import org.uniprot.api.common.repository.stream.document.TupleStreamDocumentIdStream;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.StoreStreamer;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.request.StreamRequest;
@@ -47,7 +50,7 @@ public class UniRefEntryLightService
     public static final String UNIREF_ID = "id";
     private final UniProtQueryProcessorConfig uniRefQueryProcessorConfig;
     private final SearchFieldConfig searchFieldConfig;
-    private final RDFStreamer uniRefRDFStreamer;
+    private final RdfStreamer rdfStreamer;
 
     @Autowired
     public UniRefEntryLightService(
@@ -59,8 +62,9 @@ public class UniRefEntryLightService
             SolrQueryConfig uniRefSolrQueryConf,
             UniProtQueryProcessorConfig uniRefQueryProcessorConfig,
             SearchFieldConfig uniRefSearchFieldConfig,
-            RDFStreamer uniRefRDFStreamer,
-            FacetTupleStreamTemplate facetTupleStreamTemplate) {
+            RdfStreamer unirefRdfStreamer,
+            FacetTupleStreamTemplate facetTupleStreamTemplate,
+            TupleStreamDocumentIdStream solrIdStreamer) {
         super(
                 repository,
                 uniRefQueryResultConverter,
@@ -68,11 +72,12 @@ public class UniRefEntryLightService
                 facetConfig,
                 storeStreamer,
                 uniRefSolrQueryConf,
-                facetTupleStreamTemplate);
+                facetTupleStreamTemplate,
+                solrIdStreamer);
         this.uniRefQueryProcessorConfig = uniRefQueryProcessorConfig;
         this.searchFieldConfig = uniRefSearchFieldConfig;
         this.solrQueryConfig = uniRefSolrQueryConf;
-        this.uniRefRDFStreamer = uniRefRDFStreamer;
+        this.rdfStreamer = unirefRdfStreamer;
     }
 
     @Override
@@ -102,35 +107,36 @@ public class UniRefEntryLightService
         Set<ProblemPair> warnings =
                 getWarnings(
                         request.getQuery(), uniRefQueryProcessorConfig.getLeadingWildcardFields());
-        if (!unirefRequest.isComplete()) {
-            Stream<UniRefEntryLight> content =
-                    result.getContent().map(this::removeOverLimitAndCleanMemberId);
-
-            result =
-                    QueryResult.of(
-                            content,
-                            result.getPage(),
-                            result.getFacets(),
-                            null,
-                            null,
-                            result.getSuggestions(),
-                            warnings);
-        } else {
-            Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
-
-            result = QueryResult.of(content, result.getPage(), result.getFacets(), null, warnings);
+        if (!LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            QueryResult.QueryResultBuilder<UniRefEntryLight> builder =
+                    QueryResult.<UniRefEntryLight>builder()
+                            .page(result.getPage())
+                            .facets(result.getFacets())
+                            .suggestions(result.getSuggestions())
+                            .warnings(warnings);
+            if (!unirefRequest.isComplete()) {
+                Stream<UniRefEntryLight> content =
+                        result.getContent().map(this::removeOverLimitAndCleanMemberId);
+                builder.content(content);
+            } else {
+                Stream<UniRefEntryLight> content = result.getContent().map(this::cleanMemberId);
+                builder.content(content);
+            }
+            result = builder.build();
         }
         return result;
     }
 
     @Override
     public Stream<UniRefEntryLight> stream(StreamRequest request) {
-        UniRefStreamRequest unirefRequest = (UniRefStreamRequest) request;
+        UniRefStreamRequest uniRefRequest = (UniRefStreamRequest) request;
         Stream<UniRefEntryLight> result = super.stream(request);
-        if (!unirefRequest.isComplete()) {
-            result = result.map(this::removeOverLimitAndCleanMemberId);
-        } else {
-            result = result.map(this::cleanMemberId);
+        if (!LIST_MEDIA_TYPE_VALUE.equals(request.getFormat())) {
+            if (!uniRefRequest.isComplete()) {
+                result = result.map(this::removeOverLimitAndCleanMemberId);
+            } else {
+                result = result.map(this::cleanMemberId);
+            }
         }
         return result;
     }
@@ -147,10 +153,12 @@ public class UniRefEntryLightService
                 .getFieldName();
     }
 
-    public Stream<String> streamRDF(UniRefStreamRequest streamRequest) {
+    public Stream<String> streamRdf(
+            UniRefStreamRequest streamRequest, String dataType, String format) {
         SolrRequest solrRequest =
                 createSolrRequestBuilder(streamRequest, solrSortClause, solrQueryConfig).build();
-        return this.uniRefRDFStreamer.idsToRDFStoreStream(solrRequest);
+        List<String> entryIds = solrIdStreamer.fetchIds(solrRequest).collect(Collectors.toList());
+        return rdfStreamer.stream(entryIds.stream(), dataType, format);
     }
 
     @Override
@@ -164,8 +172,14 @@ public class UniRefEntryLightService
     }
 
     @Override
-    protected RDFStreamer getRDFStreamer() {
-        return this.uniRefRDFStreamer;
+    protected RdfStreamer getRdfStreamer() {
+        return this.rdfStreamer;
+    }
+
+    @Override
+    protected UniRefEntryLight mapToThinEntry(String uniRefId) {
+        UniRefEntryLightBuilder builder = new UniRefEntryLightBuilder().id(uniRefId);
+        return builder.build();
     }
 
     private UniRefEntryLight cleanMemberId(UniRefEntryLight entry) {

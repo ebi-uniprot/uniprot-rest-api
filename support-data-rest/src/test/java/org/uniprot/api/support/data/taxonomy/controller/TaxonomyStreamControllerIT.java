@@ -1,27 +1,25 @@
 package org.uniprot.api.support.data.taxonomy.controller;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.createSolrDoc;
+import static org.uniprot.api.support.data.taxonomy.controller.TaxonomyITUtils.getTaxonomyBinary;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,12 +32,12 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
-import org.uniprot.api.support.data.AbstractRDFStreamControllerIT;
+import org.uniprot.api.support.data.AbstractRdfStreamControllerIT;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
+import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -59,12 +57,11 @@ import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(TaxonomyController.class)
 @ExtendWith(value = {SpringExtension.class})
-class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
+class TaxonomyStreamControllerIT extends AbstractRdfStreamControllerIT {
     private static final String INACTIVE_ID = "9999";
     @Autowired private TaxonomyRepository repository;
 
-    @Autowired
-    @Qualifier("taxonomyRDFRestTemplate")
+    @MockBean(name = "supportDataRdfRestTemplate")
     private RestTemplate restTemplate;
 
     private static final int searchAccession = 12;
@@ -109,6 +106,13 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
     @Override
     protected String getStreamPath() {
         return "/taxonomy/stream";
+    }
+
+    @Override
+    public String getContentDisposition() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
+        return "taxonomy_all_" + now.format(dateTimeFormatter);
     }
 
     @Test
@@ -390,7 +394,7 @@ class TaxonomyStreamControllerIT extends AbstractRDFStreamControllerIT {
     }
 
     @Override
-    protected String getRDFProlog() {
-        return RDFPrologs.TAXONOMY_PROLOG;
+    protected String getRdfProlog() {
+        return RdfPrologs.TAXONOMY_PROLOG;
     }
 }

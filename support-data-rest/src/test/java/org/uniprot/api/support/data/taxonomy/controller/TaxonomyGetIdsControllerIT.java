@@ -49,7 +49,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
-import org.uniprot.api.support.data.taxonomy.repository.TaxonomyRepository;
+import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
@@ -233,7 +233,7 @@ class TaxonomyGetIdsControllerIT {
                         header().string(
                                         "Content-Disposition",
                                         startsWith(
-                                                "form-data; name=\"attachment\"; filename=\"uniprot-")))
+                                                "form-data; name=\"attachment\"; filename=\"taxonomy_")))
                 .andExpect(jsonPath("$.results.size()", is(3)))
                 .andExpect(jsonPath("$.results.*.taxonId", contains(9606, 9607, 9608)));
     }

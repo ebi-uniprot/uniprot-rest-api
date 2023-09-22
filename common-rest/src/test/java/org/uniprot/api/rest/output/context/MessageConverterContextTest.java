@@ -10,8 +10,12 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.repository.search.ExtraOptions;
+import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.facet.Facet;
+import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
+import org.uniprot.api.rest.output.FakePair;
 
 /**
  * Created 08/11/18
@@ -30,6 +34,14 @@ class MessageConverterContextTest {
         MessageConverterContextFactory.Resource resource =
                 MessageConverterContextFactory.Resource.UNIPROTKB;
         String fields = "field1,field2";
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
+                        .failedIds(List.of("id1"))
+                        .suggestedId(FakePair.builder().from("fid2").to("tid2").build())
+                        .obsoleteCount(5)
+                        .build();
+        List<ProblemPair> warnings = List.of(new ProblemPair(1, "msg"));
+        List<Suggestion> suggestions = List.of(Suggestion.builder().build());
 
         MessageConverterContext<String> context =
                 MessageConverterContext.<String>builder()
@@ -42,6 +54,12 @@ class MessageConverterContextTest {
                         .fields(fields)
                         .resource(resource)
                         .subsequence(true)
+                        .isLargeDownload(true)
+                        .entityOnly(true)
+                        .downloadContentDispositionHeader(true)
+                        .extraOptions(extraOptions)
+                        .warnings(warnings)
+                        .suggestions(suggestions)
                         .build();
 
         assertThat(context.getContentType(), is(contentType));
@@ -53,6 +71,12 @@ class MessageConverterContextTest {
         assertThat(context.getFields(), is(fields));
         assertThat(context.getResource(), is(resource));
         assertThat(context.isSubsequence(), is(true));
+        assertThat(context.isLargeDownload(), is(true));
+        assertThat(context.isEntityOnly(), is(true));
+        assertThat(context.isDownloadContentDispositionHeader(), is(true));
+        assertThat(context.getExtraOptions(), is(extraOptions));
+        assertThat(context.getSuggestions(), is(suggestions));
+        assertThat(context.getWarnings(), is(warnings));
     }
 
     @Test
@@ -66,6 +90,14 @@ class MessageConverterContextTest {
         MessageConverterContextFactory.Resource resource =
                 MessageConverterContextFactory.Resource.UNIPROTKB;
         String fields = "field1,field2";
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
+                        .failedIds(List.of("id1"))
+                        .suggestedId(FakePair.builder().from("fid2").to("tid2").build())
+                        .obsoleteCount(10)
+                        .build();
+        List<ProblemPair> warnings = List.of(new ProblemPair(1, "msg"));
+        List<Suggestion> suggestions = List.of(Suggestion.builder().build());
 
         MessageConverterContext<String> context =
                 MessageConverterContext.<String>builder()
@@ -78,6 +110,12 @@ class MessageConverterContextTest {
                         .fields(fields)
                         .resource(resource)
                         .subsequence(true)
+                        .isLargeDownload(true)
+                        .entityOnly(true)
+                        .downloadContentDispositionHeader(true)
+                        .extraOptions(extraOptions)
+                        .warnings(warnings)
+                        .suggestions(suggestions)
                         .build();
 
         MessageConverterContext<String> contextCopy = context.asCopy();
@@ -91,6 +129,12 @@ class MessageConverterContextTest {
         assertThat(contextCopy.getFields(), is(fields));
         assertThat(contextCopy.getResource(), is(resource));
         assertThat(contextCopy.isSubsequence(), is(true));
+        assertThat(context.isLargeDownload(), is(true));
+        assertThat(context.isEntityOnly(), is(true));
+        assertThat(context.isDownloadContentDispositionHeader(), is(true));
+        assertThat(context.getExtraOptions(), is(extraOptions));
+        assertThat(context.getSuggestions(), is(suggestions));
+        assertThat(context.getWarnings(), is(warnings));
     }
 
     @Test

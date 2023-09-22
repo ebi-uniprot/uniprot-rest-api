@@ -1,12 +1,7 @@
 package org.uniprot.api.support.data.keyword.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.OBO_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
 
 import java.util.Optional;
@@ -22,12 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -35,9 +25,9 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.support.data.keyword.request.KeywordSearchRequest;
-import org.uniprot.api.support.data.keyword.request.KeywordStreamRequest;
-import org.uniprot.api.support.data.keyword.service.KeywordService;
+import org.uniprot.api.support.data.common.keyword.request.KeywordSearchRequest;
+import org.uniprot.api.support.data.common.keyword.request.KeywordStreamRequest;
+import org.uniprot.api.support.data.common.keyword.service.KeywordService;
 import org.uniprot.core.cv.keyword.KeywordEntry;
 import org.uniprot.store.config.UniProtDataType;
 
@@ -57,6 +47,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/keywords")
 @Validated
 public class KeywordController extends BasicSearchController<KeywordEntry> {
+    private static final String DATA_TYPE = "keywords";
     private final KeywordService keywordService;
     private static final String KEYWORD_ID_REGEX = "^KW-[0-9]{4}";
 
@@ -85,7 +76,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 RDF_MEDIA_TYPE_VALUE,
-                OBO_MEDIA_TYPE_VALUE
+                OBO_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get Keyword by keywordId.",
@@ -116,9 +109,10 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        if (isRDFAccept(request)) {
-            String result = this.keywordService.getRDFXml(id);
-            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String result = this.keywordService.getRdf(id, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
         KeywordEntry keywordEntry = this.keywordService.findByUniqueId(id);
         return super.getEntityResponse(keywordEntry, fields, request);
@@ -168,7 +162,9 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
                 OBO_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download Keywords by given Lucene search query.",
@@ -193,9 +189,12 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<KeywordEntry>>> stream(
             @Valid @ModelAttribute KeywordStreamRequest streamRequest, HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
-            return super.streamRDF(
-                    () -> keywordService.streamRDF(streamRequest),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () ->
+                            keywordService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

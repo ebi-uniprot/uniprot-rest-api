@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.FileType;
@@ -44,7 +45,8 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getQueryString()).thenReturn("gene:CDC7");
+        when(request.getRequestURI()).thenReturn("/uniprotkb/search");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("(gene:P53 )");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -53,7 +55,7 @@ class HeaderFactoryTest {
         assertTrue(
                 result.getFirst("Content-Disposition")
                         .startsWith(
-                                "form-data; name=\"attachment\"; filename=\"uniprot-gene_CDC7-"));
+                                "form-data; name=\"attachment\"; filename=\"uniprotkb_gene_P53_20"));
     }
 
     @Test
@@ -63,7 +65,8 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getQueryString()).thenReturn("*");
+        when(request.getRequestURI()).thenReturn("/uniref/search");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("(*:*)");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -71,7 +74,7 @@ class HeaderFactoryTest {
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
-                        .startsWith("form-data; name=\"attachment\"; filename=\"uniprot-_-"));
+                        .startsWith("form-data; name=\"attachment\"; filename=\"uniref_all_"));
     }
 
     @Test
@@ -81,7 +84,7 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getQueryString())
+        when(request.getParameter(Mockito.eq("query")))
                 .thenReturn("gene:INeedHereAVeryBigQuery OR gene:itAlsoNeedToBeBiggerThan60");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
@@ -91,7 +94,7 @@ class HeaderFactoryTest {
         assertTrue(
                 result.getFirst("Content-Disposition")
                         .startsWith(
-                                "form-data; name=\"attachment\"; filename=\"uniprot-gene_INeedHereAVeryBigQuery_OR_gene_itAlsoNeedToBeBiggerThan-"));
+                                "form-data; name=\"attachment\"; filename=\"_gene_INeedHereAVeryBigQuery_OR_"));
     }
 
     @Test
@@ -101,7 +104,7 @@ class HeaderFactoryTest {
         when(context.isDownloadContentDispositionHeader()).thenReturn(true);
         when(context.getFileType()).thenReturn(FileType.FILE);
         HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getQueryString()).thenReturn("");
+        when(request.getParameter(Mockito.eq("query"))).thenReturn("");
         HttpHeaders result = HeaderFactory.createHttpDownloadHeader(context, request);
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -109,6 +112,6 @@ class HeaderFactoryTest {
         assertNotNull(result.getFirst("Content-Disposition"));
         assertTrue(
                 result.getFirst("Content-Disposition")
-                        .startsWith("form-data; name=\"attachment\"; filename=\"uniprot-20"));
+                        .startsWith("form-data; name=\"attachment\"; filename=\"_20"));
     }
 }

@@ -8,22 +8,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_AC_ID_STR;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.UNIPROTKB_STR;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -55,19 +50,18 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
-import org.uniprot.api.rest.service.RDFPrologs;
+import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
 import org.uniprot.store.search.document.taxonomy.TaxonomyDocument;
-import org.uniprot.store.search.document.uniprot.UniProtDocument;
 
 /**
  * @author sahmad
  * @created 18/02/2021
  */
-@ActiveProfiles(profiles = "offline")
+@ActiveProfiles(profiles = {"offline", "idmapping"})
 @ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniProtKBIdMappingResultsController.class)
 @AutoConfigureWebClient
@@ -97,7 +91,8 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @Autowired private MockMvc mockMvc;
 
-    @Autowired private RestTemplate uniProtKBRestTemplate;
+    @MockBean(name = "idMappingRdfRestTemplate")
+    private RestTemplate uniProtKBRestTemplate;
 
     @Autowired private TaxonomyLineageRepository taxRepository;
 
@@ -148,16 +143,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
 
     @BeforeAll
     void saveEntriesStore() throws Exception {
-
-        when(uniProtKBRestTemplate.getUriTemplateHandler())
-                .thenReturn(new DefaultUriBuilderFactory());
-        when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
-
         for (int i = 1; i <= this.maxFromIdsAllowed; i++) {
             saveEntry(i, cloudSolrClient, storeClient);
         }
 
-        saveInactiveEntry();
+        saveInactiveEntry(cloudSolrClient);
         ReflectionTestUtils.setField(repository, "solrClient", cloudSolrClient);
 
         ReflectionTestUtils.setField(taxRepository, "solrClient", cloudSolrClient);
@@ -165,6 +155,13 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         TaxonomyDocument taxonomyDocument = createTaxonomyEntry(9606L);
         cloudSolrClient.addBean(SolrCollection.taxonomy.name(), taxonomyDocument);
         cloudSolrClient.commit(SolrCollection.taxonomy.name());
+    }
+
+    @BeforeEach
+    void setUp() {
+        when(uniProtKBRestTemplate.getUriTemplateHandler())
+                .thenReturn(new DefaultUriBuilderFactory());
+        when(uniProtKBRestTemplate.getForObject(any(), any())).thenReturn(SAMPLE_RDF);
     }
 
     @Test
@@ -198,6 +195,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
         ResultActions response =
                 mockMvc.perform(
                         get(UNIPROTKB_ID_MAPPING_RESULT_PATH, job.getJobId())
+                                .param("fields", "accession")
                                 .header(ACCEPT, MediaType.APPLICATION_JSON));
         // then
         response.andDo(log())
@@ -206,7 +204,15 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andExpect(jsonPath("$.results.size()", Matchers.is(2)))
                 .andExpect(jsonPath("$.results.*.from", contains("Q00001", "I8FBX0")))
                 .andExpect(
-                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "I8FBX0")));
+                        jsonPath("$.results.*.to.primaryAccession", contains("Q00001", "I8FBX0")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.entryType",
+                                contains("UniProtKB unreviewed (TrEMBL)", "Inactive")))
+                .andExpect(
+                        jsonPath(
+                                "$.results[1].to.inactiveReason.inactiveReasonType",
+                                is("DELETED")));
     }
 
     @Test
@@ -495,7 +501,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
     }
 
     @Test
-    void streamRDFCanReturnSuccess() throws Exception {
+    void streamRdfCanReturnSuccess() throws Exception {
         // when
         IdMappingJob job =
                 getJobOperation()
@@ -511,7 +517,7 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(content().string(startsWith(RDFPrologs.UNIPROT_RDF_PROLOG)))
+                .andExpect(content().string(startsWith(RdfPrologs.UNIPROT_PROLOG)))
                 .andExpect(
                         content()
                                 .string(
@@ -546,11 +552,11 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         content()
                                 .string(
                                         containsString(
-                                                "Q00001\tQ00001\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
+                                                "Q00001\tQ00001\tQ00001_HUMAN\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 1 gene 1 gene 1\tHomo sapiens (Human)\t821\n"
                                                         + "Q00002\tQ00002\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 2 gene 2 gene 2\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00003\tQ00003\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
+                                                        + "Q00003\tQ00003\tQ00003_HUMAN\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 3 gene 3 gene 3\tHomo sapiens (Human)\t821\n"
                                                         + "Q00004\tQ00004\tFGFR12345_HUMAN\treviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 4 gene 4 gene 4\tHomo sapiens (Human)\t821\n"
-                                                        + "Q00005\tQ00005\tATPG_12345\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
+                                                        + "Q00005\tQ00005\tQ00005_HUMAN\tunreviewed\tFibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332)\tFGFR2 BEK KGFR KSAM; gene 5 gene 5 gene 5\tHomo sapiens (Human)\t821\n")));
     }
 
     @Test
@@ -596,6 +602,35 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                         jsonPath(
                                 "$.results.*.from",
                                 containsInAnyOrder("Q00001", "Q00002.2", "Q00003.3")))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.to.primaryAccession",
+                                containsInAnyOrder("Q00001", "Q00002", "Q00003")));
+    }
+
+    @Test
+    void testIdMappingWithTremblProteinIdIgnoresAfterUnderScore() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR,
+                                UNIPROTKB_STR,
+                                "Q00001.2,Q00002_TREMBL2,Q00003_TREMBL3");
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .param("fields", "accession")
+                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.results.size()", is(3)))
+                .andExpect(
+                        jsonPath(
+                                "$.results.*.from",
+                                containsInAnyOrder("Q00001.2", "Q00002_TREMBL2", "Q00003_TREMBL3")))
                 .andExpect(
                         jsonPath(
                                 "$.results.*.to.primaryAccession",
@@ -669,19 +704,31 @@ class UniProtKBIdMappingResultsControllerIT extends AbstractIdMappingResultsCont
                                                 "Invalid request received. Unable to compute fasta subsequence for IDs: Q00002,Q00003. Expected format is accession[begin-end], for example:Q00001[10-20]")));
     }
 
+    @Test
+    void testIdMappingWithRepeatedAccessionSubSequenceValid() throws Exception {
+        // when
+        IdMappingJob job =
+                getJobOperation()
+                        .createAndPutJobInCache(
+                                UNIPROTKB_AC_ID_STR,
+                                UNIPROTKB_STR,
+                                "Q00001[10-20],Q00002[20-30],Q00001[15-20]");
+        ResultActions response =
+                mockMvc.perform(
+                        get(getIdMappingResultPath(), job.getJobId())
+                                .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE)
+                                .param("subsequence", "true"));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(content().string(containsString(">tr|Q00001|10-20\nLVVVTMATLSL\n")))
+                .andExpect(content().string(containsString(">sp|Q00002|20-30\nLARPSFSLVED")))
+                .andExpect(content().string(containsString(">tr|Q00001|15-20\nMATLSL")));
+    }
+
     @Override
     protected String getDefaultSearchQuery() {
         return "FGF1"; // geneName
-    }
-
-    private void saveInactiveEntry() throws IOException, SolrServerException {
-        UniProtDocument inactiveDoc = new UniProtDocument();
-        inactiveDoc.accession = "I8FBX0";
-        inactiveDoc.id = "INACTIVE_DROME";
-        inactiveDoc.idInactive = "INACTIVE_DROME";
-        inactiveDoc.inactiveReason = "DELETED";
-        inactiveDoc.active = false;
-        cloudSolrClient.addBean(SolrCollection.uniprot.name(), inactiveDoc);
-        cloudSolrClient.commit(SolrCollection.uniprot.name());
     }
 }

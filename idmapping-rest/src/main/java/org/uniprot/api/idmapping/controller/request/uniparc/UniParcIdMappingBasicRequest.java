@@ -41,4 +41,7 @@ public class UniParcIdMappingBasicRequest extends IdMappingPageRequest {
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String sort;
+
+    @Parameter(hidden = true)
+    private String format;
 }

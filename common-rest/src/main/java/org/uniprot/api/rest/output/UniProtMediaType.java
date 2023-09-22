@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_MARKDOWN_VALUE;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.http.MediaType;
@@ -31,10 +32,18 @@ public class UniProtMediaType {
     public static final MediaType OBO_MEDIA_TYPE = valueOf(OBO_MEDIA_TYPE_VALUE);
     public static final String RDF_MEDIA_TYPE_VALUE = "application/rdf+xml";
     public static final MediaType RDF_MEDIA_TYPE = valueOf(RDF_MEDIA_TYPE_VALUE);
+    public static final String HDF5_MEDIA_TYPE_VALUE = "application/x-hdf5";
+    public static final MediaType HDF5_MEDIA_TYPE = valueOf(HDF5_MEDIA_TYPE_VALUE);
+    public static final String TURTLE_MEDIA_TYPE_VALUE = "text/turtle";
+    public static final MediaType TURTLE_MEDIA_TYPE = valueOf(TURTLE_MEDIA_TYPE_VALUE);
+    public static final String N_TRIPLES_MEDIA_TYPE_VALUE = "application/n-triples";
+    public static final MediaType N_TRIPLES_MEDIA_TYPE = valueOf(N_TRIPLES_MEDIA_TYPE_VALUE);
     public static final String MARKDOWN_MEDIA_TYPE_VALUE = TEXT_MARKDOWN_VALUE;
     public static final MediaType MARKDOWN_MEDIA_TYPE = MediaType.TEXT_MARKDOWN;
     public static final String UNKNOWN_MEDIA_TYPE_VALUE = "unknown" + "/unknown";
     public static final MediaType UNKNOWN_MEDIA_TYPE = valueOf(UNKNOWN_MEDIA_TYPE_VALUE);
+    public static final Map<MediaType, String> SUPPORTED_RDF_MEDIA_TYPES =
+            Map.of(RDF_MEDIA_TYPE, "rdf", TURTLE_MEDIA_TYPE, "ttl", N_TRIPLES_MEDIA_TYPE, "nt");
 
     public static final Collection<MediaType> ALL_TYPES =
             asList(
@@ -47,6 +56,9 @@ public class UniProtMediaType {
                     MARKDOWN_MEDIA_TYPE,
                     OBO_MEDIA_TYPE,
                     RDF_MEDIA_TYPE,
+                    HDF5_MEDIA_TYPE,
+                    TURTLE_MEDIA_TYPE,
+                    N_TRIPLES_MEDIA_TYPE,
                     MediaType.APPLICATION_JSON,
                     MediaType.APPLICATION_XML);
 
@@ -57,7 +69,10 @@ public class UniProtMediaType {
         mediaTypeExtensionMap.put(FF_MEDIA_TYPE, "txt");
         mediaTypeExtensionMap.put(XLS_MEDIA_TYPE, "xlsx");
         mediaTypeExtensionMap.put(RDF_MEDIA_TYPE, "rdf");
+        mediaTypeExtensionMap.put(TURTLE_MEDIA_TYPE, "ttl");
+        mediaTypeExtensionMap.put(N_TRIPLES_MEDIA_TYPE, "nt");
         mediaTypeExtensionMap.put(MARKDOWN_MEDIA_TYPE, "md");
+        mediaTypeExtensionMap.put(HDF5_MEDIA_TYPE, "h5");
 
         ALL_TYPES.forEach(
                 mediaType -> {

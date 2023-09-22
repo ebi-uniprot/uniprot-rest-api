@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.validation.error;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -44,13 +46,14 @@ class ResponseExceptionHandlerTest {
     void handleInternalServerErrorWithDebug() {
         // when
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
         Mockito.when(request.getParameter("debugError")).thenReturn("true");
         NullPointerException causedBy = new NullPointerException("Null Pointer");
         Throwable error = new Throwable("Throwable error message", causedBy);
 
         ResponseEntity<ErrorInfo> responseEntity =
-                errorHandler.handleInternalServerError(error, request);
+                errorHandler.handleInternalServerError(error, request, response);
 
         // then
         assertNotNull(responseEntity);
@@ -312,5 +315,20 @@ class ResponseExceptionHandlerTest {
         assertEquals(1, errorMessage.getMessages().size());
 
         assertEquals("Resource not found", errorMessage.getMessages().get(0));
+    }
+
+    @Test
+    void handleIllegalArgumentException() {
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
+        String message = "message describing error";
+        IllegalArgumentException error = new IllegalArgumentException(message);
+
+        ResponseEntity<ErrorInfo> responseEntity =
+                errorHandler.handleIllegalArgumentException(error, request);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertThat(responseEntity.getBody().getMessages(), contains(message));
     }
 }

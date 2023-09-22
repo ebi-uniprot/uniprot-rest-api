@@ -8,7 +8,6 @@ import static org.uniprot.api.rest.output.context.MessageConverterContextFactory
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -39,7 +41,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RequestMapping("/uniref")
 public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
-
+    private static final String DATA_TYPE = "uniref";
     private final UniRefEntryService entryService;
 
     @Autowired
@@ -65,7 +67,9 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                 APPLICATION_XML_VALUE,
                 APPLICATION_JSON_VALUE,
                 XLS_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Retrieve an UniRef cluster by id.",
@@ -82,16 +86,18 @@ public class UniRefEntryController extends BasicSearchController<UniRefEntry> {
                             @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = TURTLE_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = N_TRIPLES_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntry>> getById(
-            @Valid @ModelAttribute UniRefIdRequest idRequest,
-            HttpServletRequest request,
-            HttpServletResponse response) {
-        if (isRDFAccept(request)) {
-            String rdf = entryService.getRDFXml(idRequest.getId());
-            return super.getEntityResponseRDF(rdf, getAcceptHeader(request), request);
+            @Valid @ModelAttribute UniRefIdRequest idRequest, HttpServletRequest request) {
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String rdf =
+                    entryService.getRdf(idRequest.getId(), DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
         } else {
             UniRefEntry entryResult = entryService.getEntity(idRequest.getId());
             return super.getEntityResponse(entryResult, idRequest.getFields(), request);

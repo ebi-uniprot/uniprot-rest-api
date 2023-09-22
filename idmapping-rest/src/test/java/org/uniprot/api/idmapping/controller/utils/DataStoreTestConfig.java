@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.search.SolrRequest;
 import org.uniprot.api.common.repository.search.SolrRequestConverter;
 import org.uniprot.api.idmapping.model.IdMappingResult;
@@ -129,23 +128,5 @@ public class DataStoreTestConfig {
     @Profile("offline")
     public JobOperation uniParcIdMappingJobOp(IdMappingJobCacheService cacheService) {
         return new UniParcIdMappingResultsJobOperation(cacheService);
-    }
-
-    @Bean
-    @Profile("offline")
-    public RestTemplate uniProtKBRestTemplate() {
-        return mock(RestTemplate.class);
-    }
-
-    @Bean
-    @Profile("offline")
-    public RestTemplate uniParcRestTemplate() {
-        return mock(RestTemplate.class);
-    }
-
-    @Bean
-    @Profile("offline")
-    public RestTemplate uniRefRestTemplate() {
-        return mock(RestTemplate.class);
     }
 }

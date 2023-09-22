@@ -21,10 +21,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.repository.search.ExtraOptions;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
+import org.uniprot.api.rest.output.FakePair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
 import org.uniprot.core.json.parser.uniprot.UniprotKBJsonConfig;
@@ -285,18 +287,25 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"primaryAccession\":\"P00001\"},\n{\"primaryAccession\":\"P00001\"}]}",
+                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"},\n"
+                        + "{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}]}",
                 result);
     }
 
     @Test
-    void writeCanWriteOkayAndFailedEntities() throws IOException {
+    void writeCanWriteOkayAndExtraOptionsEntities() throws IOException {
         List<UniProtKBEntry> entities = new ArrayList<>();
         entities.add(getEntity());
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
+                        .failedIds(List.of("id1"))
+                        .suggestedId(FakePair.builder().from("fromid2").to("toid2").build())
+                        .obsoleteCount(10)
+                        .build();
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
                         .fields("accession")
-                        .failedIds(List.of("id1"))
+                        .extraOptions(extraOptions)
                         .build();
         log.debug("------- BEGIN: writeCanWriteOkayAndFailedEntities");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -307,15 +316,16 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals(
-                "{\"results\":[{\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"]}",
+                "{\"results\":[{\"entryType\":\"UniProtKB reviewed (Swiss-Prot)\",\"primaryAccession\":\"P00001\"}],\"failedIds\":[\"id1\"],\"suggestedIds\":[{\"from\":\"fromid2\",\"to\":\"toid2\"}],\"obsoleteCount\":10}",
                 result);
     }
 
     @Test
     void writeCanWriteOnlyFailedEntities() throws IOException {
+        ExtraOptions extraOptions = ExtraOptions.builder().failedIds(List.of("id1", "id2")).build();
         MessageConverterContext<UniProtKBEntry> messageContext =
                 MessageConverterContext.<UniProtKBEntry>builder()
-                        .failedIds(List.of("id1", "id2"))
+                        .extraOptions(extraOptions)
                         .build();
         log.debug("------- BEGIN: writeCanWriteOnlyFailedEntities");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -326,6 +336,30 @@ class JsonMessageConverterTest {
         String result = outputStream.toString("UTF-8");
         log.debug(result);
         assertEquals("{\"results\":[],\"failedIds\":[\"id1\",\"id2\"]}", result);
+    }
+
+    @Test
+    void writeCanWriteOnlySuggestedIdsEntities() throws IOException {
+        ExtraOptions extraOptions =
+                ExtraOptions.builder()
+                        .suggestedId(FakePair.builder().from("fromid3").to("toid3").build())
+                        .suggestedId(FakePair.builder().from("fromid4").to("toid4").build())
+                        .build();
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .extraOptions(extraOptions)
+                        .build();
+        log.debug("------- BEGIN: writeCanWriteOnlyFailedEntities");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+        jsonMessageConverter.writeEntities(
+                Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
+        writeAfter(messageContext, outputStream);
+        String result = outputStream.toString("UTF-8");
+        log.debug(result);
+        assertEquals(
+                "{\"results\":[],\"suggestedIds\":[{\"from\":\"fromid3\",\"to\":\"toid3\"},{\"from\":\"fromid4\",\"to\":\"toid4\"}]}",
+                result);
     }
 
     @Test
@@ -412,6 +446,24 @@ class JsonMessageConverterTest {
         log.debug(result);
         assertEquals(
                 "{\"results\":[],\"error\":\"Error encountered when streaming data.\"}", result);
+    }
+
+    @Test
+    void writeCanWriteOnlyObsoleteCount() throws IOException {
+        ExtraOptions extraOptions = ExtraOptions.builder().obsoleteCount(15).build();
+        MessageConverterContext<UniProtKBEntry> messageContext =
+                MessageConverterContext.<UniProtKBEntry>builder()
+                        .extraOptions(extraOptions)
+                        .build();
+        log.debug("------- BEGIN: writeCanWriteOnlyFailedEntities");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeBefore(messageContext, outputStream);
+        jsonMessageConverter.writeEntities(
+                Stream.empty(), outputStream, Instant.now(), new AtomicInteger(0));
+        writeAfter(messageContext, outputStream);
+        String result = outputStream.toString("UTF-8");
+        log.debug(result);
+        assertEquals("{\"results\":[],\"obsoleteCount\":15}", result);
     }
 
     private void writeBefore(

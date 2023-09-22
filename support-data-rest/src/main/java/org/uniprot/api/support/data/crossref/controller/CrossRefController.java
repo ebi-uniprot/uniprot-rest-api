@@ -1,8 +1,7 @@
 package org.uniprot.api.support.data.crossref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.RDF_MEDIA_TYPE_VALUE;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
 
 import java.util.Optional;
@@ -18,13 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
@@ -59,6 +52,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
                         + "The databases are categorized for easy user perusal and understanding of how the "
                         + "different databases relate to both UniProtKB and to each other")
 public class CrossRefController extends BasicSearchController<CrossRefEntry> {
+    private static final String DATA_TYPE = "databases";
     @Autowired private CrossRefService crossRefService;
     private static final String ACCESSION_REGEX = "DB-(\\d{4})";
 
@@ -88,7 +82,12 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             })
     @GetMapping(
             value = "/{id}",
-            produces = {APPLICATION_JSON_VALUE, RDF_MEDIA_TYPE_VALUE})
+            produces = {
+                APPLICATION_JSON_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
+            })
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> findByAccession(
             @Parameter(description = "cross-references database id to find")
                     @PathVariable("id")
@@ -103,9 +102,11 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                     String fields,
             HttpServletRequest request) {
 
-        if (isRDFAccept(request)) {
-            String result = this.crossRefService.getRDFXml(id);
-            return super.getEntityResponseRDF(result, getAcceptHeader(request), request);
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            String result =
+                    this.crossRefService.getRdf(id, DATA_TYPE, acceptedRdfContentType.get());
+            return super.getEntityResponseRdf(result, getAcceptHeader(request), request);
         }
 
         CrossRefEntry crossRefEntry = this.crossRefService.findByUniqueId(id);
@@ -158,15 +159,23 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             })
     @GetMapping(
             value = "/stream",
-            produces = {APPLICATION_JSON_VALUE, RDF_MEDIA_TYPE_VALUE})
+            produces = {
+                APPLICATION_JSON_VALUE,
+                RDF_MEDIA_TYPE_VALUE,
+                TURTLE_MEDIA_TYPE_VALUE,
+                N_TRIPLES_MEDIA_TYPE_VALUE
+            })
     public DeferredResult<ResponseEntity<MessageConverterContext<CrossRefEntry>>> stream(
             @Valid @ModelAttribute CrossRefStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
-        if (contentType.equals(RDF_MEDIA_TYPE)) {
-            return super.streamRDF(
-                    () -> crossRefService.streamRDF(streamRequest),
+        Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
+        if (acceptedRdfContentType.isPresent()) {
+            return super.streamRdf(
+                    () ->
+                            crossRefService.streamRdf(
+                                    streamRequest, DATA_TYPE, acceptedRdfContentType.get()),
                     streamRequest,
                     contentType,
                     request);

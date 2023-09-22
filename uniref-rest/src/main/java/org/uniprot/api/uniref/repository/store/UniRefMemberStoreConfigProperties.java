@@ -17,4 +17,5 @@ public class UniRefMemberStoreConfigProperties {
     private int memberBatchSize;
     private int fetchMaxRetries;
     private int fetchRetryDelayMillis;
+    private boolean brotliEnabled;
 }
