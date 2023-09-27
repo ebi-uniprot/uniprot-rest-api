@@ -3,6 +3,7 @@ package org.uniprot.api.support.data.configure.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -70,7 +71,7 @@ public class UniProtKBConfigureService {
     public List<DatabaseGroup> getDatabases() {
         List<DatabaseGroup> databases =
                 Arrays.stream(UniProtDatabaseCategory.values())
-                        .filter(dbCat -> filteredUniProtDBCategory(dbCat))
+                        .filter(this::filteredUniProtDBCategory)
                         .map(this::getDatabaseGroup)
                         .filter(dbGroup -> !dbGroup.getItems().isEmpty())
                         .collect(Collectors.toList());
@@ -108,13 +109,17 @@ public class UniProtKBConfigureService {
     }
 
     private DatabaseGroup getDatabaseGroup(UniProtDatabaseCategory dbCategory) {
-        List<UniProtDatabaseDetail> dbTypes = DBX_TYPES.getDBTypesByCategory(dbCategory);
+        List<UniProtDatabaseDetail> dbDetails = DBX_TYPES.getDBTypesByCategory(dbCategory);
         List<Tuple> databaseTypes =
-                dbTypes.stream()
-                        .filter(val -> !val.isImplicit())
+                dbDetails.stream()
+                        .filter(this::filterUniProtDatabaseDetail)
                         .map(this::convertToTuple)
                         .collect(Collectors.toList());
         return new DatabaseGroupImpl(dbCategory.getDisplayName(), databaseTypes);
+    }
+
+    private boolean filterUniProtDatabaseDetail(UniProtDatabaseDetail dbDetail) {
+        return !dbDetail.isImplicit() && !Objects.equals("internal", dbDetail.getType());
     }
 
     private List<AdvancedSearchTerm> getCrossReferencesSearchItem() {
