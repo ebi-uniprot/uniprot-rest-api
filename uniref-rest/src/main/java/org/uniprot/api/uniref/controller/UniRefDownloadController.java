@@ -1,15 +1,14 @@
-package org.uniprot.api.uniprotkb.controller;
+package org.uniprot.api.uniref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
+import static org.uniprot.api.uniref.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
 
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.rest.controller.BasicDownloadController;
 import org.uniprot.api.rest.download.model.DownloadJob;
@@ -19,8 +18,7 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
-import org.uniprot.api.rest.validation.CustomConstraintGroupSequence;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
+import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,17 +26,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
- * @author sahmad
- * @created 21/11/2022
+ * @author tibrahim
+ * @created 14/08/2023
  */
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
-public class UniProtKBDownloadController extends BasicDownloadController {
-    static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
+public class UniRefDownloadController extends BasicDownloadController {
+
+    static final String UNIREF_RESOURCE = "/uniref";
+    static final String DOWNLOAD_RESOURCE = UNIREF_RESOURCE + "/download";
     private final ProducerMessageService messageService;
     private final DownloadJobRepository jobRepository;
 
-    public UniProtKBDownloadController(
+    public UniRefDownloadController(
             ProducerMessageService messageService, DownloadJobRepository jobRepository) {
         this.messageService = messageService;
         this.jobRepository = jobRepository;
@@ -46,8 +46,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<JobSubmitResponse> submitJob(
-            @Validated(CustomConstraintGroupSequence.class) @ModelAttribute
-                    UniProtKBDownloadRequest request) {
+            @Valid @ModelAttribute UniRefDownloadRequest request) {
         String jobId = this.messageService.sendMessage(request);
         return ResponseEntity.ok(new JobSubmitResponse(jobId));
     }
