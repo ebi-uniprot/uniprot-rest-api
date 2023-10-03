@@ -47,7 +47,7 @@ api:settings:
     paths:
       - ./${MAVEN_SETTINGS}
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
       allow_failure: true
 
@@ -69,7 +69,7 @@ api:test:
       junit:
         - ./*/target/surefire-reports/TEST-*.xml
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
       allow_failure: true
 
@@ -80,7 +80,7 @@ api:sonar:
     - api:test
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
       allow_failure: true
 
@@ -95,7 +95,7 @@ mvn:deploy:
   dependencies:
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
 
 k8s:docker-build-deploy:
   stage: docker-build-deploy
@@ -104,7 +104,7 @@ k8s:docker-build-deploy:
       artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
-    branch: master
+    branch: main
   variables:
     CI_PIPELINE_TASKS: 'build,helm-install-rest'
     ARTIFACT: 'all-rest'
@@ -113,4 +113,4 @@ k8s:docker-build-deploy:
     RELEASE_NAME: '2023_04'
   when: on_success
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
