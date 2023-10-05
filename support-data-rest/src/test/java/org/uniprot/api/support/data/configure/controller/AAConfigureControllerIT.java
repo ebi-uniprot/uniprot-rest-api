@@ -32,7 +32,7 @@ import org.uniprot.api.support.data.SupportDataRestApplication;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DataStoreTestConfig.class, SupportDataRestApplication.class})
 @WebMvcTest(AAConfigureController.class)
-public class AAConfigureControllerIT {
+class AAConfigureControllerIT {
     private static final String CONFIGURE_RESOURCE = "/configure/";
 
     @Autowired private MockMvc mockMvc;
