@@ -39,7 +39,7 @@ api:settings:
     - 'wget --no-cache --no-cookies -O ${MAVEN_SETTINGS} "${URL_MAVEN_SETTINGS}"'
   script:
     - if [ ! -f ${MAVEN_SETTINGS} ];
-      then echo "CI settings missing";
+      then echo "CI settings is missing";
       fi
   artifacts:
     when: always
