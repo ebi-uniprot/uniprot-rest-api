@@ -1,14 +1,13 @@
 package org.uniprot.api.proteome.service;
 
-import java.util.function.Function;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniprot.core.json.parser.proteome.ProteomeJsonConfig;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.function.Function;
 
 /**
  * @author jluo
@@ -28,7 +27,7 @@ public class ProteomeEntryConverter implements Function<ProteomeDocument, Proteo
         try {
             ProteomeEntry entry =
                     objectMapper.readValue(
-                            t.proteomeStored.array(),
+                            t.proteomeStored,
                             org.uniprot.core.proteome.ProteomeEntry.class);
             return entry;
         } catch (Exception e) {
