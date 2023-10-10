@@ -1,5 +1,9 @@
 package org.uniprot.api.proteome.controller;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 import org.uniprot.core.CrossReference;
 import org.uniprot.core.citation.impl.JournalArticleBuilder;
@@ -14,10 +18,6 @@ import org.uniprot.core.xml.proteome.ProteomeConverter;
 import org.uniprot.store.indexer.proteome.ProteomeDocumentConverter;
 import org.uniprot.store.indexer.uniprot.mockers.TaxonomyRepoMocker;
 import org.uniprot.store.search.document.proteome.ProteomeDocument;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author lgonzales
