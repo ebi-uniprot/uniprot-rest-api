@@ -8,10 +8,7 @@ import lombok.Data;
 import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
-import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.rest.validation.ValidSolrQueryFields;
-import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
-import org.uniprot.api.rest.validation.ValidSolrSortFields;
+import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
 import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
@@ -36,6 +33,7 @@ public class UniProtKBBasicRequest {
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
+    @ValidTSVFormatOnlyFields(fieldPattern = "xref_.*_full")
     private String fields;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
