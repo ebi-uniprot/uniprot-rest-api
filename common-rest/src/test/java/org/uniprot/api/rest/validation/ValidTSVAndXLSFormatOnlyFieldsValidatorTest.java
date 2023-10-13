@@ -10,13 +10,13 @@ import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.UniProtMediaType;
 
-public class ValidTSVFormatOnlyFieldsValidatorTest {
+public class ValidTSVAndXLSFormatOnlyFieldsValidatorTest {
 
     private static final String FIELD_PATTERN = "xref_.*_full";
 
     @Test
     void testInitializeWithInvalidFieldPattern() {
-        ValidTSVFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVFormatOnlyFields.class);
+        ValidTSVAndXLSFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVAndXLSFormatOnlyFields.class);
         Mockito.when(mockedConstraing.fieldPattern()).thenThrow(new RuntimeException());
 
         FakeValidTSVFormatOnlyFieldsValidator validator =
@@ -40,7 +40,45 @@ public class ValidTSVFormatOnlyFieldsValidatorTest {
         String contentType = UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
         Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
                 .thenReturn(contentType);
-        ValidTSVFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVFormatOnlyFields.class);
+        ValidTSVAndXLSFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVAndXLSFormatOnlyFields.class);
+        Mockito.when(mockedConstraing.fieldPattern()).thenReturn(FIELD_PATTERN);
+
+        FakeValidTSVFormatOnlyFieldsValidator validator =
+                new FakeValidTSVFormatOnlyFieldsValidator();
+        validator.mockedRequest = mockedServletWebRequest;
+        validator.initialize(mockedConstraing);
+        boolean isValid = validator.isValid(fields, null);
+        assertTrue(isValid);
+        assertNull(validator.errorFields);
+    }
+
+    @Test
+    void testValidateExtraFieldsForXLSFormatReturnTrue() {
+        String fields = "accession,xref_ensembl_full";
+        HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
+        String contentType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
+        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
+                .thenReturn(contentType);
+        ValidTSVAndXLSFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVAndXLSFormatOnlyFields.class);
+        Mockito.when(mockedConstraing.fieldPattern()).thenReturn(FIELD_PATTERN);
+
+        FakeValidTSVFormatOnlyFieldsValidator validator =
+                new FakeValidTSVFormatOnlyFieldsValidator();
+        validator.mockedRequest = mockedServletWebRequest;
+        validator.initialize(mockedConstraing);
+        boolean isValid = validator.isValid(fields, null);
+        assertTrue(isValid);
+        assertNull(validator.errorFields);
+    }
+
+    @Test
+    void testValidateNotExtraFieldsForJsonFormatReturnTrue() {
+        String fields = "accession,xref_ensembl";
+        HttpServletRequest mockedServletWebRequest = Mockito.mock(HttpServletRequest.class);
+        String contentType = MediaType.APPLICATION_JSON_VALUE;
+        Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
+                .thenReturn(contentType);
+        ValidTSVAndXLSFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVAndXLSFormatOnlyFields.class);
         Mockito.when(mockedConstraing.fieldPattern()).thenReturn(FIELD_PATTERN);
 
         FakeValidTSVFormatOnlyFieldsValidator validator =
@@ -59,7 +97,7 @@ public class ValidTSVFormatOnlyFieldsValidatorTest {
         String contentType = MediaType.APPLICATION_JSON_VALUE;
         Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
                 .thenReturn(contentType);
-        ValidTSVFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVFormatOnlyFields.class);
+        ValidTSVAndXLSFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVAndXLSFormatOnlyFields.class);
         Mockito.when(mockedConstraing.fieldPattern()).thenReturn(FIELD_PATTERN);
         FakeValidTSVFormatOnlyFieldsValidator validator =
                 new FakeValidTSVFormatOnlyFieldsValidator();
@@ -78,7 +116,7 @@ public class ValidTSVFormatOnlyFieldsValidatorTest {
         Mockito.when(mockedServletWebRequest.getHeader(Mockito.anyString()))
                 .thenReturn(contentType);
 
-        ValidTSVFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVFormatOnlyFields.class);
+        ValidTSVAndXLSFormatOnlyFields mockedConstraing = Mockito.mock(ValidTSVAndXLSFormatOnlyFields.class);
         Mockito.when(mockedConstraing.fieldPattern()).thenReturn(FIELD_PATTERN);
 
         FakeValidTSVFormatOnlyFieldsValidator validator =
@@ -92,7 +130,7 @@ public class ValidTSVFormatOnlyFieldsValidatorTest {
     }
 
     static class FakeValidTSVFormatOnlyFieldsValidator
-            extends ValidTSVFormatOnlyFields.ValidTSVFormatOnlyFieldsValidator {
+            extends ValidTSVAndXLSFormatOnlyFields.ValidTSVAndXLSFormatOnlyFieldsValidator {
 
         String errorFields;
 

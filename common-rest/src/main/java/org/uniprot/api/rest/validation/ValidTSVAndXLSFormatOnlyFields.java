@@ -26,10 +26,10 @@ import org.uniprot.core.util.Utils;
  *
  * @author Edd
  */
-@Constraint(validatedBy = ValidTSVFormatOnlyFields.ValidTSVFormatOnlyFieldsValidator.class)
+@Constraint(validatedBy = ValidTSVAndXLSFormatOnlyFields.ValidTSVAndXLSFormatOnlyFieldsValidator.class)
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidTSVFormatOnlyFields {
+public @interface ValidTSVAndXLSFormatOnlyFields {
     String fieldPattern();
 
     String message() default "{search.field.invalid.content.type}";
@@ -39,8 +39,8 @@ public @interface ValidTSVFormatOnlyFields {
     Class<? extends Payload>[] payload() default {};
 
     @Slf4j
-    class ValidTSVFormatOnlyFieldsValidator
-            implements ConstraintValidator<ValidTSVFormatOnlyFields, String> {
+    class ValidTSVAndXLSFormatOnlyFieldsValidator
+            implements ConstraintValidator<ValidTSVAndXLSFormatOnlyFields, String> {
 
         @Autowired private HttpServletRequest request;
 
@@ -48,7 +48,7 @@ public @interface ValidTSVFormatOnlyFields {
         private String message;
 
         @Override
-        public void initialize(ValidTSVFormatOnlyFields constraintAnnotation) {
+        public void initialize(ValidTSVAndXLSFormatOnlyFields constraintAnnotation) {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             try {
                 fieldPattern = constraintAnnotation.fieldPattern();
@@ -72,7 +72,7 @@ public @interface ValidTSVFormatOnlyFields {
                 }
                 String accept = getRequest().getHeader("Accept");
 
-                if (!fieldsWithPattern.isEmpty() && notTSVFormat(accept)) {
+                if (!fieldsWithPattern.isEmpty() && notTSVAndNotXLSFormat(accept)) {
                     ConstraintValidatorContextImpl contextImpl =
                             (ConstraintValidatorContextImpl) context;
                     buildUnsupportedContentTypeErrorMessage(
@@ -87,8 +87,9 @@ public @interface ValidTSVFormatOnlyFields {
             return isValid;
         }
 
-        private boolean notTSVFormat(String accept) {
-            return accept == null || !accept.equals(UniProtMediaType.TSV_MEDIA_TYPE_VALUE);
+        private boolean notTSVAndNotXLSFormat(String accept) {
+            return accept == null ||
+                    (!accept.equals(UniProtMediaType.TSV_MEDIA_TYPE_VALUE) && !accept.equals(UniProtMediaType.XLS_MEDIA_TYPE_VALUE));
         }
 
         HttpServletRequest getRequest() {
