@@ -33,7 +33,7 @@ public class UniProtKBBasicRequest {
     @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
-    @ValidTSVFormatOnlyFields(fieldPattern = "xref_.*_full")
+    @ValidTSVAndXLSFormatOnlyFields(fieldPattern = "xref_.*_full")
     private String fields;
 
     @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
