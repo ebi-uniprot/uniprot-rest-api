@@ -26,7 +26,8 @@ import org.uniprot.core.util.Utils;
  *
  * @author Edd
  */
-@Constraint(validatedBy = ValidTSVAndXLSFormatOnlyFields.ValidTSVAndXLSFormatOnlyFieldsValidator.class)
+@Constraint(
+        validatedBy = ValidTSVAndXLSFormatOnlyFields.ValidTSVAndXLSFormatOnlyFieldsValidator.class)
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidTSVAndXLSFormatOnlyFields {
@@ -88,8 +89,9 @@ public @interface ValidTSVAndXLSFormatOnlyFields {
         }
 
         private boolean notTSVAndNotXLSFormat(String accept) {
-            return accept == null ||
-                    (!accept.equals(UniProtMediaType.TSV_MEDIA_TYPE_VALUE) && !accept.equals(UniProtMediaType.XLS_MEDIA_TYPE_VALUE));
+            return accept == null
+                    || (!accept.equals(UniProtMediaType.TSV_MEDIA_TYPE_VALUE)
+                            && !accept.equals(UniProtMediaType.XLS_MEDIA_TYPE_VALUE));
         }
 
         HttpServletRequest getRequest() {
