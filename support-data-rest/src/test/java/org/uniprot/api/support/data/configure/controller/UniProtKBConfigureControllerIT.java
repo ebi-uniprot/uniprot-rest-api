@@ -1,7 +1,6 @@
 package org.uniprot.api.support.data.configure.controller;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,8 +9,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
@@ -22,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.support.data.DataStoreTestConfig;
 import org.uniprot.api.support.data.SupportDataRestApplication;
+import org.uniprot.cv.xdb.UniProtDatabaseTypes;
 
 /** @author lgonzales */
 @ExtendWith(SpringExtension.class)
@@ -33,14 +38,21 @@ class UniProtKBConfigureControllerIT {
 
     @Autowired private MockMvc mockMvc;
 
-    @Test
-    void canGetUniProtSearchTermsTemp() throws Exception {
-
+    @ParameterizedTest(name = "/configure/uniprotkb{0}")
+    @ValueSource(
+            strings = {
+                "/search_terms",
+                "/annotation_evidences",
+                "/go_evidences",
+                "/databases",
+                "/evidenceDatabases",
+                "/resultfields",
+                "/result-fields"
+            })
+    void canGetResponse(String path) throws Exception {
         // when
         ResultActions response =
-                mockMvc.perform(
-                        get(BASIC_RESOURCE + "/search_terms")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                mockMvc.perform(get(BASIC_RESOURCE + path).header(ACCEPT, APPLICATION_JSON_VALUE));
 
         // then
         validateResponse(response);
@@ -55,47 +67,17 @@ class UniProtKBConfigureControllerIT {
                         get(BASIC_RESOURCE + "/search-fields")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
 
+        List<String> internalCrossRefs =
+                UniProtDatabaseTypes.INSTANCE.getInternalDatabaseDetails().stream()
+                        .map(db -> db.getName())
+                        .collect(Collectors.toList());
         // then
         validateResponse(response);
-        response.andExpect(jsonPath("$.[4].autoComplete", is("/suggester?dict=organism&query=?")));
-    }
-
-    @Test
-    void canGetAnnotationEvidences() throws Exception {
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(BASIC_RESOURCE + "/annotation_evidences")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        validateResponse(response);
-    }
-
-    @Test
-    void canGetGoEvidences() throws Exception {
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(BASIC_RESOURCE + "/go_evidences")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        validateResponse(response);
-    }
-
-    @Test
-    void canGetDatabases() throws Exception {
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(BASIC_RESOURCE + "/databases").header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        validateResponse(response);
+        response.andExpect(jsonPath("$.[4].autoComplete", is("/suggester?dict=organism&query=?")))
+                .andExpect(
+                        jsonPath(
+                                "$.[?(@.id=='cross_references')].items.*.items.*.label",
+                                everyItem(not(is(in(internalCrossRefs))))));
     }
 
     @Test
@@ -106,48 +88,14 @@ class UniProtKBConfigureControllerIT {
                 mockMvc.perform(
                         get(BASIC_RESOURCE + "/allDatabases")
                                 .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // all cross refs including internal ones
+        List<String> allCrossRefs =
+                UniProtDatabaseTypes.INSTANCE.getAllDbTypes().stream()
+                        .map(db -> db.getName())
+                        .collect(Collectors.toList());
+        response.andExpect(jsonPath("$.*.idMappingName").doesNotExist())
+                .andExpect(jsonPath("$.*.name.*", everyItem(is(oneOf(allCrossRefs)))));
 
-        // then
-        response.andExpect(jsonPath("$.*.idMappingName").doesNotExist());
-        validateResponse(response);
-    }
-
-    @Test
-    void canGetEvidenceDatabases() throws Exception {
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(BASIC_RESOURCE + "/evidenceDatabases")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        validateResponse(response);
-    }
-
-    @Test
-    void canGetResultFields() throws Exception {
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(BASIC_RESOURCE + "/resultfields")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
-        validateResponse(response);
-    }
-
-    @Test
-    void canGetResultFieldsByNewAPI() throws Exception {
-
-        // when
-        ResultActions response =
-                mockMvc.perform(
-                        get(BASIC_RESOURCE + "/result-fields")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
-
-        // then
         validateResponse(response);
     }
 
