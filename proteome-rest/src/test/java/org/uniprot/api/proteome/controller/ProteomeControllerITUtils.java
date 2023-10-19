@@ -1,6 +1,5 @@
 package org.uniprot.api.proteome.controller;
 
-import java.nio.ByteBuffer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +39,7 @@ class ProteomeControllerITUtils {
         ProteomeDocumentConverter documentConverter =
                 new ProteomeDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         ProteomeDocument document = documentConverter.convert(proteome);
-        document.proteomeStored = ByteBuffer.wrap(documentConverter.getBinaryObject(entry));
+        document.proteomeStored = documentConverter.getBinaryObject(entry);
         return document;
     }
 
@@ -52,7 +51,7 @@ class ProteomeControllerITUtils {
         ProteomeDocumentConverter documentConverter =
                 new ProteomeDocumentConverter(TaxonomyRepoMocker.getTaxonomyRepo());
         ProteomeDocument document = documentConverter.convert(proteome);
-        document.proteomeStored = ByteBuffer.wrap(documentConverter.getBinaryObject(entry));
+        document.proteomeStored = documentConverter.getBinaryObject(entry);
         document.isRedundant = i % 2 != 0;
         document.isReferenceProteome = i % 2 != 0;
         document.isExcluded = false;

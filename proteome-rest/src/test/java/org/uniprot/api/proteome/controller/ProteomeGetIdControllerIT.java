@@ -6,12 +6,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.uniprot.api.proteome.controller.ProteomeControllerITUtils.getExcludedProteomeDocument;
 
-import java.nio.ByteBuffer;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -127,12 +126,9 @@ class ProteomeGetIdControllerIT extends AbstractGetByIdControllerIT {
                 .andExpect(jsonPath("$.exclusionReasons", contains("contaminated")));
     }
 
-    private ByteBuffer getBinary(ProteomeEntry entry) {
+    private byte[] getBinary(ProteomeEntry entry) {
         try {
-            return ByteBuffer.wrap(
-                    ProteomeJsonConfig.getInstance()
-                            .getFullObjectMapper()
-                            .writeValueAsBytes(entry));
+            return ProteomeJsonConfig.getInstance().getFullObjectMapper().writeValueAsBytes(entry);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to parse TaxonomyEntry to binary json: ", e);
         }
