@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
@@ -10,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
 import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
@@ -59,7 +61,6 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
-import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -1581,6 +1582,75 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 .andExpect(jsonPath("$.results[1].genes[0].geneName.value", is("B3GAT1")));
     }
 
+    @Test
+    void searchXrefFullForTSVFormatSuccess() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "P21802")
+                                        .param(
+                                                "fields",
+                                                "accession, xref_ensembl_full ,xref_interpro")
+                                        .header(ACCEPT, TSV_MEDIA_TYPE_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, TSV_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        containsString(
+                                                "P21802\t\"ENST00000346997; ENSP00000263451; ENSG00000066468. [P21802-5]\";"
+                                                        + "\"ENST00000356226; ENSP00000348559; ENSG00000066468. [P21802-20]\";"
+                                                        + "\"ENST00000357555; ENSP00000350166; ENSG00000066468. [P21802-21]\";"
+                                                        + "\"ENST00000358487; ENSP00000351276; ENSG00000066468. [P21802-1]\";"
+                                                        + "\"ENST00000359354; ENSP00000352309; ENSG00000066468. [P21802-14]\";"
+                                                        + "\"ENST00000360144; ENSP00000353262; ENSG00000066468. [P21802-22]\";"
+                                                        + "\"ENST00000369056; ENSP00000358052; ENSG00000066468. [P21802-17]\";"
+                                                        + "\"ENST00000369058; ENSP00000358054; ENSG00000066468. [P21802-13]\";"
+                                                        + "\"ENST00000369060; ENSP00000358056; ENSG00000066468. [P21802-15]\";"
+                                                        + "\"ENST00000369061; ENSP00000358057; ENSG00000066468. [P21802-23]\";"
+                                                        + "\"ENST00000457416; ENSP00000410294; ENSG00000066468. [P21802-3]\";"
+                                                        + "\tIPR016248;IPR041159;IPR007110;IPR036179;IPR013783;"
+                                                        + "IPR013098;IPR003599;IPR003598;IPR011009;IPR000719;"
+                                                        + "IPR017441;IPR001245;IPR008266;IPR020635;")));
+    }
+
+    @Test
+    void searchXrefFullForSingleIdXrefAndJsonFormatReturnBadRequest() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(SEARCH_RESOURCE)
+                                        .param("query", "P21802")
+                                        .param(
+                                                "fields",
+                                                "accession, xref_ensembl_full ,xref_kegg_full")
+                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.messages.size()", is(2)))
+                .andExpect(
+                        jsonPath(
+                                "$.messages.*",
+                                containsInAnyOrder(
+                                        "Invalid fields parameter value 'xref_kegg_full'",
+                                        "Fields 'xref_ensembl_full, xref_kegg_full' are only supported by TSV (text/plain;format=tsv) format.")));
+    }
+
     @Override
     protected String getSearchRequestPath() {
         return SEARCH_RESOURCE;
@@ -2082,13 +2152,13 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.FF_MEDIA_TYPE)
+                                    .contentType(FF_MEDIA_TYPE)
                                     .resultMatcher(content().string(containsString("AC   P21802;")))
                                     .resultMatcher(content().string(containsString("AC   Q8DIA7;")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .contentType(FASTA_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -2105,7 +2175,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
+                                    .contentType(GFF_MEDIA_TYPE)
                                     .resultMatcher(
                                             content().string(containsString("##gff-version 3")))
                                     .resultMatcher(
@@ -2121,7 +2191,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .contentType(LIST_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(containsString(ACCESSION_SP_CANONICAL)))
@@ -2129,7 +2199,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .contentType(TSV_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -2148,9 +2218,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .contentType(XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().contentType(XLS_MEDIA_TYPE))
                                     .build())
                     .build();
         }
@@ -2180,7 +2249,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .contentType(FASTA_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -2189,7 +2258,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
+                                    .contentType(GFF_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -2198,7 +2267,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.FF_MEDIA_TYPE)
+                                    .contentType(FF_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -2207,7 +2276,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
+                                    .contentType(LIST_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -2216,7 +2285,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
+                                    .contentType(TSV_MEDIA_TYPE)
                                     .resultMatcher(
                                             content()
                                                     .string(
@@ -2225,9 +2294,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
-                                    .resultMatcher(
-                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                    .contentType(XLS_MEDIA_TYPE)
+                                    .resultMatcher(content().contentType(XLS_MEDIA_TYPE))
                                     .build())
                     .build();
         }
