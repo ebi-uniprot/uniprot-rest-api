@@ -74,14 +74,11 @@ public @interface ValidTSVAndXLSFormatOnlyFields {
                 String accept = getRequest().getHeader("Accept");
 
                 if (!fieldsWithPattern.isEmpty() && notTSVAndNotXLSFormat(accept)) {
+                    isValid = false;
                     ConstraintValidatorContextImpl contextImpl =
                             (ConstraintValidatorContextImpl) context;
                     buildUnsupportedContentTypeErrorMessage(
                             String.join(", ", fieldsWithPattern), contextImpl);
-                    isValid = false;
-                    if (!isValid && contextImpl != null) {
-                        contextImpl.disableDefaultConstraintViolation();
-                    }
                 }
             }
 
@@ -102,6 +99,7 @@ public @interface ValidTSVAndXLSFormatOnlyFields {
                 String invalidFields, ConstraintValidatorContextImpl contextImpl) {
             contextImpl.addMessageParameter("0", invalidFields);
             contextImpl.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+            contextImpl.disableDefaultConstraintViolation();
         }
 
         String getFieldPattern() {
