@@ -3,11 +3,8 @@ package org.uniprot.api.rest.validation;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,7 +47,7 @@ public class ValidSolrQueryFacetFieldsTest {
         String query = "reviewed:true AND length123:[1 TO 200] AND existence:Homology";
         boolean isValid = validator.isValid(query, null);
         assertFalse(isValid);
-        assertEquals(Arrays.asList("length123"), validator.errorFields);
+        assertEquals(List.of("length123"), validator.errorFields);
         validator.errorFields.clear();
     }
 
@@ -60,7 +57,7 @@ public class ValidSolrQueryFacetFieldsTest {
                 "reviewed:true AND length123:[1 TO 200] AND existence:Homology OR simpleFacet:1";
         boolean isValid = validator.isValid(query, null);
         assertFalse(isValid);
-        assertEquals(Arrays.asList("length123", "simpleFacet"), validator.errorFields);
+        assertEquals(List.of("length123", "simpleFacet"), validator.errorFields);
         validator.errorFields.clear();
     }
 
@@ -68,22 +65,18 @@ public class ValidSolrQueryFacetFieldsTest {
 
         final List<String> errorFields = new ArrayList<>();
 
-        HttpServletRequest mockedRequest;
-
         final Collection<String> mockedFacetNames =
-                Arrays.asList(
-                        new String[] {
-                            "reviewed",
-                            "fragment",
-                            "structure_3d",
-                            "model_organism",
-                            "other_organism",
-                            "existence",
-                            "annotation_score",
-                            "proteome",
-                            "proteins_with",
-                            "length"
-                        });
+                List.of(
+                        "reviewed",
+                        "fragment",
+                        "structure_3d",
+                        "model_organism",
+                        "other_organism",
+                        "existence",
+                        "annotation_score",
+                        "proteome",
+                        "proteins_with",
+                        "length");
 
         @Override
         void buildInvalidFacetNameMessage(

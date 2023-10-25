@@ -4,12 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.uniprot.api.support.data.configure.service.UtilServiceTest.CONTEXT_PATH;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import junit.framework.AssertionFailedError;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
+import org.uniprot.api.support.data.configure.response.UniProtReturnField;
 
 class UniProtKBConfigureServiceTest {
     private static UniProtKBConfigureService service;
@@ -69,6 +71,31 @@ class UniProtKBConfigureServiceTest {
         assertEquals("string", embl.getDataType());
         assertEquals("general", embl.getFieldType());
         assertEquals("embl-", embl.getValuePrefix());
+    }
+
+    @Test
+    void testGetResultFields2() {
+        List<UniProtReturnField> groups = service.getResultFields2();
+        assertEquals(31, groups.size());
+
+        List<UniProtReturnField> fields =
+                groups.stream()
+                        .flatMap(group -> group.getFields().stream())
+                        .collect(Collectors.toList());
+        assertNotNull(fields);
+        assertFalse(fields.isEmpty());
+
+        List<UniProtReturnField> multiValuesXrefs =
+                fields.stream()
+                        .filter(field -> field.getIsMultiValueCrossReference() != null)
+                        .filter(UniProtReturnField::getIsMultiValueCrossReference)
+                        .collect(Collectors.toList());
+        assertNotNull(multiValuesXrefs);
+
+        assertEquals(78, multiValuesXrefs.size());
+        for (UniProtReturnField xref : multiValuesXrefs) {
+            assertTrue(xref.getName().startsWith("xref_"));
+        }
     }
 
     @Test

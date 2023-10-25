@@ -149,6 +149,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     void getGroupByGO_whenParentSpecifiedAndQuerySpecifiedWithField() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
         GoRelation goRelation = new GoRelation();
+        goRelation.setId(GO_ID_0);
         goRelation.setName(GO_NAME_0);
         when(goClient.getGoEntry(GO_ID_0)).thenReturn(Optional.of(goRelation));
 
@@ -193,6 +194,7 @@ class GroupByGOControllerIT extends GroupByControllerIT {
     void getGroupByGO_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
         GoRelation goRelation = new GoRelation();
+        goRelation.setId(GO_ID_0);
         goRelation.setName(GO_NAME_0);
         when(goClient.getGoEntry(GO_ID_0)).thenReturn(Optional.of(goRelation));
 

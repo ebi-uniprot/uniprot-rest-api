@@ -4,7 +4,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
 
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,13 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.controller.BasicDownloadController;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
@@ -82,27 +79,8 @@ public class UniProtKBDownloadController extends BasicDownloadController {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
+        String requestURL = servletRequest.getRequestURL().toString();
 
-        DownloadJobDetailResponse detailResponse = new DownloadJobDetailResponse();
-        detailResponse.setQuery(job.getQuery());
-        detailResponse.setFields(job.getFields());
-        detailResponse.setSort(job.getSort());
-        detailResponse.setFormat(job.getFormat());
-        if (JobStatus.FINISHED == job.getStatus()) {
-            detailResponse.setRedirectURL(
-                    constructDownloadRedirectUrl(
-                            job.getResultFile(), servletRequest.getRequestURL().toString()));
-        } else if (JobStatus.ERROR == job.getStatus()) {
-            ProblemPair error =
-                    new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), job.getError());
-            detailResponse.setErrors(List.of(error));
-        } else if (JobStatus.ABORTED == job.getStatus()) {
-            ProblemPair error =
-                    new ProblemPair(
-                            PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode(), job.getError());
-            detailResponse.setErrors(List.of(error));
-        }
-
-        return ResponseEntity.ok(detailResponse);
+        return getDownloadJobDetails(requestURL, job);
     }
 }

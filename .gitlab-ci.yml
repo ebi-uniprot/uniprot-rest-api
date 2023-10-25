@@ -31,8 +31,7 @@ stages:
   - test
   - quality
   - mvn-deploy
-  - docker-build
-  - helm-install
+  - docker-build-deploy
 
 api:settings:
   stage: setup
@@ -48,7 +47,7 @@ api:settings:
     paths:
       - ./${MAVEN_SETTINGS}
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
       allow_failure: true
 
@@ -70,7 +69,7 @@ api:test:
       junit:
         - ./*/target/surefire-reports/TEST-*.xml
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
       allow_failure: true
 
@@ -81,7 +80,7 @@ api:sonar:
     - api:test
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
     - when: manual
       allow_failure: true
 
@@ -96,40 +95,22 @@ mvn:deploy:
   dependencies:
     - api:settings
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'
 
-k8s:docker-build:
-  stage: docker-build
+k8s:docker-build-deploy:
+  stage: docker-build-deploy
   needs:
     - job: mvn:deploy
       artifacts: true
   trigger:
     project: uniprot/deployment/unp.ci.api.k8s
-    branch: master
+    branch: main
   variables:
-    CI_PIPELINE_TASKS: 'build'
+    CI_PIPELINE_TASKS: 'build,helm-install-rest'
     ARTIFACT: 'all-rest'
-    VERSION: '$UNIPROT_REST_VERSION'
-  when: on_success
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-
-k8s:helm-install:
-  stage: helm-install
-  needs:
-    - job: k8s:docker-build
-      artifacts: true
-    - job: mvn:deploy
-      artifacts: true
-  trigger:
-    project: uniprot/deployment/unp.ci.api.k8s
-    branch: master
-  variables:
-    CI_PIPELINE_TASKS: 'helm-install-rest'
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
-    ARTIFACT: 'all-rest'
     RELEASE_NAME: '2023_04'
   when: on_success
   rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_COMMIT_REF_NAME == "main"'

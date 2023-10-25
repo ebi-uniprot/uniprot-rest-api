@@ -166,7 +166,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)))
                 .andExpect(jsonPath("$.parent.label", is("scientific_9600")))
-                .andExpect(jsonPath("$.parent.count", is(1)));
+                .andExpect(jsonPath("$.parent.count", is(2)));
     }
 
     @Test
@@ -186,7 +186,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(2)))
                 .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+                .andExpect(jsonPath("$.parent.count", is(2)));
     }
 
     @Test
@@ -204,7 +204,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                 .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
                 .andExpect(jsonPath("$.ancestors.size()", is(1)))
                 .andExpect(jsonPath("$.parent.label", is("scientific_9600")))
-                .andExpect(jsonPath("$.parent.count", is(1)));
+                .andExpect(jsonPath("$.parent.count", is(2)));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {

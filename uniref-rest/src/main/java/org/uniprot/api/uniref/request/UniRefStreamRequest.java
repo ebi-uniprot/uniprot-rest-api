@@ -25,4 +25,6 @@ public class UniRefStreamRequest extends UniRefBasicRequest implements StreamReq
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.uniref.invalid.download}")
     private String download;
+
+    private boolean isLargeSolrStreamRestricted = true;
 }

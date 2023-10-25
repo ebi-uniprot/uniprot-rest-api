@@ -45,6 +45,7 @@ public class UniProtReturnField {
     private String sortField;
     private String groupName;
     private Boolean isDatabaseGroup;
+    private Boolean isMultiValueCrossReference;
     private String id;
     private List<UniProtReturnField> fields;
 
@@ -79,17 +80,23 @@ public class UniProtReturnField {
         return allFields.stream()
                 .filter(field -> field.getItemType().equals(ReturnFieldItemType.SINGLE))
                 .filter(field -> Objects.nonNull(field.getParentId()))
-                .map(
-                        field ->
-                                UniProtReturnField.builder()
-                                        .label(field.getLabel())
-                                        .name(field.getName())
-                                        .id(field.getId())
-                                        .sortField(field.getSortField())
-                                        .parentId(field.getParentId())
-                                        .childNumber(field.getChildNumber())
-                                        .build())
+                .map(UniProtReturnField::buildUniProtReturnField)
                 .collect(groupingBy(UniProtReturnField::getParentId));
+    }
+
+    private static UniProtReturnField buildUniProtReturnField(ReturnField field) {
+        UniProtReturnFieldBuilder builder =
+                UniProtReturnField.builder()
+                        .label(field.getLabel())
+                        .name(field.getName())
+                        .id(field.getId())
+                        .sortField(field.getSortField())
+                        .parentId(field.getParentId())
+                        .childNumber(field.getChildNumber());
+        if (field.getIsMultiValueCrossReference()) {
+            builder.isMultiValueCrossReference(field.getIsMultiValueCrossReference());
+        }
+        return builder.build();
     }
 
     private static List<UniProtReturnField> extractOrderedGroups(List<ReturnField> allFields) {

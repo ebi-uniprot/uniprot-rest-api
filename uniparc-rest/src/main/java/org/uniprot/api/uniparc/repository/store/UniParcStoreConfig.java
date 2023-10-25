@@ -23,6 +23,7 @@ public class UniParcStoreConfig {
         VoldemortClient<UniParcEntry> client =
                 new VoldemortRemoteUniParcEntryStore(
                         uniParcStoreConfigProperties.getNumberOfConnections(),
+                        uniParcStoreConfigProperties.isBrotliEnabled(),
                         uniParcStoreConfigProperties.getStoreName(),
                         uniParcStoreConfigProperties.getHost());
         return new UniParcStoreClient(client);

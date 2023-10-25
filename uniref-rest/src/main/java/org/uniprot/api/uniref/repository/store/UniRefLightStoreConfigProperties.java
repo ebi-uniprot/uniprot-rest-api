@@ -16,4 +16,6 @@ public class UniRefLightStoreConfigProperties {
     private int numberOfConnections;
     private int fetchMaxRetries;
     private int fetchRetryDelayMillis;
+
+    private boolean brotliEnabled;
 }

@@ -41,6 +41,7 @@ class GroupByTaxonomyServiceTest {
     private static final String TAX_ID_E_STRING = String.valueOf(TAX_ID_E);
     public static final String PARENT_TAX_ID_A = ("parent:" + TAX_ID_A);
     public static final String PARENT_TAX_ID_B = ("parent:" + TAX_ID_B);
+    public static final String PARENT_TAX_ID_C = ("parent:" + TAX_ID_C);
     public static final String PARENT_TAX_ID_D = ("parent:" + TAX_ID_D);
     public static final String PARENT_TAX_ID_E = ("parent:" + TAX_ID_E);
     private static final String TAX_LABEL_A = "taxLabelA";
@@ -175,7 +176,7 @@ class GroupByTaxonomyServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorB()),
-                is(ParentImpl.builder().label(null).count(10022L).build()));
+                is(ParentImpl.builder().label(null).count(TAX_COUNT_B).build()));
     }
 
     @Test
@@ -209,7 +210,7 @@ class GroupByTaxonomyServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorA(), getAncestorB()),
-                is(ParentImpl.builder().label(null).count(9999L).build()));
+                is(ParentImpl.builder().label(null).count(TAX_COUNT_A).build()));
     }
 
     @Test
@@ -249,7 +250,7 @@ class GroupByTaxonomyServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD()),
-                is(ParentImpl.builder().label(null).count(10022L).build()));
+                is(ParentImpl.builder().label(null).count(TAX_COUNT_B).build()));
     }
 
     @Test
@@ -266,6 +267,8 @@ class GroupByTaxonomyServiceTest {
                                         argument != null
                                                 && PARENT_TAX_ID_A.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of(TAXONOMY_ENTRY_E));
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_B_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(
                         SOME_QUERY, getFacetFields(TAX_ID_A_STRING + "," + TAX_ID_C_STRING)))
                 .thenReturn(MULTIPLE_TAXONOMY_FACET_COUNTS);
@@ -278,23 +281,24 @@ class GroupByTaxonomyServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 empty(),
-                is(ParentImpl.builder().label(TAX_LABEL_B).count(10022L).build()));
+                is(ParentImpl.builder().label(TAX_LABEL_B).count(TAX_COUNT_B).build()));
     }
 
     @Test
     void getGroupByResults_whenParentSpecifiedAndNoChildNodes() {
         when(taxonomyService.stream(
-                        argThat(argument -> PARENT_TAX_ID_A.equals(argument.getQuery()))))
+                        argThat(argument -> PARENT_TAX_ID_C.equals(argument.getQuery()))))
                 .thenAnswer(invocation -> Stream.of());
-        when(taxonomyService.findById(TAX_ID_A)).thenReturn(TAXONOMY_ENTRY_A);
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_C);
+        when(taxonomyService.findById(TAX_ID_C)).thenReturn(TAXONOMY_ENTRY_C);
 
-        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, TAX_ID_A_STRING);
+        GroupByResult groupByResult = service.getGroupByResult(SOME_QUERY, TAX_ID_C_STRING);
 
-        assertThat(groupByResult.getGroups(), empty());
-        assertThat(groupByResult.getAncestors(), empty());
-        assertThat(
-                groupByResult.getParent(),
-                is(ParentImpl.builder().label(TAX_LABEL_A).count(0).build()));
+        assertGroupByResultC(
+                groupByResult,
+                empty(),
+                is(ParentImpl.builder().label(TAX_LABEL_C).count(9999L).build()));
     }
 
     @Test
@@ -312,6 +316,9 @@ class GroupByTaxonomyServiceTest {
                             }
                             return Stream.of();
                         });
+
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_A_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_A);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_B_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_C_STRING)))
@@ -323,7 +330,7 @@ class GroupByTaxonomyServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB()),
-                is(ParentImpl.builder().label(TAX_LABEL_A).count(9999L).build()));
+                is(ParentImpl.builder().label(TAX_LABEL_A).count(TAX_COUNT_A).build()));
     }
 
     @Test
@@ -345,6 +352,8 @@ class GroupByTaxonomyServiceTest {
                             }
                             return Stream.of();
                         });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_B_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_D_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
@@ -359,11 +368,11 @@ class GroupByTaxonomyServiceTest {
         assertGroupByResultMultiple(
                 groupByResult,
                 contains(getAncestorD()),
-                is(ParentImpl.builder().label(TAX_LABEL_B).count(10022L).build()));
+                is(ParentImpl.builder().label(TAX_LABEL_B).count(TAX_COUNT_B).build()));
     }
 
     @Test
-    void getGroupByResult_whenParentNotSpecifiedAndOnlyOneChildExistsInFacets() {
+    void getGroupByResult_whenNoParentSpecifiedAndOnlyOneChildExistsInFacets() {
         when(taxonomyService.stream(any()))
                 .thenAnswer(
                         invocation -> {
@@ -398,7 +407,7 @@ class GroupByTaxonomyServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorB(), getAncestorD(), getAncestorE()),
-                is(ParentImpl.builder().label(null).count(9999L).build()));
+                is(ParentImpl.builder().label(null).count(TAX_COUNT_B).build()));
     }
 
     @Test
@@ -419,6 +428,8 @@ class GroupByTaxonomyServiceTest {
                             }
                             return Stream.of();
                         });
+        when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_B_STRING)))
+                .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_B);
         when(uniProtEntryService.getFacets(SOME_QUERY, getFacetFields(TAX_ID_D_STRING)))
                 .thenReturn(SINGLE_TAXONOMY_FACET_COUNTS_D);
         when(uniProtEntryService.getFacets(
@@ -433,7 +444,7 @@ class GroupByTaxonomyServiceTest {
         assertGroupByResultC(
                 groupByResult,
                 contains(getAncestorD(), getAncestorE()),
-                is(ParentImpl.builder().label(TAX_LABEL_B).count(9999L).build()));
+                is(ParentImpl.builder().label(TAX_LABEL_B).count(TAX_COUNT_B).build()));
     }
 
     private static Map<String, String> getFacetFields(String facetItems) {

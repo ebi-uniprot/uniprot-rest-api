@@ -120,6 +120,7 @@ public class UniParcIdMappingResultsConfig {
         VoldemortClient<UniParcEntry> client =
                 new VoldemortRemoteUniParcEntryStore(
                         uniParcStoreConfigProperties.getNumberOfConnections(),
+                        uniParcStoreConfigProperties.isBrotliEnabled(),
                         uniParcStoreConfigProperties.getStoreName(),
                         uniParcStoreConfigProperties.getHost());
         return new UniProtStoreClient<>(client);

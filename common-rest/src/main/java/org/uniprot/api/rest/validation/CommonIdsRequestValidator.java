@@ -12,13 +12,8 @@ import org.uniprot.store.search.field.validator.FieldRegexConstants;
  * @author sahmad
  * @created 27/07/2021
  */
-public class CommonIdsRequestValidator {
-    /**
-     * FIXME fields.split("\\s*,\\s*") pattern https://www.ebi.ac.uk/panda/jira/browse/TRM-26413 See
-     * other classes for same issue {@link ValidEnumDisplayValue} {@link
-     * org.uniprot.api.rest.request.SearchRequest} {@link ValidFacets}
-     */
-    @SuppressWarnings("squid:S5852")
+public abstract class CommonIdsRequestValidator {
+
     boolean isValidReturnFields(
             String fields,
             ReturnFieldConfig returnFieldConfig,
@@ -26,7 +21,7 @@ public class CommonIdsRequestValidator {
         boolean isValid = true;
         if (Utils.notNullNotEmpty(fields)) {
             ConstraintValidatorContextImpl contextImpl = (ConstraintValidatorContextImpl) context;
-            String[] fieldList = fields.split("\\s*,\\s*");
+            String[] fieldList = fields.replaceAll("\\s", "").split(",");
             for (String field : fieldList) {
                 if (!hasValidReturnField(field, returnFieldConfig)) {
                     buildErrorMessage(field, contextImpl);

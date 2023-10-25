@@ -18,9 +18,9 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
  * @author sahmad
  * @created 22/12/2022 To list data in redis-client 1. to list all the keys run KEYS * from
  *     redis-cli 2. to get the data for a hash run hgetall
- *     AsyncDownloadJob:1e8e33be0c54af8ba15db116e2e6c63b26acd7cd
+ *     <prefix>:1e8e33be0c54af8ba15db116e2e6c63b26acd7cd
  */
-@RedisHash("AsyncDownloadJob")
+@RedisHash("#{@redisConfiguration.getRedisHashPrefix()}")
 @Data
 @Builder
 public class DownloadJob implements Serializable {
