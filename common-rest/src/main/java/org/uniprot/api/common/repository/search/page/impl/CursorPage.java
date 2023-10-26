@@ -1,9 +1,12 @@
 package org.uniprot.api.common.repository.search.page.impl;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 import org.uniprot.api.common.repository.search.page.Page;
 import org.uniprot.core.util.Utils;
 
@@ -15,6 +18,8 @@ import org.uniprot.core.util.Utils;
  */
 public class CursorPage implements Page {
 
+    private static final String QUERY_REPLACE_STRING = "ReplaceItQueryParamValue";
+    private static final String QUERY_PARAM_NAME = "query";
     private static final String CURSOR_PARAM_NAME = "cursor";
     private static final String SIZE_PARAM_NAME = "size";
     private static final String DELIMITER = ",";
@@ -63,9 +68,19 @@ public class CursorPage implements Page {
     public Optional<String> getNextPageLink(UriComponentsBuilder uriBuilder) {
         Optional<String> nextPageLink = Optional.empty();
         if (hasNextPage()) {
+            Optional<String> encodedQueryParamValue = getEncodedQueryParamValue(uriBuilder);
+            if (encodedQueryParamValue.isPresent()) {
+                uriBuilder.replaceQueryParam(QUERY_PARAM_NAME, QUERY_REPLACE_STRING);
+            }
             uriBuilder.replaceQueryParam(CURSOR_PARAM_NAME, getEncryptedNextCursor());
             uriBuilder.replaceQueryParam(SIZE_PARAM_NAME, pageSize);
-            nextPageLink = Optional.of(uriBuilder.build().encode().toUriString());
+            String nextPageURL = uriBuilder.build().encode().toUriString();
+            if (encodedQueryParamValue.isPresent()) {
+                nextPageURL =
+                        nextPageURL.replaceFirst(
+                                QUERY_REPLACE_STRING, encodedQueryParamValue.get());
+            }
+            nextPageLink = Optional.of(nextPageURL);
         }
         return nextPageLink;
     }
@@ -125,5 +140,15 @@ public class CursorPage implements Page {
         } else {
             return (int) nextPageOffset;
         }
+    }
+
+    private Optional<String> getEncodedQueryParamValue(UriComponentsBuilder uriBuilder) {
+        Optional<String> result = Optional.empty();
+        MultiValueMap<String, String> queryParams = uriBuilder.build().normalize().getQueryParams();
+        if (queryParams.containsKey(QUERY_PARAM_NAME)) {
+            String queryParamValue = queryParams.get(QUERY_PARAM_NAME).get(0);
+            result = Optional.of(UriUtils.encode(queryParamValue, StandardCharsets.UTF_8.name()));
+        }
+        return result;
     }
 }

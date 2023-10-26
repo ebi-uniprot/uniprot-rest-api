@@ -4,10 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 /** @author lgonzales */
 class CursorPageTest {
@@ -102,5 +105,73 @@ class CursorPageTest {
         // next offset
         int nextOffset = CursorPage.getNextOffset(page);
         assertEquals(5, nextOffset);
+    }
+
+    @Test
+    void testNextLinkURLEncodingWithPlusChar() {
+        String inputQuery =
+                "http://localhost/test?query=(family:\"major facilitator superfamily phosphate:H(+) symporter (TC 2.A.1.9) family\")";
+        String encodedInputQuery =
+                "http://localhost/test?query=%28family%3A%22major%20facilitator%20superfamily%20phosphate%3AH%28%2B%29%20symporter%20%28TC%202.A.1.9%29%20family%22%29";
+        String addedCursorAndSize = "&cursor=3v3i3ublwto&size=10";
+
+        validateEncodeAndDecodeNextPageLink(inputQuery, encodedInputQuery, addedCursorAndSize);
+    }
+
+    @Test
+    void testNextLinkURLSimpleEncodingWithSpaces() {
+        String inputQuery = "http://localhost/test?query=Protein name";
+        String encodedInputQuery = "http://localhost/test?query=Protein%20name";
+        String addedCursorAndSize = "&cursor=3v3i3ublwto&size=10";
+
+        validateEncodeAndDecodeNextPageLink(inputQuery, encodedInputQuery, addedCursorAndSize);
+    }
+
+    @Test
+    void testNextLinkURLWithBracketsChars() {
+        String inputQuery = "http://localhost/test?query=(Protein name) AND length:[1 TO 10]";
+        String encodedInputQuery =
+                "http://localhost/test?query=%28Protein%20name%29%20AND%20length%3A%5B1%20TO%2010%5D";
+        String addedCursorAndSize = "&cursor=3v3i3ublwto&size=10";
+
+        validateEncodeAndDecodeNextPageLink(inputQuery, encodedInputQuery, addedCursorAndSize);
+    }
+
+    @Test
+    void testNextLinkURLWithFacetsFieldsAndSort() {
+        String inputQuery =
+                "http://localhost/test?fields=accession,name,gene&facets=reviewed,annotation_score&sort=protein_name asc&query=(Protein name AND field:value)";
+        String encodedInputQuery =
+                "http://localhost/test?fields=accession,name,gene&facets=reviewed,annotation_score&sort=protein_name%20asc&query=%28Protein%20name%20AND%20field%3Avalue%29";
+        String addedCursorAndSize = "&cursor=3v3i3ublwto&size=10";
+
+        validateEncodeAndDecodeNextPageLink(inputQuery, encodedInputQuery, addedCursorAndSize);
+    }
+
+    @Test
+    void testNextLinkURLgWithStarsChars() {
+        String inputQuery = "http://localhost/test?query=*";
+        String encodedInputQuery = "http://localhost/test?query=%2A";
+        String addedCursorAndSize = "&cursor=3v3i3ublwto&size=10";
+
+        validateEncodeAndDecodeNextPageLink(inputQuery, encodedInputQuery, addedCursorAndSize);
+    }
+
+    private void validateEncodeAndDecodeNextPageLink(
+            String inputQuery, String encodedInputQuery, String addedCursorAndSize) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(inputQuery);
+        String currentCursor = new BigInteger("10,currentCursor".getBytes()).toString(36);
+
+        CursorPage page = CursorPage.of(currentCursor, 10);
+        page.setTotalElements(21L);
+
+        Optional<String> nextPageLink = page.getNextPageLink(uriBuilder);
+        assertTrue(nextPageLink.isPresent());
+        String link = nextPageLink.get();
+
+        assertThat(link, CoreMatchers.is(encodedInputQuery + addedCursorAndSize));
+
+        String decodeURL = UriUtils.decode(link, StandardCharsets.UTF_8);
+        assertThat(decodeURL, CoreMatchers.is(inputQuery + addedCursorAndSize));
     }
 }
