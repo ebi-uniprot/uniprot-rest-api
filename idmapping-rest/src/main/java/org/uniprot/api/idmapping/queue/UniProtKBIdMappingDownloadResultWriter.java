@@ -1,6 +1,12 @@
 package org.uniprot.api.idmapping.queue;
 
+import static org.uniprot.api.idmapping.service.impl.UniProtKBIdService.isLineageAllowed;
+
+import java.lang.reflect.Type;
+import java.util.Iterator;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -21,11 +27,6 @@ import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
-import java.lang.reflect.Type;
-import java.util.Iterator;
-
-import static org.uniprot.api.idmapping.service.impl.UniProtKBIdService.isLineageAllowed;
-
 @Component
 @Slf4j
 public class UniProtKBIdMappingDownloadResultWriter
@@ -45,14 +46,16 @@ public class UniProtKBIdMappingDownloadResultWriter
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer idMappingRdfStreamer,
             TaxonomyLineageService taxonomyLineageService,
-            UniprotKBMappingRepository uniprotKBMappingRepository, DownloadJobRepository jobRepository) {
+            UniprotKBMappingRepository uniprotKBMappingRepository,
+            DownloadJobRepository jobRepository) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
                 idMappingRdfStreamer,
-                MessageConverterContextFactory.Resource.UNIPROTKB, jobRepository);
+                MessageConverterContextFactory.Resource.UNIPROTKB,
+                jobRepository);
         this.taxonomyLineageService = taxonomyLineageService;
         this.uniprotKBMappingRepository = uniprotKBMappingRepository;
         this.returnFieldConfig =
