@@ -1,10 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.lang.reflect.Type;
-import java.util.Iterator;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -16,9 +12,13 @@ import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageS
 import org.uniprot.api.common.repository.stream.store.uniprotkb.UniProtKBBatchStoreIterable;
 import org.uniprot.api.rest.download.AbstractDownloadResultWriter;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
+import java.lang.reflect.Type;
+import java.util.Iterator;
 
 @Component
 @Slf4j
@@ -35,13 +35,15 @@ public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<
             StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
             TaxonomyLineageService lineageService,
-            RdfStreamer uniProtRdfStreamer) {
+            RdfStreamer uniProtRdfStreamer,
+            DownloadJobRepository jobRepository) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
                 uniProtRdfStreamer,
+                jobRepository,
                 MessageConverterContextFactory.Resource.UNIPROTKB);
         this.lineageService = lineageService;
     }

@@ -1,10 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
@@ -18,7 +14,10 @@ import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.queue.*;
+import org.uniprot.api.rest.download.queue.AbstractMessageListener;
+import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -27,6 +26,9 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -72,7 +74,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             processH5Message(
                     message, (UniProtKBDownloadRequest) request, downloadJob, idsFile, jobId);
         } else {
-            writeResult(request, idsFile, jobId, contentType);
+            writeResult(request, downloadJob, idsFile, jobId, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
         }
     }
@@ -87,7 +89,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             Long totalHits = getSolrHits(request);
             Long maxAllowedHits = this.embeddingsQueueConfigProps.getMaxEntryCount();
             if (maxAllowedHits >= totalHits) {
-                writeSolrResult(request, idsFile, jobId);
+                writeSolrResult(request, downloadJob, idsFile, jobId);
                 sendMessageToEmbeddingsQueue(jobId);
                 updateDownloadJob(message, downloadJob, JobStatus.UNFINISHED);
             } else {

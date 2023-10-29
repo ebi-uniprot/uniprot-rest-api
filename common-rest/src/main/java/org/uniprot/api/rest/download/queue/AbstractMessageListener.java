@@ -1,12 +1,6 @@
 package org.uniprot.api.rest.download.queue;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -18,6 +12,11 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 @Slf4j
 public abstract class AbstractMessageListener extends BaseAbstractMessageListener {
@@ -64,12 +63,12 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
     }
 
     protected void writeResult(
-            DownloadRequest request, Path idsFile, String jobId, MediaType contentType) {
+            DownloadRequest request, DownloadJob downloadJob, Path idsFile, String jobId, MediaType contentType) {
         try {
-            writeSolrResult(request, idsFile, jobId);
+            writeSolrResult(request, downloadJob, idsFile, jobId);
             StoreRequest storeRequest = getStoreRequest(request);
             downloadResultWriter.writeResult(
-                    request, idsFile, jobId, contentType, storeRequest, getDataType());
+                    request, downloadJob, idsFile, jobId, contentType, storeRequest, getDataType());
             log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
             logMessageAndDeleteFile(ex, jobId);
@@ -77,10 +76,10 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
         }
     }
 
-    protected void writeSolrResult(DownloadRequest request, Path idsFile, String jobId)
+    protected void writeSolrResult(DownloadRequest request, DownloadJob downloadJob, Path idsFile, String jobId)
             throws IOException {
-        Stream<String> ids = streamIds(request);
-        writeIdentifiers(idsFile, ids);
+        writeIdentifiers(idsFile, streamIds(request));
+        updateTotalEntries(downloadJob, streamIds(request).count());
         log.info("Solr ids saved for job {}", jobId);
     }
 

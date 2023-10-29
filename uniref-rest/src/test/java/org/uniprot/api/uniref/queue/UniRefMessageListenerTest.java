@@ -1,15 +1,5 @@
 package org.uniprot.api.uniref.queue;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,21 +22,41 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 @ExtendWith({MockitoExtension.class})
-public class UniRefMessageListenerTest {
-    @Mock private MessageConverter converter;
-    @Mock private UniRefEntryLightService service;
-    @Mock DownloadConfigProperties downloadConfigProperties;
+class UniRefMessageListenerTest {
+    @Mock
+    private MessageConverter converter;
+    @Mock
+    private UniRefEntryLightService service;
+    @Mock
+    DownloadConfigProperties downloadConfigProperties;
 
-    @Mock AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
+    @Mock
+    AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
-    @Mock DownloadJobRepository jobRepository;
+    @Mock
+    DownloadJobRepository jobRepository;
 
-    @Mock private DownloadResultWriter downloadResultWriter;
+    @Mock
+    private DownloadResultWriter downloadResultWriter;
 
-    @InjectMocks private UniRefMessageListener uniRefMessageListener;
+    @InjectMocks
+    private UniRefMessageListener uniRefMessageListener;
 
-    @Mock RabbitTemplate rabbitTemplate;
+    @Mock
+    RabbitTemplate rabbitTemplate;
 
     @Test
     void testOnMessage() throws IOException {
@@ -76,6 +86,13 @@ public class UniRefMessageListenerTest {
         Assertions.assertEquals(accessions, ids);
         Files.delete(idsFilePath);
         Assertions.assertTrue(Files.notExists(idsFilePath));
+        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
+    }
+
+    private void verifyLoggingTotalNoOfEntries(DownloadJobRepository jobRepository, DownloadJob downloadJob) {
+        assertEquals(2, downloadJob.getTotalEntries());
+        assertNotNull(downloadJob.getUpdated());
+        verify(jobRepository, times(3)).save(downloadJob);
     }
 
     @Test
@@ -93,10 +110,10 @@ public class UniRefMessageListenerTest {
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
-        when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
+        when(this.service.streamIds(downloadRequest)).thenAnswer(inv -> accessions.stream());
         Mockito.doThrow(new IOException("Forced IO Exception"))
                 .when(this.downloadResultWriter)
-                .writeResult(any(), any(), any(), any(), any(), any());
+                .writeResult(any(), downloadJob, any(), any(), any(), any(), any());
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
 
         this.uniRefMessageListener.onMessage(message);
@@ -106,6 +123,7 @@ public class UniRefMessageListenerTest {
         Assertions.assertTrue(Files.notExists(idsFilePath));
         Path resultFilePath = Path.of("target/" + jobId + ".json");
         Assertions.assertTrue(Files.notExists(resultFilePath));
+        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
     }
 
     @Test
