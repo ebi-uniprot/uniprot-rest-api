@@ -1,21 +1,11 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
@@ -28,7 +18,9 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
+import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -46,11 +38,37 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 class UniRefIdMappingDownloadResultWriterTest {
+    public static final String JOB_ID = "UNIREF_WRITER_JOB_ID";
+    public static final long PROCESSED_ENTRIES = 7L;
+    private DownloadJob downloadJob;
+    private DownloadJobRepository jobRepository;
+
+    @BeforeEach
+    void setUp() {
+        jobRepository = mock(DownloadJobRepository.class);
+        downloadJob = mock(DownloadJob.class);
+        when(downloadJob.getEntriesProcessed()).thenReturn(PROCESSED_ENTRIES);
+        when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(downloadJob));
+    }
 
     @Test
     void getBatchStoreEntryPairIterable() {
@@ -72,7 +90,7 @@ class UniRefIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        rdfStream);
+                        rdfStream, jobRepository);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("UPI000000000B").build())
                         .iterator();
@@ -82,7 +100,7 @@ class UniRefIdMappingDownloadResultWriterTest {
         assertNotNull(result);
     }
 
-    @Test
+    @Test  //todo test diff format
     void canWriteResultFile() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         RequestMappingHandlerAdapter contentAdaptor =
@@ -107,7 +125,7 @@ class UniRefIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        null);
+                        null, jobRepository);
         List<IdMappingStringPair> mappedIds =
                 List.of(
                         IdMappingStringPair.builder()
@@ -115,21 +133,20 @@ class UniRefIdMappingDownloadResultWriterTest {
                                 .to("UniRef100_P03910")
                                 .build());
 
-        String jobId = "UNIREF_WRITER_JOB_ID";
         IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
         request.setFields("name");
         request.setFormat("json");
-        request.setJobId(jobId);
+        request.setJobId(JOB_ID);
 
         IdMappingResult idMappingResult = IdMappingResult.builder().mappedIds(mappedIds).build();
 
         assertDoesNotThrow(
                 () ->
                         writer.writeResult(
-                                request, idMappingResult, jobId, MediaType.APPLICATION_JSON));
+                                request, idMappingResult, JOB_ID, MediaType.APPLICATION_JSON));
 
         Path resultFilePath =
-                Path.of("target" + File.separator + jobId + FileType.GZIP.getExtension());
+                Path.of("target" + File.separator + JOB_ID + FileType.GZIP.getExtension());
         assertTrue(Files.exists(resultFilePath));
         JsonNode jsonResult =
                 objectMapper.readTree(
@@ -146,6 +163,10 @@ class UniRefIdMappingDownloadResultWriterTest {
                         .map(node -> node.findValue("value").asText())
                         .collect(Collectors.toSet())
                         .contains("UniRef100_P03910"));
+
+        verify(downloadJob).setEntriesProcessed(downloadJob.getEntriesProcessed() + 1);
+        verify(downloadJob).setUpdated(any(LocalDateTime.class));
+        verify(jobRepository).save(downloadJob);
     }
 
     @Test
@@ -164,7 +185,7 @@ class UniRefIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        rdfStream);
+                        rdfStream, jobRepository);
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(

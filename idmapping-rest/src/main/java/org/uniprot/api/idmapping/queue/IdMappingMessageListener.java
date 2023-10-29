@@ -1,11 +1,6 @@
 package org.uniprot.api.idmapping.queue;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -26,6 +21,10 @@ import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 @Profile({"live", "asyncDownload"})
@@ -81,6 +80,7 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             }
         } else {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
+            updateTotalEntries(downloadJob, idMappingJob.getIdMappingResult().getMappedIds().size());
             writeResult(request, idMappingJob, asyncDownloadJobId, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, asyncDownloadJobId);
         }

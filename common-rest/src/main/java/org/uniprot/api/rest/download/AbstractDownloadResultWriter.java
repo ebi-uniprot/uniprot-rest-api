@@ -1,6 +1,21 @@
 package org.uniprot.api.rest.download;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import org.uniprot.api.rest.request.DownloadRequest;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -19,21 +35,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPOutputStream;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
-import org.uniprot.api.common.repository.stream.store.StoreRequest;
-import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
-import org.uniprot.api.rest.request.DownloadRequest;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 @Slf4j
 public abstract class AbstractDownloadResultWriter<T> implements DownloadResultWriter {
@@ -47,6 +49,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
     private final MessageConverterContextFactory<T> converterContextFactory;
     protected final StoreStreamerConfig<T> storeStreamerConfig;
     private final DownloadConfigProperties downloadConfigProperties;
+    private final DownloadJobRepository jobRepository;
     private final MessageConverterContextFactory.Resource resource;
     private final RdfStreamer rdfStreamer;
 
@@ -56,18 +59,20 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             StoreStreamerConfig<T> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer rdfStreamer,
+            DownloadJobRepository jobRepository,
             MessageConverterContextFactory.Resource resource) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
         this.storeStreamerConfig = storeStreamerConfig;
         this.downloadConfigProperties = downloadConfigProperties;
+        this.jobRepository = jobRepository;
         this.resource = resource;
         this.rdfStreamer = rdfStreamer;
     }
 
     public void writeResult(
             DownloadRequest request,
-            Path idFile,
+            DownloadJob downloadJob, Path idFile,
             String jobId,
             MediaType contentType,
             StoreRequest storeRequest,
@@ -93,15 +98,17 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
 
             if (supportedTypes.containsKey(contentType)) {
                 Stream<String> rdfResponse =
-                        this.rdfStreamer.stream(ids, dataType, supportedTypes.get(contentType));
+                        this.rdfStreamer.stream(ids, dataType, supportedTypes.get(contentType))
+                                .peek(c -> updatedNoOfProcessedEntries(downloadJob, 1));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
-                context.setEntityIds(ids);
+                context.setEntityIds(ids.peek(c -> updatedNoOfProcessedEntries(downloadJob, 1)));
             } else {
                 BatchStoreIterable<T> batchStoreIterable =
                         getBatchStoreIterable(ids.iterator(), storeRequest);
                 Stream<T> entities =
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
+                                .peek(c -> updatedNoOfProcessedEntries(downloadJob, c.size()))
                                 .flatMap(Collection::stream)
                                 .onClose(
                                         () ->
@@ -115,6 +122,12 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, gzipOutputStream, start, counter);
         }
+    }
+
+    private void updatedNoOfProcessedEntries(DownloadJob downloadJob, int size) {
+        downloadJob.setEntriesProcessed(downloadJob.getEntriesProcessed() + size);
+        downloadJob.setUpdated(LocalDateTime.now());
+        jobRepository.save(downloadJob);
     }
 
     private AbstractUUWHttpMessageConverter<T, T> getOutputWriter(

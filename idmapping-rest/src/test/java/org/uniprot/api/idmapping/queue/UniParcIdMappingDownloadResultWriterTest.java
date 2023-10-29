@@ -1,25 +1,13 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.common.repository.search.ProblemPair;
@@ -31,7 +19,9 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
+import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -44,12 +34,36 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@ExtendWith(MockitoExtension.class)
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 class UniParcIdMappingDownloadResultWriterTest {
+    public static final String JOB_ID = "UNIPARC_WRITER_JOB_ID";
+    public static final long PROCESSED_ENTRIES = 7L;
+    private DownloadJob downloadJob;
+    private DownloadJobRepository jobRepository;
+
+    @BeforeEach
+    void setUp() {
+        jobRepository = mock(DownloadJobRepository.class);
+        downloadJob = mock(DownloadJob.class);
+        when(downloadJob.getEntriesProcessed()).thenReturn(PROCESSED_ENTRIES);
+        when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(downloadJob));
+    }
 
     @Test
     void getBatchStoreEntryPairIterable() {
@@ -71,7 +85,7 @@ class UniParcIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        rdfStream);
+                        rdfStream, jobRepository);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("UPI000000000B").build())
                         .iterator();
@@ -106,15 +120,13 @@ class UniParcIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        null);
+                        null, jobRepository);
         List<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("UPI0000283A10").build());
-
-        String jobId = "UNIPARC_WRITER_JOB_ID";
         IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
         request.setFields("upi");
         request.setFormat("json");
-        request.setJobId(jobId);
+        request.setJobId(JOB_ID);
 
         ProblemPair warning = new ProblemPair(1, "msg");
         IdMappingResult idMappingResult =
@@ -129,10 +141,10 @@ class UniParcIdMappingDownloadResultWriterTest {
         assertDoesNotThrow(
                 () ->
                         writer.writeResult(
-                                request, idMappingResult, jobId, MediaType.APPLICATION_JSON));
+                                request, idMappingResult, JOB_ID, MediaType.APPLICATION_JSON));
 
         Path resultFilePath =
-                Path.of("target" + File.separator + jobId + FileType.GZIP.getExtension());
+                Path.of("target" + File.separator + JOB_ID + FileType.GZIP.getExtension());
         assertTrue(Files.exists(resultFilePath));
         JsonNode jsonResult =
                 objectMapper.readTree(
@@ -168,6 +180,10 @@ class UniParcIdMappingDownloadResultWriterTest {
         JsonNode warningNode = warnings.get(0);
         assertEquals("1", warningNode.findValue("code").asText());
         assertEquals("msg", warningNode.findValue("message").asText());
+
+        verify(downloadJob).setEntriesProcessed(downloadJob.getEntriesProcessed() + 1);
+        verify(downloadJob).setUpdated(any(LocalDateTime.class));
+        verify(jobRepository).save(downloadJob);
     }
 
     @Test
@@ -186,7 +202,7 @@ class UniParcIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        rdfStream);
+                        rdfStream, jobRepository);
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(
