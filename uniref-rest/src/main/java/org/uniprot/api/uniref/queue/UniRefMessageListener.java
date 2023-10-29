@@ -1,6 +1,10 @@
 package org.uniprot.api.uniref.queue;
 
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,9 +23,6 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
-
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 /**
  * @author tibrahim

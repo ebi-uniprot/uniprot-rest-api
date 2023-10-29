@@ -1,9 +1,24 @@
 package org.uniprot.api.idmapping.queue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,22 +49,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 class UniParcIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPARC_WRITER_JOB_ID";
@@ -85,7 +87,8 @@ class UniParcIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        rdfStream, jobRepository);
+                        rdfStream,
+                        jobRepository);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("UPI000000000B").build())
                         .iterator();
@@ -120,7 +123,8 @@ class UniParcIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        null, jobRepository);
+                        null,
+                        jobRepository);
         List<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("UPI0000283A10").build());
         IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
@@ -202,7 +206,8 @@ class UniParcIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        rdfStream, jobRepository);
+                        rdfStream,
+                        jobRepository);
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(

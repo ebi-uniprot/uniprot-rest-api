@@ -1,9 +1,25 @@
 package org.uniprot.api.idmapping.queue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,23 +54,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.light.uniref.VoldemortInMemoryUniRefEntryLightStore;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verify;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 class UniRefIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIREF_WRITER_JOB_ID";
@@ -90,7 +92,8 @@ class UniRefIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        rdfStream, jobRepository);
+                        rdfStream,
+                        jobRepository);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("UPI000000000B").build())
                         .iterator();
@@ -100,7 +103,7 @@ class UniRefIdMappingDownloadResultWriterTest {
         assertNotNull(result);
     }
 
-    @Test  //todo test diff format
+    @Test // todo test diff format
     void canWriteResultFile() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         RequestMappingHandlerAdapter contentAdaptor =
@@ -125,7 +128,8 @@ class UniRefIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        null, jobRepository);
+                        null,
+                        jobRepository);
         List<IdMappingStringPair> mappedIds =
                 List.of(
                         IdMappingStringPair.builder()
@@ -185,7 +189,8 @@ class UniRefIdMappingDownloadResultWriterTest {
                         converterContextFactory,
                         storeStreamConfig,
                         downloadProperties,
-                        rdfStream, jobRepository);
+                        rdfStream,
+                        jobRepository);
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(

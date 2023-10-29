@@ -1,9 +1,23 @@
 package org.uniprot.api.idmapping.queue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,21 +47,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 class UniProtKBIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPROTKB_WRITER_JOB_ID";
@@ -65,8 +67,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
 
     @Test
     void getBatchStoreEntryPairIterable() {
-        RequestMappingHandlerAdapter contentAdaptor =
-                mock(RequestMappingHandlerAdapter.class);
+        RequestMappingHandlerAdapter contentAdaptor = mock(RequestMappingHandlerAdapter.class);
         when(contentAdaptor.getMessageConverters()).thenReturn(List.of());
 
         MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory = null;
@@ -85,7 +86,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         downloadProperties,
                         rdfStream,
                         null,
-                        null, jobRepository);
+                        null,
+                        jobRepository);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build())
                         .iterator();
@@ -124,7 +126,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         downloadProperties,
                         null,
                         null,
-                        uniprotKBMappingRepository, jobRepository);
+                        uniprotKBMappingRepository,
+                        jobRepository);
         List<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build());
 
@@ -166,8 +169,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
 
     @Test
     void canGetType() {
-        RequestMappingHandlerAdapter contentAdaptor =
-                mock(RequestMappingHandlerAdapter.class);
+        RequestMappingHandlerAdapter contentAdaptor = mock(RequestMappingHandlerAdapter.class);
         when(contentAdaptor.getMessageConverters()).thenReturn(List.of());
 
         MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory = null;
@@ -182,7 +184,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         downloadProperties,
                         rdfStream,
                         null,
-                        null, jobRepository);
+                        null,
+                        jobRepository);
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(
@@ -201,24 +204,20 @@ class UniProtKBIdMappingDownloadResultWriterTest {
 
         MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory =
                 mock(MessageConverterContextFactory.class);
-        when(
-                        converterContextFactory.get(
-                                any(), eq(MediaType.APPLICATION_JSON)))
+        when(converterContextFactory.get(any(), eq(MediaType.APPLICATION_JSON)))
                 .thenReturn(context);
         return converterContextFactory;
     }
 
     private RequestMappingHandlerAdapter getMockedRequestMappingHandlerAdapter(
             ObjectMapper mapper) {
-        RequestMappingHandlerAdapter contentAdaptor =
-                mock(RequestMappingHandlerAdapter.class);
+        RequestMappingHandlerAdapter contentAdaptor = mock(RequestMappingHandlerAdapter.class);
         ReturnFieldConfig returnFieldConfig =
                 ReturnFieldConfigFactory.getReturnFieldConfig(UniProtDataType.UNIPROTKB);
         JsonMessageConverter<UniProtKBEntryPair> jsonMessageConverter =
                 new JsonMessageConverter<>(
                         mapper, UniProtKBEntryPair.class, returnFieldConfig, null);
-        when(contentAdaptor.getMessageConverters())
-                .thenReturn(List.of(jsonMessageConverter));
+        when(contentAdaptor.getMessageConverters()).thenReturn(List.of(jsonMessageConverter));
         return contentAdaptor;
     }
 

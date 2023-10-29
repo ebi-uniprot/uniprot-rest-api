@@ -1,5 +1,16 @@
 package org.uniprot.api.idmapping.queue;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,46 +38,26 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith({MockitoExtension.class})
 class IdMappingMessageListenerIT {
 
-    @Mock
-    private MessageConverter converter;
+    @Mock private MessageConverter converter;
 
-    @Mock
-    DownloadConfigProperties downloadConfigProperties;
+    @Mock DownloadConfigProperties downloadConfigProperties;
 
-    @Mock
-    AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
+    @Mock AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
-    @Mock
-    DownloadJobRepository jobRepository;
+    @Mock DownloadJobRepository jobRepository;
 
-    @Mock
-    private RabbitTemplate rabbitTemplate;
+    @Mock private RabbitTemplate rabbitTemplate;
 
-    @Mock
-    IdMappingDownloadResultWriterFactory writerFactory;
+    @Mock IdMappingDownloadResultWriterFactory writerFactory;
 
-    @Mock
-    private IdMappingJobCacheService idMappingJobCacheService;
+    @Mock private IdMappingJobCacheService idMappingJobCacheService;
 
-    @Mock
-    UniProtKBIdMappingDownloadResultWriter uniProtKBIdMappingDownloadResultWriter;
+    @Mock UniProtKBIdMappingDownloadResultWriter uniProtKBIdMappingDownloadResultWriter;
 
-    @InjectMocks
-    private IdMappingMessageListener idMappingMessageListener;
+    @InjectMocks private IdMappingMessageListener idMappingMessageListener;
 
     @Test
     void testOnMessageFinishedWithSuccess() throws IOException {
@@ -107,7 +98,10 @@ class IdMappingMessageListenerIT {
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob, idMappingJob);
     }
 
-    private void verifyLoggingTotalNoOfEntries(DownloadJobRepository jobRepository, DownloadJob downloadJob, IdMappingJob idMappingJob) {
+    private void verifyLoggingTotalNoOfEntries(
+            DownloadJobRepository jobRepository,
+            DownloadJob downloadJob,
+            IdMappingJob idMappingJob) {
         assertEquals(2, downloadJob.getTotalEntries());
         assertNotNull(downloadJob.getUpdated());
         verify(jobRepository, times(3)).save(downloadJob);
