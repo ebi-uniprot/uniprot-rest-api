@@ -1,5 +1,13 @@
 package org.uniprot.api.uniref.queue;
 
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.uniref.utils.UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore;
+import static org.uniprot.api.uniref.utils.UniRefAsyncDownloadUtils.setUp;
+
+import java.util.List;
+import java.util.stream.Stream;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,14 +40,6 @@ import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
-
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
-import static org.uniprot.api.uniref.utils.UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore;
-import static org.uniprot.api.uniref.utils.UniRefAsyncDownloadUtils.setUp;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload", "integration"})
 @EnableConfigurationProperties
