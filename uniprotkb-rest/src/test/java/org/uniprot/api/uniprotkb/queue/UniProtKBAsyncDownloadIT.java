@@ -1,18 +1,5 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.rest.download.queue.RedisUtil.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.setUp;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.*;
@@ -50,6 +37,19 @@ import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.rest.download.queue.RedisUtil.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
+import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore;
+import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.setUp;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload", "integration"})
 @EnableConfigurationProperties
@@ -194,5 +194,10 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected String getMessageWithUnhandledExceptionQuery() {
         return "field:value";
+    }
+
+    @Override
+    protected int getMessageSuccessAfterRetryCount() {
+        return 10;
     }
 }
