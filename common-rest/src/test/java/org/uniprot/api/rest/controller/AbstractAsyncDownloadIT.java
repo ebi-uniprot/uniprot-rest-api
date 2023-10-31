@@ -1,21 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.download.queue.RedisUtil.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -40,7 +25,21 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.rest.download.queue.RedisUtil.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
@@ -75,6 +74,8 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
     protected abstract String getMessageFailAfterMaximumRetryQuery();
 
     protected abstract String getMessageWithUnhandledExceptionQuery();
+
+    protected abstract int getMessageSuccessAfterRetryCount();
 
     @Test
     void sendAndProcessDownloadMessageSuccessfully() throws IOException {
@@ -111,7 +112,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         // after certain delay the job should be reprocessed
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
         verifyMessageListener(2, 1, 1);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true, 10);
+        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true, getMessageSuccessAfterRetryCount());
         verifyIdsAndResultFiles(jobId);
     }
 
