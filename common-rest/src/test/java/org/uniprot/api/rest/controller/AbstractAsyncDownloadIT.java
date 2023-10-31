@@ -1,6 +1,21 @@
 package org.uniprot.api.rest.controller;
 
-import com.jayway.jsonpath.JsonPath;
+import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.rest.download.queue.RedisUtil.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -25,21 +40,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.download.queue.RedisUtil.*;
+import com.jayway.jsonpath.JsonPath;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
@@ -112,7 +113,13 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         // after certain delay the job should be reprocessed
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
         verifyMessageListener(2, 1, 1);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 1, true, getMessageSuccessAfterRetryCount());
+        verifyRedisEntry(
+                query,
+                jobId,
+                List.of(JobStatus.FINISHED),
+                1,
+                true,
+                getMessageSuccessAfterRetryCount());
         verifyIdsAndResultFiles(jobId);
     }
 
