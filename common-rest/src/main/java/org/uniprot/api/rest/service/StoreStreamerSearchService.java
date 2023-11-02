@@ -1,12 +1,5 @@
 package org.uniprot.api.rest.service;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 import org.apache.solr.client.solrj.io.stream.TupleStream;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.SolrQueryConfig;
@@ -28,6 +21,13 @@ import org.uniprot.api.rest.search.AbstractSolrSortClause;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.document.Document;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 
 public abstract class StoreStreamerSearchService<D extends Document, R>
         extends BasicSearchService<D, R> {
@@ -95,6 +95,11 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
     public Stream<String> streamIds(StreamRequest request) {
         SolrRequest solrRequest = createDownloadSolrRequest(request);
         return this.storeStreamer.idsStream(solrRequest);
+    }
+
+    public long getNumberOfEntries(StreamRequest request) {
+        SolrRequest solrRequest = createDownloadSolrRequest(request);
+        return this.storeStreamer.getNoOfEntries(solrRequest);
     }
 
     public QueryResult<R> getByIds(IdsSearchRequest idsRequest) {

@@ -1,10 +1,6 @@
 package org.uniprot.api.uniref.queue;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -23,6 +19,9 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
+
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * @author tibrahim
@@ -59,7 +58,7 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
         String jobId = downloadJob.getId();
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
         updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
-        writeResult(request, downloadJob, idsFile, jobId, contentType);
+        writeResult(request, downloadJob, idsFile, contentType);
         updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
     }
 
@@ -71,6 +70,11 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
     @Override
     protected Stream<String> streamIds(DownloadRequest request) {
         return service.streamIds(request);
+    }
+
+    @Override
+    protected long getNoOfEntries(DownloadRequest downloadRequest) {
+        return service.getNumberOfEntries(downloadRequest);
     }
 
     @Override
