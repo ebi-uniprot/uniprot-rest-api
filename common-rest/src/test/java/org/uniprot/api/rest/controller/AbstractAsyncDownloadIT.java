@@ -1,21 +1,6 @@
 package org.uniprot.api.rest.controller;
 
-import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.download.queue.RedisUtil.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
-
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -40,7 +25,21 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
+import static com.carrotsearch.ant.tasks.junit4.dependencies.com.google.common.base.Predicates.equalTo;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.rest.download.queue.RedisUtil.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
@@ -90,7 +89,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
         verifyMessageListener(1, 0, 1);
-        verifyRedisEntry(query, jobId, List.of(JobStatus.FINISHED), 0, false, 12);
+        verifyRedisEntry(query, jobId, JobStatus.FINISHED, 0, false, 12);
         verifyIdsAndResultFiles(jobId);
     }
 
@@ -109,14 +108,14 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         // verify  redis
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true, 0);
+        verifyRedisEntry(query, jobId, JobStatus.ERROR, 1, true, 0);
         // after certain delay the job should be reprocessed
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
         verifyMessageListener(2, 1, 1);
         verifyRedisEntry(
                 query,
                 jobId,
-                List.of(JobStatus.FINISHED),
+                JobStatus.FINISHED,
                 1,
                 true,
                 getMessageSuccessAfterRetryCount());
@@ -141,12 +140,12 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         await().until(jobRetriedMaximumTimes(downloadJobRepository, jobId, maxRetry));
         // verify  redis
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true, 0);
+        verifyRedisEntry(query, jobId, JobStatus.ERROR, this.maxRetry, true, 0);
         // after certain delay the job should be reprocessed
         await().until(
                         verifyMessageCountIsThanOrEqualToRejectedCount(
                                 amqpAdmin, rejectedQueue, rejectedMsgCount));
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), this.maxRetry, true, 0);
+        verifyRedisEntry(query, jobId, JobStatus.ERROR, this.maxRetry, true, 0);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
 
@@ -170,14 +169,14 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         await().until(verifyJobRetriedCountIsEqualToGivenCount(downloadJobRepository, jobId, 2));
         await().until(getMessageCountInQueue(amqpAdmin, this.rejectedQueue), equalTo(1));
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 2, true, 0);
+        verifyRedisEntry(query, jobId, JobStatus.ERROR, 2, true, 0);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
 
     protected void verifyRedisEntry(
             String query,
             String jobId,
-            List<JobStatus> statuses,
+            JobStatus status,
             int retryCount,
             boolean isError,
             int entryCount) {
@@ -193,14 +192,13 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         assertAll(
                 () -> assertNull(downloadJob.getSort()), () -> assertNull(downloadJob.getFields()));
         assertEquals(retryCount, downloadJob.getRetried());
-        assertTrue(statuses.contains(downloadJob.getStatus()));
+        assertEquals(downloadJob.getStatus(),status);
         assertEquals(isError, Objects.nonNull(downloadJob.getError()));
         assertEquals(entryCount, downloadJob.getTotalEntries());
         if (downloadJob.getStatus() == JobStatus.FINISHED) {
             assertEquals(entryCount, downloadJob.getEntriesProcessed());
             assertNotNull(downloadJob.getResultFile());
-            String expectedFile = jobId;
-            assertEquals(expectedFile, downloadJob.getResultFile());
+            assertEquals(jobId, downloadJob.getResultFile());
         } else {
             assertNull(downloadJob.getResultFile());
         }

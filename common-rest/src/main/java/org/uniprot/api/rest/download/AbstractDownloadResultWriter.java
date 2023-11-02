@@ -1,6 +1,21 @@
 package org.uniprot.api.rest.download;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
+import org.uniprot.api.common.repository.stream.store.StoreRequest;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import org.uniprot.api.rest.request.DownloadRequest;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,23 +35,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPOutputStream;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
-import org.uniprot.api.common.repository.stream.store.StoreRequest;
-import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
-import org.uniprot.api.rest.request.DownloadRequest;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 @Slf4j
 public abstract class AbstractDownloadResultWriter<T> implements DownloadResultWriter {
@@ -75,24 +74,24 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             DownloadRequest request,
             DownloadJob downloadJob,
             Path idFile,
-            String jobId,
             MediaType contentType,
             StoreRequest storeRequest,
             String dataType)
             throws IOException {
+        String jobId = downloadJob.getId();
         String fileNameWithExt = jobId + FileType.GZIP.getExtension();
         Path resultPath =
                 Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
         AbstractUUWHttpMessageConverter<T, T> outputWriter =
                 getOutputWriter(contentType, getType());
         try (Stream<String> ids = Files.lines(idFile);
-                OutputStream output =
-                        Files.newOutputStream(
-                                resultPath,
-                                StandardOpenOption.WRITE,
-                                StandardOpenOption.CREATE,
-                                StandardOpenOption.TRUNCATE_EXISTING);
-                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
+             OutputStream output =
+                     Files.newOutputStream(
+                             resultPath,
+                             StandardOpenOption.WRITE,
+                             StandardOpenOption.CREATE,
+                             StandardOpenOption.TRUNCATE_EXISTING);
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
