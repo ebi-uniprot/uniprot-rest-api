@@ -1,6 +1,10 @@
 package org.uniprot.api.uniprotkb.queue;
 
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
@@ -26,9 +30,6 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
-
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -71,8 +72,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
         updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
         if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
-            processH5Message(
-                    message, (UniProtKBDownloadRequest) request, downloadJob, idsFile);
+            processH5Message(message, (UniProtKBDownloadRequest) request, downloadJob, idsFile);
         } else {
             writeResult(request, downloadJob, idsFile, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
