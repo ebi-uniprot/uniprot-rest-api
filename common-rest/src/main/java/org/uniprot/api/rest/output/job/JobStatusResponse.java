@@ -1,13 +1,15 @@
 package org.uniprot.api.rest.output.job;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author sahmad
