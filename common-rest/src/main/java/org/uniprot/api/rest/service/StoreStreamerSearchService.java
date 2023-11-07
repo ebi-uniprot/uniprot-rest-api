@@ -99,7 +99,7 @@ public abstract class StoreStreamerSearchService<D extends Document, R>
 
     public long getNumberOfEntries(StreamRequest request) {
         SolrRequest solrRequest = createDownloadSolrRequest(request);
-        return this.storeStreamer.getNoOfEntries(solrRequest);
+        return this.storeStreamer.getNumberOfEntries(solrRequest);
     }
 
     public QueryResult<R> getByIds(IdsSearchRequest idsRequest) {
