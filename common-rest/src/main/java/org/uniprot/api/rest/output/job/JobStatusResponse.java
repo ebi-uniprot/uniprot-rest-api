@@ -1,14 +1,13 @@
 package org.uniprot.api.rest.output.job;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author sahmad
@@ -20,7 +19,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class JobStatusResponse {
     private final JobStatus jobStatus;
     private final List<ProblemPair> warnings;
-    private List<ProblemPair> errors;
+    private final List<ProblemPair> errors;
+    private LocalDateTime start;
+    private Long totalEntries;
+    private Long processedEntries;
+    private LocalDateTime lastUpdated;
 
     public JobStatusResponse(JobStatus jobStatus) {
         this(jobStatus, List.of());
@@ -28,6 +31,19 @@ public class JobStatusResponse {
 
     public JobStatusResponse(List<ProblemPair> errors) {
         this(JobStatus.ERROR, List.of(), errors);
+    }
+
+    public JobStatusResponse(
+            List<ProblemPair> errors,
+            LocalDateTime start,
+            Long totalEntries,
+            Long processedEntries,
+            LocalDateTime lastUpdated) {
+        this(JobStatus.ERROR, List.of(), errors);
+        this.start = start;
+        this.totalEntries = totalEntries;
+        this.processedEntries = processedEntries;
+        this.lastUpdated = lastUpdated;
     }
 
     public JobStatusResponse(JobStatus jobStatus, List<ProblemPair> warnings) {
@@ -39,5 +55,33 @@ public class JobStatusResponse {
         this.jobStatus = jobStatus;
         this.warnings = warnings;
         this.errors = errors;
+    }
+
+    public JobStatusResponse(
+            JobStatus jobStatus,
+            List<ProblemPair> warnings,
+            List<ProblemPair> errors,
+            LocalDateTime start,
+            Long totalEntries,
+            Long processedEntries,
+            LocalDateTime lastUpdated) {
+        this(jobStatus, warnings, errors);
+        this.start = start;
+        this.totalEntries = totalEntries;
+        this.processedEntries = processedEntries;
+        this.lastUpdated = lastUpdated;
+    }
+
+    public JobStatusResponse(
+            JobStatus jobStatus,
+            LocalDateTime start,
+            Long totalEntries,
+            Long processedEntries,
+            LocalDateTime lastUpdated) {
+        this(jobStatus);
+        this.start = start;
+        this.totalEntries = totalEntries;
+        this.processedEntries = processedEntries;
+        this.lastUpdated = lastUpdated;
     }
 }
