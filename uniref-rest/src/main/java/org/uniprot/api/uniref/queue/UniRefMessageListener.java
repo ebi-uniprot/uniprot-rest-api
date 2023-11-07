@@ -74,7 +74,7 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
     }
 
     @Override
-    protected long getNoOfEntries(DownloadRequest downloadRequest) {
+    protected long getNumberOfEntries(DownloadRequest downloadRequest) {
         return service.getNumberOfEntries(downloadRequest);
     }
 

@@ -81,7 +81,7 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
     protected void writeSolrResult(DownloadRequest request, DownloadJob downloadJob, Path idsFile)
             throws IOException {
         writeIdentifiers(idsFile, streamIds(request));
-        updateTotalEntries(downloadJob, getNoOfEntries(request));
+        updateTotalEntries(downloadJob, getNumberOfEntries(request));
         log.info("Solr ids saved for job {}", downloadJob.getId());
     }
 
@@ -89,7 +89,7 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
 
     protected abstract Stream<String> streamIds(DownloadRequest request);
 
-    protected abstract long getNoOfEntries(DownloadRequest downloadRequest);
+    protected abstract long getNumberOfEntries(DownloadRequest downloadRequest);
 
     protected abstract String getDataType();
 
