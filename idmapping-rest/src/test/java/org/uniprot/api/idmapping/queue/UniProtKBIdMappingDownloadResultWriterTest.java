@@ -1,23 +1,9 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,9 +33,21 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class UniProtKBIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPROTKB_WRITER_JOB_ID";
@@ -61,6 +59,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
     void setUp() {
         jobRepository = mock(DownloadJobRepository.class);
         downloadJob = mock(DownloadJob.class);
+        when(downloadJob.getId()).thenReturn(JOB_ID);
         when(downloadJob.getEntriesProcessed()).thenReturn(PROCESSED_ENTRIES);
         when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(downloadJob));
     }
@@ -141,7 +140,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
         assertDoesNotThrow(
                 () ->
                         writer.writeResult(
-                                request, idMappingResult, JOB_ID, MediaType.APPLICATION_JSON));
+                                request, idMappingResult, downloadJob, MediaType.APPLICATION_JSON));
 
         Path resultFilePath =
                 Path.of("target" + File.separator + JOB_ID + FileType.GZIP.getExtension());

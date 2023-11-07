@@ -1,16 +1,5 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +26,17 @@ import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class IdMappingMessageListenerIT {
@@ -80,7 +80,8 @@ class IdMappingMessageListenerIT {
         when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
                 .thenReturn(idMappingJob);
         Mockito.verify(this.uniProtKBIdMappingDownloadResultWriter, atMostOnce())
-                .writeResult(downloadRequest, idMappingResult, jobId, MediaType.APPLICATION_JSON);
+                .writeResult(
+                        downloadRequest, idMappingResult, downloadJob, MediaType.APPLICATION_JSON);
         when(this.writerFactory.getResultWriter(to))
                 .thenReturn(
                         (AbstractIdMappingDownloadResultWriter)
