@@ -54,7 +54,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
     private final MessageConverterContextFactory.Resource resource;
     private final RdfStreamer rdfStreamer;
 
-    public AbstractDownloadResultWriter(
+    protected AbstractDownloadResultWriter(
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<T> converterContextFactory,
             StoreStreamerConfig<T> storeStreamerConfig,
