@@ -1,8 +1,24 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.search.EntryPair;
+import org.uniprot.api.common.repository.search.ExtraOptions;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
+import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,26 +39,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPOutputStream;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.search.EntryPair;
-import org.uniprot.api.common.repository.search.ExtraOptions;
-import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
 
 @Slf4j
 public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<S>, S> {
@@ -85,12 +84,12 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
         AbstractUUWHttpMessageConverter<T, S> outputWriter =
                 getOutputWriter(contentType, getType());
         try (OutputStream output =
-                        Files.newOutputStream(
-                                resultPath,
-                                StandardOpenOption.WRITE,
-                                StandardOpenOption.CREATE,
-                                StandardOpenOption.TRUNCATE_EXISTING);
-                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
+                     Files.newOutputStream(
+                             resultPath,
+                             StandardOpenOption.WRITE,
+                             StandardOpenOption.CREATE,
+                             StandardOpenOption.TRUNCATE_EXISTING);
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
             ExtraOptions extraOptions = getExtraOptions(idMappingResult);
 
@@ -108,19 +107,25 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 resource.name().toLowerCase(),
                                 SUPPORTED_RDF_MEDIA_TYPES.get(contentType),
                                 batchSize ->
-                                        updatedNoOfProcessedEntriesByBatch(downloadJob, batchSize));
+                                        updateEntriesProcessedByBatch(downloadJob, batchSize));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 Set<String> toIds = getToIds(idMappingResult);
                 context.setEntityIds(
-                        toIds.stream().peek(c -> updatedNoOfProcessedEntries(downloadJob, 1)));
+                        toIds.stream().map(c -> {
+                            updateEntriesProcessed(downloadJob, 1);
+                            return c;
+                        }));
             } else {
                 BatchStoreEntryPairIterable<T, S> batchStoreIterable =
                         getBatchStoreEntryPairIterable(
                                 idMappingResult.getMappedIds().iterator(), request.getFields());
                 Stream<T> entities =
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
-                                .peek(c -> updatedNoOfProcessedEntries(downloadJob, c.size()))
+                                .map(c -> {
+                                    updateEntriesProcessed(downloadJob, c.size());
+                                    return c;
+                                })
                                 .flatMap(Collection::stream)
                                 .onClose(
                                         () ->
@@ -136,14 +141,14 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
         }
     }
 
-    private void updatedNoOfProcessedEntries(DownloadJob downloadJob, long size) {
+    private void updateEntriesProcessed(DownloadJob downloadJob, long size) {
         downloadJob.setEntriesProcessed(downloadJob.getEntriesProcessed() + size);
         downloadJob.setUpdated(LocalDateTime.now());
         jobRepository.save(downloadJob);
     }
 
-    private void updatedNoOfProcessedEntriesByBatch(DownloadJob downloadJob, int size) {
-        updatedNoOfProcessedEntries(
+    private void updateEntriesProcessedByBatch(DownloadJob downloadJob, int size) {
+        updateEntriesProcessed(
                 downloadJob,
                 Math.min(size, downloadJob.getTotalEntries() - downloadJob.getEntriesProcessed()));
     }
