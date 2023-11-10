@@ -1,16 +1,17 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-import org.uniprot.api.common.repository.stream.common.BatchIterable;
-import org.uniprot.api.rest.service.RdfService;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+
+import org.uniprot.api.common.repository.stream.common.BatchIterable;
+import org.uniprot.api.rest.service.RdfService;
 
 @Slf4j
 public class RdfStreamer {
@@ -31,7 +32,8 @@ public class RdfStreamer {
     }
 
     public Stream<String> stream(Stream<String> entryIds, String dataType, String format) {
-        BatchRdfXmlStoreIterable batchRDFXMLStoreIterable = getBatchRdfXmlStoreIterable(entryIds, dataType, format);
+        BatchRdfXmlStoreIterable batchRDFXMLStoreIterable =
+                getBatchRdfXmlStoreIterable(entryIds, dataType, format);
 
         Stream<String> rdfStringStream =
                 StreamSupport.stream(batchRDFXMLStoreIterable.spliterator(), false)
@@ -47,14 +49,16 @@ public class RdfStreamer {
 
     public Stream<String> stream(
             Stream<String> entryIds, String dataType, String format, IntConsumer consumer) {
-        BatchRdfXmlStoreIterable batchRDFXMLStoreIterable = getBatchRdfXmlStoreIterable(entryIds, dataType, format);
+        BatchRdfXmlStoreIterable batchRDFXMLStoreIterable =
+                getBatchRdfXmlStoreIterable(entryIds, dataType, format);
 
         Stream<String> rdfStringStream =
                 StreamSupport.stream(batchRDFXMLStoreIterable.spliterator(), false)
-                        .map(responseCollection -> {
-                            consumer.accept(batchSize);
-                            return responseCollection;
-                        })
+                        .map(
+                                responseCollection -> {
+                                    consumer.accept(batchSize);
+                                    return responseCollection;
+                                })
                         .flatMap(Collection::stream)
                         .onClose(
                                 () ->
@@ -64,7 +68,8 @@ public class RdfStreamer {
         return getFullResponseAsStream(dataType, format, rdfStringStream);
     }
 
-    private BatchRdfXmlStoreIterable getBatchRdfXmlStoreIterable(Stream<String> entryIds, String dataType, String format) {
+    private BatchRdfXmlStoreIterable getBatchRdfXmlStoreIterable(
+            Stream<String> entryIds, String dataType, String format) {
         return new BatchRdfXmlStoreIterable(
                 entryIds::iterator,
                 rdfServiceFactory.getRdfService(dataType, format),
@@ -72,7 +77,8 @@ public class RdfStreamer {
                 batchSize);
     }
 
-    private Stream<String> getFullResponseAsStream(String dataType, String format, Stream<String> rdfStringStream) {
+    private Stream<String> getFullResponseAsStream(
+            String dataType, String format, Stream<String> rdfStringStream) {
         // prepend rdf prolog then rdf data and then append closing rdf tag
         return Stream.concat(
                 Stream.of(prologProvider.getProLog(dataType, format)),
