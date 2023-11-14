@@ -1,17 +1,6 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import net.jodah.failsafe.RetryPolicy;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +11,16 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.service.RdfService;
 import org.uniprot.api.rest.service.TagPositionProvider;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * @author lgonzales
@@ -54,11 +53,12 @@ class RdfStreamerTest {
     @Mock private RdfService<String> rdfService;
     @Mock private RestTemplate restTemplate;
     @Mock private TagPositionProvider tagPositionProvider;
+    @Mock private RdfEntryCountProvider rdfEntryCountProvider;
     RdfStreamer rdfStreamer;
 
     @BeforeEach
     void setUp() {
-        rdfStreamer = new RdfStreamer(BATCH_SIZE, prologProvider, rdfServiceFactory, RETRY_POLICY);
+        rdfStreamer = new RdfStreamer(BATCH_SIZE, prologProvider, rdfServiceFactory, RETRY_POLICY, rdfEntryCountProvider);
         rdfService =
                 new RdfService<>(
                         tagPositionProvider, restTemplate, String.class, DATA_TYPE, FORMAT);

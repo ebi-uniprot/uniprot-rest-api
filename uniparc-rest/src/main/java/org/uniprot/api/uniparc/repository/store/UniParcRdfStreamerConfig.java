@@ -1,7 +1,5 @@
 package org.uniprot.api.uniparc.repository.store;
 
-import java.util.Collections;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,15 +12,19 @@ import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
+import java.util.Collections;
+
 @Configuration
 public class UniParcRdfStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagPositionProvider tagPositionProvider;
+    private final RdfEntryCountProvider rdfEntryCountProvider;
 
     public UniParcRdfStreamerConfig(
-            PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
+            PrologProvider prologProvider, TagPositionProvider tagPositionProvider, RdfEntryCountProvider rdfEntryCountProvider) {
         this.prologProvider = prologProvider;
         this.tagPositionProvider = tagPositionProvider;
+        this.rdfEntryCountProvider = rdfEntryCountProvider;
     }
 
     @Bean
@@ -33,7 +35,7 @@ public class UniParcRdfStreamerConfig {
                 uniparcRdfStreamerConfigProperties.getBatchSize(),
                 prologProvider,
                 uniparcRdfServiceFactory,
-                RdfStreamConfig.rdfRetryPolicy(uniparcRdfStreamerConfigProperties));
+                RdfStreamConfig.rdfRetryPolicy(uniparcRdfStreamerConfigProperties), rdfEntryCountProvider);
     }
 
     @Bean
