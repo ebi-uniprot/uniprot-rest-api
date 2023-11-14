@@ -1,16 +1,17 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-import org.uniprot.api.common.repository.stream.common.BatchIterable;
-import org.uniprot.api.rest.service.RdfService;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+
+import org.uniprot.api.common.repository.stream.common.BatchIterable;
+import org.uniprot.api.rest.service.RdfService;
 
 @Slf4j
 public class RdfStreamer {
@@ -24,7 +25,8 @@ public class RdfStreamer {
             int batchSize,
             PrologProvider prologProvider,
             RdfServiceFactory rdfServiceFactory,
-            RetryPolicy<Object> rdfFetchRetryPolicy, RdfEntryCountProvider rdfEntryCountProvider) {
+            RetryPolicy<Object> rdfFetchRetryPolicy,
+            RdfEntryCountProvider rdfEntryCountProvider) {
         this.batchSize = batchSize;
         this.prologProvider = prologProvider;
         this.rdfServiceFactory = rdfServiceFactory;
@@ -58,10 +60,11 @@ public class RdfStreamer {
                         .flatMap(Collection::stream)
                         .map(
                                 response -> {
-                                    consumer.accept(rdfEntryCountProvider.getEntryCount(response, dataType, format));
+                                    consumer.accept(
+                                            rdfEntryCountProvider.getEntryCount(
+                                                    response, dataType, format));
                                     return response;
-                                }
-                        )
+                                })
                         .onClose(
                                 () ->
                                         log.debug(

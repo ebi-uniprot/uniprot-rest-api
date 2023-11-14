@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.common;
 
+import java.util.Collections;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,8 +14,6 @@ import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.output.RequestResponseLoggingInterceptor;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
-import java.util.Collections;
-
 @Configuration
 public class SupportDataRdfStreamerConfig {
     private final PrologProvider prologProvider;
@@ -21,7 +21,9 @@ public class SupportDataRdfStreamerConfig {
     private final RdfEntryCountProvider rdfEntryCountProvider;
 
     public SupportDataRdfStreamerConfig(
-            PrologProvider prologProvider, TagPositionProvider tagPositionProvider, RdfEntryCountProvider rdfEntryCountProvider) {
+            PrologProvider prologProvider,
+            TagPositionProvider tagPositionProvider,
+            RdfEntryCountProvider rdfEntryCountProvider) {
         this.prologProvider = prologProvider;
         this.tagPositionProvider = tagPositionProvider;
         this.rdfEntryCountProvider = rdfEntryCountProvider;
@@ -35,7 +37,8 @@ public class SupportDataRdfStreamerConfig {
                 supportDataRdfStreamerConfigProperties.getBatchSize(),
                 prologProvider,
                 supportDataRdfServiceFactory,
-                RdfStreamConfig.rdfRetryPolicy(supportDataRdfStreamerConfigProperties), rdfEntryCountProvider);
+                RdfStreamConfig.rdfRetryPolicy(supportDataRdfStreamerConfigProperties),
+                rdfEntryCountProvider);
     }
 
     @Bean

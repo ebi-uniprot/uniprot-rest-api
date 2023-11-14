@@ -1,13 +1,13 @@
 package org.uniprot.api.uniref.repository.store;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.service.TagPositionProvider;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class UniRefRdfStreamerConfigTest {
     @Mock private PrologProvider prologProvider;
@@ -20,7 +20,9 @@ class UniRefRdfStreamerConfigTest {
 
     @BeforeEach
     void setUp() {
-        unirefRdfStreamerConfig = new UniRefRdfStreamerConfig(prologProvider, tagPositionProvider, rdfEntryCountProvider);
+        unirefRdfStreamerConfig =
+                new UniRefRdfStreamerConfig(
+                        prologProvider, tagPositionProvider, rdfEntryCountProvider);
         properties = new RdfStreamerConfigProperties();
         properties.setRequestUrl("http://localhost");
         properties.setBatchSize(25);
