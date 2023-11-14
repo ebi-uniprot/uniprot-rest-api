@@ -1,26 +1,7 @@
 package org.uniprot.api.rest.controller;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matchers;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
@@ -43,8 +24,26 @@ import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.rest.controller.ControllerITUtils.NO_CACHE_VALUE;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {

@@ -1,17 +1,16 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
+import lombok.extern.slf4j.Slf4j;
+import net.jodah.failsafe.Failsafe;
+import net.jodah.failsafe.RetryPolicy;
+import org.uniprot.api.common.repository.stream.common.BatchIterable;
+import org.uniprot.api.rest.service.RdfService;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import lombok.extern.slf4j.Slf4j;
-import net.jodah.failsafe.Failsafe;
-import net.jodah.failsafe.RetryPolicy;
-
-import org.uniprot.api.common.repository.stream.common.BatchIterable;
-import org.uniprot.api.rest.service.RdfService;
 
 @Slf4j
 public class RdfStreamer {
@@ -19,16 +18,18 @@ public class RdfStreamer {
     private final PrologProvider prologProvider;
     private final RdfServiceFactory rdfServiceFactory;
     private final RetryPolicy<Object> rdfFetchRetryPolicy;
+    private final RdfEntryCountProvider rdfEntryCountProvider;
 
     public RdfStreamer(
             int batchSize,
             PrologProvider prologProvider,
             RdfServiceFactory rdfServiceFactory,
-            RetryPolicy<Object> rdfFetchRetryPolicy) {
+            RetryPolicy<Object> rdfFetchRetryPolicy, RdfEntryCountProvider rdfEntryCountProvider) {
         this.batchSize = batchSize;
         this.prologProvider = prologProvider;
         this.rdfServiceFactory = rdfServiceFactory;
         this.rdfFetchRetryPolicy = rdfFetchRetryPolicy;
+        this.rdfEntryCountProvider = rdfEntryCountProvider;
     }
 
     public Stream<String> stream(Stream<String> entryIds, String dataType, String format) {
@@ -54,12 +55,13 @@ public class RdfStreamer {
 
         Stream<String> rdfStringStream =
                 StreamSupport.stream(batchRDFXMLStoreIterable.spliterator(), false)
-                        .map(
-                                responseCollection -> {
-                                    consumer.accept(batchSize);
-                                    return responseCollection;
-                                })
                         .flatMap(Collection::stream)
+                        .map(
+                                response -> {
+                                    consumer.accept(rdfEntryCountProvider.getEntryCount(response, dataType, format));
+                                    return response;
+                                }
+                        )
                         .onClose(
                                 () ->
                                         log.debug(
