@@ -1,10 +1,35 @@
 package org.uniprot.api.idmapping.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.jayway.jsonpath.JsonPath;
+import static java.util.function.Predicate.isEqual;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,35 +89,11 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.function.Predicate.isEqual;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
 @ContextConfiguration(classes = {IdMappingREST.class})
@@ -195,89 +196,98 @@ public class IdMappingDownloadControllerIT {
         URI uniProtRdfServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniprotkb"), eq("rdf"), any())).thenReturn(uniProtRdfServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniProtRdfServiceURI), any()))
-                .thenReturn("<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<rdf:RDF>\n"
-                        + "    <owl:Ontology rdf:about=\"\">\n"
-                        + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
-                        + "    </owl:Ontology>\n"
-                        + "    <sample>text</sample>\n"
-                        + "    <rdf:Description rdf:about=\"P00001\">\n"
-                        + "    <rdf:Description rdf:about=\"P00002\">\n"
-                        + "</rdf:RDF>");
+                .thenReturn(
+                        "<?xml version='1.0' encoding='UTF-8'?>\n"
+                                + "<rdf:RDF>\n"
+                                + "    <owl:Ontology rdf:about=\"\">\n"
+                                + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                                + "    </owl:Ontology>\n"
+                                + "    <sample>text</sample>\n"
+                                + "    <rdf:Description rdf:about=\"P00001\">\n"
+                                + "    <rdf:Description rdf:about=\"P00002\">\n"
+                                + "</rdf:RDF>");
 
         URI uniParcRdfServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniparc"), eq("rdf"), any())).thenReturn(uniParcRdfServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniParcRdfServiceURI), any()))
-                .thenReturn("<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<rdf:RDF>\n"
-                        + "    <owl:Ontology rdf:about=\"\">\n"
-                        + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
-                        + "    </owl:Ontology>\n"
-                        + "    <sample>text</sample>\n"
-                        + "    <rdf:Description rdf:about=\"UPI000012A72A\">\n"
-                        + "    <rdf:Description rdf:about=\"UPI000012A73A\">\n"
-                        + "</rdf:RDF>");
+                .thenReturn(
+                        "<?xml version='1.0' encoding='UTF-8'?>\n"
+                                + "<rdf:RDF>\n"
+                                + "    <owl:Ontology rdf:about=\"\">\n"
+                                + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                                + "    </owl:Ontology>\n"
+                                + "    <sample>text</sample>\n"
+                                + "    <rdf:Description rdf:about=\"UPI000012A72A\">\n"
+                                + "    <rdf:Description rdf:about=\"UPI000012A73A\">\n"
+                                + "</rdf:RDF>");
 
         URI uniRefRdfServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniref"), eq("rdf"), any())).thenReturn(uniRefRdfServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniRefRdfServiceURI), any()))
-                .thenReturn("<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<rdf:RDF>\n"
-                        + "    <owl:Ontology rdf:about=\"\">\n"
-                        + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
-                        + "    </owl:Ontology>\n"
-                        + "    <sample>text</sample>\n"
-                        + "    <rdf:Description rdf:about=\"UniRef100_P21802\">\n"
-                        + "    <rdf:Description rdf:about=\"UniRef100_P21803\">\n"
-                        + "</rdf:RDF>");
+                .thenReturn(
+                        "<?xml version='1.0' encoding='UTF-8'?>\n"
+                                + "<rdf:RDF>\n"
+                                + "    <owl:Ontology rdf:about=\"\">\n"
+                                + "        <owl:imports rdf:resource=\"http://purl.uniprot.org/core/\"/>\n"
+                                + "    </owl:Ontology>\n"
+                                + "    <sample>text</sample>\n"
+                                + "    <rdf:Description rdf:about=\"UniRef100_P21802\">\n"
+                                + "    <rdf:Description rdf:about=\"UniRef100_P21803\">\n"
+                                + "</rdf:RDF>");
 
         URI uniProtNtServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniprotkb"), eq("nt"), any())).thenReturn(uniProtNtServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniProtNtServiceURI), any()))
-                .thenReturn("<http://purl.uniprot.org/uniprot/SAMPLE> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/SAMPLE> .\n" +
-                        "<http://purl.uniprot.org/uniprot/P00001> <http://purl.uniprot.org/core/reviewed>\n" +
-                        "<http://purl.uniprot.org/uniprot/P00002> <http://purl.uniprot.org/core/reviewed>");
+                .thenReturn(
+                        "<http://purl.uniprot.org/uniprot/SAMPLE> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/SAMPLE> .\n"
+                                + "<http://purl.uniprot.org/uniprot/P00001> <http://purl.uniprot.org/core/reviewed>\n"
+                                + "<http://purl.uniprot.org/uniprot/P00002> <http://purl.uniprot.org/core/reviewed>");
 
         URI uniParcNtServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniparc"), eq("nt"), any())).thenReturn(uniParcNtServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniParcNtServiceURI), any()))
-                .thenReturn("<http://purl.uniprot.org/uniprot/SAMPLE> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/SAMPLE> .\n" +
-                        "<http://purl.uniprot.org/uniprot/UPI000012A71A> <http://purl.uniprot.org/core/reviewed>\n" +
-                        "<http://purl.uniprot.org/uniprot/UPI000012A72A> <http://purl.uniprot.org/core/reviewed>");
+                .thenReturn(
+                        "<http://purl.uniprot.org/uniprot/SAMPLE> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/SAMPLE> .\n"
+                                + "<http://purl.uniprot.org/uniprot/UPI000012A71A> <http://purl.uniprot.org/core/reviewed>\n"
+                                + "<http://purl.uniprot.org/uniprot/UPI000012A72A> <http://purl.uniprot.org/core/reviewed>");
 
         URI uniRefNtServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniref"), eq("nt"), any())).thenReturn(uniRefNtServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniRefNtServiceURI), any()))
-                .thenReturn("<http://purl.uniprot.org/uniprot/SAMPLE> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/SAMPLE> .\n" +
-                        "<http://purl.uniprot.org/uniprot/UniRef100_P21801> <http://purl.uniprot.org/core/reviewed>\n" +
-                        "<http://purl.uniprot.org/uniprot/UniRef100_P21802> <http://purl.uniprot.org/core/reviewed>");
+                .thenReturn(
+                        "<http://purl.uniprot.org/uniprot/SAMPLE> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.uniprot.org/core/SAMPLE> .\n"
+                                + "<http://purl.uniprot.org/uniprot/UniRef100_P21801> <http://purl.uniprot.org/core/reviewed>\n"
+                                + "<http://purl.uniprot.org/uniprot/UniRef100_P21802> <http://purl.uniprot.org/core/reviewed>");
 
         URI uniProtTtlServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniprotkb"), eq("ttl"), any())).thenReturn(uniProtTtlServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniProtTtlServiceURI), any()))
-                .thenReturn("@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
-                        + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
-                        + "<P00001> rdf:type up:Protein ;\n"
-                        + "<P00002> rdf:type up:Protein ;\n"
-                        + "<SAMPLE> rdf:type up:Protein ;");
+                .thenReturn(
+                        "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
+                                + "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n"
+                                + "<P00001> rdf:type up:Protein ;\n"
+                                + "<P00002> rdf:type up:Protein ;\n"
+                                + "<SAMPLE> rdf:type up:Protein ;");
 
         URI uniParcTtlServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniparc"), eq("ttl"), any())).thenReturn(uniParcTtlServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniParcTtlServiceURI), any()))
-                .thenReturn("@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
-                        + "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n"
-                        + "<UPI000012A72A> rdf:type up:Protein ;\n"
-                        + "<UPI000012A73A> rdf:type up:Protein ;\n"
-                        + "<SAMPLE> rdf:type up:Protein ;");
+                .thenReturn(
+                        "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
+                                + "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n"
+                                + "<UPI000012A72A> rdf:type up:Protein ;\n"
+                                + "<UPI000012A73A> rdf:type up:Protein ;\n"
+                                + "<SAMPLE> rdf:type up:Protein ;");
 
         URI uniRefTtlServiceURI = Mockito.mock(URI.class);
         when(uriBuilder.build(eq("uniref"), eq("ttl"), any())).thenReturn(uniRefTtlServiceURI);
         when(idMappingRdfRestTemplate.getForObject(eq(uniRefTtlServiceURI), any()))
-                .thenReturn("@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
-                        + "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n"
-                        + "<UniRef100_P21802> rdf:type up:Protein ;\n"
-                        + "<UniRef100_P21803> rdf:type up:Protein ;\n"
-                        + "<SAMPLE> rdf:type up:Protein ;");
+                .thenReturn(
+                        "@prefix uniparc: <http://purl.uniprot.org/uniparc/> .\n"
+                                + "@prefix uniprot: <http://purl.uniprot.org/uniprot/> .\n"
+                                + "<UniRef100_P21802> rdf:type up:Protein ;\n"
+                                + "<UniRef100_P21803> rdf:type up:Protein ;\n"
+                                + "<SAMPLE> rdf:type up:Protein ;");
     }
 
     private void saveUniProtKB(int i, String isoFormString) {
