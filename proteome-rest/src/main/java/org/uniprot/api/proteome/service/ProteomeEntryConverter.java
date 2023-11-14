@@ -28,8 +28,7 @@ public class ProteomeEntryConverter implements Function<ProteomeDocument, Proteo
         try {
             ProteomeEntry entry =
                     objectMapper.readValue(
-                            t.proteomeStored.array(),
-                            org.uniprot.core.proteome.ProteomeEntry.class);
+                            t.proteomeStored, org.uniprot.core.proteome.ProteomeEntry.class);
             return entry;
         } catch (Exception e) {
             LOGGER.info("Error converting solr avro_binary default UniProtKBEntry", e);
