@@ -1,15 +1,16 @@
 package org.uniprot.api.common.repository.stream.store;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.solr.client.solrj.io.stream.TupleStream;
-import org.uniprot.api.common.repository.search.SolrRequest;
-import org.uniprot.api.common.repository.stream.common.TupleStreamIterable;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.solr.client.solrj.io.stream.TupleStream;
+import org.uniprot.api.common.repository.search.SolrRequest;
+import org.uniprot.api.common.repository.stream.common.TupleStreamIterable;
 
 /**
  * The purpose of this class is to stream results from a data-store, e.g., Voldemort. Clients of

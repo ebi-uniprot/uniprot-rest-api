@@ -1,15 +1,5 @@
 package org.uniprot.api.rest.download.queue;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.context.FileType;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,6 +10,17 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
 
 @Slf4j
 public abstract class BaseAbstractMessageListener implements MessageListener {
@@ -134,7 +135,7 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                 writer.newLine();
                 count++;
             }
-        }finally {
+        } finally {
             if (writer != null) {
                 writer.close();
             }
