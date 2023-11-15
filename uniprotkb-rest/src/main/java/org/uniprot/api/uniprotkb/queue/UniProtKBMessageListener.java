@@ -1,10 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
@@ -30,6 +26,9 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -124,11 +123,6 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
     @Override
     protected Stream<String> streamIds(DownloadRequest request) {
         return service.streamIds(request);
-    }
-
-    @Override
-    protected long getNumberOfEntries(DownloadRequest downloadRequest) {
-        return service.getNumberOfEntries(downloadRequest);
     }
 
     @Override
