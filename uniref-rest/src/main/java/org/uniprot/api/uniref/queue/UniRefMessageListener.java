@@ -74,11 +74,6 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
     }
 
     @Override
-    protected long getNumberOfEntries(DownloadRequest downloadRequest) {
-        return service.getNumberOfEntries(downloadRequest);
-    }
-
-    @Override
     protected String getDataType() {
         return UNIREF_DATA_TYPE;
     }

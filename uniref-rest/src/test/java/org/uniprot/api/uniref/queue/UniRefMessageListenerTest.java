@@ -1,17 +1,5 @@
 package org.uniprot.api.uniref.queue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +21,18 @@ import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class UniRefMessageListenerTest {
@@ -65,7 +65,6 @@ class UniRefMessageListenerTest {
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
-        when(this.service.getNumberOfEntries(downloadRequest)).thenReturn(2L);
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
 
         this.uniRefMessageListener.onMessage(message);
@@ -105,7 +104,6 @@ class UniRefMessageListenerTest {
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
-        when(this.service.getNumberOfEntries(downloadRequest)).thenReturn(2L);
         Mockito.doThrow(new IOException("Forced IO Exception"))
                 .when(this.downloadResultWriter)
                 .writeResult(any(), any(), any(), any(), any(), any());
