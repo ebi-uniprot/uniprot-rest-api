@@ -4,6 +4,8 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
+import java.util.List;
+
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -86,6 +88,10 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
                         .build();
 
         CrossRefEntryBuilder entryBuilder = new CrossRefEntryBuilder();
+        List<String> servers =
+                List.of(
+                        "http://ncbifam.jcvi.org/cgi-bin/index.cgi",
+                        "http://ncbidam.jcvi.org/cgi-bin/index.cgi");
         CrossRefEntry crossRefEntry =
                 entryBuilder
                         .id(ACCESSION)
@@ -94,7 +100,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
                         .pubMedId("17151080")
                         .doiId("10.1093/nar/gkl1043")
                         .linkType("Explicit")
-                        .server("http://ncbifam.jcvi.org/cgi-bin/index.cgi")
+                        .serversSet(servers)
                         .dbUrl("http://ncbifam.jcvi.org/cgi-bin/HmmReportPage.cgi?acc=%s")
                         .category("Family and domain databases")
                         .statistics(statistics)
@@ -108,7 +114,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
                         .pubMedId(crossRefEntry.getPubMedId())
                         .doiId(crossRefEntry.getDoiId())
                         .linkType(crossRefEntry.getLinkType())
-                        .server(crossRefEntry.getServer())
+                        .servers(crossRefEntry.getServers())
                         .dbUrl(crossRefEntry.getDbUrl())
                         .category(crossRefEntry.getCategory())
                         .reviewedProteinCount(statistics.getReviewedProteinCount())
@@ -140,8 +146,15 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
             return GetIdParameter.builder()
                     .id(ACCESSION)
                     .resultMatcher(jsonPath("$.linkType", is("Explicit")))
+                    .resultMatcher(jsonPath("$.servers.size()", is(2)))
                     .resultMatcher(
-                            jsonPath("$.server", is("http://ncbifam.jcvi.org/cgi-bin/index.cgi")))
+                            jsonPath(
+                                    "$.servers[0]",
+                                    is("http://ncbifam.jcvi.org/cgi-bin/index.cgi")))
+                    .resultMatcher(
+                            jsonPath(
+                                    "$.servers[1]",
+                                    is("http://ncbidam.jcvi.org/cgi-bin/index.cgi")))
                     .resultMatcher(jsonPath("$.statistics.unreviewedProteinCount", is(5)))
                     .resultMatcher(jsonPath("$.name", is("NCBIfam; a protein family database")))
                     .resultMatcher(
@@ -220,7 +233,7 @@ public class CrossRefGetIdControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .resultMatcher(jsonPath("$.linkType", is("Explicit")))
                                     .resultMatcher(
                                             jsonPath(
-                                                    "$.server",
+                                                    "$.servers[0]",
                                                     is(
                                                             "http://ncbifam.jcvi.org/cgi-bin/index.cgi")))
                                     .resultMatcher(
