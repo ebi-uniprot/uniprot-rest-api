@@ -1,16 +1,10 @@
 package org.uniprot.api.idmapping.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.idmapping.controller.IdMappingDownloadController.*;
-import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
-import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -23,6 +17,7 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.queue.IdMappingProducerMessageService;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.BasicDownloadController;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -31,11 +26,15 @@ import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.idmapping.controller.IdMappingDownloadController.ID_MAPPING_DOWNLOAD_RESOURCE;
+import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
+import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 
 @Tag(name = "downloadJob", description = "APIs related to idMapping download job")
 @RestController
@@ -50,7 +49,8 @@ public class IdMappingDownloadController extends BasicDownloadController {
     protected IdMappingDownloadController(
             IdMappingProducerMessageService messageService,
             IdMappingJobCacheService idMappingJobCacheService,
-            DownloadJobRepository jobRepository) {
+            DownloadJobRepository jobRepository, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+        super(asyncDownloadHeartBeatConfiguration);
         this.messageService = messageService;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.jobRepository = jobRepository;
@@ -60,15 +60,15 @@ public class IdMappingDownloadController extends BasicDownloadController {
     @Operation(
             summary = "Submit a idmapping download job.",
             responses = {
-                @ApiResponse(
-                        content = {
-                            @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
-                                    schema =
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            schema =
                                             @Schema(
                                                     implementation =
                                                             IdMappingDownloadRequest.class))
-                        })
+                            })
             })
     public ResponseEntity<JobSubmitResponse> submitDownloadJob(
             @Valid @ModelAttribute IdMappingDownloadRequestImpl request) {
@@ -83,12 +83,12 @@ public class IdMappingDownloadController extends BasicDownloadController {
     @Operation(
             summary = "Get the status of a idmapping download job.",
             responses = {
-                @ApiResponse(
-                        content = {
-                            @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = JobStatus.class))
-                        })
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            schema = @Schema(implementation = JobStatus.class))
+                            })
             })
     public ResponseEntity<JobStatusResponse> getJobStatus(@PathVariable String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
