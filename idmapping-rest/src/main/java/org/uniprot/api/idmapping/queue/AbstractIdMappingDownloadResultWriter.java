@@ -61,7 +61,8 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer rdfStreamer,
             MessageConverterContextFactory.Resource resource,
-            DownloadJobRepository jobRepository, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            DownloadJobRepository jobRepository,
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
         this.storeStreamerConfig = storeStreamerConfig;
@@ -169,8 +170,11 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
         }
     }
 
-    private boolean isNextCheckPointPassed(DownloadJob downloadJob, long totalNumberOfProcessedEntries) {
-        long nextCheckPoint = downloadJob.getEntriesProcessed() + asyncDownloadHeartBeatConfiguration.getInterval();
+    private boolean isNextCheckPointPassed(
+            DownloadJob downloadJob, long totalNumberOfProcessedEntries) {
+        long nextCheckPoint =
+                downloadJob.getEntriesProcessed()
+                        + asyncDownloadHeartBeatConfiguration.getInterval();
         long totalNumberOfEntries = downloadJob.getTotalEntries();
         return totalNumberOfProcessedEntries >= Math.min(totalNumberOfEntries, nextCheckPoint);
     }

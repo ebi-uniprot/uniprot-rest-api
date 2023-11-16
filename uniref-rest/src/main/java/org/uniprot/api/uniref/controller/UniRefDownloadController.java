@@ -1,9 +1,13 @@
 package org.uniprot.api.uniref.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniref.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.rest.controller.BasicDownloadController;
@@ -17,12 +21,10 @@ import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniref.controller.UniRefDownloadController.DOWNLOAD_RESOURCE;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
  * @author tibrahim
@@ -38,7 +40,9 @@ public class UniRefDownloadController extends BasicDownloadController {
     private final DownloadJobRepository jobRepository;
 
     public UniRefDownloadController(
-            ProducerMessageService messageService, DownloadJobRepository jobRepository, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            ProducerMessageService messageService,
+            DownloadJobRepository jobRepository,
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         super(asyncDownloadHeartBeatConfiguration);
         this.messageService = messageService;
         this.jobRepository = jobRepository;

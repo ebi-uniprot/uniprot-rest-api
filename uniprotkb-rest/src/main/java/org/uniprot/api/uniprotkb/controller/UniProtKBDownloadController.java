@@ -1,9 +1,13 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
+
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +23,10 @@ import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.rest.validation.CustomConstraintGroupSequence;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 /**
  * @author sahmad
@@ -38,7 +40,9 @@ public class UniProtKBDownloadController extends BasicDownloadController {
     private final DownloadJobRepository jobRepository;
 
     public UniProtKBDownloadController(
-            ProducerMessageService messageService, DownloadJobRepository jobRepository, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            ProducerMessageService messageService,
+            DownloadJobRepository jobRepository,
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         super(asyncDownloadHeartBeatConfiguration);
         this.messageService = messageService;
         this.jobRepository = jobRepository;
