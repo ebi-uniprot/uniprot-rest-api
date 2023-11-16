@@ -1,9 +1,22 @@
 package org.uniprot.api.idmapping.queue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.jodah.failsafe.RetryPolicy;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,20 +49,9 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 class UniProtKBIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPROTKB_WRITER_JOB_ID";
@@ -91,7 +93,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         rdfStream,
                         null,
                         null,
-                        jobRepository, asyncDownloadHeartBeatConfiguration);
+                        jobRepository,
+                        asyncDownloadHeartBeatConfiguration);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build())
                         .iterator();
@@ -133,7 +136,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         null,
                         null,
                         uniprotKBMappingRepository,
-                        jobRepository, asyncDownloadHeartBeatConfiguration);
+                        jobRepository,
+                        asyncDownloadHeartBeatConfiguration);
         List<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build());
 
@@ -168,7 +172,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         .collect(Collectors.toSet())
                         .contains("P12345"));
 
-        verify(downloadJob, isEnabled ? times(1) : never()).setEntriesProcessed(downloadJob.getEntriesProcessed() + 1);
+        verify(downloadJob, isEnabled ? times(1) : never())
+                .setEntriesProcessed(downloadJob.getEntriesProcessed() + 1);
         verify(downloadJob, isEnabled ? times(1) : never()).setUpdated(any(LocalDateTime.class));
         verify(jobRepository, isEnabled ? times(1) : never()).save(downloadJob);
     }
@@ -191,7 +196,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         rdfStream,
                         null,
                         null,
-                        jobRepository, asyncDownloadHeartBeatConfiguration);
+                        jobRepository,
+                        asyncDownloadHeartBeatConfiguration);
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(

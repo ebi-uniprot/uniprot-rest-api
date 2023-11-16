@@ -1,6 +1,10 @@
 package org.uniprot.api.uniref.queue;
 
+import java.lang.reflect.Type;
+import java.util.Iterator;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -16,9 +20,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
-import java.lang.reflect.Type;
-import java.util.Iterator;
-
 @Component
 @Slf4j
 public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<UniRefEntryLight> {
@@ -33,7 +34,8 @@ public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<Uni
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer uniRefRdfStreamer,
-            DownloadJobRepository jobRepository, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            DownloadJobRepository jobRepository,
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         super(
                 contentAdapter,
                 converterContextFactory,
@@ -41,7 +43,8 @@ public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<Uni
                 downloadConfigProperties,
                 uniRefRdfStreamer,
                 jobRepository,
-                MessageConverterContextFactory.Resource.UNIREF, asyncDownloadHeartBeatConfiguration);
+                MessageConverterContextFactory.Resource.UNIREF,
+                asyncDownloadHeartBeatConfiguration);
     }
 
     @Override

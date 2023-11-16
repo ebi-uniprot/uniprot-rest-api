@@ -1,6 +1,10 @@
 package org.uniprot.api.uniprotkb.queue;
 
+import java.lang.reflect.Type;
+import java.util.Iterator;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -18,9 +22,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-import java.lang.reflect.Type;
-import java.util.Iterator;
-
 @Component
 @Slf4j
 public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<UniProtKBEntry> {
@@ -37,7 +38,8 @@ public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<
             DownloadConfigProperties downloadConfigProperties,
             TaxonomyLineageService lineageService,
             RdfStreamer uniProtRdfStreamer,
-            DownloadJobRepository jobRepository, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            DownloadJobRepository jobRepository,
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         super(
                 contentAdapter,
                 converterContextFactory,
@@ -45,7 +47,8 @@ public class UniProtKBDownloadResultWriter extends AbstractDownloadResultWriter<
                 downloadConfigProperties,
                 uniProtRdfStreamer,
                 jobRepository,
-                MessageConverterContextFactory.Resource.UNIPROTKB, asyncDownloadHeartBeatConfiguration);
+                MessageConverterContextFactory.Resource.UNIPROTKB,
+                asyncDownloadHeartBeatConfiguration);
         this.lineageService = lineageService;
     }
 
