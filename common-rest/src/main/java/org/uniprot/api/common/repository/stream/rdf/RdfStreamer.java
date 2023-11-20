@@ -59,11 +59,11 @@ public class RdfStreamer {
                 StreamSupport.stream(batchRDFXMLStoreIterable.spliterator(), false)
                         .flatMap(Collection::stream)
                         .map(
-                                response -> {
+                                singleBatchResponse -> {
                                     consumer.accept(
                                             rdfEntryCountProvider.getEntryCount(
-                                                    response, dataType, format));
-                                    return response;
+                                                    singleBatchResponse, dataType, format));
+                                    return singleBatchResponse;
                                 })
                         .onClose(
                                 () ->
