@@ -1,8 +1,24 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.search.EntryPair;
+import org.uniprot.api.common.repository.search.ExtraOptions;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
+import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,26 +39,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPOutputStream;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.search.EntryPair;
-import org.uniprot.api.common.repository.search.ExtraOptions;
-import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
 
 @Slf4j
 public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<S>, S> {
@@ -114,9 +113,9 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                 context.setEntityIds(
                         toIds.stream()
                                 .map(
-                                        c -> {
+                                        id -> {
                                             updateEntriesProcessed(downloadJob, 1);
-                                            return c;
+                                            return id;
                                         }));
             } else {
                 BatchStoreEntryPairIterable<T, S> batchStoreIterable =
@@ -125,9 +124,9 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                 Stream<T> entities =
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
                                 .map(
-                                        c -> {
-                                            updateEntriesProcessed(downloadJob, c.size());
-                                            return c;
+                                        entityCollection -> {
+                                            updateEntriesProcessed(downloadJob, entityCollection.size());
+                                            return entityCollection;
                                         })
                                 .flatMap(Collection::stream)
                                 .onClose(
