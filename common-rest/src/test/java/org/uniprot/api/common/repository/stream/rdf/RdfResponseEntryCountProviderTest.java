@@ -1,8 +1,8 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 class RdfResponseEntryCountProviderTest {
     private static final String UNIPROT = "uniprotkb";
