@@ -1,17 +1,16 @@
 package org.uniprot.api.common.repository.stream.rdf;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.function.IntConsumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.Failsafe;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.uniprot.api.common.repository.stream.common.BatchIterable;
 import org.uniprot.api.rest.service.RdfService;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.function.LongConsumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 public class RdfStreamer {
@@ -51,7 +50,7 @@ public class RdfStreamer {
     }
 
     public Stream<String> stream(
-            Stream<String> entryIds, String dataType, String format, IntConsumer consumer) {
+            Stream<String> entryIds, String dataType, String format, LongConsumer consumer) {
         BatchRdfXmlStoreIterable batchRDFXMLStoreIterable =
                 getBatchRdfXmlStoreIterable(entryIds, dataType, format);
 
