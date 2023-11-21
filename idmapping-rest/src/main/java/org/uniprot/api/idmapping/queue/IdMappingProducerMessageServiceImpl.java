@@ -1,12 +1,6 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -19,6 +13,12 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.request.HashGenerator;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Service
 @Slf4j
@@ -63,6 +63,7 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
 
     @Override
     public void alreadyProcessed(String jobId) {
+        Optional<DownloadJob> downloadJob = this.jobRepository.findById(jobId);
         log.info("Job is either being processed or already processed {}", jobId);
     }
 
