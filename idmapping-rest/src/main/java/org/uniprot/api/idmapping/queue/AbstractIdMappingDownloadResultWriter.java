@@ -1,6 +1,27 @@
 package org.uniprot.api.idmapping.queue;
 
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import java.util.zip.GZIPOutputStream;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -20,26 +41,6 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import java.util.zip.GZIPOutputStream;
-
-import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
 
 @Slf4j
 public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<S>, S> {
@@ -86,12 +87,12 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
         AbstractUUWHttpMessageConverter<T, S> outputWriter =
                 getOutputWriter(contentType, getType());
         try (OutputStream output =
-                     Files.newOutputStream(
-                             resultPath,
-                             StandardOpenOption.WRITE,
-                             StandardOpenOption.CREATE,
-                             StandardOpenOption.TRUNCATE_EXISTING);
-             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
+                        Files.newOutputStream(
+                                resultPath,
+                                StandardOpenOption.WRITE,
+                                StandardOpenOption.CREATE,
+                                StandardOpenOption.TRUNCATE_EXISTING);
+                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
             ExtraOptions extraOptions = getExtraOptions(idMappingResult);
 
@@ -153,7 +154,8 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
         try {
             if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
                 String jobId = downloadJob.getId();
-                long totalNumberOfProcessedEntries = downloadJobCheckPoints.getOrDefault(jobId, 0L) + size;
+                long totalNumberOfProcessedEntries =
+                        downloadJobCheckPoints.getOrDefault(jobId, 0L) + size;
                 downloadJobCheckPoints.put(jobId, totalNumberOfProcessedEntries);
                 if (isNextCheckPointPassed(downloadJob, totalNumberOfProcessedEntries)) {
                     downloadJob.setEntriesProcessed(totalNumberOfProcessedEntries);
