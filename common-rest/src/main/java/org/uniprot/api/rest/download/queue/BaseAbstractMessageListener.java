@@ -1,7 +1,5 @@
 package org.uniprot.api.rest.download.queue;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -126,12 +124,9 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                 && downloadJob.getStatus() != JobStatus.ERROR;
     }
 
-    protected int writeIdentifiers(Path filePath, Stream<String> ids) throws IOException {
-        int count = 0;
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile(), true))) {
-            ids.forEach();
-        }
-        return count;
+    protected void writeIdentifiers(Path filePath, Stream<String> ids) throws IOException {
+        Iterable<String> source = ids::iterator;
+        Files.write(filePath, source, StandardOpenOption.CREATE);
     }
 
     protected void updateDownloadJob(
