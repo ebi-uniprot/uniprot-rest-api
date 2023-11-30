@@ -36,7 +36,7 @@ stages:
 api:settings:
   stage: setup
   before_script:
-    - 'wget --no-cache --no-cookies -O ${MAVEN_SETTINGS} "${URL_MAVEN_SETTINGS}"'
+    - 'curl --location "${URL_MAVEN_SETTINGS}" --output ${MAVEN_SETTINGS}'
   script:
     - if [ ! -f ${MAVEN_SETTINGS} ];
       then echo "CI settings missing";
