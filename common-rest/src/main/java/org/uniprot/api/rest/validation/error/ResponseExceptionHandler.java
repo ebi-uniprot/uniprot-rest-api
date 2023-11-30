@@ -41,8 +41,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.uniprot.api.common.exception.*;
 import org.uniprot.api.common.repository.search.QueryRetrievalException;
+import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.output.converter.StopStreamException;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.rest.request.MutableHttpServletRequest;
 import org.uniprot.core.util.Utils;
 
@@ -160,6 +162,14 @@ public class ResponseExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(getContentTypeFromRequest(request))
                 .body(error);
+    }
+
+    @ExceptionHandler({IllegalDownloadJobSubmissionException.class})
+    public ResponseEntity<JobSubmitResponse> handleIllegalCallerException(
+            IllegalDownloadJobSubmissionException exception, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(getContentTypeFromRequest(request))
+                .body(new JobSubmitResponse(exception.getJobId(), exception.getMessage()));
     }
 
     /**

@@ -512,8 +512,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         String jobStatusUrl = getDownloadAPIsBasePath() + "/status/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
                 get(jobStatusUrl, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
-        ResultActions response = getMockMvcObject().perform(requestBuilder);
-        return response;
+        return getMockMvcObject().perform(requestBuilder);
     }
 
     protected String callRunAPIAndVerify(

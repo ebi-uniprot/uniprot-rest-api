@@ -9,4 +9,8 @@ public interface IdMappingDownloadRequest {
     String getFields();
 
     void setFormat(String format);
+
+    boolean isForce();
+
+    void setForce(boolean force);
 }
