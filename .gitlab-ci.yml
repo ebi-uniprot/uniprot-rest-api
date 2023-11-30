@@ -19,7 +19,7 @@ services:
   - name: docker:dind
     # explicitly disable tls to avoid docker startup interruption
     command: ["--tls=false"]
-image: maven:3.6.3-jdk-11
+image: maven:3.8.5-openjdk-17
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
