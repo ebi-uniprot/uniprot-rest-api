@@ -1,5 +1,16 @@
 package org.uniprot.api.rest.download.queue;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,17 +21,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.context.FileType;
 
 @Slf4j
 public abstract class BaseAbstractMessageListener implements MessageListener {
@@ -36,16 +36,19 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
     private final DownloadJobRepository jobRepository;
 
     protected final RabbitTemplate rabbitTemplate;
+    private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
+    private final Map<String, Long> downloadJobCheckPoints = new HashMap<>();
 
     public BaseAbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
             AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
-            RabbitTemplate rabbitTemplate) {
+            RabbitTemplate rabbitTemplate, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.asyncDownloadQueueConfigProperties = asyncDownloadQueueConfigProperties;
         this.jobRepository = jobRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.asyncDownloadHeartBeatConfiguration = asyncDownloadHeartBeatConfiguration;
     }
 
     @Override
@@ -125,7 +128,7 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                 && downloadJob.getStatus() != JobStatus.ERROR;
     }
 
-    protected long writeIdentifiers(Path filePath, Stream<String> ids) throws IOException {
+    protected long writeIdentifiers(Path filePath, Stream<String> ids, DownloadJob downloadJob) throws IOException {
         long count = 0;
         try (BufferedWriter writer =
                 Files.newBufferedWriter(
@@ -135,9 +138,42 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                 writer.append(id);
                 writer.newLine();
                 count++;
+                updateEntriesProcessed(downloadJob, 1);
             }
         }
+        downloadJobCheckPoints.remove(downloadJob.getId());
         return count;
+    }
+
+    private void updateEntriesProcessed(DownloadJob downloadJob, long size) {
+        try {
+            if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
+                String jobId = downloadJob.getId();
+                long totalNumberOfProcessedEntries =
+                        downloadJobCheckPoints.getOrDefault(jobId, 0L) + size;
+                downloadJobCheckPoints.put(jobId, totalNumberOfProcessedEntries);
+                if (isNextCheckPointPassed(downloadJob, totalNumberOfProcessedEntries)) {
+                    downloadJob.setEntriesProcessed(totalNumberOfProcessedEntries);
+                    downloadJob.setUpdated(LocalDateTime.now());
+                    jobRepository.save(downloadJob);
+                }
+            }
+        } catch (Exception e) {
+            log.warn(
+                    String.format(
+                            "Updating the Number of Processed Entries was failed for Download Job ID: %s , "
+                                    + "Last updated number of entries processed: %d",
+                            downloadJob.getId(), downloadJob.getEntriesProcessed()));
+        }
+    }
+
+    private boolean isNextCheckPointPassed(
+            DownloadJob downloadJob, long totalNumberOfProcessedEntries) {
+        long nextCheckPoint =
+                downloadJob.getEntriesProcessed()
+                        + asyncDownloadHeartBeatConfiguration.getInterval();
+        long totalNumberOfEntries = downloadJob.getTotalEntries();
+        return totalNumberOfProcessedEntries >= Math.min(totalNumberOfEntries, nextCheckPoint);
     }
 
     protected void updateDownloadJob(

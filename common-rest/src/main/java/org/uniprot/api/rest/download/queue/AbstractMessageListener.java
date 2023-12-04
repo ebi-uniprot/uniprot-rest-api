@@ -1,23 +1,23 @@
 package org.uniprot.api.rest.download.queue;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
 
 @Slf4j
 public abstract class AbstractMessageListener extends BaseAbstractMessageListener {
@@ -31,12 +31,12 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
             AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
-            RabbitTemplate rabbitTemplate) {
+            RabbitTemplate rabbitTemplate, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         super(
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
-                rabbitTemplate);
+                rabbitTemplate, asyncDownloadHeartBeatConfiguration);
         this.converter = converter;
         this.downloadResultWriter = downloadResultWriter;
     }
@@ -80,7 +80,7 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
 
     protected void writeSolrResult(DownloadRequest request, DownloadJob downloadJob, Path idsFile)
             throws IOException {
-        long totalNumberOfEntries = writeIdentifiers(idsFile, streamIds(request));
+        long totalNumberOfEntries = writeIdentifiers(idsFile, streamIds(request), downloadJob);
         updateTotalEntries(downloadJob, totalNumberOfEntries);
         log.info("Solr ids saved for job {}", downloadJob.getId());
     }

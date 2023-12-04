@@ -1,10 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
@@ -16,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.AbstractMessageListener;
@@ -30,6 +27,9 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -53,14 +53,14 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
-            EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties) {
+            EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         super(
                 converter,
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
                 downloadResultWriter,
-                rabbitTemplate);
+                rabbitTemplate, asyncDownloadHeartBeatConfiguration);
         this.service = service;
         this.embeddingsQueueConfigProps = embeddingsQueueConfigProperties;
     }
