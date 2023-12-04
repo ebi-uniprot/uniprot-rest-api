@@ -1,10 +1,6 @@
 package org.uniprot.api.uniref.queue;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -14,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.AbstractMessageListener;
@@ -23,6 +20,9 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
+
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * @author tibrahim
@@ -42,14 +42,14 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
-            UniRefEntryLightService service) {
+            UniRefEntryLightService service, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         super(
                 converter,
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
                 downloadResultWriter,
-                rabbitTemplate);
+                rabbitTemplate, asyncDownloadHeartBeatConfiguration);
         this.service = service;
     }
 

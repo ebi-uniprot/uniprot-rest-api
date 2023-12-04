@@ -1,11 +1,6 @@
 package org.uniprot.api.idmapping.queue;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,6 +12,7 @@ import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
@@ -26,6 +22,10 @@ import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 @Profile({"live", "asyncDownload"})
@@ -45,12 +45,12 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             RabbitTemplate rabbitTemplate,
             MessageConverter converter,
             IdMappingJobCacheService idMappingJobCacheService,
-            IdMappingDownloadResultWriterFactory writerFactory) {
+            IdMappingDownloadResultWriterFactory writerFactory, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
         super(
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
-                rabbitTemplate);
+                rabbitTemplate, asyncDownloadHeartBeatConfiguration);
         this.converter = converter;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.downloadConfigProperties = downloadConfigProperties;
