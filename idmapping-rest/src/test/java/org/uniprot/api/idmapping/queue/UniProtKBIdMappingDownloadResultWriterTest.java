@@ -1,27 +1,12 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
@@ -33,10 +18,9 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -49,26 +33,31 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class UniProtKBIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPROTKB_WRITER_JOB_ID";
     public static final long PROCESSED_ENTRIES = 39L;
-    private DownloadJobRepository jobRepository;
     private DownloadJob downloadJob;
-    private AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
+    private HeartBeatProducer heartBeatProducer;
 
     @BeforeEach
     void setUp() {
-        jobRepository = mock(DownloadJobRepository.class);
         downloadJob = mock(DownloadJob.class);
-        asyncDownloadHeartBeatConfiguration = mock(AsyncDownloadHeartBeatConfiguration.class);
+        heartBeatProducer = mock(HeartBeatProducer.class);
         when(downloadJob.getId()).thenReturn(JOB_ID);
         when(downloadJob.getEntriesProcessed()).thenReturn(PROCESSED_ENTRIES);
-        when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(downloadJob));
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(2L);
     }
 
     @Test
@@ -93,8 +82,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         rdfStream,
                         null,
                         null,
-                        jobRepository,
-                        asyncDownloadHeartBeatConfiguration);
+                        heartBeatProducer);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build())
                         .iterator();
@@ -104,10 +92,8 @@ class UniProtKBIdMappingDownloadResultWriterTest {
         assertNotNull(result);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void canWriteResultFile(boolean isEnabled) throws Exception {
-        when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(isEnabled);
+   @Test
+    void canWriteResultFile() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         RequestMappingHandlerAdapter contentAdaptor =
                 getMockedRequestMappingHandlerAdapter(objectMapper);
@@ -136,8 +122,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         null,
                         null,
                         uniprotKBMappingRepository,
-                        jobRepository,
-                        asyncDownloadHeartBeatConfiguration);
+                        heartBeatProducer);
         List<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("P12345").build());
 
@@ -171,11 +156,6 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         .map(node -> node.findValue("value").asText())
                         .collect(Collectors.toSet())
                         .contains("P12345"));
-
-        verify(downloadJob, isEnabled ? times(1) : never())
-                .setEntriesProcessed(downloadJob.getEntriesProcessed() + 1);
-        verify(downloadJob, isEnabled ? times(1) : never()).setUpdated(any(LocalDateTime.class));
-        verify(jobRepository, isEnabled ? times(1) : never()).save(downloadJob);
     }
 
     @Test
@@ -196,8 +176,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         rdfStream,
                         null,
                         null,
-                        jobRepository,
-                        asyncDownloadHeartBeatConfiguration);
+                        heartBeatProducer);
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(

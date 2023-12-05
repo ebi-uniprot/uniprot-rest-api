@@ -7,7 +7,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -31,12 +31,14 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
             AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
-            RabbitTemplate rabbitTemplate, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            RabbitTemplate rabbitTemplate,
+            HeartBeatProducer heartBeatProducer) {
         super(
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
-                rabbitTemplate, asyncDownloadHeartBeatConfiguration);
+                rabbitTemplate,
+                heartBeatProducer);
         this.converter = converter;
         this.downloadResultWriter = downloadResultWriter;
     }
