@@ -1,27 +1,6 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import java.util.zip.GZIPOutputStream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -33,14 +12,35 @@ import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import java.util.zip.GZIPOutputStream;
+
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
 
 @Slf4j
 public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<S>, S> {
@@ -51,9 +51,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
     private final DownloadConfigProperties downloadConfigProperties;
     private final MessageConverterContextFactory.Resource resource;
     private final RdfStreamer rdfStreamer;
-    private final DownloadJobRepository jobRepository;
-    private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
-    private final Map<String, Long> downloadJobCheckPoints = new HashMap<>();
+    private final HeartBeatProducer heartBeatProducer;
 
     protected AbstractIdMappingDownloadResultWriter(
             RequestMappingHandlerAdapter contentAdapter,
@@ -61,17 +59,14 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
             StoreStreamerConfig<S> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer rdfStreamer,
-            MessageConverterContextFactory.Resource resource,
-            DownloadJobRepository jobRepository,
-            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            MessageConverterContextFactory.Resource resource, HeartBeatProducer heartBeatProducer) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
         this.storeStreamerConfig = storeStreamerConfig;
         this.downloadConfigProperties = downloadConfigProperties;
         this.resource = resource;
         this.rdfStreamer = rdfStreamer;
-        this.jobRepository = jobRepository;
-        this.asyncDownloadHeartBeatConfiguration = asyncDownloadHeartBeatConfiguration;
+        this.heartBeatProducer = heartBeatProducer;
     }
 
     public void writeResult(
@@ -109,19 +104,19 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 toIds.stream(),
                                 resource.name().toLowerCase(),
                                 SUPPORTED_RDF_MEDIA_TYPES.get(contentType),
-                                entries -> updateEntriesProcessed(downloadJob, entries));
+                                entries -> heartBeatProducer.updateEntriesProcessed(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
-                downloadJobCheckPoints.remove(downloadJob.getId());
+                heartBeatProducer.stopHeartBeat(downloadJob.getId());
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 Set<String> toIds = getToIds(idMappingResult);
                 context.setEntityIds(
                         toIds.stream()
                                 .map(
                                         id -> {
-                                            updateEntriesProcessed(downloadJob, 1);
+                                            heartBeatProducer.updateEntriesProcessed(downloadJob, 1);
                                             return id;
                                         }));
-                downloadJobCheckPoints.remove(downloadJob.getId());
+                heartBeatProducer.stopHeartBeat(downloadJob.getId());
             } else {
                 BatchStoreEntryPairIterable<T, S> batchStoreIterable =
                         getBatchStoreEntryPairIterable(
@@ -130,7 +125,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
                                 .map(
                                         entityCollection -> {
-                                            updateEntriesProcessed(
+                                            heartBeatProducer.updateEntriesProcessed(
                                                     downloadJob, entityCollection.size());
                                             return entityCollection;
                                         })
@@ -142,43 +137,12 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                                         jobId));
 
                 context.setEntities(entities);
-                downloadJobCheckPoints.remove(downloadJob.getId());
+                heartBeatProducer.stopHeartBeat(downloadJob.getId());
             }
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, gzipOutputStream, start, counter);
         }
-    }
-
-    private void updateEntriesProcessed(DownloadJob downloadJob, long size) {
-        try {
-            if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
-                String jobId = downloadJob.getId();
-                long totalNumberOfProcessedEntries =
-                        downloadJobCheckPoints.getOrDefault(jobId, 0L) + size;
-                downloadJobCheckPoints.put(jobId, totalNumberOfProcessedEntries);
-                if (isNextCheckPointPassed(downloadJob, totalNumberOfProcessedEntries)) {
-                    downloadJob.setEntriesProcessed(totalNumberOfProcessedEntries);
-                    downloadJob.setUpdated(LocalDateTime.now());
-                    jobRepository.save(downloadJob);
-                }
-            }
-        } catch (Exception e) {
-            log.warn(
-                    String.format(
-                            "Updating the Number of Processed Entries was failed for Download Job ID: %s , "
-                                    + "Last updated number of entries processed: %d",
-                            downloadJob.getId(), downloadJob.getEntriesProcessed()));
-        }
-    }
-
-    private boolean isNextCheckPointPassed(
-            DownloadJob downloadJob, long totalNumberOfProcessedEntries) {
-        long nextCheckPoint =
-                downloadJob.getEntriesProcessed()
-                        + asyncDownloadHeartBeatConfiguration.getInterval();
-        long totalNumberOfEntries = downloadJob.getTotalEntries();
-        return totalNumberOfProcessedEntries >= Math.min(totalNumberOfEntries, nextCheckPoint);
     }
 
     private Set<String> getToIds(IdMappingResult idMappingResult) {

@@ -1,10 +1,6 @@
 package org.uniprot.api.uniref.queue;
 
-import java.lang.reflect.Type;
-import java.util.Iterator;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -13,12 +9,14 @@ import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.rest.download.AbstractDownloadResultWriter;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.uniref.UniRefEntryLight;
+
+import java.lang.reflect.Type;
+import java.util.Iterator;
 
 @Component
 @Slf4j
@@ -33,18 +31,14 @@ public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<Uni
             MessageConverterContextFactory<UniRefEntryLight> converterContextFactory,
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RdfStreamer uniRefRdfStreamer,
-            DownloadJobRepository jobRepository,
-            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            RdfStreamer uniRefRdfStreamer, HeartBeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
                 uniRefRdfStreamer,
-                jobRepository,
-                MessageConverterContextFactory.Resource.UNIREF,
-                asyncDownloadHeartBeatConfiguration);
+                MessageConverterContextFactory.Resource.UNIREF, heartBeatProducer);
     }
 
     @Override

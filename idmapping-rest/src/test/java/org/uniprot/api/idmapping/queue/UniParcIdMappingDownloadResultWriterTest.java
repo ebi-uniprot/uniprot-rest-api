@@ -1,28 +1,12 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -35,10 +19,9 @@ import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -51,27 +34,32 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class UniParcIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPARC_WRITER_JOB_ID";
     public static final long PROCESSED_ENTRIES = 7L;
     private DownloadJob downloadJob;
-    private DownloadJobRepository jobRepository;
-    private AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
+    private HeartBeatProducer heartBeatProducer;
 
     @BeforeEach
     void setUp() {
-        jobRepository = mock(DownloadJobRepository.class);
         downloadJob = mock(DownloadJob.class);
-        asyncDownloadHeartBeatConfiguration = mock(AsyncDownloadHeartBeatConfiguration.class);
+        heartBeatProducer = mock(HeartBeatProducer.class);
         when(downloadJob.getId()).thenReturn(JOB_ID);
         when(downloadJob.getEntriesProcessed()).thenReturn(PROCESSED_ENTRIES);
-        when(jobRepository.findById(JOB_ID)).thenReturn(Optional.of(downloadJob));
-        when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(2L);
     }
 
     @Test
@@ -95,8 +83,7 @@ class UniParcIdMappingDownloadResultWriterTest {
                         storeStreamConfig,
                         downloadProperties,
                         rdfStream,
-                        jobRepository,
-                        asyncDownloadHeartBeatConfiguration);
+                        heartBeatProducer);
         Iterator<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("UPI000000000B").build())
                         .iterator();
@@ -106,10 +93,8 @@ class UniParcIdMappingDownloadResultWriterTest {
         assertNotNull(result);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void canWriteResultFile(boolean isEnabled) throws Exception {
-        when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(isEnabled);
+    @Test
+    void canWriteResultFile() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         RequestMappingHandlerAdapter contentAdaptor =
                 getMockedRequestMappingHandlerAdapter(objectMapper);
@@ -134,8 +119,7 @@ class UniParcIdMappingDownloadResultWriterTest {
                         storeStreamConfig,
                         downloadProperties,
                         null,
-                        jobRepository,
-                        asyncDownloadHeartBeatConfiguration);
+                        heartBeatProducer);
         List<IdMappingStringPair> mappedIds =
                 List.of(IdMappingStringPair.builder().from("P12345").to("UPI0000283A10").build());
         IdMappingDownloadRequestImpl request = new IdMappingDownloadRequestImpl();
@@ -195,11 +179,6 @@ class UniParcIdMappingDownloadResultWriterTest {
         JsonNode warningNode = warnings.get(0);
         assertEquals("1", warningNode.findValue("code").asText());
         assertEquals("msg", warningNode.findValue("message").asText());
-
-        verify(downloadJob, isEnabled ? times(1) : never())
-                .setEntriesProcessed(downloadJob.getEntriesProcessed() + 1);
-        verify(downloadJob, isEnabled ? times(1) : never()).setUpdated(any(LocalDateTime.class));
-        verify(jobRepository, isEnabled ? times(1) : never()).save(downloadJob);
     }
 
     @Test
@@ -219,8 +198,7 @@ class UniParcIdMappingDownloadResultWriterTest {
                         storeStreamConfig,
                         downloadProperties,
                         rdfStream,
-                        jobRepository,
-                        asyncDownloadHeartBeatConfiguration);
+                        heartBeatProducer);
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(

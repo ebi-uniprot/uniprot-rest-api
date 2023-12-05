@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.AbstractMessageListener;
@@ -53,14 +53,16 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
-            EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties, AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+            EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
+            HeartBeatProducer heartBeatProducer) {
         super(
                 converter,
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
                 downloadResultWriter,
-                rabbitTemplate, asyncDownloadHeartBeatConfiguration);
+                rabbitTemplate,
+                heartBeatProducer);
         this.service = service;
         this.embeddingsQueueConfigProps = embeddingsQueueConfigProperties;
     }
