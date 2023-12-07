@@ -61,7 +61,7 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
     protected List<FacetField.Count> getFacetCounts(String query, List<KeywordEntry> entries) {
         List<FacetField.Count> result = super.getFacetCounts(query, entries);
         return result.stream()
-                .peek(c -> c.setName(c.getName().toUpperCase()))
+                .map(c -> {c.setName(c.getName().toUpperCase()); return c;})
                 .collect(Collectors.toList());
     }
 
