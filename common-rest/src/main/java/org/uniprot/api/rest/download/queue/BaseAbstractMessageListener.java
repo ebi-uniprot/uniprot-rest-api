@@ -139,10 +139,10 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                 writer.append(id);
                 writer.newLine();
                 count++;
-                heartBeatProducer.updateEntriesProcessed(downloadJob, 1);
+                heartBeatProducer.create(downloadJob, 1);
             }
         }
-        heartBeatProducer.stopHeartBeat(downloadJob.getId());
+        heartBeatProducer.stop(downloadJob.getId());
         return count;
     }
 

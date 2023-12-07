@@ -104,19 +104,19 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 toIds.stream(),
                                 resource.name().toLowerCase(),
                                 SUPPORTED_RDF_MEDIA_TYPES.get(contentType),
-                                entries -> heartBeatProducer.updateEntriesProcessed(downloadJob, entries));
+                                entries -> heartBeatProducer.create(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
-                heartBeatProducer.stopHeartBeat(downloadJob.getId());
+                heartBeatProducer.stop(downloadJob.getId());
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 Set<String> toIds = getToIds(idMappingResult);
                 context.setEntityIds(
                         toIds.stream()
                                 .map(
                                         id -> {
-                                            heartBeatProducer.updateEntriesProcessed(downloadJob, 1);
+                                            heartBeatProducer.create(downloadJob, 1);
                                             return id;
                                         }));
-                heartBeatProducer.stopHeartBeat(downloadJob.getId());
+                heartBeatProducer.stop(downloadJob.getId());
             } else {
                 BatchStoreEntryPairIterable<T, S> batchStoreIterable =
                         getBatchStoreEntryPairIterable(
@@ -125,7 +125,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
                                 .map(
                                         entityCollection -> {
-                                            heartBeatProducer.updateEntriesProcessed(
+                                            heartBeatProducer.create(
                                                     downloadJob, entityCollection.size());
                                             return entityCollection;
                                         })
@@ -137,7 +137,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                                         jobId));
 
                 context.setEntities(entities);
-                heartBeatProducer.stopHeartBeat(downloadJob.getId());
+                heartBeatProducer.stop(downloadJob.getId());
             }
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();

@@ -103,18 +103,18 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                 dataType,
                                 SUPPORTED_RDF_TYPES.get(contentType),
                                 entries ->
-                                        heartBeatProducer.updateEntriesProcessed(
+                                        heartBeatProducer.create(
                                                 downloadJob, entries));
                 context.setEntityIds(rdfResponse);
-                heartBeatProducer.stopHeartBeat(downloadJob.getId());
+                heartBeatProducer.stop(downloadJob.getId());
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 context.setEntityIds(
                         ids.map(
                                 id -> {
-                                    heartBeatProducer.updateEntriesProcessed(downloadJob, 1);
+                                    heartBeatProducer.create(downloadJob, 1);
                                     return id;
                                 }));
-                heartBeatProducer.stopHeartBeat(downloadJob.getId());
+                heartBeatProducer.stop(downloadJob.getId());
             } else {
                 BatchStoreIterable<T> batchStoreIterable =
                         getBatchStoreIterable(ids.iterator(), storeRequest);
@@ -122,7 +122,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
                                 .map(
                                         entityCollection -> {
-                                            heartBeatProducer.updateEntriesProcessed(
+                                            heartBeatProducer.create(
                                                     downloadJob, entityCollection.size());
                                             return entityCollection;
                                         })
@@ -134,7 +134,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                                         jobId));
 
                 context.setEntities(entities);
-                heartBeatProducer.stopHeartBeat(downloadJob.getId());
+                heartBeatProducer.stop(downloadJob.getId());
             }
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
