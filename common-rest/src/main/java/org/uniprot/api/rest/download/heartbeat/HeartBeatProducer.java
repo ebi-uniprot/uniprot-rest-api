@@ -24,6 +24,13 @@ public class HeartBeatProducer {
         this.jobRepository = jobRepository;
     }
 
+    public void create(DownloadJob downloadJob) {
+        if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
+            downloadJob.setUpdated(LocalDateTime.now());
+            jobRepository.save(downloadJob);
+        }
+    }
+
     public void create(DownloadJob downloadJob, long size) {
         try {
             if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
@@ -53,7 +60,7 @@ public class HeartBeatProducer {
     private boolean isNextCheckPointPassed(
             DownloadJob downloadJob, long totalNumberOfProcessedEntries) {
         long nextCheckPoint =
-                downloadJob.getEntriesProcessed() - downloadJob.getEntriesProcessed()% asyncDownloadHeartBeatConfiguration.getInterval()
+                downloadJob.getEntriesProcessed() - (downloadJob.getEntriesProcessed() % asyncDownloadHeartBeatConfiguration.getInterval())
                         + asyncDownloadHeartBeatConfiguration.getInterval();
         long totalNumberOfEntries = downloadJob.getTotalEntries();
         return totalNumberOfProcessedEntries >= Math.min(totalNumberOfEntries, nextCheckPoint);

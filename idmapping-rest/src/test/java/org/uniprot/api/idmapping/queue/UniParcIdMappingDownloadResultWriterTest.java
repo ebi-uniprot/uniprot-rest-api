@@ -45,8 +45,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.*;
 
 class UniParcIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPARC_WRITER_JOB_ID";
@@ -179,6 +180,9 @@ class UniParcIdMappingDownloadResultWriterTest {
         JsonNode warningNode = warnings.get(0);
         assertEquals("1", warningNode.findValue("code").asText());
         assertEquals("msg", warningNode.findValue("message").asText());
+
+        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob), anyLong());
+        verify(heartBeatProducer).stop(JOB_ID);
     }
 
     @Test
