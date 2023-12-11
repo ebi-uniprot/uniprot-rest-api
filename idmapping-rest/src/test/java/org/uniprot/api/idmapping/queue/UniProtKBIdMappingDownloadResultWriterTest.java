@@ -92,7 +92,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
         assertNotNull(result);
     }
 
-   @Test
+    @Test
     void canWriteResultFile() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         RequestMappingHandlerAdapter contentAdaptor =
@@ -156,6 +156,9 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         .map(node -> node.findValue("value").asText())
                         .collect(Collectors.toSet())
                         .contains("P12345"));
+
+        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob), anyLong());
+        verify(heartBeatProducer).stop(JOB_ID);
     }
 
     @Test
@@ -185,7 +188,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
     }
 
     private MessageConverterContextFactory<UniProtKBEntryPair>
-            getMockedMessageConverterContextFactory() {
+    getMockedMessageConverterContextFactory() {
         MessageConverterContext<UniProtKBEntryPair> context =
                 MessageConverterContext.<UniProtKBEntryPair>builder()
                         .entities(Stream.of(UniProtKBEntryPair.builder().build()))

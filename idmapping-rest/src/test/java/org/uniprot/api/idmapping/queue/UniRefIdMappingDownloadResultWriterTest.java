@@ -49,8 +49,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.*;
 
 class UniRefIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIREF_WRITER_JOB_ID";
@@ -161,6 +162,9 @@ class UniRefIdMappingDownloadResultWriterTest {
                         .map(node -> node.findValue("value").asText())
                         .collect(Collectors.toSet())
                         .contains("UniRef100_P03910"));
+
+        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob), anyLong());
+        verify(heartBeatProducer).stop(JOB_ID);
     }
 
     @Test

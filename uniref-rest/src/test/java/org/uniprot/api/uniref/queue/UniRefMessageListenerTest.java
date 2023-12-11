@@ -82,6 +82,7 @@ class UniRefMessageListenerTest {
         Files.delete(idsFilePath);
         Assertions.assertTrue(Files.notExists(idsFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
+        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob));
     }
 
     private void verifyLoggingTotalNoOfEntries(
@@ -120,6 +121,7 @@ class UniRefMessageListenerTest {
         Path resultFilePath = Path.of("target/" + jobId + ".json");
         Assertions.assertTrue(Files.notExists(resultFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
+        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob));
     }
 
     @Test

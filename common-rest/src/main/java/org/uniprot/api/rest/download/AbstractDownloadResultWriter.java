@@ -84,13 +84,13 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
         AbstractUUWHttpMessageConverter<T, T> outputWriter =
                 getOutputWriter(contentType, getType());
         try (Stream<String> ids = Files.lines(idFile);
-                OutputStream output =
-                        Files.newOutputStream(
-                                resultPath,
-                                StandardOpenOption.WRITE,
-                                StandardOpenOption.CREATE,
-                                StandardOpenOption.TRUNCATE_EXISTING);
-                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
+             OutputStream output =
+                     Files.newOutputStream(
+                             resultPath,
+                             StandardOpenOption.WRITE,
+                             StandardOpenOption.CREATE,
+                             StandardOpenOption.TRUNCATE_EXISTING);
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(output)) {
 
             MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
             context.setFields(request.getFields());
@@ -106,7 +106,6 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                         heartBeatProducer.create(
                                                 downloadJob, entries));
                 context.setEntityIds(rdfResponse);
-                heartBeatProducer.stop(downloadJob.getId());
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 context.setEntityIds(
                         ids.map(
@@ -114,7 +113,6 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                     heartBeatProducer.create(downloadJob, 1);
                                     return id;
                                 }));
-                heartBeatProducer.stop(downloadJob.getId());
             } else {
                 BatchStoreIterable<T> batchStoreIterable =
                         getBatchStoreIterable(ids.iterator(), storeRequest);
@@ -134,11 +132,12 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                                         jobId));
 
                 context.setEntities(entities);
-                heartBeatProducer.stop(downloadJob.getId());
             }
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, gzipOutputStream, start, counter);
+        } finally {
+            heartBeatProducer.stop(downloadJob.getId());
         }
     }
 
