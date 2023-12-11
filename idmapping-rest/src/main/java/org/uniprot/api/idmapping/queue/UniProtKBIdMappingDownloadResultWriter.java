@@ -1,6 +1,12 @@
 package org.uniprot.api.idmapping.queue;
 
+import static org.uniprot.api.idmapping.service.impl.UniProtKBIdService.isLineageAllowed;
+
+import java.lang.reflect.Type;
+import java.util.Iterator;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -20,11 +26,6 @@ import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.config.ReturnFieldConfig;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
-
-import java.lang.reflect.Type;
-import java.util.Iterator;
-
-import static org.uniprot.api.idmapping.service.impl.UniProtKBIdService.isLineageAllowed;
 
 @Component
 @Slf4j

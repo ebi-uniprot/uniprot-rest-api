@@ -1,14 +1,15 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @Slf4j
@@ -60,7 +61,9 @@ public class HeartBeatProducer {
     private boolean isNextCheckPointPassed(
             DownloadJob downloadJob, long totalNumberOfProcessedEntries) {
         long nextCheckPoint =
-                downloadJob.getEntriesProcessed() - (downloadJob.getEntriesProcessed() % asyncDownloadHeartBeatConfiguration.getInterval())
+                downloadJob.getEntriesProcessed()
+                        - (downloadJob.getEntriesProcessed()
+                                % asyncDownloadHeartBeatConfiguration.getInterval())
                         + asyncDownloadHeartBeatConfiguration.getInterval();
         long totalNumberOfEntries = downloadJob.getTotalEntries();
         return totalNumberOfProcessedEntries >= Math.min(totalNumberOfEntries, nextCheckPoint);
