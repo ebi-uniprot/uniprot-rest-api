@@ -239,7 +239,7 @@ public abstract class BasicSearchController<T> {
                             } else {
                                 runRequestNow(contextSupplier, request, deferredResult);
                             }
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             log.error("Error occurred during processing.", e);
                             if (Utils.notNull(downloadGatekeeper)) {
                                 downloadGatekeeper.exit();
