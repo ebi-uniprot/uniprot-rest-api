@@ -103,7 +103,8 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                 ids,
                                 dataType,
                                 SUPPORTED_RDF_TYPES.get(contentType),
-                                entries -> heartBeatProducer.createWithProgress(downloadJob, entries));
+                                entries ->
+                                        heartBeatProducer.createWithProgress(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 context.setEntityIds(
