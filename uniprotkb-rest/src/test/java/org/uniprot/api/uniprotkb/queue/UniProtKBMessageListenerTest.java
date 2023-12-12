@@ -1,19 +1,5 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
-import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +21,20 @@ import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
+import static org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
 
 @ExtendWith({MockitoExtension.class})
 class UniProtKBMessageListenerTest {
@@ -82,6 +82,7 @@ class UniProtKBMessageListenerTest {
         Assertions.assertTrue(Files.notExists(idsFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
         verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob));
+        verify(heartBeatProducer).stop(jobId);
     }
 
     private void verifyLoggingTotalNoOfEntries(
@@ -121,6 +122,7 @@ class UniProtKBMessageListenerTest {
         Assertions.assertTrue(Files.notExists(resultFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
         verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob));
+        verify(heartBeatProducer).stop(jobId);
     }
 
     @Test

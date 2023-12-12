@@ -165,7 +165,7 @@ class UniRefIdMappingDownloadResultWriterTest {
                         .collect(Collectors.toSet())
                         .contains("UniRef100_P03910"));
 
-        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob), anyLong());
+        verify(heartBeatProducer, atLeastOnce()).createWithProgress(same(downloadJob), anyLong());
         verify(heartBeatProducer).stop(JOB_ID);
     }
 

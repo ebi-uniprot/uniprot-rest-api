@@ -159,7 +159,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         .collect(Collectors.toSet())
                         .contains("P12345"));
 
-        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob), anyLong());
+        verify(heartBeatProducer, atLeastOnce()).createWithProgress(same(downloadJob), anyLong());
         verify(heartBeatProducer).stop(JOB_ID);
     }
 
