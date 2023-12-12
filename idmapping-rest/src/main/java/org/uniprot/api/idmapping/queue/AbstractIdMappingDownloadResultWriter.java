@@ -106,7 +106,8 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 toIds.stream(),
                                 resource.name().toLowerCase(),
                                 SUPPORTED_RDF_MEDIA_TYPES.get(contentType),
-                                entries -> heartBeatProducer.createWithProgress(downloadJob, entries));
+                                entries ->
+                                        heartBeatProducer.createWithProgress(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 Set<String> toIds = getToIds(idMappingResult);

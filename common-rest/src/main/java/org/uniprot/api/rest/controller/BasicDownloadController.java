@@ -1,5 +1,8 @@
 package org.uniprot.api.rest.controller;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -10,9 +13,6 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
-
-import java.util.List;
-import java.util.Optional;
 
 public abstract class BasicDownloadController {
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
@@ -82,9 +82,7 @@ public abstract class BasicDownloadController {
     }
 
     private Long getProcessedEntries(DownloadJob job) {
-        return asyncDownloadHeartBeatConfiguration.isEnabled()
-                ? job.getEntriesProcessed()
-                : null;
+        return asyncDownloadHeartBeatConfiguration.isEnabled() ? job.getEntriesProcessed() : null;
     }
 
     protected String constructDownloadRedirectUrl(String resultFile, String url) {
