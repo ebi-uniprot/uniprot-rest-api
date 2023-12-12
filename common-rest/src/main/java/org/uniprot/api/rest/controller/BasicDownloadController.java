@@ -1,8 +1,5 @@
 package org.uniprot.api.rest.controller;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
@@ -13,6 +10,9 @@ import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
+
+import java.util.List;
+import java.util.Optional;
 
 public abstract class BasicDownloadController {
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
@@ -34,9 +34,7 @@ public abstract class BasicDownloadController {
                                         job.getStatus(),
                                         job.getCreated(),
                                         job.getTotalEntries(),
-                                        isAsyncDownloadHearBeatEnabled()
-                                                ? job.getEntriesProcessed()
-                                                : null,
+                                        getProcessedEntries(job),
                                         job.getUpdated()));
                 break;
             case PROCESSING:
@@ -47,9 +45,7 @@ public abstract class BasicDownloadController {
                                         JobStatus.RUNNING,
                                         job.getCreated(),
                                         job.getTotalEntries(),
-                                        isAsyncDownloadHearBeatEnabled()
-                                                ? job.getEntriesProcessed()
-                                                : null,
+                                        getProcessedEntries(job),
                                         job.getUpdated()));
                 break;
             case ABORTED:
@@ -64,9 +60,7 @@ public abstract class BasicDownloadController {
                                         List.of(abortedError),
                                         job.getCreated(),
                                         job.getTotalEntries(),
-                                        isAsyncDownloadHearBeatEnabled()
-                                                ? job.getEntriesProcessed()
-                                                : null,
+                                        getProcessedEntries(job),
                                         job.getUpdated()));
                 break;
             default:
@@ -79,9 +73,7 @@ public abstract class BasicDownloadController {
                                                 List.of(error),
                                                 job.getCreated(),
                                                 job.getTotalEntries(),
-                                                isAsyncDownloadHearBeatEnabled()
-                                                        ? job.getEntriesProcessed()
-                                                        : null,
+                                                getProcessedEntries(job),
                                                 job.getUpdated()));
                 break;
         }
@@ -89,8 +81,10 @@ public abstract class BasicDownloadController {
         return response;
     }
 
-    private boolean isAsyncDownloadHearBeatEnabled() {
-        return asyncDownloadHeartBeatConfiguration.isEnabled();
+    private Long getProcessedEntries(DownloadJob job) {
+        return asyncDownloadHeartBeatConfiguration.isEnabled()
+                ? job.getEntriesProcessed()
+                : null;
     }
 
     protected String constructDownloadRedirectUrl(String resultFile, String url) {

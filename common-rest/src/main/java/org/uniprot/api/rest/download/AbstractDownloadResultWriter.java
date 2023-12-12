@@ -103,13 +103,13 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                                 ids,
                                 dataType,
                                 SUPPORTED_RDF_TYPES.get(contentType),
-                                entries -> heartBeatProducer.create(downloadJob, entries));
+                                entries -> heartBeatProducer.createWithProgress(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 context.setEntityIds(
                         ids.map(
                                 id -> {
-                                    heartBeatProducer.create(downloadJob, 1);
+                                    heartBeatProducer.createWithProgress(downloadJob, 1);
                                     return id;
                                 }));
             } else {
@@ -119,7 +119,7 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
                                 .map(
                                         entityCollection -> {
-                                            heartBeatProducer.create(
+                                            heartBeatProducer.createWithProgress(
                                                     downloadJob, entityCollection.size());
                                             return entityCollection;
                                         })

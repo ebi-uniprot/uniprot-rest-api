@@ -183,7 +183,7 @@ class UniParcIdMappingDownloadResultWriterTest {
         assertEquals("1", warningNode.findValue("code").asText());
         assertEquals("msg", warningNode.findValue("message").asText());
 
-        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob), anyLong());
+        verify(heartBeatProducer, atLeastOnce()).createWithProgress(same(downloadJob), anyLong());
         verify(heartBeatProducer).stop(JOB_ID);
     }
 
