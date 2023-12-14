@@ -237,7 +237,7 @@ public abstract class BasicSearchController<T> {
                     () -> {
                         try {
                             String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
-                            if (applyStreamGatekeeping(userAgent)) {
+                            if (isGatekeeperNeeded(userAgent)) {
                                 runRequestIfNotBusy(contextSupplier, request, deferredResult);
                             } else {
                                 runRequestNow(contextSupplier, request, deferredResult);
@@ -354,7 +354,7 @@ public abstract class BasicSearchController<T> {
         result.setResult(ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build());
     }
 
-    private boolean applyStreamGatekeeping(String userAgent) {
+    private boolean isGatekeeperNeeded(String userAgent) {
         return Utils.notNull(downloadGatekeeper) &&
                 !isBrowserAsFarAsWeKnow(userAgent);
     }
