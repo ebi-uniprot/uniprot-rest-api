@@ -1,15 +1,14 @@
 package org.uniprot.api.rest.output.job;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.rest.download.model.JobStatus;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @author sahmad
@@ -22,9 +21,11 @@ public class JobStatusResponse {
     private final JobStatus jobStatus;
     private final List<ProblemPair> warnings;
     private final List<ProblemPair> errors;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime start;
     private Long totalEntries;
     private Long processedEntries;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastUpdated;
 
     public JobStatusResponse(JobStatus jobStatus) {

@@ -1,10 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
-import java.nio.file.Path;
-import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.core.MessageProperties;
@@ -31,6 +27,9 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
 import org.uniprot.api.uniprotkb.queue.embeddings.EmbeddingsQueueConfigProperties;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 /**
  * @author sahmad
@@ -77,6 +76,8 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
             processH5Message(message, (UniProtKBDownloadRequest) request, downloadJob, idsFile);
         } else {
+            Long totalHits = getSolrHits((UniProtKBDownloadRequest) request);
+            updateTotalEntries(downloadJob, totalHits);
             writeResult(request, downloadJob, idsFile, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
         }
@@ -90,6 +91,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         String jobId = downloadJob.getId();
         try {
             Long totalHits = getSolrHits(request);
+            updateTotalEntries(downloadJob, totalHits);
             Long maxAllowedHits = this.embeddingsQueueConfigProps.getMaxEntryCount();
             if (maxAllowedHits >= totalHits) {
                 writeSolrResult(request, downloadJob, idsFile);

@@ -1,11 +1,5 @@
 package org.uniprot.api.rest.download.heartbeat;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,6 +10,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class HeartBeatProducerTest {
@@ -38,10 +38,11 @@ class HeartBeatProducerTest {
         verifySavedJob(140L);
     }
 
-    private void verifySavedJob(long expected) {
+    private void verifySavedJob(long processedEntries) {
         verify(jobRepository).save(downloadJobArgumentCaptor.capture());
         DownloadJob savedJob = downloadJobArgumentCaptor.getValue();
-        assertEquals(expected, savedJob.getEntriesProcessed());
+        assertEquals(1, savedJob.getUpdateCount());
+        assertEquals(processedEntries, savedJob.getProcessedEntries());
         assertTrue(savedJob.getUpdated().isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
@@ -59,7 +60,8 @@ class HeartBeatProducerTest {
 
         verify(jobRepository, times(2)).save(downloadJobArgumentCaptor.capture());
         List<DownloadJob> savedJobs = downloadJobArgumentCaptor.getAllValues();
-        assertEquals(140L, savedJobs.get(1).getEntriesProcessed());
+        assertEquals(140L, savedJobs.get(1).getProcessedEntries());
+        assertEquals(2, savedJobs.get(1).getUpdateCount());
         assertTrue(savedJobs.get(1).getUpdated().isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
@@ -77,7 +79,8 @@ class HeartBeatProducerTest {
 
         verify(jobRepository, times(2)).save(downloadJobArgumentCaptor.capture());
         List<DownloadJob> savedJobs = downloadJobArgumentCaptor.getAllValues();
-        assertEquals(100L, savedJobs.get(1).getEntriesProcessed());
+        assertEquals(100L, savedJobs.get(1).getProcessedEntries());
+        assertEquals(2, savedJobs.get(1).getUpdateCount());
         assertTrue(savedJobs.get(1).getUpdated().isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
@@ -98,7 +101,7 @@ class HeartBeatProducerTest {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
         when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(200L);
         downloadJob.setTotalEntries(130L);
-        downloadJob.setEntriesProcessed(100L);
+        downloadJob.setProcessedEntries(100L);
 
         heartBeatProducer.createWithProgress(downloadJob, 70);
         heartBeatProducer.createWithProgress(downloadJob, 60);
@@ -157,14 +160,15 @@ class HeartBeatProducerTest {
         downloadJob.setTotalEntries(130L);
 
         heartBeatProducer.createWithProgress(downloadJob, 70);
-        downloadJob.setEntriesProcessed(0);
+        downloadJob.setProcessedEntries(0);
         heartBeatProducer.stop(JOB_ID);
         heartBeatProducer.createWithProgress(downloadJob, 70);
 
         verify(jobRepository, times(2)).save(downloadJobArgumentCaptor.capture());
         List<DownloadJob> savedJobs = downloadJobArgumentCaptor.getAllValues();
         DownloadJob afterStopped = savedJobs.get(1);
-        assertEquals(70L, afterStopped.getEntriesProcessed());
+        assertEquals(70L, afterStopped.getProcessedEntries());
+        assertEquals(2, savedJobs.get(1).getUpdateCount());
         assertTrue(afterStopped.getUpdated().isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 }

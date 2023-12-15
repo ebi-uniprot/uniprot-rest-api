@@ -66,7 +66,7 @@ class UniRefIdMappingDownloadResultWriterTest {
         downloadJob = mock(DownloadJob.class);
         heartBeatProducer = mock(HeartBeatProducer.class);
         when(downloadJob.getId()).thenReturn(JOB_ID);
-        when(downloadJob.getEntriesProcessed()).thenReturn(PROCESSED_ENTRIES);
+        when(downloadJob.getProcessedEntries()).thenReturn(PROCESSED_ENTRIES);
     }
 
     @Test

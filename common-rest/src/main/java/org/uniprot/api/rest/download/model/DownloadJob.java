@@ -1,18 +1,16 @@
 package org.uniprot.api.rest.download.model;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import lombok.Builder;
-import lombok.Data;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.Builder;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author sahmad
@@ -45,5 +43,6 @@ public class DownloadJob implements Serializable {
 
     private String format;
     private long totalEntries;
-    private long entriesProcessed;
+    private long processedEntries;
+    private long updateCount;
 }

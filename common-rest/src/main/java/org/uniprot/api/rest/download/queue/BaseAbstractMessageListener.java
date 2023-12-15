@@ -1,5 +1,16 @@
 package org.uniprot.api.rest.download.queue;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,18 +21,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.context.FileType;
 
 @Slf4j
 public abstract class BaseAbstractMessageListener implements MessageListener {
@@ -129,9 +128,8 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                 && downloadJob.getStatus() != JobStatus.ERROR;
     }
 
-    protected long writeIdentifiers(Path filePath, Stream<String> ids, DownloadJob downloadJob)
+    protected void writeIdentifiers(Path filePath, Stream<String> ids, DownloadJob downloadJob)
             throws IOException {
-        long count = 0;
         try (BufferedWriter writer =
                 Files.newBufferedWriter(
                         filePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
@@ -139,13 +137,11 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
             for (String id : iterator) {
                 writer.append(id);
                 writer.newLine();
-                count++;
                 heartBeatProducer.create(downloadJob);
             }
         } finally {
             heartBeatProducer.stop(downloadJob.getId());
         }
-        return count;
     }
 
     protected void updateDownloadJob(

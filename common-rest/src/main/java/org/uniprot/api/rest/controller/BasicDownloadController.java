@@ -82,7 +82,7 @@ public abstract class BasicDownloadController {
     }
 
     private Long getProcessedEntries(DownloadJob job) {
-        return asyncDownloadHeartBeatConfiguration.isEnabled() ? job.getEntriesProcessed() : null;
+        return asyncDownloadHeartBeatConfiguration.isEnabled() ? job.getProcessedEntries() : null;
     }
 
     protected String constructDownloadRedirectUrl(String resultFile, String url) {

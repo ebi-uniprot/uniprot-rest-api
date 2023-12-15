@@ -1,17 +1,16 @@
 package org.uniprot.api.rest.download.heartbeat;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.LongConsumer;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.LongConsumer;
 
 @Component
 @Slf4j
@@ -34,14 +33,16 @@ public class HeartBeatProducer {
                     downloadJob,
                     1,
                     pe -> {
+                        downloadJob.setUpdateCount(downloadJob.getUpdateCount() + 1);
                         downloadJob.setUpdated(LocalDateTime.now());
                         jobRepository.save(downloadJob);
                     });
+            log.debug(String.format("%s: Download Job ID: %s was updated in Solr phase", downloadJob.getUpdateCount(), downloadJob.getId()));
+
         } catch (Exception e) {
             log.warn(
                     String.format(
-                            "Updating the the last updated timestamp for Download Job ID: %s",
-                            downloadJob.getId()));
+                            "%s: Updating Download Job ID: %s in Solr phase was failed", downloadJob.getUpdateCount(), downloadJob.getId()));
         }
     }
 
@@ -60,9 +61,9 @@ public class HeartBeatProducer {
         String jobId = downloadJob.getId();
         downloadJobCheckPoints.put(jobId, totalNumberOfProcessedEntries);
         long nextCheckPoint =
-                downloadJob.getEntriesProcessed()
-                        - (downloadJob.getEntriesProcessed()
-                                % asyncDownloadHeartBeatConfiguration.getInterval())
+                downloadJob.getProcessedEntries()
+                        - (downloadJob.getProcessedEntries()
+                        % asyncDownloadHeartBeatConfiguration.getInterval())
                         + asyncDownloadHeartBeatConfiguration.getInterval();
         return totalNumberOfProcessedEntries
                 >= Math.min(downloadJob.getTotalEntries(), nextCheckPoint);
@@ -74,16 +75,18 @@ public class HeartBeatProducer {
                     downloadJob,
                     increase,
                     pe -> {
-                        downloadJob.setEntriesProcessed(pe);
+                        downloadJob.setProcessedEntries(pe);
+                        downloadJob.setUpdateCount(downloadJob.getUpdateCount() + 1);
                         downloadJob.setUpdated(LocalDateTime.now());
                         jobRepository.save(downloadJob);
                     });
+            log.debug(String.format("%s: Download Job ID: %s was updated in writing phase. Number of  entries processed: %d",
+                            downloadJob.getUpdateCount(), downloadJob.getId(), downloadJob.getProcessedEntries()));
         } catch (Exception e) {
             log.warn(
                     String.format(
-                            "Updating the Number of Processed Entries was failed for Download Job ID: %s , "
-                                    + "Last updated number of entries processed: %d",
-                            downloadJob.getId(), downloadJob.getEntriesProcessed()));
+                            "%s: Updating Download Job ID: %s in writing phase was failed. Number of entries processed: %d",
+                            downloadJob.getUpdateCount(), downloadJob.getId(), downloadJob.getProcessedEntries()));
         }
     }
 
