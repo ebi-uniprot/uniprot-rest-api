@@ -1,16 +1,17 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.LongConsumer;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.LongConsumer;
 
 @Component
 @Slf4j
@@ -20,7 +21,9 @@ public class HeartBeatProducer {
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
     private final DownloadJobRepository jobRepository;
 
-    public HeartBeatProducer(AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration, DownloadJobRepository jobRepository) {
+    public HeartBeatProducer(
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration,
+            DownloadJobRepository jobRepository) {
         this.asyncDownloadHeartBeatConfiguration = asyncDownloadHeartBeatConfiguration;
         this.jobRepository = jobRepository;
     }
@@ -33,10 +36,13 @@ public class HeartBeatProducer {
                     pe -> {
                         long newUpdateCount = downloadJob.getUpdateCount() + 1;
                         downloadJob.setUpdateCount(newUpdateCount);
-                        jobRepository.update(downloadJob.getId(), Map.of(
-                                "updateCount", newUpdateCount,
-                                "updated", LocalDateTime.now()
-                        ));
+                        jobRepository.update(
+                                downloadJob.getId(),
+                                Map.of(
+                                        "updateCount",
+                                        newUpdateCount,
+                                        "updated",
+                                        LocalDateTime.now()));
                     });
             log.debug(
                     String.format(
@@ -68,7 +74,7 @@ public class HeartBeatProducer {
         long nextCheckPoint =
                 downloadJob.getProcessedEntries()
                         - (downloadJob.getProcessedEntries()
-                        % asyncDownloadHeartBeatConfiguration.getInterval())
+                                % asyncDownloadHeartBeatConfiguration.getInterval())
                         + asyncDownloadHeartBeatConfiguration.getInterval();
         return totalNumberOfProcessedEntries
                 >= Math.min(downloadJob.getTotalEntries(), nextCheckPoint);
@@ -83,11 +89,12 @@ public class HeartBeatProducer {
                         long newUpdateCount = downloadJob.getUpdateCount() + 1;
                         downloadJob.setUpdateCount(newUpdateCount);
                         downloadJob.setProcessedEntries(pe);
-                        jobRepository.update(downloadJob.getId(), Map.of(
-                                "updateCount", newUpdateCount,
-                                "updated", LocalDateTime.now(),
-                                "processedEntries", pe
-                        ));
+                        jobRepository.update(
+                                downloadJob.getId(),
+                                Map.of(
+                                        "updateCount", newUpdateCount,
+                                        "updated", LocalDateTime.now(),
+                                        "processedEntries", pe));
                     });
             log.debug(
                     String.format(
