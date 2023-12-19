@@ -1,7 +1,5 @@
 package org.uniprot.api.rest.download.configuration;
 
-import java.io.IOException;
-
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -14,6 +12,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.uniprot.api.rest.download.model.DownloadJob;
+
+import java.io.IOException;
 
 /**
  * @author sahmad
