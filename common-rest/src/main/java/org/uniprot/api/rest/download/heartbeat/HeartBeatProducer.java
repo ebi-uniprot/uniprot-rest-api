@@ -1,16 +1,17 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.LongConsumer;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.LongConsumer;
 
 @Component
 @Slf4j
@@ -40,11 +41,7 @@ public class HeartBeatProducer {
                         downloadJob.setUpdateCount(newUpdateCount);
                         jobRepository.update(
                                 downloadJob.getId(),
-                                Map.of(
-                                        UPDATE_COUNT,
-                                        newUpdateCount,
-                                        UPDATED,
-                                        LocalDateTime.now()));
+                                Map.of(UPDATE_COUNT, newUpdateCount, UPDATED, LocalDateTime.now()));
                     });
             log.debug(
                     String.format(
