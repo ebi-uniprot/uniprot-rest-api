@@ -1,22 +1,24 @@
 package org.uniprot.api.rest.download.heartbeat;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.LongConsumer;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.LongConsumer;
+
 @Component
 @Slf4j
 @Profile({"asyncDownload"})
 public class HeartBeatProducer {
+    private static final String UPDATE_COUNT = "updateCount";
+    private static final String UPDATED = "updated";
+    private static final String PROCESSED_ENTRIES = "processedEntries";
     private final Map<String, Long> downloadJobCheckPoints = new HashMap<>();
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
     private final DownloadJobRepository jobRepository;
@@ -39,9 +41,9 @@ public class HeartBeatProducer {
                         jobRepository.update(
                                 downloadJob.getId(),
                                 Map.of(
-                                        "updateCount",
+                                        UPDATE_COUNT,
                                         newUpdateCount,
-                                        "updated",
+                                        UPDATED,
                                         LocalDateTime.now()));
                     });
             log.debug(
@@ -92,9 +94,9 @@ public class HeartBeatProducer {
                         jobRepository.update(
                                 downloadJob.getId(),
                                 Map.of(
-                                        "updateCount", newUpdateCount,
-                                        "updated", LocalDateTime.now(),
-                                        "processedEntries", pe));
+                                        UPDATE_COUNT, newUpdateCount,
+                                        UPDATED, LocalDateTime.now(),
+                                        PROCESSED_ENTRIES, pe));
                     });
             log.debug(
                     String.format(
