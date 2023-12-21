@@ -1,16 +1,17 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.LongConsumer;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.LongConsumer;
 
 @Component
 @Slf4j
@@ -59,10 +60,12 @@ public class HeartBeatProducer {
     private void createIfEligible(DownloadJob downloadJob, long size, LongConsumer consumer) {
         if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
             String jobId = downloadJob.getId();
-            long totalProcessedEntries =
-                    processedEntries.getOrDefault(jobId, 0L) + size;
+            long totalProcessedEntries = processedEntries.getOrDefault(jobId, 0L) + size;
             processedEntries.put(jobId, totalProcessedEntries);
-            if (isEligibleToUpdate(downloadJob.getTotalEntries(), totalProcessedEntries, lastSavedPoints.getOrDefault(jobId, 0L))) {
+            if (isEligibleToUpdate(
+                    downloadJob.getTotalEntries(),
+                    totalProcessedEntries,
+                    lastSavedPoints.getOrDefault(jobId, 0L))) {
                 consumer.accept(totalProcessedEntries);
                 lastSavedPoints.put(jobId, totalProcessedEntries);
             }
@@ -73,11 +76,9 @@ public class HeartBeatProducer {
             long totalEntries, long totalNumberOfProcessedEntries, long lastSavedPoint) {
         long nextCheckPoint =
                 lastSavedPoint
-                        - (lastSavedPoint
-                        % asyncDownloadHeartBeatConfiguration.getInterval())
+                        - (lastSavedPoint % asyncDownloadHeartBeatConfiguration.getInterval())
                         + asyncDownloadHeartBeatConfiguration.getInterval();
-        return totalNumberOfProcessedEntries
-                >= Math.min(totalEntries, nextCheckPoint);
+        return totalNumberOfProcessedEntries >= Math.min(totalEntries, nextCheckPoint);
     }
 
     public void createWithProgress(DownloadJob downloadJob, long increase) {

@@ -1,5 +1,12 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -11,13 +18,6 @@ import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfigu
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class HeartBeatProducerTest {
     public static final String JOB_ID = "downloadJobId";
@@ -25,14 +25,10 @@ class HeartBeatProducerTest {
     public static final String PROCESSED_ENTRIES = "processedEntries";
     public static final String UPDATED = "updated";
     private final DownloadJob downloadJob = DownloadJob.builder().id(JOB_ID).build();
-    @Mock
-    private AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
-    @Mock
-    private DownloadJobRepository jobRepository;
-    @Captor
-    private ArgumentCaptor<Map<String, Object>> downloadJobArgumentCaptor;
-    @InjectMocks
-    private HeartBeatProducer heartBeatProducer;
+    @Mock private AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
+    @Mock private DownloadJobRepository jobRepository;
+    @Captor private ArgumentCaptor<Map<String, Object>> downloadJobArgumentCaptor;
+    @InjectMocks private HeartBeatProducer heartBeatProducer;
 
     @Test
     void createWithProgress_whenHeartBeatEnabledAndIntervalIsBiggerThanBatchSize() {
