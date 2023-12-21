@@ -19,7 +19,7 @@ public class HeartBeatProducer {
     private static final String UPDATE_COUNT = "updateCount";
     private static final String UPDATED = "updated";
     private static final String PROCESSED_ENTRIES = "processedEntries";
-    private final Map<String, Long> numberOfProcessedEntries = new HashMap<>();
+    private final Map<String, Long> processedEntries = new HashMap<>();
     private final Map<String, Long> lastSavedPoints = new HashMap<>();
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
     private final DownloadJobRepository jobRepository;
@@ -59,12 +59,12 @@ public class HeartBeatProducer {
     private void createIfEligible(DownloadJob downloadJob, long size, LongConsumer consumer) {
         if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
             String jobId = downloadJob.getId();
-            long totalNumberOfProcessedEntries =
-                    numberOfProcessedEntries.getOrDefault(jobId, 0L) + size;
-            numberOfProcessedEntries.put(jobId, totalNumberOfProcessedEntries);
-            if (isEligibleToUpdate(downloadJob.getTotalEntries(), totalNumberOfProcessedEntries, lastSavedPoints.getOrDefault(jobId, 0L))) {
-                consumer.accept(totalNumberOfProcessedEntries);
-                lastSavedPoints.put(jobId, totalNumberOfProcessedEntries);
+            long totalProcessedEntries =
+                    processedEntries.getOrDefault(jobId, 0L) + size;
+            processedEntries.put(jobId, totalProcessedEntries);
+            if (isEligibleToUpdate(downloadJob.getTotalEntries(), totalProcessedEntries, lastSavedPoints.getOrDefault(jobId, 0L))) {
+                consumer.accept(totalProcessedEntries);
+                lastSavedPoints.put(jobId, totalProcessedEntries);
             }
         }
     }
@@ -113,7 +113,7 @@ public class HeartBeatProducer {
     }
 
     public void stop(String jobId) {
-        numberOfProcessedEntries.remove(jobId);
+        processedEntries.remove(jobId);
         lastSavedPoints.remove(jobId);
     }
 }
