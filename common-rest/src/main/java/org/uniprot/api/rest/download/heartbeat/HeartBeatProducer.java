@@ -1,17 +1,16 @@
 package org.uniprot.api.rest.download.heartbeat;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.LongConsumer;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.LongConsumer;
 
 @Component
 @Slf4j
@@ -20,7 +19,8 @@ public class HeartBeatProducer {
     private static final String UPDATE_COUNT = "updateCount";
     private static final String UPDATED = "updated";
     private static final String PROCESSED_ENTRIES = "processedEntries";
-    private final Map<String, Long> downloadJobCheckPoints = new HashMap<>();
+    private final Map<String, Long> numberOfProcessedEntries = new HashMap<>();
+    private final Map<String, Long> lastSavedPoints = new HashMap<>();
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
     private final DownloadJobRepository jobRepository;
 
@@ -58,25 +58,26 @@ public class HeartBeatProducer {
 
     private void createIfEligible(DownloadJob downloadJob, long size, LongConsumer consumer) {
         if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
+            String jobId = downloadJob.getId();
             long totalNumberOfProcessedEntries =
-                    downloadJobCheckPoints.getOrDefault(downloadJob.getId(), 0L) + size;
-            if (isEligibleToUpdate(downloadJob, totalNumberOfProcessedEntries)) {
+                    numberOfProcessedEntries.getOrDefault(jobId, 0L) + size;
+            numberOfProcessedEntries.put(jobId, totalNumberOfProcessedEntries);
+            if (isEligibleToUpdate(downloadJob.getTotalEntries(), totalNumberOfProcessedEntries, lastSavedPoints.getOrDefault(jobId, 0L))) {
                 consumer.accept(totalNumberOfProcessedEntries);
+                lastSavedPoints.put(jobId, totalNumberOfProcessedEntries);
             }
         }
     }
 
     private boolean isEligibleToUpdate(
-            DownloadJob downloadJob, long totalNumberOfProcessedEntries) {
-        String jobId = downloadJob.getId();
-        downloadJobCheckPoints.put(jobId, totalNumberOfProcessedEntries);
+            long totalEntries, long totalNumberOfProcessedEntries, long lastSavedPoint) {
         long nextCheckPoint =
-                downloadJob.getProcessedEntries()
-                        - (downloadJob.getProcessedEntries()
-                                % asyncDownloadHeartBeatConfiguration.getInterval())
+                lastSavedPoint
+                        - (lastSavedPoint
+                        % asyncDownloadHeartBeatConfiguration.getInterval())
                         + asyncDownloadHeartBeatConfiguration.getInterval();
         return totalNumberOfProcessedEntries
-                >= Math.min(downloadJob.getTotalEntries(), nextCheckPoint);
+                >= Math.min(totalEntries, nextCheckPoint);
     }
 
     public void createWithProgress(DownloadJob downloadJob, long increase) {
@@ -112,6 +113,7 @@ public class HeartBeatProducer {
     }
 
     public void stop(String jobId) {
-        downloadJobCheckPoints.remove(jobId);
+        numberOfProcessedEntries.remove(jobId);
+        lastSavedPoints.remove(jobId);
     }
 }
