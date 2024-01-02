@@ -10,5 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class AsyncDownloadHeartBeatConfiguration {
     private boolean enabled = false;
-    private long interval = 0;
+    private long resultsInterval = 0;
+    private long idsInterval = 0;
 }

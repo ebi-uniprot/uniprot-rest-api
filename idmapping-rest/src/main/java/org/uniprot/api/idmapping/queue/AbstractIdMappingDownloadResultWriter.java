@@ -1,8 +1,24 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
-import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
-import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.uniprot.api.common.repository.search.EntryPair;
+import org.uniprot.api.common.repository.search.ExtraOptions;
+import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
+import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
+import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.output.context.FileType;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
+import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,26 +38,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.zip.GZIPOutputStream;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.uniprot.api.common.repository.search.EntryPair;
-import org.uniprot.api.common.repository.search.ExtraOptions;
-import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
-import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
-import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
-import org.uniprot.api.rest.output.context.FileType;
-import org.uniprot.api.rest.output.context.MessageConverterContext;
-import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.output.converter.AbstractUUWHttpMessageConverter;
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
+import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
 
 @Slf4j
 public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<S>, S> {
@@ -107,7 +106,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 resource.name().toLowerCase(),
                                 SUPPORTED_RDF_MEDIA_TYPES.get(contentType),
                                 entries ->
-                                        heartBeatProducer.createWithProgress(downloadJob, entries));
+                                        heartBeatProducer.createForResults(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 Set<String> toIds = getToIds(idMappingResult);
@@ -115,7 +114,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                         toIds.stream()
                                 .map(
                                         id -> {
-                                            heartBeatProducer.createWithProgress(downloadJob, 1);
+                                            heartBeatProducer.createForResults(downloadJob, 1);
                                             return id;
                                         }));
             } else {
@@ -126,7 +125,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
                                 .map(
                                         entityCollection -> {
-                                            heartBeatProducer.createWithProgress(
+                                            heartBeatProducer.createForResults(
                                                     downloadJob, entityCollection.size());
                                             return entityCollection;
                                         })

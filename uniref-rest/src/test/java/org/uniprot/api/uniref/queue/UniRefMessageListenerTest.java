@@ -1,17 +1,5 @@
 package org.uniprot.api.uniref.queue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +22,18 @@ import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith({MockitoExtension.class})
 class UniRefMessageListenerTest {
@@ -81,7 +81,7 @@ class UniRefMessageListenerTest {
         Files.delete(idsFilePath);
         Assertions.assertTrue(Files.notExists(idsFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
-        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob));
+        verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
         verify(heartBeatProducer).stop(jobId);
     }
 
@@ -121,7 +121,7 @@ class UniRefMessageListenerTest {
         Path resultFilePath = Path.of("target/" + jobId + ".json");
         Assertions.assertTrue(Files.notExists(resultFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
-        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob));
+        verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
         verify(heartBeatProducer).stop(jobId);
     }
 

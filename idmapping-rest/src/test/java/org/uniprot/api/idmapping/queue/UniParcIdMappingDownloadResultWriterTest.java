@@ -1,22 +1,9 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,9 +34,20 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniparc.VoldemortInMemoryUniParcEntryStore;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.*;
 
 class UniParcIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPARC_WRITER_JOB_ID";
@@ -183,7 +181,7 @@ class UniParcIdMappingDownloadResultWriterTest {
         assertEquals("1", warningNode.findValue("code").asText());
         assertEquals("msg", warningNode.findValue("message").asText());
 
-        verify(heartBeatProducer, atLeastOnce()).createWithProgress(same(downloadJob), anyLong());
+        verify(heartBeatProducer, atLeastOnce()).createForResults(same(downloadJob), anyLong());
         verify(heartBeatProducer).stop(JOB_ID);
     }
 

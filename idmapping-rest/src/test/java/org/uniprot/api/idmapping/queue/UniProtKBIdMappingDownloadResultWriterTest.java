@@ -1,20 +1,9 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import net.jodah.failsafe.RetryPolicy;
-
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,9 +33,18 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import java.io.File;
+import java.io.FileInputStream;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class UniProtKBIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPROTKB_WRITER_JOB_ID";
@@ -159,7 +157,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         .collect(Collectors.toSet())
                         .contains("P12345"));
 
-        verify(heartBeatProducer, atLeastOnce()).createWithProgress(same(downloadJob), anyLong());
+        verify(heartBeatProducer, atLeastOnce()).createForResults(same(downloadJob), anyLong());
         verify(heartBeatProducer).stop(JOB_ID);
     }
 
