@@ -1,5 +1,12 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -10,13 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class HeartBeatProducerTest {

@@ -1,16 +1,17 @@
 package org.uniprot.api.rest.download.heartbeat;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.LongConsumer;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.LongConsumer;
 
 @Component
 @Slf4j
@@ -57,7 +58,8 @@ public class HeartBeatProducer {
         }
     }
 
-    private void createIfEligible(DownloadJob downloadJob, long size, long interval, LongConsumer consumer) {
+    private void createIfEligible(
+            DownloadJob downloadJob, long size, long interval, LongConsumer consumer) {
         if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
             String jobId = downloadJob.getId();
             long totalProcessedEntries = processedEntries.getOrDefault(jobId, 0L) + size;
@@ -65,7 +67,8 @@ public class HeartBeatProducer {
             if (isEligibleToUpdate(
                     downloadJob.getTotalEntries(),
                     totalProcessedEntries,
-                    lastSavedPoints.getOrDefault(jobId, 0L), interval)) {
+                    lastSavedPoints.getOrDefault(jobId, 0L),
+                    interval)) {
                 consumer.accept(totalProcessedEntries);
                 lastSavedPoints.put(jobId, totalProcessedEntries);
             }
@@ -73,10 +76,11 @@ public class HeartBeatProducer {
     }
 
     private boolean isEligibleToUpdate(
-            long totalEntries, long totalNumberOfProcessedEntries, long lastSavedPoint, long interval) {
-        long nextCheckPoint =
-                lastSavedPoint
-                        - (lastSavedPoint % interval) + interval;
+            long totalEntries,
+            long totalNumberOfProcessedEntries,
+            long lastSavedPoint,
+            long interval) {
+        long nextCheckPoint = lastSavedPoint - (lastSavedPoint % interval) + interval;
         return totalNumberOfProcessedEntries >= Math.min(totalEntries, nextCheckPoint);
     }
 
