@@ -1,17 +1,17 @@
 package org.uniprot.api.rest.download.heartbeat;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.LongConsumer;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.LongConsumer;
 
 @Component
 @Slf4j
@@ -53,8 +53,10 @@ public class HeartBeatProducer {
         } catch (Exception e) {
             log.warn(
                     String.format(
-                            "%s: Updating Download Job ID: %s in Solr phase was failed",
-                            downloadJob.getUpdateCount(), downloadJob.getId()));
+                            "%s: Updating Download Job ID: %s in Solr phase was failed, %s",
+                            downloadJob.getUpdateCount(),
+                            downloadJob.getId(),
+                            Arrays.toString(e.getStackTrace())));
         }
     }
 
@@ -110,10 +112,11 @@ public class HeartBeatProducer {
         } catch (Exception e) {
             log.warn(
                     String.format(
-                            "%s: Updating Download Job ID: %s in writing phase was failed. Number of entries processed: %d",
+                            "%s: Updating Download Job ID: %s in writing phase was failed. Number of entries processed: %d, %s",
                             downloadJob.getUpdateCount(),
                             downloadJob.getId(),
-                            downloadJob.getProcessedEntries()));
+                            downloadJob.getProcessedEntries(),
+                            Arrays.toString(e.getStackTrace())));
         }
     }
 
