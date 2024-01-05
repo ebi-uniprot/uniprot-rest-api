@@ -1,17 +1,18 @@
 package org.uniprot.api.rest.download.heartbeat;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.LongConsumer;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
 @Component
 @Slf4j
