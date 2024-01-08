@@ -1,17 +1,18 @@
 package org.uniprot.api.rest.download.heartbeat;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.LongConsumer;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
 @Component
 @Slf4j
@@ -20,9 +21,9 @@ public class HeartBeatProducer {
     private static final String UPDATE_COUNT = "updateCount";
     private static final String UPDATED = "updated";
     private static final String PROCESSED_ENTRIES = "processedEntries";
-    //number processed entries so far for a given job id
+    // number processed entries so far for a given job id
     private final Map<String, Long> processedEntries = new HashMap<>();
-    //number processed entries for a given job id, at the time it was last updated in the cache
+    // number processed entries for a given job id, at the time it was last updated in the cache
     private final Map<String, Long> lastSavedPoints = new HashMap<>();
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
     private final DownloadJobRepository jobRepository;
@@ -84,9 +85,9 @@ public class HeartBeatProducer {
             long totalNumberOfProcessedEntries,
             long lastSavedPoint,
             long interval) {
-        //example, batchSize=70, interval=50
-        //first update is 70
-        //next checkPoint = 70 - (70%50) + 50 = 100
+        // example, batchSize=70, interval=50
+        // first update is 70
+        // next checkPoint = 70 - (70%50) + 50 = 100
         long nextCheckPoint = lastSavedPoint - (lastSavedPoint % interval) + interval;
         return totalNumberOfProcessedEntries >= Math.min(totalEntries, nextCheckPoint);
     }
