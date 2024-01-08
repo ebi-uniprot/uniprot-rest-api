@@ -192,7 +192,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         assertEquals(isError, Objects.nonNull(downloadJob.getError()));
         assertEquals(entryCount, downloadJob.getTotalEntries());
         if (downloadJob.getStatus() == JobStatus.FINISHED) {
-            assertEquals(entryCount, downloadJob.getEntriesProcessed());
+            assertEquals(entryCount, downloadJob.getProcessedEntries());
             assertNotNull(downloadJob.getResultFile());
             assertEquals(jobId, downloadJob.getResultFile());
         } else {

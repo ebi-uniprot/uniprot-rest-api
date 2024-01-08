@@ -129,9 +129,8 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                 && downloadJob.getStatus() != JobStatus.ERROR;
     }
 
-    protected long writeIdentifiers(Path filePath, Stream<String> ids, DownloadJob downloadJob)
+    protected void writeIdentifiers(Path filePath, Stream<String> ids, DownloadJob downloadJob)
             throws IOException {
-        long count = 0;
         try (BufferedWriter writer =
                 Files.newBufferedWriter(
                         filePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
@@ -139,13 +138,11 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
             for (String id : iterator) {
                 writer.append(id);
                 writer.newLine();
-                count++;
-                heartBeatProducer.create(downloadJob);
+                heartBeatProducer.createForIds(downloadJob);
             }
         } finally {
             heartBeatProducer.stop(downloadJob.getId());
         }
-        return count;
     }
 
     protected void updateDownloadJob(

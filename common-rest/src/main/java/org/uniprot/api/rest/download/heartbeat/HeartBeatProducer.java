@@ -1,6 +1,7 @@
 package org.uniprot.api.rest.download.heartbeat;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.LongConsumer;
@@ -17,7 +18,13 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 @Slf4j
 @Profile({"asyncDownload"})
 public class HeartBeatProducer {
-    private final Map<String, Long> downloadJobCheckPoints = new HashMap<>();
+    private static final String UPDATE_COUNT = "updateCount";
+    private static final String UPDATED = "updated";
+    private static final String PROCESSED_ENTRIES = "processedEntries";
+    // number processed entries so far for a given job id
+    private final Map<String, Long> processedEntries = new HashMap<>();
+    // number processed entries for a given job id, at the time it was last updated in the cache
+    private final Map<String, Long> lastSavedPoints = new HashMap<>();
     private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
     private final DownloadJobRepository jobRepository;
 
@@ -28,66 +35,99 @@ public class HeartBeatProducer {
         this.jobRepository = jobRepository;
     }
 
-    public void create(DownloadJob downloadJob) {
+    public void createForIds(DownloadJob downloadJob) {
         try {
             createIfEligible(
                     downloadJob,
                     1,
+                    asyncDownloadHeartBeatConfiguration.getIdsInterval(),
                     pe -> {
-                        downloadJob.setUpdated(LocalDateTime.now());
-                        jobRepository.save(downloadJob);
+                        long newUpdateCount = downloadJob.getUpdateCount() + 1;
+                        downloadJob.setUpdateCount(newUpdateCount);
+                        jobRepository.update(
+                                downloadJob.getId(),
+                                Map.of(UPDATE_COUNT, newUpdateCount, UPDATED, LocalDateTime.now()));
                     });
+            log.debug(
+                    String.format(
+                            "%s: Download Job ID: %s was updated in Solr phase",
+                            downloadJob.getUpdateCount(), downloadJob.getId()));
+
         } catch (Exception e) {
             log.warn(
                     String.format(
-                            "Updating the the last updated timestamp for Download Job ID: %s",
-                            downloadJob.getId()));
+                            "%s: Updating Download Job ID: %s in Solr phase was failed, %s",
+                            downloadJob.getUpdateCount(),
+                            downloadJob.getId(),
+                            Arrays.toString(e.getStackTrace())));
         }
     }
 
-    private void createIfEligible(DownloadJob downloadJob, long size, LongConsumer consumer) {
+    private void createIfEligible(
+            DownloadJob downloadJob, long size, long interval, LongConsumer consumer) {
         if (asyncDownloadHeartBeatConfiguration.isEnabled()) {
-            long totalNumberOfProcessedEntries =
-                    downloadJobCheckPoints.getOrDefault(downloadJob.getId(), 0L) + size;
-            if (isEligibleToUpdate(downloadJob, totalNumberOfProcessedEntries)) {
-                consumer.accept(totalNumberOfProcessedEntries);
+            String jobId = downloadJob.getId();
+            long totalProcessedEntries = processedEntries.getOrDefault(jobId, 0L) + size;
+            processedEntries.put(jobId, totalProcessedEntries);
+            if (isEligibleToUpdate(
+                    downloadJob.getTotalEntries(),
+                    totalProcessedEntries,
+                    lastSavedPoints.getOrDefault(jobId, 0L),
+                    interval)) {
+                consumer.accept(totalProcessedEntries);
+                lastSavedPoints.put(jobId, totalProcessedEntries);
             }
         }
     }
 
     private boolean isEligibleToUpdate(
-            DownloadJob downloadJob, long totalNumberOfProcessedEntries) {
-        String jobId = downloadJob.getId();
-        downloadJobCheckPoints.put(jobId, totalNumberOfProcessedEntries);
-        long nextCheckPoint =
-                downloadJob.getEntriesProcessed()
-                        - (downloadJob.getEntriesProcessed()
-                                % asyncDownloadHeartBeatConfiguration.getInterval())
-                        + asyncDownloadHeartBeatConfiguration.getInterval();
-        return totalNumberOfProcessedEntries
-                >= Math.min(downloadJob.getTotalEntries(), nextCheckPoint);
+            long totalEntries,
+            long totalNumberOfProcessedEntries,
+            long lastSavedPoint,
+            long interval) {
+        // example, batchSize=70, interval=50
+        // first update is 70
+        // next checkPoint = 70 - (70%50) + 50 = 100
+        long nextCheckPoint = lastSavedPoint - (lastSavedPoint % interval) + interval;
+        return totalNumberOfProcessedEntries >= Math.min(totalEntries, nextCheckPoint);
     }
 
-    public void createWithProgress(DownloadJob downloadJob, long increase) {
+    public void createForResults(DownloadJob downloadJob, long increase) {
         try {
             createIfEligible(
                     downloadJob,
                     increase,
+                    asyncDownloadHeartBeatConfiguration.getResultsInterval(),
                     pe -> {
-                        downloadJob.setEntriesProcessed(pe);
-                        downloadJob.setUpdated(LocalDateTime.now());
-                        jobRepository.save(downloadJob);
+                        long newUpdateCount = downloadJob.getUpdateCount() + 1;
+                        downloadJob.setUpdateCount(newUpdateCount);
+                        downloadJob.setProcessedEntries(pe);
+                        jobRepository.update(
+                                downloadJob.getId(),
+                                Map.of(
+                                        UPDATE_COUNT, newUpdateCount,
+                                        UPDATED, LocalDateTime.now(),
+                                        PROCESSED_ENTRIES, pe));
                     });
+            log.debug(
+                    String.format(
+                            "%s: Download Job ID: %s was updated in writing phase. Number of  entries processed: %d",
+                            downloadJob.getUpdateCount(),
+                            downloadJob.getId(),
+                            downloadJob.getProcessedEntries()));
         } catch (Exception e) {
             log.warn(
                     String.format(
-                            "Updating the Number of Processed Entries was failed for Download Job ID: %s , "
-                                    + "Last updated number of entries processed: %d",
-                            downloadJob.getId(), downloadJob.getEntriesProcessed()));
+                            "%s: Updating Download Job ID: %s in writing phase was failed. Number of entries processed: %d, %s",
+                            downloadJob.getUpdateCount(),
+                            downloadJob.getId(),
+                            downloadJob.getProcessedEntries(),
+                            Arrays.toString(e.getStackTrace())));
         }
     }
 
     public void stop(String jobId) {
-        downloadJobCheckPoints.remove(jobId);
+        processedEntries.remove(jobId);
+        lastSavedPoints.remove(jobId);
     }
 }

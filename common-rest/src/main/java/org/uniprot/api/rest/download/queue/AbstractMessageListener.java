@@ -83,8 +83,7 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
 
     protected void writeSolrResult(DownloadRequest request, DownloadJob downloadJob, Path idsFile)
             throws IOException {
-        long totalNumberOfEntries = writeIdentifiers(idsFile, streamIds(request), downloadJob);
-        updateTotalEntries(downloadJob, totalNumberOfEntries);
+        writeIdentifiers(idsFile, streamIds(request), downloadJob);
         log.info("Solr ids saved for job {}", downloadJob.getId());
     }
 

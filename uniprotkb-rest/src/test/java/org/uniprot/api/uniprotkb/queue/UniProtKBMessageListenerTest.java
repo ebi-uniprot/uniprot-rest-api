@@ -81,7 +81,7 @@ class UniProtKBMessageListenerTest {
         Files.delete(idsFilePath);
         Assertions.assertTrue(Files.notExists(idsFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
-        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob));
+        verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
         verify(heartBeatProducer).stop(jobId);
     }
 
@@ -121,7 +121,7 @@ class UniProtKBMessageListenerTest {
         Path resultFilePath = Path.of("target/" + jobId + ".json");
         Assertions.assertTrue(Files.notExists(resultFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
-        verify(heartBeatProducer, atLeastOnce()).create(same(downloadJob));
+        verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
         verify(heartBeatProducer).stop(jobId);
     }
 

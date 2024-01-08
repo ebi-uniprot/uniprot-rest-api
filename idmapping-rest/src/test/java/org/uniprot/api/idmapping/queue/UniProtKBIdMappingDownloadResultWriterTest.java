@@ -59,7 +59,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
         downloadJob = mock(DownloadJob.class);
         heartBeatProducer = mock(HeartBeatProducer.class);
         when(downloadJob.getId()).thenReturn(JOB_ID);
-        when(downloadJob.getEntriesProcessed()).thenReturn(PROCESSED_ENTRIES);
+        when(downloadJob.getProcessedEntries()).thenReturn(PROCESSED_ENTRIES);
     }
 
     @Test
@@ -159,7 +159,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
                         .collect(Collectors.toSet())
                         .contains("P12345"));
 
-        verify(heartBeatProducer, atLeastOnce()).createWithProgress(same(downloadJob), anyLong());
+        verify(heartBeatProducer, atLeastOnce()).createForResults(same(downloadJob), anyLong());
         verify(heartBeatProducer).stop(JOB_ID);
     }
 

@@ -77,6 +77,8 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
             processH5Message(message, (UniProtKBDownloadRequest) request, downloadJob, idsFile);
         } else {
+            Long totalHits = getSolrHits((UniProtKBDownloadRequest) request);
+            updateTotalEntries(downloadJob, totalHits);
             writeResult(request, downloadJob, idsFile, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
         }
@@ -90,6 +92,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         String jobId = downloadJob.getId();
         try {
             Long totalHits = getSolrHits(request);
+            updateTotalEntries(downloadJob, totalHits);
             Long maxAllowedHits = this.embeddingsQueueConfigProps.getMaxEntryCount();
             if (maxAllowedHits >= totalHits) {
                 writeSolrResult(request, downloadJob, idsFile);

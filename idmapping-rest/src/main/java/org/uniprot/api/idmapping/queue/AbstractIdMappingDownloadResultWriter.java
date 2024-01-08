@@ -107,7 +107,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                                 resource.name().toLowerCase(),
                                 SUPPORTED_RDF_MEDIA_TYPES.get(contentType),
                                 entries ->
-                                        heartBeatProducer.createWithProgress(downloadJob, entries));
+                                        heartBeatProducer.createForResults(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 Set<String> toIds = getToIds(idMappingResult);
@@ -115,7 +115,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                         toIds.stream()
                                 .map(
                                         id -> {
-                                            heartBeatProducer.createWithProgress(downloadJob, 1);
+                                            heartBeatProducer.createForResults(downloadJob, 1);
                                             return id;
                                         }));
             } else {
@@ -126,7 +126,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
                                 .map(
                                         entityCollection -> {
-                                            heartBeatProducer.createWithProgress(
+                                            heartBeatProducer.createForResults(
                                                     downloadJob, entityCollection.size());
                                             return entityCollection;
                                         })

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,151 +21,179 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 @ExtendWith(MockitoExtension.class)
 class HeartBeatProducerTest {
     public static final String JOB_ID = "downloadJobId";
+    public static final String UPDATE_COUNT = "updateCount";
+    public static final String PROCESSED_ENTRIES = "processedEntries";
+    public static final String UPDATED = "updated";
     private final DownloadJob downloadJob = DownloadJob.builder().id(JOB_ID).build();
     @Mock private AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
     @Mock private DownloadJobRepository jobRepository;
-    @Captor private ArgumentCaptor<DownloadJob> downloadJobArgumentCaptor;
+    @Captor private ArgumentCaptor<Map<String, Object>> downloadJobArgumentCaptor;
     @InjectMocks private HeartBeatProducer heartBeatProducer;
 
     @Test
-    void createWithProgress_whenHeartBeatEnabledAndIntervalIsBiggerThanBatchSize() {
+    void createForResults_whenHeartBeatEnabledAndIntervalIsBiggerThanBatchSize() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(100L);
+        when(asyncDownloadHeartBeatConfiguration.getResultsInterval()).thenReturn(100L);
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createWithProgress(downloadJob, 70);
-        heartBeatProducer.createWithProgress(downloadJob, 70);
+        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.createForResults(downloadJob, 70);
 
         verifySavedJob(140L);
     }
 
-    private void verifySavedJob(long expected) {
-        verify(jobRepository).save(downloadJobArgumentCaptor.capture());
-        DownloadJob savedJob = downloadJobArgumentCaptor.getValue();
-        assertEquals(expected, savedJob.getEntriesProcessed());
-        assertTrue(savedJob.getUpdated().isAfter(LocalDateTime.now().minusMinutes(2)));
+    private void verifySavedJob(Long processedEntries) {
+        verify(jobRepository).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
+        Map<String, Object> savedJob = downloadJobArgumentCaptor.getValue();
+        assertEquals(1L, savedJob.get(UPDATE_COUNT));
+        assertEquals(processedEntries, savedJob.get(PROCESSED_ENTRIES));
+        assertTrue(
+                ((LocalDateTime) savedJob.get(UPDATED))
+                        .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
     @Test
-    void createWithProgress_whenHeartBeatEnabledAndIntervalIsSmallerThanBatchSize() {
+    void createForResults_whenHeartBeatEnabledAndIntervalIsSmallerThanBatchSize() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(50L);
+        when(asyncDownloadHeartBeatConfiguration.getResultsInterval()).thenReturn(50L);
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createWithProgress(downloadJob, 70);
+        heartBeatProducer.createForResults(downloadJob, 70);
 
         verifySavedJob(70L);
 
-        heartBeatProducer.createWithProgress(downloadJob, 70);
+        heartBeatProducer.createForResults(downloadJob, 70);
 
-        verify(jobRepository, times(2)).save(downloadJobArgumentCaptor.capture());
-        List<DownloadJob> savedJobs = downloadJobArgumentCaptor.getAllValues();
-        assertEquals(140L, savedJobs.get(1).getEntriesProcessed());
-        assertTrue(savedJobs.get(1).getUpdated().isAfter(LocalDateTime.now().minusMinutes(2)));
+        verify(jobRepository, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
+        List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
+        Map<String, Object> lastCall = savedJobs.get(2);
+        assertEquals(2L, lastCall.get(UPDATE_COUNT));
+        assertEquals(140L, lastCall.get(PROCESSED_ENTRIES));
+        assertTrue(
+                ((LocalDateTime) lastCall.get(UPDATED))
+                        .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
     @Test
-    void createWithProgress_whenHeartBeatEnabledAndIntervalIsSameSizeAsBatchSize() {
+    void createForResults_whenHeartBeatEnabledAndIntervalIsSameSizeAsBatchSize() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(50L);
+        when(asyncDownloadHeartBeatConfiguration.getResultsInterval()).thenReturn(50L);
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createWithProgress(downloadJob, 50);
+        heartBeatProducer.createForResults(downloadJob, 50);
 
         verifySavedJob(50L);
 
-        heartBeatProducer.createWithProgress(downloadJob, 50);
+        heartBeatProducer.createForResults(downloadJob, 50);
 
-        verify(jobRepository, times(2)).save(downloadJobArgumentCaptor.capture());
-        List<DownloadJob> savedJobs = downloadJobArgumentCaptor.getAllValues();
-        assertEquals(100L, savedJobs.get(1).getEntriesProcessed());
-        assertTrue(savedJobs.get(1).getUpdated().isAfter(LocalDateTime.now().minusMinutes(2)));
+        verify(jobRepository, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
+        List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
+        Map<String, Object> lastCall = savedJobs.get(2);
+        assertEquals(2L, lastCall.get(UPDATE_COUNT));
+        assertEquals(100L, lastCall.get(PROCESSED_ENTRIES));
+        assertTrue(
+                ((LocalDateTime) lastCall.get(UPDATED))
+                        .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 
     @Test
-    void createWithProgress_whenHeartBeatDisabled() {
+    void createForResults_whenHeartBeatDisabled() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(false);
 
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.createWithProgress(downloadJob, 70);
-        heartBeatProducer.createWithProgress(downloadJob, 70);
+        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.createForResults(downloadJob, 70);
 
-        verify(jobRepository, never()).save(downloadJobArgumentCaptor.capture());
+        verify(jobRepository, never()).save(any());
+        verify(jobRepository, never()).update(any(), any());
     }
 
     @Test
-    void createWithProgress_whenHeartBeatEnabledAndFinalUpdate() {
+    void createForResults_whenHeartBeatEnabledAndFinalUpdate() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(200L);
+        when(asyncDownloadHeartBeatConfiguration.getResultsInterval()).thenReturn(200L);
         downloadJob.setTotalEntries(130L);
-        downloadJob.setEntriesProcessed(100L);
+        downloadJob.setProcessedEntries(100L);
 
-        heartBeatProducer.createWithProgress(downloadJob, 70);
-        heartBeatProducer.createWithProgress(downloadJob, 60);
+        heartBeatProducer.createForResults(downloadJob, 70);
+        heartBeatProducer.createForResults(downloadJob, 60);
 
         verifySavedJob(130L);
     }
 
     @Test
-    void createWithProgress_whenExceptionsOccurs() {
+    void createForResults_whenExceptionsOccurs() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(50L);
-        doThrow(RuntimeException.class).when(jobRepository).save(any(DownloadJob.class));
+        when(asyncDownloadHeartBeatConfiguration.getResultsInterval()).thenReturn(50L);
+        doThrow(RuntimeException.class)
+                .when(jobRepository)
+                .update(any(String.class), any(Map.class));
         downloadJob.setTotalEntries(130L);
 
-        assertDoesNotThrow(() -> heartBeatProducer.createWithProgress(downloadJob, 70));
+        assertDoesNotThrow(() -> heartBeatProducer.createForResults(downloadJob, 70));
     }
 
     @Test
-    void create() {
+    void createForIds() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(2L);
+        when(asyncDownloadHeartBeatConfiguration.getIdsInterval()).thenReturn(2L);
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.create(downloadJob);
-        heartBeatProducer.create(downloadJob);
+        heartBeatProducer.createForIds(downloadJob);
+        heartBeatProducer.createForIds(downloadJob);
 
-        verifySavedJob(0L);
+        verifySavedJob(null);
+
+        heartBeatProducer.createForIds(downloadJob);
+        heartBeatProducer.createForIds(downloadJob);
+        verify(jobRepository, times(2)).update(eq(JOB_ID), any(Map.class));
     }
 
     @Test
-    void create_whenHeartBeatIsDisabled() {
+    void createForIds_whenHeartBeatIsDisabled() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(false);
+        when(asyncDownloadHeartBeatConfiguration.getIdsInterval()).thenReturn(2L);
 
         downloadJob.setTotalEntries(1000L);
 
-        heartBeatProducer.create(downloadJob);
-        heartBeatProducer.create(downloadJob);
+        heartBeatProducer.createForIds(downloadJob);
+        heartBeatProducer.createForIds(downloadJob);
 
-        verify(jobRepository, never()).save(downloadJobArgumentCaptor.capture());
+        verify(jobRepository, never()).save(any());
+        verify(jobRepository, never()).update(any(), any());
     }
 
     @Test
-    void create_whenExceptionsOccurs() {
+    void createForIds_whenExceptionsOccurs() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(1L);
-        doThrow(RuntimeException.class).when(jobRepository).save(any(DownloadJob.class));
+        when(asyncDownloadHeartBeatConfiguration.getIdsInterval()).thenReturn(1L);
+        doThrow(RuntimeException.class)
+                .when(jobRepository)
+                .update(any(String.class), any(Map.class));
         downloadJob.setTotalEntries(130L);
 
-        assertDoesNotThrow(() -> heartBeatProducer.create(downloadJob));
+        assertDoesNotThrow(() -> heartBeatProducer.createForIds(downloadJob));
     }
 
     @Test
     void stop() {
         when(asyncDownloadHeartBeatConfiguration.isEnabled()).thenReturn(true);
-        when(asyncDownloadHeartBeatConfiguration.getInterval()).thenReturn(50L);
+        when(asyncDownloadHeartBeatConfiguration.getResultsInterval()).thenReturn(50L);
         downloadJob.setTotalEntries(130L);
 
-        heartBeatProducer.createWithProgress(downloadJob, 70);
-        downloadJob.setEntriesProcessed(0);
+        heartBeatProducer.createForResults(downloadJob, 70);
+        downloadJob.setProcessedEntries(0);
         heartBeatProducer.stop(JOB_ID);
-        heartBeatProducer.createWithProgress(downloadJob, 70);
+        heartBeatProducer.createForResults(downloadJob, 70);
 
-        verify(jobRepository, times(2)).save(downloadJobArgumentCaptor.capture());
-        List<DownloadJob> savedJobs = downloadJobArgumentCaptor.getAllValues();
-        DownloadJob afterStopped = savedJobs.get(1);
-        assertEquals(70L, afterStopped.getEntriesProcessed());
-        assertTrue(afterStopped.getUpdated().isAfter(LocalDateTime.now().minusMinutes(2)));
+        verify(jobRepository, times(2)).update(eq(JOB_ID), downloadJobArgumentCaptor.capture());
+        List<Map<String, Object>> savedJobs = downloadJobArgumentCaptor.getAllValues();
+        Map<String, Object> afterStopped = savedJobs.get(1);
+        assertEquals(2L, afterStopped.get(UPDATE_COUNT));
+        assertEquals(70L, afterStopped.get(PROCESSED_ENTRIES));
+        assertTrue(
+                ((LocalDateTime) afterStopped.get(UPDATED))
+                        .isAfter(LocalDateTime.now().minusMinutes(2)));
     }
 }

@@ -62,7 +62,7 @@ class UniParcIdMappingDownloadResultWriterTest {
         downloadJob = mock(DownloadJob.class);
         heartBeatProducer = mock(HeartBeatProducer.class);
         when(downloadJob.getId()).thenReturn(JOB_ID);
-        when(downloadJob.getEntriesProcessed()).thenReturn(PROCESSED_ENTRIES);
+        when(downloadJob.getProcessedEntries()).thenReturn(PROCESSED_ENTRIES);
     }
 
     @Test
@@ -183,7 +183,7 @@ class UniParcIdMappingDownloadResultWriterTest {
         assertEquals("1", warningNode.findValue("code").asText());
         assertEquals("msg", warningNode.findValue("message").asText());
 
-        verify(heartBeatProducer, atLeastOnce()).createWithProgress(same(downloadJob), anyLong());
+        verify(heartBeatProducer, atLeastOnce()).createForResults(same(downloadJob), anyLong());
         verify(heartBeatProducer).stop(JOB_ID);
     }
 

@@ -45,5 +45,6 @@ public class DownloadJob implements Serializable {
 
     private String format;
     private long totalEntries;
-    private long entriesProcessed;
+    private long processedEntries;
+    private long updateCount;
 }
