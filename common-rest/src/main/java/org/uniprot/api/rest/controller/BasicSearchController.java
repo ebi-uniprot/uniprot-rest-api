@@ -30,7 +30,6 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.BasicRequest;
-import org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator;
 import org.uniprot.api.rest.request.StreamRequest;
 import org.uniprot.core.util.Utils;
 
@@ -355,7 +354,6 @@ public abstract class BasicSearchController<T> {
     }
 
     private boolean isGatekeeperNeeded(String userAgent) {
-        return Utils.notNull(downloadGatekeeper) &&
-                !isBrowserAsFarAsWeKnow(userAgent);
+        return Utils.notNull(downloadGatekeeper) && !isBrowserAsFarAsWeKnow(userAgent);
     }
 }

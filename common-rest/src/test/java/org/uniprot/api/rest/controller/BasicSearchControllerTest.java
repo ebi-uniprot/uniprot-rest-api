@@ -89,15 +89,15 @@ class BasicSearchControllerTest {
     }
 
     @Test
-    void browserRequestsBypassGatekeeper() throws Exception{
-        setUp(true);// set with gatekeeper
+    void browserRequestsBypassGatekeeper() throws Exception {
+        setUp(true); // set with gatekeeper
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         when(httpRequest.getHeader(USER_AGENT))
                 .thenReturn(
                         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36");
         for (int i = 0; i < 5; i++) {
             controller.getDeferredResultResponseEntity(() -> context, httpRequest);
-            Thread.sleep(100);//give some time to allow the Gatekeeper to allow an "enter"
+            Thread.sleep(100); // give some time to allow the Gatekeeper to allow an "enter"
             // gatekeeper capacity remains unchanged because the browser request bypasses it
             MatcherAssert.assertThat(
                     gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity()));
@@ -105,13 +105,13 @@ class BasicSearchControllerTest {
     }
 
     @Test
-    void nonBrowserRequestsGoThroughGatekeeper() throws Exception{
-        setUp(true);// set with gatekeeper
+    void nonBrowserRequestsGoThroughGatekeeper() throws Exception {
+        setUp(true); // set with gatekeeper
         HttpServletRequest httpRequest = mock(HttpServletRequest.class);
         when(httpRequest.getHeader(USER_AGENT)).thenReturn("python-requests/2.31.0");
         controller.getDeferredResultResponseEntity(() -> context, httpRequest);
-        Thread.sleep(100);//give some time to allow the Gatekeeper to allow an "enter"
+        Thread.sleep(100); // give some time to allow the Gatekeeper to allow an "enter"
         MatcherAssert.assertThat(
-                gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity()-1));
+                gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity() - 1));
     }
 }
