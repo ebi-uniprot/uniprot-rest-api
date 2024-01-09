@@ -1,12 +1,6 @@
 package org.uniprot.api.rest.download.queue;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -14,12 +8,18 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Common for all, UniProtKB, UniParc and UniRef
@@ -37,6 +37,7 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     private final DownloadJobRepository jobRepository;
     private final HashGenerator<DownloadRequest> hashGenerator;
     private final AsyncDownloadSubmissionRules asyncDownloadSubmissionRules;
+    private final AsyncDownloadFileHandler asyncDownloadFileHandler;
     public static final String JOB_ID = "jobId";
 
     public RabbitProducerMessageService(
@@ -44,12 +45,13 @@ public class RabbitProducerMessageService implements ProducerMessageService {
             RabbitTemplate rabbitTemplate,
             DownloadJobRepository downloadJobRepository,
             HashGenerator<DownloadRequest> hashGenerator,
-            AsyncDownloadSubmissionRules asyncDownloadSubmissionRules) {
+            AsyncDownloadSubmissionRules asyncDownloadSubmissionRules, AsyncDownloadFileHandler asyncDownloadFileHandler) {
         this.rabbitTemplate = rabbitTemplate;
         this.converter = converter;
         this.jobRepository = downloadJobRepository;
         this.hashGenerator = hashGenerator;
         this.asyncDownloadSubmissionRules = asyncDownloadSubmissionRules;
+        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
     }
 
     @Override
@@ -83,6 +85,7 @@ public class RabbitProducerMessageService implements ProducerMessageService {
 
     private void cleanBeforeResubmission(String jobId) {
         jobRepository.deleteById(jobId);
+        asyncDownloadFileHandler.deleteAllFiles(jobId);
     }
 
     @Override
