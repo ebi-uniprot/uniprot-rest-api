@@ -1,16 +1,17 @@
 package org.uniprot.api.rest.download.file;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.output.context.FileType;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Component
 @Profile({"asyncDownload"})
@@ -22,14 +23,15 @@ public class AsyncDownloadFileHandler {
         this.downloadConfigProperties = downloadConfigProperties;
     }
 
-    public  void deleteIdFile(String jobId) {
+    public void deleteIdFile(String jobId) {
         Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
         deleteFile(idsFile, jobId);
     }
 
-    public  void deleteResultFile(String jobId) {
+    public void deleteResultFile(String jobId) {
         String resultFileName = jobId + "." + FileType.GZIP.getExtension();
-        Path resultFile = Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
+        Path resultFile =
+                Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
         deleteFile(resultFile, jobId);
     }
 

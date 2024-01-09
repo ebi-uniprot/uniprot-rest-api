@@ -1,5 +1,10 @@
 package org.uniprot.api.rest.download.queue;
 
+import static org.assertj.core.api.Fail.fail;
+import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,11 +23,6 @@ import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.FakeDownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
-
-import static org.assertj.core.api.Fail.fail;
-import static org.junit.Assert.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RabbitProducerMessageServiceTest {
