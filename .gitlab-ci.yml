@@ -108,12 +108,12 @@ k8s:docker-build-deploy:
     branch: main
   variables:
     CI_PIPELINE_TASKS: 'build,upgrade'
-    ARTIFACT: 'all-rest'
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
     K8S_ENV: 'dev'
     RELEASE_NAME: '2023_05'
     RELEASE_DATE: '$RELEASE_DATE'
+    REST_ARTIFACT: 'all-rest'
   when: on_success
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'
