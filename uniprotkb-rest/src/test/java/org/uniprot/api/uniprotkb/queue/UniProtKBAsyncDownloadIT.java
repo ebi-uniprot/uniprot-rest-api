@@ -2,10 +2,6 @@ package org.uniprot.api.uniprotkb.queue;
 
 import static org.mockito.Mockito.*;
 import static org.uniprot.api.rest.download.queue.RedisUtil.*;
-import static org.uniprot.api.rest.download.queue.RedisUtil.jobFinished;
-import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.setUp;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,15 +35,17 @@ import org.uniprot.api.rest.download.AsyncDownloadTestConfig;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.BaseAbstractMessageListener;
+import org.uniprot.api.rest.download.queue.RedisUtil;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
+import org.uniprot.api.uniprotkb.request.UniProtKBDownloadRequest;
+import org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
@@ -92,13 +90,13 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
-        saveEntriesInSolrAndStore(
+        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniprotQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
     }
 
     @BeforeEach
     void setUpRestTemplate() {
-        setUp(restTemplate);
+        UniProtKBAsyncDownloadUtils.setUp(restTemplate);
     }
 
     @Test
@@ -113,23 +111,23 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
         String jobId = this.messageService.sendMessage(request);
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
-        Awaitility.await().until(jobCreatedInRedis(downloadJobRepository, jobId));
+        Awaitility.await().until(RedisUtil.jobCreatedInRedis(downloadJobRepository, jobId));
         Awaitility.await()
                 .atMost(Duration.ofSeconds(20))
-                .until(jobErrored(downloadJobRepository, jobId));
+                .until(RedisUtil.jobErrored(downloadJobRepository, jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
         // after certain delay the job should be reprocessed from kb side
         Awaitility.await()
                 .atMost(Duration.ofSeconds(20))
-                .until(jobUnfinished(downloadJobRepository, jobId));
+                .until(RedisUtil.jobUnfinished(downloadJobRepository, jobId));
         verifyRedisEntry(query, jobId, List.of(JobStatus.UNFINISHED), 1, true);
         // then job should be picked by embeddings consumers and set to Running again
         //        await().until(jobRunning(jobId));
         // the job should be completed after sometime by embeddings consumer
         Awaitility.await()
                 .atMost(Duration.ofSeconds(20))
-                .until(jobFinished(downloadJobRepository, jobId));
+                .until(RedisUtil.jobFinished(downloadJobRepository, jobId));
         // verify ids file generated from solr
         verifyIdsFile(jobId);
         // verify result file doesn't exist yet
@@ -169,7 +167,8 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected Stream<Arguments> getSupportedTypes() {
         return Stream.of(
-                Arguments.of(MediaType.APPLICATION_JSON, 1), Arguments.of(HDF5_MEDIA_TYPE, 2));
+                Arguments.of(MediaType.APPLICATION_JSON, 1),
+                Arguments.of(UniProtMediaType.HDF5_MEDIA_TYPE, 2));
     }
 
     @Override

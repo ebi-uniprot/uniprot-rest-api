@@ -1,9 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB_INTERACTION;
-
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +7,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -48,7 +45,11 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
             MessageConverterContextFactory<InteractionEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             UniProtKBEntryInteractionService interactionService) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB_INTERACTION);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                MessageConverterContextFactory.Resource.UNIPROTKB_INTERACTION);
         this.interactionService = interactionService;
     }
 
@@ -65,7 +66,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
 
     @GetMapping(
             value = "/{accession}/interactions",
-            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<MessageConverterContext<InteractionEntry>> getInteractions(
             @PathVariable("accession")
                     @Pattern(

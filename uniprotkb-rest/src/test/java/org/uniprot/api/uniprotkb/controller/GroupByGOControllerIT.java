@@ -2,10 +2,6 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +21,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GOClient;
 import org.uniprot.api.uniprotkb.groupby.service.go.client.GoRelation;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
@@ -57,18 +56,20 @@ class GroupByGOControllerIT extends GroupByControllerIT {
 
     @BeforeAll
     static void beforeAll() {
-        dataStoreManager.addSolrClient(UNIPROT, SolrCollection.uniprot);
+        dataStoreManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
     }
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(
-                repository, "solrClient", dataStoreManager.getSolrClient(UNIPROT));
+                repository,
+                "solrClient",
+                dataStoreManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
     }
 
     @AfterEach
     void tearDown() {
-        dataStoreManager.cleanSolr(UNIPROT);
+        dataStoreManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
     }
 
     @Test
@@ -76,32 +77,34 @@ class GroupByGOControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_0))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_0)))
-                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_0)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(PATH)
+                                .param("query", "organism_id:" + ORGANISM_ID_0))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
     void getGroupByGO_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_0))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_0)))
-                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_0)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH).param("query", ORGANISM_ID_0))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -109,40 +112,42 @@ class GroupByGOControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + ORGANISM_ID_2))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(PATH)
+                                .param("query", "organism_id:" + ORGANISM_ID_2))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(GO_ID_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].id", is(GO_ID_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
     void getGroupByGO_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH).param("query", ORGANISM_ID_2))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(GO_ID_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].id", is(GO_ID_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -154,40 +159,40 @@ class GroupByGOControllerIT extends GroupByControllerIT {
         when(goClient.getGoEntry(GO_ID_0)).thenReturn(Optional.of(goRelation));
 
         mockMvc.perform(
-                        get(PATH)
+                        MockMvcRequestBuilders.get(PATH)
                                 .param("query", "organism_id:" + ORGANISM_ID_2)
                                 .param("parent", GO_ID_0))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_1)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)))
-                .andExpect(jsonPath("$.parent.label", is("goName0")))
-                .andExpect(jsonPath("$.parent.count", is(1)));
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(GO_ID_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label", is("goName0")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
     void getGroupByGO_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_0)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(GO_ID_1)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH).param("query", ORGANISM_ID_2))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(GO_ID_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].label", is(GO_NAME_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].id", is(GO_ID_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].label", is(GO_NAME_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -198,18 +203,21 @@ class GroupByGOControllerIT extends GroupByControllerIT {
         goRelation.setName(GO_NAME_0);
         when(goClient.getGoEntry(GO_ID_0)).thenReturn(Optional.of(goRelation));
 
-        mockMvc.perform(get(PATH).param("query", ORGANISM_ID_2).param("parent", GO_ID_0))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(GO_ID_2)))
-                .andExpect(jsonPath("$.groups[0].label", is(GO_NAME_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(GO_ID_1)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)))
-                .andExpect(jsonPath("$.parent.label", is("goName0")))
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(PATH)
+                                .param("query", ORGANISM_ID_2)
+                                .param("parent", GO_ID_0))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(GO_ID_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].label", is(GO_NAME_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(GO_ID_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].label", is(GO_NAME_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label", is("goName0")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() {

@@ -5,17 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.ACCEPT_ENCODING;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.controller.ControllerITUtils.CACHE_VALUE;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,10 +37,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
+import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
@@ -135,30 +128,33 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     void streamCanReturnSuccess() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "content:*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(10)))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Content-Disposition"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder(
                                         "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
                                         "P00007", "P00008", "P00009", "P00010")))
-                .andExpect(header().string(HttpHeaders.CACHE_CONTROL, CACHE_VALUE))
                 .andExpect(
-                        header().stringValues(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CACHE_CONTROL, ControllerITUtils.CACHE_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .stringValues(
                                         HttpHeaders.VARY,
-                                        ACCEPT,
-                                        ACCEPT_ENCODING,
+                                        HttpHeaders.ACCEPT,
+                                        HttpHeaders.ACCEPT_ENCODING,
                                         HttpCommonHeaderConfig.X_UNIPROT_RELEASE,
                                         HttpCommonHeaderConfig.X_API_DEPLOYMENT_DATE));
     }
@@ -167,21 +163,21 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     void streamCanReturnIncludeIsoforms() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "content:*")
                         .param("includeIsoform", "true");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(12)))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Content-Disposition"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(12)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder(
                                         "P00001",
@@ -202,20 +198,20 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     void streamCanReturnIsoformsOnly() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "(content:BEK) AND (is_isoform:true)");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(2)))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Content-Disposition"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder("P00011-2", "P00012-2")));
     }
@@ -224,33 +220,33 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     void streamCanReturnLineageData() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "*:*")
                         .param("fields", "accession,lineage_ids");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(jsonPath("$.results.size()", is(10)))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(MockMvcResultMatchers.header().doesNotExist("Content-Disposition"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder(
                                         "P00001", "P00002", "P00003", "P00004", "P00005", "P00006",
                                         "P00007", "P00008", "P00009", "P00010")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.lineages[0].taxonId",
                                 contains(
                                         9607, 9607, 9607, 9607, 9607, 9607, 9607, 9607, 9607,
                                         9607)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.lineages[1].taxonId",
                                 contains(
                                         9608, 9608, 9608, 9608, 9608, 9608, 9608, 9608, 9608,
@@ -262,19 +258,21 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(streamRequestPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(streamRequestPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("query", "invalid:invalid")
                                 .param("fields", "invalid,invalid1")
                                 .param("sort", "invalid")
                                 .param("download", "invalid"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "'invalid' is not a valid search field",
@@ -288,43 +286,46 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     void streamDownloadCompressedFile() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "content:*")
                         .param("download", "true");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         "Content-Disposition",
                                         startsWith(
                                                 "form-data; name=\"attachment\"; filename=\"uniprotkb_")))
-                .andExpect(jsonPath("$.results.size()", is(10)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)));
     }
 
     @Test
     void streamSortWorks() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "content:*")
                         .param("sort", "accession desc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 contains(
                                         "P00010", "P00009", "P00008", "P00007", "P00006", "P00005",
@@ -336,44 +337,50 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     void streamCanSortAllPossibleSortFields(String sortField) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "content:*")
                         .param("sort", sortField + " asc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(10)));
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)));
     }
 
     @Test
     void streamFields() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "accession:P00006 OR accession:P00005")
                         .param("fields", "gene_primary");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder("P00005", "P00006")))
-                .andExpect(jsonPath("$.results.*.genes.*.geneName.*", contains("FGFR2", "FGFR2")))
-                .andExpect(jsonPath("$.results.*.keywords").doesNotExist())
-                .andExpect(jsonPath("$.results.*.sequence").doesNotExist());
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.genes.*.geneName.*", contains("FGFR2", "FGFR2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.*.keywords").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.*.sequence").doesNotExist());
     }
 
     @ParameterizedTest(name = "[{index}] contentType {0}")
@@ -381,44 +388,53 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, mediaType)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, mediaType)
                         .param("query", "content:*")
                         .param("fields", "accession,rhea");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
-                .andExpect(content().contentTypeCompatibleWith(mediaType));
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(mediaType));
     }
 
     @Test
     void streamTSVFormatWithRheaId() throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, UniProtMediaType.TSV_MEDIA_TYPE)
                         .param("query", "content:*")
                         .param("fields", "accession,rhea");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.CONTENT_TYPE,
                                         UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(UniProtMediaType.TSV_MEDIA_TYPE))
-                .andExpect(content().string(containsString("Entry\tRhea ID")))
-                .andExpect(content().string(not(containsString("RHEA-COMP:10136 RHEA-COMP:10137"))))
-                .andExpect(content().string(containsString("P00001\tRHEA:10596")));
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(UniProtMediaType.TSV_MEDIA_TYPE))
+                .andExpect(MockMvcResultMatchers.content().string(containsString("Entry\tRhea ID")))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .string(not(containsString("RHEA-COMP:10136 RHEA-COMP:10137"))))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .string(containsString("P00001\tRHEA:10596")));
     }
 
     @Test
@@ -429,20 +445,24 @@ class UniProtKBStreamControllerIT extends AbstractStreamControllerIT {
         cloudSolrClient.commit(SolrCollection.uniprot.name());
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.get(streamRequestPath)
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", "content:*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
         // then
-        mockMvc.perform(asyncDispatch(response))
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.url", is("http://localhost/uniprotkb/stream")))
+        mockMvc.perform(MockMvcRequestBuilders.asyncDispatch(response))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.FORBIDDEN.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.url", is("http://localhost/uniprotkb/stream")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 contains(
                                         "Too many results to retrieve. Please refine your query or consider fetching batch by batch")));

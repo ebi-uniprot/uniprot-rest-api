@@ -1,13 +1,12 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
 
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,7 @@ import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.rest.validation.CustomConstraintGroupSequence;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
+import org.uniprot.api.uniprotkb.request.UniProtKBDownloadRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,7 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
 public class UniProtKBDownloadController extends BasicDownloadController {
-    static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
+    static final String DOWNLOAD_RESOURCE = UniProtKBController.UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;
     private final DownloadJobRepository jobRepository;
 
@@ -44,7 +43,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
         this.jobRepository = jobRepository;
     }
 
-    @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/run", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobSubmitResponse> submitJob(
             @Validated(CustomConstraintGroupSequence.class) @ModelAttribute
                     UniProtKBDownloadRequest request) {
@@ -54,14 +53,14 @@ public class UniProtKBDownloadController extends BasicDownloadController {
 
     @GetMapping(
             value = "/status/{jobId}",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     @Operation(
             summary = "Get the status of a job.",
             responses = {
                 @ApiResponse(
                         content = {
                             @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = JobStatus.class))
                         })
             })
@@ -73,7 +72,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
 
     @GetMapping(
             value = "/details/{jobId}",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
             @PathVariable String jobId, HttpServletRequest servletRequest) {
 

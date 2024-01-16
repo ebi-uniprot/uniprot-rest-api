@@ -1,11 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.TAXONOMY;
-import static org.uniprot.store.indexer.DataStoreManager.StoreType.UNIPROT;
 
 import java.util.List;
 
@@ -22,6 +17,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyRepository;
 import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
@@ -56,22 +54,27 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
 
     @BeforeAll
     static void beforeAll() {
-        dataStoreManager.addSolrClient(UNIPROT, SolrCollection.uniprot);
-        dataStoreManager.addSolrClient(TAXONOMY, SolrCollection.taxonomy);
+        dataStoreManager.addSolrClient(DataStoreManager.StoreType.UNIPROT, SolrCollection.uniprot);
+        dataStoreManager.addSolrClient(
+                DataStoreManager.StoreType.TAXONOMY, SolrCollection.taxonomy);
     }
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(
-                uniprotQueryRepository, "solrClient", dataStoreManager.getSolrClient(UNIPROT));
+                uniprotQueryRepository,
+                "solrClient",
+                dataStoreManager.getSolrClient(DataStoreManager.StoreType.UNIPROT));
         ReflectionTestUtils.setField(
-                taxonomyRepository, "solrClient", dataStoreManager.getSolrClient(TAXONOMY));
+                taxonomyRepository,
+                "solrClient",
+                dataStoreManager.getSolrClient(DataStoreManager.StoreType.TAXONOMY));
     }
 
     @AfterEach
     void tearDown() {
-        dataStoreManager.cleanSolr(UNIPROT);
-        dataStoreManager.cleanSolr(TAXONOMY);
+        dataStoreManager.cleanSolr(DataStoreManager.StoreType.UNIPROT);
+        dataStoreManager.cleanSolr(DataStoreManager.StoreType.TAXONOMY);
     }
 
     @Test
@@ -79,32 +82,36 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + TAX_ID_0_STRING))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
-                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_0)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(PATH)
+                                .param("query", "organism_id:" + TAX_ID_0_STRING))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
     void getGroupByTaxonomy_whenNoParentSpecifiedAndNoTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootNodeWithNoChildren();
 
-        mockMvc.perform(get(PATH).param("query", TAX_ID_0_STRING))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
-                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_0)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH).param("query", TAX_ID_0_STRING))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -112,40 +119,52 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
             throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", "organism_id:" + TAX_ID_2_STRING))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(PATH)
+                                .param("query", "organism_id:" + TAX_ID_2_STRING))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
     void getGroupByTaxonomy_whenNoParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", TAX_ID_2_STRING))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(1)));
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH).param("query", TAX_ID_2_STRING))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(1)));
     }
 
     @Test
@@ -153,58 +172,72 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
         prepareSingleRootWithTwoLevelsOfChildren();
 
         mockMvc.perform(
-                        get(PATH)
+                        MockMvcRequestBuilders.get(PATH)
                                 .param("query", "taxonomy_id:" + TAX_ID_1_STRING)
                                 .param("parent", TAX_ID_0_STRING))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)))
-                .andExpect(jsonPath("$.parent.label", is("scientific_9600")))
-                .andExpect(jsonPath("$.parent.count", is(2)));
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label", is("scientific_9600")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(2)));
     }
 
     @Test
     void getGroupByTaxonomy_whenParentNotSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
-                .andExpect(jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
-                .andExpect(jsonPath("$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(2)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(2)));
+        mockMvc.perform(MockMvcRequestBuilders.get(PATH).param("query", TAX_ID_1_STRING))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(TAX_ID_0_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.ancestors[0].label", is(TAX_SCIENTIFIC_0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[1].id", is(TAX_ID_1_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.ancestors[1].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(2)));
     }
 
     @Test
     void getGroupByTaxonomy_whenParentSpecifiedAndTraversalAndFreeFormQuery() throws Exception {
         prepareSingleRootWithTwoLevelsOfChildren();
 
-        mockMvc.perform(get(PATH).param("query", TAX_ID_1_STRING).param("parent", TAX_ID_0_STRING))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
-                .andExpect(jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
-                .andExpect(jsonPath("$.groups[0].expandable", is(false)))
-                .andExpect(jsonPath("$.groups[0].count", is(1)))
-                .andExpect(jsonPath("$.groups.size()", is(1)))
-                .andExpect(jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
-                .andExpect(jsonPath("$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
-                .andExpect(jsonPath("$.ancestors.size()", is(1)))
-                .andExpect(jsonPath("$.parent.label", is("scientific_9600")))
-                .andExpect(jsonPath("$.parent.count", is(2)));
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get(PATH)
+                                .param("query", TAX_ID_1_STRING)
+                                .param("parent", TAX_ID_0_STRING))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].id", is(TAX_ID_2_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.groups[0].label", is(TAX_SCIENTIFIC_2)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].expandable", is(false)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups[0].count", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors[0].id", is(TAX_ID_1_STRING)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.ancestors[0].label", is(TAX_SCIENTIFIC_1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label", is("scientific_9600")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(2)));
     }
 
     private void prepareSingleRootWithTwoLevelsOfChildren() throws Exception {
@@ -243,7 +276,7 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
         uniProtDocument.accession = accession;
         uniProtDocument.organismTaxId = organismId;
         uniProtDocument.taxLineageIds = taxonomies;
-        save(UNIPROT, uniProtDocument);
+        save(DataStoreManager.StoreType.UNIPROT, uniProtDocument);
     }
 
     private void saveTaxonomyDocument(Long taxId, String scientificName, Long parent)
@@ -264,6 +297,6 @@ class GroupByTaxonomyControllerIT extends GroupByControllerIT {
                         .active(true)
                         .taxonomyObj(scientific00s)
                         .build();
-        save(TAXONOMY, taxonomyDocument);
+        save(DataStoreManager.StoreType.TAXONOMY, taxonomyDocument);
     }
 }

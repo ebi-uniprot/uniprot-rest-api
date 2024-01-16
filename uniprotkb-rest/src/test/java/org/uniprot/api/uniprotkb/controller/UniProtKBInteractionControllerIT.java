@@ -1,15 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
 import java.util.HashMap;
 
@@ -25,12 +16,16 @@ import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebCl
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -108,13 +103,17 @@ class UniProtKBInteractionControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ACCESSION_PATH
-                                        + entryWithNoInteractions.getPrimaryAccession().getValue()
-                                        + "/interactions")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        MockMvcRequestBuilders.get(
+                                        UNIPROTKB_ACCESSION_PATH
+                                                + entryWithNoInteractions
+                                                        .getPrimaryAccession()
+                                                        .getValue()
+                                                + "/interactions")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log()).andExpect(status().is(HttpStatus.NO_CONTENT.value()));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NO_CONTENT.value()));
     }
 
     @Test
@@ -122,50 +121,72 @@ class UniProtKBInteractionControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ACCESSION_PATH + ENTRY_WITH_INTERACTION + "/interactions")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        MockMvcRequestBuilders.get(
+                                        UNIPROTKB_ACCESSION_PATH
+                                                + ENTRY_WITH_INTERACTION
+                                                + "/interactions")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.interactionMatrix[0].uniProtKBAccession",
                                 is(ENTRY_WITH_INTERACTION)))
-                .andExpect(jsonPath("$.interactionMatrix[0].uniProtKBId").exists())
-                .andExpect(jsonPath("$.interactionMatrix[0].organism").exists())
-                .andExpect(jsonPath("$.interactionMatrix[0].proteinExistence").exists())
-                .andExpect(jsonPath("$.interactionMatrix[0].interactions.size()", is(1)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath("$.interactionMatrix[0].uniProtKBId")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.interactionMatrix[0].organism").exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.interactionMatrix[0].proteinExistence")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.interactionMatrix[0].interactions.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.interactionMatrix[0].interactions[0].interactantOne.uniProtKBAccession",
                                 is(ENTRY_WITH_INTERACTION)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.interactionMatrix[0].interactions[0].interactantOne.intActId",
                                 is("EBI-00001")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.interactionMatrix[0].interactions[0].interactantTwo.uniProtKBAccession",
                                 is(CROSS_REFERENCED_ASSOCIATION)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.interactionMatrix[0].interactions[0].interactantTwo.intActId",
                                 is("EBI-00001")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.interactionMatrix[0].interactions[0].numberOfExperiments",
                                 is(2)))
-                .andExpect(jsonPath("$.interactionMatrix[0].subcellularLocations").exists())
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
+                                        "$.interactionMatrix[0].subcellularLocations")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.interactionMatrix[1].uniProtKBAccession",
                                 is(CROSS_REFERENCED_ASSOCIATION)))
-                .andExpect(jsonPath("$.interactionMatrix[1].uniProtKBId").exists())
-                .andExpect(jsonPath("$.interactionMatrix[1].organism").exists())
-                .andExpect(jsonPath("$.interactionMatrix[1].proteinExistence").exists())
-                .andExpect(jsonPath("$.interactionMatrix[1].interactions").doesNotExist());
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.interactionMatrix[1].uniProtKBId")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.interactionMatrix[1].organism").exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.interactionMatrix[1].proteinExistence")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.interactionMatrix[1].interactions")
+                                .doesNotExist());
     }
 
     @Test
@@ -173,49 +194,74 @@ class UniProtKBInteractionControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ACCESSION_PATH + ENTRY_WITH_INTERACTION + "/interactions")
-                                .header(ACCEPT, APPLICATION_XML_VALUE));
+                        MockMvcRequestBuilders.get(
+                                        UNIPROTKB_ACCESSION_PATH
+                                                + ENTRY_WITH_INTERACTION
+                                                + "/interactions")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
-                .andExpect(xpath("//InteractionEntry").exists())
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        xpath("//InteractionEntry/interactionMatrix[1]/primaryAccession")
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
+                .andExpect(MockMvcResultMatchers.xpath("//InteractionEntry").exists())
+                .andExpect(
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[1]/primaryAccession")
                                 .string(ENTRY_WITH_INTERACTION))
-                .andExpect(xpath("//InteractionEntry/interactionMatrix[1]/uniProtKBId").exists())
-                .andExpect(xpath("//InteractionEntry/interactionMatrix[1]/organism").exists())
                 .andExpect(
-                        xpath("//InteractionEntry/interactionMatrix[1]/proteinExistence").exists())
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[1]/uniProtKBId")
+                                .exists())
                 .andExpect(
-                        xpath("count(//InteractionEntry/interactionMatrix[1]/interactions)")
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[1]/organism")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[1]/proteinExistence")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.xpath(
+                                        "count(//InteractionEntry/interactionMatrix[1]/interactions)")
                                 .string("1"))
                 .andExpect(
-                        xpath(
+                        MockMvcResultMatchers.xpath(
                                         "//InteractionEntry/interactionMatrix[1]/interactions[1]/interactantOne/uniProtKBAccession")
                                 .string(ENTRY_WITH_INTERACTION))
                 .andExpect(
-                        xpath(
+                        MockMvcResultMatchers.xpath(
                                         "//InteractionEntry/interactionMatrix[1]/interactions[1]/interactantOne/intActId")
                                 .string("EBI-00001"))
                 .andExpect(
-                        xpath(
+                        MockMvcResultMatchers.xpath(
                                         "//InteractionEntry/interactionMatrix[1]/interactions[1]/interactantTwo/uniProtKBAccession")
                                 .string(CROSS_REFERENCED_ASSOCIATION))
                 .andExpect(
-                        xpath(
+                        MockMvcResultMatchers.xpath(
                                         "//InteractionEntry/interactionMatrix[1]/interactions[1]/interactantTwo/intActId")
                                 .string("EBI-00001"))
                 .andExpect(
-                        xpath("//InteractionEntry/interactionMatrix[2]/primaryAccession")
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[2]/primaryAccession")
                                 .string(CROSS_REFERENCED_ASSOCIATION))
-                .andExpect(xpath("//InteractionEntry/interactionMatrix[2]/uniProtKBId").exists())
-                .andExpect(xpath("//InteractionEntry/interactionMatrix[2]/organism").exists())
                 .andExpect(
-                        xpath("//InteractionEntry/interactionMatrix[2]/proteinExistence").exists())
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[2]/uniProtKBId")
+                                .exists())
                 .andExpect(
-                        xpath("//InteractionEntry/interactionMatrix[2]/interactions")
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[2]/organism")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[2]/proteinExistence")
+                                .exists())
+                .andExpect(
+                        MockMvcResultMatchers.xpath(
+                                        "//InteractionEntry/interactionMatrix[2]/interactions")
                                 .doesNotExist());
     }
 
@@ -224,11 +270,15 @@ class UniProtKBInteractionControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ACCESSION_PATH + NON_EXISTENT_ENTRY + "/interactions")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        MockMvcRequestBuilders.get(
+                                        UNIPROTKB_ACCESSION_PATH
+                                                + NON_EXISTENT_ENTRY
+                                                + "/interactions")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log()).andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value()));
     }
 
     @Test
@@ -236,16 +286,19 @@ class UniProtKBInteractionControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(UNIPROTKB_ACCESSION_PATH
-                                        + ENTRY_WITH_INTERACTION_BUT_NO_ASSOCIATED_ENTRIES
-                                        + "/interactions")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        MockMvcRequestBuilders.get(
+                                        UNIPROTKB_ACCESSION_PATH
+                                                + ENTRY_WITH_INTERACTION_BUT_NO_ASSOCIATED_ENTRIES
+                                                + "/interactions")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+        response.andDo(MockMvcResultHandlers.log())
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.status().is(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.CACHE_CONTROL,
                                         HttpCommonHeaderConfig.NO_CACHE));
     }

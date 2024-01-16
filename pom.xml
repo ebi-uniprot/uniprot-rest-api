@@ -70,6 +70,7 @@
 		<module>common-rest</module>
 		<module>support-data-common</module>
 		<module>support-data-rest</module>
+		<module>uniprotkb-common</module>
 		<module>uniprotkb-rest</module>
 		<module>proteome-rest</module>
 		<module>uniparc-rest</module>
@@ -441,7 +442,7 @@
 							<systemProperties>
 								<property>
 									<name>cv.dr.ord.location</name>
-									<value>${project.build.directory}/../../uniprotkb-rest/src/test/resources/xdb/dr_ord</value>
+									<value>${project.build.directory}/../../uniprotkb-common/src/test/resources/xdb/dr_ord</value>
 								</property>
 							</systemProperties>
 							<!-- Exclude integration tests from unit test run -->
@@ -460,7 +461,7 @@
 							<systemProperties>
 								<property>
 									<name>cv.dr.ord.location</name>
-									<value>${project.build.directory}/../../uniprotkb-rest/src/test/resources/xdb/dr_ord</value>
+									<value>${project.build.directory}/../../uniprotkb-common/src/test/resources/xdb/dr_ord</value>
 								</property>
 							</systemProperties>
 							<skipITs>${skipITs}</skipITs>

@@ -38,7 +38,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
-			<artifactId>uniprotkb-rest</artifactId>
+			<artifactId>uniprotkb-common</artifactId>
 			<version>${uniprot-core.version}</version>
 			<scope>compile</scope>
 		</dependency>

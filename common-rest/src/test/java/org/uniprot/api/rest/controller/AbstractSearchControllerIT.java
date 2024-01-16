@@ -551,7 +551,9 @@ public abstract class AbstractSearchControllerIT {
     @MethodSource("getAllReturnedFields")
     void searchCanSearchWithAllAvailableReturnedFields(String name, List<String> paths)
             throws Exception {
-
+        if ("error_gmodel_pred".equals(name)) {
+            System.out.println();
+        }
         // given
         saveEntry(SaveScenario.SEARCH_ALL_RETURN_FIELDS);
 
