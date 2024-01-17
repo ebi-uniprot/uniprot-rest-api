@@ -21,6 +21,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -37,7 +39,8 @@ import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
 import org.uniprot.api.uniprotkb.service.UniProtEntryService;
 
 @ExtendWith({MockitoExtension.class})
-class UniProtKBMessageListenerTest {
+@MockitoSettings(strictness = Strictness.LENIENT)
+public class UniProtKBMessageListenerTest {
     @Mock private MessageConverter converter;
     @Mock private UniProtEntryService service;
     @Mock DownloadConfigProperties downloadConfigProperties;
@@ -66,6 +69,7 @@ class UniProtKBMessageListenerTest {
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
+        when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
 
@@ -107,6 +111,7 @@ class UniProtKBMessageListenerTest {
         when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
         when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
+        when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
         Mockito.doThrow(new IOException("Forced IO Exception"))
                 .when(this.downloadResultWriter)

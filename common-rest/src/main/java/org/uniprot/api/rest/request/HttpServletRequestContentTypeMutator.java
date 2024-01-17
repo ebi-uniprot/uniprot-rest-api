@@ -66,6 +66,10 @@ public class HttpServletRequestContentTypeMutator {
         pathVariables.sort(stringComparator);
     }
 
+    public static boolean isBrowserAsFarAsWeKnow(String userAgent) {
+        return notNullNotEmpty(userAgent) && BROWSER_PATTERN.matcher(userAgent).find();
+    }
+
     public void mutate(MutableHttpServletRequest request) {
         mutateAcceptHeader(request);
         mutateAcceptEncodingHeader(request);
@@ -252,10 +256,6 @@ public class HttpServletRequestContentTypeMutator {
             }
         }
         return false;
-    }
-
-    private static boolean isBrowserAsFarAsWeKnow(String userAgent) {
-        return notNullNotEmpty(userAgent) && BROWSER_PATTERN.matcher(userAgent).find();
     }
 
     private static void setURL(MutableHttpServletRequest request, String extension) {

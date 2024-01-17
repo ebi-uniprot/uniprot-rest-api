@@ -3,6 +3,7 @@ package org.uniprot.api.rest.controller;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloadHeader;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
+import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.isBrowserAsFarAsWeKnow;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -234,7 +235,8 @@ public abstract class BasicSearchController<T> {
             downloadTaskExecutor.execute(
                     () -> {
                         try {
-                            if (Utils.notNull(downloadGatekeeper)) {
+                            String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
+                            if (isGatekeeperNeeded(userAgent)) {
                                 runRequestIfNotBusy(contextSupplier, request, deferredResult);
                             } else {
                                 runRequestNow(contextSupplier, request, deferredResult);
@@ -349,5 +351,9 @@ public abstract class BasicSearchController<T> {
     private void setTooManyRequestsResponse(
             DeferredResult<ResponseEntity<MessageConverterContext<T>>> result) {
         result.setResult(ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build());
+    }
+
+    private boolean isGatekeeperNeeded(String userAgent) {
+        return Utils.notNull(downloadGatekeeper) && !isBrowserAsFarAsWeKnow(userAgent);
     }
 }
