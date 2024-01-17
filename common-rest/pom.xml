@@ -17,7 +17,6 @@
 		<poi.version>4.1.0</poi.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
-		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
 		<micrometer-registry-prometheus.version>1.6.6</micrometer-registry-prometheus.version>
 		<redisson-spring-data-version>3.17.7</redisson-spring-data-version>
 		<testcontainers.version>1.17.6</testcontainers.version>
@@ -132,22 +131,6 @@
 				<exclusion>
 					<groupId>org.apache.logging.log4j</groupId>
 					<artifactId>log4j-slf4j-impl</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>uk.ac.ebi.uniprot</groupId>
-			<artifactId>openapi-maven-plugin</artifactId>
-			<version>${openapi-maven-plugin.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.data</groupId>
-					<artifactId>spring-data-solr</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

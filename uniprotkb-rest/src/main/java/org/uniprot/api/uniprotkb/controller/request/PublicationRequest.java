@@ -7,6 +7,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 2019-07-09
  */
 @Data
+@ParameterObject
 public class PublicationRequest {
 
     @Parameter(description = "Size of the result. Defaults to 25")

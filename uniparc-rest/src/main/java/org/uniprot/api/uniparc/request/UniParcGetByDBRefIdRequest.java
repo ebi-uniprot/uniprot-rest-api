@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.api.annotations.ParameterObject;
 
 /**
  * @author sahmad
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ParameterObject
 public class UniParcGetByDBRefIdRequest extends UniParcGetByIdPageSearchRequest {
     @Parameter(hidden = true)
     private static final String DB_ID_STR = "dbid";

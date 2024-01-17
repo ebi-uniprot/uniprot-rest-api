@@ -5,12 +5,10 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -19,9 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements SearchRequest {
-    @ModelFieldMeta(
-            reader = ReturnFieldMetaReaderImpl.class,
-            path = "uniparc-crossref-return-fields.json")
+
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC_CROSSREF)
     private String fields;

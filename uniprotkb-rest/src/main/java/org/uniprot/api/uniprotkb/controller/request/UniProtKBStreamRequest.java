@@ -5,6 +5,7 @@ import javax.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ParameterObject
 public class UniProtKBStreamRequest extends UniProtKBBasicRequest implements StreamRequest {
 
     @Parameter(
@@ -26,5 +28,6 @@ public class UniProtKBStreamRequest extends UniProtKBBasicRequest implements Str
             message = "{search.uniprot.invalid.download}")
     private String download;
 
+    @Parameter(hidden = true)
     private boolean isLargeSolrStreamRestricted = true;
 }

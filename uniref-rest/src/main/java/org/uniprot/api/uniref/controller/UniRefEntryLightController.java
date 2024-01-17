@@ -27,7 +27,6 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniref.request.UniRefIdsPostRequest;
 import org.uniprot.api.uniref.request.UniRefIdsSearchRequest;
@@ -40,7 +39,6 @@ import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -119,10 +117,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.id.value}")
                     String id,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "uniref-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
                     @Parameter(
                             description =
                                     "Comma separated list of fields to be returned in response")

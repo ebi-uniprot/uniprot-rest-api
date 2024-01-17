@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -104,6 +105,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntryPair>> getMappedEntries(
+            @Parameter(description = "Unique identifier for idmapping job")
             @PathVariable String jobId,
             @Valid @ModelAttribute UniRefIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
@@ -155,6 +157,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryPair>>>
             streamMappedEntries(
+                    @Parameter(description = "Unique identifier for idmapping job")
                     @PathVariable String jobId,
                     @Valid @ModelAttribute UniRefIdMappingStreamRequest streamRequest,
                     HttpServletRequest request,

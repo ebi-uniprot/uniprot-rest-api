@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@ParameterObject
 public class IdMappingStreamRequest implements StreamRequest {
     @Parameter(
             description =

@@ -36,7 +36,6 @@ public class GroupByECController extends GroupByController {
         this.uniProtKBGroupByECService = uniProtKBGroupByECService;
     }
 
-    @Tag(name = "uniprotkbgroup")
     @Operation(summary = "List of groups with respect to to the given query and parent")
     @ApiResponse(
             content =

@@ -7,19 +7,17 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
-import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
+@ParameterObject
 public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
 
     @NotNull(message = "{search.required}")
@@ -27,7 +25,6 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String accessions;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniprotkb-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
@@ -37,7 +34,6 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
     @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -62,7 +58,6 @@ public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniprotkb-search-fields.json")
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;

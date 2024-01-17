@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestMapping(value = GROUP_BY_TAXONOMY_RESOURCE)
 @RestController
@@ -36,7 +35,6 @@ public class GroupByTaxonomyController extends GroupByController {
         this.uniProtKBGroupByTaxonomyService = uniProtKBGroupByTaxonomyService;
     }
 
-    @Tag(name = "uniprotkbgroup")
     @Operation(summary = "List of groups with respect to to the given query and parent")
     @ApiResponse(
             content =

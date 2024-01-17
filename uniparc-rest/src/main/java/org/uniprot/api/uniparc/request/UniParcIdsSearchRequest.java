@@ -9,9 +9,6 @@ import lombok.Data;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
-import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
@@ -22,7 +19,6 @@ import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.api.rest.validation.ValidUniqueIdList;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -36,7 +32,6 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIPARC)
     private String upis;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
@@ -46,7 +41,6 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "uniparc-search-fields.json")
     @Parameter(description = "Criteria to search the uniparc. It can take any valid solr query.")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -71,7 +65,6 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "uniparc-search-fields.json")
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String sort;

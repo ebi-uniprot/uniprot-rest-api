@@ -5,6 +5,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyFacetConfig;
@@ -12,6 +13,7 @@ import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyFacetConf
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
+@ParameterObject
 public class TaxonomySearchRequest extends TaxonomyBasicRequest implements SearchRequest {
 
     @Parameter(hidden = true)

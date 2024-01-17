@@ -6,6 +6,7 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.aa.repository.UniRuleFacetConfig;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ParameterObject
 public class UniRuleSearchRequest extends UniRuleBasicRequest implements SearchRequest {
     @Parameter(hidden = true)
     private String cursor;

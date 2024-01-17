@@ -8,12 +8,10 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -30,9 +28,9 @@ public class GeneCentricUPIdRequest {
             message = "{search.invalid.upid.value}")
     private String upid;
 
-    @ModelFieldMeta(
-            reader = ReturnFieldMetaReaderImpl.class,
-            path = "genecentric-return-fields.json")
+    @Parameter(
+            description =
+                    "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String fields;
 

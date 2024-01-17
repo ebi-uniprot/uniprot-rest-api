@@ -29,14 +29,12 @@ import org.uniprot.api.proteome.service.ProteomeQueryService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.proteome.ProteomeEntry;
 import org.uniprot.core.xml.jaxb.proteome.Proteome;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -159,10 +157,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upid.value}")
                     String upid,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "proteome-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
                     @Parameter(
                             description =
                                     "Comma separated list of fields to be returned in response")

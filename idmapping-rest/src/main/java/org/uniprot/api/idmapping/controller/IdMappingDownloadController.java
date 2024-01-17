@@ -11,6 +11,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -90,7 +91,9 @@ public class IdMappingDownloadController extends BasicDownloadController {
                                     schema = @Schema(implementation = JobStatus.class))
                         })
             })
-    public ResponseEntity<JobStatusResponse> getJobStatus(@PathVariable String jobId) {
+    public ResponseEntity<JobStatusResponse> getJobStatus(
+            @Parameter(description = "Unique identifier for idmapping job")
+            @PathVariable String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
         return getAsyncDownloadStatus(job);
@@ -100,6 +103,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
+            @Parameter(description = "Unique identifier for idmapping job")
             @PathVariable String jobId, HttpServletRequest servletRequest) {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);

@@ -5,11 +5,13 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.SearchRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
+@ParameterObject
 public class SubcellularLocationSearchRequest extends SubcellularLocationBasicRequest
         implements SearchRequest {
     @Parameter(hidden = true)

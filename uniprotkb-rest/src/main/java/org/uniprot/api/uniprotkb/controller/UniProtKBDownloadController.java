@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  */
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
+@Tag(name = "UniProtKB job", description = "UniProtKB asynchronous download job")
 public class UniProtKBDownloadController extends BasicDownloadController {
     static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;
@@ -45,6 +47,15 @@ public class UniProtKBDownloadController extends BasicDownloadController {
     }
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
+    @Operation(
+            summary = "Submit UniProtKB asynchronous download job.",
+            responses = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            schema = @Schema(implementation = JobSubmitResponse.class))
+                            })})
     public ResponseEntity<JobSubmitResponse> submitJob(
             @Validated(CustomConstraintGroupSequence.class) @ModelAttribute
                     UniProtKBDownloadRequest request) {
@@ -56,7 +67,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get the status of a job.",
+            summary = "Get UniProtKB asynchronous download job status.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -74,6 +85,16 @@ public class UniProtKBDownloadController extends BasicDownloadController {
     @GetMapping(
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = "Get UniProtKB asynchronous download submitted job details.",
+            responses = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            schema = @Schema(implementation = DownloadJobDetailResponse.class))
+                            })
+            })
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
             @PathVariable String jobId, HttpServletRequest servletRequest) {
 

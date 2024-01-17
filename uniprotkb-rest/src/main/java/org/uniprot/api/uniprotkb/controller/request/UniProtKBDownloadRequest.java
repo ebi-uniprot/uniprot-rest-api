@@ -7,6 +7,7 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.CustomConstraintGroup;
@@ -16,6 +17,7 @@ import org.uniprot.api.rest.validation.ValidDownloadRequest;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ValidDownloadRequest(groups = CustomConstraintGroup.class)
+@ParameterObject
 public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements DownloadRequest {
     @ValidAsyncDownloadFormats(
             formats = {

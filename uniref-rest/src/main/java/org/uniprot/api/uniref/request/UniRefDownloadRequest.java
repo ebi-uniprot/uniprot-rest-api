@@ -6,12 +6,14 @@ import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ParameterObject
 public class UniRefDownloadRequest extends UniRefStreamRequest implements DownloadRequest {
 
     @ValidAsyncDownloadFormats(

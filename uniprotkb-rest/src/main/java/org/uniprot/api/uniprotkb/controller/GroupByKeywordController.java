@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
+@Tag(name = "UniProtKB group by")
 @RequestMapping(value = GROUP_BY_KEYWORD_RESOURCE)
 @RestController
 @Validated
@@ -37,7 +37,6 @@ public class GroupByKeywordController extends GroupByController {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    @Tag(name = "uniprotkbgroup")
     @Operation(summary = "List of groups with respect to to the given query and parent")
     @ApiResponse(
             content =

@@ -12,14 +12,12 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyFacetConfig;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -38,7 +36,6 @@ public class GetByTaxonIdsRequest implements SearchRequest {
     @ValidCommaSeparatedItemsLength(maxLength = 1000)
     private String taxonIds;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "taxonomy-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;

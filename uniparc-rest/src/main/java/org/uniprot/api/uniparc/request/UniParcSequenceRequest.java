@@ -8,11 +8,9 @@ import javax.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -28,7 +26,6 @@ public class UniParcSequenceRequest extends UniParcGetByIdRequest {
     @Pattern(regexp = SEQUENCE_REGEX, message = "{uniparc.sequence.invalid}")
     private String sequence;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "uniparc-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in the response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;

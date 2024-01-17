@@ -11,6 +11,7 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
@@ -31,6 +32,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ParameterObject
 public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements SearchRequest {
     @Parameter(hidden = true)
     public static final String DEFAULT_FIELDS =

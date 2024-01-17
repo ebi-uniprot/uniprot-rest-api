@@ -10,6 +10,7 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -88,6 +89,7 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobStatusResponse> getStatus(
+            @Parameter(description = "Unique identifier for idmapping job")
             @PathVariable String jobId, HttpServletRequest servletRequest) {
         return createStatus(
                 cacheService.getJobAsResource(jobId), servletRequest.getRequestURL().toString());
@@ -107,6 +109,7 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobDetailResponse> getDetails(
+            @Parameter(description = "Unique identifier for idmapping job")
             @PathVariable String jobId, HttpServletRequest servletRequest) {
         IdMappingJob job = cacheService.getJobAsResource(jobId);
         IdMappingJobRequest jobRequest = job.getIdMappingRequest();

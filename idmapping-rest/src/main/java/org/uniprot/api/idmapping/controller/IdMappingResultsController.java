@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +105,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                         })
             })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> results(
+            @Parameter(description = "Unique identifier for idmapping job")
             @PathVariable String jobId,
             @Valid @ModelAttribute IdMappingPageRequest pageRequest,
             HttpServletRequest request,
@@ -154,6 +156,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<IdMappingStringPair>>>
             streamResults(
+                    @Parameter(description = "Unique identifier for idmapping job")
                     @PathVariable String jobId,
                     @Valid @ModelAttribute IdMappingStreamRequest streamRequest,
                     HttpServletRequest request,

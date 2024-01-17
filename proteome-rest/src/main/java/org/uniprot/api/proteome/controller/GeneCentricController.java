@@ -30,14 +30,12 @@ import org.uniprot.api.proteome.service.GeneCentricService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.core.genecentric.GeneCentricEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -245,10 +243,10 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accession,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "genecentric-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
+            @Parameter(
+                    description =
+                            "Comma separated list of fields to be returned in response")
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

@@ -10,6 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +42,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb")
-@Tag(name = "Miscellaneous")
+@Tag(name = "UniProtKB")
 public class UniProtKBPublicationController extends BasicSearchController<PublicationEntry> {
     private final PublicationService publicationService;
 
@@ -66,6 +70,15 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
     @GetMapping(
             value = "/{accession}/publications",
             produces = {APPLICATION_JSON_VALUE})
+    @Operation(
+            summary = "Get UniProtKB entry publications by accession.",
+            responses = {
+                    @ApiResponse(
+                            content = {
+                                    @Content(
+                                            mediaType = APPLICATION_JSON_VALUE,
+                                            schema = @Schema(implementation = PublicationEntry.class))
+                            })})
     public ResponseEntity<MessageConverterContext<PublicationEntry>>
             getMappedPublicationsByUniProtAccession(
                     @PathVariable("accession")

@@ -33,7 +33,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsPostRequest;
@@ -49,7 +48,6 @@ import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -66,6 +64,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @RequestMapping(value = UNIPROTKB_RESOURCE)
+@Tag(
+        name = "UniProtKB",
+        description =
+                "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.")
 public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     private static final String DATA_TYPE = "uniprotkb";
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
@@ -93,10 +95,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         this.entryService = entryService;
     }
 
-    @Tag(
-            name = "uniprotkb",
-            description =
-                    "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.")
     @GetMapping(
             value = "/search",
             produces = {
@@ -151,7 +149,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         return super.getSearchResponse(result, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "uniprotkb")
     @GetMapping(
             value = "/{accession}",
             produces = {
@@ -197,10 +194,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.accession.value}")
                     String accessionOrId,
-            @ModelFieldMeta(
-                            reader = ReturnFieldMetaReaderImpl.class,
-                            path = "uniprotkb-return-fields.json")
-                    @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
+            @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
                             description =
                                     "Comma separated list of fields to be returned in response")
@@ -241,7 +235,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
      *   - for GZIPPED results, add -H "Accept-Encoding:gzip"
      *   - omit '-OJ' option to curl, to just see it print to standard output
      */
-    @Tag(name = "uniprotkb")
     @GetMapping(
             value = "/stream",
             produces = {
@@ -308,7 +301,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         }
     }
 
-    @Tag(name = "uniprotkb")
     @RequestMapping(
             value = "/accessions",
             method = {RequestMethod.GET},
@@ -358,7 +350,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         return getByAccessions(accessionsRequest, request, response);
     }
 
-    @Tag(name = "uniprotkb")
     @RequestMapping(
             value = "/accessions",
             method = {RequestMethod.POST},

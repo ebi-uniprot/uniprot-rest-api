@@ -5,6 +5,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.support.data.literature.repository.LiteratureFacetConfig;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 2019-07-04
  */
 @Data
+@ParameterObject
 public class LiteratureSearchRequest extends LiteratureBasicRequest implements SearchRequest {
     @Parameter(hidden = true)
     private String cursor;

@@ -9,17 +9,13 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
-import org.uniprot.api.rest.request.QueryFieldMetaReaderImpl;
-import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.request.SearchRequest;
-import org.uniprot.api.rest.request.SortFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
-import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 /**
@@ -37,7 +33,6 @@ public class HelpCentreSearchRequest implements SearchRequest {
                     .filter(fieldName -> !fieldName.equals("content"))
                     .collect(Collectors.joining(","));
 
-    @ModelFieldMeta(reader = QueryFieldMetaReaderImpl.class, path = "help-search-fields.json")
     @Parameter(description = "Criteria to search help centre. It can take any valid Lucene query.")
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
@@ -46,12 +41,10 @@ public class HelpCentreSearchRequest implements SearchRequest {
             messagePrefix = "search.helpcentre")
     private String query;
 
-    @ModelFieldMeta(reader = SortFieldMetaReaderImpl.class, path = "help-search-fields.json")
     @Parameter(description = "Name of the field to be sorted on")
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.HELP)
     private String sort;
 
-    @ModelFieldMeta(reader = ReturnFieldMetaReaderImpl.class, path = "help-return-fields.json")
     @Parameter(description = "Comma separated list of fields to be returned in response")
     @ValidReturnFields(uniProtDataType = UniProtDataType.HELP)
     private String fields;

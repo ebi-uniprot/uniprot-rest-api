@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +125,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntryPair>> getMappedEntries(
+            @Parameter(description = "Unique identifier for idmapping job")
             @PathVariable String jobId,
             @Valid @ModelAttribute UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
@@ -192,6 +194,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntryPair>>>
             streamMappedEntries(
+                    @Parameter(description = "Unique identifier for idmapping job")
                     @PathVariable String jobId,
                     @Valid @ModelAttribute UniProtKBIdMappingStreamRequest streamRequest,
                     HttpServletRequest request,
