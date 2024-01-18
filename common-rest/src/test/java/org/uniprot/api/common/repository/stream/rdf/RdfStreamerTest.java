@@ -54,11 +54,18 @@ class RdfStreamerTest {
     @Mock private RdfService<String> rdfService;
     @Mock private RestTemplate restTemplate;
     @Mock private TagPositionProvider tagPositionProvider;
+    @Mock private RdfEntryCountProvider rdfEntryCountProvider;
     RdfStreamer rdfStreamer;
 
     @BeforeEach
     void setUp() {
-        rdfStreamer = new RdfStreamer(BATCH_SIZE, prologProvider, rdfServiceFactory, RETRY_POLICY);
+        rdfStreamer =
+                new RdfStreamer(
+                        BATCH_SIZE,
+                        prologProvider,
+                        rdfServiceFactory,
+                        RETRY_POLICY,
+                        rdfEntryCountProvider);
         rdfService =
                 new RdfService<>(
                         tagPositionProvider, restTemplate, String.class, DATA_TYPE, FORMAT);

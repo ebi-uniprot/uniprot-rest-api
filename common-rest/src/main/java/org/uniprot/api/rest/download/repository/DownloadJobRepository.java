@@ -11,4 +11,5 @@ import org.uniprot.api.rest.download.model.DownloadJob;
  */
 @Repository
 @Profile({"asyncDownload"})
-public interface DownloadJobRepository extends CrudRepository<DownloadJob, String> {}
+public interface DownloadJobRepository
+        extends CrudRepository<DownloadJob, String>, DownloadJobPartialUpdateRepository {}
