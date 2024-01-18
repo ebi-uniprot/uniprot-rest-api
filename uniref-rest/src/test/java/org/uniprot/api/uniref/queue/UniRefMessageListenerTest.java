@@ -26,6 +26,8 @@ import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
+import org.uniprot.api.common.repository.search.QueryResult;
+import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.download.DownloadResultWriter;
 import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
@@ -34,8 +36,10 @@ import org.uniprot.api.rest.download.queue.BaseAbstractMessageListener;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 import org.uniprot.api.uniref.service.UniRefEntryLightService;
+import org.uniprot.core.uniref.UniRefEntryLight;
 
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -71,6 +75,11 @@ class UniRefMessageListenerTest {
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
+        when(this.service.search(any(SearchRequest.class)))
+                .thenReturn(
+                        QueryResult.<UniRefEntryLight>builder()
+                                .page(CursorPage.of("", 10, 2))
+                                .build());
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
 
         this.uniRefMessageListener.onMessage(message);
@@ -113,6 +122,11 @@ class UniRefMessageListenerTest {
         when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
         when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
         when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
+        when(this.service.search(any(SearchRequest.class)))
+                .thenReturn(
+                        QueryResult.<UniRefEntryLight>builder()
+                                .page(CursorPage.of("", 10, 2))
+                                .build());
         Mockito.doThrow(new IOException("Forced IO Exception"))
                 .when(this.downloadResultWriter)
                 .writeResult(any(), any(), any(), any(), any(), any());

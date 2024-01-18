@@ -16,7 +16,7 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
 @Component
 @Slf4j
-@Profile({"asyncDownload"})
+@Profile({"live", "asyncDownload"})
 public class HeartBeatProducer {
     private static final String UPDATE_COUNT = "updateCount";
     private static final String UPDATED = "updated";

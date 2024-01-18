@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -21,6 +22,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 
 @Component
 @Slf4j
+@Profile({"live", "asyncDownload"})
 public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<UniRefEntryLight> {
 
     private static final Type type =
