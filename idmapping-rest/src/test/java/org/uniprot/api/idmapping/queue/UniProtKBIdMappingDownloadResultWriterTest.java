@@ -47,6 +47,7 @@ import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 class UniProtKBIdMappingDownloadResultWriterTest {
     public static final String JOB_ID = "UNIPROTKB_WRITER_JOB_ID";
@@ -97,6 +98,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
     @Test
     void canWriteResultFile() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         RequestMappingHandlerAdapter contentAdaptor =
                 getMockedRequestMappingHandlerAdapter(objectMapper);
         MessageConverterContextFactory<UniProtKBEntryPair> converterContextFactory =

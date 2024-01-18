@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.USER_AGENT;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -85,5 +86,32 @@ class BasicSearchControllerTest {
         when(request.getHeader(HttpHeaders.ACCEPT)).thenReturn("INVALID");
         assertThrows(
                 ImportantMessageServiceException.class, () -> controller.getAcceptHeader(request));
+    }
+
+    @Test
+    void browserRequestsBypassGatekeeper() throws Exception {
+        setUp(true); // set with gatekeeper
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getHeader(USER_AGENT))
+                .thenReturn(
+                        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36");
+        for (int i = 0; i < 5; i++) {
+            controller.getDeferredResultResponseEntity(() -> context, httpRequest);
+            Thread.sleep(100); // give some time to allow the Gatekeeper to allow an "enter"
+            // gatekeeper capacity remains unchanged because the browser request bypasses it
+            MatcherAssert.assertThat(
+                    gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity()));
+        }
+    }
+
+    @Test
+    void nonBrowserRequestsGoThroughGatekeeper() throws Exception {
+        setUp(true); // set with gatekeeper
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getHeader(USER_AGENT)).thenReturn("python-requests/2.31.0");
+        controller.getDeferredResultResponseEntity(() -> context, httpRequest);
+        Thread.sleep(100); // give some time to allow the Gatekeeper to allow an "enter"
+        MatcherAssert.assertThat(
+                gatekeeper.getSpaceInside(), CoreMatchers.is(gatekeeper.getCapacity() - 1));
     }
 }

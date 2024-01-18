@@ -53,7 +53,7 @@ class CrossRefControllerTest {
                 .andExpect(jsonPath("$.pubMedId", equalTo(crossRef.getPubMedId())))
                 .andExpect(jsonPath("$.doiId", equalTo(crossRef.getDoiId())))
                 .andExpect(jsonPath("$.linkType", equalTo(crossRef.getLinkType())))
-                .andExpect(jsonPath("$.server", equalTo(crossRef.getServer())))
+                .andExpect(jsonPath("$.servers", equalTo(crossRef.getServers())))
                 .andExpect(jsonPath("$.dbUrl", equalTo(crossRef.getDbUrl())))
                 .andExpect(jsonPath("$.category", equalTo(crossRef.getCategory())))
                 .andExpect(
@@ -91,7 +91,7 @@ class CrossRefControllerTest {
 
         CrossRefEntryBuilder builder = new CrossRefEntryBuilder();
         builder.abbrev(ab).id(ac).category(ct).dbUrl(du);
-        builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).server(sr);
+        builder.doiId(di).linkType(lt).name(nm).pubMedId(pb).serversAdd(sr);
         builder.statistics(statistics);
         return builder.build();
     }
