@@ -9,54 +9,7 @@
 		<version>1.0.28-SNAPSHOT</version>
 	</parent>
 	<artifactId>uniprotkb-common</artifactId>
-
-	<properties>
-		<!-- Plugin versions -->
-		<maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
-		<!-- Dependency versions -->
-		<slf4j.version>1.7.25</slf4j.version>
-		<logback.version>1.2.3</logback.version>
-		<commons-codec.version>1.11</commons-codec.version>
-		<jayway.version>2.4.0</jayway.version>
-		<testcontainers.version>1.17.6</testcontainers.version>
-		<dev.jna.version>5.8.0</dev.jna.version>
-		<awaitility.version>4.2.0</awaitility.version>
-	</properties>
-
-	<repositories>
-		<repository>
-			<id>local-third-party-repository</id>
-			<name>Third Party Local Repository</name>
-			<url>file://${basedir}/lib</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
-		<dependency>
-			<groupId>uk.ac.ebi.uniprot</groupId>
-			<artifactId>openapi-maven-plugin</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-		</dependency>
-		<dependency>
-			<groupId>io.dropwizard.metrics</groupId>
-			<artifactId>metrics-core</artifactId>
-			<version>${dropwizard.metrics.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>common-rest</artifactId>
@@ -132,59 +85,15 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>net.jodah</groupId>
-			<artifactId>failsafe</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>${commons-codec.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>${logback.version}</version>
-		</dependency>
-
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cache</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.cache</groupId>
-			<artifactId>cache-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.ehcache</groupId>
-			<artifactId>ehcache</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.jayway.jsonpath</groupId>
-			<artifactId>json-path</artifactId>
-			<version>${jayway.version}</version>
-		</dependency>
 		<!-- Tests -->
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -233,106 +142,10 @@
 			<version>${uniprot-store.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.awaitility/awaitility -->
-		<dependency>
-			<groupId>org.awaitility</groupId>
-			<artifactId>awaitility</artifactId>
-			<version>${awaitility.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers</artifactId>
-			<version>${testcontainers.version}</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>net.java.dev.jna</groupId>
-					<artifactId>jna</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>${testcontainers.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>rabbitmq</artifactId>
-			<version>${testcontainers.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.java.dev.jna</groupId>
-			<artifactId>jna</artifactId>
-			<version>${dev.jna.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-	<profiles>
-		<profile>
-			<id>openapi</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>uk.ac.ebi.uniprot</groupId>
-						<artifactId>openapi-maven-plugin</artifactId>
-						<version>${openapi-maven-plugin.version}</version>
-						<configuration>
-							<packageLocations>
-								<packageLocation>org.uniprot.api.uniprotkb.controller</packageLocation>
-							</packageLocations>
-							<openApiDirectory>target/generated-sources/swagger</openApiDirectory>
-							<openApiFileName>uniprot-openapi3.yaml</openApiFileName>
-							<serverBaseUrl>https://wwwdev.ebi.ac.uk/uniprot/api</serverBaseUrl>
-						</configuration>
-						<dependencies>
-							<dependency>
-								<groupId>org.uniprot</groupId>
-								<artifactId>uniprot-config</artifactId>
-								<version>${uniprot-store.version}</version>
-								<exclusions>
-									<exclusion>
-										<groupId>com.fasterxml.jackson.core</groupId>
-										<artifactId>*</artifactId>
-									</exclusion>
-								</exclusions>
-							</dependency>
-						</dependencies>
-						<executions>
-							<execution>
-								<phase>compile</phase>
-								<goals>
-									<goal>oas-generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
