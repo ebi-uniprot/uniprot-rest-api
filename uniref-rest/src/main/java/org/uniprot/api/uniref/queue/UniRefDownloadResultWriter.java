@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -13,6 +14,7 @@ import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.rest.download.AbstractDownloadResultWriter;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -20,6 +22,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 
 @Component
 @Slf4j
+@Profile({"live", "asyncDownload"})
 public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<UniRefEntryLight> {
 
     private static final Type type =
@@ -31,14 +34,16 @@ public class UniRefDownloadResultWriter extends AbstractDownloadResultWriter<Uni
             MessageConverterContextFactory<UniRefEntryLight> converterContextFactory,
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RdfStreamer uniRefRdfStreamer) {
+            RdfStreamer uniRefRdfStreamer,
+            HeartBeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
                 uniRefRdfStreamer,
-                MessageConverterContextFactory.Resource.UNIREF);
+                MessageConverterContextFactory.Resource.UNIREF,
+                heartBeatProducer);
     }
 
     @Override
