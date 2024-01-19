@@ -122,7 +122,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                                 "$.uniParcCrossReferences[*].database",
                                 containsInAnyOrder("UniProtKB/TrEMBL", "EMBL")))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
 
     @Test
@@ -171,7 +171,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].database", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].organism.taxonId", hasItem(9606)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
 
     @Test
@@ -200,7 +200,7 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                                 "$.uniParcCrossReferences[*].active",
                                 contains(true, true, true, true, true)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
 
     @Test
@@ -225,6 +225,6 @@ abstract class AbstractGetSingleUniParcByIdTest extends AbstractGetByIdControlle
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].organism", notNullValue()))
                 .andExpect(jsonPath("$.uniParcCrossReferences[*].active", contains(false)))
                 .andExpect(jsonPath("$.sequence", notNullValue()))
-                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(13)));
+                .andExpect(jsonPath("$.sequenceFeatures", iterableWithSize(12)));
     }
 }
