@@ -118,7 +118,7 @@ class IdMappingConfigureControllerIT {
                                         "https://thebiogrid.org/%id",
                                         "https://www.ebi.ac.uk/complexportal/complex/%id",
                                         "https://dip.doe-mbi.ucla.edu/dip/Browse.cgi?ID=%id",
-                                        "https://version-11-5.string-db.org/network/%id")))
+                                        "https://string-db.org/network/%id")))
                 .andExpect(
                         jsonPath(
                                 "$.groups.[?(@.groupName=='Chemistry')].items.*",
