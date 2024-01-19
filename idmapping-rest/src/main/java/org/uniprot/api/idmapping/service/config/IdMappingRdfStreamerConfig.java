@@ -18,11 +18,15 @@ import org.uniprot.api.rest.service.TagPositionProvider;
 public class IdMappingRdfStreamerConfig {
     private final PrologProvider prologProvider;
     private final TagPositionProvider tagPositionProvider;
+    private final RdfEntryCountProvider rdfEntryCountProvider;
 
     public IdMappingRdfStreamerConfig(
-            PrologProvider prologProvider, TagPositionProvider tagPositionProvider) {
+            PrologProvider prologProvider,
+            TagPositionProvider tagPositionProvider,
+            RdfEntryCountProvider rdfEntryCountProvider) {
         this.prologProvider = prologProvider;
         this.tagPositionProvider = tagPositionProvider;
+        this.rdfEntryCountProvider = rdfEntryCountProvider;
     }
 
     @Bean
@@ -33,7 +37,8 @@ public class IdMappingRdfStreamerConfig {
                 idMappingRdfStreamerConfigProperties.getBatchSize(),
                 prologProvider,
                 idMappingRdfServiceFactory,
-                RdfStreamConfig.rdfRetryPolicy(idMappingRdfStreamerConfigProperties));
+                RdfStreamConfig.rdfRetryPolicy(idMappingRdfStreamerConfigProperties),
+                rdfEntryCountProvider);
     }
 
     @Bean

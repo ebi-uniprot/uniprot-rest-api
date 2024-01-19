@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
@@ -14,8 +15,12 @@ import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 
 public abstract class BasicDownloadController {
+    private final AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration;
 
-    protected BasicDownloadController() {}
+    protected BasicDownloadController(
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+        this.asyncDownloadHeartBeatConfiguration = asyncDownloadHeartBeatConfiguration;
+    }
 
     protected ResponseEntity<JobStatusResponse> getAsyncDownloadStatus(DownloadJob job) {
         ResponseEntity<JobStatusResponse> response;
@@ -23,11 +28,25 @@ public abstract class BasicDownloadController {
             case NEW:
             case RUNNING:
             case FINISHED:
-                response = ResponseEntity.ok(new JobStatusResponse(job.getStatus()));
+                response =
+                        ResponseEntity.ok(
+                                new JobStatusResponse(
+                                        job.getStatus(),
+                                        job.getCreated(),
+                                        job.getTotalEntries(),
+                                        getProcessedEntries(job),
+                                        job.getUpdated()));
                 break;
             case PROCESSING:
             case UNFINISHED:
-                response = ResponseEntity.ok(new JobStatusResponse(JobStatus.RUNNING));
+                response =
+                        ResponseEntity.ok(
+                                new JobStatusResponse(
+                                        JobStatus.RUNNING,
+                                        job.getCreated(),
+                                        job.getTotalEntries(),
+                                        getProcessedEntries(job),
+                                        job.getUpdated()));
                 break;
             case ABORTED:
                 ProblemPair abortedError =
@@ -36,18 +55,34 @@ public abstract class BasicDownloadController {
                 response =
                         ResponseEntity.ok(
                                 new JobStatusResponse(
-                                        JobStatus.ABORTED, List.of(), List.of(abortedError)));
+                                        JobStatus.ABORTED,
+                                        List.of(),
+                                        List.of(abortedError),
+                                        job.getCreated(),
+                                        job.getTotalEntries(),
+                                        getProcessedEntries(job),
+                                        job.getUpdated()));
                 break;
             default:
                 ProblemPair error =
                         new ProblemPair(PredefinedAPIStatus.SERVER_ERROR.getCode(), job.getError());
                 response =
                         ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(new JobStatusResponse(List.of(error)));
+                                .body(
+                                        new JobStatusResponse(
+                                                List.of(error),
+                                                job.getCreated(),
+                                                job.getTotalEntries(),
+                                                getProcessedEntries(job),
+                                                job.getUpdated()));
                 break;
         }
 
         return response;
+    }
+
+    private Long getProcessedEntries(DownloadJob job) {
+        return asyncDownloadHeartBeatConfiguration.isEnabled() ? job.getProcessedEntries() : null;
     }
 
     protected String constructDownloadRedirectUrl(String resultFile, String url) {

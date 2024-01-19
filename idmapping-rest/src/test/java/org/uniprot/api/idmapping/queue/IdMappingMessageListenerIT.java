@@ -26,7 +26,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl;
-import org.uniprot.api.idmapping.model.*;
+import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.model.IdMappingResult;
+import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -78,7 +80,8 @@ class IdMappingMessageListenerIT {
         when(this.idMappingJobCacheService.getCompletedJobAsResource(jobId))
                 .thenReturn(idMappingJob);
         Mockito.verify(this.uniProtKBIdMappingDownloadResultWriter, atMostOnce())
-                .writeResult(downloadRequest, idMappingResult, jobId, MediaType.APPLICATION_JSON);
+                .writeResult(
+                        downloadRequest, idMappingResult, downloadJob, MediaType.APPLICATION_JSON);
         when(this.writerFactory.getResultWriter(to))
                 .thenReturn(
                         (AbstractIdMappingDownloadResultWriter)
@@ -93,6 +96,16 @@ class IdMappingMessageListenerIT {
         assertTrue(downloadJobResultOpt.isPresent());
         DownloadJob downloadJobResult = downloadJobResultOpt.get();
         assertEquals(JobStatus.FINISHED, downloadJobResult.getStatus());
+        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob, idMappingJob);
+    }
+
+    private void verifyLoggingTotalNoOfEntries(
+            DownloadJobRepository jobRepository,
+            DownloadJob downloadJob,
+            IdMappingJob idMappingJob) {
+        assertEquals(2, downloadJob.getTotalEntries());
+        assertNotNull(downloadJob.getUpdated());
+        verify(jobRepository, times(3)).save(downloadJob);
     }
 
     @Test
@@ -142,6 +155,7 @@ class IdMappingMessageListenerIT {
                                 "IdMappingMessageListener.writeResult(IdMappingMessageListener.java"));
 
         verify(this.rabbitTemplate, atLeast(1)).convertAndSend(eq(retryQueue), any(Message.class));
+        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob, idMappingJob);
     }
 
     @Test

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 @Data
 @Builder
 public class DownloadJob implements Serializable {
+    private static final long serialVersionUID = 4548782902533470468L;
     @Id private String id;
     private JobStatus status;
 
@@ -43,4 +44,7 @@ public class DownloadJob implements Serializable {
     private String resultFile;
 
     private String format;
+    private long totalEntries;
+    private long processedEntries;
+    private long updateCount;
 }

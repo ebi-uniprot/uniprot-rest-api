@@ -6,10 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
-import org.uniprot.api.common.repository.stream.rdf.PrologProvider;
-import org.uniprot.api.common.repository.stream.rdf.RdfServiceFactory;
-import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
-import org.uniprot.api.common.repository.stream.rdf.RdfStreamerConfigProperties;
+import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.service.TagPositionProvider;
 
 class SupportDataRdfStreamerConfigTest {
@@ -17,13 +14,15 @@ class SupportDataRdfStreamerConfigTest {
     @Mock private TagPositionProvider tagPositionProvider;
     @Mock private RestTemplate restTemplate;
     @Mock private RdfServiceFactory rdfServiceFactory;
+    @Mock private RdfEntryCountProvider rdfEntryCountProvider;
     private RdfStreamerConfigProperties properties;
     private SupportDataRdfStreamerConfig supportDataRdfStreamerConfig;
 
     @BeforeEach
     void setUp() {
         supportDataRdfStreamerConfig =
-                new SupportDataRdfStreamerConfig(prologProvider, tagPositionProvider);
+                new SupportDataRdfStreamerConfig(
+                        prologProvider, tagPositionProvider, rdfEntryCountProvider);
         properties = new RdfStreamerConfigProperties();
         properties.setRequestUrl("http://localhost");
         properties.setBatchSize(25);

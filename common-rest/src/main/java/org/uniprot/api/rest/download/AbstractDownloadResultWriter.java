@@ -28,6 +28,8 @@ import org.uniprot.api.common.repository.stream.rdf.RdfStreamer;
 import org.uniprot.api.common.repository.stream.store.BatchStoreIterable;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
+import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -38,7 +40,7 @@ import org.uniprot.api.rest.request.DownloadRequest;
 @Slf4j
 public abstract class AbstractDownloadResultWriter<T> implements DownloadResultWriter {
 
-    public static final Map<MediaType, String> supportedTypes =
+    private static final Map<MediaType, String> SUPPORTED_RDF_TYPES =
             Map.of(
                     RDF_MEDIA_TYPE, "rdf",
                     TURTLE_MEDIA_TYPE, "ttl",
@@ -49,30 +51,34 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
     private final DownloadConfigProperties downloadConfigProperties;
     private final MessageConverterContextFactory.Resource resource;
     private final RdfStreamer rdfStreamer;
+    private final HeartBeatProducer heartBeatProducer;
 
-    public AbstractDownloadResultWriter(
+    protected AbstractDownloadResultWriter(
             RequestMappingHandlerAdapter contentAdapter,
             MessageConverterContextFactory<T> converterContextFactory,
             StoreStreamerConfig<T> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer rdfStreamer,
-            MessageConverterContextFactory.Resource resource) {
+            MessageConverterContextFactory.Resource resource,
+            HeartBeatProducer heartBeatProducer) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
         this.storeStreamerConfig = storeStreamerConfig;
         this.downloadConfigProperties = downloadConfigProperties;
         this.resource = resource;
         this.rdfStreamer = rdfStreamer;
+        this.heartBeatProducer = heartBeatProducer;
     }
 
     public void writeResult(
             DownloadRequest request,
+            DownloadJob downloadJob,
             Path idFile,
-            String jobId,
             MediaType contentType,
             StoreRequest storeRequest,
             String dataType)
             throws IOException {
+        String jobId = downloadJob.getId();
         String fileNameWithExt = jobId + FileType.GZIP.getExtension();
         Path resultPath =
                 Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
@@ -91,17 +97,33 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             context.setFields(request.getFields());
             context.setContentType(contentType);
 
-            if (supportedTypes.containsKey(contentType)) {
+            if (SUPPORTED_RDF_TYPES.containsKey(contentType)) {
                 Stream<String> rdfResponse =
-                        this.rdfStreamer.stream(ids, dataType, supportedTypes.get(contentType));
+                        this.rdfStreamer.stream(
+                                ids,
+                                dataType,
+                                SUPPORTED_RDF_TYPES.get(contentType),
+                                entries ->
+                                        heartBeatProducer.createForResults(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
-                context.setEntityIds(ids);
+                context.setEntityIds(
+                        ids.map(
+                                id -> {
+                                    heartBeatProducer.createForResults(downloadJob, 1);
+                                    return id;
+                                }));
             } else {
                 BatchStoreIterable<T> batchStoreIterable =
                         getBatchStoreIterable(ids.iterator(), storeRequest);
                 Stream<T> entities =
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
+                                .map(
+                                        entityCollection -> {
+                                            heartBeatProducer.createForResults(
+                                                    downloadJob, entityCollection.size());
+                                            return entityCollection;
+                                        })
                                 .flatMap(Collection::stream)
                                 .onClose(
                                         () ->
@@ -114,6 +136,8 @@ public abstract class AbstractDownloadResultWriter<T> implements DownloadResultW
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, gzipOutputStream, start, counter);
+        } finally {
+            heartBeatProducer.stop(downloadJob.getId());
         }
     }
 

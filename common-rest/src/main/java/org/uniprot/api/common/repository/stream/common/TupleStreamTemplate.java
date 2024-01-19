@@ -69,28 +69,31 @@ public class TupleStreamTemplate extends AbstractTupleStreamTemplate {
 
     void validateResponse(SolrRequest request) {
         if (streamConfig.getStoreMaxCountToRetrieve() > 0) {
-            SolrRequest slimRequest =
-                    SolrRequest.builder()
-                            .query(request.getQuery())
-                            .filterQueries(request.getFilterQueries())
-                            .queryConfig(request.getQueryConfig())
-                            .queryField(request.getQueryField())
-                            .rows(0)
-                            .build();
-            try {
-                JsonQueryRequest jsonQueryRequest =
-                        solrRequestConverter.toJsonQueryRequest(slimRequest);
-                QueryResponse response =
-                        jsonQueryRequest.process(solrClient, streamConfig.getCollection());
-                if (response.getResults().getNumFound()
-                        > streamConfig.getStoreMaxCountToRetrieve()) {
-                    throw new ForbiddenRequestException(
-                            "Too many results to retrieve. Please refine your query or consider fetching batch by batch");
-                }
-            } catch (SolrServerException | IOException e) {
-                throw new ServiceException("Server error when querying Solr", e);
+            if (getNumberOfEntries(request) > streamConfig.getStoreMaxCountToRetrieve()) {
+                throw new ForbiddenRequestException(
+                        "Too many results to retrieve. Please refine your query or consider fetching batch by batch");
             }
             log.debug("Request to stream is valid: " + request);
+        }
+    }
+
+    public long getNumberOfEntries(SolrRequest request) {
+        SolrRequest slimRequest =
+                SolrRequest.builder()
+                        .query(request.getQuery())
+                        .filterQueries(request.getFilterQueries())
+                        .queryConfig(request.getQueryConfig())
+                        .queryField(request.getQueryField())
+                        .rows(0)
+                        .build();
+        try {
+            JsonQueryRequest jsonQueryRequest =
+                    solrRequestConverter.toJsonQueryRequest(slimRequest);
+            QueryResponse response =
+                    jsonQueryRequest.process(solrClient, streamConfig.getCollection());
+            return response.getResults().getNumFound();
+        } catch (SolrServerException | IOException e) {
+            throw new ServiceException("Server error when querying Solr", e);
         }
     }
 
