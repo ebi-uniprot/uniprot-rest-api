@@ -161,6 +161,10 @@ class IdMappingConfigureControllerIT {
                                 iterableWithSize(12)))
                 .andExpect(
                         jsonPath(
+                                "$.groups.[?(@.groupName=='Genome annotation databases')].items.[?(@.name=='WBParaSite_Transcript-Protein')].displayName",
+                                contains("WBParaSite Transcript/Protein")))
+                .andExpect(
+                        jsonPath(
                                 "$.groups.[?(@.groupName=='Organism-specific databases')].items.*",
                                 iterableWithSize(32)))
                 .andExpect(
