@@ -1,5 +1,11 @@
 package org.uniprot.api.rest.download.queue;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,12 +15,6 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.job.JobSubmitFeedback;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AsyncDownloadSubmissionRulesTest {
@@ -49,7 +49,8 @@ class AsyncDownloadSubmissionRulesTest {
         JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(JOB_ID, false);
 
         assertFalse(jobSubmitFeedback.isAllowed());
-        assertEquals("Job with id jobId has already been submitted", jobSubmitFeedback.getMessage());
+        assertEquals(
+                "Job with id jobId has already been submitted", jobSubmitFeedback.getMessage());
     }
 
     @Test
@@ -70,7 +71,8 @@ class AsyncDownloadSubmissionRulesTest {
         JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(JOB_ID, true);
 
         assertFalse(jobSubmitFeedback.isAllowed());
-        assertEquals("Job with id jobId has already been submitted", jobSubmitFeedback.getMessage());
+        assertEquals(
+                "Job with id jobId has already been submitted", jobSubmitFeedback.getMessage());
     }
 
     @Test
@@ -81,7 +83,9 @@ class AsyncDownloadSubmissionRulesTest {
         JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(JOB_ID, true);
 
         assertFalse(jobSubmitFeedback.isAllowed());
-        assertEquals("Job with id jobId is already aborted for the excess size of results", jobSubmitFeedback.getMessage());
+        assertEquals(
+                "Job with id jobId is already aborted for the excess size of results",
+                jobSubmitFeedback.getMessage());
     }
 
     @Test
@@ -92,7 +96,9 @@ class AsyncDownloadSubmissionRulesTest {
         JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(JOB_ID, true);
 
         assertFalse(jobSubmitFeedback.isAllowed());
-        assertEquals("Job with id jobId has already been finished successfully.", jobSubmitFeedback.getMessage());
+        assertEquals(
+                "Job with id jobId has already been finished successfully.",
+                jobSubmitFeedback.getMessage());
     }
 
     @Test
@@ -103,7 +109,8 @@ class AsyncDownloadSubmissionRulesTest {
         JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(JOB_ID, true);
 
         assertFalse(jobSubmitFeedback.isAllowed());
-        assertEquals("Job with id jobId has already been submitted", jobSubmitFeedback.getMessage());
+        assertEquals(
+                "Job with id jobId has already been submitted", jobSubmitFeedback.getMessage());
     }
 
     @Test
@@ -139,7 +146,8 @@ class AsyncDownloadSubmissionRulesTest {
         JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(JOB_ID, true);
 
         assertFalse(jobSubmitFeedback.isAllowed());
-        assertEquals("Job with id jobId is already running and live", jobSubmitFeedback.getMessage());
+        assertEquals(
+                "Job with id jobId is already running and live", jobSubmitFeedback.getMessage());
     }
 
     @Test
@@ -151,7 +159,8 @@ class AsyncDownloadSubmissionRulesTest {
         JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(JOB_ID, true);
 
         assertFalse(jobSubmitFeedback.isAllowed());
-        assertEquals("Job with id jobId is already running and live", jobSubmitFeedback.getMessage());
+        assertEquals(
+                "Job with id jobId is already running and live", jobSubmitFeedback.getMessage());
     }
 
     @Test

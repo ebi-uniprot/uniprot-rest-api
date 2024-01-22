@@ -1,15 +1,15 @@
 package org.uniprot.api.rest.download.queue;
 
+import java.time.LocalDateTime;
+import java.util.EnumSet;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.job.JobSubmitFeedback;
-
-import java.time.LocalDateTime;
-import java.util.EnumSet;
-import java.util.Optional;
 
 @Component
 public class AsyncDownloadSubmissionRules {
@@ -39,9 +39,7 @@ public class AsyncDownloadSubmissionRules {
                 if (EnumSet.of(JobStatus.NEW, JobStatus.UNFINISHED).contains(downloadJobStatus)) {
                     return new JobSubmitFeedback(
                             false,
-                            String.format(
-                                    "Job with id %s has already been submitted",
-                                    jobId));
+                            String.format("Job with id %s has already been submitted", jobId));
                 }
                 if (JobStatus.ABORTED.equals(downloadJobStatus)) {
                     return new JobSubmitFeedback(
@@ -54,23 +52,19 @@ public class AsyncDownloadSubmissionRules {
                     return new JobSubmitFeedback(
                             false,
                             String.format(
-                                    "Job with id %s has already been finished successfully.", jobId));
+                                    "Job with id %s has already been finished successfully.",
+                                    jobId));
                 }
                 if (JobStatus.ERROR.equals(downloadJobStatus)
                         && maxRetryCountNotFinished(downloadJob)) {
                     return new JobSubmitFeedback(
-                            false,
-                            String.format(
-                                    "Job with id %s is already being retried",
-                                    jobId));
+                            false, String.format("Job with id %s is already being retried", jobId));
                 }
                 if (EnumSet.of(JobStatus.RUNNING, JobStatus.PROCESSING).contains(downloadJobStatus)
                         && maxWaitingTimeNotElapsed(downloadJob)) {
                     return new JobSubmitFeedback(
                             false,
-                            String.format(
-                                    "Job with id %s is already running and live",
-                                    jobId));
+                            String.format("Job with id %s is already running and live", jobId));
                 }
             }
         }

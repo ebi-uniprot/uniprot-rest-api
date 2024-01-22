@@ -1,10 +1,36 @@
 package org.uniprot.api.idmapping.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.jayway.jsonpath.JsonPath;
+import static java.util.function.Predicate.isEqual;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,36 +90,11 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.function.Predicate.isEqual;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.jayway.jsonpath.JsonPath;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
 @ContextConfiguration(classes = {IdMappingREST.class})
@@ -118,29 +119,22 @@ public class IdMappingDownloadControllerIT {
     @Value("${download.resultFilesFolder}")
     protected String resultFolder;
 
-    @Autowired
-    protected AmqpAdmin amqpAdmin;
+    @Autowired protected AmqpAdmin amqpAdmin;
 
-    @Autowired
-    protected DownloadJobRepository downloadJobRepository;
+    @Autowired protected DownloadJobRepository downloadJobRepository;
 
-    @Autowired
-    protected MockMvc mockMvc;
+    @Autowired protected MockMvc mockMvc;
 
-    @Autowired
-    protected IdMappingJobCacheService cacheService;
+    @Autowired protected IdMappingJobCacheService cacheService;
 
-    @Autowired
-    private UniProtStoreClient<UniParcEntry> uniParcStoreClient;
+    @Autowired private UniProtStoreClient<UniParcEntry> uniParcStoreClient;
 
-    @Autowired
-    private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
+    @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
     @MockBean(name = "idMappingRdfRestTemplate")
     private RestTemplate idMappingRdfRestTemplate;
 
-    @Autowired
-    private UniProtStoreClient<UniRefEntryLight> uniRefStoreClient;
+    @Autowired private UniProtStoreClient<UniRefEntryLight> uniRefStoreClient;
 
     private static final UniProtKBEntry TEMPLATE_KB_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
@@ -510,10 +504,7 @@ public class IdMappingDownloadControllerIT {
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         DownloadJob downloadJob =
-                DownloadJob.builder()
-                        .id(asyncJobId)
-                        .status(JobStatus.FINISHED)
-                        .build();
+                DownloadJob.builder().id(asyncJobId).status(JobStatus.FINISHED).build();
         downloadJobRepository.save(downloadJob);
 
         ResultActions response =
@@ -523,8 +514,7 @@ public class IdMappingDownloadControllerIT {
                                 .param("jobId", idMappingJobId)
                                 .param("format", "json")
                                 .param("fields", "accession")
-                                .param("force", "true")
-                );
+                                .param("force", "true"));
 
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -540,11 +530,7 @@ public class IdMappingDownloadControllerIT {
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         DownloadJob downloadJob =
-                DownloadJob.builder()
-                        .id(asyncJobId)
-                        .retried(3)
-                        .status(JobStatus.ERROR)
-                        .build();
+                DownloadJob.builder().id(asyncJobId).retried(3).status(JobStatus.ERROR).build();
         downloadJobRepository.save(downloadJob);
 
         ResultActions response =
@@ -554,8 +540,7 @@ public class IdMappingDownloadControllerIT {
                                 .param("jobId", idMappingJobId)
                                 .param("format", "json")
                                 .param("fields", "accession")
-                                .param("force", "true")
-                );
+                                .param("force", "true"));
 
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
@@ -571,11 +556,7 @@ public class IdMappingDownloadControllerIT {
 
         cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
         DownloadJob downloadJob =
-                DownloadJob.builder()
-                        .id(asyncJobId)
-                        .retried(1)
-                        .status(JobStatus.ERROR)
-                        .build();
+                DownloadJob.builder().id(asyncJobId).retried(1).status(JobStatus.ERROR).build();
         downloadJobRepository.save(downloadJob);
 
         ResultActions response =
@@ -585,8 +566,7 @@ public class IdMappingDownloadControllerIT {
                                 .param("jobId", idMappingJobId)
                                 .param("format", "json")
                                 .param("fields", "accession")
-                                .param("force", "true")
-                );
+                                .param("force", "true"));
 
         response.andDo(print())
                 .andExpect(status().is(HttpStatus.OK.value()))
