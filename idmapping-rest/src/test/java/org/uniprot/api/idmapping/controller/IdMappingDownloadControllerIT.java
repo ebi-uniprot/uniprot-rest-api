@@ -1,35 +1,10 @@
 package org.uniprot.api.idmapping.controller;
 
-import static java.util.function.Predicate.isEqual;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,11 +64,36 @@ import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.MissingNode;
-import com.jayway.jsonpath.JsonPath;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.function.Predicate.isEqual;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 @ActiveProfiles(profiles = {"offline", "asyncDownload"})
 @ContextConfiguration(classes = {IdMappingREST.class})
@@ -118,22 +118,29 @@ public class IdMappingDownloadControllerIT {
     @Value("${download.resultFilesFolder}")
     protected String resultFolder;
 
-    @Autowired protected AmqpAdmin amqpAdmin;
+    @Autowired
+    protected AmqpAdmin amqpAdmin;
 
-    @Autowired protected DownloadJobRepository downloadJobRepository;
+    @Autowired
+    protected DownloadJobRepository downloadJobRepository;
 
-    @Autowired protected MockMvc mockMvc;
+    @Autowired
+    protected MockMvc mockMvc;
 
-    @Autowired protected IdMappingJobCacheService cacheService;
+    @Autowired
+    protected IdMappingJobCacheService cacheService;
 
-    @Autowired private UniProtStoreClient<UniParcEntry> uniParcStoreClient;
+    @Autowired
+    private UniProtStoreClient<UniParcEntry> uniParcStoreClient;
 
-    @Autowired private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
+    @Autowired
+    private UniProtStoreClient<UniProtKBEntry> uniProtKBStoreClient;
 
     @MockBean(name = "idMappingRdfRestTemplate")
     private RestTemplate idMappingRdfRestTemplate;
 
-    @Autowired private UniProtStoreClient<UniRefEntryLight> uniRefStoreClient;
+    @Autowired
+    private UniProtStoreClient<UniRefEntryLight> uniRefStoreClient;
 
     private static final UniProtKBEntry TEMPLATE_KB_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
@@ -494,6 +501,98 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.errors[0].code", is(PredefinedAPIStatus.SERVER_ERROR.getCode())))
                 .andExpect(jsonPath("$.errors[0].message", is(downloadJob.getError())));
+    }
+
+    @Test
+    void resubmit_withForceOnAlreadyFinishedJob() throws Exception {
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        DownloadJob downloadJob =
+                DownloadJob.builder()
+                        .id(asyncJobId)
+                        .status(JobStatus.FINISHED)
+                        .build();
+        downloadJobRepository.save(downloadJob);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("jobId", idMappingJobId)
+                                .param("format", "json")
+                                .param("fields", "accession")
+                                .param("force", "true")
+                );
+
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)))
+                .andExpect(jsonPath("$.message", containsString("has already been finished")));
+    }
+
+    @Test
+    void resubmit_withForceOnAlreadyFailedJobAfterMaxRetry() throws Exception {
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        DownloadJob downloadJob =
+                DownloadJob.builder()
+                        .id(asyncJobId)
+                        .retried(3)
+                        .status(JobStatus.ERROR)
+                        .build();
+        downloadJobRepository.save(downloadJob);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("jobId", idMappingJobId)
+                                .param("format", "json")
+                                .param("fields", "accession")
+                                .param("force", "true")
+                );
+
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)))
+                .andExpect(jsonPath("$.message").doesNotExist());
+    }
+
+    @Test
+    void resubmit_withForceOnAlreadyFailedJobBeforeMaxRetry() throws Exception {
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        DownloadJob downloadJob =
+                DownloadJob.builder()
+                        .id(asyncJobId)
+                        .retried(1)
+                        .status(JobStatus.ERROR)
+                        .build();
+        downloadJobRepository.save(downloadJob);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("jobId", idMappingJobId)
+                                .param("format", "json")
+                                .param("fields", "accession")
+                                .param("force", "true")
+                );
+
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)))
+                .andExpect(jsonPath("$.message", containsString("already being retried")));
     }
 
     @Test

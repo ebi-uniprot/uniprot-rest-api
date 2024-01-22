@@ -165,7 +165,7 @@ public class ResponseExceptionHandler {
     }
 
     @ExceptionHandler({IllegalDownloadJobSubmissionException.class})
-    public ResponseEntity<JobSubmitResponse> handleIllegalCallerException(
+    public ResponseEntity<JobSubmitResponse> handleIllegalDownloadJobSubmissionException(
             IllegalDownloadJobSubmissionException exception, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(getContentTypeFromRequest(request))

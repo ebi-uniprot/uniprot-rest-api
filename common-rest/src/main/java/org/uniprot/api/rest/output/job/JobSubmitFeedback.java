@@ -9,5 +9,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JobSubmitFeedback {
     private final boolean allowed;
-    private String error;
+    private String message;
 }

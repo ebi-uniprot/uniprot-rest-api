@@ -1,12 +1,6 @@
 package org.uniprot.api.rest.download.queue;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
@@ -21,6 +15,11 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * Common for all, UniProtKB, UniParc and UniRef
@@ -79,7 +78,7 @@ public class RabbitProducerMessageService implements ProducerMessageService {
             log.info("Message with jobId {} ready to be processed", jobId);
         } else {
             alreadyProcessed(jobId);
-            throw new IllegalDownloadJobSubmissionException(jobId, jobSubmitFeedback.getError());
+            throw new IllegalDownloadJobSubmissionException(jobId, jobSubmitFeedback.getMessage());
         }
 
         return jobId;
