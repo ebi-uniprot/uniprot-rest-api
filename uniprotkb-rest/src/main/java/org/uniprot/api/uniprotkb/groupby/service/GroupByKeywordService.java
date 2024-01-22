@@ -36,7 +36,10 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
     @Override
     protected Map<String, String> getFacetParams(List<KeywordEntry> entries) {
         String keywordIds =
-                entries.stream().map(KeywordEntry::getAccession).collect(Collectors.joining(","));
+                entries.stream()
+                        .map(KeywordEntry::getAccession)
+                        .map(String::toLowerCase)
+                        .collect(Collectors.joining(","));
         return Map.of(FacetParams.FACET_FIELD, String.format("{!terms='%s'}keyword", keywordIds));
     }
 
@@ -52,6 +55,18 @@ public class GroupByKeywordService extends GroupByService<KeywordEntry> {
                 keywordEntries.stream().collect(Collectors.toMap(this::getId, Function.identity()));
         return getGroupByResult(
                 facetCounts, idEntryMap, ancestorEntries, parentId, parentFacetCounts, query);
+    }
+
+    @Override
+    protected List<FacetField.Count> getFacetCounts(String query, List<KeywordEntry> entries) {
+        List<FacetField.Count> result = super.getFacetCounts(query, entries);
+        return result.stream()
+                .map(
+                        c -> {
+                            c.setName(c.getName().toUpperCase());
+                            return c;
+                        })
+                .collect(Collectors.toList());
     }
 
     @Override
