@@ -2,9 +2,8 @@ package org.uniprot.api.rest.validation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import javax.validation.ConstraintValidatorContext;
-
 import org.hamcrest.CoreMatchers;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintViolationBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -38,8 +37,8 @@ class QuerySyntaxValidatorTest {
                 new ValidSolrQuerySyntax.QuerySyntaxValidator();
 
         ConstraintValidatorContextImpl context = Mockito.mock(ConstraintValidatorContextImpl.class);
-        ConstraintValidatorContext.ConstraintViolationBuilder builder =
-                Mockito.mock(ConstraintValidatorContext.ConstraintViolationBuilder.class);
+        HibernateConstraintViolationBuilder builder =
+                Mockito.mock(HibernateConstraintViolationBuilder.class);
         Mockito.when(context.buildConstraintViolationWithTemplate(Mockito.anyString()))
                 .thenReturn(builder);
 

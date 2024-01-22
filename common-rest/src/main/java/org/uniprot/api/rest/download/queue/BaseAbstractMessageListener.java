@@ -1,5 +1,6 @@
 package org.uniprot.api.rest.download.queue;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -35,16 +37,19 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
     private final DownloadJobRepository jobRepository;
 
     protected final RabbitTemplate rabbitTemplate;
+    private final HeartBeatProducer heartBeatProducer;
 
     public BaseAbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
             AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
-            RabbitTemplate rabbitTemplate) {
+            RabbitTemplate rabbitTemplate,
+            HeartBeatProducer heartBeatProducer) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.asyncDownloadQueueConfigProperties = asyncDownloadQueueConfigProperties;
         this.jobRepository = jobRepository;
         this.rabbitTemplate = rabbitTemplate;
+        this.heartBeatProducer = heartBeatProducer;
     }
 
     @Override
@@ -124,9 +129,20 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                 && downloadJob.getStatus() != JobStatus.ERROR;
     }
 
-    protected void writeIdentifiers(Path filePath, Stream<String> ids) throws IOException {
-        Iterable<String> source = ids::iterator;
-        Files.write(filePath, source, StandardOpenOption.CREATE);
+    protected void writeIdentifiers(Path filePath, Stream<String> ids, DownloadJob downloadJob)
+            throws IOException {
+        try (BufferedWriter writer =
+                Files.newBufferedWriter(
+                        filePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+            Iterable<String> iterator = ids::iterator;
+            for (String id : iterator) {
+                writer.append(id);
+                writer.newLine();
+                heartBeatProducer.createForIds(downloadJob);
+            }
+        } finally {
+            heartBeatProducer.stop(downloadJob.getId());
+        }
     }
 
     protected void updateDownloadJob(
@@ -141,6 +157,12 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
             String error = getLastError(message);
             updateDownloadJob(downloadJob, jobStatus, error, retryCount, resultFile);
         }
+    }
+
+    protected void updateTotalEntries(DownloadJob downloadJob, long totalEntries) {
+        downloadJob.setTotalEntries(totalEntries);
+        downloadJob.setUpdated(LocalDateTime.now());
+        jobRepository.save(downloadJob);
     }
 
     protected void updateDownloadJob(

@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.idmapping.controller.IdMappingDownloadController.*;
+import static org.uniprot.api.idmapping.controller.IdMappingDownloadController.ID_MAPPING_DOWNLOAD_RESOURCE;
 import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 
@@ -23,6 +23,7 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.queue.IdMappingProducerMessageService;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.BasicDownloadController;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -50,7 +51,9 @@ public class IdMappingDownloadController extends BasicDownloadController {
     protected IdMappingDownloadController(
             IdMappingProducerMessageService messageService,
             IdMappingJobCacheService idMappingJobCacheService,
-            DownloadJobRepository jobRepository) {
+            DownloadJobRepository jobRepository,
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+        super(asyncDownloadHeartBeatConfiguration);
         this.messageService = messageService;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.jobRepository = jobRepository;

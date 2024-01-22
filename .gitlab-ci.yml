@@ -19,7 +19,7 @@ services:
   - name: docker:dind
     # explicitly disable tls to avoid docker startup interruption
     command: ["--tls=false"]
-image: maven:3.6.3-jdk-11
+image: maven:3.8.5-openjdk-17
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
@@ -36,7 +36,7 @@ stages:
 api:settings:
   stage: setup
   before_script:
-    - 'wget --no-cache --no-cookies -O ${MAVEN_SETTINGS} "${URL_MAVEN_SETTINGS}"'
+    - 'curl --location "${URL_MAVEN_SETTINGS}" --output ${MAVEN_SETTINGS}'
   script:
     - if [ ! -f ${MAVEN_SETTINGS} ];
       then echo "CI settings missing";
@@ -89,6 +89,7 @@ mvn:deploy:
   script:
   - mvn $MAVEN_CLI_OPTS -DskipTests deploy -s ${MAVEN_SETTINGS}
   - echo "UNIPROT_REST_VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)" >> variables.env
+  - echo "RELEASE_DATE=$(date +%d-%B-%Y)" >> variables.env
   artifacts:
     reports:
       dotenv: variables.env
@@ -106,11 +107,13 @@ k8s:docker-build-deploy:
     project: uniprot/deployment/unp.ci.api.k8s
     branch: main
   variables:
-    CI_PIPELINE_TASKS: 'build,helm-install-rest'
-    ARTIFACT: 'all-rest'
+    CI_PIPELINE_TASKS: 'build,upgrade'
     VERSION: '$UNIPROT_REST_VERSION'
     DC: 'DEV'
-    RELEASE_NAME: '2023_04'
+    K8S_ENV: 'dev'
+    RELEASE_NAME: '2023_05'
+    RELEASE_DATE: '$RELEASE_DATE'
+    REST_ARTIFACT: 'all-rest'
   when: on_success
   rules:
     - if: '$CI_COMMIT_REF_NAME == "main"'

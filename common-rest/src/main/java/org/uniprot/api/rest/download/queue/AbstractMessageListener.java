@@ -13,6 +13,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -31,12 +32,14 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
             AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
-            RabbitTemplate rabbitTemplate) {
+            RabbitTemplate rabbitTemplate,
+            HeartBeatProducer heartBeatProducer) {
         super(
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
-                rabbitTemplate);
+                rabbitTemplate,
+                heartBeatProducer);
         this.converter = converter;
         this.downloadResultWriter = downloadResultWriter;
     }
@@ -64,12 +67,13 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
     }
 
     protected void writeResult(
-            DownloadRequest request, Path idsFile, String jobId, MediaType contentType) {
+            DownloadRequest request, DownloadJob downloadJob, Path idsFile, MediaType contentType) {
+        String jobId = downloadJob.getId();
         try {
-            writeSolrResult(request, idsFile, jobId);
+            writeSolrResult(request, downloadJob, idsFile);
             StoreRequest storeRequest = getStoreRequest(request);
             downloadResultWriter.writeResult(
-                    request, idsFile, jobId, contentType, storeRequest, getDataType());
+                    request, downloadJob, idsFile, contentType, storeRequest, getDataType());
             log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
             logMessageAndDeleteFile(ex, jobId);
@@ -77,11 +81,10 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
         }
     }
 
-    protected void writeSolrResult(DownloadRequest request, Path idsFile, String jobId)
+    protected void writeSolrResult(DownloadRequest request, DownloadJob downloadJob, Path idsFile)
             throws IOException {
-        Stream<String> ids = streamIds(request);
-        writeIdentifiers(idsFile, ids);
-        log.info("Solr ids saved for job {}", jobId);
+        writeIdentifiers(idsFile, streamIds(request), downloadJob);
+        log.info("Solr ids saved for job {}", downloadJob.getId());
     }
 
     protected abstract StoreRequest getStoreRequest(DownloadRequest request);
