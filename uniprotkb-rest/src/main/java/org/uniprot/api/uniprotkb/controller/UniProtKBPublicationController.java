@@ -71,7 +71,8 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
             value = "/{accession}/publications",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get UniProtKB entry publications by accession.",
+            summary = "Get publications for a UniProtKB entry by accession.",
+            description = "Get all publication data for a UniProtKB entry by accession, including computationally-mapped and community-mapped sources.",
             responses = {
                     @ApiResponse(
                             content = {

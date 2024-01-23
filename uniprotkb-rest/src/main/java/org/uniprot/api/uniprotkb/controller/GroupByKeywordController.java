@@ -37,7 +37,7 @@ public class GroupByKeywordController extends GroupByController {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    @Operation(summary = "List of groups with respect to to the given query and parent")
+    @Operation(summary = "List of groups with respect to the given query and parent")
     @ApiResponse(
             content =
                     @Content(

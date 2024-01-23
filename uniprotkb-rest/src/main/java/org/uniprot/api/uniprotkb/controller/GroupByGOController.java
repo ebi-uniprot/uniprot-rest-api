@@ -35,7 +35,7 @@ public class GroupByGOController extends GroupByController {
         this.uniProtKBGroupByGoService = uniProtKBGroupByGoService;
     }
 
-    @Operation(summary = "List of groups with respect to to the given query and parent")
+    @Operation(summary = "List of groups with respect to the given query and parent")
     @ApiResponse(
             content =
                     @Content(

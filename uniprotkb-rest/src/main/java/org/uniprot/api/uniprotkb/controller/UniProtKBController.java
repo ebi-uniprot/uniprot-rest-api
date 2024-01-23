@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -108,7 +109,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniProtKB protein entry (or entries) by a SOLR query.",
+            summary = "Retrieve UniProtKB entries by a search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -165,7 +166,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniProtKB entry by an accession.",
+            summary = "Get UniProtKB entry by a single accession.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -251,7 +252,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download a UniProtKB protein entry (or entries) retrieved by a SOLR query.",
+            summary = "Download UniProtKB entries retrieved by a search query. (Max. 10 million entries)",
+            description = "The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniProtKB asynchronous download job' requests described below. The 'UniProtKB asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.",
             responses = {
                 @ApiResponse(
                         content = {

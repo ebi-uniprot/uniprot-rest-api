@@ -35,7 +35,7 @@ public class GroupByTaxonomyController extends GroupByController {
         this.uniProtKBGroupByTaxonomyService = uniProtKBGroupByTaxonomyService;
     }
 
-    @Operation(summary = "List of groups with respect to to the given query and parent")
+    @Operation(summary = "List of groups with respect to the given query and parent")
     @ApiResponse(
             content =
                     @Content(

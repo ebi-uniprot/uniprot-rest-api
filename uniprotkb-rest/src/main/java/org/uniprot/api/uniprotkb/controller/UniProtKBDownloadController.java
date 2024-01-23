@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,7 +35,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  */
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
-@Tag(name = "UniProtKB job", description = "UniProtKB asynchronous download job")
+@Tag(name = "UniProtKB job", description = "UniProtKB asynchronous download jobs are different from \"normal\" downloads offered via stream. " +
+        "First, a separate file must be generated for download. " +
+        "Much like <tt>IDMapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, " +
+        "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. " +
+        "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.")
 public class UniProtKBDownloadController extends BasicDownloadController {
     static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;
@@ -67,7 +72,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get UniProtKB asynchronous download job status.",
+            summary = "Get progress of UniProtKB asynchronous download job.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -86,7 +91,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get UniProtKB asynchronous download submitted job details.",
+            summary = "Get details of UniProtKB asynchronous download job.",
             responses = {
                     @ApiResponse(
                             content = {

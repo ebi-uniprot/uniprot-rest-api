@@ -71,7 +71,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
             value = "/{accession}/interactions",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
     @Operation(
-            summary = "Get UniProtKB entry interactions by accession.",
+            summary = "Get interactions for a UniProtKB entry by accession.",
             responses = {
                     @ApiResponse(
                             content = {
