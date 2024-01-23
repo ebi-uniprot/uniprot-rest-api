@@ -47,7 +47,7 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.repository.DataStoreTestConfig;
-import org.uniprot.api.uniref.repository.UniRefQueryRepository;
+import org.uniprot.api.uniref.common.repository.UniRefQueryRepository;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;

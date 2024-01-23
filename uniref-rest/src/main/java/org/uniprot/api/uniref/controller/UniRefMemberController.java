@@ -20,8 +20,8 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniref.request.UniRefMemberRequest;
-import org.uniprot.api.uniref.service.UniRefMemberService;
+import org.uniprot.api.uniref.common.request.UniRefMemberRequest;
+import org.uniprot.api.uniref.common.service.UniRefMemberService;
 import org.uniprot.core.uniref.UniRefMember;
 
 import io.swagger.v3.oas.annotations.Operation;
