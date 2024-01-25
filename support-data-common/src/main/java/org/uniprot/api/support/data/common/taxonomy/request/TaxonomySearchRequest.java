@@ -23,7 +23,7 @@ public class TaxonomySearchRequest extends TaxonomyBasicRequest implements Searc
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Size of the result. Defaults to 25")
+    @Parameter(description = "Pagination size. Defaults to 25.")
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

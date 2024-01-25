@@ -79,7 +79,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             value = "/{arbaId}",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get a rule by ARBA id.",
+            summary = "Get ArbaRule entry by a single arbaId.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -110,7 +110,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             value = "/search",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Search for a ARBA entry (or entries) by a Lucene query.",
+            summary = "Retrieve ArbaRule entries by a search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -141,7 +141,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             value = "/stream",
             produces = {LIST_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Stream a ARBA entry (or entries) by a Lucene query.",
+            summary = "Download ArbaRule entries retrieved by a search query.",
             responses = {
                 @ApiResponse(
                         content = {

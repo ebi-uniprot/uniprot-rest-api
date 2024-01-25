@@ -46,7 +46,7 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
 
     @Parameter(
             description =
-                    "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
+                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
@@ -56,7 +56,7 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Size of the result. Defaults to number of accessions passed.")
+    @Parameter(description = "Pagination size. Defaults to number of ids passed. (Single page)")
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

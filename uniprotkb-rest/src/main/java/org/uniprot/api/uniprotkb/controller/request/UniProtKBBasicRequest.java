@@ -3,6 +3,7 @@ package org.uniprot.api.uniprotkb.controller.request;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import lombok.Data;
 
 import org.uniprot.api.rest.validation.*;
@@ -17,7 +18,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class UniProtKBBasicRequest {
 
-    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query.")
+    @Parameter(description = "Criteria to search the proteins. It can take any valid solr query. <a href='https://uniprot.org'>More details</a> ",
+            examples = {@ExampleObject(name = "default search", value = "test", description = "example description 1"),
+                    @ExampleObject(name = "parameter search", value = "name:proteinName", description = "example description 2"),
+                    @ExampleObject(name = "boolean search", value = "name:ProteinName OR gene:geneName", description = "example description 3")})
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -25,7 +29,7 @@ public class UniProtKBBasicRequest {
             messagePrefix = "search.uniprot")
     private String query;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = "Comma separated list of fields to be returned in response", example = "accession,gene")
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     @ValidTSVAndXLSFormatOnlyFields(fieldPattern = "xref_.*_full")
     private String fields;

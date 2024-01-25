@@ -54,7 +54,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
 
     @Parameter(
             description =
-                    "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
+                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
     @Pattern(
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             regexp = "^true|false$",
@@ -63,7 +63,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
 
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
-    @Parameter(description = "Size of the result. Defaults to number of ids passed.")
+    @Parameter(description = "Pagination size. Defaults to number of taxonIds passed (Single page).")
     private Integer size;
 
     @Parameter(hidden = true)

@@ -85,7 +85,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get a UniRule by id.",
+            summary = "Get UniRule entry by a single uniruleid.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -123,7 +123,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniRule entry (or entries) by a Lucene query.",
+            summary = "Retrieve UniRule entries by a search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -161,7 +161,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream a UniRule entry (or entries) by a Lucene query.",
+            summary = "Download UniRule entries retrieved by a search query.",
             responses = {
                 @ApiResponse(
                         content = {

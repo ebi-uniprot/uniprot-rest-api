@@ -283,7 +283,6 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> stream(
             @Valid @ModelAttribute UniProtKBStreamRequest streamRequest,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
 
         MediaType contentType = getAcceptHeader(request);
@@ -367,6 +366,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             })
     @Operation(
             summary = "Get UniProtKB entries by a list of accessions.",
+            hidden = true,
             responses = {
                 @ApiResponse(
                         content = {

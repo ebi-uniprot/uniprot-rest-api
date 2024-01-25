@@ -47,6 +47,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 24 Apr 2019
  */
+@Tag(
+        name = "proteome",
+        description =
+                "The Proteomes service provides access to UniProtKB proteomes with"
+                        + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
+                        + " proteome identifiers, species names or taxonomy identifiers")
 @RestController
 @Validated
 @RequestMapping("/proteomes")
@@ -71,12 +77,6 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         this.queryService = queryService;
     }
 
-    @Tag(
-            name = "proteome",
-            description =
-                    "The Proteomes service provides access to UniProtKB proteomes with"
-                            + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
-                            + " proteome identifiers, species names or taxonomy identifiers")
     @GetMapping(
             value = "/search",
             produces = {
@@ -123,7 +123,6 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "proteome")
     @GetMapping(
             value = "/{upid}",
             produces = {
@@ -168,7 +167,6 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
         return super.getEntityResponse(entry, fields, request);
     }
 
-    @Tag(name = "proteome")
     @GetMapping(
             value = "/stream",
             produces = {

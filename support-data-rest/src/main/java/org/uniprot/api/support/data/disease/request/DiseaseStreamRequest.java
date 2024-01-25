@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class DiseaseStreamRequest extends DiseaseBasicRequest implements StreamRequest {
     @Parameter(
             description =
-                    "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
+                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

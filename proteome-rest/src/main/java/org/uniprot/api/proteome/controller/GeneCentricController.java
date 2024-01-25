@@ -48,6 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 30 Apr 2019
  */
+@Tag(name = "genecentric", description = "gene centric service")
 @RestController
 @Validated
 @RequestMapping("/genecentric")
@@ -76,9 +77,8 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 geneCentricSearchFieldConfig.getSearchFieldItemByName("upid").getFieldName();
     }
 
-    @Tag(name = "genecentric", description = "gene centric service")
     @Operation(
-            summary = "Search for gene centric data set.",
+            summary = "Retrieve GeneCentric entries by a search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -120,7 +120,6 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "genecentric")
     @GetMapping(
             value = "/upid/{upid}",
             produces = {
@@ -130,7 +129,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Fetch all proteins of Proteome id.",
+            summary = "Retrieve all proteins of Proteome id.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -165,9 +164,8 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "genecentric")
     @Operation(
-            summary = "Download Gene Centric data retrieved by search.",
+            summary = "Download GeneCentric entries retrieved by a search query.",
             responses = {
                 @ApiResponse(
                         content = {
@@ -211,7 +209,6 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 request);
     }
 
-    @Tag(name = "genecentric")
     @Operation(
             summary = "Retrieve an gene centric entry by uniprot accession.",
             responses = {
