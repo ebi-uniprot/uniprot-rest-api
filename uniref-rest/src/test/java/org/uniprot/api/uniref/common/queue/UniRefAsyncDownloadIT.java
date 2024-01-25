@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.PropertySource;
@@ -27,11 +29,13 @@ import org.uniprot.api.rest.download.*;
 import org.uniprot.api.rest.download.configuration.RedisConfiguration;
 import org.uniprot.api.rest.download.queue.BaseAbstractMessageListener;
 import org.uniprot.api.rest.request.DownloadRequest;
+import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.common.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.repository.store.UniRefStoreConfig;
 import org.uniprot.api.uniref.common.request.UniRefDownloadRequest;
 import org.uniprot.api.uniref.common.utils.UniRefAsyncDownloadUtils;
+import org.uniprot.api.uniref.controller.UniRefDownloadController;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
@@ -42,12 +46,15 @@ import org.uniprot.store.search.SolrCollection;
 @ContextConfiguration(
         classes = {
             DataStoreTestConfig.class,
+            UniRefRestApplication.class,
             UniRefStoreConfig.class,
             AsyncDownloadTestConfig.class,
             RedisConfiguration.class
         })
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WebMvcTest({UniRefDownloadController.class})
+@AutoConfigureWebClient
 public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @SpyBean private UniRefMessageListener uniRefMessageListener;

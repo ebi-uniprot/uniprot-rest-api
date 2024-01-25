@@ -32,7 +32,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
-import org.uniprot.api.uniref.repository.DataStoreTestConfig;
+import org.uniprot.api.uniref.common.repository.DataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.UniRefEntry;

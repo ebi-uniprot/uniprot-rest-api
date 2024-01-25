@@ -73,8 +73,8 @@
 		<module>uniprotkb-rest</module>
 		<module>proteome-rest</module>
 		<module>uniparc-rest</module>
-		<module>uniref-rest</module>
 		<module>uniref-common</module>
+		<module>uniref-rest</module>
 		<module>unisave-rest</module>
 		<module>benchmark-rest</module>
 		<module>aa-rest</module>
