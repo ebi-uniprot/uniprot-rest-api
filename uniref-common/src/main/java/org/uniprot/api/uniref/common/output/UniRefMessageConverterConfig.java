@@ -1,9 +1,6 @@
-package org.uniprot.api.uniref.output;
+package org.uniprot.api.uniref.common.output;
 
 import static java.util.Arrays.asList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_XML;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.List;
 
@@ -16,12 +13,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
-import org.uniprot.api.uniref.output.converter.UniRefFastaMessageConverter;
-import org.uniprot.api.uniref.output.converter.UniRefLightFastaMessageConverter;
-import org.uniprot.api.uniref.output.converter.UniRefXmlMessageConverter;
+import org.uniprot.api.uniref.common.output.converter.UniRefFastaMessageConverter;
+import org.uniprot.api.uniref.common.output.converter.UniRefLightFastaMessageConverter;
+import org.uniprot.api.uniref.common.output.converter.UniRefXmlMessageConverter;
 import org.uniprot.core.json.parser.uniref.UniRefEntryJsonConfig;
 import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
 import org.uniprot.core.json.parser.uniref.UniRefMemberJsonConfig;
@@ -122,15 +120,15 @@ public class UniRefMessageConverterConfig {
                 new MessageConverterContextFactory<>();
 
         asList(
-                        uniRefLightContext(LIST_MEDIA_TYPE),
-                        uniRefLightContext(APPLICATION_XML),
-                        uniRefLightContext(APPLICATION_JSON),
-                        uniRefLightContext(FASTA_MEDIA_TYPE),
-                        uniRefLightContext(TSV_MEDIA_TYPE),
-                        uniRefLightContext(XLS_MEDIA_TYPE),
-                        uniRefLightContext(RDF_MEDIA_TYPE),
-                        uniRefLightContext(TURTLE_MEDIA_TYPE),
-                        uniRefLightContext(N_TRIPLES_MEDIA_TYPE))
+                        uniRefLightContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                        uniRefLightContext(MediaType.APPLICATION_XML),
+                        uniRefLightContext(MediaType.APPLICATION_JSON),
+                        uniRefLightContext(UniProtMediaType.FASTA_MEDIA_TYPE),
+                        uniRefLightContext(UniProtMediaType.TSV_MEDIA_TYPE),
+                        uniRefLightContext(UniProtMediaType.XLS_MEDIA_TYPE),
+                        uniRefLightContext(UniProtMediaType.RDF_MEDIA_TYPE),
+                        uniRefLightContext(UniProtMediaType.TURTLE_MEDIA_TYPE),
+                        uniRefLightContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -142,7 +140,9 @@ public class UniRefMessageConverterConfig {
         MessageConverterContextFactory<UniRefMember> contextFactory =
                 new MessageConverterContextFactory<>();
 
-        asList(uniRefMemberContext(LIST_MEDIA_TYPE), uniRefMemberContext(APPLICATION_JSON))
+        asList(
+                        uniRefMemberContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                        uniRefMemberContext(MediaType.APPLICATION_JSON))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;
@@ -154,15 +154,15 @@ public class UniRefMessageConverterConfig {
                 new MessageConverterContextFactory<>();
 
         asList(
-                        uniRefContext(LIST_MEDIA_TYPE),
-                        uniRefContext(APPLICATION_XML),
-                        uniRefContext(APPLICATION_JSON),
-                        uniRefContext(FASTA_MEDIA_TYPE),
-                        uniRefContext(TSV_MEDIA_TYPE),
-                        uniRefContext(XLS_MEDIA_TYPE),
-                        uniRefContext(RDF_MEDIA_TYPE),
-                        uniRefContext(TURTLE_MEDIA_TYPE),
-                        uniRefContext(N_TRIPLES_MEDIA_TYPE))
+                        uniRefContext(UniProtMediaType.LIST_MEDIA_TYPE),
+                        uniRefContext(MediaType.APPLICATION_XML),
+                        uniRefContext(MediaType.APPLICATION_JSON),
+                        uniRefContext(UniProtMediaType.FASTA_MEDIA_TYPE),
+                        uniRefContext(UniProtMediaType.TSV_MEDIA_TYPE),
+                        uniRefContext(UniProtMediaType.XLS_MEDIA_TYPE),
+                        uniRefContext(UniProtMediaType.RDF_MEDIA_TYPE),
+                        uniRefContext(UniProtMediaType.TURTLE_MEDIA_TYPE),
+                        uniRefContext(UniProtMediaType.N_TRIPLES_MEDIA_TYPE))
                 .forEach(contextFactory::addMessageConverterContext);
 
         return contextFactory;

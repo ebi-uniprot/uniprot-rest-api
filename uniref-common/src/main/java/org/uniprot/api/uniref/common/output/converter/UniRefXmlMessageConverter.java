@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.output.converter;
+package org.uniprot.api.uniref.common.output.converter;
 
 import java.io.IOException;
 import java.io.OutputStream;
