@@ -138,7 +138,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 post(getDownloadAPIsBasePath() + "/run")
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("query", query)
+                        .param("org/uniprot/api/uniparc/common/service/query", query)
                         .param("fields", fields)
                         .param("sort", sort)
                         .param("format", Objects.isNull(format) ? null : format);

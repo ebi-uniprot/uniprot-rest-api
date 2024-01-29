@@ -161,7 +161,7 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
                         get(GET_BY_IDS_PATH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("ids", getCommaSeparatedIds())
-                                .param("query", queryFilter)
+                                .param("org/uniprot/api/uniparc/common/service/query", queryFilter)
                                 .param("fields", "id,name,types")
                                 .param("size", "10"));
 
@@ -186,7 +186,7 @@ class UniRefGetByIdsIT extends AbstractGetByIdsControllerIT {
                         get(GET_BY_IDS_PATH)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
                                 .param("ids", getCommaSeparatedIds())
-                                .param("query", queryFilter)
+                                .param("org/uniprot/api/uniparc/common/service/query", queryFilter)
                                 .param("fields", "id,name,types")
                                 .param("size", "10"));
 

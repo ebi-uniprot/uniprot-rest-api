@@ -27,8 +27,8 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniparc.request.UniParcDatabasesRequest;
-import org.uniprot.api.uniparc.service.UniParcQueryService;
+import org.uniprot.api.uniparc.common.service.query.UniParcQueryService;
+import org.uniprot.api.uniparc.common.service.query.request.UniParcDatabasesRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 

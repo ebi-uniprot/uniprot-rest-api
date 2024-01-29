@@ -26,8 +26,14 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
+import org.uniprot.api.uniparc.common.service.query.UniParcQueryService;
+import org.uniprot.api.uniparc.common.service.query.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.common.service.query.request.UniParcGetByAccessionRequest;
+import org.uniprot.api.uniparc.common.service.query.request.UniParcGetByUniParcIdRequest;
+import org.uniprot.api.uniparc.common.service.query.request.UniParcSearchRequest;
+import org.uniprot.api.uniparc.common.service.query.request.UniParcSequenceRequest;
+import org.uniprot.api.uniparc.common.service.query.request.UniParcStreamRequest;
 import org.uniprot.api.uniparc.request.*;
-import org.uniprot.api.uniparc.service.UniParcQueryService;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
