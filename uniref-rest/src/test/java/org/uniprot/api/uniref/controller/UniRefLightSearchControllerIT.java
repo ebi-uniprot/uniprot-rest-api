@@ -354,7 +354,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         @Override
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("org/uniprot/api/uniparc/common/service/query", Collections.singletonList("id:UniRef50_P03911"))
+                    .queryParam(
+                            "org/uniprot/api/uniparc/common/service/query",
+                            Collections.singletonList("id:UniRef50_P03911"))
                     .resultMatcher(jsonPath("$.results.*.id", contains("UniRef50_P03911")))
                     .build();
         }
@@ -362,7 +364,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         @Override
         protected SearchParameter searchCanReturnNotFoundParameter() {
             return SearchParameter.builder()
-                    .queryParam("org/uniprot/api/uniparc/common/service/query", Collections.singletonList("id:UniRef50_P03931"))
+                    .queryParam(
+                            "org/uniprot/api/uniparc/common/service/query",
+                            Collections.singletonList("id:UniRef50_P03931"))
                     .resultMatcher(jsonPath("$.results.size()", is(0)))
                     .build();
         }
@@ -370,7 +374,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         @Override
         protected SearchParameter searchAllowWildcardQueryAllDocumentsParameter() {
             return SearchParameter.builder()
-                    .queryParam("org/uniprot/api/uniparc/common/service/query", Collections.singletonList("id:*"))
+                    .queryParam(
+                            "org/uniprot/api/uniparc/common/service/query",
+                            Collections.singletonList("id:*"))
                     .resultMatcher(
                             jsonPath(
                                     "$.results.*.id",
@@ -381,7 +387,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         @Override
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
-                    .queryParam("org/uniprot/api/uniparc/common/service/query", Collections.singletonList("taxonomy_name:[1 TO 10]"))
+                    .queryParam(
+                            "org/uniprot/api/uniparc/common/service/query",
+                            Collections.singletonList("taxonomy_name:[1 TO 10]"))
                     .resultMatcher(jsonPath("$.url", not(emptyOrNullString())))
                     .resultMatcher(
                             jsonPath(
@@ -415,7 +423,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         @Override
         protected SearchParameter searchSortWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("org/uniprot/api/uniparc/common/service/query", Collections.singletonList("*:*"))
+                    .queryParam(
+                            "org/uniprot/api/uniparc/common/service/query",
+                            Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("id desc"))
                     .resultMatcher(
                             jsonPath(
@@ -427,7 +437,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         @Override
         protected SearchParameter searchFieldsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("org/uniprot/api/uniparc/common/service/query", Collections.singletonList("*:*"))
+                    .queryParam(
+                            "org/uniprot/api/uniparc/common/service/query",
+                            Collections.singletonList("*:*"))
                     .queryParam("fields", Collections.singletonList("id,name"))
                     .resultMatcher(
                             jsonPath(
@@ -442,7 +454,9 @@ class UniRefLightSearchControllerIT extends AbstractSearchWithSuggestionsControl
         @Override
         protected SearchParameter searchFacetsWithCorrectValuesReturnSuccessParameter() {
             return SearchParameter.builder()
-                    .queryParam("org/uniprot/api/uniparc/common/service/query", Collections.singletonList("*:*"))
+                    .queryParam(
+                            "org/uniprot/api/uniparc/common/service/query",
+                            Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("identity"))
                     .resultMatcher(
                             jsonPath(
