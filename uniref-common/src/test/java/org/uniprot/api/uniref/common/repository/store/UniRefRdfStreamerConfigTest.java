@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.repository.stream.rdf.*;
 import org.uniprot.api.rest.service.TagPositionProvider;
+import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
 
 class UniRefRdfStreamerConfigTest {
     @Mock private PrologProvider prologProvider;

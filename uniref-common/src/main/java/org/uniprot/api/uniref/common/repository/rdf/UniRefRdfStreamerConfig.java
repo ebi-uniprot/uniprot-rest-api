@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.repository.store;
+package org.uniprot.api.uniref.common.repository.rdf;
 
 import java.util.Collections;
 

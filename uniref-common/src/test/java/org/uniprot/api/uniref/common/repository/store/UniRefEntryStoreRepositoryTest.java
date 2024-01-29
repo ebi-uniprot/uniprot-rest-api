@@ -20,7 +20,7 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.facet.FacetItem;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
-import org.uniprot.api.uniref.common.request.UniRefMemberRequest;
+import org.uniprot.api.uniref.common.service.member.request.UniRefMemberRequest;
 import org.uniprot.core.cv.go.GoAspect;
 import org.uniprot.core.cv.go.impl.GeneOntologyEntryBuilder;
 import org.uniprot.core.impl.SequenceBuilder;
