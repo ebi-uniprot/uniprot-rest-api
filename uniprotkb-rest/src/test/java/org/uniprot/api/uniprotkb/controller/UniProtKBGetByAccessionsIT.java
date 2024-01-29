@@ -1,14 +1,20 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBEntryConvertITUtils.*;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -17,10 +23,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -38,11 +42,14 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsControllerIT;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.core.fasta.UniProtKBFasta;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.gene.GeneName;
+import org.uniprot.core.parser.fasta.uniprot.UniProtKBFastaParser;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.GeneBuilder;
@@ -90,6 +97,10 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         "P00001", "P00002", "P00003", "P00004", "P00005", "P00006", "P00007", "P00008", "P00009",
         "P00010"
     };
+
+    private static final String TEST_IDS_SEQ_RANGE =
+            "P00003[10-20],P00007,P00003,P00001,P00003[20-40],P00003[1-5],P00002";
+    private static final String TEST_IDS_SEQ_RANGE_SORTED = "P00001,P00002,P00003,P00003,P00003,P00003,P00007";
     private static final String MISSING_ID1 = "Q00001";
     private static final String MISSING_ID2 = "Q00002";
 
@@ -220,6 +231,78 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                 .andExpect(jsonPath("$.facets").doesNotExist());
     }
 
+    @Test
+    void getByIdsWithSequenceRangeSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE)
+                                        .param(getRequestParamName(), TEST_IDS_SEQ_RANGE)
+                        );
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, UniProtMediaType.FASTA_MEDIA_TYPE_VALUE));
+        String fastaResponse = response.andReturn().getResponse().getContentAsString();
+        verifyFastaResponse(fastaResponse);
+    }
+    /*@Test
+    void getByIdsWithSequenceRangeSortedByAccessionSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .param(getRequestParamName(), TEST_IDS_SEQ_RANGE)
+                                        .param("sort", "accession asc")
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE));
+        String fastaResponse = response.andReturn().getResponse().getContentAsString();
+        List<UniProtKBFasta> uniProtKBFastas = getUniProtKBFastas(fastaResponse);
+        List<String> returnedIds = uniProtKBFastas.stream().map(UniProtKBFasta::getId).collect(Collectors.toList());
+        Assertions.assertEquals(Arrays.asList(TEST_IDS_SEQ_RANGE_SORTED.split(",")), returnedIds);
+    }*/
+
+    private void verifyFastaResponse(String fastaResponse) {
+        List<UniProtKBFasta> uniProtKBFastas = getUniProtKBFastas(fastaResponse);
+        Assertions.assertEquals(TEST_IDS_SEQ_RANGE.split(",").length, uniProtKBFastas.size());
+        List<String> passedAccessions = Arrays.stream(TEST_IDS_SEQ_RANGE.split(","))
+                .map(id -> UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(id).matches()
+                        ? id.substring(0, id.indexOf("["))
+                        : id).collect(Collectors.toList());
+        List<String> returnedIds = uniProtKBFastas.stream().map(UniProtKBFasta::getId).collect(Collectors.toList());
+        Assertions.assertEquals(passedAccessions, returnedIds);
+
+        String[] ids = TEST_IDS_SEQ_RANGE.split(",");
+        for(int i = 0; i < uniProtKBFastas.size(); i++){
+            UniProtKBFasta fasta = uniProtKBFastas.get(i);
+            String id = ids[i];
+            if(UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(id).matches()){
+                String[] range = id.substring(id.indexOf('[') + 1, id.indexOf(']')).split("-");
+                int sequenceLength = Integer.parseInt(range[1]) - Integer.parseInt(range[0]) + 1;
+                Assertions.assertEquals(sequenceLength, fasta.getSequence().getLength());
+            }
+        }
+    }
+
+    private List<UniProtKBFasta> getUniProtKBFastas(String fastaResponse) {
+        String[] fastaEntries = fastaResponse.split("\n>");
+        List<UniProtKBFasta> uniProtKBFastas = Arrays.stream(fastaEntries)
+                .map(fasta -> fasta.startsWith(">") ? fasta : ">" + fasta)
+                .map(UniProtKBFastaParser::fromFasta)
+                .collect(Collectors.toList());
+        return uniProtKBFastas;
+    }
+
+
     @Override
     protected String getIdSortField() {
         return "accession";
@@ -229,6 +312,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     protected String getCommaSeparatedIds() {
         return TEST_IDS;
     }
+
 
     @Override
     protected String getCommaSeparatedNIds(int n) {
@@ -387,8 +471,8 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
             "Invalid fields parameter value 'invalid'",
             "Invalid fields parameter value 'invalid1'",
             "The 'download' parameter has invalid format. It should be a boolean true or false.",
-            "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
-            "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession."
+            "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20].",
+            "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20]."
         };
     }
 

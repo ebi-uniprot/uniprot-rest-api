@@ -5,11 +5,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.store.config.UniProtDataType;
@@ -34,6 +36,8 @@ public @interface ValidUniqueIdList {
 
         private UniProtDataType dataType;
 
+        @Autowired private HttpServletRequest request;
+
         @Override
         public void initialize(ValidUniqueIdList constraintAnnotation) {
             this.dataType = constraintAnnotation.uniProtDataType();
@@ -57,6 +61,11 @@ public @interface ValidUniqueIdList {
 
         UniProtDataType getDataType() {
             return this.dataType;
+        }
+
+        @Override
+        HttpServletRequest getHttpServletRequest() {
+            return this.request;
         }
     }
 }
