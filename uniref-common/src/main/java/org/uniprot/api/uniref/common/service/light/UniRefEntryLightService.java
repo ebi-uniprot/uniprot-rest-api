@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.service;
+package org.uniprot.api.uniref.common.service.light;
 
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 
@@ -25,9 +25,10 @@ import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.StoreStreamerSearchService;
 import org.uniprot.api.rest.service.query.config.UniRefSolrQueryConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
-import org.uniprot.api.uniref.common.repository.UniRefQueryRepository;
-import org.uniprot.api.uniref.common.request.UniRefSearchRequest;
-import org.uniprot.api.uniref.common.request.UniRefStreamRequest;
+import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
+import org.uniprot.api.uniref.common.response.converter.UniRefLightQueryResultConverter;
+import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
+import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
 import org.uniprot.core.uniprotkb.taxonomy.Organism;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.core.uniref.impl.UniRefEntryLightBuilder;

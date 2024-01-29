@@ -50,7 +50,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
 import org.uniprot.api.uniref.common.repository.DataStoreTestConfig;
-import org.uniprot.api.uniref.common.repository.UniRefQueryRepository;
+import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.repository.store.UniRefEntryFacetConfig;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.api.uniref.common.repository.store.UniRefMemberStoreClient;

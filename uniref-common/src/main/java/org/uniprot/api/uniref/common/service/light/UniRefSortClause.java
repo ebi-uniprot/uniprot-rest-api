@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.service;
+package org.uniprot.api.uniref.common.service.light;
 
 import javax.annotation.PostConstruct;
 

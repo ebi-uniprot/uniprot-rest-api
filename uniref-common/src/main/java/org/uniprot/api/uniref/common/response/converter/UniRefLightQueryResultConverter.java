@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.service;
+package org.uniprot.api.uniref.common.response.converter;
 
 import java.io.IOException;
 import java.time.Duration;

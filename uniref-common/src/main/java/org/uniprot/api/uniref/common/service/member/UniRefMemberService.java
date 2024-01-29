@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.service;
+package org.uniprot.api.uniref.common.service.member;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -8,7 +8,7 @@ import org.uniprot.api.common.exception.ServiceException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.service.query.config.UniRefSolrQueryConfig;
 import org.uniprot.api.uniref.common.repository.store.UniRefEntryStoreRepository;
-import org.uniprot.api.uniref.common.request.UniRefMemberRequest;
+import org.uniprot.api.uniref.common.service.member.request.UniRefMemberRequest;
 import org.uniprot.core.uniref.UniRefMember;
 
 /**

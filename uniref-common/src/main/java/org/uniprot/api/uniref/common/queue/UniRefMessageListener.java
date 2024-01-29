@@ -24,9 +24,8 @@ import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
-import org.uniprot.api.uniref.common.request.UniRefDownloadRequest;
-import org.uniprot.api.uniref.common.request.UniRefSearchRequest;
-import org.uniprot.api.uniref.common.service.UniRefEntryLightService;
+import org.uniprot.api.uniref.common.service.light.UniRefEntryLightService;
+import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;
 
 /**

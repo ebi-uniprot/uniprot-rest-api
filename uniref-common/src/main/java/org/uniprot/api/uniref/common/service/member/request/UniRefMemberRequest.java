@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.request;
+package org.uniprot.api.uniref.common.service.member.request;
 
 import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 

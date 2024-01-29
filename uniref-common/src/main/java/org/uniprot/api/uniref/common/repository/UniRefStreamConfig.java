@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.repository.store;
+package org.uniprot.api.uniref.common.repository;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -21,6 +21,7 @@ import org.uniprot.api.common.repository.stream.store.StoreStreamerConfig;
 import org.uniprot.api.common.repository.stream.store.StreamerConfigProperties;
 import org.uniprot.api.rest.respository.RepositoryConfig;
 import org.uniprot.api.rest.respository.RepositoryConfigProperties;
+import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.search.SolrCollection;
 

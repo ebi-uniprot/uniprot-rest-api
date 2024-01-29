@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.output;
+package org.uniprot.api.uniref.common.response.converter;
 
 import static java.util.Arrays.asList;
 
@@ -17,9 +17,6 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.*;
-import org.uniprot.api.uniref.common.output.converter.UniRefFastaMessageConverter;
-import org.uniprot.api.uniref.common.output.converter.UniRefLightFastaMessageConverter;
-import org.uniprot.api.uniref.common.output.converter.UniRefXmlMessageConverter;
 import org.uniprot.core.json.parser.uniref.UniRefEntryJsonConfig;
 import org.uniprot.core.json.parser.uniref.UniRefEntryLightJsonConfig;
 import org.uniprot.core.json.parser.uniref.UniRefMemberJsonConfig;

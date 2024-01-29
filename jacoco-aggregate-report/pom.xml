@@ -62,6 +62,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
+			<artifactId>uniref-common</artifactId>
+			<version>${uniprot-core.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
 			<artifactId>uniref-rest</artifactId>
 			<version>${uniprot-core.version}</version>
 			<scope>compile</scope>

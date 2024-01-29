@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.request;
+package org.uniprot.api.uniref.common.service.light.request;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
