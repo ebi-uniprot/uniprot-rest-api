@@ -193,7 +193,9 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                 mockMvc.perform(
                         get(streamRequestPath)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param("org/uniprot/api/uniparc/common/service/query", "invalid:invalid")
+                                .param(
+                                        "org/uniprot/api/uniparc/common/service/query",
+                                        "invalid:invalid")
                                 .param("fields", "invalid,invalid1")
                                 .param("sort", "invalid")
                                 .param("download", "invalid"));
@@ -288,7 +290,9 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("org/uniprot/api/uniparc/common/service/query", "identity:1.0 AND (P12301 OR P12302)")
+                        .param(
+                                "org/uniprot/api/uniparc/common/service/query",
+                                "identity:1.0 AND (P12301 OR P12302)")
                         .param("fields", "length,organism_id");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -317,7 +321,9 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath).header(ACCEPT, mediaType).param("org/uniprot/api/uniparc/common/service/query", "*");
+                get(streamRequestPath)
+                        .header(ACCEPT, mediaType)
+                        .param("org/uniprot/api/uniparc/common/service/query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
