@@ -77,6 +77,7 @@
 		<module>uniprotkb-common</module>
 		<module>uniprotkb-rest</module>
 		<module>proteome-rest</module>
+		<module>uniparc-common</module>
 		<module>uniparc-rest</module>
 		<module>uniref-rest</module>
 		<module>unisave-rest</module>
