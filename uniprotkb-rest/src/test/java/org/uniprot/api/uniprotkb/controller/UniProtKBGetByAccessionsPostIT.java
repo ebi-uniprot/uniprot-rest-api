@@ -187,8 +187,8 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
             "Only '10' accessions are allowed in each request.",
             "Invalid fields parameter value 'invalid'",
             "Invalid fields parameter value 'invalid1'",
-            "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
-            "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession."
+            "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20].",
+            "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20]."
         };
     }
 
