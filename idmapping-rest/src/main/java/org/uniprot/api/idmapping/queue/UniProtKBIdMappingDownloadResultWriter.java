@@ -1,12 +1,13 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.uniprot.api.idmapping.service.impl.UniProtKBIdService.*;
+import static org.uniprot.api.idmapping.service.impl.UniProtKBIdService.isLineageAllowed;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -18,6 +19,7 @@ import org.uniprot.api.idmapping.model.UniProtKBEntryPair;
 import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
 import org.uniprot.api.idmapping.service.store.impl.UniProtKBBatchStoreEntryPairIterable;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -28,6 +30,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 
 @Component
 @Slf4j
+@Profile({"live", "asyncDownload"})
 public class UniProtKBIdMappingDownloadResultWriter
         extends AbstractIdMappingDownloadResultWriter<UniProtKBEntryPair, UniProtKBEntry> {
 
@@ -45,14 +48,16 @@ public class UniProtKBIdMappingDownloadResultWriter
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer idMappingRdfStreamer,
             TaxonomyLineageService taxonomyLineageService,
-            UniprotKBMappingRepository uniprotKBMappingRepository) {
+            UniprotKBMappingRepository uniprotKBMappingRepository,
+            HeartBeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
                 idMappingRdfStreamer,
-                MessageConverterContextFactory.Resource.UNIPROTKB);
+                MessageConverterContextFactory.Resource.UNIPROTKB,
+                heartBeatProducer);
         this.taxonomyLineageService = taxonomyLineageService;
         this.uniprotKBMappingRepository = uniprotKBMappingRepository;
         this.returnFieldConfig =

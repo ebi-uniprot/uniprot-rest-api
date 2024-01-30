@@ -1,11 +1,13 @@
 package org.uniprot.api.idmapping.queue;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
 
 @Component
+@Profile({"live", "asyncDownload"})
 public class IdMappingDownloadResultWriterFactory {
 
     private final UniParcIdMappingDownloadResultWriter uniParcIdMappingDownloadResultWriter;

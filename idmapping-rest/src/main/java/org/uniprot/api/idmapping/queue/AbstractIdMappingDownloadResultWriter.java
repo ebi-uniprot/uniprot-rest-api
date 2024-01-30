@@ -1,8 +1,8 @@
 package org.uniprot.api.idmapping.queue;
 
-import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.idmapping.service.IdMappingServiceUtils.getExtraOptions;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.SUPPORTED_RDF_MEDIA_TYPES;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,7 +12,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,6 +35,8 @@ import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.model.IdMappingResult;
 import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
+import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
@@ -47,6 +52,7 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
     private final DownloadConfigProperties downloadConfigProperties;
     private final MessageConverterContextFactory.Resource resource;
     private final RdfStreamer rdfStreamer;
+    private final HeartBeatProducer heartBeatProducer;
 
     protected AbstractIdMappingDownloadResultWriter(
             RequestMappingHandlerAdapter contentAdapter,
@@ -54,21 +60,24 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
             StoreStreamerConfig<S> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
             RdfStreamer rdfStreamer,
-            MessageConverterContextFactory.Resource resource) {
+            MessageConverterContextFactory.Resource resource,
+            HeartBeatProducer heartBeatProducer) {
         this.messageConverters = contentAdapter.getMessageConverters();
         this.converterContextFactory = converterContextFactory;
         this.storeStreamerConfig = storeStreamerConfig;
         this.downloadConfigProperties = downloadConfigProperties;
         this.resource = resource;
         this.rdfStreamer = rdfStreamer;
+        this.heartBeatProducer = heartBeatProducer;
     }
 
     public void writeResult(
             IdMappingDownloadRequest request,
             IdMappingResult idMappingResult,
-            String jobId,
+            DownloadJob downloadJob,
             MediaType contentType)
             throws IOException {
+        String jobId = downloadJob.getId();
         String fileNameWithExt = jobId + FileType.GZIP.getExtension();
         Path resultPath =
                 Paths.get(downloadConfigProperties.getResultFilesFolder(), fileNameWithExt);
@@ -96,17 +105,31 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
                         this.rdfStreamer.stream(
                                 toIds.stream(),
                                 resource.name().toLowerCase(),
-                                SUPPORTED_RDF_MEDIA_TYPES.get(contentType));
+                                SUPPORTED_RDF_MEDIA_TYPES.get(contentType),
+                                entries ->
+                                        heartBeatProducer.createForResults(downloadJob, entries));
                 context.setEntityIds(rdfResponse);
             } else if (contentType.equals(LIST_MEDIA_TYPE)) {
                 Set<String> toIds = getToIds(idMappingResult);
-                context.setEntityIds(toIds.stream());
+                context.setEntityIds(
+                        toIds.stream()
+                                .map(
+                                        id -> {
+                                            heartBeatProducer.createForResults(downloadJob, 1);
+                                            return id;
+                                        }));
             } else {
                 BatchStoreEntryPairIterable<T, S> batchStoreIterable =
                         getBatchStoreEntryPairIterable(
                                 idMappingResult.getMappedIds().iterator(), request.getFields());
                 Stream<T> entities =
                         StreamSupport.stream(batchStoreIterable.spliterator(), false)
+                                .map(
+                                        entityCollection -> {
+                                            heartBeatProducer.createForResults(
+                                                    downloadJob, entityCollection.size());
+                                            return entityCollection;
+                                        })
                                 .flatMap(Collection::stream)
                                 .onClose(
                                         () ->
@@ -119,6 +142,8 @@ public abstract class AbstractIdMappingDownloadResultWriter<T extends EntryPair<
             Instant start = Instant.now();
             AtomicInteger counter = new AtomicInteger();
             outputWriter.writeContents(context, gzipOutputStream, start, counter);
+        } finally {
+            heartBeatProducer.stop(downloadJob.getId());
         }
     }
 

@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +127,7 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Override
     protected String getMessageSuccessAfterRetryQuery() {
-        return "uniprot_id:q9h9k5";
+        return "id:UniRef50_P03901";
     }
 
     @Override
@@ -136,5 +138,10 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected String getMessageWithUnhandledExceptionQuery() {
         return "field:value";
+    }
+
+    @Override
+    protected int getMessageSuccessAfterRetryCount() {
+        return 1;
     }
 }

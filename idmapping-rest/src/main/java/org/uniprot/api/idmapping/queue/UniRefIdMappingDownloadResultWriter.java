@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
@@ -14,6 +15,7 @@ import org.uniprot.api.idmapping.model.IdMappingStringPair;
 import org.uniprot.api.idmapping.model.UniRefEntryPair;
 import org.uniprot.api.idmapping.service.store.BatchStoreEntryPairIterable;
 import org.uniprot.api.idmapping.service.store.impl.UniRefBatchStoreEntryPairIterable;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -21,6 +23,7 @@ import org.uniprot.core.uniref.UniRefEntryLight;
 
 @Component
 @Slf4j
+@Profile({"live", "asyncDownload"})
 public class UniRefIdMappingDownloadResultWriter
         extends AbstractIdMappingDownloadResultWriter<UniRefEntryPair, UniRefEntryLight> {
 
@@ -33,14 +36,16 @@ public class UniRefIdMappingDownloadResultWriter
             MessageConverterContextFactory<UniRefEntryPair> converterContextFactory,
             StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig,
             DownloadConfigProperties downloadConfigProperties,
-            RdfStreamer idMappingRdfStreamer) {
+            RdfStreamer idMappingRdfStreamer,
+            HeartBeatProducer heartBeatProducer) {
         super(
                 contentAdapter,
                 converterContextFactory,
                 storeStreamerConfig,
                 downloadConfigProperties,
                 idMappingRdfStreamer,
-                MessageConverterContextFactory.Resource.UNIREF);
+                MessageConverterContextFactory.Resource.UNIREF,
+                heartBeatProducer);
     }
 
     @Override

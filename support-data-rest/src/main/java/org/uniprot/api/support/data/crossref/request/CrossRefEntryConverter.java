@@ -24,7 +24,7 @@ public class CrossRefEntryConverter implements Function<CrossRefDocument, CrossR
                 .pubMedId(crossRefDocument.getPubMedId())
                 .doiId(crossRefDocument.getDoiId())
                 .linkType(crossRefDocument.getLinkType())
-                .server(crossRefDocument.getServer())
+                .serversSet(crossRefDocument.getServers())
                 .dbUrl(crossRefDocument.getDbUrl())
                 .category(crossRefDocument.getCategory())
                 .statistics(getStatistics(crossRefDocument))
