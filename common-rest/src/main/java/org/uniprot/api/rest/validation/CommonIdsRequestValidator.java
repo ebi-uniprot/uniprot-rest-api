@@ -143,7 +143,7 @@ public abstract class CommonIdsRequestValidator {
             String range = id.substring(id.indexOf('[') + 1, id.indexOf(']'));
             String[] rangeTokens = range.split("-");
 
-            if(rangeTokens.length != 2){
+            if (rangeTokens.length != 2) {
                 return false;
             }
 
@@ -160,7 +160,7 @@ public abstract class CommonIdsRequestValidator {
         return isValid;
     }
 
-     void invalidSequeceRangeMessage(String id, ConstraintValidatorContextImpl contextImpl) {
+    void invalidSequeceRangeMessage(String id, ConstraintValidatorContextImpl contextImpl) {
         String errMsg = "Invalid sequence range '{0}' in the accession.";
         contextImpl.addMessageParameter("0", id);
         contextImpl.buildConstraintViolationWithTemplate(errMsg).addConstraintViolation();

@@ -762,22 +762,29 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(is(">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n" +
-                        "AEITAEGLKPQ\n")));
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n"
+                                                        + "AEITAEGLKPQ\n")));
     }
 
     @Test
     void testGetEntryForAGivenSequenceRangeWithFileExtension() throws Exception {
         // when
-        ResultActions response =
-                getMockMvc().perform(get(ACCESSION_RESOURCE, "Q8DIA7[1-5].fasta"));
+        ResultActions response = getMockMvc().perform(get(ACCESSION_RESOURCE, "Q8DIA7[1-5].fasta"));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(is(">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n" +
-                        "MSQTP\n")));
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n"
+                                                        + "MSQTP\n")));
     }
 
     @Test
@@ -793,7 +800,11 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(is(">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n\n")));
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n\n")));
     }
 
     @Test
@@ -813,18 +824,20 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(content().string(is(">sp|P21802-2|FGFR2-2_HUMAN Isoform 2 of Fibroblast growth factor receptor 2 OS=Homo sapiens OX=9606 GN=FGFR2\nLVVVTMATLSL\n")));
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">sp|P21802-2|FGFR2-2_HUMAN Isoform 2 of Fibroblast growth factor receptor 2 OS=Homo sapiens OX=9606 GN=FGFR2\nLVVVTMATLSL\n")));
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidAccession")
-    void testGetEntryForGivenInvalidRanges(String accession, String format, ResultMatcher matcher) throws Exception {
+    void testGetEntryForGivenInvalidRanges(String accession, String format, ResultMatcher matcher)
+            throws Exception {
         // when
         ResultActions response =
-                getMockMvc()
-                        .perform(
-                                get(ACCESSION_RESOURCE, accession)
-                                        .header(ACCEPT, format));
+                getMockMvc().perform(get(ACCESSION_RESOURCE, accession).header(ACCEPT, format));
 
         // then
         response.andDo(log())
@@ -1167,23 +1180,52 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         }
     }
 
-    private static Stream<Arguments> provideInvalidAccession(){
+    private static Stream<Arguments> provideInvalidAccession() {
         return Stream.of(
-                Arguments.of("P12345[10-20]", APPLICATION_JSON_VALUE,
-                        jsonPath("$.messages.*", contains("Invalid request received. Sequence range is only supported for type text/plain;format=flatfile"))),
-                Arguments.of("P12345[20-10]", FASTA_MEDIA_TYPE_VALUE,
-                        content().string(is("Error messages\n" +
-                                "Invalid request received. Invalid sequence range [20-10]"))),
-                Arguments.of("P12345[0-10]", FASTA_MEDIA_TYPE_VALUE,
-                        content().string(is("Error messages\n" +
-                                "Invalid request received. Invalid sequence range [0-10]"))),
-                Arguments.of("P12345[1-5147483647]", FASTA_MEDIA_TYPE_VALUE,
-                        content().string(is("Error messages\n" +
-                                "Invalid request received. Invalid sequence range [1-5147483647]"))),
-                Arguments.of("P12345.3[1-10]", FASTA_MEDIA_TYPE_VALUE,
-                        content().string(is("Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession"))),
-                Arguments.of("P12345[1-10].3", FASTA_MEDIA_TYPE_VALUE,
-                        content().string(is("Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
-                );
+                Arguments.of(
+                        "P12345[10-20]",
+                        APPLICATION_JSON_VALUE,
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "Invalid request received. Sequence range is only supported for type text/plain;format=flatfile"))),
+                Arguments.of(
+                        "P12345[20-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\n"
+                                                        + "Invalid request received. Invalid sequence range [20-10]"))),
+                Arguments.of(
+                        "P12345[0-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\n"
+                                                        + "Invalid request received. Invalid sequence range [0-10]"))),
+                Arguments.of(
+                        "P12345[1-5147483647]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\n"
+                                                        + "Invalid request received. Invalid sequence range [1-5147483647]"))),
+                Arguments.of(
+                        "P12345.3[1-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession"))),
+                Arguments.of(
+                        "P12345[1-10].3",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession"))));
     }
 }
