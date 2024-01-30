@@ -1,12 +1,10 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,11 +19,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -100,7 +101,6 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     private static final String TEST_IDS_SEQ_RANGE =
             "P00003[10-20],P00007,P00003,P00001,P00003[20-40],P00003[1-5],P00002";
-    private static final String TEST_IDS_SEQ_RANGE_SORTED = "P00001,P00002,P00003,P00003,P00003,P00003,P00007";
     private static final String MISSING_ID1 = "Q00001";
     private static final String MISSING_ID2 = "Q00002";
 
@@ -239,18 +239,21 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                         .perform(
                                 get(getGetByIdsPath())
                                         .header(ACCEPT, FASTA_MEDIA_TYPE)
-                                        .param(getRequestParamName(), TEST_IDS_SEQ_RANGE)
-                        );
+                                        .param(getRequestParamName(), TEST_IDS_SEQ_RANGE));
 
         // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().doesNotExist("Content-Disposition"))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, UniProtMediaType.FASTA_MEDIA_TYPE_VALUE));
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE));
         String fastaResponse = response.andReturn().getResponse().getContentAsString();
         verifyFastaResponse(fastaResponse);
     }
-    /*@Test
+
+    @Test
     void getByIdsWithSequenceRangeSortedByAccessionSuccess() throws Exception {
         // when
         ResultActions response =
@@ -259,33 +262,87 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 get(getGetByIdsPath())
                                         .param(getRequestParamName(), TEST_IDS_SEQ_RANGE)
                                         .param("sort", "accession asc")
+                                        .param("query", "reviewed:true")
                                         .header(ACCEPT, FASTA_MEDIA_TYPE));
 
         // then
-        response.andDo(print())
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content().string(containsString("sort not supported with sequence range")))
+                .andExpect(
+                        content()
+                                .string(containsString("query not supported with sequence range")));
+    }
+
+    @Test
+    void downloadByIdsWithSequenceRangeSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .param("download", "true")
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE)
+                                        .param(getRequestParamName(), TEST_IDS_SEQ_RANGE));
+
+        // then
+        response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE));
+                .andExpect(header().exists("Content-Disposition"))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE));
         String fastaResponse = response.andReturn().getResponse().getContentAsString();
-        List<UniProtKBFasta> uniProtKBFastas = getUniProtKBFastas(fastaResponse);
-        List<String> returnedIds = uniProtKBFastas.stream().map(UniProtKBFasta::getId).collect(Collectors.toList());
-        Assertions.assertEquals(Arrays.asList(TEST_IDS_SEQ_RANGE_SORTED.split(",")), returnedIds);
-    }*/
+        verifyFastaResponse(fastaResponse);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidRequests")
+    void getByIdsWithSequenceRangeWithInvalidRequests(
+            String accessions, String format, List<ResultMatcher> matchers) throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, format)
+                                        .param(getRequestParamName(), accessions));
+
+        // then
+        ResultActions resultActions =
+                response.andDo(log())
+                        .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, format));
+        for (ResultMatcher matcher : matchers) {
+            resultActions.andExpect(matcher);
+        }
+    }
 
     private void verifyFastaResponse(String fastaResponse) {
         List<UniProtKBFasta> uniProtKBFastas = getUniProtKBFastas(fastaResponse);
         Assertions.assertEquals(TEST_IDS_SEQ_RANGE.split(",").length, uniProtKBFastas.size());
-        List<String> passedAccessions = Arrays.stream(TEST_IDS_SEQ_RANGE.split(","))
-                .map(id -> UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(id).matches()
-                        ? id.substring(0, id.indexOf("["))
-                        : id).collect(Collectors.toList());
-        List<String> returnedIds = uniProtKBFastas.stream().map(UniProtKBFasta::getId).collect(Collectors.toList());
+        List<String> passedAccessions =
+                Arrays.stream(TEST_IDS_SEQ_RANGE.split(","))
+                        .map(
+                                id ->
+                                        UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
+                                                        .matcher(id)
+                                                        .matches()
+                                                ? id.substring(0, id.indexOf("["))
+                                                : id)
+                        .collect(Collectors.toList());
+        List<String> returnedIds =
+                uniProtKBFastas.stream().map(UniProtKBFasta::getId).collect(Collectors.toList());
         Assertions.assertEquals(passedAccessions, returnedIds);
 
         String[] ids = TEST_IDS_SEQ_RANGE.split(",");
-        for(int i = 0; i < uniProtKBFastas.size(); i++){
+        for (int i = 0; i < uniProtKBFastas.size(); i++) {
             UniProtKBFasta fasta = uniProtKBFastas.get(i);
             String id = ids[i];
-            if(UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(id).matches()){
+            if (UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(id).matches()) {
                 String[] range = id.substring(id.indexOf('[') + 1, id.indexOf(']')).split("-");
                 int sequenceLength = Integer.parseInt(range[1]) - Integer.parseInt(range[0]) + 1;
                 Assertions.assertEquals(sequenceLength, fasta.getSequence().getLength());
@@ -295,13 +352,13 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     private List<UniProtKBFasta> getUniProtKBFastas(String fastaResponse) {
         String[] fastaEntries = fastaResponse.split("\n>");
-        List<UniProtKBFasta> uniProtKBFastas = Arrays.stream(fastaEntries)
-                .map(fasta -> fasta.startsWith(">") ? fasta : ">" + fasta)
-                .map(UniProtKBFastaParser::fromFasta)
-                .collect(Collectors.toList());
+        List<UniProtKBFasta> uniProtKBFastas =
+                Arrays.stream(fastaEntries)
+                        .map(fasta -> fasta.startsWith(">") ? fasta : ">" + fasta)
+                        .map(UniProtKBFastaParser::fromFasta)
+                        .collect(Collectors.toList());
         return uniProtKBFastas;
     }
-
 
     @Override
     protected String getIdSortField() {
@@ -312,7 +369,6 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     protected String getCommaSeparatedIds() {
         return TEST_IDS;
     }
-
 
     @Override
     protected String getCommaSeparatedNIds(int n) {
@@ -540,5 +596,65 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
         return "uniprotkb_" + now.format(dateTimeFormatter);
+    }
+
+    private static Stream<Arguments> provideInvalidRequests() {
+        return Stream.of(
+                Arguments.of(
+                        "P12345[10-20]",
+                        APPLICATION_JSON_VALUE,
+                        List.of(
+                                jsonPath(
+                                        "$.messages.*",
+                                        contains(
+                                                "Invalid content type received, 'application/json'. Expected one of [text/plain;format=fasta].")))),
+                Arguments.of(
+                        "P12345,P12345[20-10],P12345[10-20]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                is(
+                                                        "Error messages\n"
+                                                                + "Invalid sequence range 'P12345[20-10]' in the accession.")))),
+                Arguments.of(
+                        "Q12345[10-20],P12345[0-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                is(
+                                                        "Error messages\n"
+                                                                + "Invalid sequence range 'P12345[0-10]' in the accession.")))),
+                Arguments.of(
+                        "P12345[1-5147483647],Q12345[0-10],Q12345",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                containsString(
+                                                        "Invalid sequence range 'P12345[1-5147483647]' in the accession."))),
+                        content()
+                                .string(
+                                        containsString(
+                                                "Invalid sequence range 'Q12345[0-10]' in the accession."))),
+                Arguments.of(
+                        "Q12345,P12345.3[1-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                is(
+                                                        "Error messages\n"
+                                                                + "Accession 'P12345.3[1-10]' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20].")))),
+                Arguments.of(
+                        "P12345[1-10].3,Q12345",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                is(
+                                                        "Error messages\n"
+                                                                + "Accession 'P12345[1-10].3' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20].")))));
     }
 }

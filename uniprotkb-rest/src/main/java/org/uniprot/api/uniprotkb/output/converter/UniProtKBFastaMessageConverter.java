@@ -90,6 +90,9 @@ public class UniProtKBFastaMessageConverter
         String[] rangeTokens = sequenceRange.split("-");
         int start = Integer.parseInt(rangeTokens[0]);
         int end = Integer.parseInt(rangeTokens[1]);
-        return sequence.getValue().substring(Math.min(start - 1, sequence.getLength()), Math.min(end, sequence.getLength()));
+        return sequence.getValue()
+                .substring(
+                        Math.min(start - 1, sequence.getLength()),
+                        Math.min(end, sequence.getLength()));
     }
 }
