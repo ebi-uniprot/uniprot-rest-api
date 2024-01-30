@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -9,7 +11,6 @@ import lombok.Data;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.*;
@@ -17,14 +18,14 @@ import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-
 @Data
 @ParameterObject
 public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
 
     @NotNull(message = "{search.required}")
-    @Parameter(description = ACCESSIONS_UNIPROTKB_DESCRIPTION, example = ACCESSIONS_UNIPROTKB_EXAMPLE)
+    @Parameter(
+            description = ACCESSIONS_UNIPROTKB_DESCRIPTION,
+            example = ACCESSIONS_UNIPROTKB_EXAMPLE)
     @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String accessions;
 

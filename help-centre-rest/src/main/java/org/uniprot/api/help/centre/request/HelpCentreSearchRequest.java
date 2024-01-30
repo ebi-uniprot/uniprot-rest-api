@@ -1,5 +1,7 @@
 package org.uniprot.api.help.centre.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.Max;
@@ -9,7 +11,6 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.uniprot.api.help.centre.repository.HelpCentreFacetConfig;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.core.util.Utils;
@@ -18,8 +19,6 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 import org.uniprot.store.config.returnfield.model.ReturnField;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author lgonzales

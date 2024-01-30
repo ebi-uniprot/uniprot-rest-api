@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.DOWNLOAD_DESCRIPTION;
+
 import javax.validation.constraints.Pattern;
 
 import lombok.Data;
@@ -9,8 +11,6 @@ import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.DOWNLOAD_DESCRIPTION;
 
 /**
  * @author lgonzales

@@ -99,7 +99,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByUniRuleId(
             @Parameter(description = "Get UniRule entry by an uniruleid")
-            @PathVariable("uniruleid")
+                    @PathVariable("uniruleid")
                     @Pattern(
                             regexp = UNIRULE_ALL_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},

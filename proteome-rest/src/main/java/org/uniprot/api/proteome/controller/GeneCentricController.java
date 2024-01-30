@@ -29,7 +29,6 @@ import org.uniprot.api.proteome.request.GeneCentricStreamRequest;
 import org.uniprot.api.proteome.request.GeneCentricUPIdRequest;
 import org.uniprot.api.proteome.service.GeneCentricService;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -243,8 +242,8 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                             message = "{search.invalid.accession.value}")
                     String accession,
             @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
-            @Parameter(description = FIELDS_DESCRIPTION)
-            @RequestParam(value = "fields", required = false)
+                    @Parameter(description = FIELDS_DESCRIPTION)
+                    @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
         GeneCentricEntry entry = service.findByUniqueId(accession.toUpperCase());

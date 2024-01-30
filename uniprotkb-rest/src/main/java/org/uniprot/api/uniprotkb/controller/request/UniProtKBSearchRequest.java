@@ -1,5 +1,7 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -13,15 +15,12 @@ import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * Search cursor request Entity

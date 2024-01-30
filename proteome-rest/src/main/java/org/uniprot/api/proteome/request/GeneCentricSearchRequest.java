@@ -1,5 +1,7 @@
 package org.uniprot.api.proteome.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -8,13 +10,10 @@ import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author jluo

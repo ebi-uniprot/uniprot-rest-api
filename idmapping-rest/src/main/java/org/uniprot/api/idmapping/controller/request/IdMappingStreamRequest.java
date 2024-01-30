@@ -1,5 +1,7 @@
 package org.uniprot.api.idmapping.controller.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Pattern;
 
 import lombok.AllArgsConstructor;
@@ -7,12 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 
 import org.springdoc.api.annotations.ParameterObject;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * Created 20/05/2021
@@ -31,10 +30,13 @@ public class IdMappingStreamRequest implements StreamRequest {
     // FAKE fields never used
     @Parameter(hidden = true)
     private String query;
+
     @Parameter(hidden = true)
     private String fields;
+
     @Parameter(hidden = true)
     private String sort;
+
     @Parameter(hidden = true)
     private String format;
 }

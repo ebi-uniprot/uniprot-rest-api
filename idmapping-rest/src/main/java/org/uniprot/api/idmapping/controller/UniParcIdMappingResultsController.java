@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
@@ -36,6 +35,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -116,8 +116,8 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntryPair>> getMappedEntries(
-            @Parameter(description = "Unique identifier for idmapping job")
-            @PathVariable String jobId,
+            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                    String jobId,
             @Valid @ModelAttribute UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -176,8 +176,8 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntryPair>>>
             streamMappedEntries(
-                    @Parameter(description = "Unique identifier for idmapping job")
-                    @PathVariable String jobId,
+                    @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                            String jobId,
                     @Valid @ModelAttribute UniParcIdMappingStreamRequest streamRequest,
                     HttpServletRequest request,
                     HttpServletResponse response) {

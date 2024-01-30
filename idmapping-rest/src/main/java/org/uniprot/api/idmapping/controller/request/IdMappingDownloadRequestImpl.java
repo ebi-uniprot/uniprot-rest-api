@@ -1,14 +1,15 @@
 package org.uniprot.api.idmapping.controller.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.NotNull;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
 @ParameterObject

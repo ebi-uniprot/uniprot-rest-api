@@ -10,7 +10,6 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,6 +31,7 @@ import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -89,8 +89,9 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobStatusResponse> getStatus(
-            @Parameter(description = "Unique identifier for idmapping job")
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
+            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                    String jobId,
+            HttpServletRequest servletRequest) {
         return createStatus(
                 cacheService.getJobAsResource(jobId), servletRequest.getRequestURL().toString());
     }
@@ -109,8 +110,9 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobDetailResponse> getDetails(
-            @Parameter(description = "Unique identifier for idmapping job")
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
+            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                    String jobId,
+            HttpServletRequest servletRequest) {
         IdMappingJob job = cacheService.getJobAsResource(jobId);
         IdMappingJobRequest jobRequest = job.getIdMappingRequest();
 

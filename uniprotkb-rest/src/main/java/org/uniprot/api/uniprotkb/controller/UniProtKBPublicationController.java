@@ -11,11 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
@@ -36,6 +30,11 @@ import org.uniprot.api.uniprotkb.model.PublicationEntry;
 import org.uniprot.api.uniprotkb.service.PublicationService;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -75,18 +74,20 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
             summary = "Get publications for a UniProtKB entry by accession.",
-            description = "Get all publication data for a UniProtKB entry by accession, including computationally-mapped and community-mapped sources.",
+            description =
+                    "Get all publication data for a UniProtKB entry by accession, including computationally-mapped and community-mapped sources.",
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = PublicationEntry.class))
-                            })})
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = PublicationEntry.class))
+                        })
+            })
     public ResponseEntity<MessageConverterContext<PublicationEntry>>
             getMappedPublicationsByUniProtAccession(
                     @Parameter(description = ACCESSION_DESCRIPTION, example = "P05067")
-                    @PathVariable("accession")
+                            @PathVariable("accession")
                             @Pattern(
                                     regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
                                     flags = {Pattern.Flag.CASE_INSENSITIVE},

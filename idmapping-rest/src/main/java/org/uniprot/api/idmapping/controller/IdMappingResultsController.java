@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +40,7 @@ import org.uniprot.core.util.Utils;
 import com.google.common.base.Stopwatch;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -105,8 +105,8 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                         })
             })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> results(
-            @Parameter(description = "Unique identifier for idmapping job")
-            @PathVariable String jobId,
+            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                    String jobId,
             @Valid @ModelAttribute IdMappingPageRequest pageRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -156,8 +156,8 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<IdMappingStringPair>>>
             streamResults(
-                    @Parameter(description = "Unique identifier for idmapping job")
-                    @PathVariable String jobId,
+                    @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                            String jobId,
                     @Valid @ModelAttribute IdMappingStreamRequest streamRequest,
                     HttpServletRequest request,
                     HttpServletResponse response) {

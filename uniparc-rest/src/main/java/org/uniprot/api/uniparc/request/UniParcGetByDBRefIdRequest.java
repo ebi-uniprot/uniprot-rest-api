@@ -4,8 +4,10 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import io.swagger.v3.oas.annotations.Parameter;
+
 import org.springdoc.api.annotations.ParameterObject;
+
+import io.swagger.v3.oas.annotations.Parameter;
 
 /**
  * @author sahmad

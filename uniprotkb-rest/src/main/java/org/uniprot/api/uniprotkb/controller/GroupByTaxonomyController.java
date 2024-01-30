@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService;
 
@@ -48,7 +47,7 @@ public class GroupByTaxonomyController extends GroupByController {
             @Parameter(description = QUERY_UNIPROTKB_TAXONOMY_DESCRIPTION)
                     @RequestParam(value = "query")
                     String query,
-                    @Parameter(description = GROUP_PARENT_DESCRIPTION)
+            @Parameter(description = GROUP_PARENT_DESCRIPTION)
                     @Pattern(
                             regexp = TAXONOMY_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},

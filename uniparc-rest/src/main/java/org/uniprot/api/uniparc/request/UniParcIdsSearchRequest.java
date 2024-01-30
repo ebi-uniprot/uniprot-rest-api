@@ -1,5 +1,7 @@
 package org.uniprot.api.uniparc.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -48,9 +50,7 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
             messagePrefix = "search.uniparc")
     protected String query;
 
-    @Parameter(
-            description =
-                    OpenApiConstants.DOWNLOAD_DESCRIPTION)
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

@@ -91,7 +91,7 @@ public class ArbaController extends BasicSearchController<UniRuleEntry> {
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByArbaId(
             @Parameter(description = "Get Arba entry by an arbaId")
-            @PathVariable("arbaId")
+                    @PathVariable("arbaId")
                     @Pattern(
                             regexp = ARBA_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},

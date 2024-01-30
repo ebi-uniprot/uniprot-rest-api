@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByECService;
 
@@ -24,7 +23,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RequestMapping(value = GROUP_BY_EC_RESOURCE)
 @RestController
@@ -46,8 +44,7 @@ public class GroupByECController extends GroupByController {
                             schema = @Schema(implementation = GroupByResult.class)))
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<GroupByResult> getGroups(
-            @Parameter(description = QUERY_UNIPROTKB_EC_DESCRIPTION)
-                    @RequestParam(value = "query")
+            @Parameter(description = QUERY_UNIPROTKB_EC_DESCRIPTION) @RequestParam(value = "query")
                     String query,
             @Parameter(description = GROUP_PARENT_DESCRIPTION)
                     @Pattern(

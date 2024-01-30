@@ -28,7 +28,6 @@ import org.uniprot.api.proteome.request.ProteomeSearchRequest;
 import org.uniprot.api.proteome.request.ProteomeStreamRequest;
 import org.uniprot.api.proteome.service.ProteomeQueryService;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;

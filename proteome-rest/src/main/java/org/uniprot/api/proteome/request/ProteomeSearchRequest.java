@@ -1,5 +1,7 @@
 package org.uniprot.api.proteome.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -29,7 +31,7 @@ public class ProteomeSearchRequest extends ProteomeBasicRequest implements Searc
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = OpenApiConstants.SIZE_DESCRIPTION)
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

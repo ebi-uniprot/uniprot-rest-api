@@ -16,7 +16,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +30,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -199,7 +197,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                     String accessionOrId,
             @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
-                            description = FIELDS_UNIPROTKB_DESCRIPTION, example = "accession,protein_name,gene_names,organism_name")
+                            description = FIELDS_UNIPROTKB_DESCRIPTION,
+                            example = "accession,protein_name,gene_names,organism_name")
                     @RequestParam(value = "fields", required = false)
                     String fields,
             @Parameter(description = VERSION_DESCRIPTION)
@@ -253,8 +252,10 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download UniProtKB entries retrieved by a search query. (Max. 10 million entries)",
-            description = "The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniProtKB asynchronous download job' requests described below. The 'UniProtKB asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.",
+            summary =
+                    "Download UniProtKB entries retrieved by a search query. (Max. 10 million entries)",
+            description =
+                    "The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniProtKB asynchronous download job' requests described below. The 'UniProtKB asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.",
             responses = {
                 @ApiResponse(
                         content = {

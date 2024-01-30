@@ -11,7 +11,6 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.common.exception.InvalidRequestException;
@@ -34,6 +33,7 @@ import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -95,8 +95,8 @@ public class IdMappingDownloadController extends BasicDownloadController {
                         })
             })
     public ResponseEntity<JobStatusResponse> getJobStatus(
-            @Parameter(description = "Unique identifier for idmapping job")
-            @PathVariable String jobId) {
+            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                    String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
         return getAsyncDownloadStatus(job);
@@ -106,8 +106,9 @@ public class IdMappingDownloadController extends BasicDownloadController {
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
-            @Parameter(description = "Unique identifier for idmapping job")
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
+            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                    String jobId,
+            HttpServletRequest servletRequest) {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);

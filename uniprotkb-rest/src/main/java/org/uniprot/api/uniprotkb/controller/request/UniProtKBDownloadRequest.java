@@ -5,7 +5,6 @@ import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.openapi.OpenApiConstants.FORMAT_UNIPROTKB_DESCRIPTION;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,6 +14,8 @@ import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.CustomConstraintGroup;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 import org.uniprot.api.rest.validation.ValidDownloadRequest;
+
+import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

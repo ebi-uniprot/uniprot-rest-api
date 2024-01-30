@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByGOService;
 
@@ -45,10 +44,9 @@ public class GroupByGOController extends GroupByController {
                             schema = @Schema(implementation = GroupByResult.class)))
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<GroupByResult> getGroups(
-            @Parameter(description = QUERY_UNIPROTKB_GO_DESCRIPTION)
-                    @RequestParam(value = "query")
+            @Parameter(description = QUERY_UNIPROTKB_GO_DESCRIPTION) @RequestParam(value = "query")
                     String query,
-                    @Parameter(description = GROUP_PARENT_DESCRIPTION)
+            @Parameter(description = GROUP_PARENT_DESCRIPTION)
                     @Pattern(
                             regexp = GO_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},

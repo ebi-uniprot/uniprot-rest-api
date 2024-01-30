@@ -10,7 +10,6 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
