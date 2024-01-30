@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController.DOWNLOAD_RESOURCE;
 
@@ -9,6 +10,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +20,7 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
@@ -81,7 +84,9 @@ public class UniProtKBDownloadController extends BasicDownloadController {
                                     schema = @Schema(implementation = JobStatus.class))
                         })
             })
-    public ResponseEntity<JobStatusResponse> getJobStatus(@PathVariable String jobId) {
+    public ResponseEntity<JobStatusResponse> getJobStatus(
+            @Parameter(description = JOB_ID_DESCRIPTION)
+            @PathVariable String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
         return getAsyncDownloadStatus(job);
@@ -101,7 +106,9 @@ public class UniProtKBDownloadController extends BasicDownloadController {
                             })
             })
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
+            @Parameter(description = JOB_ID_DESCRIPTION)
+            @PathVariable String jobId,
+            HttpServletRequest servletRequest) {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);

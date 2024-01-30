@@ -6,9 +6,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author lgonzales
@@ -19,9 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class ProteomeStreamRequest extends ProteomeBasicRequest implements StreamRequest {
 
-    @Parameter(
-            description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^true|false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

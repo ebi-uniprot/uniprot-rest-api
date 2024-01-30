@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.common.taxonomy.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Pattern;
 
 import lombok.Data;
@@ -18,9 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @EqualsAndHashCode(callSuper = true)
 @ParameterObject
 public class TaxonomyStreamRequest extends TaxonomyBasicRequest implements StreamRequest {
-    @Parameter(
-            description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

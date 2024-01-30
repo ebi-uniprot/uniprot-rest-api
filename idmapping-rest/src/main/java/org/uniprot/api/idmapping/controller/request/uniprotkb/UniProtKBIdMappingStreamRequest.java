@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,9 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class UniProtKBIdMappingStreamRequest extends UniProtKBIdMappingBasicRequest
         implements StreamRequest {
-    @Parameter(
-            description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+    @Parameter(description = OpenApiConstants.DOWNLOAD_DESCRIPTION)
     @Pattern(regexp = "^(?:true|false)$", message = "{search.uniprot.invalid.download}")
     private String download;
 }

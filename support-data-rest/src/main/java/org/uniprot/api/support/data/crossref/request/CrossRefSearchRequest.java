@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.crossref.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -22,7 +24,7 @@ public class CrossRefSearchRequest extends CrossRefBasicRequest implements Searc
     @ValidFacets(facetConfig = CrossRefFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

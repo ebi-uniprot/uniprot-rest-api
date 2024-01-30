@@ -6,11 +6,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad
@@ -20,29 +23,29 @@ import io.swagger.v3.oas.annotations.Parameter;
 @EqualsAndHashCode(callSuper = true)
 public class UniProtKBIdMappingBasicRequest extends IdMappingPageRequest {
 
-    @Parameter(description = "Criteria to search the proteins. It can take any valid lucene query.")
+    @Parameter(description = QUERY_UNIPROTKB_SEARCH_DESCRIPTION)
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPROTKB,
             messagePrefix = "search.uniprot")
     private String query;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_UNIPROTKB_DESCRIPTION)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_UNIPROTKB_DESCRIPTION)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 
-    @Parameter(description = "Flag to include Isoform or not")
+    @Parameter(description = INCLUDE_ISOFORM_DESCRIPTION)
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.invalid.includeIsoform}")
     private String includeIsoform;
 
-    @Parameter(description = "Flag to write subsequences. Only accepted in fasta format")
+    @Parameter(description = SUB_SEQUENCE_DESCRIPTION)
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

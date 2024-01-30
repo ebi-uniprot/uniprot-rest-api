@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.common.taxonomy.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,9 +54,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
     @ValidSolrQueryFacetFields(facetConfig = TaxonomyFacetConfig.class)
     private String facetFilter;
 
-    @Parameter(
-            description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             regexp = "^true|false$",
@@ -63,7 +63,8 @@ public class GetByTaxonIdsRequest implements SearchRequest {
 
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
-    @Parameter(description = "Pagination size. Defaults to number of taxonIds passed (Single page).")
+    @Parameter(
+            description = "Pagination size. Defaults to number of taxonIds passed (Single page).")
     private Integer size;
 
     @Parameter(hidden = true)

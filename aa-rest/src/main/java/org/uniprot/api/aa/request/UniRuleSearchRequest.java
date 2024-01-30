@@ -8,10 +8,13 @@ import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.aa.repository.UniRuleFacetConfig;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidFacets;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -20,11 +23,11 @@ public class UniRuleSearchRequest extends UniRuleBasicRequest implements SearchR
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniRuleFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

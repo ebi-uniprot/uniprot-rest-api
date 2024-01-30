@@ -8,19 +8,21 @@ import lombok.Data;
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 @Data
 @ParameterObject
 public class IdMappingDownloadRequestImpl implements IdMappingDownloadRequest {
 
-    @Parameter(description = "Unique identifier for idmapping job")
+    @Parameter(description = ID_MAPPING_JOB_ID_DESCRIPTION)
     @NotNull(message = "{search.required}")
     private String jobId;
 
-    @Parameter(description = "Download response format, for example: json")
+    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = "json")
     @NotNull(message = "{search.required}")
     private String format;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_DESCRIPTION)
     private String fields;
 
     @Override

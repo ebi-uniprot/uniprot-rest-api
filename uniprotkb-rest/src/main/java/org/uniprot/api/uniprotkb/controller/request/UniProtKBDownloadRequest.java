@@ -2,8 +2,10 @@ package org.uniprot.api.uniprotkb.controller.request;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.FORMAT_UNIPROTKB_DESCRIPTION;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,6 +35,7 @@ public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements 
                 N_TRIPLES_MEDIA_TYPE_VALUE,
                 HDF5_MEDIA_TYPE_VALUE
             })
+    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = "json")
     private String format;
 
     public void setFormat(String format) {

@@ -13,6 +13,8 @@ import org.uniprot.api.rest.validation.ValidFacets;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 /**
  * @author sahmad
  * @created 19/07/2021
@@ -24,11 +26,11 @@ public class ArbaSearchRequest extends ArbaBasicRequest implements SearchRequest
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = ArbaFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

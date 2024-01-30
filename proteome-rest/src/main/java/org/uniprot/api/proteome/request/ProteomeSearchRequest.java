@@ -29,7 +29,7 @@ public class ProteomeSearchRequest extends ProteomeBasicRequest implements Searc
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = OpenApiConstants.SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

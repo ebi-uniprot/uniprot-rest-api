@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -12,6 +13,8 @@ import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 /**
  * @author sahmad
  * @created 19/07/2021
@@ -19,17 +22,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class ArbaBasicRequest {
 
-    @Parameter(description = "Criteria to search ARBA rules. It can take any valid lucene query.")
+    @Parameter(description = QUERY_DESCRIPTION)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(uniProtDataType = UniProtDataType.ARBA, messagePrefix = "search.arba")
     private String query;
 
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_DESCRIPTION)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.ARBA)
     private String sort;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_DESCRIPTION)
     @ValidReturnFields(uniProtDataType = UniProtDataType.ARBA)
     private String fields;
 

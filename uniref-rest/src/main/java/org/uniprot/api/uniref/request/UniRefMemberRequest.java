@@ -1,5 +1,6 @@
 package org.uniprot.api.uniref.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 
 import javax.validation.constraints.Max;
@@ -9,6 +10,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -44,7 +46,7 @@ public class UniRefMemberRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

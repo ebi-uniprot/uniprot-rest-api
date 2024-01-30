@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.uniprotkb.controller.GroupByECController.GROUP_BY_EC_RESOURCE;
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.EC_ID_REGEX;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByECService;
 
@@ -36,7 +38,7 @@ public class GroupByECController extends GroupByController {
         this.uniProtKBGroupByECService = uniProtKBGroupByECService;
     }
 
-    @Operation(summary = "List of groups with respect to the given query and parent")
+    @Operation(summary = GROUP_EC_DESCRIPTION)
     @ApiResponse(
             content =
                     @Content(
@@ -44,12 +46,10 @@ public class GroupByECController extends GroupByController {
                             schema = @Schema(implementation = GroupByResult.class)))
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<GroupByResult> getGroups(
-            @Parameter(
-                            description =
-                                    "Criteria to search the groups. It can take any valid solr query.")
+            @Parameter(description = QUERY_UNIPROTKB_EC_DESCRIPTION)
                     @RequestParam(value = "query")
                     String query,
-            @Parameter(description = "Name of the parent")
+            @Parameter(description = GROUP_PARENT_DESCRIPTION)
                     @Pattern(
                             regexp = EC_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},

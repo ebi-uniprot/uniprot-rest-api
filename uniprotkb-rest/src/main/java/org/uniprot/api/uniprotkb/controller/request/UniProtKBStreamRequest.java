@@ -10,6 +10,8 @@ import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.DOWNLOAD_DESCRIPTION;
+
 /**
  * @author lgonzales
  * @since 18/06/2020
@@ -19,9 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class UniProtKBStreamRequest extends UniProtKBBasicRequest implements StreamRequest {
 
-    @Parameter(
-            description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^true|false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

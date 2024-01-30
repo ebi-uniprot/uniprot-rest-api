@@ -7,9 +7,12 @@ import lombok.Builder;
 import lombok.Data;
 
 import org.springdoc.api.annotations.ParameterObject;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.StreamRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * Created 20/05/2021
@@ -21,15 +24,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Builder(toBuilder = true)
 @ParameterObject
 public class IdMappingStreamRequest implements StreamRequest {
-    @Parameter(
-            description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(regexp = "^(?:true|false)$", message = "{idmapping.results.invalid.download}")
     private String download;
 
     // FAKE fields never used
+    @Parameter(hidden = true)
     private String query;
+    @Parameter(hidden = true)
     private String fields;
+    @Parameter(hidden = true)
     private String sort;
+    @Parameter(hidden = true)
     private String format;
 }

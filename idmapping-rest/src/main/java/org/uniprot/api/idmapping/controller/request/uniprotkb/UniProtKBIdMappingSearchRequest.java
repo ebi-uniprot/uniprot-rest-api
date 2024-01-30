@@ -4,11 +4,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidFacets;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad
@@ -20,7 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniProtKBIdMappingSearchRequest extends UniProtKBIdMappingBasicRequest
         implements SearchRequest {
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     private String facets;
 

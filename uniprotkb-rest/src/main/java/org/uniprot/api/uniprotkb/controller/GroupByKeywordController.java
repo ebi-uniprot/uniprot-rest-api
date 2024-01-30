@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.uniprotkb.controller.GroupByKeywordController.GROUP_BY_KEYWORD_RESOURCE;
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.KEYWORD_ID_REGEX;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
 import org.uniprot.api.uniprotkb.groupby.service.GroupByKeywordService;
 
@@ -37,19 +39,17 @@ public class GroupByKeywordController extends GroupByController {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    @Operation(summary = "List of groups with respect to the given query and parent")
+    @Operation(summary = GROUP_KEYWORD_DESCRIPTION)
     @ApiResponse(
             content =
                     @Content(
                             mediaType = APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = GroupByResult.class)))
     public ResponseEntity<GroupByResult> getGroups(
-            @Parameter(
-                            description =
-                                    "Criteria to search the groups. It can take any valid solr query.")
+            @Parameter(description = QUERY_UNIPROTKB_KEYWORD_DESCRIPTION)
                     @RequestParam(value = "query")
                     String query,
-            @Parameter(description = "Name of the parent")
+                    @Parameter(description = GROUP_PARENT_DESCRIPTION)
                     @Pattern(
                             regexp = KEYWORD_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},

@@ -2,6 +2,7 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
@@ -30,6 +31,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -188,7 +190,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccession(
-            @Parameter(description = "Unique identifier for the UniProt entry")
+            @Parameter(description = ACCESSION_DESCRIPTION, example = "P05067")
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_OR_ID,
@@ -197,11 +199,10 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                     String accessionOrId,
             @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
-                            description =
-                                    "Comma separated list of fields to be returned in response")
+                            description = FIELDS_UNIPROTKB_DESCRIPTION, example = "accession,protein_name,gene_names,organism_name")
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @Parameter(description = "Entry version")
+            @Parameter(description = VERSION_DESCRIPTION)
                     @RequestParam(value = "version", required = false)
                     @ValidContentTypes(contentTypes = {FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
                     String version,

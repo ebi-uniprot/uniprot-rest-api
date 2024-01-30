@@ -1,18 +1,19 @@
-package org.uniprot.api.rest.output;
+package org.uniprot.api.rest.openapi;
+
+import java.util.Arrays;
+
+import org.uniprot.core.util.EnumDisplay;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.cfg.PackageVersion;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import org.uniprot.core.util.EnumDisplay;
-
-import java.util.Arrays;
 
 public class ApiDocsAnnotationIntrospector extends JacksonAnnotationIntrospector {
 
     private static final long serialVersionUID = 891330293783978035L;
 
-    public ApiDocsAnnotationIntrospector() {
-    }
+    public ApiDocsAnnotationIntrospector() {}
+
     @Override
     public Version version() {
         return PackageVersion.VERSION;
@@ -32,5 +33,4 @@ public class ApiDocsAnnotationIntrospector extends JacksonAnnotationIntrospector
             return super.findEnumValues(enumType, enumValues, names);
         }
     }
-
 }

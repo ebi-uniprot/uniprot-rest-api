@@ -8,10 +8,13 @@ import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.proteome.repository.GeneCentricFacetConfig;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author jluo
@@ -22,14 +25,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class GeneCentricSearchRequest extends GeneCentricBasicRequest implements SearchRequest {
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = GeneCentricFacetConfig.class)
     private String facets;
 
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

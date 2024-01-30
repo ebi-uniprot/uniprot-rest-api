@@ -2,6 +2,7 @@ package org.uniprot.api.proteome.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.PROTEOME;
 
@@ -27,6 +28,7 @@ import org.uniprot.api.proteome.request.ProteomeSearchRequest;
 import org.uniprot.api.proteome.request.ProteomeStreamRequest;
 import org.uniprot.api.proteome.service.ProteomeQueryService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -149,7 +151,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<ProteomeEntry>> getByUpId(
-            @Parameter(description = "Unique identifier for the Proteome entry")
+            @Parameter(description = UPID_DESCRIPTION)
                     @PathVariable("upid")
                     @Pattern(
                             regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
@@ -157,9 +159,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                             message = "{search.invalid.upid.value}")
                     String upid,
             @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
-                    @Parameter(
-                            description =
-                                    "Comma separated list of fields to be returned in response")
+                    @Parameter(description = FIELDS_DESCRIPTION)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {

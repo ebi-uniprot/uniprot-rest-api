@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -12,6 +13,8 @@ import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 /**
  * @author lgonzales
  * @since 29/10/2020
@@ -19,9 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class GeneCentricBasicRequest {
 
-    @Parameter(
-            description =
-                    "Criteria to search the gene centric data set. It can take any valid solr query.")
+    @Parameter(description = QUERY_DESCRIPTION)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -29,11 +30,11 @@ public class GeneCentricBasicRequest {
             messagePrefix = "search.genecentric")
     private String query;
 
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_DESCRIPTION)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String sort;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_DESCRIPTION)
     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String fields;
 

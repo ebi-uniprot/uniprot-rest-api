@@ -11,12 +11,15 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad
@@ -44,9 +47,7 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     @ValidSolrQueryFields(uniProtDataType = UniProtDataType.UNIREF, messagePrefix = "search.uniref")
     private String query;
 
-    @Parameter(
-            description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

@@ -50,7 +50,7 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
 
     @Parameter(
             description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+                    OpenApiConstants.DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

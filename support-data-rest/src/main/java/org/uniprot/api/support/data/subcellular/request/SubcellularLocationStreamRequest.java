@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.subcellular.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Pattern;
 
 import lombok.Data;
@@ -19,9 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class SubcellularLocationStreamRequest extends SubcellularLocationBasicRequest
         implements StreamRequest {
-    @Parameter(
-            description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+    @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

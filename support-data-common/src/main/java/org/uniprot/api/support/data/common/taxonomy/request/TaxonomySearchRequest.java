@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.common.taxonomy.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -19,11 +21,11 @@ public class TaxonomySearchRequest extends TaxonomyBasicRequest implements Searc
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Comma separated list of facets to search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

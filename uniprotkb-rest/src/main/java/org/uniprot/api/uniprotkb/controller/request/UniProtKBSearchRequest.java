@@ -13,12 +13,15 @@ import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * Search cursor request Entity
@@ -41,17 +44,17 @@ public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements Sea
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniProtKBFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(description = "Used to return matched fields ")
+    @Parameter(hidden = true)
     @Pattern(
             regexp = "true|false",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

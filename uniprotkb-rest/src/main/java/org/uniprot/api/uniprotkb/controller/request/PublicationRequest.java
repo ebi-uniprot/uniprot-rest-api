@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.controller.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 
 import javax.validation.constraints.Max;
@@ -25,7 +26,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class PublicationRequest {
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
@@ -33,12 +34,12 @@ public class PublicationRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Facet filter query for Publications")
+    @Parameter(description = FACET_FILTER_PUBLICATION, example = "types:1")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFacetFields(facetConfig = PublicationFacetConfig.class)
     private String facetFilter;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(description = FACETS_PUBLICATION, example = "types,categories")
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     @ValidFacets(facetConfig = PublicationFacetConfig.class)
     private String facets;

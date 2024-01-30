@@ -25,7 +25,7 @@ public abstract class UniParcGetByIdPageSearchRequest extends UniParcGetByIdRequ
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = OpenApiConstants.SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;

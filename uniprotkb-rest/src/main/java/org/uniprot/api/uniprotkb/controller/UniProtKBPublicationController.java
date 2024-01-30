@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB_PUBLICATION;
 
 import java.util.Optional;
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
@@ -82,6 +85,7 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
                             })})
     public ResponseEntity<MessageConverterContext<PublicationEntry>>
             getMappedPublicationsByUniProtAccession(
+                    @Parameter(description = ACCESSION_DESCRIPTION, example = "P05067")
                     @PathVariable("accession")
                             @Pattern(
                                     regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,

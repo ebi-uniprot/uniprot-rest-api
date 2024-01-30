@@ -22,7 +22,7 @@ public class UniRefIdMappingStreamRequest extends UniRefIdMappingBasicRequest
 
     @Parameter(
             description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+                    OpenApiConstants.DOWNLOAD_DESCRIPTION)
     @Pattern(regexp = "^(?:true|false)$", message = "{search.uniref.invalid.download}")
     private String download;
 }

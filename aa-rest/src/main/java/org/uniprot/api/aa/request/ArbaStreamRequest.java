@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class ArbaStreamRequest extends ArbaBasicRequest implements StreamRequest {
     @Parameter(
             description =
-                    "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.")
+                    OpenApiConstants.DOWNLOAD_DESCRIPTION)
     @Pattern(
             regexp = "^(?:true|false)$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},

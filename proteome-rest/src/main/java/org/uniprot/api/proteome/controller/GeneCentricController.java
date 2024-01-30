@@ -2,6 +2,7 @@ package org.uniprot.api.proteome.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.LIST_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.GENECENTRIC;
@@ -28,6 +29,7 @@ import org.uniprot.api.proteome.request.GeneCentricStreamRequest;
 import org.uniprot.api.proteome.request.GeneCentricUPIdRequest;
 import org.uniprot.api.proteome.service.GeneCentricService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -233,7 +235,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 LIST_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<GeneCentricEntry>> getByAccession(
-            @Parameter(description = "UnirotKB accession")
+            @Parameter(description = ACCESSION_DESCRIPTION)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
@@ -241,10 +243,8 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                             message = "{search.invalid.accession.value}")
                     String accession,
             @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
-            @Parameter(
-                    description =
-                            "Comma separated list of fields to be returned in response")
-                    @RequestParam(value = "fields", required = false)
+            @Parameter(description = FIELDS_DESCRIPTION)
+            @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
         GeneCentricEntry entry = service.findByUniqueId(accession.toUpperCase());

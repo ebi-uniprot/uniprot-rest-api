@@ -1,12 +1,9 @@
-package org.uniprot.api.rest.output;
+package org.uniprot.api.rest.openapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.core.converter.AnnotatedType;
-import io.swagger.v3.core.converter.ModelConverters;
-import io.swagger.v3.core.converter.ResolvedSchema;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.media.ArraySchema;
-import io.swagger.v3.oas.models.media.Schema;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springdoc.core.providers.ObjectMapperProvider;
@@ -15,32 +12,37 @@ import org.springframework.context.annotation.Configuration;
 import org.uniprot.core.citation.*;
 import org.uniprot.core.uniprotkb.comment.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.v3.core.converter.AnnotatedType;
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.core.converter.ResolvedSchema;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.media.ArraySchema;
+import io.swagger.v3.oas.models.media.Schema;
 
 @Configuration
 public class ApiDocConfig {
 
-    private static final List<String> STRING_SERILISER_LIST = List.of(
-            "#/components/schemas/UniProtKBId",
-            "#/components/schemas/ProteomeId",
-            "#/components/schemas/Author",
-            "#/components/schemas/Journal",
-            "#/components/schemas/LocalDate",
-            "#/components/schemas/Locator",
-            "#/components/schemas/PublicationDate",
-            "#/components/schemas/UniParcId",
-            "#/components/schemas/ECNumber",
-            "#/components/schemas/FeatureDescription",
-            "#/components/schemas/FeatureId",
-            "#/components/schemas/Flag",
-            "#/components/schemas/IsoformId",
-            "#/components/schemas/UniProtKBDatabase",
-            "#/components/schemas/UniProtKBAccession",
-            "#/components/schemas/UniRefEntryId",
-            "#/components/schemas/UniRuleId"
-    );
+    private static final List<String> STRING_SERILISER_LIST =
+            List.of(
+                    "#/components/schemas/UniProtKBId",
+                    "#/components/schemas/ProteomeId",
+                    "#/components/schemas/Author",
+                    "#/components/schemas/Journal",
+                    "#/components/schemas/LocalDate",
+                    "#/components/schemas/Locator",
+                    "#/components/schemas/PublicationDate",
+                    "#/components/schemas/UniParcId",
+                    "#/components/schemas/ECNumber",
+                    "#/components/schemas/FeatureDescription",
+                    "#/components/schemas/FeatureId",
+                    "#/components/schemas/Flag",
+                    "#/components/schemas/IsoformId",
+                    "#/components/schemas/UniProtKBDatabase",
+                    "#/components/schemas/UniProtKBAccession",
+                    "#/components/schemas/UniRefEntryId",
+                    "#/components/schemas/UniRuleId");
 
     @Bean
     ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties) {
@@ -56,30 +58,31 @@ public class ApiDocConfig {
             Map<String, Schema> schemaMap = openApi.getComponents().getSchemas();
 
             Schema commentParent = schemaMap.get("Comment");
-            if(commentParent != null) {
+            if (commentParent != null) {
                 configureCommentSchema(openApi, commentParent);
             }
             Schema citationParent = schemaMap.get("Citation");
-            if(citationParent != null) {
+            if (citationParent != null) {
                 configureCitationSchema(openApi, citationParent);
             }
 
-            for(Schema item : schemaMap.values()) {
-                if("Evidence".equals(item.getName())){
+            for (Schema item : schemaMap.values()) {
+                if ("Evidence".equals(item.getName())) {
                     configureEvidenceSchema(item);
                 }
-                for(Object prop : item.getProperties().values()) {
+                for (Object prop : item.getProperties().values()) {
                     Schema propSchema = (Schema) prop;
-                    if(prop instanceof ArraySchema){
+                    if (prop instanceof ArraySchema) {
                         propSchema = propSchema.getItems();
                     }
-                    if(propSchema.get$ref() != null && STRING_SERILISER_LIST.contains(propSchema.get$ref())){
+                    if (propSchema.get$ref() != null
+                            && STRING_SERILISER_LIST.contains(propSchema.get$ref())) {
                         propSchema.set$ref(null);
                         propSchema.type("string");
                     }
                 }
             }
-            for(String serialiser : STRING_SERILISER_LIST) {
+            for (String serialiser : STRING_SERILISER_LIST) {
                 String schemaKey = serialiser.substring(serialiser.lastIndexOf("/") + 1);
                 schemaMap.remove(schemaKey);
             }
@@ -99,8 +102,10 @@ public class ApiDocConfig {
     private void configureCitationSchema(OpenAPI openApi, Schema citationParent) {
         citationParent.setAllOf(new ArrayList<Schema>());
         getSchemaReferenceMapForClass(Book.class, citationParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(ElectronicArticle.class, citationParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(JournalArticle.class, citationParent).forEach(openApi::schema);
+        getSchemaReferenceMapForClass(ElectronicArticle.class, citationParent)
+                .forEach(openApi::schema);
+        getSchemaReferenceMapForClass(JournalArticle.class, citationParent)
+                .forEach(openApi::schema);
         getSchemaReferenceMapForClass(Literature.class, citationParent).forEach(openApi::schema);
         getSchemaReferenceMapForClass(Patent.class, citationParent).forEach(openApi::schema);
         getSchemaReferenceMapForClass(Submission.class, citationParent).forEach(openApi::schema);
@@ -109,33 +114,42 @@ public class ApiDocConfig {
 
     private void configureCommentSchema(OpenAPI openApi, Schema commentParent) {
         commentParent.setAllOf(new ArrayList<Schema>());
-        getSchemaReferenceMapForClass(AlternativeProductsComment.class, commentParent).forEach(openApi::schema);
+        getSchemaReferenceMapForClass(AlternativeProductsComment.class, commentParent)
+                .forEach(openApi::schema);
         getSchemaReferenceMapForClass(BPCPComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(CatalyticActivityComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(CofactorComment.class, commentParent).forEach(openApi::schema);
+        getSchemaReferenceMapForClass(CatalyticActivityComment.class, commentParent)
+                .forEach(openApi::schema);
+        getSchemaReferenceMapForClass(CofactorComment.class, commentParent)
+                .forEach(openApi::schema);
         getSchemaReferenceMapForClass(DiseaseComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(FreeTextComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(InteractionComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(MassSpectrometryComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(RnaEditingComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(SequenceCautionComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(SubcellularLocationComment.class, commentParent).forEach(openApi::schema);
-        getSchemaReferenceMapForClass(WebResourceComment.class, commentParent).forEach(openApi::schema);
+        getSchemaReferenceMapForClass(FreeTextComment.class, commentParent)
+                .forEach(openApi::schema);
+        getSchemaReferenceMapForClass(InteractionComment.class, commentParent)
+                .forEach(openApi::schema);
+        getSchemaReferenceMapForClass(MassSpectrometryComment.class, commentParent)
+                .forEach(openApi::schema);
+        getSchemaReferenceMapForClass(RnaEditingComment.class, commentParent)
+                .forEach(openApi::schema);
+        getSchemaReferenceMapForClass(SequenceCautionComment.class, commentParent)
+                .forEach(openApi::schema);
+        getSchemaReferenceMapForClass(SubcellularLocationComment.class, commentParent)
+                .forEach(openApi::schema);
+        getSchemaReferenceMapForClass(WebResourceComment.class, commentParent)
+                .forEach(openApi::schema);
     }
 
     private Map<String, Schema> getSchemaReferenceMapForClass(Class<?> className, Schema parent) {
         AnnotatedType aType = new AnnotatedType(className).parent(parent).resolveAsRef(false);
 
-        ResolvedSchema resolvedSchema = ModelConverters.getInstance()
-                .resolveAsResolvedSchema(aType);
+        ResolvedSchema resolvedSchema =
+                ModelConverters.getInstance().resolveAsResolvedSchema(aType);
         parent.addAllOfItem(getReferenceSchema(resolvedSchema.schema));
         return resolvedSchema.referencedSchemas;
     }
 
     private Schema getReferenceSchema(Schema fromSchema) {
         Schema schema = new Schema();
-        schema.set$ref("#/components/schemas/" +fromSchema.getName());
+        schema.set$ref("#/components/schemas/" + fromSchema.getName());
         return schema;
     }
-
 }

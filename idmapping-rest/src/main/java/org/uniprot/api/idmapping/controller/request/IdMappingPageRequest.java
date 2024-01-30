@@ -1,5 +1,6 @@
 package org.uniprot.api.idmapping.controller.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 
 import javax.validation.constraints.Max;
@@ -18,7 +19,7 @@ public class IdMappingPageRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Pagination size. Defaults to 25.")
+    @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
