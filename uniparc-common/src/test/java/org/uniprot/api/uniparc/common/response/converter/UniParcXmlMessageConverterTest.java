@@ -5,6 +5,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.AbstractXmlValidationTest;
+import org.uniprot.api.uniparc.common.response.MessageConverterConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
