@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.service.query;
+package org.uniprot.api.uniparc.common.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,11 +7,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.uniprot.api.uniparc.common.service.query.exception.BestGuessAnalyserException;
-import org.uniprot.api.uniparc.common.service.query.filter.UniParcCrossReferenceTaxonomyFilter;
-import org.uniprot.api.uniparc.common.service.query.filter.UniParcDatabaseFilter;
-import org.uniprot.api.uniparc.common.service.query.filter.UniParcDatabaseStatusFilter;
-import org.uniprot.api.uniparc.common.service.query.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.common.service.exception.BestGuessAnalyserException;
+import org.uniprot.api.uniparc.common.service.filter.UniParcCrossReferenceTaxonomyFilter;
+import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseFilter;
+import org.uniprot.api.uniparc.common.service.filter.UniParcDatabaseStatusFilter;
+import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.core.uniparc.UniParcCrossReference;
 import org.uniprot.core.uniparc.UniParcDatabase;
 import org.uniprot.core.uniparc.UniParcEntry;

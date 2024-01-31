@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.uniparc.common.service.query.request.UniParcGetByIdPageSearchRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdPageSearchRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 

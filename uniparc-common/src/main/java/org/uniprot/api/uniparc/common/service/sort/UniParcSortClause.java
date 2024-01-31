@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.service.query.sort;
+package org.uniprot.api.uniparc.common.service.sort;
 
 import javax.annotation.PostConstruct;
 

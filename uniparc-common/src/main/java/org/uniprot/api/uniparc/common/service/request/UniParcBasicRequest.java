@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.service.query.request;
+package org.uniprot.api.uniparc.common.service.request;
 
 import javax.validation.constraints.NotNull;
 

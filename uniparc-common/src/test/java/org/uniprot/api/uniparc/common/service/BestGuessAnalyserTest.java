@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.service.query;
+package org.uniprot.api.uniparc.common.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.uniprot.api.uniparc.common.service.query.exception.BestGuessAnalyserException;
-import org.uniprot.api.uniparc.common.service.query.request.UniParcBestGuessRequest;
+import org.uniprot.api.uniparc.common.service.exception.BestGuessAnalyserException;
+import org.uniprot.api.uniparc.common.service.request.UniParcBestGuessRequest;
 import org.uniprot.core.Sequence;
 import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniparc.*;

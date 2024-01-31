@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.service.query.exception;
+package org.uniprot.api.uniparc.common.service.exception;
 
 import org.uniprot.api.common.exception.InvalidRequestException;
 
