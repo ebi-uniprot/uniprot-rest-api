@@ -12,9 +12,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 import javax.servlet.ServletContext;
 
+import org.awaitility.Awaitility;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsIn;
 import org.junit.jupiter.api.Assertions;
@@ -116,8 +118,8 @@ class IdMappingJobServiceTest {
         Assertions.assertNotNull(submitResponse);
         Assertions.assertNotNull(submitResponse.getJobId());
         // then
-        Thread.sleep(500); // to make sure that task is picked to run
         String jobId = submitResponse.getJobId();
+        Awaitility.await().until(jobRunning(jobId));
         IdMappingJob submittedJob = this.cacheService.getJobAsResource(jobId);
         Assertions.assertNotNull(submittedJob);
         Assertions.assertEquals(jobId, submittedJob.getJobId());
@@ -127,6 +129,12 @@ class IdMappingJobServiceTest {
         Assertions.assertNull(submittedJob.getIdMappingResult());
         Assertions.assertNotNull(submittedJob.getCreated());
         Assertions.assertNotNull(submittedJob.getUpdated());
+    }
+
+    private Callable<Boolean> jobRunning(String jobId) {
+        return () ->
+                this.cacheService.exists(jobId)
+                        && this.cacheService.get(jobId).getJobStatus() == JobStatus.RUNNING;
     }
 
     @Disabled

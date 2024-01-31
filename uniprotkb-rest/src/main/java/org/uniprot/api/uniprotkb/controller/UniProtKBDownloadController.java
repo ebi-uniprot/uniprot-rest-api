@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.rest.controller.BasicDownloadController;
+import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
@@ -38,7 +39,10 @@ public class UniProtKBDownloadController extends BasicDownloadController {
     private final DownloadJobRepository jobRepository;
 
     public UniProtKBDownloadController(
-            ProducerMessageService messageService, DownloadJobRepository jobRepository) {
+            ProducerMessageService messageService,
+            DownloadJobRepository jobRepository,
+            AsyncDownloadHeartBeatConfiguration asyncDownloadHeartBeatConfiguration) {
+        super(asyncDownloadHeartBeatConfiguration);
         this.messageService = messageService;
         this.jobRepository = jobRepository;
     }

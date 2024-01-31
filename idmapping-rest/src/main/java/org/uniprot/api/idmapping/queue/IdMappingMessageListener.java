@@ -17,6 +17,7 @@ import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
@@ -45,12 +46,14 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             RabbitTemplate rabbitTemplate,
             MessageConverter converter,
             IdMappingJobCacheService idMappingJobCacheService,
-            IdMappingDownloadResultWriterFactory writerFactory) {
+            IdMappingDownloadResultWriterFactory writerFactory,
+            HeartBeatProducer heartBeatProducer) {
         super(
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
-                rabbitTemplate);
+                rabbitTemplate,
+                heartBeatProducer);
         this.converter = converter;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.downloadConfigProperties = downloadConfigProperties;
@@ -81,7 +84,9 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             }
         } else {
             updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
-            writeResult(request, idMappingJob, asyncDownloadJobId, contentType);
+            updateTotalEntries(
+                    downloadJob, idMappingJob.getIdMappingResult().getMappedIds().size());
+            writeResult(request, idMappingJob, downloadJob, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, asyncDownloadJobId);
         }
     }
@@ -89,15 +94,16 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
     private void writeResult(
             IdMappingDownloadRequest request,
             IdMappingJob idMappingJob,
-            String jobId,
+            DownloadJob downloadJob,
             MediaType contentType) {
         try {
             AbstractIdMappingDownloadResultWriter<? extends EntryPair<?>, ?> writer =
                     writerFactory.getResultWriter(idMappingJob.getIdMappingRequest().getTo());
-            writer.writeResult(request, idMappingJob.getIdMappingResult(), jobId, contentType);
-            log.info("Voldemort results saved for job {}", jobId);
+            writer.writeResult(
+                    request, idMappingJob.getIdMappingResult(), downloadJob, contentType);
+            log.info("Voldemort results saved for job {}", downloadJob.getId());
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId);
+            logMessageAndDeleteFile(ex, downloadJob.getId());
             throw new MessageListenerException(ex);
         }
     }

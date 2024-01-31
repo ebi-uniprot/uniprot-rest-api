@@ -16,9 +16,13 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.queue.*;
+import org.uniprot.api.rest.download.queue.AbstractMessageListener;
+import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
+import org.uniprot.api.rest.download.queue.DownloadConfigProperties;
+import org.uniprot.api.rest.download.queue.MessageListenerException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -50,14 +54,16 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
-            EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties) {
+            EmbeddingsQueueConfigProperties embeddingsQueueConfigProperties,
+            HeartBeatProducer heartBeatProducer) {
         super(
                 converter,
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
                 downloadResultWriter,
-                rabbitTemplate);
+                rabbitTemplate,
+                heartBeatProducer);
         this.service = service;
         this.embeddingsQueueConfigProps = embeddingsQueueConfigProperties;
     }
@@ -69,10 +75,11 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
         MediaType contentType = UniProtMediaType.valueOf(request.getFormat());
         updateDownloadJob(message, downloadJob, JobStatus.RUNNING);
         if (UniProtMediaType.HDF5_MEDIA_TYPE.equals(contentType)) {
-            processH5Message(
-                    message, (UniProtKBDownloadRequest) request, downloadJob, idsFile, jobId);
+            processH5Message(message, (UniProtKBDownloadRequest) request, downloadJob, idsFile);
         } else {
-            writeResult(request, idsFile, jobId, contentType);
+            Long totalHits = getSolrHits((UniProtKBDownloadRequest) request);
+            updateTotalEntries(downloadJob, totalHits);
+            writeResult(request, downloadJob, idsFile, contentType);
             updateDownloadJob(message, downloadJob, JobStatus.FINISHED, jobId);
         }
     }
@@ -81,13 +88,14 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
             Message message,
             UniProtKBDownloadRequest request,
             DownloadJob downloadJob,
-            Path idsFile,
-            String jobId) {
+            Path idsFile) {
+        String jobId = downloadJob.getId();
         try {
             Long totalHits = getSolrHits(request);
+            updateTotalEntries(downloadJob, totalHits);
             Long maxAllowedHits = this.embeddingsQueueConfigProps.getMaxEntryCount();
             if (maxAllowedHits >= totalHits) {
-                writeSolrResult(request, idsFile, jobId);
+                writeSolrResult(request, downloadJob, idsFile);
                 sendMessageToEmbeddingsQueue(jobId);
                 updateDownloadJob(message, downloadJob, JobStatus.UNFINISHED);
             } else {

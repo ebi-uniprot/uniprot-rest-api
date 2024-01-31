@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.queue;
 
 import static org.mockito.Mockito.*;
+import static org.uniprot.api.rest.download.queue.RedisUtil.jobUnfinished;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -117,12 +118,12 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
                 .atMost(Duration.ofSeconds(20))
                 .until(RedisUtil.jobErrored(downloadJobRepository, jobId));
         // verify  redis
-        verifyRedisEntry(query, jobId, List.of(JobStatus.ERROR), 1, true);
+        verifyRedisEntry(query, jobId, JobStatus.ERROR, 1, true, 0);
         // after certain delay the job should be reprocessed from kb side
         Awaitility.await()
                 .atMost(Duration.ofSeconds(20))
-                .until(RedisUtil.jobUnfinished(downloadJobRepository, jobId));
-        verifyRedisEntry(query, jobId, List.of(JobStatus.UNFINISHED), 1, true);
+                .until(jobUnfinished(downloadJobRepository, jobId));
+        verifyRedisEntry(query, jobId, JobStatus.UNFINISHED, 1, true, 10);
         // then job should be picked by embeddings consumers and set to Running again
         //        await().until(jobRunning(jobId));
         // the job should be completed after sometime by embeddings consumer
@@ -195,5 +196,10 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected String getMessageWithUnhandledExceptionQuery() {
         return "field:value";
+    }
+
+    @Override
+    protected int getMessageSuccessAfterRetryCount() {
+        return 10;
     }
 }
