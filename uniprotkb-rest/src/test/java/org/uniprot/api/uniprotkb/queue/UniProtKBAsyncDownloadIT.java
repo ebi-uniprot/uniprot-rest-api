@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
 import static org.mockito.Mockito.*;
-import static org.uniprot.api.rest.download.queue.RedisUtil.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,12 +39,14 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
+import org.uniprot.api.uniprotkb.common.queue.EmbeddingsTestConsumer;
+import org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.repository.store.UniProtStoreConfig;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBDownloadRequest;
+import org.uniprot.api.uniprotkb.common.utils.UniProtKBAsyncDownloadUtils;
 import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
-import org.uniprot.api.uniprotkb.request.UniProtKBDownloadRequest;
-import org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;

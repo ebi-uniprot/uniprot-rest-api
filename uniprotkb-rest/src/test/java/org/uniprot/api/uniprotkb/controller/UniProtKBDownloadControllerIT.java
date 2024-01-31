@@ -1,9 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -58,10 +55,10 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.ValidDownloadRequest;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils;
+import org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.utils.UniProtKBAsyncDownloadUtils;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;

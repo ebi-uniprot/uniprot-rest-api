@@ -19,7 +19,7 @@ import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.rest.validation.CustomConstraintGroupSequence;
-import org.uniprot.api.uniprotkb.request.UniProtKBDownloadRequest;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBDownloadRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

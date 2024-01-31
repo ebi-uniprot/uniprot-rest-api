@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.uniprotkb.groupby.model.GroupByResult;
-import org.uniprot.api.uniprotkb.groupby.service.GroupByTaxonomyService;
+import org.uniprot.api.uniprotkb.common.service.groupby.GroupByTaxonomyService;
+import org.uniprot.api.uniprotkb.common.service.groupby.model.GroupByResult;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.Operation;

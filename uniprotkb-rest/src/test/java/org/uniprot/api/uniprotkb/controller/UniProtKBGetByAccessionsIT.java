@@ -35,7 +35,7 @@ import org.uniprot.api.rest.controller.AbstractGetByIdsControllerIT;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.gene.GeneName;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;

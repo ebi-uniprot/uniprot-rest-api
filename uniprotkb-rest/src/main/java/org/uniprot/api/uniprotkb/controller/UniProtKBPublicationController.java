@@ -22,9 +22,9 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniprotkb.model.PublicationEntry;
-import org.uniprot.api.uniprotkb.request.PublicationRequest;
-import org.uniprot.api.uniprotkb.service.PublicationService;
+import org.uniprot.api.uniprotkb.common.repository.model.PublicationEntry;
+import org.uniprot.api.uniprotkb.common.service.publication.PublicationService;
+import org.uniprot.api.uniprotkb.common.service.publication.request.PublicationRequest;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.tags.Tag;

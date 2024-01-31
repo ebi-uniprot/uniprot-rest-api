@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.core.cv.ec.ECEntry;
 import org.uniprot.cv.ec.ECRepo;
 import org.uniprot.store.indexer.DataStoreManager;

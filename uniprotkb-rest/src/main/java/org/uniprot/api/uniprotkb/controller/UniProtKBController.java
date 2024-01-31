@@ -1,6 +1,5 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.util.Optional;
@@ -33,12 +32,12 @@ import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniprotkb.request.UniProtKBIdsPostRequest;
-import org.uniprot.api.uniprotkb.request.UniProtKBIdsSearchRequest;
-import org.uniprot.api.uniprotkb.request.UniProtKBSearchRequest;
-import org.uniprot.api.uniprotkb.request.UniProtKBStreamRequest;
-import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.api.uniprotkb.service.UniProtKBEntryVersionService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtKBEntryVersionService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBIdsPostRequest;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBIdsSearchRequest;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Utils;

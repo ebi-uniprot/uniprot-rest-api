@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniprotkb.service.UniProtKBEntryInteractionService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtKBEntryInteractionService;
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
