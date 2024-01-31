@@ -11,7 +11,7 @@ public class OpenApiConstants {
     public static final String INCLUDE_ISOFORM_DESCRIPTION =
             "Default: <tt>false</tt>. Use <tt>true</tt> to include isoforms.";
 
-    public static final String SIZE_DESCRIPTION = "Pagination size. Defaults to 25.";
+    public static final String SIZE_DESCRIPTION = "Pagination size. Defaults to 25. (Max. size of 500)";
     public static final String DOWNLOAD_DESCRIPTION =
             "Default: <tt>false</tt>. Use <tt>true</tt> to download as a file.";
     public static final String JOB_ID_DESCRIPTION =

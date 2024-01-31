@@ -318,7 +318,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniProtKB entries by a list of accessions.",
+            summary = "Get UniProtKB entries by a list of accessions. (Max. 1K entries)",
             responses = {
                 @ApiResponse(
                         content = {
