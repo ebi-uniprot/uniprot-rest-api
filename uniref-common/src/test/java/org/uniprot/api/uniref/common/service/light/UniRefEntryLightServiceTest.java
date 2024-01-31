@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.service;
+package org.uniprot.api.uniref.common.service.light;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,8 +29,6 @@ import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.response.converter.UniRefLightQueryResultConverter;
-import org.uniprot.api.uniref.common.service.light.UniRefEntryLightService;
-import org.uniprot.api.uniref.common.service.light.UniRefSortClause;
 import org.uniprot.api.uniref.common.service.light.request.UniRefSearchRequest;
 import org.uniprot.api.uniref.common.service.light.request.UniRefStreamRequest;
 import org.uniprot.core.uniref.UniRefEntryLight;

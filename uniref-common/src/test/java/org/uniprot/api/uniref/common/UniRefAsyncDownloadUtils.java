@@ -1,4 +1,4 @@
-package org.uniprot.api.uniref.common.utils;
+package org.uniprot.api.uniref.common;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
