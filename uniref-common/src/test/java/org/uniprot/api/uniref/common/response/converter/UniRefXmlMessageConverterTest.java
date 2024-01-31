@@ -1,12 +1,10 @@
-package org.uniprot.api.uniref.common.output.converter;
+package org.uniprot.api.uniref.common.response.converter;
 
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.AbstractXmlValidationTest;
-import org.uniprot.api.uniref.common.response.converter.UniRefMessageConverterConfig;
-import org.uniprot.api.uniref.common.response.converter.UniRefXmlMessageConverter;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefType;
 import org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker;
