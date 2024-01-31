@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.service.query;
+package org.uniprot.api.uniparc.common.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -25,9 +25,9 @@ import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
 import org.uniprot.api.uniparc.common.repository.search.UniParcQueryRepository;
 import org.uniprot.api.uniparc.common.response.converter.UniParcQueryResultConverter;
-import org.uniprot.api.uniparc.common.service.query.request.UniParcSearchRequest;
-import org.uniprot.api.uniparc.common.service.query.request.UniParcStreamRequest;
-import org.uniprot.api.uniparc.common.service.query.sort.UniParcSortClause;
+import org.uniprot.api.uniparc.common.service.request.UniParcSearchRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcStreamRequest;
+import org.uniprot.api.uniparc.common.service.sort.UniParcSortClause;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.uniparc.impl.UniParcEntryBuilder;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;

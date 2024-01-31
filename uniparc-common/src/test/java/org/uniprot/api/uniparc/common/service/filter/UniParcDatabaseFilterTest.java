@@ -1,4 +1,4 @@
-package org.uniprot.api.uniparc.common.service.query.filter;
+package org.uniprot.api.uniparc.common.service.filter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
