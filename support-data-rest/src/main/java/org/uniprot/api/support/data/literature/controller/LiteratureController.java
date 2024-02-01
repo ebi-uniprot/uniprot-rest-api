@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.literature.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.LITERATURE;
 
@@ -23,6 +24,7 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -45,7 +47,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @since 2019-07-04
  */
 @Tag(
-        name = "Literature",
+        name = "Literature citations",
         description =
                 "Search publications that are cited in, or were computationally mapped to, UniProtKB")
 @RestController
@@ -75,7 +77,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     }
 
     @Operation(
-            summary = "Get literature by citation id.",
+            summary = ID_LIT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -100,14 +102,14 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<LiteratureEntry>> getByLiteratureId(
-            @Parameter(description = "Citation id to find")
+            @Parameter(description = ID_LIT_DESCRIPTION, example = ID_LIT_EXAMPLE)
                     @PathVariable("citationId")
                     @Pattern(
                             regexp = LITERATURE_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.literature.invalid.id}")
                     String citationId,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_LIT_DESCRIPTION, example = FIELDS_LIT_EXAMPLE)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.LITERATURE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -127,7 +129,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     }
 
     @Operation(
-            summary = "Search literature by given Lucene search query.",
+            summary = SEARCH_LIT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -162,7 +164,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     }
 
     @Operation(
-            summary = "Download literature by given Lucene search query.",
+            summary = STREAM_LIT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -194,6 +196,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> stream(
             @Valid @ModelAttribute LiteratureStreamRequest streamRequest,
+            @Parameter(hidden = true)
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {

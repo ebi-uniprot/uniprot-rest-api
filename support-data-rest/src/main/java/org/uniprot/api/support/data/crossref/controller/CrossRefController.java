@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.crossref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.CROSSREF;
 
@@ -43,7 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/database")
 @Validated
 @Tag(
-        name = "CrossReference",
+        name = "Cross-referenced databases",
         description =
                 "The cross-references section of UniProtKB entries "
                         + "displays explicit and implicit links to databases such as nucleotide sequence databases, "
@@ -70,7 +71,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     }
 
     @Operation(
-            summary = "Get cross-references by database id.",
+            summary = ID_CROSSREF_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -89,14 +90,14 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<CrossRefEntry>> findByAccession(
-            @Parameter(description = "cross-references database id to find")
+            @Parameter(description = ID_CROSSREF_DESCRIPTION, example = ID_CROSSREF_EXAMPLE)
                     @PathVariable("id")
                     @Pattern(
                             regexp = ACCESSION_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.crossref.invalid.id}")
                     String id,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_CROSSREF_DESCRIPTION, example = FIELDS_CROSSREF_EXAMPLE)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.CROSSREF)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -115,7 +116,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     }
 
     @Operation(
-            summary = "Search cross-references by given Lucene search query.",
+            summary = SEARCH_CROSSREF_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -142,7 +143,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     }
 
     @Operation(
-            summary = "Download cross-references by given Lucene search query.",
+            summary = STREAM_CROSSREF_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -168,6 +169,7 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<CrossRefEntry>>> stream(
             @Valid @ModelAttribute CrossRefStreamRequest streamRequest,
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                    @Parameter(hidden = true)
                     MediaType contentType,
             HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);

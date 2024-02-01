@@ -12,6 +12,8 @@ import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 /**
  * @author sahmad
  * @created 20/01/2021
@@ -19,7 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class DiseaseBasicRequest {
 
-    @Parameter(description = "Criteria to search diseases. It can take any valid Lucene query.")
+    @Parameter(description = QUERY_DISEASE_DESCRIPTION, example = QUERY_DISEASE_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -27,11 +29,11 @@ public class DiseaseBasicRequest {
             messagePrefix = "search.disease")
     private String query;
 
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_DISEASE_DESCRIPTION, example = SORT_DISEASE_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.DISEASE)
     private String sort;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_DISEASE_DESCRIPTION, example = FIELDS_DISEASE_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.DISEASE)
     private String fields;
 

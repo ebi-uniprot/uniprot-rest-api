@@ -20,7 +20,7 @@ public class CrossRefSearchRequest extends CrossRefBasicRequest implements Searc
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Comma separated list of facets to search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = CrossRefFacetConfig.class)
     private String facets;
 

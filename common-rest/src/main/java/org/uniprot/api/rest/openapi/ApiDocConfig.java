@@ -1,9 +1,11 @@
 package org.uniprot.api.rest.openapi;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import org.apache.commons.collections.CollectionUtils;
 import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springdoc.core.providers.ObjectMapperProvider;
@@ -20,6 +22,9 @@ import io.swagger.v3.core.converter.ResolvedSchema;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
+import org.uniprot.core.util.Utils;
+
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
 
 @Configuration
 public class ApiDocConfig {
@@ -44,6 +49,11 @@ public class ApiDocConfig {
                     "#/components/schemas/UniRefEntryId",
                     "#/components/schemas/UniRuleId");
 
+    private static final Comparator<Parameter> parameterComparator = Comparator
+            .comparing(Parameter::getRequired).reversed()
+            .thenComparing(Parameter::getName, Comparator.comparing("size"::equals))
+            .thenComparing(Parameter::getName, Comparator.comparing("download"::equals));
+
     @Bean
     ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties) {
         ObjectMapperProvider mapperProvider = new ObjectMapperProvider(springDocConfigProperties);
@@ -55,38 +65,57 @@ public class ApiDocConfig {
     @Bean
     public OpenApiCustomiser defaultOpenApiCustomizer(ObjectMapperProvider objectMapperProvider) {
         return openApi -> {
-            Map<String, Schema> schemaMap = openApi.getComponents().getSchemas();
-
-            Schema commentParent = schemaMap.get("Comment");
-            if (commentParent != null) {
-                configureCommentSchema(openApi, commentParent);
-            }
-            Schema citationParent = schemaMap.get("Citation");
-            if (citationParent != null) {
-                configureCitationSchema(openApi, citationParent);
-            }
-
-            for (Schema item : schemaMap.values()) {
-                if ("Evidence".equals(item.getName())) {
-                    configureEvidenceSchema(item);
-                }
-                for (Object prop : item.getProperties().values()) {
-                    Schema propSchema = (Schema) prop;
-                    if (prop instanceof ArraySchema) {
-                        propSchema = propSchema.getItems();
-                    }
-                    if (propSchema.get$ref() != null
-                            && STRING_SERILISER_LIST.contains(propSchema.get$ref())) {
-                        propSchema.set$ref(null);
-                        propSchema.type("string");
-                    }
-                }
-            }
-            for (String serialiser : STRING_SERILISER_LIST) {
-                String schemaKey = serialiser.substring(serialiser.lastIndexOf("/") + 1);
-                schemaMap.remove(schemaKey);
-            }
+            customizeSchema(openApi);
+            sortRequestParametersForGetAndPostMethods(openApi.getPaths().values());
         };
+    }
+
+    private static void sortRequestParametersForGetAndPostMethods(Collection<PathItem> pathItems) {
+        for(PathItem item : pathItems){
+            if(hasParameterToSort(item.getGet())){
+                item.getGet().getParameters().sort(parameterComparator);
+            }
+            if(hasParameterToSort(item.getPost())){
+                item.getPost().getParameters().sort(parameterComparator);
+            }
+        }
+    }
+
+    private static boolean hasParameterToSort(Operation operation) {
+        return operation != null && notNullNotEmpty(operation.getParameters());
+    }
+
+    private void customizeSchema(OpenAPI openApi) {
+        Map<String, Schema> schemaMap = openApi.getComponents().getSchemas();
+        Schema commentParent = schemaMap.get("Comment");
+        if (commentParent != null) {
+            configureCommentSchema(openApi, commentParent);
+        }
+        Schema citationParent = schemaMap.get("Citation");
+        if (citationParent != null) {
+            configureCitationSchema(openApi, citationParent);
+        }
+
+        for (Schema item : schemaMap.values()) {
+            if ("Evidence".equals(item.getName())) {
+                configureEvidenceSchema(item);
+            }
+            for (Object prop : item.getProperties().values()) {
+                Schema propSchema = (Schema) prop;
+                if (prop instanceof ArraySchema) {
+                    propSchema = propSchema.getItems();
+                }
+                if (propSchema.get$ref() != null
+                        && STRING_SERILISER_LIST.contains(propSchema.get$ref())) {
+                    propSchema.set$ref(null);
+                    propSchema.type("string");
+                }
+            }
+        }
+        for (String serialiser : STRING_SERILISER_LIST) {
+            String schemaKey = serialiser.substring(serialiser.lastIndexOf("/") + 1);
+            schemaMap.remove(schemaKey);
+        }
     }
 
     private static void configureEvidenceSchema(Schema item) {

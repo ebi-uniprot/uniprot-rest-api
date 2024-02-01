@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.keyword.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.KEYWORD;
 
@@ -22,6 +23,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -40,7 +42,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(
-        name = "Keyword",
+        name = "Keywords",
         description =
                 "UniProtKB Keywords constitute a controlled vocabulary with a hierarchical structure. Keywords summarise the content of a UniProtKB entry and facilitate the search for proteins of interest. An entry often contains several keywords. Keywords can be used to retrieve subsets of protein entries. Keywords are classified in 10 categories: Biological process, Cellular component, Coding sequence diversity, Developmental stage, DiseaseEntry, Domain, Ligand, Molecular function, Post-translational modification, Technical term.")
 @RestController
@@ -81,7 +83,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get Keyword by keywordId.",
+            summary = ID_KEYWORDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -96,14 +98,14 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<KeywordEntry>> getById(
-            @Parameter(description = "Keyword id to find")
+            @Parameter(description = ID_KEYWORDS_DESCRIPTION, example = ID_KEYWORDS_EXAMPLE)
                     @PathVariable("id")
                     @Pattern(
                             regexp = KEYWORD_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.keyword.invalid.id}")
                     String id,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_KEYWORDS_DESCRIPTION, example = FIELDS_KEYWORDS_EXAMPLE)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.KEYWORD)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -128,7 +130,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 OBO_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search Keywords by given Lucene search query.",
+            summary = SEARCH_KEYWORDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -167,7 +169,7 @@ public class KeywordController extends BasicSearchController<KeywordEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download Keywords by given Lucene search query.",
+            summary = STREAM_KEYWORDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

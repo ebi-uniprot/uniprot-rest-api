@@ -27,7 +27,7 @@ public class KeywordSearchRequest extends KeywordBasicRequest implements SearchR
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(description = "Comma separated list of facets to search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = KeywordFacetConfig.class)
     private String facets;
 }

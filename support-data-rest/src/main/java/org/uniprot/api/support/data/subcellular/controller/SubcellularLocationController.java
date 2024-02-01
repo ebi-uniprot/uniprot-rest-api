@@ -44,7 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @since 2019-07-19
  */
 @Tag(
-        name = "Subcellular location",
+        name = "Subcellular locations",
         description =
                 "The subcellular locations in which a protein is found are described in UniProtKB entries with a controlled vocabulary, which includes also membrane topology and orientation terms.")
 @RestController
