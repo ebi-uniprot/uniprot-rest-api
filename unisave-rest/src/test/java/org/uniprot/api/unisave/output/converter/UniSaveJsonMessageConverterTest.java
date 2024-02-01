@@ -12,7 +12,6 @@ import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -28,17 +27,10 @@ import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
  */
 class UniSaveJsonMessageConverterTest {
 
-    private static UniSaveJsonMessageConverter converter;
-    private static OutputStream outputStream;
-
-    @BeforeAll
-    static void setUp() throws IOException {
-        outputStream = mock(OutputStream.class);
-        converter = new UniSaveJsonMessageConverter();
-    }
-
     @Test
     void canWriteJson() throws IOException {
+        UniSaveJsonMessageConverter converter = new UniSaveJsonMessageConverter();
+        OutputStream outputStream = mock(OutputStream.class);
         EntryImpl mockEntry = UniSaveEntityMocker.mockEntry("P12345", 1);
         UniSaveEntry entry =
                 UniSaveEntry.builder()
