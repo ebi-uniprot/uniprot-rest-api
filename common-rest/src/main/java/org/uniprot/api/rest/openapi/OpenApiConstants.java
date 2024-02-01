@@ -135,4 +135,42 @@ public class OpenApiConstants {
     public static final String QUERY_LIT_EXAMPLE = "";
     public static final String SORT_LIT_DESCRIPTION = "Name of the field to be sorted on";
     public static final String SORT_LIT_EXAMPLE = "";
+
+    //STATISTICS
+    public static final String RELEASE_NAME_STATS_DESCRIPTION = "UniProt release name";
+    public static final String TYPE_STATS_DESCRIPTION = "Statistic type";
+    public static final String CATEGORY_STATS_DESCRIPTION = "List of statistics categories, separated by commas.";
+    public static final String RELEASE_NAME_STATS_EXAMPLE = "2023_05";
+    public static final String TYPE_STATS_EXAMPLE = "reviewed";
+    public static final String CATEGORY_STATS_EXAMPLE = "TOTAL_ORGANISM,COMMENTS";
+
+    //SUBCEL
+    public static final String ID_SUBCEL_OPERATION = "Get subcellular locations by id.";
+    public static final String SEARCH_SUBCEL_OPERATION = "Search subcellular locations by given Lucene search query.";
+    public static final String STREAM_SUBCEL_OPERATION = "Download subcellular locations by given Lucene search query.";
+    public static final String ID_SUBCEL_DESCRIPTION = "Subcellular location id to find";
+    public static final String ID_SUBCEL_EXAMPLE = "";
+    public static final String FIELDS_SUBCEL_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_SUBCEL_EXAMPLE = "";
+    public static final String QUERY_SUBCEL_DESCRIPTION = "Criteria to search Subcellular locations. It can take any valid Lucene query.";
+    public static final String QUERY_SUBCEL_EXAMPLE = "";
+    public static final String SORT_SUBCEL_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_SUBCEL_EXAMPLE = "";
+
+    //SUGGEST
+    public static final String SUGGESTER_OPERATION = "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).";
+    public static final String DICT_SUGGESTER_DESCRIPTION = "Suggest data dictionary.";
+    public static final String DICT_SUGGESTER_EXAMPLE = "ORGANISM";
+    public static final String QUERY_SUGGESTER_DESCRIPTION = "Text to look up for auto-complete.";
+    public static final String QUERY_SUGGESTER_EXAMPLE = "huma";
+
+    //TAXONOMY
+    public static final String ID_TAX_OPERATION = "Get taxonomy by id.";
+    public static final String IDS_TAX_OPERATION = "Get taxonomy by comma separated taxon ids.";
+    public static final String SEARCH_TAX_OPERATION = "Search taxonomies by given Lucene search query.";
+    public static final String STREAM_TAX_OPERATION = "Download taxonomies by given Lucene search query.";
+    public static final String ID_TAX_DESCRIPTION = "Taxon id to find";
+    public static final String FIELDS_TAX_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String ID_TAX_EXAMPLE = "";
+    public static final String FIELDS_TAX_EXAMPLE = "";
 }

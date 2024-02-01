@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.suggester.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.support.data.suggester.response.Suggestions;
 import org.uniprot.api.support.data.suggester.service.SuggesterService;
 
@@ -40,8 +42,7 @@ public class SuggesterController {
     }
 
     @Operation(
-            summary =
-                    "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).",
+            summary = SUGGESTER_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -59,12 +60,10 @@ public class SuggesterController {
             value = "/suggester",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<Suggestions> suggester(
-            @Parameter(
-                            description =
-                                    "Suggest dictionary. The list of valid dictionaries is: KEYWORD, SUBCELL, MAIN, TAXONOMY, GO, EC, CATALYTIC_ACTIVITY, ORGANISM, HOST or CHEBI")
+            @Parameter(description = DICT_SUGGESTER_DESCRIPTION, schema = @Schema(type = "type", allowableValues = {"KEYWORD", "SUBCELL", "MAIN", "TAXONOMY", "GO", "EC", "CATALYTIC_ACTIVITY", "ORGANISM", "HOST", "CHEBI"}), example = DICT_SUGGESTER_EXAMPLE)
                     @RequestParam(value = "dict", required = true)
                     String dict,
-            @Parameter(description = "Text to look up for auto-complete. For example: huma")
+            @Parameter(description = QUERY_SUGGESTER_DESCRIPTION, example = QUERY_SUGGESTER_EXAMPLE)
                     @RequestParam(value = "query", required = true)
                     String query) {
 

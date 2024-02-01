@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.subcellular.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.SUBCELLULAR_LOCATION;
 
@@ -22,6 +23,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -73,7 +75,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Operation(
-            summary = "Get subcellular locations by id.",
+            summary = ID_SUBCEL_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -103,14 +105,14 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<SubcellularLocationEntry>> getById(
-            @Parameter(description = "Subcellular location id to find")
+            @Parameter(description = ID_SUBCEL_DESCRIPTION, example = ID_SUBCEL_EXAMPLE)
                     @PathVariable("id")
                     @Pattern(
                             regexp = SUBCELLULAR_LOCATION_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.subcellularLocation.invalid.id}")
                     String id,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_SUBCEL_DESCRIPTION, example = FIELDS_SUBCEL_EXAMPLE)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.SUBCELLLOCATION)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -130,7 +132,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Operation(
-            summary = "Search subcellular locations by given Lucene search query.",
+            summary = SEARCH_SUBCEL_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -168,7 +170,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     }
 
     @Operation(
-            summary = "Download subcellular locations by given Lucene search query.",
+            summary = STREAM_SUBCEL_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -202,6 +204,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>> stream(
             @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,
+            @Parameter(hidden = true)
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
