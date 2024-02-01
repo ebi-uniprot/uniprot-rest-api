@@ -16,7 +16,7 @@
 
 		<jayway.version>2.4.0</jayway.version>
 		<redisson-version>3.17.4</redisson-version>
-		<testcontainers.version>1.17.6</testcontainers.version>
+		<testcontainers.version>1.19.4</testcontainers.version>
 		<jna.version>5.8.0</jna.version>
 		<awaitility.version>4.2.0</awaitility.version>
 	</properties>

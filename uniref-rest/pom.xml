@@ -15,7 +15,7 @@
 
 	<properties>
 		<awaitility.version>4.2.0</awaitility.version>
-		<testcontainers.version>1.17.6</testcontainers.version>
+		<testcontainers.version>1.19.4</testcontainers.version>
 		<dev.jna.version>5.8.0</dev.jna.version>
 	</properties>
 

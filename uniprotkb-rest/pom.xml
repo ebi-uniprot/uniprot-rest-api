@@ -18,7 +18,7 @@
 		<logback.version>1.2.3</logback.version>
 		<commons-codec.version>1.11</commons-codec.version>
 		<jayway.version>2.4.0</jayway.version>
-		<testcontainers.version>1.17.6</testcontainers.version>
+		<testcontainers.version>1.19.4</testcontainers.version>
 		<dev.jna.version>5.8.0</dev.jna.version>
 		<awaitility.version>4.2.0</awaitility.version>
 	</properties>

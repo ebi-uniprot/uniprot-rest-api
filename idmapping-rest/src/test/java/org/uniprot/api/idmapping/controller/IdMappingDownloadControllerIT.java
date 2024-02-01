@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.rest.download.queue.RedisUtil.jobCreatedInRedis;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.File;
@@ -377,6 +378,9 @@ public class IdMappingDownloadControllerIT {
     }
 
     protected JobStatus getJobStatus(String jobId) throws Exception {
+
+        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
+
         MockHttpServletRequestBuilder requestBuilder =
                 get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
         ResultActions response = this.mockMvc.perform(requestBuilder);
