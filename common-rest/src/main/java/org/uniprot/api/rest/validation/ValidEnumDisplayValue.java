@@ -51,7 +51,7 @@ public @interface ValidEnumDisplayValue {
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;
                 // verify if db name is valid.
-                String[] dbNames = value.split("\\s*,\\s*");
+                String[] dbNames = value.replaceAll("\\s", "").split(",");
                 for (String dbName : dbNames) {
                     if (!isValidUniParcDatabase(dbName)) {
                         buildInvalidUniParcDBMessage(dbName, contextImpl);
