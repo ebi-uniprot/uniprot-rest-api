@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl;
+import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequestImpl;
 
 class UniRefIdMappingDownloadRequestValidatorTest {
 

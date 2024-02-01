@@ -77,6 +77,7 @@
 		<module>unisave-rest</module>
 		<module>benchmark-rest</module>
 		<module>aa-rest</module>
+		<module>idmapping-common</module>
 		<module>idmapping-rest</module>
 		<module>help-centre-rest</module>
 		<module>jacoco-aggregate-report</module>

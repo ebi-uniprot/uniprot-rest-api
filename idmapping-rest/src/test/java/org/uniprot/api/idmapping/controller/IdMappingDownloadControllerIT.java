@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.File;
@@ -62,13 +63,13 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.idmapping.IdMappingREST;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.controller.validator.UniParcIdMappingDownloadRequestValidator;
 import org.uniprot.api.idmapping.controller.validator.UniProtKBIdMappingDownloadRequestValidator;
 import org.uniprot.api.idmapping.controller.validator.UniRefIdMappingDownloadRequestValidator;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -146,14 +147,12 @@ public class IdMappingDownloadControllerIT {
 
     protected static final ObjectMapper MAPPER = new ObjectMapper();
 
-    protected static final String JOB_SUBMIT_ENDPOINT =
-            IdMappingJobController.IDMAPPING_PATH + "/download/run";
+    protected static final String JOB_SUBMIT_ENDPOINT = IDMAPPING_PATH + "/download/run";
 
-    protected static final String JOB_STATUS_ENDPOINT =
-            IdMappingJobController.IDMAPPING_PATH + "/download/status/{jobId}";
+    protected static final String JOB_STATUS_ENDPOINT = IDMAPPING_PATH + "/download/status/{jobId}";
 
     protected static final String JOB_DETAILS_ENDPOINT =
-            IdMappingJobController.IDMAPPING_PATH + "/download/details/{jobId}";
+            IDMAPPING_PATH + "/download/details/{jobId}";
 
     @DynamicPropertySource
     public static void setUp(DynamicPropertyRegistry propertyRegistry) {

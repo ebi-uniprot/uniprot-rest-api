@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniProtKBITUtils.*;
+import static org.uniprot.api.idmapping.common.IdMappingUniProtKBITUtils.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.X_TOTAL_RESULTS;
 
@@ -44,10 +44,10 @@ import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
-import org.uniprot.api.idmapping.controller.utils.JobOperation;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.repository.UniprotKBMappingRepository;
+import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.JobOperation;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.repository.UniprotKBMappingRepository;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.service.RdfPrologs;

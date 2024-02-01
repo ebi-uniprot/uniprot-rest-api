@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniParcITUtils.*;
+import static org.uniprot.api.idmapping.common.IdMappingUniParcITUtils.*;
 
 import java.util.List;
 
@@ -33,9 +33,9 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
-import org.uniprot.api.idmapping.controller.utils.JobOperation;
-import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.JobOperation;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.datastore.UniProtStoreClient;

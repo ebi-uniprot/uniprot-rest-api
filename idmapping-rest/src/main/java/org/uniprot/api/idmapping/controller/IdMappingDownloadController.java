@@ -1,8 +1,8 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
 import static org.uniprot.api.idmapping.controller.IdMappingDownloadController.ID_MAPPING_DOWNLOAD_RESOURCE;
-import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
 import static org.uniprot.api.rest.download.model.JobStatus.FINISHED;
 
 import java.util.List;
@@ -15,13 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
-import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequestImpl;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.queue.IdMappingProducerMessageService;
+import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequest;
+import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequestImpl;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.controller.validator.IdMappingDownloadRequestValidator;
 import org.uniprot.api.idmapping.controller.validator.IdMappingDownloadRequestValidatorFactory;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.queue.IdMappingProducerMessageService;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.controller.BasicDownloadController;
 import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfiguration;
 import org.uniprot.api.rest.download.model.DownloadJob;

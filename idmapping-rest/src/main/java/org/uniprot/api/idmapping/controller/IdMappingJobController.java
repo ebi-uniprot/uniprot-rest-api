@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.ProblemPair;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
-import org.uniprot.api.idmapping.service.IdMappingJobService;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.common.service.IdMappingJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.job.JobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
@@ -44,7 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping(IDMAPPING_PATH)
 public class IdMappingJobController {
-    public static final String IDMAPPING_PATH = "/idmapping";
+
     private final IdMappingJobService idMappingJobService;
     private final IdMappingJobCacheService cacheService;
 

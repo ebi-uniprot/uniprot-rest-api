@@ -9,8 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
-import static org.uniprot.api.idmapping.controller.utils.IdMappingUniRefITUtils.saveEntries;
+import static org.uniprot.api.idmapping.common.IdMappingUniRefITUtils.getUniRefFieldValueForValidatedField;
+import static org.uniprot.api.idmapping.common.IdMappingUniRefITUtils.saveEntries;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,9 +41,9 @@ import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.controller.utils.DataStoreTestConfig;
-import org.uniprot.api.idmapping.controller.utils.JobOperation;
-import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.JobOperation;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.service.RdfPrologs;

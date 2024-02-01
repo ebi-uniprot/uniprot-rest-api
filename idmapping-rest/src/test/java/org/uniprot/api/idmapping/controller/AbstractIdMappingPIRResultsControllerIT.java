@@ -21,8 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.uniprot.api.idmapping.controller.utils.JobOperation;
-import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.JobOperation;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 
 /**

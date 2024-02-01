@@ -13,31 +13,17 @@
 	<properties>
 		<slf4j.version>1.7.25</slf4j.version>
 		<logback.version>1.2.3</logback.version>
-
-		<jayway.version>2.4.0</jayway.version>
-		<redisson-version>3.17.4</redisson-version>
+		<awaitility.version>4.2.0</awaitility.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
 		<jna.version>5.8.0</jna.version>
-		<awaitility.version>4.2.0</awaitility.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.uniprot</groupId>
-			<artifactId>common-rest</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>idmapping-common</artifactId>
 			<version>${project.parent.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.solr</groupId>
-					<artifactId>solr-solrj</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.solr</groupId>
-					<artifactId>solr-core</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
-
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>common-rest</artifactId>
@@ -54,6 +40,11 @@
 			</exclusions>
 			<type>test-jar</type>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -91,12 +82,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
@@ -107,38 +92,7 @@
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
 		</dependency>
-
-
-		<!-- Solr Data -->
-		<dependency>
-			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-solrj</artifactId>
-		</dependency>
-
-		<!-- CACHING -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cache</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.redisson</groupId>
-			<artifactId>redisson</artifactId>
-			<version>${redisson-version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.jayway.jsonpath</groupId>
-			<artifactId>json-path</artifactId>
-			<version>${jayway.version}</version>
-		</dependency>
-
-		<!-- Tests -->
+		<!-- tests -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -156,21 +110,27 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
-			<artifactId>uniprot-indexer-integration-test</artifactId>
-			<version>${uniprot-store.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.uniprot</groupId>
 			<artifactId>spark-indexer</artifactId>
 			<version>${uniprot-store.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
-			<artifactId>json-parser</artifactId>
-			<version>${uniprot-core.version}</version>
+			<artifactId>uniprot-indexer-integration-test</artifactId>
+			<version>${uniprot-store.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>idmapping-common</artifactId>
+			<version>${project.parent.version}</version>
 			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -186,21 +146,15 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>${testcontainers.version}</version>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>rabbitmq</artifactId>
 			<version>${testcontainers.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.java.dev.jna</groupId>
-			<artifactId>jna</artifactId>
-			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

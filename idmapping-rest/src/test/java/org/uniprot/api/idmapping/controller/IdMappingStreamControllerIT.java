@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.rest.controller.ControllerITUtils;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 
