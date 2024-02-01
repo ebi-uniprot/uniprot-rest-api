@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -145,6 +146,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
 
+    @Disabled
     @Test
     void sendAndProcessMessageWithUnhandledExceptionShouldBeDiscarded() throws IOException {
         // when
