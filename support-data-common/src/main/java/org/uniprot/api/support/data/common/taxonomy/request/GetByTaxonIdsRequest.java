@@ -14,6 +14,7 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyFacetConfig;
@@ -33,23 +34,21 @@ public class GetByTaxonIdsRequest implements SearchRequest {
     private static final String TAXONOMY_ID_LIST_REGEX = "^\\d+(?:,\\d+)*$";
 
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Comma separated list of taxonIds")
+    @Parameter(description = IDS_TAX_DESCRIPTION, example = IDS_TAX_EXAMPLE)
     @Pattern(regexp = TAXONOMY_ID_LIST_REGEX, message = "{search.taxonomy.invalid.list.id}")
     @ValidCommaSeparatedItemsLength(maxLength = 1000)
     private String taxonIds;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_TAX_DESCRIPTION, example = FIELDS_TAX_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.TAXONOMY)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = TaxonomyFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @Parameter(
-            description =
-                    "Criteria to filter by facet value. It can any supported valid Lucene query.")
+    @Parameter(description = FACET_FILTER_TAX_DESCRIPTION, example = FACET_FILTER_TAX_EXAMPLE)
     @ValidSolrQuerySyntax(message = "{search.taxonomy.ids.invalid.facet.filter}")
     @ValidSolrQueryFacetFields(facetConfig = TaxonomyFacetConfig.class)
     private String facetFilter;
@@ -63,8 +62,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
 
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
-    @Parameter(
-            description = "Pagination size. Defaults to number of taxonIds passed (Single page).")
+    @Parameter(description = IDS_SIZE_TAX_DESCRIPTION)
     private Integer size;
 
     @Parameter(hidden = true)

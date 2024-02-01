@@ -170,7 +170,17 @@ public class OpenApiConstants {
     public static final String SEARCH_TAX_OPERATION = "Search taxonomies by given Lucene search query.";
     public static final String STREAM_TAX_OPERATION = "Download taxonomies by given Lucene search query.";
     public static final String ID_TAX_DESCRIPTION = "Taxon id to find";
-    public static final String FIELDS_TAX_DESCRIPTION = "Comma separated list of fields to be returned in response";
     public static final String ID_TAX_EXAMPLE = "";
+    public static final String FIELDS_TAX_DESCRIPTION = "Comma separated list of fields to be returned in response";
     public static final String FIELDS_TAX_EXAMPLE = "";
+    public static final String IDS_TAX_DESCRIPTION = "Comma separated list of taxonIds";
+    public static final String IDS_TAX_EXAMPLE = "";
+    public static final String FACET_FILTER_TAX_DESCRIPTION = "Criteria to filter by facet value. It can any supported valid Lucene query.";
+    public static final String FACET_FILTER_TAX_EXAMPLE = "";
+    public static final String QUERY_TAX_DESCRIPTION = "Criteria to search taxonomies. It can take any valid Lucene query.";
+    public static final String QUERY_TAX_EXAMPLE = "";
+    public static final String SORT_TAX_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_TAX_EXAMPLE = "";
+    public static final String IDS_SIZE_TAX_DESCRIPTION = "Pagination size. Defaults to number of taxonIds passed (Single page).";
+
 }
