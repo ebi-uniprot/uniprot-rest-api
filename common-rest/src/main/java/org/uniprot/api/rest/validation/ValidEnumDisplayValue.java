@@ -39,6 +39,7 @@ public @interface ValidEnumDisplayValue {
             EnumDisplay[] values = constraintAnnotation.enumDisplay().getEnumConstants();
             Arrays.stream(values)
                     .map(EnumDisplay::getDisplayName)
+                    .map(n -> n.replaceAll("\\s", ""))
                     .map(String::toLowerCase)
                     .forEach(acceptedValues::add);
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
