@@ -67,13 +67,13 @@ public class OpenApiConstants {
     public static final String GROUP_PARENT_DESCRIPTION =
             "If nothing is passed, the root of the hierarchical tree is returned with all available children. If the parent is specified, only children below the parent node is returned.";
     public static final String GROUP_EC_DESCRIPTION =
-            "List of Enzyme Classification groups with respect to the given query and parent.";
+            "List of Enzyme Classification (EC) groups with respect to the given query and parent.";
     public static final String GROUP_GO_DESCRIPTION =
-            "List of Gene Ontology groups with respect to the given query and parent";
+            "List of Gene Ontology (GO) groups with respect to the given query and parent";
     public static final String GROUP_KEYWORD_DESCRIPTION =
-            "List of Keyword groups with respect to the given query and parent";
+            "List of keyword groups with respect to the given query and parent";
     public static final String GROUP_TAXONOMY_DESCRIPTION =
-            "List of Taxonomy groups with respect to the given query and parent";
+            "List of taxonomy groups with respect to the given query and parent";
 
     // Proteome
     public static final String UPID_DESCRIPTION = "Unique identifier for the Proteome entry";
@@ -85,55 +85,71 @@ public class OpenApiConstants {
             "Flag to write subsequences. Only accepted in fasta format";
 
     //Support date cross reference
-    public static final String QUERY_CROSSREF_DESCRIPTION = "Criteria to search cross-references. It can take any valid Lucene query.";
+    public static final String QUERY_CROSSREF_DESCRIPTION = "Criteria to search cross-reference databases. "
+            + QUERY_ADVANCED
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_CROSSREF_EXAMPLE = "";
-    public static final String SORT_CROSSREF_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_CROSSREF_DESCRIPTION = SORT_DESCRIPTION
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_CROSSREF_EXAMPLE = "";
-    public static final String FIELDS_CROSSREF_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_CROSSREF_DESCRIPTION = FIELDS_DESCRIPTION
+            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_CROSSREF_EXAMPLE = "";
-    public static final String ID_CROSSREF_DESCRIPTION = "cross-references database id to find";
+    public static final String ID_CROSSREF_DESCRIPTION = "Unique identifier for the cross-reference database entry";
     public static final String ID_CROSSREF_EXAMPLE = "";
-    public static final String ID_CROSSREF_OPERATION = "Get cross-references by database id.";
-    public static final String SEARCH_CROSSREF_OPERATION = "Search cross-references by given Lucene search query.";
-    public static final String STREAM_CROSSREF_OPERATION = "Download cross-references by given Lucene search query.";
+    public static final String ID_CROSSREF_OPERATION = "Get cross-reference database entry by a single accession.";
+    public static final String SEARCH_CROSSREF_OPERATION = "Retrieve cross-reference database entries by a search query.";
+    public static final String STREAM_CROSSREF_OPERATION = "Download cross-reference database entries retrieved by a search query.";
 
     //Support date Keywords
-    public static final String ID_KEYWORDS_OPERATION = "Get Keyword by keywordId.";
-    public static final String SEARCH_KEYWORDS_OPERATION = "Search Keywords by given Lucene search query.";
-    public static final String STREAM_KEYWORDS_OPERATION = "Download Keywords by given Lucene search query.";
-    public static final String ID_KEYWORDS_DESCRIPTION = "Keyword id to find";
+    public static final String ID_KEYWORDS_OPERATION = "Get keyword entry by a single accession.";
+    public static final String SEARCH_KEYWORDS_OPERATION = "Retrieve keyword entries by a search query.";
+    public static final String STREAM_KEYWORDS_OPERATION = "Download keyword entries retrieved by a search query.";
+    public static final String ID_KEYWORDS_DESCRIPTION = "Unique identifier for the keyword entry";
     public static final String ID_KEYWORDS_EXAMPLE = "";
-    public static final String FIELDS_KEYWORDS_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_KEYWORDS_DESCRIPTION = FIELDS_DESCRIPTION
+            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_KEYWORDS_EXAMPLE = "";
-    public static final String SORT_KEYWORDS_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_KEYWORDS_DESCRIPTION = SORT_DESCRIPTION
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_KEYWORDS_EXAMPLE = "";
-    public static final String QUERY_KEYWORDS_DESCRIPTION = "Criteria to search keywords. It can take any valid Lucene query.";
+    public static final String QUERY_KEYWORDS_DESCRIPTION = "Criteria to search keywords. "
+            + QUERY_ADVANCED
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_KEYWORDS_EXAMPLE = "";
 
     //Support date diseases
-    public static final String ID_DISEASE_OPERATION = "Get diseases by id.";
-    public static final String SEARCH_DISEASE_OPERATION = "Search disease by given Lucene search query.";
-    public static final String STREAM_DISEASE_OPERATION = "Download disease by given Lucene search query.";
-    public static final String QUERY_DISEASE_DESCRIPTION = "Criteria to search diseases. It can take any valid Lucene query.";
+    public static final String ID_DISEASE_OPERATION = "Get human disease entry by a single accession.";
+    public static final String SEARCH_DISEASE_OPERATION = "Retrieve human disease entries by a search query.";
+    public static final String STREAM_DISEASE_OPERATION = "Download human disease entries retrieved by a search query.";
+    public static final String QUERY_DISEASE_DESCRIPTION = "Criteria to search human diseases. "
+            + QUERY_ADVANCED
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_DISEASE_EXAMPLE = "Alzheimer";
-    public static final String SORT_DISEASE_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_DISEASE_DESCRIPTION = SORT_DESCRIPTION
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_DISEASE_EXAMPLE = "id asc";
-    public static final String ID_DISEASE_DESCRIPTION = "disease id to find";
+    public static final String ID_DISEASE_DESCRIPTION = "Unique identifier for the human disease entry";
     public static final String ID_DISEASE_EXAMPLE = "DI-04530";
-    public static final String FIELDS_DISEASE_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_DISEASE_DESCRIPTION = FIELDS_DESCRIPTION
+            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_DISEASE_EXAMPLE = "id,name";
 
     //support- data literature citations
-    public static final String ID_LIT_OPERATION = "Get literature by citation id.";
-    public static final String ID_LIT_DESCRIPTION = "Citation id to find";
+    public static final String ID_LIT_OPERATION = "Get literature citation entry by a single accession.";
+    public static final String ID_LIT_DESCRIPTION = "Unique identifier for the literature citation entry";
     public static final String ID_LIT_EXAMPLE = "";
-    public static final String FIELDS_LIT_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_LIT_DESCRIPTION = FIELDS_DESCRIPTION
+            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_LIT_EXAMPLE = "";
-    public static final String SEARCH_LIT_OPERATION = "Search literature by given Lucene search query.";
-    public static final String STREAM_LIT_OPERATION = "Download literature by given Lucene search query.";
-    public static final String QUERY_LIT_DESCRIPTION = "Criteria to search literature publications. It can take any valid Lucene query.";
+    public static final String SEARCH_LIT_OPERATION = "Retrieve literature citation entries by a search query.";
+    public static final String STREAM_LIT_OPERATION = "Download literature citation entries retrieved by a search query.";
+    public static final String QUERY_LIT_DESCRIPTION = "Criteria to search literature citations. "
+            + QUERY_ADVANCED
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_LIT_EXAMPLE = "";
-    public static final String SORT_LIT_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_LIT_DESCRIPTION = SORT_DESCRIPTION
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_LIT_EXAMPLE = "";
 
     //STATISTICS
@@ -145,16 +161,20 @@ public class OpenApiConstants {
     public static final String CATEGORY_STATS_EXAMPLE = "TOTAL_ORGANISM,COMMENTS";
 
     //SUBCEL
-    public static final String ID_SUBCEL_OPERATION = "Get subcellular locations by id.";
-    public static final String SEARCH_SUBCEL_OPERATION = "Search subcellular locations by given Lucene search query.";
-    public static final String STREAM_SUBCEL_OPERATION = "Download subcellular locations by given Lucene search query.";
-    public static final String ID_SUBCEL_DESCRIPTION = "Subcellular location id to find";
+    public static final String ID_SUBCEL_OPERATION = "Get subcellular location entry by a single accession.";
+    public static final String SEARCH_SUBCEL_OPERATION = "Retrieve subcellular location entries by a search query.";
+    public static final String STREAM_SUBCEL_OPERATION = "Download subcellular location entries retrieved by a search query.";
+    public static final String ID_SUBCEL_DESCRIPTION = "Unique identifier for the subcellular location entry";
     public static final String ID_SUBCEL_EXAMPLE = "";
-    public static final String FIELDS_SUBCEL_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_SUBCEL_DESCRIPTION = FIELDS_DESCRIPTION
+            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_SUBCEL_EXAMPLE = "";
-    public static final String QUERY_SUBCEL_DESCRIPTION = "Criteria to search Subcellular locations. It can take any valid Lucene query.";
+    public static final String QUERY_SUBCEL_DESCRIPTION = "Criteria to search subcellular locations. "
+            + QUERY_ADVANCED
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_SUBCEL_EXAMPLE = "";
-    public static final String SORT_SUBCEL_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_SUBCEL_DESCRIPTION = SORT_DESCRIPTION
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_SUBCEL_EXAMPLE = "";
 
     //SUGGEST
@@ -165,21 +185,25 @@ public class OpenApiConstants {
     public static final String QUERY_SUGGESTER_EXAMPLE = "huma";
 
     //TAXONOMY
-    public static final String ID_TAX_OPERATION = "Get taxonomy by id.";
-    public static final String IDS_TAX_OPERATION = "Get taxonomy by comma separated taxon ids.";
-    public static final String SEARCH_TAX_OPERATION = "Search taxonomies by given Lucene search query.";
-    public static final String STREAM_TAX_OPERATION = "Download taxonomies by given Lucene search query.";
-    public static final String ID_TAX_DESCRIPTION = "Taxon id to find";
+    public static final String ID_TAX_OPERATION = "Get taxonomy entry by a single accession.";
+    public static final String IDS_TAX_OPERATION = "Get taxonomy entries by a list of taxon ids. (Max. 1K entries)";
+    public static final String SEARCH_TAX_OPERATION = "Retrieve taxonomy entries by a search query.";
+    public static final String STREAM_TAX_OPERATION = "Download taxonomy entries retrieved by a search query.";
+    public static final String ID_TAX_DESCRIPTION = "Unique identifier for the taxonomy entry";
     public static final String ID_TAX_EXAMPLE = "";
-    public static final String FIELDS_TAX_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_TAX_DESCRIPTION = FIELDS_DESCRIPTION
+            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_TAX_EXAMPLE = "";
     public static final String IDS_TAX_DESCRIPTION = "Comma separated list of taxonIds";
     public static final String IDS_TAX_EXAMPLE = "";
-    public static final String FACET_FILTER_TAX_DESCRIPTION = "Criteria to filter by facet value. It can any supported valid Lucene query.";
+    public static final String FACET_FILTER_TAX_DESCRIPTION = "Criteria to filter taxonomy. <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String FACET_FILTER_TAX_EXAMPLE = "";
-    public static final String QUERY_TAX_DESCRIPTION = "Criteria to search taxonomies. It can take any valid Lucene query.";
+    public static final String QUERY_TAX_DESCRIPTION = "Criteria to search taxonomy. "
+            + QUERY_ADVANCED
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_TAX_EXAMPLE = "";
-    public static final String SORT_TAX_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_TAX_DESCRIPTION = SORT_DESCRIPTION
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_TAX_EXAMPLE = "";
     public static final String IDS_SIZE_TAX_DESCRIPTION = "Pagination size. Defaults to number of taxonIds passed (Single page).";
 

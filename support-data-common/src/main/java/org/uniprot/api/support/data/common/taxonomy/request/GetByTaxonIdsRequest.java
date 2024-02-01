@@ -13,6 +13,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
@@ -28,6 +29,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 17/09/2020
  */
 @Data
+@ParameterObject
 public class GetByTaxonIdsRequest implements SearchRequest {
 
     @Parameter(hidden = true)

@@ -29,7 +29,7 @@ public class LiteratureSearchRequest extends LiteratureBasicRequest implements S
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(description = "Comma separated list of facets to search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = LiteratureFacetConfig.class)
     private String facets;
 }

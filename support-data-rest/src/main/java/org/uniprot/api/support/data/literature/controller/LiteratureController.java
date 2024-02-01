@@ -49,7 +49,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
         name = "Literature citations",
         description =
-                "Search publications that are cited in, or were computationally mapped to, UniProtKB")
+                "Search publications that are linked to UniProtKB. Publications can be manually curated, computationally mapped, or community curated.")
 @RestController
 @RequestMapping("/citations")
 @Validated
