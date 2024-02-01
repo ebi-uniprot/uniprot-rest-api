@@ -8,17 +8,18 @@ import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.SWISSPROT;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.unisave.UniSaveEntityMocker;
 import org.uniprot.api.unisave.model.UniSaveEntry;
 import org.uniprot.api.unisave.repository.domain.impl.EntryImpl;
-
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerator;
 
 /**
  * Created 15/04/20
@@ -33,7 +34,7 @@ class UniSaveJsonMessageConverterTest {
     @BeforeAll
     static void setUp() throws IOException {
         outputStream = mock(OutputStream.class);
-        converter = new UniSaveJsonMessageConverterProxy(outputStream);
+        converter = new UniSaveJsonMessageConverter();
     }
 
     @Test
@@ -47,8 +48,14 @@ class UniSaveJsonMessageConverterTest {
                         .firstRelease("1111")
                         .firstReleaseDate("DATE")
                         .build();
+        MessageConverterContext<UniSaveEntry> messageConverterContext =
+                MessageConverterContext.<UniSaveEntry>builder()
+                        .entityOnly(true)
+                        .entities(Stream.of(entry))
+                        .build();
 
-        converter.writeEntity(entry, outputStream);
+        converter.writeContents(
+                messageConverterContext, outputStream, Instant.now(), new AtomicInteger(0));
 
         ArgumentCaptor<byte[]> byteCaptor = ArgumentCaptor.forClass(byte[].class);
         verify(outputStream)
@@ -69,13 +76,5 @@ class UniSaveJsonMessageConverterTest {
             }
         }
         return bytes.length - 1;
-    }
-
-    private static class UniSaveJsonMessageConverterProxy extends UniSaveJsonMessageConverter {
-        UniSaveJsonMessageConverterProxy(OutputStream outputStream) throws IOException {
-            JsonGenerator generator =
-                    objectMapper.getFactory().createGenerator(outputStream, JsonEncoding.UTF8);
-            TL_JSON_GENERATOR.set(generator);
-        }
     }
 }
