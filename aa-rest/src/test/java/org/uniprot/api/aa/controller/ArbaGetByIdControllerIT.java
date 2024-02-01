@@ -148,7 +148,7 @@ public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
                     .id(ARBA_ID)
                     .fields("annotation_covered")
                     .resultMatcher(jsonPath("$.uniRuleId", is(ARBA_ID)))
-                    .resultMatcher(jsonPath("$.information").doesNotExist())
+                    .resultMatcher(jsonPath("$.information").exists())
                     .resultMatcher(jsonPath("$.mainRule").exists())
                     .resultMatcher(jsonPath("$.otherRules").doesNotExist())
                     .resultMatcher(jsonPath("$.samFeatureSets").doesNotExist())
