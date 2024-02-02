@@ -483,6 +483,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         ResultActions response = callGetJobStatus(jobId);
         // then
         response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", Matchers.notNullValue()));
         String responseAsString = response.andReturn().getResponse().getContentAsString();

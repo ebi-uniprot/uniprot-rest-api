@@ -20,11 +20,13 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Testcontainers
 public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
 
     @Value("${download.idFilesFolder}")
@@ -47,6 +49,7 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
     @Container
     protected static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
+
     @Container
     protected static GenericContainer<?> redisContainer =
             new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);

@@ -61,6 +61,7 @@ import org.springframework.web.util.UriBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.idmapping.IdMappingREST;
@@ -102,6 +103,7 @@ import com.jayway.jsonpath.JsonPath;
 @WebMvcTest(IdMappingDownloadController.class)
 @ExtendWith(value = {SpringExtension.class})
 @AutoConfigureWebClient
+@Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IdMappingDownloadControllerIT {
 
