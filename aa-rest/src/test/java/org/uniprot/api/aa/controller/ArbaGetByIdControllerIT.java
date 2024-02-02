@@ -55,6 +55,7 @@ import org.uniprot.store.search.SolrCollection;
 public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
     private static final String PATH = "/arba/{arbaId}";
     private static final String ARBA_ID = "ARBA00000103";
+    private static final String OLD_RULE_NUM = "OLD_" + ARBA_ID;
 
     @Autowired private ArbaQueryRepository repository;
 
@@ -87,7 +88,7 @@ public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
         // remove unnecessary fields for ARBA
         var builder = UniRuleEntryBuilder.from(uniRule);
         InformationBuilder infoBuilder = new InformationBuilder("0");
-        builder.information(infoBuilder.build());
+        builder.information(infoBuilder.oldRuleNum(OLD_RULE_NUM).build());
         return builder.uniRuleId(uniRuleId)
                 .otherRulesSet(null)
                 .positionFeatureSetsSet(null)
@@ -107,7 +108,7 @@ public class ArbaGetByIdControllerIT extends AbstractGetByIdControllerIT {
             return GetIdParameter.builder()
                     .id(ARBA_ID)
                     .resultMatcher(jsonPath("$.uniRuleId", is(ARBA_ID)))
-                    .resultMatcher(jsonPath("$.information", notNullValue()))
+                    .resultMatcher(jsonPath("$.information.oldRuleNum", is(OLD_RULE_NUM)))
                     .resultMatcher(jsonPath("$.mainRule", notNullValue()))
                     .resultMatcher(jsonPath("$.otherRules").doesNotExist())
                     .resultMatcher(jsonPath("$.samFeatureSets").doesNotExist())
