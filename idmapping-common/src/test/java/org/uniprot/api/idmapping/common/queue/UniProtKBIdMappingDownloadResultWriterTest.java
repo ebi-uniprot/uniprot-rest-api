@@ -187,7 +187,7 @@ class UniProtKBIdMappingDownloadResultWriterTest {
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(
-                "org.uniprot.api.rest.output.context.MessageConverterContext<org.uniprot.api.idmapping.model.UniProtKBEntryPair>",
+                "org.uniprot.api.rest.output.context.MessageConverterContext<org.uniprot.api.idmapping.common.response.model.UniProtKBEntryPair>",
                 result.getTypeName());
     }
 

@@ -192,7 +192,7 @@ class UniRefIdMappingDownloadResultWriterTest {
         Type result = writer.getType();
         assertNotNull(result);
         assertEquals(
-                "org.uniprot.api.rest.output.context.MessageConverterContext<org.uniprot.api.idmapping.model.UniRefEntryPair>",
+                "org.uniprot.api.rest.output.context.MessageConverterContext<org.uniprot.api.idmapping.common.response.model.UniRefEntryPair>",
                 result.getTypeName());
     }
 
