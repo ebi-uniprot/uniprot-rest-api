@@ -60,6 +60,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.idmapping.IdMappingREST;
@@ -139,9 +140,11 @@ public class IdMappingDownloadControllerIT {
     private static final UniProtKBEntry TEMPLATE_KB_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
+    @Container
     protected static final RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
 
+    @Container
     protected static final GenericContainer<?> redisContainer =
             new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
 

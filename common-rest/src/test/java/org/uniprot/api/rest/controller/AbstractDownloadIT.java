@@ -19,6 +19,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
@@ -43,8 +44,10 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
 
     @Autowired protected AmqpAdmin amqpAdmin;
 
+    @Container
     protected static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
+    @Container
     protected static GenericContainer<?> redisContainer =
             new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
 

@@ -100,7 +100,6 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
         setUp(restTemplate);
     }
 
-    @Disabled
     @Test
     void sendAndProcessEmbeddingsH5MessageSuccessfullyAfterRetry() throws IOException {
         doThrow(new RuntimeException("Forced exception for testing on call converter.fromMessage"))
