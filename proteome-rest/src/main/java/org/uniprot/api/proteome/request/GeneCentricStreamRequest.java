@@ -21,7 +21,7 @@ public class GeneCentricStreamRequest extends GeneCentricBasicRequest implements
             description =
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
-            regexp = "^true|false$",
+            regexp = "^true$|^false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{stream.invalid.download}")
     private String download;
