@@ -7,6 +7,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @created 29/03/2021
  */
 @Data
+@ParameterObject
 public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements SearchRequest {
 
     @Parameter(description = "Comma separated list of fields to be returned in response")

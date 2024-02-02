@@ -493,6 +493,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = "Get UniParc entries by a list of upis.",
             responses = {
                 @ApiResponse(

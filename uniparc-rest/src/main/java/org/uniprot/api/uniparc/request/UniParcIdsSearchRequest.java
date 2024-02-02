@@ -9,6 +9,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniParcFacetConfig;
@@ -28,6 +29,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @created 18/03/2021
  */
 @Data
+@ParameterObject
 public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @NotNull(message = "{search.required}")
     @Parameter(description = "Comma separated list of UniParc ids(upis)")

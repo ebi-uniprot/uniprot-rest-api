@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 12/08/2020
  */
 @Data
+@ParameterObject
 public class UniParcBestGuessRequest {
 
     @Parameter(

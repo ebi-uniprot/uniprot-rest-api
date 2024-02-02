@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ParameterObject
 public class UniParcGetByAccessionRequest extends UniParcGetByIdRequest {
     @Pattern(
             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,
