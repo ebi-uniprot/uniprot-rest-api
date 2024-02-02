@@ -88,15 +88,15 @@ public class OpenApiConstants {
     public static final String QUERY_CROSSREF_DESCRIPTION = "Criteria to search cross-reference databases. "
             + QUERY_ADVANCED
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
-    public static final String QUERY_CROSSREF_EXAMPLE = "";
+    public static final String QUERY_CROSSREF_EXAMPLE = "Ensembl";
     public static final String SORT_CROSSREF_DESCRIPTION = SORT_DESCRIPTION
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
-    public static final String SORT_CROSSREF_EXAMPLE = "";
+    public static final String SORT_CROSSREF_EXAMPLE = "id desc";
     public static final String FIELDS_CROSSREF_DESCRIPTION = FIELDS_DESCRIPTION
             + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
-    public static final String FIELDS_CROSSREF_EXAMPLE = "";
+    public static final String FIELDS_CROSSREF_EXAMPLE = "id,name,abbrev,category";
     public static final String ID_CROSSREF_DESCRIPTION = "Unique identifier for the cross-reference database entry";
-    public static final String ID_CROSSREF_EXAMPLE = "";
+    public static final String ID_CROSSREF_EXAMPLE = "DB-0244";
     public static final String ID_CROSSREF_OPERATION = "Get cross-reference database entry by a single accession.";
     public static final String SEARCH_CROSSREF_OPERATION = "Retrieve cross-reference database entries by a search query.";
     public static final String STREAM_CROSSREF_OPERATION = "Download cross-reference database entries retrieved by a search query.";
@@ -106,17 +106,17 @@ public class OpenApiConstants {
     public static final String SEARCH_KEYWORDS_OPERATION = "Retrieve keyword entries by a search query.";
     public static final String STREAM_KEYWORDS_OPERATION = "Download keyword entries retrieved by a search query.";
     public static final String ID_KEYWORDS_DESCRIPTION = "Unique identifier for the keyword entry";
-    public static final String ID_KEYWORDS_EXAMPLE = "";
+    public static final String ID_KEYWORDS_EXAMPLE = "KW-0020";
     public static final String FIELDS_KEYWORDS_DESCRIPTION = FIELDS_DESCRIPTION
             + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
-    public static final String FIELDS_KEYWORDS_EXAMPLE = "";
+    public static final String FIELDS_KEYWORDS_EXAMPLE = "id,name,category";
     public static final String SORT_KEYWORDS_DESCRIPTION = SORT_DESCRIPTION
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
-    public static final String SORT_KEYWORDS_EXAMPLE = "";
+    public static final String SORT_KEYWORDS_EXAMPLE = "name asc";
     public static final String QUERY_KEYWORDS_DESCRIPTION = "Criteria to search keywords. "
             + QUERY_ADVANCED
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
-    public static final String QUERY_KEYWORDS_EXAMPLE = "";
+    public static final String QUERY_KEYWORDS_EXAMPLE = "Phosphoprotein";
 
     //Support date diseases
     public static final String ID_DISEASE_OPERATION = "Get human disease entry by a single accession.";
@@ -138,19 +138,19 @@ public class OpenApiConstants {
     //support- data literature citations
     public static final String ID_LIT_OPERATION = "Get literature citation entry by a single accession.";
     public static final String ID_LIT_DESCRIPTION = "Unique identifier for the literature citation entry";
-    public static final String ID_LIT_EXAMPLE = "";
+    public static final String ID_LIT_EXAMPLE = "10024047";
     public static final String FIELDS_LIT_DESCRIPTION = FIELDS_DESCRIPTION
             + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
-    public static final String FIELDS_LIT_EXAMPLE = "";
+    public static final String FIELDS_LIT_EXAMPLE = "id,title,authors,publication_date";
     public static final String SEARCH_LIT_OPERATION = "Retrieve literature citation entries by a search query.";
     public static final String STREAM_LIT_OPERATION = "Download literature citation entries retrieved by a search query.";
     public static final String QUERY_LIT_DESCRIPTION = "Criteria to search literature citations. "
             + QUERY_ADVANCED
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
-    public static final String QUERY_LIT_EXAMPLE = "";
+    public static final String QUERY_LIT_EXAMPLE = "\"genome analysis\"";
     public static final String SORT_LIT_DESCRIPTION = SORT_DESCRIPTION
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
-    public static final String SORT_LIT_EXAMPLE = "";
+    public static final String SORT_LIT_EXAMPLE = "id desc";
 
     //STATISTICS
     public static final String RELEASE_NAME_STATS_DESCRIPTION = "UniProt release name";
@@ -165,17 +165,17 @@ public class OpenApiConstants {
     public static final String SEARCH_SUBCEL_OPERATION = "Retrieve subcellular location entries by a search query.";
     public static final String STREAM_SUBCEL_OPERATION = "Download subcellular location entries retrieved by a search query.";
     public static final String ID_SUBCEL_DESCRIPTION = "Unique identifier for the subcellular location entry";
-    public static final String ID_SUBCEL_EXAMPLE = "";
+    public static final String ID_SUBCEL_EXAMPLE = "SL-0039";
     public static final String FIELDS_SUBCEL_DESCRIPTION = FIELDS_DESCRIPTION
             + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
-    public static final String FIELDS_SUBCEL_EXAMPLE = "";
+    public static final String FIELDS_SUBCEL_EXAMPLE = "id,name,category";
     public static final String QUERY_SUBCEL_DESCRIPTION = "Criteria to search subcellular locations. "
             + QUERY_ADVANCED
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
-    public static final String QUERY_SUBCEL_EXAMPLE = "";
+    public static final String QUERY_SUBCEL_EXAMPLE = "\"Cell membrane\"";
     public static final String SORT_SUBCEL_DESCRIPTION = SORT_DESCRIPTION
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
-    public static final String SORT_SUBCEL_EXAMPLE = "";
+    public static final String SORT_SUBCEL_EXAMPLE = "id asc";
 
     //SUGGEST
     public static final String SUGGESTER_OPERATION = "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).";
@@ -190,21 +190,21 @@ public class OpenApiConstants {
     public static final String SEARCH_TAX_OPERATION = "Retrieve taxonomy entries by a search query.";
     public static final String STREAM_TAX_OPERATION = "Download taxonomy entries retrieved by a search query.";
     public static final String ID_TAX_DESCRIPTION = "Unique identifier for the taxonomy entry";
-    public static final String ID_TAX_EXAMPLE = "";
+    public static final String ID_TAX_EXAMPLE = "9606";
     public static final String FIELDS_TAX_DESCRIPTION = FIELDS_DESCRIPTION
             + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
-    public static final String FIELDS_TAX_EXAMPLE = "";
+    public static final String FIELDS_TAX_EXAMPLE = "id,common_name,scientific_name,lineage";
     public static final String IDS_TAX_DESCRIPTION = "Comma separated list of taxonIds";
-    public static final String IDS_TAX_EXAMPLE = "";
+    public static final String IDS_TAX_EXAMPLE = "9606,10116,9913";
     public static final String FACET_FILTER_TAX_DESCRIPTION = "Criteria to filter taxonomy. <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
-    public static final String FACET_FILTER_TAX_EXAMPLE = "";
+    public static final String FACET_FILTER_TAX_EXAMPLE = "superkingdom:Eukaryota";
     public static final String QUERY_TAX_DESCRIPTION = "Criteria to search taxonomy. "
             + QUERY_ADVANCED
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
-    public static final String QUERY_TAX_EXAMPLE = "";
+    public static final String QUERY_TAX_EXAMPLE = "\"Homo sapiens\"";
     public static final String SORT_TAX_DESCRIPTION = SORT_DESCRIPTION
             + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
-    public static final String SORT_TAX_EXAMPLE = "";
+    public static final String SORT_TAX_EXAMPLE = "scientific desc";
     public static final String IDS_SIZE_TAX_DESCRIPTION = "Pagination size. Defaults to number of taxonIds passed (Single page).";
 
 }
