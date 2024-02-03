@@ -24,6 +24,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -63,6 +64,7 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.validator.UniParcIdMappingDownloadRequestValidator;
@@ -176,6 +178,9 @@ public class IdMappingDownloadControllerIT {
 
     @BeforeAll
     public void setUpDownload() throws Exception {
+        Duration asyncDuration = Duration.ofMillis(500);
+        Awaitility.setDefaultPollDelay(asyncDuration);
+        Awaitility.setDefaultPollInterval(asyncDuration);
         Files.createDirectories(Path.of(this.idsFolder));
         Files.createDirectories(Path.of(this.resultFolder));
 
