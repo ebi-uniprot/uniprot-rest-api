@@ -73,7 +73,7 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
     }
 
     @BeforeAll
-    public void setUpAsyncDownload(){
+    public void setUpAsyncDownload() {
         Duration asyncDuration = Duration.ofMillis(500);
         Awaitility.setDefaultPollDelay(asyncDuration);
         Awaitility.setDefaultPollInterval(asyncDuration);
