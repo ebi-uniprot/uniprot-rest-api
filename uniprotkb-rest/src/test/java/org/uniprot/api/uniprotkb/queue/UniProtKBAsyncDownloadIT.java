@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -112,32 +113,32 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
         MediaType format = UniProtMediaType.HDF5_MEDIA_TYPE;
         DownloadRequest request = createDownloadRequest(query, format);
         String jobId = this.messageService.sendMessage(request);
-        log.info("messageService.sendMessage for jobId: "+jobId);
+        log.info("messageService.sendMessage for jobId: " + jobId);
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
-        log.info("verified message for jobId: "+jobId);
+        log.info("verified message for jobId: " + jobId);
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
-        log.info("After jobErrored await: "+jobId);
+        log.info("After jobErrored await: " + jobId);
         // verify  redis
         verifyRedisEntry(query, jobId, JobStatus.ERROR, 1, true, 0);
-        log.info("verifyRedisEntry ERROR: "+jobId);
+        log.info("verifyRedisEntry ERROR: " + jobId);
         // after certain delay the job should be reprocessed from kb side
         await().atMost(Duration.ofSeconds(20)).until(jobUnfinished(downloadJobRepository, jobId));
         verifyRedisEntry(query, jobId, JobStatus.UNFINISHED, 1, true, 10);
-        log.info("After UNFINISHED status check: "+jobId);
+        log.info("After UNFINISHED status check: " + jobId);
         // then job should be picked by embeddings consumers and set to Running again
         //        await().until(jobRunning(jobId));
         // the job should be completed after sometime by embeddings consumer
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
-        log.info("After jobFinished status check: "+jobId);
+        log.info("After jobFinished status check: " + jobId);
         // verify ids file generated from solr
         verifyIdsFile(jobId);
         // verify result file doesn't exist yet
         String fileName = jobId + FileType.GZIP.getExtension();
         Path resultFilePath = Path.of(this.resultFolder + "/" + fileName);
         Assertions.assertFalse(Files.exists(resultFilePath));
-        log.info("Success all passed: "+jobId);
+        log.info("Success all passed: " + jobId);
     }
 
     @Override
