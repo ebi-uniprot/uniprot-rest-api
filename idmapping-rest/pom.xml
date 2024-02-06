@@ -68,6 +68,10 @@
 					<groupId>org.springframework.data</groupId>
 					<artifactId>spring-data-solr</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>javax.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
