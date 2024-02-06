@@ -72,7 +72,11 @@ public @interface ValidGetByIdsRequest {
                 if (Utils.notNullNotEmpty(passedAccessions)) {
                     isValid =
                             validateAccessionsWithSequenceRange(
-                                    passedAccessions, passedFacets, passedQuery, passedSort, context);
+                                    passedAccessions,
+                                    passedFacets,
+                                    passedQuery,
+                                    passedSort,
+                                    context);
                 }
 
                 if (!isValid && context != null) {

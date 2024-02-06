@@ -43,6 +43,7 @@ public class MessageConverterConfig {
 
                 converters.add(index++, new ErrorMessageConverter());
                 converters.add(index++, new ErrorMessageXlsConverter());
+                converters.add(index++, new ErrorMessageXMLConverter());
                 converters.add(index++, new ErrorMessageTurtleConverter());
                 converters.add(index++, new ErrorMessageNTriplesConverter());
                 converters.add(index++, new ListMessageConverter(downloadGatekeeper));

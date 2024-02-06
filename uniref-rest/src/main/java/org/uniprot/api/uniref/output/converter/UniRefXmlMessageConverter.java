@@ -3,8 +3,6 @@ package org.uniprot.api.uniref.output.converter;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.xml.bind.Marshaller;
-
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
@@ -12,6 +10,8 @@ import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 import org.uniprot.core.xml.uniref.UniRefEntryConverter;
+
+import jakarta.xml.bind.Marshaller;
 
 /**
  * @author jluo

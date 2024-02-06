@@ -149,6 +149,10 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>javax.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -168,13 +172,6 @@
 			<artifactId>commons-compress</artifactId>
 		</dependency>
 
-
-		<!-- xml marshaller -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>${jaxb.version}</version>
-		</dependency>
 		<!-- OBO Format Writer -->
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
