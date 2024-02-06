@@ -31,6 +31,10 @@
 					<groupId>org.apache.tomcat</groupId>
 					<artifactId>tomcat-jdbc</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -46,6 +50,10 @@
 				<exclusion>
 					<groupId>com.vaadin.external.google</groupId>
 					<artifactId>android-json</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
 				</exclusion>
 			</exclusions>
 
@@ -91,6 +99,12 @@
 			<groupId>org.uniprot</groupId>
 			<artifactId>common-rest</artifactId>
 			<version>${project.parent.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
