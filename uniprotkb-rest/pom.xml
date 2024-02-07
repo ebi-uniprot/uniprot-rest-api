@@ -15,7 +15,7 @@
 		<maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
 		<!-- Dependency versions -->
 		<slf4j.version>1.7.25</slf4j.version>
-		<logback.version>1.2.3</logback.version>
+		<logback.version>1.2.13</logback.version>
 		<commons-codec.version>1.11</commons-codec.version>
 		<jayway.version>2.4.0</jayway.version>
 		<testcontainers.version>1.19.4</testcontainers.version>
