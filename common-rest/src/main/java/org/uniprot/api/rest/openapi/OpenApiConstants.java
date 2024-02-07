@@ -187,7 +187,7 @@ public class OpenApiConstants {
     public static final String QUERY_SUGGESTER_EXAMPLE = "huma";
 
     //TAXONOMY
-    public static final String ID_TAX_OPERATION = "Get taxonomy entry by a single accession.";
+    public static final String ID_TAX_OPERATION = "Get taxonomy entry by a single taxon id.";
     public static final String IDS_TAX_OPERATION = "Get taxonomy entries by a list of taxon ids. (Max. 1K entries)";
     public static final String SEARCH_TAX_OPERATION = "Retrieve taxonomy entries by a search query.";
     public static final String STREAM_TAX_OPERATION = "Download taxonomy entries retrieved by a search query.";
@@ -196,7 +196,7 @@ public class OpenApiConstants {
     public static final String FIELDS_TAX_DESCRIPTION = FIELDS_DESCRIPTION
             + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_TAX_EXAMPLE = "id,common_name,scientific_name,lineage";
-    public static final String IDS_TAX_DESCRIPTION = "Comma separated list of taxonIds";
+    public static final String IDS_TAX_DESCRIPTION = "Comma separated list of taxon ids";
     public static final String IDS_TAX_EXAMPLE = "9606,10116,9913";
     public static final String FACET_FILTER_TAX_DESCRIPTION = "Criteria to filter taxonomy. <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String FACET_FILTER_TAX_EXAMPLE = "superkingdom:Eukaryota";
@@ -211,10 +211,10 @@ public class OpenApiConstants {
 
 
     //UniParc
-    public static final String SEARCH_UNIPARC_OPERATION = "Search for a UniParc sequence entry (or entries) by a SOLR query.";
-    public static final String ID_UNIPARC_OPERATION = "Retrieve an UniParc entry by upi.";
-    public static final String STREAM_UNIPARC_OPERATION = "Stream a UniParc sequence entry (or entries) by a SOLR query.";
-    public static final String ACCESSION_UNIPARC_OPERATION = "Get UniParc entry only by UniProt accession";
+    public static final String SEARCH_UNIPARC_OPERATION = "Retrieve UniParc entries by a search query.";
+    public static final String ID_UNIPARC_OPERATION = "Get UniParc entry by a single upi.";
+    public static final String STREAM_UNIPARC_OPERATION = "Download UniParc entries retrieved by a search query.";
+    public static final String ACCESSION_UNIPARC_OPERATION = "Get UniParc entry by UniProtKB accession";
     public static final String DBID_UNIPARC_OPERATION = "Get UniParc entries by all UniParc cross reference accessions";
     public static final String PROTEOME_UPID_UNIPARC_OPERATION = "Get UniParc entries by Proteome UPID";
     public static final String DATABASES_UNIPARC_OPERATION = "Retrieve UniParc databases by a upi.";
