@@ -250,4 +250,31 @@ public class OpenApiConstants {
     public static final String DBID_UNIPARC_EXAMPLE = "AAC02967,XP_006524055";
     public static final String ACCESSION_UNIPARC_DESCRIPTION = ACCESSION_UNIPROTKB_DESCRIPTION;
     public static final String ACCESSION_UNIPARC_EXAMPLE = ACCESSION_UNIPROTKB_EXAMPLE;
+
+    //Arba
+    public static final String ID_ARBA_OPERATION = "Get ArbaRule entry by a single arbaId.";
+    public static final String SEARCH_ARBA_OPERATION = "Retrieve ArbaRule entries by a search query.";
+    public static final String STREAM_ARBA_OPERATION = "Download ArbaRule entries retrieved by a search query.";
+    public static final String ID_ARBA_DESCRIPTION = "Get Arba entry by an arbaId";
+    public static final String FIELDS_ARBA_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String ID_ARBA_EXAMPLE = "";
+    public static final String FIELDS_ARBA_EXAMPLE = "";
+    public static final String QUERY_ARBA_DESCRIPTION = "";
+    public static final String QUERY_ARBA_EXAMPLE = "";
+    public static final String SORT_ARBA_DESCRIPTION = "";
+    public static final String SORT_ARBA_EXAMPLE = "";
+
+    //UniRule
+    public static final String ID_UNIRULE_OPERATION = "Get UniRule entry by a single uniruleid.";
+    public static final String ID_UNIRULE_DESCRIPTION = "Get UniRule entry by an uniruleid";
+    public static final String FIELDS_UNIRULE_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String ID_UNIRULE_EXAMPLE = "";
+    public static final String FIELDS_UNIRULE_EXAMPLE = "";
+    public static final String SEARCH_UNIRULE_OPERATION = "Retrieve UniRule entries by a search query.";
+    public static final String STREAM_UNIRULE_OPERATION = "Download UniRule entries retrieved by a search query.";
+
+    public static final String QUERY_UNIRULE_DESCRIPTION = "Criteria to search UniRules. It can take any valid Lucene query.";
+    public static final String SORT_UNIRULE_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String QUERY_UNIRULE_EXAMPLE = "";
+    public static final String SORT_UNIRULE_EXAMPLE = "";
 }

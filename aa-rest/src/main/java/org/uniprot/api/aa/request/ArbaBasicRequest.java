@@ -6,6 +6,7 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -21,17 +22,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class ArbaBasicRequest {
 
-    @Parameter(description = QUERY_DESCRIPTION)
+    @Parameter(description = QUERY_ARBA_DESCRIPTION, example = QUERY_ARBA_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(uniProtDataType = UniProtDataType.ARBA, messagePrefix = "search.arba")
     private String query;
 
-    @Parameter(description = SORT_DESCRIPTION)
+    @Parameter(description = SORT_ARBA_DESCRIPTION, example = SORT_ARBA_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.ARBA)
     private String sort;
 
-    @Parameter(description = FIELDS_DESCRIPTION)
+    @Parameter(description = FIELDS_ARBA_DESCRIPTION, example = FIELDS_ARBA_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.ARBA)
     private String fields;
 

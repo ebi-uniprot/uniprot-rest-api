@@ -1,6 +1,7 @@
 package org.uniprot.api.aa.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIRULE;
 
@@ -25,6 +26,7 @@ import org.uniprot.api.aa.service.UniRuleService;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -85,7 +87,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniRule entry by a single uniruleid.",
+            summary = ID_UNIRULE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -98,14 +100,14 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRuleEntry>> getByUniRuleId(
-            @Parameter(description = "Get UniRule entry by an uniruleid")
+            @Parameter(description = ID_UNIRULE_DESCRIPTION, example = ID_UNIRULE_EXAMPLE)
                     @PathVariable("uniruleid")
                     @Pattern(
                             regexp = UNIRULE_ALL_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.unirule.invalid.id}")
                     String uniRuleId,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_UNIRULE_DESCRIPTION, example = FIELDS_UNIRULE_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIRULE)
                     String fields,
@@ -123,7 +125,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve UniRule entries by a search query.",
+            summary = SEARCH_UNIRULE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -161,7 +163,7 @@ public class UniRuleController extends BasicSearchController<UniRuleEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download UniRule entries retrieved by a search query.",
+            summary = STREAM_UNIRULE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
