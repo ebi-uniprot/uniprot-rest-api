@@ -8,4 +8,8 @@ public interface DownloadRequest extends StreamRequest {
     boolean isLargeSolrStreamRestricted();
 
     void setLargeSolrStreamRestricted(boolean isRestricted);
+
+    boolean isForce();
+
+    void setForce(boolean force);
 }

@@ -33,6 +33,8 @@ public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements 
             })
     private String format;
 
+    private boolean force;
+
     public void setFormat(String format) {
         this.format = UniProtKBRequestUtil.parseFormat(format);
     }
