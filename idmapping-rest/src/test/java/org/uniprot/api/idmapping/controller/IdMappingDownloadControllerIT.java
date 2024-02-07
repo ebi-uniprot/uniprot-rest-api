@@ -24,6 +24,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -60,7 +61,10 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.controller.validator.UniParcIdMappingDownloadRequestValidator;
@@ -101,6 +105,7 @@ import com.jayway.jsonpath.JsonPath;
 @WebMvcTest(IdMappingDownloadController.class)
 @ExtendWith(value = {SpringExtension.class})
 @AutoConfigureWebClient
+@Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IdMappingDownloadControllerIT {
 
@@ -139,9 +144,11 @@ public class IdMappingDownloadControllerIT {
     private static final UniProtKBEntry TEMPLATE_KB_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
+    @Container
     protected static final RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
 
+    @Container
     protected static final GenericContainer<?> redisContainer =
             new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
 
@@ -171,6 +178,9 @@ public class IdMappingDownloadControllerIT {
 
     @BeforeAll
     public void setUpDownload() throws Exception {
+        Duration asyncDuration = Duration.ofMillis(500);
+        Awaitility.setDefaultPollDelay(asyncDuration);
+        Awaitility.setDefaultPollInterval(asyncDuration);
         Files.createDirectories(Path.of(this.idsFolder));
         Files.createDirectories(Path.of(this.resultFolder));
 

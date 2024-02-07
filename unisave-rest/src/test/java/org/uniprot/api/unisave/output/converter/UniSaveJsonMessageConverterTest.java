@@ -2,19 +2,16 @@ package org.uniprot.api.unisave.output.converter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.uniprot.api.unisave.repository.domain.DatabaseEnum.SWISSPROT;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.unisave.UniSaveEntityMocker;
 import org.uniprot.api.unisave.model.UniSaveEntry;
@@ -30,7 +27,7 @@ class UniSaveJsonMessageConverterTest {
     @Test
     void canWriteJson() throws IOException {
         UniSaveJsonMessageConverter converter = new UniSaveJsonMessageConverter();
-        OutputStream outputStream = mock(OutputStream.class);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         EntryImpl mockEntry = UniSaveEntityMocker.mockEntry("P12345", 1);
         UniSaveEntry entry =
                 UniSaveEntry.builder()
@@ -49,12 +46,7 @@ class UniSaveJsonMessageConverterTest {
         converter.writeContents(
                 messageConverterContext, outputStream, Instant.now(), new AtomicInteger(0));
 
-        ArgumentCaptor<byte[]> byteCaptor = ArgumentCaptor.forClass(byte[].class);
-        verify(outputStream)
-                .write(byteCaptor.capture(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
-
-        byte[] bytesWritten = byteCaptor.getValue();
-        String writtenValue = new String(bytesWritten, 0, findEndOfString(bytesWritten));
+        String writtenValue = outputStream.toString(Charset.defaultCharset());
         assertThat(
                 writtenValue,
                 is(

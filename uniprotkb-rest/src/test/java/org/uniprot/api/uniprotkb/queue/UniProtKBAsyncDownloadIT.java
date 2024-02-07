@@ -1,5 +1,6 @@
 package org.uniprot.api.uniprotkb.queue;
 
+import static org.awaitility.Awaitility.*;
 import static org.mockito.Mockito.*;
 import static org.uniprot.api.rest.download.queue.RedisUtil.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
@@ -13,8 +14,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.solr.client.solrj.SolrClient;
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
@@ -100,7 +102,6 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
         setUp(restTemplate);
     }
 
-    @Disabled
     @Test
     void sendAndProcessEmbeddingsH5MessageSuccessfullyAfterRetry() throws IOException {
         doThrow(new RuntimeException("Forced exception for testing on call converter.fromMessage"))
@@ -113,23 +114,17 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
         String jobId = this.messageService.sendMessage(request);
         // Producer
         verify(this.messageService, never()).alreadyProcessed(jobId);
-        Awaitility.await().until(jobCreatedInRedis(downloadJobRepository, jobId));
-        Awaitility.await()
-                .atMost(Duration.ofSeconds(20))
-                .until(jobErrored(downloadJobRepository, jobId));
+        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         // verify  redis
         verifyRedisEntry(query, jobId, JobStatus.ERROR, 1, true, 0);
         // after certain delay the job should be reprocessed from kb side
-        Awaitility.await()
-                .atMost(Duration.ofSeconds(20))
-                .until(jobUnfinished(downloadJobRepository, jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobUnfinished(downloadJobRepository, jobId));
         verifyRedisEntry(query, jobId, JobStatus.UNFINISHED, 1, true, 10);
         // then job should be picked by embeddings consumers and set to Running again
         //        await().until(jobRunning(jobId));
         // the job should be completed after sometime by embeddings consumer
-        Awaitility.await()
-                .atMost(Duration.ofSeconds(20))
-                .until(jobFinished(downloadJobRepository, jobId));
+        await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
         // verify ids file generated from solr
         verifyIdsFile(jobId);
         // verify result file doesn't exist yet
