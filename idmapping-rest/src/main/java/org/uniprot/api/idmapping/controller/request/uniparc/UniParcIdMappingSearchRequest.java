@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniParcIdMappingSearchRequest extends UniParcIdMappingBasicRequest
         implements SearchRequest {
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniParcFacetConfig.class)
     private String facets;
 

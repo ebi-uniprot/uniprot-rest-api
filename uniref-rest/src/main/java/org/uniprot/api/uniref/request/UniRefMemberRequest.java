@@ -10,6 +10,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -25,7 +26,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class UniRefMemberRequest {
 
-    @Parameter(description = "Unique identifier for the UniRef cluster")
+    @Parameter(description = ID_UNIREF_DESCRIPTION, example = ID_UNIREF_EXAMPLE)
     @Pattern(
             regexp = FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX,
             flags = {Pattern.Flag.CASE_INSENSITIVE},
@@ -33,11 +34,11 @@ public class UniRefMemberRequest {
     @NotNull(message = "{search.required}")
     private String id;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniRefEntryFacetConfig.class)
     private String facets;
 
-    @Parameter(description = "Facet filter query for UniRef Cluster Members")
+    @Parameter(description = FACET_FILTER_UNIREF_DESCRIPTION, example = FACET_FILTER_UNIREF_EXAMPLE)
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFacetFields(facetConfig = UniRefEntryFacetConfig.class)
     private String facetFilter;

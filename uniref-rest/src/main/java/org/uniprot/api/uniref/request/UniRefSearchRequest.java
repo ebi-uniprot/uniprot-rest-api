@@ -25,7 +25,7 @@ public class UniRefSearchRequest extends UniRefBasicRequest implements SearchReq
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniRefFacetConfig.class)
     private String facets;
 

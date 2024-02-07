@@ -13,6 +13,7 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.validation.*;
@@ -26,22 +27,22 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class UniRefIdsSearchRequest implements IdsSearchRequest {
+
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Comma separated list of UniRef ids")
+    @Parameter(description = IDS_UNIREF_DESCRIPTION, example = IDS_UNIREF_EXAMPLE)
     @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIREF)
     private String ids;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_UNIREF_DESCRIPTION, example = FIELDS_UNIREF_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniRefFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @Parameter(
-            description = "Criteria to search UniRef clusters. It can take any valid solr query.")
+    @Parameter(description = QUERY_UNIREF_DESCRIPTION, example = QUERY_UNIREF_EXAMPLE)
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(uniProtDataType = UniProtDataType.UNIREF, messagePrefix = "search.uniref")
     private String query;
@@ -56,12 +57,12 @@ public class UniRefIdsSearchRequest implements IdsSearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Pagination size. Defaults to number of ids passed. (Single page)")
+    @Parameter(description = SIZE_UNIREF_ID_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_UNIREF_DESCRIPTION, example = SORT_UNIREF_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIREF)
     private String sort;
 

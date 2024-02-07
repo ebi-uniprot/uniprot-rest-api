@@ -277,4 +277,31 @@ public class OpenApiConstants {
     public static final String SORT_UNIRULE_DESCRIPTION = "Name of the field to be sorted on";
     public static final String QUERY_UNIRULE_EXAMPLE = "";
     public static final String SORT_UNIRULE_EXAMPLE = "";
+
+
+    //UniRef
+    public static final String ID_UNIREF_MEMBER_OPERATION = "Retrieve UniRef members by cluster id.";
+    public static final String ID_UNIREF_OPERATION = "Retrieve an UniRef cluster by id.";
+    public static final String JOB_STATUS_UNIREF_OPERATION = "Get the status of a job.";
+    public static final String JOB_ID_UNIREF_DESCRIPTION = "";
+    public static final String JOB_DETAILS_UNIREF_OPERATION = "";
+    public static final String JOB_RUN_UNIREF_OPERATION = "Submit UniRef asynchronous download job.";
+    public static final String ID_UNIREF_LIGHT_OPERATION = "Retrieve a light object of UniRef cluster by id.";
+    public static final String SEARCH_UNIREF_LIGHT_OPERATION = "Search for a UniRef cluster (or clusters) by a SOLR query.";
+    public static final String STREAM_UNIREF_LIGHT_OPERATION = "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.";
+    public static final String IDS_UNIREF_LIGHT_OPERATION = "Get UniRef entries by a list of ids.";
+    public static final String ID_UNIREF_DESCRIPTION = "Unique identifier for the UniRef cluster";
+    public static final String ID_UNIREF_EXAMPLE = "";
+    public static final String FIELDS_UNIREF_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_UNIREF_EXAMPLE = "";
+    public static final String QUERY_UNIREF_DESCRIPTION = "Criteria to search UniRef clusters. It can take any valid solr query.";
+    public static final String QUERY_UNIREF_EXAMPLE = "";
+    public static final String SORT_UNIREF_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String COMPLETE_UNIREF_DESCRIPTION = "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms";
+    public static final String IDS_UNIREF_DESCRIPTION = "Comma separated list of UniRef ids";
+    public static final String IDS_UNIREF_EXAMPLE = "";
+    public static final String SORT_UNIREF_EXAMPLE = "";
+    public static final String SIZE_UNIREF_ID_DESCRIPTION = "Pagination size. Defaults to number of ids passed. (Single page)";
+    public static final String FACET_FILTER_UNIREF_DESCRIPTION = "Facet filter query for UniRef Cluster Members";
+    public static final String FACET_FILTER_UNIREF_EXAMPLE = "";
 }

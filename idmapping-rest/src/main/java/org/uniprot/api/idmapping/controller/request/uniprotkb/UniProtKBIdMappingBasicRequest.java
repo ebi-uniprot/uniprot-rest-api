@@ -22,18 +22,18 @@ import io.swagger.v3.oas.annotations.Parameter;
 @EqualsAndHashCode(callSuper = true)
 public class UniProtKBIdMappingBasicRequest extends IdMappingPageRequest {
 
-    @Parameter(description = QUERY_UNIPROTKB_SEARCH_DESCRIPTION)
+    @Parameter(description = QUERY_UNIPROTKB_SEARCH_DESCRIPTION, example = QUERY_UNIPROTKB_EXAMPLE)
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPROTKB,
             messagePrefix = "search.uniprot")
     private String query;
 
-    @Parameter(description = FIELDS_UNIPROTKB_DESCRIPTION)
+    @Parameter(description = FIELDS_UNIPROTKB_DESCRIPTION, example = FIELDS_UNIPROTKB_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String fields;
 
-    @Parameter(description = SORT_UNIPROTKB_DESCRIPTION)
+    @Parameter(description = SORT_UNIPROTKB_DESCRIPTION, example = SORT_UNIPROTKB_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPROTKB)
     private String sort;
 

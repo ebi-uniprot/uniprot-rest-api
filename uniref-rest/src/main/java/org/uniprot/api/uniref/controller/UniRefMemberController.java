@@ -35,6 +35,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 05/01/2021
  */
+@Tag(
+        name = "uniref",
+        description =
+                "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
 @RestController
 @Validated
 @RequestMapping("/uniref")
@@ -52,10 +56,6 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
         this.service = queryService;
     }
 
-    @Tag(
-            name = "uniref",
-            description =
-                    "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
     @GetMapping(
             value = "/{id}/members",
             produces = {
@@ -63,7 +63,7 @@ public class UniRefMemberController extends BasicSearchController<UniRefMember> 
                 APPLICATION_JSON_VALUE,
             })
     @Operation(
-            summary = "Retrieve UniRef members by cluster id.",
+            summary = ID_UNIREF_MEMBER_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

@@ -2,6 +2,7 @@ package org.uniprot.api.uniref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
@@ -24,6 +25,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
@@ -51,6 +53,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 09/07/2020
  */
+@Tag(
+        name = "uniref",
+        description =
+                "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
 @RestController
 @Validated
 @RequestMapping("/uniref")
@@ -75,10 +81,6 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
         this.service = queryService;
     }
 
-    @Tag(
-            name = "uniref",
-            description =
-                    "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
     @GetMapping(
             value = "/{id}/light",
             produces = {
@@ -92,7 +94,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve a light object of UniRef cluster by id.",
+            summary = ID_UNIREF_LIGHT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -110,7 +112,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntryLight>> getById(
-            @Parameter(description = "Unique identifier for the UniRef cluster")
+            @Parameter(description = ID_UNIREF_DESCRIPTION, example = ID_UNIREF_EXAMPLE)
                     @PathVariable("id")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIREF_CLUSTER_ID_REGEX,
@@ -118,9 +120,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                             message = "{search.invalid.id.value}")
                     String id,
             @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
-                    @Parameter(
-                            description =
-                                    "Comma separated list of fields to be returned in response")
+                    @Parameter(description = FIELDS_UNIREF_DESCRIPTION, example = FIELDS_UNIREF_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -134,7 +134,6 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
         }
     }
 
-    @Tag(name = "uniref")
     @GetMapping(
             value = "/search",
             produces = {
@@ -145,7 +144,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniRef cluster (or clusters) by a SOLR query.",
+            summary = SEARCH_UNIREF_LIGHT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -187,7 +186,6 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
         return super.getSearchResponse(results, searchRequest.getFields(), request, response);
     }
 
-    @Tag(name = "uniref")
     @GetMapping(
             value = "/stream",
             produces = {
@@ -201,7 +199,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.",
+            summary = STREAM_UNIREF_LIGHT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -232,9 +230,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryLight>>> stream(
             @Valid @ModelAttribute UniRefStreamRequest streamRequest,
+            @Parameter(hidden = true)
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
                     MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
         setBasicRequestFormat(streamRequest, request);
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
@@ -251,7 +249,6 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
     }
 
     @SuppressWarnings("squid:S3752")
-    @Tag(name = "uniref")
     @RequestMapping(
             value = "/ids",
             method = {RequestMethod.GET},
@@ -263,7 +260,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniRef entries by a list of ids.",
+            summary = IDS_UNIREF_LIGHT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -290,7 +287,6 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
     }
 
     @SuppressWarnings("squid:S3752")
-    @Tag(name = "uniref")
     @RequestMapping(
             value = "/ids",
             method = {RequestMethod.POST},
@@ -302,7 +298,8 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniRef entries by a list of ids.",
+            hidden = true,
+            summary = IDS_UNIREF_LIGHT_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
