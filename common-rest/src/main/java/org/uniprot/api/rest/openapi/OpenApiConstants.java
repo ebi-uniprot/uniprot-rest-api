@@ -224,17 +224,21 @@ public class OpenApiConstants {
     public static final String IDS_UNIPARC_OPERATION = "Get UniParc entries by a list of upis.";
     public static final String PROTEOME_UPID_UNIPARC_DESCRIPTION = UPID_PROTEOME_DESCRIPTION;
     public static final String PROTEOME_UPID_UNIPARC_EXAMPLE = UPID_PROTEOME_EXAMPLE;
-    public static final String QUERY_UNIPARC_DESCRIPTION = "Criteria to search the uniparc. It can take any valid solr query.";
+    public static final String QUERY_UNIPARC_DESCRIPTION = "Criteria to search UniParc. "
+            + QUERY_ADVANCED
+            + " <a href='https://rest.uniprot.org/configure/uniparc/search-fields'>List of valid search fields</a>";
     public static final String QUERY_UNIPARC_EXAMPLE = "\"Homo Sapiens\"";
-    public static final String SORT_UNIPARC_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_UNIPARC_DESCRIPTION = SORT_DESCRIPTION
+            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_UNIPARC_EXAMPLE = "upi asc";
-    public static final String FIELDS_UNIPARC_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_UNIPARC_DESCRIPTION = FIELDS_DESCRIPTION
+            + "  <a href='https://rest.uniprot.org/configure/uniparc/result-fields'>List of valid fields</a>";
     public static final String FIELDS_UNIPARC_EXAMPLE = "upi,organism,length";
     public static final String SEQUENCE_UNIPARC_DESCRIPTION = "Protein Sequence";
     public static final String SEQUENCE_UNIPARC_EXAMPLE = "";
-    public static final String ID_UNIPARC_DESCRIPTION = "UniParc ID (UPI)";
+    public static final String ID_UNIPARC_DESCRIPTION = "Unique identifier for the UniParc id (UPI)";
     public static final String ID_UNIPARC_EXAMPLE = "UPI000002DB1C";
-    public static final String IDS_UNIPARC_DESCRIPTION = "Comma separated list of UniParc ids(upis)";
+    public static final String IDS_UNIPARC_DESCRIPTION = "Comma separated list of UniParc ids (upis)";
     public static final String IDS_UNIPARC_EXAMPLE = "UPI000002DB1C,UPI000002A2F2";
     public static final String SIZE_IDS_UNIPARC_DESCRIPTION = "Pagination size. Defaults to number of upis passed (Single page).";
     public static final String TAXON_IDS_UNIPARC_DESCRIPTION = IDS_TAX_DESCRIPTION + ". (Max. 100)";
