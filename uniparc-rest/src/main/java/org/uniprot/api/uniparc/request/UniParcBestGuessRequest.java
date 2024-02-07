@@ -12,6 +12,9 @@ import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.FIELDS_UNIPARC_EXAMPLE;
+
 /**
  * @author lgonzales
  * @since 12/08/2020
@@ -20,9 +23,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class UniParcBestGuessRequest {
 
-    @Parameter(
-            description =
-                    "The query is used to search UniParc. This accepts any valid standard Lucene query.")
+    @Parameter(description = QUERY_UNIPARC_DESCRIPTION, example = QUERY_UNIPARC_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -30,7 +31,7 @@ public class UniParcBestGuessRequest {
             messagePrefix = "search.uniparc")
     protected String query;
 
-    @Parameter(description = "Comma separated list of fields to be returned in the response")
+    @Parameter(description = FIELDS_UNIPARC_DESCRIPTION, example = FIELDS_UNIPARC_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     protected String fields;
 }

@@ -83,7 +83,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
                         })
             })
     public ResponseEntity<MessageConverterContext<InteractionEntry>> getInteractions(
-            @Parameter(description = ACCESSION_DESCRIPTION, example = "P05067")
+            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,

@@ -58,8 +58,9 @@ public class OpenApiConstants {
             SORT_DESCRIPTION
                     + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_UNIPROTKB_EXAMPLE = "accession desc";
-    public static final String ACCESSION_DESCRIPTION = "Unique identifier for the UniProtKB entry";
-    public static final String VERSION_DESCRIPTION =
+    public static final String ACCESSION_UNIPROTKB_DESCRIPTION = "Unique identifier for the UniProtKB entry";
+    public static final String ACCESSION_UNIPROTKB_EXAMPLE = "P05067";
+    public static final String VERSION_UNIPROTKB_DESCRIPTION =
             "Version of the entry. Versions are integers 1 or above; enter <tt>last</tt> for the latest version.</br>"
                     + "Please note that when passing <tt>version</tt> file formats are restricted to <tt>fasta</tt> and <tt>txt</tt> only";
     public static final String FORMAT_UNIPROTKB_DESCRIPTION =
@@ -76,7 +77,8 @@ public class OpenApiConstants {
             "List of taxonomy groups with respect to the given query and parent";
 
     // Proteome
-    public static final String UPID_DESCRIPTION = "Unique identifier for the Proteome entry";
+    public static final String UPID_PROTEOME_DESCRIPTION = "Unique identifier for the Proteome entry";
+    public static final String UPID_PROTEOME_EXAMPLE = "UP000005640";
 
     // Id Mapping
     public static final String ID_MAPPING_JOB_ID_DESCRIPTION =
@@ -207,4 +209,41 @@ public class OpenApiConstants {
     public static final String SORT_TAX_EXAMPLE = "scientific desc";
     public static final String IDS_SIZE_TAX_DESCRIPTION = "Pagination size. Defaults to number of taxonIds passed (Single page).";
 
+
+    //UniParc
+    public static final String SEARCH_UNIPARC_OPERATION = "Search for a UniParc sequence entry (or entries) by a SOLR query.";
+    public static final String ID_UNIPARC_OPERATION = "Retrieve an UniParc entry by upi.";
+    public static final String STREAM_UNIPARC_OPERATION = "Stream a UniParc sequence entry (or entries) by a SOLR query.";
+    public static final String ACCESSION_UNIPARC_OPERATION = "Get UniParc entry only by UniProt accession";
+    public static final String DBID_UNIPARC_OPERATION = "Get UniParc entries by all UniParc cross reference accessions";
+    public static final String PROTEOME_UPID_UNIPARC_OPERATION = "Get UniParc entries by Proteome UPID";
+    public static final String DATABASES_UNIPARC_OPERATION = "Retrieve UniParc databases by a upi.";
+    public static final String BEST_GUESS_UNIPARC_OPERATION = "Best Guess returns UniParc entry with a cross-reference to the longest active UniProtKB sequence.";
+    public static final String BEST_GUESS_UNIPARC_OPERATION_DESC = "For a given user input (request parameters), Best Guess returns the UniParcEntry with a cross-reference to the longest active UniProtKB sequence (preferably from Swiss-Prot and if not then TrEMBL). It also returns the sequence and related information. If it finds more than one longest active UniProtKB sequence it returns 400 (Bad Request) error response with the list of cross references found.";
+    public static final String SEQUENCE_UNIPARC_OPERATION = "Get UniParc entry by protein sequence";
+    public static final String IDS_UNIPARC_OPERATION = "Get UniParc entries by a list of upis.";
+    public static final String PROTEOME_UPID_UNIPARC_DESCRIPTION = UPID_PROTEOME_DESCRIPTION;
+    public static final String PROTEOME_UPID_UNIPARC_EXAMPLE = UPID_PROTEOME_EXAMPLE;
+    public static final String QUERY_UNIPARC_DESCRIPTION = "Criteria to search the uniparc. It can take any valid solr query.";
+    public static final String QUERY_UNIPARC_EXAMPLE = "\"Homo Sapiens\"";
+    public static final String SORT_UNIPARC_DESCRIPTION = "Name of the field to be sorted on";
+    public static final String SORT_UNIPARC_EXAMPLE = "upi asc";
+    public static final String FIELDS_UNIPARC_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_UNIPARC_EXAMPLE = "upi,organism,length";
+    public static final String SEQUENCE_UNIPARC_DESCRIPTION = "Protein Sequence";
+    public static final String SEQUENCE_UNIPARC_EXAMPLE = "";
+    public static final String ID_UNIPARC_DESCRIPTION = "UniParc ID (UPI)";
+    public static final String ID_UNIPARC_EXAMPLE = "UPI000002DB1C";
+    public static final String IDS_UNIPARC_DESCRIPTION = "Comma separated list of UniParc ids(upis)";
+    public static final String IDS_UNIPARC_EXAMPLE = "UPI000002DB1C,UPI000002A2F2";
+    public static final String SIZE_IDS_UNIPARC_DESCRIPTION = "Pagination size. Defaults to number of upis passed (Single page).";
+    public static final String TAXON_IDS_UNIPARC_DESCRIPTION = IDS_TAX_DESCRIPTION + ". (Max. 100)";
+    public static final String TAXON_IDS_UNIPARC_EXAMPLE = IDS_TAX_EXAMPLE;
+    public static final String DBTYPES_UNIPARC_DESCRIPTION = "Comma separated list of UniParc cross reference database names. (Max. 50)";
+    public static final String DBTYPES_UNIPARC_EXAMPLE = "EnsemblBacteria,FlyBase";
+    public static final String ACTIVE_UNIPARC_DESCRIPTION = "Flag to filter by active(true) or inactive(false) cross reference";
+    public static final String DBID_UNIPARC_DESCRIPTION = "UniParc cross-referenced id";
+    public static final String DBID_UNIPARC_EXAMPLE = "AAC02967,XP_006524055";
+    public static final String ACCESSION_UNIPARC_DESCRIPTION = ACCESSION_UNIPROTKB_DESCRIPTION;
+    public static final String ACCESSION_UNIPARC_EXAMPLE = ACCESSION_UNIPROTKB_EXAMPLE;
 }

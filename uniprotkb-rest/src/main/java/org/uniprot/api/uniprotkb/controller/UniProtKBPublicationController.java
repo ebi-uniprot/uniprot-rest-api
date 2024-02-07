@@ -86,7 +86,7 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
             })
     public ResponseEntity<MessageConverterContext<PublicationEntry>>
             getMappedPublicationsByUniProtAccession(
-                    @Parameter(description = ACCESSION_DESCRIPTION, example = "P05067")
+                    @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
                             @PathVariable("accession")
                             @Pattern(
                                     regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,

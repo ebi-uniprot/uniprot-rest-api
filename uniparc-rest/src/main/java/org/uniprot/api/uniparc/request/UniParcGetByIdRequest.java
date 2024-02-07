@@ -2,11 +2,14 @@ package org.uniprot.api.uniparc.request;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidEnumDisplayValue;
 import org.uniprot.core.uniparc.UniParcDatabase;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad
@@ -14,15 +17,16 @@ import io.swagger.v3.oas.annotations.Parameter;
  */
 @Data
 public class UniParcGetByIdRequest {
-    @Parameter(description = "Comma separated list of UniParc cross reference database names")
+
+    @Parameter(description = DBTYPES_UNIPARC_DESCRIPTION, example = DBTYPES_UNIPARC_EXAMPLE)
     @ValidCommaSeparatedItemsLength(maxLength = 50)
     @ValidEnumDisplayValue(enumDisplay = UniParcDatabase.class)
     private String dbTypes;
 
-    @Parameter(description = "Flag to filter by active(true) or inactive(false) cross reference")
+    @Parameter(description = ACTIVE_UNIPARC_DESCRIPTION)
     private Boolean active;
 
-    @Parameter(description = "Comma separated list of taxonomy Ids")
+    @Parameter(description = TAXON_IDS_UNIPARC_DESCRIPTION, example = TAXON_IDS_UNIPARC_EXAMPLE)
     @ValidCommaSeparatedItemsLength(maxLength = 100)
     private String taxonIds;
 

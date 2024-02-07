@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class UniParcDatabasesRequest extends UniParcGetByIdRequest implements SearchRequest {
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_UNIPARC_DESCRIPTION, example = FIELDS_UNIPARC_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC_CROSSREF)
     private String fields;
 

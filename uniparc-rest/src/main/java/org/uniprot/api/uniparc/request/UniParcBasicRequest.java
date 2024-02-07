@@ -4,11 +4,14 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.UniProtKBRequestUtil;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author lgonzales
@@ -17,7 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class UniParcBasicRequest {
 
-    @Parameter(description = "Criteria to search the uniparc. It can take any valid solr query.")
+    @Parameter(description = QUERY_UNIPARC_DESCRIPTION, example = QUERY_UNIPARC_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -25,11 +28,11 @@ public class UniParcBasicRequest {
             messagePrefix = "search.uniparc")
     protected String query;
 
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_UNIPARC_DESCRIPTION, example = SORT_UNIPARC_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     protected String sort;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_UNIPARC_DESCRIPTION, example = FIELDS_UNIPARC_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     protected String fields;
 

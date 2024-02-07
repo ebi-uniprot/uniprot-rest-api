@@ -234,7 +234,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 LIST_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<GeneCentricEntry>> getByAccession(
-            @Parameter(description = ACCESSION_DESCRIPTION)
+            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,

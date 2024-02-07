@@ -32,20 +32,20 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @NotNull(message = "{search.required}")
-    @Parameter(description = "Comma separated list of UniParc ids(upis)")
+    @Parameter(description = IDS_UNIPARC_DESCRIPTION, example = IDS_UNIPARC_EXAMPLE)
     @ValidUniqueIdList(uniProtDataType = UniProtDataType.UNIPARC)
     private String upis;
 
-    @Parameter(description = "Comma separated list of fields to be returned in response")
+    @Parameter(description = FIELDS_UNIPARC_DESCRIPTION, example = FIELDS_UNIPARC_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
 
-    @Parameter(description = "Name of the facet search")
+    @Parameter(hidden = true)
     @ValidFacets(facetConfig = UniParcFacetConfig.class)
     @ValidContentTypes(contentTypes = {MediaType.APPLICATION_JSON_VALUE})
     private String facets;
 
-    @Parameter(description = "Criteria to search the uniparc. It can take any valid solr query.")
+    @Parameter(description = QUERY_UNIPARC_DESCRIPTION, example = QUERY_UNIPARC_EXAMPLE)
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
             uniProtDataType = UniProtDataType.UNIPARC,
@@ -62,12 +62,12 @@ public class UniParcIdsSearchRequest implements IdsSearchRequest {
     @Parameter(hidden = true)
     private String cursor;
 
-    @Parameter(description = "Pagination size. Defaults to number of upis passed (Single page).")
+    @Parameter(description = SIZE_IDS_UNIPARC_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive.or.zero}")
     @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
-    @Parameter(description = "Name of the field to be sorted on")
+    @Parameter(description = SORT_UNIPARC_DESCRIPTION, example = SORT_UNIPARC_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String sort;
 

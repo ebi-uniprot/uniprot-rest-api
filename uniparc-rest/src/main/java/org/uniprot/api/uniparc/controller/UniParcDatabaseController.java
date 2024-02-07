@@ -1,6 +1,7 @@
 package org.uniprot.api.uniparc.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.TSV_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.UniProtMediaType.XLS_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.uniparc.request.UniParcDatabasesRequest;
@@ -68,7 +70,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
             value = "/{upi}/databases",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     @Operation(
-            summary = "Retrieve UniParc databases by a upi.",
+            summary = DATABASES_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -86,7 +88,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.invalid.upi.value}")
                     @NotNull(message = "{search.required}")
-                    @Parameter(description = "UniParc ID (UPI)")
+                    @Parameter(description = ID_UNIPARC_DESCRIPTION, example = ID_UNIPARC_EXAMPLE)
                     String upi,
             @Valid @ModelAttribute UniParcDatabasesRequest databasesRequest,
             HttpServletRequest request,

@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public abstract class UniParcGetByIdPageSearchRequest extends UniParcGetByIdRequest
         implements SearchRequest {
 
-    @Parameter(description = "Comma separated list of fields to be returned in the response")
+    @Parameter(description = FIELDS_UNIPARC_DESCRIPTION, example = FIELDS_UNIPARC_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPARC)
     private String fields;
 

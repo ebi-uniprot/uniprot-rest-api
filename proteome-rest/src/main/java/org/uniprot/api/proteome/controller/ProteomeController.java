@@ -150,7 +150,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<ProteomeEntry>> getByUpId(
-            @Parameter(description = UPID_DESCRIPTION)
+            @Parameter(description = UPID_PROTEOME_DESCRIPTION, example = UPID_PROTEOME_EXAMPLE)
                     @PathVariable("upid")
                     @Pattern(
                             regexp = FieldRegexConstants.PROTEOME_ID_REGEX,

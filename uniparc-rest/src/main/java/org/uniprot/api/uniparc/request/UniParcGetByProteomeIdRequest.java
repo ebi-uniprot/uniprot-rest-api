@@ -6,9 +6,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad
@@ -22,7 +25,7 @@ public class UniParcGetByProteomeIdRequest extends UniParcGetByIdPageSearchReque
     @Parameter(hidden = true)
     private static final String PROTEOME_ID_STR = "upid";
 
-    @Parameter(description = "UniProt Proteome UPID")
+    @Parameter(description = PROTEOME_UPID_UNIPARC_DESCRIPTION, example = PROTEOME_UPID_UNIPARC_EXAMPLE)
     @NotNull(message = "{search.required}")
     private String upId;
 

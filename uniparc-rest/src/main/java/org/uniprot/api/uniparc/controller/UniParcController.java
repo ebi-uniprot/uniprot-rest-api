@@ -2,6 +2,7 @@ package org.uniprot.api.uniparc.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
@@ -23,6 +24,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
@@ -83,7 +85,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for a UniParc sequence entry (or entries) by a SOLR query.",
+            summary = SEARCH_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -135,7 +137,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve an UniParc entry by upi.",
+            summary = ID_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -184,7 +186,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream a UniParc sequence entry (or entries) by a SOLR query.",
+            summary = STREAM_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -212,9 +214,9 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> stream(
             @Valid @ModelAttribute UniParcStreamRequest streamRequest,
+            @Parameter(hidden = true)
             @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
                     MediaType contentType,
-            @RequestHeader(value = "Accept-Encoding", required = false) String encoding,
             HttpServletRequest request) {
         setBasicRequestFormat(streamRequest, request);
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
@@ -243,7 +245,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniParc entry only by UniProt accession",
+            summary = ACCESSION_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -261,8 +263,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     public ResponseEntity<MessageConverterContext<UniParcEntry>> getByAccession(
             @Valid @ModelAttribute UniParcGetByAccessionRequest getByAccessionRequest,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletRequest request) {
 
         UniParcEntry entry = queryService.getByUniProtAccession(getByAccessionRequest);
 
@@ -280,7 +281,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniParc entries by all UniParc cross reference accessions",
+            summary = DBID_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -327,7 +328,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniParc entries by Proteome UPID",
+            summary = PROTEOME_UPID_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -367,8 +368,8 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/bestguess",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
     @Operation(
-            summary =
-                    "For a given user input (request parameters), Best Guess returns the UniParcEntry with a cross-reference to the longest active UniProtKB sequence (preferably from Swiss-Prot and if not then TrEMBL). It also returns the sequence and related information. If it finds more than one longest active UniProtKB sequence it returns 400 (Bad Request) error response with the list of cross references found.",
+            summary = BEST_GUESS_UNIPARC_OPERATION,
+            description = BEST_GUESS_UNIPARC_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -406,7 +407,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniParc entry by protein sequence",
+            summary = SEQUENCE_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -444,7 +445,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniParc entries by a list of upis.",
+            summary = IDS_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -494,7 +495,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             })
     @Operation(
             hidden = true,
-            summary = "Get UniParc entries by a list of upis.",
+            summary = IDS_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

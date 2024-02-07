@@ -8,6 +8,9 @@ import lombok.EqualsAndHashCode;
 import org.springdoc.api.annotations.ParameterObject;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
+
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad
@@ -20,9 +23,7 @@ public class UniParcGetByDBRefIdRequest extends UniParcGetByIdPageSearchRequest 
     @Parameter(hidden = true)
     private static final String DB_ID_STR = "dbid";
 
-    @Parameter(
-            description =
-                    "UniParc cross reference id, eg. AAC02967 (EMBL) or XP_006524055 (RefSeq)")
+    @Parameter(description = DBID_UNIPARC_DESCRIPTION, example = DBID_UNIPARC_EXAMPLE)
     @NotNull(message = "{search.required}")
     private String dbId;
 

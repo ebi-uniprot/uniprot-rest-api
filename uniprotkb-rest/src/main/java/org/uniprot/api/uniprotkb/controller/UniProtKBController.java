@@ -188,7 +188,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccession(
-            @Parameter(description = ACCESSION_DESCRIPTION, example = "P05067")
+            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_OR_ID,
@@ -201,7 +201,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             example = "accession,protein_name,gene_names,organism_name")
                     @RequestParam(value = "fields", required = false)
                     String fields,
-            @Parameter(description = VERSION_DESCRIPTION)
+            @Parameter(description = VERSION_UNIPROTKB_DESCRIPTION)
                     @RequestParam(value = "version", required = false)
                     @ValidContentTypes(contentTypes = {FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
                     String version,
