@@ -1188,7 +1188,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                         jsonPath(
                                 "$.messages.*",
                                 contains(
-                                        "Invalid request received. Sequence range is only supported for type text/plain;format=flatfile"))),
+                                        "Invalid request received. Sequence range is only supported for type text/plain;format=fasta"))),
                 Arguments.of(
                         "P12345[20-10]",
                         FASTA_MEDIA_TYPE_VALUE,

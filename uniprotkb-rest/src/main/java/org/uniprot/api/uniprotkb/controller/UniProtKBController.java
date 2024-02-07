@@ -533,7 +533,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         MediaType format = getAcceptHeader(request);
         if (!FASTA_MEDIA_TYPE.equals(format)) {
             throw new InvalidRequestException(
-                    "Sequence range is only supported for type " + FF_MEDIA_TYPE_VALUE);
+                    "Sequence range is only supported for type " + FASTA_MEDIA_TYPE_VALUE);
         }
         // extract the range and validate
         String[] rangeTokens = sequenceRange.split("-");
