@@ -128,7 +128,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, UniProtMediaType.RDF_MEDIA_TYPE)
-                        .param("org/uniprot/api/uniparc/common/service/query", "*");
+                        .param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -154,7 +154,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("org/uniprot/api/uniparc/common/service/query", "*");
+                        .param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
@@ -193,9 +193,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
                 mockMvc.perform(
                         get(streamRequestPath)
                                 .header(ACCEPT, MediaType.APPLICATION_JSON)
-                                .param(
-                                        "org/uniprot/api/uniparc/common/service/query",
-                                        "invalid:invalid")
+                                .param("query", "invalid:invalid")
                                 .param("fields", "invalid,invalid1")
                                 .param("sort", "invalid")
                                 .param("download", "invalid"));
@@ -221,7 +219,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("org/uniprot/api/uniparc/common/service/query", "*")
+                        .param("query", "*")
                         .param("download", "true");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -244,7 +242,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("org/uniprot/api/uniparc/common/service/query", "identity:0.5")
+                        .param("query", "identity:0.5")
                         .param("sort", "id desc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -271,7 +269,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param("org/uniprot/api/uniparc/common/service/query", "*")
+                        .param("query", "*")
                         .param("sort", sortField + " asc");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -290,9 +288,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
         MockHttpServletRequestBuilder requestBuilder =
                 get(streamRequestPath)
                         .header(ACCEPT, MediaType.APPLICATION_JSON)
-                        .param(
-                                "org/uniprot/api/uniparc/common/service/query",
-                                "identity:1.0 AND (P12301 OR P12302)")
+                        .param("query", "identity:1.0 AND (P12301 OR P12302)")
                         .param("fields", "length,organism_id");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
@@ -321,9 +317,7 @@ class UniRefLightStreamControllerIT extends AbstractStreamControllerIT {
     void streamAllContentType(MediaType mediaType) throws Exception {
         // when
         MockHttpServletRequestBuilder requestBuilder =
-                get(streamRequestPath)
-                        .header(ACCEPT, mediaType)
-                        .param("org/uniprot/api/uniparc/common/service/query", "*");
+                get(streamRequestPath).header(ACCEPT, mediaType).param("query", "*");
 
         MvcResult response = mockMvc.perform(requestBuilder).andReturn();
 
