@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -12,6 +13,7 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 
 @Component
+@Profile({"asyncDownload"})
 public class AsyncDownloadSubmissionRules {
     private final int maxRetryCount;
     private final int maxWaitingTime;

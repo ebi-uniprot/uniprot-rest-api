@@ -14,8 +14,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.solr.client.solrj.SolrClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
