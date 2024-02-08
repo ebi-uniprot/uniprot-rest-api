@@ -192,7 +192,7 @@ public class PublicationService extends BasicSearchService<PublicationDocument, 
         @Override
         public List<String> getFacetList() {
             if (Utils.notNullNotEmpty(facets)) {
-                return Arrays.asList(facets.split(("\\s*,\\s*")));
+                return Arrays.asList(facets.replaceAll("\\s", "").split(","));
             } else {
                 return Collections.emptyList();
             }

@@ -17,6 +17,7 @@ import uk.ac.ebi.uniprot.openapi.extension.ModelFieldMeta;
 import io.swagger.v3.oas.annotations.Parameter;
 
 @Data
+@ValidGetByIdsRequest
 public class UniProtKBIdsSearchRequest implements IdsSearchRequest {
 
     @NotNull(message = "{search.required}")

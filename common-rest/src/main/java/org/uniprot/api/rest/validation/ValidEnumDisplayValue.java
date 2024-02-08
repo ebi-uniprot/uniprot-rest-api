@@ -39,6 +39,7 @@ public @interface ValidEnumDisplayValue {
             EnumDisplay[] values = constraintAnnotation.enumDisplay().getEnumConstants();
             Arrays.stream(values)
                     .map(EnumDisplay::getDisplayName)
+                    .map(n -> n.replaceAll("\\s", ""))
                     .map(String::toLowerCase)
                     .forEach(acceptedValues::add);
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
@@ -51,7 +52,7 @@ public @interface ValidEnumDisplayValue {
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;
                 // verify if db name is valid.
-                String[] dbNames = value.split("\\s*,\\s*");
+                String[] dbNames = value.replaceAll("\\s", "").split(",");
                 for (String dbName : dbNames) {
                     if (!isValidUniParcDatabase(dbName)) {
                         buildInvalidUniParcDBMessage(dbName, contextImpl);

@@ -9,14 +9,14 @@ import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLA
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.xml.bind.Marshaller;
-
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.core.xml.uniprot.UniProtEntryConverter;
+
+import jakarta.xml.bind.Marshaller;
 
 public class UniProtKBXmlMessageConverter
         extends AbstractXmlMessageConverter<UniProtKBEntry, Entry> {

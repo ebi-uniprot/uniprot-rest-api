@@ -64,7 +64,7 @@ public class UniProtKBSearchRequest extends UniProtKBBasicRequest implements Sea
     @Override
     public List<String> getFacetList() {
         if (hasFacets()) {
-            return Arrays.asList(facets.split(("\\s*,\\s*")));
+            return Arrays.asList(facets.replaceAll("\\s", "").split(","));
         } else {
             return Collections.emptyList();
         }

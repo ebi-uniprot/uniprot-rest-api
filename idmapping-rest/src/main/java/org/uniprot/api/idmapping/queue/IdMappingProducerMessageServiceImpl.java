@@ -15,9 +15,13 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.queue.AsyncDownloadSubmissionRules;
+import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 import org.uniprot.api.rest.request.HashGenerator;
 
 @Service
@@ -29,36 +33,54 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
     private final MessageConverter converter;
     private final DownloadJobRepository jobRepository;
     private final HashGenerator<IdMappingDownloadRequest> idMappingHashGenerator;
+    private final AsyncDownloadSubmissionRules asyncDownloadSubmissionRules;
+    private final AsyncDownloadFileHandler asyncDownloadFileHandler;
     private static final String JOB_ID = "jobId";
 
     public IdMappingProducerMessageServiceImpl(
             MessageConverter converter,
             RabbitTemplate rabbitTemplate,
             DownloadJobRepository downloadJobRepository,
-            HashGenerator<IdMappingDownloadRequest> idMappingHashGenerator) {
+            HashGenerator<IdMappingDownloadRequest> idMappingHashGenerator,
+            AsyncDownloadSubmissionRules asyncDownloadSubmissionRules,
+            AsyncDownloadFileHandler asyncDownloadFileHandler) {
         this.rabbitTemplate = rabbitTemplate;
         this.converter = converter;
         this.jobRepository = downloadJobRepository;
         this.idMappingHashGenerator = idMappingHashGenerator;
+        this.asyncDownloadSubmissionRules = asyncDownloadSubmissionRules;
+        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
     }
 
     @Override
     public String sendMessage(IdMappingDownloadRequest downloadRequest) {
         MessageProperties messageHeader = new MessageProperties();
-        String asyncDownloadJobId = idMappingHashGenerator.generateHash(downloadRequest);
-        messageHeader.setHeader(JOB_ID, asyncDownloadJobId);
+        String jobId = idMappingHashGenerator.generateHash(downloadRequest);
+        messageHeader.setHeader(JOB_ID, jobId);
 
         if (Objects.isNull(downloadRequest.getFormat())) {
             downloadRequest.setFormat(APPLICATION_JSON_VALUE);
         }
+        boolean force = downloadRequest.isForce();
+        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(jobId, force);
 
-        if (!this.jobRepository.existsById(asyncDownloadJobId)) {
-            doSendMessage(downloadRequest, messageHeader, asyncDownloadJobId);
-            log.info("Message with jobId {} ready to be processed", asyncDownloadJobId);
+        if (jobSubmitFeedback.isAllowed()) {
+            if (force) {
+                cleanBeforeResubmission(jobId);
+                log.info("Message with jobId {} is ready to resubmit", jobId);
+            }
+            doSendMessage(downloadRequest, messageHeader, jobId);
+            log.info("Message with jobId {} ready to be processed", jobId);
         } else {
-            alreadyProcessed(asyncDownloadJobId);
+            alreadyProcessed(jobId);
+            throw new IllegalDownloadJobSubmissionException(jobId, jobSubmitFeedback.getMessage());
         }
-        return asyncDownloadJobId;
+        return jobId;
+    }
+
+    private void cleanBeforeResubmission(String jobId) {
+        jobRepository.deleteById(jobId);
+        asyncDownloadFileHandler.deleteAllFiles(jobId);
     }
 
     @Override

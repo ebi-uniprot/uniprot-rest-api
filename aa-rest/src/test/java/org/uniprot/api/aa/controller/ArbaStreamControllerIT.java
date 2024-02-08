@@ -201,9 +201,10 @@ class ArbaStreamControllerIT extends AbstractSolrStreamControllerIT {
                 .andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.information").doesNotExist())
+                .andExpect(jsonPath("$.results.*.information").exists())
                 .andExpect(jsonPath("$.results.*.uniRuleId").exists())
                 .andExpect(jsonPath("$.results.*.mainRule").exists())
+                .andExpect(jsonPath("$.results.*.samFeatureSets.*.mainRule").doesNotExist())
                 .andExpect(jsonPath("$.results.size()", is(12)));
     }
 }

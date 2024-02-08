@@ -266,7 +266,6 @@ public abstract class AbstractGetByIdsControllerIT extends AbstractStreamControl
     void getByIdsWithMixMissingIdsPagination() throws Exception {
         int pageSize = 4;
         String ids = getCommaSeparatedMixedIds();
-        String[] idsArray = ids.split(",");
         // when
         ResultActions response =
                 getMockMvc()

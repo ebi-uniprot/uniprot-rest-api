@@ -1,8 +1,16 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.util.HashMap;
@@ -31,6 +39,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -922,6 +931,103 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                 "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
     }
 
+    @Test
+    void testGetEntryForAGivenSequenceRange() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "Q8DIA7[10-20]")
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n"
+                                                        + "AEITAEGLKPQ\n")));
+    }
+
+    @Test
+    void testGetEntryForAGivenSequenceRangeWithFileExtension() throws Exception {
+        // when
+        ResultActions response = getMockMvc().perform(get(ACCESSION_RESOURCE, "Q8DIA7[1-5].fasta"));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n"
+                                                        + "MSQTP\n")));
+    }
+
+    @Test
+    void testGetEntryBeyondRangeReturnsEmptySequence() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "Q8DIA7[9999-999999]")
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n\n")));
+    }
+
+    @Test
+    void testGetIsoformEntrySequenceRange() throws Exception {
+        // given
+        UniProtKBEntry entry = UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_ISOFORM);
+        getStoreManager().save(DataStoreManager.StoreType.UNIPROT, entry);
+
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(ACCESSION_RESOURCE, "P21802-2[10-20]")
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE_VALUE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content()
+                                .string(
+                                        is(
+                                                ">sp|P21802-2|FGFR2-2_HUMAN Isoform 2 of Fibroblast growth factor receptor 2 OS=Homo sapiens OX=9606 GN=FGFR2\nLVVVTMATLSL\n")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidAccession")
+    void testGetEntryForGivenInvalidRanges(String accession, String format, ResultMatcher matcher)
+            throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc().perform(get(ACCESSION_RESOURCE, accession).header(ACCEPT, format));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, format))
+                .andExpect(matcher);
+    }
+
     private String getRedirectToEntryVersionPath(String accession, String version, String format) {
         return String.format(
                 "/unisave/%s?from=%s&versions=%s&format=%s", accession, accession, version, format);
@@ -1288,5 +1394,54 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                     .build())
                     .build();
         }
+    }
+
+    private static Stream<Arguments> provideInvalidAccession() {
+        return Stream.of(
+                Arguments.of(
+                        "P12345[10-20]",
+                        APPLICATION_JSON_VALUE,
+                        jsonPath(
+                                "$.messages.*",
+                                contains(
+                                        "Invalid request received. Sequence range is only supported for type text/plain;format=fasta"))),
+                Arguments.of(
+                        "P12345[20-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\n"
+                                                        + "Invalid request received. Invalid sequence range [20-10]"))),
+                Arguments.of(
+                        "P12345[0-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\n"
+                                                        + "Invalid request received. Invalid sequence range [0-10]"))),
+                Arguments.of(
+                        "P12345[1-5147483647]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\n"
+                                                        + "Invalid request received. Invalid sequence range [1-5147483647]"))),
+                Arguments.of(
+                        "P12345.3[1-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession"))),
+                Arguments.of(
+                        "P12345[1-10].3",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        content()
+                                .string(
+                                        is(
+                                                "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession"))));
     }
 }

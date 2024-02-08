@@ -20,7 +20,7 @@
 		<openapi-maven-plugin.version>0.3</openapi-maven-plugin.version>
 		<micrometer-registry-prometheus.version>1.6.6</micrometer-registry-prometheus.version>
 		<redisson-spring-data-version>3.17.7</redisson-spring-data-version>
-		<testcontainers.version>1.17.6</testcontainers.version>
+		<testcontainers.version>1.19.4</testcontainers.version>
 		<dev.jna.version>5.8.0</dev.jna.version>
 	</properties>
 
@@ -149,6 +149,10 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>javax.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -168,13 +172,6 @@
 			<artifactId>commons-compress</artifactId>
 		</dependency>
 
-
-		<!-- xml marshaller -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>${jaxb.version}</version>
-		</dependency>
 		<!-- OBO Format Writer -->
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>

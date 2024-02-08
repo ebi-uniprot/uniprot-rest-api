@@ -1,8 +1,11 @@
 package org.uniprot.api.uniprotkb.controller;
 
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX;
 
-import java.util.Optional;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.uniprot.api.common.concurrency.Gatekeeper;
+import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.UniProtMediaType;
@@ -40,6 +44,8 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearc
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
+import org.uniprot.core.util.Pair;
+import org.uniprot.core.util.PairImpl;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniprot.Entry;
 import org.uniprot.store.config.UniProtDataType;
@@ -102,7 +108,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 MediaType.APPLICATION_XML_VALUE,
                 MediaType.APPLICATION_JSON_VALUE,
                 UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
-                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
                 UniProtMediaType.GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
@@ -130,7 +136,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = UniProtMediaType.FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE)
                         })
             })
@@ -157,7 +163,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 MediaType.APPLICATION_XML_VALUE,
                 MediaType.APPLICATION_JSON_VALUE,
                 UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
-                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
                 UniProtMediaType.GFF_MEDIA_TYPE_VALUE,
                 UniProtMediaType.RDF_MEDIA_TYPE_VALUE,
                 UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE,
@@ -178,7 +184,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = UniProtMediaType.FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.RDF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE),
@@ -206,7 +212,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                     @RequestParam(value = "version", required = false)
                     @ValidContentTypes(
                             contentTypes = {
-                                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                                FASTA_MEDIA_TYPE_VALUE,
                                 UniProtMediaType.FF_MEDIA_TYPE_VALUE
                             })
                     String version,
@@ -223,14 +229,22 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         } else if (accessionOrId.contains(".")) {
             return redirectToUniSave(accessionOrId, request, Optional.empty());
         } else {
+            Map<String, List<Pair<String, Boolean>>> accessionRangeMap = null;
+            String accessionOnly = accessionOrId;
+
+            if (UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(accessionOrId).matches()) {
+                accessionRangeMap = validateAndGetAccessionRangesMap(accessionOrId, request);
+                accessionOnly = extractAccession(accessionOrId);
+            }
+
             Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);
             if (acceptedRdfContentType.isPresent()) {
                 String rdf =
                         entryService.getRdf(accessionOrId, DATA_TYPE, acceptedRdfContentType.get());
                 return super.getEntityResponseRdf(rdf, getAcceptHeader(request), request);
             } else {
-                UniProtKBEntry entry = entryService.findByUniqueId(accessionOrId, fields);
-                return super.getEntityResponse(entry, fields, request);
+                UniProtKBEntry entry = entryService.findByUniqueId(accessionOnly, fields);
+                return super.getEntityResponse(entry, fields, accessionRangeMap, request);
             }
         }
     }
@@ -251,7 +265,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 MediaType.APPLICATION_XML_VALUE,
                 MediaType.APPLICATION_JSON_VALUE,
                 UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
-                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
                 UniProtMediaType.GFF_MEDIA_TYPE_VALUE,
                 UniProtMediaType.RDF_MEDIA_TYPE_VALUE,
                 UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE,
@@ -282,7 +296,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = UniProtMediaType.FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE)
                         })
             })
@@ -319,7 +333,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 MediaType.APPLICATION_XML_VALUE,
                 MediaType.APPLICATION_JSON_VALUE,
                 UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
-                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
                 UniProtMediaType.GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
@@ -347,7 +361,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = UniProtMediaType.FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE)
                         })
             })
@@ -369,7 +383,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 MediaType.APPLICATION_XML_VALUE,
                 MediaType.APPLICATION_JSON_VALUE,
                 UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
-                UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                FASTA_MEDIA_TYPE_VALUE,
                 UniProtMediaType.GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
@@ -397,7 +411,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                             @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = UniProtMediaType.FASTA_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
                             @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE)
                         })
             })
@@ -414,10 +428,14 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             HttpServletRequest request,
             HttpServletResponse response) {
         QueryResult<UniProtKBEntry> result = entryService.getByIds(accessionsRequest);
+        Map<String, List<Pair<String, Boolean>>> accessionRangesMap =
+                getAccessionSequenceRangesMap(accessionsRequest);
         return super.getSearchResponse(
                 result,
                 accessionsRequest.getFields(),
                 accessionsRequest.isDownload(),
+                false,
+                accessionRangesMap,
                 request,
                 response);
     }
@@ -504,5 +522,81 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                                 BasicSearchController.getLocationURLForId(
                                         accession, accessionOrId, contentType));
         return responseBuilder.headers(HeaderFactory.createHttpSearchHeader(contentType)).build();
+    }
+
+    private String extractAccession(String accessionOrId) {
+        return accessionOrId.substring(0, accessionOrId.indexOf('['));
+    }
+
+    private String getSequenceRange(String accessionOrId) {
+        return accessionOrId.substring(accessionOrId.indexOf('[') + 1, accessionOrId.indexOf(']'));
+    }
+
+    private void validateSubsequence(String sequenceRange, HttpServletRequest request) {
+        MediaType format = getAcceptHeader(request);
+        if (!FASTA_MEDIA_TYPE.equals(format)) {
+            throw new InvalidRequestException(
+                    "Sequence range is only supported for type " + FASTA_MEDIA_TYPE_VALUE);
+        }
+        // extract the range and validate
+        String[] rangeTokens = sequenceRange.split("-");
+
+        String errorMsg = "Invalid sequence range [" + sequenceRange + "]";
+
+        if (rangeTokens.length != 2) {
+            throw new InvalidRequestException(errorMsg);
+        }
+
+        try {
+            int start = Integer.parseInt(rangeTokens[0]);
+            int end = Integer.parseInt(rangeTokens[1]);
+            if (start <= 0 || start > end) {
+                throw new InvalidRequestException(errorMsg);
+            }
+        } catch (NumberFormatException nfe) {
+            throw new InvalidRequestException(errorMsg);
+        }
+    }
+
+    private Map<String, List<Pair<String, Boolean>>> validateAndGetAccessionRangesMap(
+            String accessionOrId, HttpServletRequest request) {
+        Map<String, List<Pair<String, Boolean>>> accessionRange = new HashMap<>();
+        if (UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(accessionOrId).matches()) {
+            // values between square brackets e.g. 10-20
+            String range = getSequenceRange(accessionOrId);
+            validateSubsequence(range, request);
+            String accessionOnly = extractAccession(accessionOrId);
+            Pair<String, Boolean> rangeIsProcessedPair = new PairImpl<>(range, Boolean.FALSE);
+            accessionRange = new HashMap<>();
+            List<Pair<String, Boolean>> rangeIsProcessedPairs = new ArrayList<>();
+            rangeIsProcessedPairs.add(rangeIsProcessedPair);
+            accessionRange.put(accessionOnly, rangeIsProcessedPairs);
+        }
+        return accessionRange;
+    }
+
+    private Map<String, List<Pair<String, Boolean>>> getAccessionSequenceRangesMap(
+            IdsSearchRequest accessionsRequest) {
+        Map<String, List<Pair<String, Boolean>>> accessionRangesMap = new HashMap<>();
+        for (String passedId : accessionsRequest.getCommaSeparatedIds().split(",")) {
+            String sanitisedId = passedId.strip().toUpperCase();
+            String sequenceRange = null;
+            if (UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(sanitisedId).matches()) {
+                sequenceRange = getSequenceRange(sanitisedId);
+                sanitisedId = extractAccession(sanitisedId);
+            }
+            Pair<String, Boolean> rangeIsProcessedPair =
+                    new PairImpl<>(sequenceRange, Boolean.FALSE);
+            List<Pair<String, Boolean>> rangeIsProcessedPairs;
+            if (!accessionRangesMap.containsKey(sanitisedId)) {
+                rangeIsProcessedPairs = new ArrayList<>();
+                rangeIsProcessedPairs.add(rangeIsProcessedPair);
+                accessionRangesMap.put(sanitisedId, rangeIsProcessedPairs);
+            } else {
+                rangeIsProcessedPairs = accessionRangesMap.get(sanitisedId);
+                rangeIsProcessedPairs.add(rangeIsProcessedPair);
+            }
+        }
+        return accessionRangesMap;
     }
 }
