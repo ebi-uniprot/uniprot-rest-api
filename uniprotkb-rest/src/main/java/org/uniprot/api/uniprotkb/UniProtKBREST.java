@@ -2,12 +2,12 @@ package org.uniprot.api.uniprotkb;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
-import org.uniprot.api.uniprotkb.configuration.UniProtKBCacheConfig;
-import org.uniprot.api.uniprotkb.groupby.GroupByServiceConfig;
+import org.uniprot.api.uniprotkb.common.service.groupby.GroupByServiceConfig;
 
 /**
  * Starts advanced-search REST application.
@@ -15,12 +15,8 @@ import org.uniprot.api.uniprotkb.groupby.GroupByServiceConfig;
  * @author lgonzales
  */
 @SpringBootApplication
-@Import({
-    HttpCommonHeaderConfig.class,
-    RepositoryConfig.class,
-    GroupByServiceConfig.class,
-    UniProtKBCacheConfig.class
-})
+@EnableCaching
+@Import({HttpCommonHeaderConfig.class, RepositoryConfig.class, GroupByServiceConfig.class})
 @ComponentScan(
         basePackages = {
             "org.uniprot.api.uniprotkb",

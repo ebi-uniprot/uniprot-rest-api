@@ -8,14 +8,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,12 +30,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
 import org.uniprot.core.uniprotkb.ProteinExistence;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
@@ -131,8 +127,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
@@ -140,16 +136,18 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(5)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(5)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 contains("P00012", "P00014", "P00016", "P00018", "P00020")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.entryType",
                                 contains(
                                         "UniProtKB reviewed (Swiss-Prot)",
@@ -157,7 +155,7 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                         "UniProtKB reviewed (Swiss-Prot)",
                                         "UniProtKB reviewed (Swiss-Prot)",
                                         "UniProtKB reviewed (Swiss-Prot)")))
-                .andExpect(jsonPath("$.facets").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     @Test
@@ -166,8 +164,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
@@ -175,16 +173,18 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(5)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(5)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 contains("P00011", "P00013", "P00015", "P00017", "P00019")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.proteinExistence",
                                 contains(
                                         "3: Inferred from homology",
@@ -192,7 +192,7 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                         "2: Evidence at transcript level",
                                         "3: Inferred from homology",
                                         "3: Inferred from homology")))
-                .andExpect(jsonPath("$.facets").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     @Test
@@ -201,8 +201,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
@@ -210,10 +210,12 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(0)));
     }
 
     @Test
@@ -223,8 +225,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00014,P00018,P00020,P00015")
@@ -234,25 +236,40 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(4)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(4)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 contains("P00011", "P00013", "P00015", "P00017")))
-                .andExpect(jsonPath("$.facets.*.label", contains("Protein existence", "Status")))
-                .andExpect(jsonPath("$.facets.*.name", contains("existence", "reviewed")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.label", contains("Protein existence", "Status")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.name", contains("existence", "reviewed")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets[0].values.*.label",
                                 contains("Homology", "Transcript level")))
-                .andExpect(jsonPath("$.facets[0].values.*.value", contains("3", "2")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 1)))
-                .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
-                .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
-                .andExpect(jsonPath("$.facets[1].values[0].count", equalTo(4)));
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values.*.value", contains("3", "2")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values.*.count", contains(3, 1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[1].values[0].value", equalTo("false")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.facets[1].values[0].count", equalTo(4)));
     }
 
     @Test
@@ -261,8 +278,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00014,P00018,P00020,P00015")
@@ -271,14 +288,22 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(9)))
-                .andExpect(jsonPath("$.facets.*.label", contains("Annotation score")))
-                .andExpect(jsonPath("$.facets.*.name", contains(facets)))
-                .andExpect(jsonPath("$.facets[0].values.*.value", contains("4", "3", "2")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(3, 1, 5)));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(9)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.label", contains("Annotation score")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets.*.name", contains(facets)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values.*.value", contains("4", "3", "2")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values.*.count", contains(3, 1, 5)));
     }
 
     @Test
@@ -289,8 +314,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
@@ -300,26 +325,49 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", String.valueOf(pageSize)));
 
         // then//, "P00019"
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
-                .andExpect(jsonPath("$.results.size()", is(pageSize)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00011", "P00013")))
-                .andExpect(jsonPath("$.facets.*.label", contains("Protein existence", "Status")))
-                .andExpect(jsonPath("$.facets.*.name", contains("existence", "reviewed")))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpCommonHeaderConfig.X_TOTAL_RESULTS, "5"))
+                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.LINK, containsString("size=2")))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.LINK, containsString("cursor=")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(pageSize)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P00011", "P00013")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.label", contains("Protein existence", "Status")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.name", contains("existence", "reviewed")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets[0].values.*.label",
                                 contains("Homology", "Transcript level")))
-                .andExpect(jsonPath("$.facets[0].values.*.value", contains("3", "2")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(4, 1)))
-                .andExpect(jsonPath("$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
-                .andExpect(jsonPath("$.facets[1].values[0].value", equalTo("false")))
-                .andExpect(jsonPath("$.facets[1].values[0].count", equalTo(5)));
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values.*.value", contains("3", "2")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values.*.count", contains(4, 1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[1].values[0].label", equalTo("Unreviewed (TrEMBL)")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[1].values[0].value", equalTo("false")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.facets[1].values[0].count", equalTo(5)));
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
@@ -328,8 +376,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when 2nd page
         response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
@@ -340,16 +388,26 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", String.valueOf(pageSize)));
 
         // then 2nd page
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("size=2")))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
-                .andExpect(jsonPath("$.results.size()", is(pageSize)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00015", "P00017")))
-                .andExpect(jsonPath("$.facets").doesNotExist());
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpCommonHeaderConfig.X_TOTAL_RESULTS, "5"))
+                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.LINK, containsString("size=2")))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.LINK, containsString("cursor=")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(pageSize)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P00015", "P00017")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
 
         linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
@@ -358,8 +416,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when last page
         response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
@@ -370,14 +428,20 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", String.valueOf(pageSize)));
 
         // then last page
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "5"))
-                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00019")))
-                .andExpect(jsonPath("$.facets").doesNotExist());
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpCommonHeaderConfig.X_TOTAL_RESULTS, "5"))
+                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P00019")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     @Test
@@ -387,8 +451,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
@@ -396,11 +460,13 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "'invalidField1' is not a valid search field",
@@ -413,8 +479,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00020,P00019")
@@ -422,11 +488,13 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*", contains("query parameter has an invalid syntax")));
     }
 
@@ -435,8 +503,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00019")
@@ -444,21 +512,27 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "0"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.facets.*.label", contains("Sequence length")))
-                .andExpect(jsonPath("$.facets.*.name", contains("length")))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(0)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.label", contains("Sequence length")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets.*.name", contains("length")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets[0].values.*.label",
                                 contains("201 - 400", "401 - 600", "601 - 800")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets[0].values.*.value",
                                 contains("[201 TO 400]", "[401 TO 600]", "[601 TO 800]")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(1, 6, 2)));
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values.*.count", contains(1, 6, 2)));
     }
 
     @Test
@@ -466,8 +540,8 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(accessionsByIdPath)
-                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                        MockMvcRequestBuilders.get(accessionsByIdPath)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                                 .param(
                                         "accessions",
                                         "P00013,P00012,P00011,P00017,P00016,P00015,P00014,P00018,P00019")
@@ -475,16 +549,22 @@ class UniProtKBGetByAccessionsWithFilterIT extends AbstractStreamControllerIT {
                                 .param("size", "0"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)))
-                .andExpect(jsonPath("$.facets.*.label", contains("Popular organisms")))
-                .andExpect(jsonPath("$.facets.*.name", contains("model_organism")))
-                .andExpect(jsonPath("$.facets[0].values.size()", is(5)))
-                .andExpect(jsonPath("$.facets[0].values.*.label").exists())
-                .andExpect(jsonPath("$.facets[0].values.*.value").exists())
-                .andExpect(jsonPath("$.facets[0].values.*.count").exists());
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(0)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.label", contains("Popular organisms")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.name", contains("model_organism")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets[0].values.size()", is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets[0].values.*.label").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets[0].values.*.value").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets[0].values.*.count").exists());
     }
 
     @Override

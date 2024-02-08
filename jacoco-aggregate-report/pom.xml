@@ -26,6 +26,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
+			<artifactId>support-data-common</artifactId>
+			<version>${uniprot-core.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
 			<artifactId>support-data-rest</artifactId>
 			<version>${uniprot-core.version}</version>
 			<scope>compile</scope>
@@ -39,6 +45,12 @@
 		<dependency>
 			<groupId>org.uniprot</groupId>
 			<artifactId>uniparc-rest</artifactId>
+			<version>${uniprot-core.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>uniprotkb-common</artifactId>
 			<version>${uniprot-core.version}</version>
 			<scope>compile</scope>
 		</dependency>

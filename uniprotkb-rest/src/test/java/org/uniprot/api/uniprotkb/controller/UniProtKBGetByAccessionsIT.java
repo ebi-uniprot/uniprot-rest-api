@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
@@ -8,20 +9,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBEntryConvertITUtils.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
+import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,15 +38,21 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsControllerIT;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
+import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.core.fasta.UniProtKBFasta;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.gene.GeneName;
+import org.uniprot.core.parser.fasta.uniprot.UniProtKBFastaParser;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.GeneBuilder;
@@ -90,6 +100,9 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         "P00001", "P00002", "P00003", "P00004", "P00005", "P00006", "P00007", "P00008", "P00009",
         "P00010"
     };
+
+    private static final String TEST_IDS_SEQ_RANGE =
+            "P00003[10-20],P00007,P00003,P00001,P00003[20-40],P00003[1-5],P00002";
     private static final String MISSING_ID1 = "Q00001";
     private static final String MISSING_ID2 = "Q00002";
 
@@ -146,7 +159,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     private void saveEntry(UniProtKBEntry uniProtKBEntry) throws IOException, SolrServerException {
         UniProtDocument document = documentConverter.convert(uniProtKBEntry);
-        aggregateTaxonomyDataToDocument(taxonomyRepo, document);
+        UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
 
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), document);
         storeClient.saveEntry(uniProtKBEntry);
@@ -158,7 +171,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getGetByIdsPath())
+                                MockMvcRequestBuilders.get(getGetByIdsPath())
                                         .header(
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
@@ -167,12 +180,14 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                         .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(10)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)))
                 .andExpect(getReverseSortedIdResultMatcher())
-                .andExpect(jsonPath("$.facets").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     @Test
@@ -181,7 +196,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getGetByIdsPath())
+                                MockMvcRequestBuilders.get(getGetByIdsPath())
                                         .header(
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
@@ -189,12 +204,16 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                         .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00003", "P21802-2")))
-                .andExpect(jsonPath("$.facets").doesNotExist());
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P00003", "P21802-2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     @Test
@@ -204,7 +223,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getGetByIdsPath())
+                                MockMvcRequestBuilders.get(getGetByIdsPath())
                                         .header(
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
@@ -212,12 +231,145 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                         .param("size", "10"));
 
         // then
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("F1Q0X3")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
+    }
+
+    @Test
+    void getByIdsWithSequenceRangeSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE)
+                                        .param(getRequestParamName(), TEST_IDS_SEQ_RANGE));
+
+        // then
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].primaryAccession", is("F1Q0X3")))
-                .andExpect(jsonPath("$.facets").doesNotExist());
+                .andExpect(header().doesNotExist("Content-Disposition"))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE));
+        String fastaResponse = response.andReturn().getResponse().getContentAsString();
+        verifyFastaResponse(fastaResponse);
+    }
+
+    @Test
+    void getByIdsWithSequenceRangeSortedByAccessionSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .param(getRequestParamName(), TEST_IDS_SEQ_RANGE)
+                                        .param("sort", "accession asc")
+                                        .param("query", "reviewed:true")
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        content().string(containsString("sort not supported with sequence range")))
+                .andExpect(
+                        content()
+                                .string(containsString("query not supported with sequence range")));
+    }
+
+    @Test
+    void downloadByIdsWithSequenceRangeSuccess() throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .param("download", "true")
+                                        .header(ACCEPT, FASTA_MEDIA_TYPE)
+                                        .param(getRequestParamName(), TEST_IDS_SEQ_RANGE));
+
+        // then
+        response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().exists("Content-Disposition"))
+                .andExpect(
+                        header().string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE));
+        String fastaResponse = response.andReturn().getResponse().getContentAsString();
+        verifyFastaResponse(fastaResponse);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidRequests")
+    void getByIdsWithSequenceRangeWithInvalidRequests(
+            String accessions, String format, List<ResultMatcher> matchers) throws Exception {
+        // when
+        ResultActions response =
+                getMockMvc()
+                        .perform(
+                                get(getGetByIdsPath())
+                                        .header(ACCEPT, format)
+                                        .param(getRequestParamName(), accessions));
+
+        // then
+        ResultActions resultActions =
+                response.andDo(log())
+                        .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, format));
+        for (ResultMatcher matcher : matchers) {
+            resultActions.andExpect(matcher);
+        }
+    }
+
+    private void verifyFastaResponse(String fastaResponse) {
+        List<UniProtKBFasta> uniProtKBFastas = getUniProtKBFastas(fastaResponse);
+        Assertions.assertEquals(TEST_IDS_SEQ_RANGE.split(",").length, uniProtKBFastas.size());
+        List<String> passedAccessions =
+                Arrays.stream(TEST_IDS_SEQ_RANGE.split(","))
+                        .map(
+                                id ->
+                                        UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX
+                                                        .matcher(id)
+                                                        .matches()
+                                                ? id.substring(0, id.indexOf("["))
+                                                : id)
+                        .collect(Collectors.toList());
+        List<String> returnedIds =
+                uniProtKBFastas.stream().map(UniProtKBFasta::getId).collect(Collectors.toList());
+        Assertions.assertEquals(passedAccessions, returnedIds);
+
+        String[] ids = TEST_IDS_SEQ_RANGE.split(",");
+        for (int i = 0; i < uniProtKBFastas.size(); i++) {
+            UniProtKBFasta fasta = uniProtKBFastas.get(i);
+            String id = ids[i];
+            if (UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX.matcher(id).matches()) {
+                String[] range = id.substring(id.indexOf('[') + 1, id.indexOf(']')).split("-");
+                int sequenceLength = Integer.parseInt(range[1]) - Integer.parseInt(range[0]) + 1;
+                Assertions.assertEquals(sequenceLength, fasta.getSequence().getLength());
+            }
+        }
+    }
+
+    private List<UniProtKBFasta> getUniProtKBFastas(String fastaResponse) {
+        String[] fastaEntries = fastaResponse.split("\n>");
+        List<UniProtKBFasta> uniProtKBFastas =
+                Arrays.stream(fastaEntries)
+                        .map(fasta -> fasta.startsWith(">") ? fasta : ">" + fasta)
+                        .map(UniProtKBFastaParser::fromFasta)
+                        .collect(Collectors.toList());
+        return uniProtKBFastas;
     }
 
     @Override
@@ -254,18 +406,22 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected List<ResultMatcher> getResultsResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
+        ResultMatcher rm1 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
         ResultMatcher rm2 =
-                jsonPath("$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)"));
-        ResultMatcher rm3 = jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN"));
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)"));
+        ResultMatcher rm3 =
+                MockMvcResultMatchers.jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN"));
         return List.of(rm1, rm2, rm3);
     }
 
     @Override
     protected List<ResultMatcher> getFacetsResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.facets.size()", is(9));
+        ResultMatcher rm1 = MockMvcResultMatchers.jsonPath("$.facets.size()", is(9));
         ResultMatcher rm2 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.facets.*.label",
                         containsInAnyOrder(
                                 "3D Structure",
@@ -283,7 +439,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getIdsAsResultMatchers() {
         return Arrays.stream(TEST_IDS_ARRAY)
-                .map(id -> content().string(containsString(id)))
+                .map(id -> MockMvcResultMatchers.content().string(containsString(id)))
                 .collect(Collectors.toList());
     }
 
@@ -309,17 +465,23 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected List<ResultMatcher> getFieldsResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
-        ResultMatcher rm2 = jsonPath("$.results.*.organism").exists();
-        ResultMatcher rm3 = jsonPath("$.results.*.genes").exists();
-        ResultMatcher rm4 = jsonPath("$.results.*.sequence").doesNotExist();
-        ResultMatcher rm5 = jsonPath("$.results.*.comments").doesNotExist();
+        ResultMatcher rm1 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
+        ResultMatcher rm2 = MockMvcResultMatchers.jsonPath("$.results.*.organism").exists();
+        ResultMatcher rm3 = MockMvcResultMatchers.jsonPath("$.results.*.genes").exists();
+        ResultMatcher rm4 = MockMvcResultMatchers.jsonPath("$.results.*.sequence").doesNotExist();
+        ResultMatcher rm5 = MockMvcResultMatchers.jsonPath("$.results.*.comments").doesNotExist();
         ResultMatcher rm6 =
-                jsonPath("$.results[0].organism.scientificName", equalTo("Homo sapiens"));
-        ResultMatcher rm7 = jsonPath("$.results[0].organism.commonName", equalTo("Human"));
-        ResultMatcher rm8 = jsonPath("$.results[0].organism.taxonId", equalTo(9606));
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].organism.scientificName", equalTo("Homo sapiens"));
+        ResultMatcher rm7 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].organism.commonName", equalTo("Human"));
+        ResultMatcher rm8 =
+                MockMvcResultMatchers.jsonPath("$.results[0].organism.taxonId", equalTo(9606));
         ResultMatcher rm9 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results[0].organism.lineage",
                         equalTo(TEMPLATE_ENTRY.getOrganism().getLineages()));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8, rm9);
@@ -328,12 +490,12 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getFirstPageResultMatchers() {
         ResultMatcher rm1 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results.*.primaryAccession",
                         contains(List.of(TEST_IDS_ARRAY).subList(0, 4).toArray()));
-        ResultMatcher rm2 = jsonPath("$.facets", iterableWithSize(9));
+        ResultMatcher rm2 = MockMvcResultMatchers.jsonPath("$.facets", iterableWithSize(9));
         ResultMatcher rm3 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.facets.*.label",
                         containsInAnyOrder(
                                 "3D Structure",
@@ -346,7 +508,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 "Popular organisms",
                                 "Proteomes"));
         ResultMatcher rm4 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.facets.*.name",
                         containsInAnyOrder(
                                 "structure_3d",
@@ -358,15 +520,15 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 "annotation_score",
                                 "model_organism",
                                 "proteome"));
-        ResultMatcher rm5 = jsonPath("$.facets.*.values").exists();
-        ResultMatcher rm6 = jsonPath("$.facets.*.values").isArray();
+        ResultMatcher rm5 = MockMvcResultMatchers.jsonPath("$.facets.*.values").exists();
+        ResultMatcher rm6 = MockMvcResultMatchers.jsonPath("$.facets.*.values").isArray();
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6);
     }
 
     @Override
     protected List<ResultMatcher> getSecondPageResultMatchers() {
         ResultMatcher rm1 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results.*.primaryAccession",
                         contains(List.of(TEST_IDS_ARRAY).subList(4, 8).toArray()));
         return List.of(rm1);
@@ -375,7 +537,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getThirdPageResultMatchers() {
         ResultMatcher rm1 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results.*.primaryAccession",
                         contains(List.of(TEST_IDS_ARRAY).subList(8, 10).toArray()));
         return List.of(rm1);
@@ -387,8 +549,8 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
             "Invalid fields parameter value 'invalid'",
             "Invalid fields parameter value 'invalid1'",
             "The 'download' parameter has invalid format. It should be a boolean true or false.",
-            "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession.",
-            "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession."
+            "Accession 'INVALID' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20].",
+            "Accession 'INVALID2' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20]."
         };
     }
 
@@ -407,12 +569,13 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected ResultMatcher getSortedIdResultMatcher() {
-        return jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY_SORTED));
+        return MockMvcResultMatchers.jsonPath(
+                "$.results.*.primaryAccession", contains(TEST_IDS_ARRAY_SORTED));
     }
 
     @Override
     protected ResultMatcher getReverseSortedIdResultMatcher() {
-        return jsonPath(
+        return MockMvcResultMatchers.jsonPath(
                 "$.results.*.primaryAccession",
                 contains(
                         Arrays.stream(TEST_IDS_ARRAY_SORTED)
@@ -456,5 +619,65 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy_MM_dd");
         return "uniprotkb_" + now.format(dateTimeFormatter);
+    }
+
+    private static Stream<Arguments> provideInvalidRequests() {
+        return Stream.of(
+                Arguments.of(
+                        "P12345[10-20]",
+                        APPLICATION_JSON_VALUE,
+                        List.of(
+                                jsonPath(
+                                        "$.messages.*",
+                                        contains(
+                                                "Invalid content type received, 'application/json'. Expected one of [text/plain;format=fasta].")))),
+                Arguments.of(
+                        "P12345,P12345[20-10],P12345[10-20]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                is(
+                                                        "Error messages\n"
+                                                                + "Invalid sequence range 'P12345[20-10]' in the accession.")))),
+                Arguments.of(
+                        "Q12345[10-20],P12345[0-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                is(
+                                                        "Error messages\n"
+                                                                + "Invalid sequence range 'P12345[0-10]' in the accession.")))),
+                Arguments.of(
+                        "P12345[1-5147483647],Q12345[0-10],Q12345",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                containsString(
+                                                        "Invalid sequence range 'P12345[1-5147483647]' in the accession."))),
+                        content()
+                                .string(
+                                        containsString(
+                                                "Invalid sequence range 'Q12345[0-10]' in the accession."))),
+                Arguments.of(
+                        "Q12345,P12345.3[1-10]",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                is(
+                                                        "Error messages\n"
+                                                                + "Accession 'P12345.3[1-10]' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20].")))),
+                Arguments.of(
+                        "P12345[1-10].3,Q12345",
+                        FASTA_MEDIA_TYPE_VALUE,
+                        List.of(
+                                content()
+                                        .string(
+                                                is(
+                                                        "Error messages\n"
+                                                                + "Accession 'P12345[1-10].3' has invalid format. It should be a valid UniProtKB accession with optional sequence range e.g. P12345[10-20].")))));
     }
 }

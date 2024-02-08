@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -13,6 +14,7 @@ import javax.validation.Payload;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.uniprot.core.util.Utils;
@@ -51,6 +53,8 @@ public @interface ValidPostByIdsRequest {
         private String accessions;
         private String fields;
         private ReturnFieldConfig returnFieldConfig;
+
+        @Autowired private HttpServletRequest request;
 
         @Override
         public void initialize(ValidPostByIdsRequest constraintAnnotation) {
@@ -115,6 +119,11 @@ public @interface ValidPostByIdsRequest {
 
         UniProtDataType getDataType() {
             return this.uniProtDataType;
+        }
+
+        @Override
+        HttpServletRequest getHttpServletRequest() {
+            return this.request;
         }
     }
 }

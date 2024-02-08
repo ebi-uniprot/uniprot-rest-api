@@ -3,8 +3,6 @@ package org.uniprot.api.uniparc.common.response.converter;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.xml.bind.Marshaller;
-
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractXmlMessageConverter;
@@ -13,6 +11,8 @@ import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.core.util.Utils;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
 import org.uniprot.core.xml.uniparc.UniParcEntryConverter;
+
+import jakarta.xml.bind.Marshaller;
 
 /**
  * @author jluo

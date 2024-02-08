@@ -34,7 +34,7 @@
 
 ####Run/Edit the Postmant tests in Postman application:
  
-1. Import a collection.json (`e.g. ../../../../uniprotkb-rest/src/test/postman/uniprotkb.postman_collection.json`) in Postman
+1. Import a collection.json (`e.g. ../../../../uniprotkb-common/src/test/postman/uniprotkb.postman_collection.json`) in Postman
     - Load the collection in Postman application by clicking import button on top left
     - Edit accordingly
     - Export the collection and replace this collection at the appropriate place
