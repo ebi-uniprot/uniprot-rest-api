@@ -4,7 +4,7 @@ variables:
   DOCKER_DRIVER: overlay2
   REGISTRY_USER: uniprot/deployment
   MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.springframework.boot.test.autoconfigure.web.servlet=ERROR -Dorg.slf4j.simpleLogger.log.org.springframework.boot.test.context.SpringBootTestContextBootstrapper=ERROR -Dorg.slf4j.simpleLogger.log.org.springframework.test.context.transaction.TransactionContext=ERROR -Dorg.slf4j.simpleLogger.log.org.apache.zookeeper=ERROR -Dorg.slf4j.simpleLogger.log.org.uniprot.store.datastore.voldemort=ERROR -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=false -DdeployAtEnd=true"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --show-version -DinstallAtEnd=false -DdeployAtEnd=true"
   SONAR_PROPS: "-Dsonar.organization=ebi-uniprot -Dsonar.qualitygate.timeout=1800 -Dsonar.qualitygate.wait=true"
   SONAR_HOST_URL: "https://sonarcloud.io"
   MAVEN_SETTINGS: "maven-settings.xml"

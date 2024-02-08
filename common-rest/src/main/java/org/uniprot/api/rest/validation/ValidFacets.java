@@ -73,7 +73,7 @@ public @interface ValidFacets {
                 // verify if facet name is valid.
                 ConstraintValidatorContextImpl contextImpl =
                         (ConstraintValidatorContextImpl) context;
-                String[] facetList = value.split("\\s*,\\s*");
+                String[] facetList = value.replaceAll("\\s", "").split(",");
                 for (String facet : facetList) {
                     if (!getFacetNames().contains(facet)) {
                         buildInvalidFacetNameMessage(facet, getFacetNames(), contextImpl);

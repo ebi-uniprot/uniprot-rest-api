@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.uniprot.api.rest.request.SearchRequest;
+import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdPageSearchRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 

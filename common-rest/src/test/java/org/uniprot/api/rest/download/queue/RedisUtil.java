@@ -67,8 +67,12 @@ public class RedisUtil {
 
     private static Callable<Boolean> jobStatus(
             DownloadJobRepository downloadJobRepository, String jobId, JobStatus status) {
-        return () ->
-                downloadJobRepository.existsById(jobId)
-                        && downloadJobRepository.findById(jobId).get().getStatus() == status;
+        return () -> {
+            Optional<DownloadJob> optJob = downloadJobRepository.findById(jobId);
+            if (optJob.isPresent()) {
+                return (optJob.get().getStatus() == status);
+            }
+            return false;
+        };
     }
 }

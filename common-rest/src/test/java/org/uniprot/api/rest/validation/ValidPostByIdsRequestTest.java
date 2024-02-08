@@ -8,11 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.http.MediaType;
 import org.uniprot.store.config.UniProtDataType;
 
 /**
@@ -86,6 +88,7 @@ class ValidPostByIdsRequestTest {
 
         final List<String> errorList = new ArrayList<>();
         final UniProtDataType dataType;
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 
         FakeValidPostByIdsRequestValidator() {
             this(UniProtDataType.UNIPROTKB);
@@ -102,6 +105,8 @@ class ValidPostByIdsRequestTest {
             Mockito.when(validIdsRequest.accessions()).thenReturn("accessions");
             Mockito.when(validIdsRequest.fields()).thenReturn("fields");
             Mockito.when(validIdsRequest.uniProtDataType()).thenReturn(UniProtDataType.UNIPROTKB);
+            Mockito.when(getHttpServletRequest().getHeader("Accept"))
+                    .thenReturn(MediaType.APPLICATION_JSON_VALUE);
             return validIdsRequest;
         }
 
@@ -135,6 +140,11 @@ class ValidPostByIdsRequestTest {
         @Override
         UniProtDataType getDataType() {
             return this.dataType;
+        }
+
+        @Override
+        HttpServletRequest getHttpServletRequest() {
+            return request;
         }
     }
 }

@@ -1,6 +1,8 @@
 package org.uniprot.api.rest.output.context;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import lombok.Builder;
@@ -12,6 +14,7 @@ import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.common.repository.search.facet.Facet;
 import org.uniprot.api.common.repository.search.suggestion.Suggestion;
 import org.uniprot.api.common.repository.search.term.TermInfo;
+import org.uniprot.core.util.Pair;
 
 /**
  * Created 07/09/18
@@ -37,6 +40,15 @@ public class MessageConverterContext<T> {
     private Collection<ProblemPair> warnings;
     private boolean isLargeDownload;
     private boolean subsequence;
+    /**
+     * A map to store accessions along with their associated sequence ranges and a flag indicating
+     * if they have been processed. Accessions can be repeated, allowing multiple sequence ranges
+     * for the same accession. For example, "P12345[20-30], P12345[0-10]". The isProcessed flag is
+     * set to true once a sequence range is handled.
+     *
+     * @see org.uniprot.api.uniprotkb.output.converter.UniProtKBFastaMessageConverter
+     */
+    private Map<String, List<Pair<String, Boolean>>> accessionSequenceRange;
 
     MessageConverterContext<T> asCopy() {
         return MessageConverterContext.<T>builder()
@@ -55,6 +67,7 @@ public class MessageConverterContext<T> {
                 .warnings(this.warnings)
                 .isLargeDownload(this.isLargeDownload)
                 .subsequence(subsequence)
+                .accessionSequenceRange(this.accessionSequenceRange)
                 .build();
     }
 }

@@ -223,7 +223,7 @@ public class UniRuleGetIdControllerIT extends AbstractGetByIdControllerIT {
                     .id(UNIRULE_ID)
                     .fields("template_entries")
                     .resultMatcher(jsonPath("$.uniRuleId", is(UNIRULE_ID)))
-                    .resultMatcher(jsonPath("$.information", notNullValue()))
+                    .resultMatcher(jsonPath("$.information.oldRuleNum", is(OLD_RULE_ID)))
                     .resultMatcher(jsonPath("$.mainRule").doesNotExist())
                     .resultMatcher(jsonPath("$.otherRules").doesNotExist())
                     .resultMatcher(jsonPath("$.samFeatureSets").doesNotExist())
