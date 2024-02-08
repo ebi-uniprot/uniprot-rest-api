@@ -426,8 +426,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     /**
      * Tests that class level validation is called after field level validation. It also tests that
      * class level validation (see annotation on {@link
-     * org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest} ) is not called if the
-     * fields validation is failed.
+     * org.uniprot.controller.request.UniProtKBDownloadRequest} ) is not called if the fields
+     * validation is failed.
      *
      * @throws Exception
      */

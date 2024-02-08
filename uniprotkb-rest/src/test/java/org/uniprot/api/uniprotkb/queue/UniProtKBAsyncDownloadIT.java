@@ -3,9 +3,7 @@ package org.uniprot.api.uniprotkb.queue;
 import static org.awaitility.Awaitility.*;
 import static org.mockito.Mockito.*;
 import static org.uniprot.api.rest.download.queue.RedisUtil.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.HDF5_MEDIA_TYPE;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.setUp;
+import static org.uniprot.api.rest.download.queue.RedisUtil.jobUnfinished;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,11 +40,14 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
+import org.uniprot.api.uniprotkb.common.queue.EmbeddingsTestConsumer;
+import org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.repository.store.UniProtStoreConfig;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBDownloadRequest;
+import org.uniprot.api.uniprotkb.common.utils.UniProtKBAsyncDownloadUtils;
 import org.uniprot.api.uniprotkb.controller.UniProtKBDownloadController;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.api.uniprotkb.repository.store.UniProtStoreConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
@@ -91,13 +92,13 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
-        saveEntriesInSolrAndStore(
+        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniprotQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
     }
 
     @BeforeEach
     void setUpRestTemplate() {
-        setUp(restTemplate);
+        UniProtKBAsyncDownloadUtils.setUp(restTemplate);
     }
 
     @Test
@@ -162,7 +163,8 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected Stream<Arguments> getSupportedTypes() {
         return Stream.of(
-                Arguments.of(MediaType.APPLICATION_JSON, 1), Arguments.of(HDF5_MEDIA_TYPE, 2));
+                Arguments.of(MediaType.APPLICATION_JSON, 1),
+                Arguments.of(UniProtMediaType.HDF5_MEDIA_TYPE, 2));
     }
 
     @Override

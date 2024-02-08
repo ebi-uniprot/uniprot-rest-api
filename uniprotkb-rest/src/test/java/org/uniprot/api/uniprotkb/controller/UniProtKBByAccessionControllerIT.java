@@ -2,7 +2,6 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
-import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
@@ -12,9 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.MERGED;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hamcrest.Matcher;
+import org.junit.Assert;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +40,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
@@ -53,14 +54,15 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypePa
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.api.rest.service.NTriplesPrologs;
 import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
-import org.uniprot.api.uniprotkb.service.UniSaveClient;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.datastore.voldemort.uniprot.VoldemortInMemoryUniprotEntryStore;
@@ -104,26 +106,67 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
     public Stream<Arguments> fetchingInactiveEntriesWithFileExtension() {
         return Stream.of(
                 Arguments.of(
-                        getFileExtension(APPLICATION_JSON), "P00000", "P99999", "MY_ID", "MY_ID"),
-                Arguments.of(getFileExtension(FF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "MY_ID"),
+                        UniProtMediaType.getFileExtension(MediaType.APPLICATION_JSON),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "MY_ID"),
                 Arguments.of(
-                        getFileExtension(GFF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
+                        UniProtMediaType.getFileExtension(UniProtMediaType.FF_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "MY_ID"),
                 Arguments.of(
-                        getFileExtension(LIST_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
+                        UniProtMediaType.getFileExtension(UniProtMediaType.GFF_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "P99999"),
                 Arguments.of(
-                        getFileExtension(TSV_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
+                        UniProtMediaType.getFileExtension(UniProtMediaType.LIST_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "P99999"),
                 Arguments.of(
-                        getFileExtension(APPLICATION_XML), "P00000", "P99999", "MY_ID", "P99999"),
+                        UniProtMediaType.getFileExtension(UniProtMediaType.TSV_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "P99999"),
                 Arguments.of(
-                        getFileExtension(XLS_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "BINARY"),
+                        UniProtMediaType.getFileExtension(MediaType.APPLICATION_XML),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "P99999"),
                 Arguments.of(
-                        getFileExtension(FASTA_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P99999"),
+                        UniProtMediaType.getFileExtension(UniProtMediaType.XLS_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "BINARY"),
                 Arguments.of(
-                        getFileExtension(RDF_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"),
+                        UniProtMediaType.getFileExtension(UniProtMediaType.FASTA_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "P99999"),
                 Arguments.of(
-                        getFileExtension(TURTLE_MEDIA_TYPE), "P00000", "P99999", "MY_ID", "P00000"),
+                        UniProtMediaType.getFileExtension(UniProtMediaType.RDF_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "P00000"),
                 Arguments.of(
-                        getFileExtension(N_TRIPLES_MEDIA_TYPE),
+                        UniProtMediaType.getFileExtension(UniProtMediaType.TURTLE_MEDIA_TYPE),
+                        "P00000",
+                        "P99999",
+                        "MY_ID",
+                        "P00000"),
+                Arguments.of(
+                        UniProtMediaType.getFileExtension(UniProtMediaType.N_TRIPLES_MEDIA_TYPE),
                         "P00000",
                         "P99999",
                         "MY_ID",
@@ -181,16 +224,20 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, ACCESSION_ID)
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, ACCESSION_ID)
                                         .param("fields", "invalid, organism_name, invalid2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid fields parameter value 'invalid'",
@@ -212,18 +259,22 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "P21802-2")
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "P21802-2")
                                         .param("fields", "accession,organism_name")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.primaryAccession", is("P21802-2")))
-                .andExpect(jsonPath("$.organism").exists())
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("P21802-2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.organism").exists())
                 // ensure other parts of the entry were not returned (using one example)
-                .andExpect(jsonPath("$.genes").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.genes").doesNotExist());
     }
 
     @Test
@@ -245,32 +296,40 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "P21802-1")
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "P21802-1")
                                         .param("fields", "accession,organism_name")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then return the canonical isoform entry
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.primaryAccession", is("P21802-1")))
-                .andExpect(jsonPath("$.organism").exists())
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("P21802-1")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.organism").exists())
                 // ensure other parts of the entry were not returned (using one example)
-                .andExpect(jsonPath("$.comments").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.comments").doesNotExist());
 
         // when is an accession without isoforms (Alternative products comment)
         response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "q8dia7-1")
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "q8dia7-1")
                                         .param("fields", "accession,organism_name")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then return the canonical entry
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.primaryAccession", is("Q8DIA7")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("Q8DIA7")));
     }
 
     @Test
@@ -288,18 +347,28 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "B4DFC2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "B4DFC2")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=B4DFC2"))
-                .andExpect(jsonPath("$.primaryAccession", is("B4DFC2")))
-                .andExpect(jsonPath("$.entryType", is("Inactive")))
-                .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("MERGED")))
-                .andExpect(jsonPath("$.inactiveReason.mergeDemergeTo", contains("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=B4DFC2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("B4DFC2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.inactiveReason.inactiveReasonType", is("MERGED")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.inactiveReason.mergeDemergeTo", contains("P21802")));
     }
 
     @ParameterizedTest
@@ -323,37 +392,51 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
 
         // ... inactive entry that was merged into 'activeAcc' entry
         InactiveUniProtEntry inactiveEntry =
-                InactiveUniProtEntry.from(inactiveAcc, "I8FBX0_MYCAB", MERGED, activeAcc);
+                InactiveUniProtEntry.from(
+                        inactiveAcc, "I8FBX0_MYCAB", InactiveEntryMocker.MERGED, activeAcc);
         getStoreManager()
                 .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveEntry);
 
         // REQUEST 1 ---------------------------
         // WHEN we fetch the inactive accession
         ResultActions response =
-                getMockMvc().perform(get(ACCESSION_RESOURCE, inactiveAcc + "." + fileExtension));
+                getMockMvc()
+                        .perform(
+                                MockMvcRequestBuilders.get(
+                                        ACCESSION_RESOURCE, inactiveAcc + "." + fileExtension));
 
         // THEN we expect a redirect 303 (200 for RDF)
-        ResultActions resultActions = response.andDo(log());
+        ResultActions resultActions = response.andDo(MockMvcResultHandlers.log());
         String redirectedURL = "/uniprotkb/" + activeAcc;
-        if (!mediaType.equals(DEFAULT_MEDIA_TYPE)) {
+        if (!mediaType.equals(UniProtMediaType.DEFAULT_MEDIA_TYPE)) {
             redirectedURL += "." + fileExtension;
         }
         redirectedURL += "?from=" + inactiveAcc;
 
-        if (Set.of(RDF_MEDIA_TYPE, TURTLE_MEDIA_TYPE, N_TRIPLES_MEDIA_TYPE).contains(mediaType)) {
+        if (Set.of(
+                        UniProtMediaType.RDF_MEDIA_TYPE,
+                        UniProtMediaType.TURTLE_MEDIA_TYPE,
+                        UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                .contains(mediaType)) {
             resultActions
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()));
+                    .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                    .andExpect(
+                            MockMvcResultMatchers.header()
+                                    .string(HttpHeaders.CONTENT_TYPE, mediaType.toString()));
         } else {
             // response REDIRECTS client
             resultActions
-                    .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
-                    .andExpect(header().string(HttpHeaders.LOCATION, redirectedURL));
+                    .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
+                    .andExpect(
+                            MockMvcResultMatchers.header()
+                                    .string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                    .andExpect(
+                            MockMvcResultMatchers.header()
+                                    .string(HttpHeaders.LOCATION, redirectedURL));
 
             // REQUEST 2 ---------------------------
             // ... let's simulate a client (e.g., browser) redirect and go to the address directly
-            response = getMockMvc().perform(get(redirectedURL));
+            response = getMockMvc().perform(MockMvcRequestBuilders.get(redirectedURL));
 
             // then we expect the active entry to contain the appropriate contents
             Matcher<String> matcher = containsString(expectResponseMatch);
@@ -361,10 +444,12 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                 matcher = is(not(emptyString()));
             }
 
-            response.andDo(log())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
-                    .andExpect(content().string(matcher));
+            response.andDo(MockMvcResultHandlers.log())
+                    .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                    .andExpect(
+                            MockMvcResultMatchers.header()
+                                    .string(HttpHeaders.CONTENT_TYPE, mediaType.toString()))
+                    .andExpect(MockMvcResultMatchers.content().string(matcher));
         }
     }
 
@@ -383,19 +468,28 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "Q00007")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "Q00007")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.primaryAccession", is("Q00007")))
-                .andExpect(jsonPath("$.entryType", is("Inactive")))
-                .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DEMERGED")))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath("$.inactiveReason.mergeDemergeTo", contains("P21802", "P63151")));
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("Q00007")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.inactiveReason.inactiveReasonType", is("DEMERGED")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.inactiveReason.mergeDemergeTo", contains("P21802", "P63151")));
     }
 
     @Test
@@ -413,17 +507,25 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "I8FBX2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "I8FBX2")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.primaryAccession", is("I8FBX2")))
-                .andExpect(jsonPath("$.entryType", is("Inactive")))
-                .andExpect(jsonPath("$.inactiveReason.inactiveReasonType", is("DELETED")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.primaryAccession", is("I8FBX2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.entryType", is("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.inactiveReason.inactiveReasonType", is("DELETED")));
     }
 
     @Test
@@ -436,16 +538,23 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "P21802.20")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "P21802.20")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.LOCATION,
                                         "/unisave/P21802?from=P21802.20&versions=20&format=json"));
     }
@@ -460,16 +569,23 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "FGFR2_HUMAN")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "FGFR2_HUMAN")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.LOCATION,
                                         "/uniprotkb/P21802?from=FGFR2_HUMAN"));
     }
@@ -484,15 +600,22 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "FGFR2_DOG")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "FGFR2_DOG")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, nullValue()));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, nullValue()));
     }
 
     @Test
@@ -510,16 +633,23 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "FGFR2_HUMAN")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "FGFR2_HUMAN")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.LOCATION,
                                         "/uniprotkb/P21802?from=FGFR2_HUMAN"));
     }
@@ -539,16 +669,23 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "Q14301_FGFR2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "Q14301_FGFR2")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.LOCATION,
                                         "/uniprotkb/Q14301?from=Q14301_FGFR2"));
     }
@@ -568,16 +705,23 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "I8FBX2_YERPE")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "I8FBX2_YERPE")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.LOCATION,
                                         "/uniprotkb/I8FBX2?from=I8FBX2_YERPE"));
     }
@@ -595,15 +739,23 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "OBS_ID")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "OBS_ID")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(content().contentTypeCompatibleWith(APPLICATION_JSON_VALUE))
-                .andExpect(header().string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=OBS_ID"));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.LOCATION, "/uniprotkb/P21802?from=OBS_ID"));
     }
 
     @Test
@@ -625,15 +777,19 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "YK29_YEAST")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "YK29_YEAST")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid request received. This protein ID 'YK29_YEAST' is now obsolete. Please refer to the accessions derived from this protein ID (F1Q0X3, P21802).")));
@@ -649,15 +805,22 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "A0A1J4H6S2")
                                         .param("version", "last")
-                                        .header(ACCEPT, FF_MEDIA_TYPE_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                UniProtMediaType.FF_MEDIA_TYPE_VALUE));
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FF_MEDIA_TYPE_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FF_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.LOCATION,
                                         getRedirectToEntryVersionPath("A0A1J4H6S2", "9", "txt")));
     }
@@ -672,12 +835,14 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "B0B1J1H6A7")
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "B0B1J1H6A7")
                                         .param("version", "last")
-                                        .header(ACCEPT, FF_MEDIA_TYPE_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                UniProtMediaType.FF_MEDIA_TYPE_VALUE));
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(
                         result ->
                                 assertTrue(
@@ -685,7 +850,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                                                 instanceof ResourceNotFoundException))
                 .andExpect(
                         result ->
-                                assertEquals(
+                                Assert.assertEquals(
                                         "No entries for B0B1J1H6A7 were found",
                                         result.getResolvedException().getMessage()));
     }
@@ -696,15 +861,22 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "A0A1J4H6S2")
                                         .param("version", "5")
-                                        .header(ACCEPT, FF_MEDIA_TYPE_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                UniProtMediaType.FF_MEDIA_TYPE_VALUE));
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.SEE_OTHER.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FF_MEDIA_TYPE_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.SEE_OTHER.value()))
                 .andExpect(
-                        header().string(
+                        MockMvcResultMatchers.header()
+                                .string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.FF_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(
                                         HttpHeaders.LOCATION,
                                         getRedirectToEntryVersionPath("A0A1J4H6S2", "5", "txt")));
     }
@@ -715,15 +887,19 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "A0A1J4H6S2")
                                         .param("version", "3")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        content()
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
                                 .string(
                                         containsString(
                                                 "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
@@ -735,15 +911,21 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(ACCESSION_RESOURCE, "A0A1J4H6S2")
+                                MockMvcRequestBuilders.get(ACCESSION_RESOURCE, "A0A1J4H6S2")
                                         .param("version", "5")
-                                        .header(ACCEPT, TSV_MEDIA_TYPE_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                UniProtMediaType.TSV_MEDIA_TYPE_VALUE));
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, TSV_MEDIA_TYPE_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        content()
+                        MockMvcResultMatchers.header()
+                                .string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
                                 .string(
                                         containsString(
                                                 "Expected one of [text/plain;format=fasta, text/plain;format=flatfile]")));
@@ -879,7 +1061,8 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         public GetIdParameter validIdParameter() {
             return GetIdParameter.builder()
                     .id(ACCESSION_ID)
-                    .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath("$.primaryAccession", is(ACCESSION_ID)))
                     .build();
         }
 
@@ -887,9 +1070,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         public GetIdParameter invalidIdParameter() {
             return GetIdParameter.builder()
                     .id("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.messages.*",
                                     contains(
                                             "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
@@ -900,8 +1084,11 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         public GetIdParameter nonExistentIdParameter() {
             return GetIdParameter.builder()
                     .id(NON_EXISTENT_ACCESSION_ID)
-                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
-                    .resultMatcher(jsonPath("$.messages.*", contains("Resource not found")))
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath("$.url", not(is(emptyOrNullString()))))
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
+                                    "$.messages.*", contains("Resource not found")))
                     .build();
         }
 
@@ -910,14 +1097,23 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
             return GetIdParameter.builder()
                     .id(ACCESSION_ID)
                     .fields("gene_primary,cc_function,cc_pathway")
-                    .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
-                    .resultMatcher(jsonPath("$.genes").exists())
-                    .resultMatcher(jsonPath("$.comments[?(@.commentType=='FUNCTION')]").exists())
-                    .resultMatcher(jsonPath("$.comments[?(@.commentType=='PATHWAY')]").exists())
-                    // ensure other parts of the entry were not returned (using one example)
-                    .resultMatcher(jsonPath("$.organism").doesNotExist())
                     .resultMatcher(
-                            jsonPath("$.comments[?(@.commentType=='SIMILARITY')]").doesNotExist())
+                            MockMvcResultMatchers.jsonPath("$.primaryAccession", is(ACCESSION_ID)))
+                    .resultMatcher(MockMvcResultMatchers.jsonPath("$.genes").exists())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
+                                            "$.comments[?(@.commentType=='FUNCTION')]")
+                                    .exists())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
+                                            "$.comments[?(@.commentType=='PATHWAY')]")
+                                    .exists())
+                    // ensure other parts of the entry were not returned (using one example)
+                    .resultMatcher(MockMvcResultMatchers.jsonPath("$.organism").doesNotExist())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
+                                            "$.comments[?(@.commentType=='SIMILARITY')]")
+                                    .doesNotExist())
                     .build();
         }
 
@@ -926,9 +1122,10 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
             return GetIdParameter.builder()
                     .id(ACCESSION_ID)
                     .fields("invalid")
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.messages.*",
                                     contains("Invalid fields parameter value 'invalid'")))
                     .build();
@@ -944,39 +1141,46 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.primaryAccession", is(ACCESSION_ID)))
                                     .resultMatcher(
-                                            jsonPath(
+                                            MockMvcResultMatchers.jsonPath(
+                                                    "$.primaryAccession", is(ACCESSION_ID)))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.jsonPath(
                                                     "$.entryType",
                                                     is("UniProtKB reviewed (Swiss-Prot)")))
-                                    .resultMatcher(jsonPath("$.uniProtkbId", is("PURL_THEEB")))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.jsonPath(
+                                                    "$.uniProtkbId", is("PURL_THEEB")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             startsWith(
-                                                                    XML_DECLARATION
-                                                                            + UNIPROTKB_XML_SCHEMA)))
+                                                                    ConverterConstants
+                                                                                    .XML_DECLARATION
+                                                                            + ConverterConstants
+                                                                                    .UNIPROTKB_XML_SCHEMA)))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "<accession>Q8DIA7</accession>")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             endsWith(
-                                                                    COPYRIGHT_TAG
-                                                                            + UNIPROTKB_XML_CLOSE_TAG)))
+                                                                    ConverterConstants.COPYRIGHT_TAG
+                                                                            + ConverterConstants
+                                                                                    .UNIPROTKB_XML_CLOSE_TAG)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "ID   PURL_THEEB              Reviewed;         761 AA.\n"
@@ -989,7 +1193,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     ">sp|Q8DIA7|"
@@ -1000,7 +1204,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "##gff-version 3\n"
@@ -1010,18 +1214,20 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString(ACCESSION_ID)))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .string(containsString(ACCESSION_ID)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "Entry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL (FGAM synthase)")))
@@ -1030,13 +1236,14 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                            MockMvcResultMatchers.content()
+                                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "<?xml version='1.0' encoding='UTF-8'?>\n"
@@ -1053,12 +1260,12 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             startsWith(
                                                                     TurtlePrologs.UNIPROT_PROLOG)))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "    <sample>text</sample>\n"
@@ -1070,13 +1277,13 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             startsWith(
                                                                     NTriplesPrologs
                                                                             .N_TRIPLES_COMMON_PROLOG)))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "    <sample>text</sample>\n"
@@ -1094,9 +1301,11 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(is(emptyOrNullString()))))
                                     .resultMatcher(
-                                            jsonPath(
+                                            MockMvcResultMatchers.jsonPath(
+                                                    "$.url", not(is(emptyOrNullString()))))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.jsonPath(
                                                     "$.messages.*",
                                                     contains(
                                                             "The 'accession' value has invalid format. It should be a valid UniProtKB accession")))
@@ -1105,7 +1314,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "<messages>The 'accession' value has invalid format. It should be a valid UniProtKB accession</messages>")))
@@ -1114,7 +1323,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
@@ -1123,7 +1332,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
@@ -1132,7 +1341,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
@@ -1141,7 +1350,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
@@ -1150,7 +1359,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' value has invalid format. It should be a valid UniProtKB accession")))
@@ -1159,22 +1368,29 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().contentType(UniProtMediaType.XLS_MEDIA_TYPE))
+                                            MockMvcResultMatchers.content()
+                                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(UniProtMediaType.RDF_MEDIA_TYPE)
-                                    .resultMatcher(content().string(not(is(emptyOrNullString()))))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .string(not(is(emptyOrNullString()))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(TURTLE_MEDIA_TYPE)
-                                    .resultMatcher(content().string(not(is(emptyOrNullString()))))
+                                    .contentType(UniProtMediaType.TURTLE_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .string(not(is(emptyOrNullString()))))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(N_TRIPLES_MEDIA_TYPE)
-                                    .resultMatcher(content().string(not(is(emptyOrNullString()))))
+                                    .contentType(UniProtMediaType.N_TRIPLES_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .string(not(is(emptyOrNullString()))))
                                     .build())
                     .build();
         }

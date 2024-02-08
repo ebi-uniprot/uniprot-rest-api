@@ -3,12 +3,6 @@ package org.uniprot.api.uniprotkb.controller;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.header.HttpCommonHeaderConfig.*;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,19 +21,24 @@ import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebCl
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
-import org.uniprot.api.uniprotkb.UniProtKBObjectsForTests;
+import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.LiteratureRepository;
-import org.uniprot.api.uniprotkb.repository.search.impl.PublicationRepository;
-import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.common.UniProtKBObjectsForTests;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.search.LiteratureRepository;
+import org.uniprot.api.uniprotkb.common.repository.search.PublicationRepository;
+import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.citation.Submission;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.indexer.DataStoreManager;
@@ -124,29 +123,36 @@ class UniProtKBPublicationControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        MockMvcRequestBuilders.get(
+                                        MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(2)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath("$.results[0].citation.citationCrossReferences[0].id", is("12")))
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].citation.citationCrossReferences[0].id", is("12")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results[0].citation.citationType",
                                 is("UniProt indexed literatures")))
-                .andExpect(jsonPath("$.results[0].citation.title", is("title 12")))
                 .andExpect(
-                        jsonPath("$.results[*].citation.title", contains("title 12", "title 13")))
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].citation.title", is("title 12")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[*].citation.title", contains("title 12", "title 13")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results[*].references[*].sourceCategories[*]",
                                 everyItem(in(VALID_CATEGORIES))))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results[*].references[*].source.name",
                                 contains(
                                         "source P12312",
@@ -155,13 +161,19 @@ class UniProtKBPublicationControllerIT {
                                         "source P12312",
                                         "source P12312",
                                         "source P12312")))
-                .andExpect(jsonPath("$.results[0].statistics.reviewedProteinCount", is(10)))
-                .andExpect(jsonPath("$.results[0].statistics.unreviewedProteinCount", is(20)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].statistics.reviewedProteinCount", is(10)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].statistics.unreviewedProteinCount", is(20)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results[0].statistics.computationallyMappedProteinCount",
                                 is(30)))
-                .andExpect(jsonPath("$.results[0].statistics.communityMappedProteinCount", is(40)));
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].statistics.communityMappedProteinCount", is(40)));
     }
 
     @Test
@@ -172,21 +184,26 @@ class UniProtKBPublicationControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        MockMvcRequestBuilders.get(
+                                        MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results[*].citation.id", contains("CI-F4UM8V2OKRCK4", "12")))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[*].citation.id", contains("CI-F4UM8V2OKRCK4", "12")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results[*].citation.citationType",
                                 contains("submission", "UniProt indexed literatures")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results[*].citation.title",
                                 contains("Submission title", "title 12")));
     }
@@ -205,34 +222,43 @@ class UniProtKBPublicationControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
+                        MockMvcRequestBuilders.get(
+                                        MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
                                 .param("facets", "types,is_large_scale,categories")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(2)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath("$.facets.*.label", contains("Source", "Study type", "Category")))
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.label", contains("Source", "Study type", "Category")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets.*.name",
                                 contains("types", "is_large_scale", "categories")))
-                .andExpect(jsonPath("$.facets[0].values[0].label", is("Computationally mapped")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(2)))
-                .andExpect(jsonPath("$.facets[2].values.*.value", everyItem(in(VALID_CATEGORIES))))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values[0].label", is("Computationally mapped")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.facets[0].values.*.count", contains(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[2].values.*.value", everyItem(in(VALID_CATEGORIES))))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets[2].values.*.count",
                                 hasSize(lessThanOrEqualTo(VALID_CATEGORIES.size()))))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets[1].values.*.label",
                                 everyItem(in(asList("Small scale", "Large scale")))))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets[1].values.*.value",
                                 everyItem(in(asList("true", "false")))));
     }
@@ -251,27 +277,36 @@ class UniProtKBPublicationControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
+                        MockMvcRequestBuilders.get(
+                                        MAPPED_PROTEIN_PATH + ACCESSION + "/publications")
                                 .param("facets", "types,is_large_scale,categories")
                                 .param("facetFilter", "categories:Interaction")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(3)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath("$.facets.*.label", contains("Source", "Study type", "Category")))
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(3)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets.*.label", contains("Source", "Study type", "Category")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.facets.*.name",
                                 contains("types", "is_large_scale", "categories")))
                 .andExpect(
-                        jsonPath("$.facets[0].values.*.label", contains("Computationally mapped")))
-                .andExpect(jsonPath("$.facets[0].values.*.value", contains("1")))
-                .andExpect(jsonPath("$.facets[0].values.*.count", contains(3)))
-                .andExpect(jsonPath("$.facets[2].values.*.value", hasItem("Interaction")));
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[0].values.*.label", contains("Computationally mapped")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.facets[0].values.*.value", contains("1")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.facets[0].values.*.count", contains(3)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.facets[2].values.*.value", hasItem("Interaction")));
     }
 
     @Test
@@ -279,18 +314,20 @@ class UniProtKBPublicationControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + "P12345/publications")
+                        MockMvcRequestBuilders.get(MAPPED_PROTEIN_PATH + "P12345/publications")
                                 .param("facets", "invalid")
                                 .param("facetFilter", "invalidQuery:invalidValue")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid facet name 'invalid'. Expected value can be [types, categories, is_large_scale].",
@@ -302,16 +339,18 @@ class UniProtKBPublicationControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + "INVALID/publications")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        MockMvcRequestBuilders.get(MAPPED_PROTEIN_PATH + "INVALID/publications")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.url", not(emptyOrNullString())))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.url", not(emptyOrNullString())))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 contains(
                                         "The 'accession' value has invalid format. It should be a valid UniProtKB accession")));
@@ -325,14 +364,16 @@ class UniProtKBPublicationControllerIT {
         // when
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + "P99999/publications")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE));
+                        MockMvcRequestBuilders.get(MAPPED_PROTEIN_PATH + "P99999/publications")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(0)));
     }
 
     @Test
@@ -343,21 +384,29 @@ class UniProtKBPublicationControllerIT {
         // when first page
         ResultActions response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + "P12345/publications")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                        MockMvcRequestBuilders.get(MAPPED_PROTEIN_PATH + "P12345/publications")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("facets", "is_large_scale")
                                 .param("size", "5"));
 
         // then first page
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "7"))
-                .andExpect(header().string(HttpHeaders.LINK, notNullValue()))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("size=5")))
-                .andExpect(header().string(HttpHeaders.LINK, containsString("cursor=")))
-                .andExpect(jsonPath("$.results.size()", is(5)))
-                .andExpect(jsonPath("$.facets.size()", is(1)));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpCommonHeaderConfig.X_TOTAL_RESULTS, "7"))
+                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LINK, notNullValue()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.LINK, containsString("size=5")))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.LINK, containsString("cursor=")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets.size()", is(1)));
 
         String linkHeader = response.andReturn().getResponse().getHeader(HttpHeaders.LINK);
         assertThat(linkHeader, notNullValue());
@@ -366,18 +415,22 @@ class UniProtKBPublicationControllerIT {
         // when last page
         response =
                 mockMvc.perform(
-                        get(MAPPED_PROTEIN_PATH + "P12345/publications")
-                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                        MockMvcRequestBuilders.get(MAPPED_PROTEIN_PATH + "P12345/publications")
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("cursor", cursor)
                                 .param("size", "5"));
 
         // then last page
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(header().string(X_TOTAL_RESULTS, "7"))
-                .andExpect(header().string(HttpHeaders.LINK, nullValue()))
-                .andExpect(jsonPath("$.results.size()", is(2)));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpCommonHeaderConfig.X_TOTAL_RESULTS, "7"))
+                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LINK, nullValue()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)));
     }
 
     private static final AtomicInteger REFERENCE_NUMBER_COUNT = new AtomicInteger();

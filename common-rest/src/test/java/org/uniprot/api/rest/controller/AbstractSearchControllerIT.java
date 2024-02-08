@@ -551,7 +551,6 @@ public abstract class AbstractSearchControllerIT {
     @MethodSource("getAllReturnedFields")
     void searchCanSearchWithAllAvailableReturnedFields(String name, List<String> paths)
             throws Exception {
-
         // given
         saveEntry(SaveScenario.SEARCH_ALL_RETURN_FIELDS);
 

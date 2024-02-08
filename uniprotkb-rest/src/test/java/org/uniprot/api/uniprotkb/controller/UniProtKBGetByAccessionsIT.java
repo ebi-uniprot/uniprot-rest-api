@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
 import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
-import static org.uniprot.api.uniprotkb.controller.UniProtKBEntryConvertITUtils.*;
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX;
 
 import java.io.IOException;
@@ -39,6 +38,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsControllerIT;
@@ -46,7 +48,7 @@ import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
 import org.uniprot.core.fasta.UniProtKBFasta;
 import org.uniprot.core.gene.Gene;
 import org.uniprot.core.gene.GeneName;
@@ -157,7 +159,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     private void saveEntry(UniProtKBEntry uniProtKBEntry) throws IOException, SolrServerException {
         UniProtDocument document = documentConverter.convert(uniProtKBEntry);
-        aggregateTaxonomyDataToDocument(taxonomyRepo, document);
+        UniProtKBEntryConvertITUtils.aggregateTaxonomyDataToDocument(taxonomyRepo, document);
 
         cloudSolrClient.addBean(SolrCollection.uniprot.name(), document);
         storeClient.saveEntry(uniProtKBEntry);
@@ -169,7 +171,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getGetByIdsPath())
+                                MockMvcRequestBuilders.get(getGetByIdsPath())
                                         .header(
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
@@ -178,12 +180,14 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                         .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(10)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(10)))
                 .andExpect(getReverseSortedIdResultMatcher())
-                .andExpect(jsonPath("$.facets").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     @Test
@@ -192,7 +196,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getGetByIdsPath())
+                                MockMvcRequestBuilders.get(getGetByIdsPath())
                                         .header(
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
@@ -200,12 +204,16 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                         .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P00003", "P21802-2")))
-                .andExpect(jsonPath("$.facets").doesNotExist());
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P00003", "P21802-2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     @Test
@@ -215,7 +223,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(getGetByIdsPath())
+                                MockMvcRequestBuilders.get(getGetByIdsPath())
                                         .header(
                                                 org.apache.http.HttpHeaders.ACCEPT,
                                                 MediaType.APPLICATION_JSON)
@@ -223,12 +231,16 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                         .param("size", "10"));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].primaryAccession", is("F1Q0X3")))
-                .andExpect(jsonPath("$.facets").doesNotExist());
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("F1Q0X3")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.facets").doesNotExist());
     }
 
     @Test
@@ -394,18 +406,22 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected List<ResultMatcher> getResultsResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
+        ResultMatcher rm1 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
         ResultMatcher rm2 =
-                jsonPath("$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)"));
-        ResultMatcher rm3 = jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN"));
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)"));
+        ResultMatcher rm3 =
+                MockMvcResultMatchers.jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN"));
         return List.of(rm1, rm2, rm3);
     }
 
     @Override
     protected List<ResultMatcher> getFacetsResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.facets.size()", is(9));
+        ResultMatcher rm1 = MockMvcResultMatchers.jsonPath("$.facets.size()", is(9));
         ResultMatcher rm2 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.facets.*.label",
                         containsInAnyOrder(
                                 "3D Structure",
@@ -423,7 +439,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getIdsAsResultMatchers() {
         return Arrays.stream(TEST_IDS_ARRAY)
-                .map(id -> content().string(containsString(id)))
+                .map(id -> MockMvcResultMatchers.content().string(containsString(id)))
                 .collect(Collectors.toList());
     }
 
@@ -449,17 +465,23 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected List<ResultMatcher> getFieldsResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
-        ResultMatcher rm2 = jsonPath("$.results.*.organism").exists();
-        ResultMatcher rm3 = jsonPath("$.results.*.genes").exists();
-        ResultMatcher rm4 = jsonPath("$.results.*.sequence").doesNotExist();
-        ResultMatcher rm5 = jsonPath("$.results.*.comments").doesNotExist();
+        ResultMatcher rm1 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
+        ResultMatcher rm2 = MockMvcResultMatchers.jsonPath("$.results.*.organism").exists();
+        ResultMatcher rm3 = MockMvcResultMatchers.jsonPath("$.results.*.genes").exists();
+        ResultMatcher rm4 = MockMvcResultMatchers.jsonPath("$.results.*.sequence").doesNotExist();
+        ResultMatcher rm5 = MockMvcResultMatchers.jsonPath("$.results.*.comments").doesNotExist();
         ResultMatcher rm6 =
-                jsonPath("$.results[0].organism.scientificName", equalTo("Homo sapiens"));
-        ResultMatcher rm7 = jsonPath("$.results[0].organism.commonName", equalTo("Human"));
-        ResultMatcher rm8 = jsonPath("$.results[0].organism.taxonId", equalTo(9606));
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].organism.scientificName", equalTo("Homo sapiens"));
+        ResultMatcher rm7 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].organism.commonName", equalTo("Human"));
+        ResultMatcher rm8 =
+                MockMvcResultMatchers.jsonPath("$.results[0].organism.taxonId", equalTo(9606));
         ResultMatcher rm9 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results[0].organism.lineage",
                         equalTo(TEMPLATE_ENTRY.getOrganism().getLineages()));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8, rm9);
@@ -468,12 +490,12 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getFirstPageResultMatchers() {
         ResultMatcher rm1 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results.*.primaryAccession",
                         contains(List.of(TEST_IDS_ARRAY).subList(0, 4).toArray()));
-        ResultMatcher rm2 = jsonPath("$.facets", iterableWithSize(9));
+        ResultMatcher rm2 = MockMvcResultMatchers.jsonPath("$.facets", iterableWithSize(9));
         ResultMatcher rm3 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.facets.*.label",
                         containsInAnyOrder(
                                 "3D Structure",
@@ -486,7 +508,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 "Popular organisms",
                                 "Proteomes"));
         ResultMatcher rm4 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.facets.*.name",
                         containsInAnyOrder(
                                 "structure_3d",
@@ -498,15 +520,15 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                                 "annotation_score",
                                 "model_organism",
                                 "proteome"));
-        ResultMatcher rm5 = jsonPath("$.facets.*.values").exists();
-        ResultMatcher rm6 = jsonPath("$.facets.*.values").isArray();
+        ResultMatcher rm5 = MockMvcResultMatchers.jsonPath("$.facets.*.values").exists();
+        ResultMatcher rm6 = MockMvcResultMatchers.jsonPath("$.facets.*.values").isArray();
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6);
     }
 
     @Override
     protected List<ResultMatcher> getSecondPageResultMatchers() {
         ResultMatcher rm1 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results.*.primaryAccession",
                         contains(List.of(TEST_IDS_ARRAY).subList(4, 8).toArray()));
         return List.of(rm1);
@@ -515,7 +537,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
     @Override
     protected List<ResultMatcher> getThirdPageResultMatchers() {
         ResultMatcher rm1 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results.*.primaryAccession",
                         contains(List.of(TEST_IDS_ARRAY).subList(8, 10).toArray()));
         return List.of(rm1);
@@ -547,12 +569,13 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
 
     @Override
     protected ResultMatcher getSortedIdResultMatcher() {
-        return jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY_SORTED));
+        return MockMvcResultMatchers.jsonPath(
+                "$.results.*.primaryAccession", contains(TEST_IDS_ARRAY_SORTED));
     }
 
     @Override
     protected ResultMatcher getReverseSortedIdResultMatcher() {
-        return jsonPath(
+        return MockMvcResultMatchers.jsonPath(
                 "$.results.*.primaryAccession",
                 contains(
                         Arrays.stream(TEST_IDS_ARRAY_SORTED)

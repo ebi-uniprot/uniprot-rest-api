@@ -2,12 +2,13 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.containsStringIgnoringCase;
 import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.store.indexer.DataStoreManager;
 import org.uniprot.store.search.document.Document;
 
@@ -19,12 +20,14 @@ public abstract class GroupByControllerIT {
         prepareSingleRootNodeWithNoChildren();
 
         getMockMvc()
-                .perform(get(getPath()).param("query", "organism_id:" + INVALID_ORGANISM_ID))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(0)));
+                .perform(
+                        MockMvcRequestBuilders.get(getPath())
+                                .param("query", "organism_id:" + INVALID_ORGANISM_ID))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(0)));
     }
 
     @Test
@@ -32,36 +35,41 @@ public abstract class GroupByControllerIT {
         prepareSingleRootNodeWithNoChildren();
 
         getMockMvc()
-                .perform(get(getPath()).param("query", INVALID_ORGANISM_ID))
-                .andDo(log())
-                .andExpect(jsonPath("$.groups.size()", is(0)))
-                .andExpect(jsonPath("$.ancestors.size()", is(0)))
-                .andExpect(jsonPath("$.parent.label").doesNotExist())
-                .andExpect(jsonPath("$.parent.count", is(0)));
+                .perform(MockMvcRequestBuilders.get(getPath()).param("query", INVALID_ORGANISM_ID))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.groups.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ancestors.size()", is(0)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.label").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent.count", is(0)));
     }
 
     @Test
     void getGroupBy_whenQueryNotSpecified() throws Exception {
         getMockMvc()
-                .perform(get(getPath()))
-                .andDo(log())
-                .andExpect(status().isBadRequest())
+                .perform(MockMvcRequestBuilders.get(getPath()))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(
-                        content()
+                        MockMvcResultMatchers.content()
                                 .string(
                                         containsStringIgnoringCase(
                                                 "query is a required parameter")))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent").doesNotExist());
     }
 
     @Test
     void getGroupBy_invalidParent() throws Exception {
         getMockMvc()
-                .perform(get(getPath()).param("query", "*").param("parent", "invalid-parent"))
-                .andDo(log())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsStringIgnoringCase("id value should be")))
-                .andExpect(jsonPath("$.parent").doesNotExist());
+                .perform(
+                        MockMvcRequestBuilders.get(getPath())
+                                .param("query", "*")
+                                .param("parent", "invalid-parent"))
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(
+                        MockMvcResultMatchers.content()
+                                .string(containsStringIgnoringCase("id value should be")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.parent").doesNotExist());
     }
 
     protected void save(DataStoreManager.StoreType type, Document doc) {

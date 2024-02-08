@@ -1,10 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
-import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.UNIPROTKB_ACCESSION_SEQUENCE_RANGE_REGEX;
 
@@ -34,16 +31,17 @@ import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.rest.output.header.HeaderFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.request.ReturnFieldMetaReaderImpl;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidReturnFields;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsPostRequest;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsSearchRequest;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBSearchRequest;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBStreamRequest;
-import org.uniprot.api.uniprotkb.service.UniProtEntryService;
-import org.uniprot.api.uniprotkb.service.UniProtKBEntryVersionService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtKBEntryVersionService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBIdsPostRequest;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBIdsSearchRequest;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBSearchRequest;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBStreamRequest;
 import org.uniprot.core.uniprotkb.InactiveReasonType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Pair;
@@ -92,7 +90,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 eventPublisher,
                 converterContextFactory,
                 downloadTaskExecutor,
-                UNIPROTKB,
+                MessageConverterContextFactory.Resource.UNIPROTKB,
                 downloadGatekeeper);
         this.entryService = entryService;
     }
@@ -104,14 +102,14 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     @GetMapping(
             value = "/search",
             produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                FF_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE,
+                UniProtMediaType.TSV_MEDIA_TYPE_VALUE,
+                UniProtMediaType.FF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.LIST_MEDIA_TYPE_VALUE,
+                MediaType.APPLICATION_XML_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
+                UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                GFF_MEDIA_TYPE_VALUE
+                UniProtMediaType.GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Search for a UniProtKB protein entry (or entries) by a SOLR query.",
@@ -119,7 +117,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 @ApiResponse(
                         content = {
                             @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     array =
                                             @ArraySchema(
                                                     schema =
@@ -127,19 +125,19 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                                                                     implementation =
                                                                             UniProtKBEntry.class))),
                             @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
+                                    mediaType = MediaType.APPLICATION_XML_VALUE,
                                     array =
                                             @ArraySchema(
                                                     schema =
                                                             @Schema(
                                                                     implementation = Entry.class,
                                                                     name = "entries"))),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> searchCursor(
@@ -159,17 +157,17 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     @GetMapping(
             value = "/{accession}",
             produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                FF_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE,
+                UniProtMediaType.TSV_MEDIA_TYPE_VALUE,
+                UniProtMediaType.FF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.LIST_MEDIA_TYPE_VALUE,
+                MediaType.APPLICATION_XML_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
+                UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                GFF_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE,
-                TURTLE_MEDIA_TYPE_VALUE,
-                N_TRIPLES_MEDIA_TYPE_VALUE
+                UniProtMediaType.GFF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.RDF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE,
+                UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get UniProtKB entry by an accession.",
@@ -177,20 +175,20 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 @ApiResponse(
                         content = {
                             @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     schema = @Schema(implementation = UniProtKBEntry.class)),
                             @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
+                                    mediaType = MediaType.APPLICATION_XML_VALUE,
                                     schema = @Schema(implementation = Entry.class)),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = RDF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = TURTLE_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = N_TRIPLES_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.RDF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccession(
@@ -212,7 +210,11 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                     String fields,
             @Parameter(description = "Entry version")
                     @RequestParam(value = "version", required = false)
-                    @ValidContentTypes(contentTypes = {FASTA_MEDIA_TYPE_VALUE, FF_MEDIA_TYPE_VALUE})
+                    @ValidContentTypes(
+                            contentTypes = {
+                                FASTA_MEDIA_TYPE_VALUE,
+                                UniProtMediaType.FF_MEDIA_TYPE_VALUE
+                            })
                     String version,
             HttpServletRequest request) {
         if (Utils.notNullNotEmpty(version)
@@ -257,17 +259,17 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     @GetMapping(
             value = "/stream",
             produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                FF_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE,
+                UniProtMediaType.TSV_MEDIA_TYPE_VALUE,
+                UniProtMediaType.FF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.LIST_MEDIA_TYPE_VALUE,
+                MediaType.APPLICATION_XML_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
+                UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                GFF_MEDIA_TYPE_VALUE,
-                RDF_MEDIA_TYPE_VALUE,
-                TURTLE_MEDIA_TYPE_VALUE,
-                N_TRIPLES_MEDIA_TYPE_VALUE
+                UniProtMediaType.GFF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.RDF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE,
+                UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Download a UniProtKB protein entry (or entries) retrieved by a SOLR query.",
@@ -275,7 +277,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 @ApiResponse(
                         content = {
                             @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     array =
                                             @ArraySchema(
                                                     schema =
@@ -283,19 +285,19 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                                                                     implementation =
                                                                             UniProtKBEntry.class))),
                             @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
+                                    mediaType = MediaType.APPLICATION_XML_VALUE,
                                     array =
                                             @ArraySchema(
                                                     schema =
                                                             @Schema(
                                                                     implementation = Entry.class,
                                                                     name = "entries"))),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE)
                         })
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniProtKBEntry>>> stream(
@@ -325,14 +327,14 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             value = "/accessions",
             method = {RequestMethod.GET},
             produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                FF_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE,
+                UniProtMediaType.TSV_MEDIA_TYPE_VALUE,
+                UniProtMediaType.FF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.LIST_MEDIA_TYPE_VALUE,
+                MediaType.APPLICATION_XML_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
+                UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                GFF_MEDIA_TYPE_VALUE
+                UniProtMediaType.GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get UniProtKB entries by a list of accessions.",
@@ -340,7 +342,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 @ApiResponse(
                         content = {
                             @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     array =
                                             @ArraySchema(
                                                     schema =
@@ -348,19 +350,19 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                                                                     implementation =
                                                                             UniProtKBEntry.class))),
                             @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
+                                    mediaType = MediaType.APPLICATION_XML_VALUE,
                                     array =
                                             @ArraySchema(
                                                     schema =
                                                             @Schema(
                                                                     implementation = Entry.class,
                                                                     name = "entries"))),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessionsGet(
@@ -375,14 +377,14 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             value = "/accessions",
             method = {RequestMethod.POST},
             produces = {
-                TSV_MEDIA_TYPE_VALUE,
-                FF_MEDIA_TYPE_VALUE,
-                LIST_MEDIA_TYPE_VALUE,
-                APPLICATION_XML_VALUE,
-                APPLICATION_JSON_VALUE,
-                XLS_MEDIA_TYPE_VALUE,
+                UniProtMediaType.TSV_MEDIA_TYPE_VALUE,
+                UniProtMediaType.FF_MEDIA_TYPE_VALUE,
+                UniProtMediaType.LIST_MEDIA_TYPE_VALUE,
+                MediaType.APPLICATION_XML_VALUE,
+                MediaType.APPLICATION_JSON_VALUE,
+                UniProtMediaType.XLS_MEDIA_TYPE_VALUE,
                 FASTA_MEDIA_TYPE_VALUE,
-                GFF_MEDIA_TYPE_VALUE
+                UniProtMediaType.GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
             summary = "Get UniProtKB entries by a list of accessions.",
@@ -390,7 +392,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 @ApiResponse(
                         content = {
                             @Content(
-                                    mediaType = APPLICATION_JSON_VALUE,
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
                                     array =
                                             @ArraySchema(
                                                     schema =
@@ -398,19 +400,19 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                                                                     implementation =
                                                                             UniProtKBEntry.class))),
                             @Content(
-                                    mediaType = APPLICATION_XML_VALUE,
+                                    mediaType = MediaType.APPLICATION_XML_VALUE,
                                     array =
                                             @ArraySchema(
                                                     schema =
                                                             @Schema(
                                                                     implementation = Entry.class,
                                                                     name = "entries"))),
-                            @Content(mediaType = TSV_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = FF_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = LIST_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = XLS_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.TSV_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.FF_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.LIST_MEDIA_TYPE_VALUE),
+                            @Content(mediaType = UniProtMediaType.XLS_MEDIA_TYPE_VALUE),
                             @Content(mediaType = FASTA_MEDIA_TYPE_VALUE),
-                            @Content(mediaType = GFF_MEDIA_TYPE_VALUE)
+                            @Content(mediaType = UniProtMediaType.GFF_MEDIA_TYPE_VALUE)
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccessionsPost(
@@ -507,7 +509,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
         ResponseEntity.BodyBuilder responseBuilder =
                 ResponseEntity.status(HttpStatus.SEE_OTHER)
                         .header(HttpHeaders.LOCATION, uniSavePath);
-        return responseBuilder.headers(createHttpSearchHeader(contentType)).build();
+        return responseBuilder.headers(HeaderFactory.createHttpSearchHeader(contentType)).build();
     }
 
     private ResponseEntity<MessageConverterContext<UniProtKBEntry>> redirectToAccession(
@@ -517,8 +519,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 ResponseEntity.status(HttpStatus.SEE_OTHER)
                         .header(
                                 HttpHeaders.LOCATION,
-                                getLocationURLForId(accession, accessionOrId, contentType));
-        return responseBuilder.headers(createHttpSearchHeader(contentType)).build();
+                                BasicSearchController.getLocationURLForId(
+                                        accession, accessionOrId, contentType));
+        return responseBuilder.headers(HeaderFactory.createHttpSearchHeader(contentType)).build();
     }
 
     private String extractAccession(String accessionOrId) {

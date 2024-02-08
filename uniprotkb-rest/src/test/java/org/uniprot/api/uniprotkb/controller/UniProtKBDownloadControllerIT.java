@@ -1,15 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.uniprotkb.utils.UniProtKBAsyncDownloadUtils.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,6 +14,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.awaitility.Awaitility;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,8 +36,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.client.RestTemplate;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
@@ -61,9 +55,10 @@ import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.ValidDownloadRequest;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.queue.UniProtKBMessageListener;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.utils.UniProtKBAsyncDownloadUtils;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
@@ -107,13 +102,13 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
-        saveEntriesInSolrAndStore(
+        UniProtKBAsyncDownloadUtils.saveEntriesInSolrAndStore(
                 uniprotQueryRepository, cloudSolrClient, solrClient, storeClient, taxRepository);
     }
 
     @BeforeEach
     void setUpRestTemplate() {
-        setUp(restTemplate);
+        UniProtKBAsyncDownloadUtils.setUp(restTemplate);
     }
 
     @Test
@@ -154,34 +149,38 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
                 String.format(
                         UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
                         this.maxEntryCount,
-                        totalNonIsoformEntries);
+                        UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
         String query = "key:value";
         DownloadJob job =
                 builder.id(jobId)
                         .query(query)
                         .status(JobStatus.ABORTED)
                         .error(errMsg)
-                        .format(HDF5_MEDIA_TYPE_VALUE)
+                        .format(UniProtMediaType.HDF5_MEDIA_TYPE_VALUE)
                         .build();
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
-        await().until(() -> repo.existsById(jobId));
+        Awaitility.await().until(() -> repo.existsById(jobId));
 
         ResultActions response = callGetJobDetails(jobId);
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.query", is(query)))
-                .andExpect(jsonPath("$.format", is(HDF5_MEDIA_TYPE_VALUE)))
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.errors.length()", is(1)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.query", is(query)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.format", Matchers.is(UniProtMediaType.HDF5_MEDIA_TYPE_VALUE)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.errors[0].code",
-                                is(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode())))
-                .andExpect(jsonPath("$.errors[0].message", is(errMsg)));
+                                Matchers.is(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(errMsg)));
     }
 
     @Test
@@ -192,12 +191,12 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
                 String.format(
                         UniProtKBMessageListener.H5_LIMIT_EXCEED_MSG,
                         this.maxEntryCount,
-                        totalNonIsoformEntries);
+                        UniProtKBAsyncDownloadUtils.totalNonIsoformEntries);
         DownloadJob job =
                 builder.id(jobId)
                         .status(JobStatus.ABORTED)
                         .error(errMsg)
-                        .format(HDF5_MEDIA_TYPE_VALUE)
+                        .format(UniProtMediaType.HDF5_MEDIA_TYPE_VALUE)
                         .build();
         DownloadJobRepository repo = getDownloadJobRepository();
         repo.save(job);
@@ -206,17 +205,21 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         ResultActions response = callGetJobStatus(jobId);
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.jobStatus", is(JobStatus.ABORTED.toString())))
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.errors.length()", is(1)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.jobStatus", Matchers.is(JobStatus.ABORTED.toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors.length()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.errors[0].code",
-                                is(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode())))
-                .andExpect(jsonPath("$.errors[0].message", is(errMsg)));
+                                Matchers.is(PredefinedAPIStatus.LIMIT_EXCEED_ERROR.getCode())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message", is(errMsg)));
     }
 
     @Test
@@ -226,8 +229,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         String fields = "accession,lineage";
         String jobId = callRunAPIAndVerify(query, fields, null, null, false);
         // then
-        await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        Awaitility.await().until(() -> getDownloadJobRepository().existsById(jobId));
+        Awaitility.await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         // verify result file
         Path resultFilePath =
@@ -251,8 +254,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         String fields = "accession";
         String jobId = callRunAPIAndVerify(query, fields, null, null, true);
         // then
-        await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
+        Awaitility.await().until(() -> getDownloadJobRepository().existsById(jobId));
+        Awaitility.await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         // verify result file
         Path resultFilePath =
@@ -278,12 +281,14 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         ResultActions resultActions =
                 callPostJobStatus(query, fields, null, format.toString(), false);
         resultActions
-                .andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.url").exists())
+                .andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.url").exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages",
                                 contains("'fields' are not supported for 'format' " + format)));
     }
@@ -291,10 +296,10 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Test
     void submitJob_H5_Format_Success() throws Exception {
         String query = "reviewed:true";
-        MediaType format = HDF5_MEDIA_TYPE;
+        MediaType format = UniProtMediaType.HDF5_MEDIA_TYPE;
         String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
-        await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(jobProcessed(jobId), Matchers.equalTo(JobStatus.RUNNING));
+        Awaitility.await().until(() -> getDownloadJobRepository().existsById(jobId));
+        Awaitility.await().until(jobProcessed(jobId), Matchers.equalTo(JobStatus.RUNNING));
         verifyIdsFile(jobId);
         // result file should not exist yet
         String fileWithExt = jobId + FileType.GZIP.getExtension();
@@ -305,10 +310,10 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Test
     void submitJob_H5_Format_Star_Query_Aborted() throws Exception {
         String query = "*:*";
-        MediaType format = HDF5_MEDIA_TYPE;
+        MediaType format = UniProtMediaType.HDF5_MEDIA_TYPE;
         String jobId = callRunAPIAndVerify(query, null, null, format.toString(), false);
-        await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(isJobAborted(jobId));
+        Awaitility.await().until(() -> getDownloadJobRepository().existsById(jobId));
+        Awaitility.await().until(isJobAborted(jobId));
         // id file should not exist yet
         Path resultFilePath = Path.of(this.idsFolder + "/" + jobId);
         Assertions.assertFalse(Files.exists(resultFilePath));
@@ -317,10 +322,10 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
     @Test
     void submitJob_H5_Format_With_Isoform_Aborted() throws Exception {
         String query = "reviewed:true AND gene:*";
-        MediaType format = HDF5_MEDIA_TYPE;
+        MediaType format = UniProtMediaType.HDF5_MEDIA_TYPE;
         String jobId = callRunAPIAndVerify(query, null, null, format.toString(), true);
-        await().until(() -> getDownloadJobRepository().existsById(jobId));
-        await().until(isJobAborted(jobId));
+        Awaitility.await().until(() -> getDownloadJobRepository().existsById(jobId));
+        Awaitility.await().until(isJobAborted(jobId));
         // id file should not exist yet
         Path resultFilePath = Path.of(this.idsFolder + "/" + jobId);
         Assertions.assertFalse(Files.exists(resultFilePath));
@@ -331,8 +336,8 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
             String query, String fields, String sort, String format, boolean includeIsoform)
             throws Exception {
         MockHttpServletRequestBuilder requestBuilder =
-                post(getDownloadAPIsBasePath() + "/run")
-                        .header(ACCEPT, MediaType.APPLICATION_JSON)
+                MockMvcRequestBuilders.post(getDownloadAPIsBasePath() + "/run")
+                        .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .param("query", query)
                         .param("fields", fields)
                         .param("sort", sort)
@@ -347,17 +352,17 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
         return List.of(
                         "xml",
                         "json",
-                        TSV_MEDIA_TYPE_VALUE,
-                        FF_MEDIA_TYPE_VALUE,
-                        LIST_MEDIA_TYPE_VALUE,
-                        APPLICATION_XML_VALUE,
-                        APPLICATION_JSON_VALUE,
-                        FASTA_MEDIA_TYPE_VALUE,
-                        GFF_MEDIA_TYPE_VALUE,
-                        RDF_MEDIA_TYPE_VALUE,
-                        TURTLE_MEDIA_TYPE_VALUE,
-                        N_TRIPLES_MEDIA_TYPE_VALUE,
-                        HDF5_MEDIA_TYPE_VALUE,
+                        UniProtMediaType.TSV_MEDIA_TYPE_VALUE,
+                        UniProtMediaType.FF_MEDIA_TYPE_VALUE,
+                        UniProtMediaType.LIST_MEDIA_TYPE_VALUE,
+                        MediaType.APPLICATION_XML_VALUE,
+                        MediaType.APPLICATION_JSON_VALUE,
+                        UniProtMediaType.FASTA_MEDIA_TYPE_VALUE,
+                        UniProtMediaType.GFF_MEDIA_TYPE_VALUE,
+                        UniProtMediaType.RDF_MEDIA_TYPE_VALUE,
+                        UniProtMediaType.TURTLE_MEDIA_TYPE_VALUE,
+                        UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE,
+                        UniProtMediaType.HDF5_MEDIA_TYPE_VALUE,
                         "h5")
                 .stream()
                 .map(Arguments::of);
@@ -460,7 +465,7 @@ class UniProtKBDownloadControllerIT extends AbstractDownloadControllerIT {
 
     @Override
     protected MediaType getUnsupportedFormat() {
-        return UniProtMediaType.valueOf(XLS_MEDIA_TYPE_VALUE);
+        return UniProtMediaType.valueOf(UniProtMediaType.XLS_MEDIA_TYPE_VALUE);
     }
 
     @Override

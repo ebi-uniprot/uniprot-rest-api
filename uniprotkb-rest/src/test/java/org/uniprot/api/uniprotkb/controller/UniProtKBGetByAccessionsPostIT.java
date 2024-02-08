@@ -3,8 +3,6 @@ package org.uniprot.api.uniprotkb.controller;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsPostControllerIT;
@@ -30,8 +29,8 @@ import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.controller.request.UniProtKBIdsPostRequest;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBIdsPostRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
@@ -134,17 +133,21 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
 
     @Override
     protected List<ResultMatcher> getResultsResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
+        ResultMatcher rm1 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
         ResultMatcher rm2 =
-                jsonPath("$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)"));
-        ResultMatcher rm3 = jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN"));
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].entryType", equalTo("UniProtKB unreviewed (TrEMBL)"));
+        ResultMatcher rm3 =
+                MockMvcResultMatchers.jsonPath("$.results[0].uniProtkbId", equalTo("FGFR2_HUMAN"));
         return List.of(rm1, rm2, rm3);
     }
 
     @Override
     protected List<ResultMatcher> getIdsAsResultMatchers() {
         return Arrays.stream(TEST_IDS_ARRAY)
-                .map(id -> content().string(containsString(id)))
+                .map(id -> MockMvcResultMatchers.content().string(containsString(id)))
                 .collect(Collectors.toList());
     }
 
@@ -165,17 +168,23 @@ class UniProtKBGetByAccessionsPostIT extends AbstractGetByIdsPostControllerIT {
 
     @Override
     protected List<ResultMatcher> getFieldsResultMatchers() {
-        ResultMatcher rm1 = jsonPath("$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
-        ResultMatcher rm2 = jsonPath("$.results.*.organism").exists();
-        ResultMatcher rm3 = jsonPath("$.results.*.genes").exists();
-        ResultMatcher rm4 = jsonPath("$.results.*.sequence").doesNotExist();
-        ResultMatcher rm5 = jsonPath("$.results.*.comments").doesNotExist();
+        ResultMatcher rm1 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results.*.primaryAccession", contains(TEST_IDS_ARRAY));
+        ResultMatcher rm2 = MockMvcResultMatchers.jsonPath("$.results.*.organism").exists();
+        ResultMatcher rm3 = MockMvcResultMatchers.jsonPath("$.results.*.genes").exists();
+        ResultMatcher rm4 = MockMvcResultMatchers.jsonPath("$.results.*.sequence").doesNotExist();
+        ResultMatcher rm5 = MockMvcResultMatchers.jsonPath("$.results.*.comments").doesNotExist();
         ResultMatcher rm6 =
-                jsonPath("$.results[0].organism.scientificName", equalTo("Homo sapiens"));
-        ResultMatcher rm7 = jsonPath("$.results[0].organism.commonName", equalTo("Human"));
-        ResultMatcher rm8 = jsonPath("$.results[0].organism.taxonId", equalTo(9606));
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].organism.scientificName", equalTo("Homo sapiens"));
+        ResultMatcher rm7 =
+                MockMvcResultMatchers.jsonPath(
+                        "$.results[0].organism.commonName", equalTo("Human"));
+        ResultMatcher rm8 =
+                MockMvcResultMatchers.jsonPath("$.results[0].organism.taxonId", equalTo(9606));
         ResultMatcher rm9 =
-                jsonPath(
+                MockMvcResultMatchers.jsonPath(
                         "$.results[0].organism.lineage",
                         equalTo(TEMPLATE_ENTRY.getOrganism().getLineages()));
         return List.of(rm1, rm2, rm3, rm4, rm5, rm6, rm7, rm8, rm9);

@@ -66,12 +66,15 @@
 		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
 		<jakarta-xml-bind.version>4.0.0</jakarta-xml-bind.version>
 		<jakarta-activation.version>2.0.1</jakarta-activation.version>
+		<testcontainers.version>1.17.6</testcontainers.version>
+		<jayway.version>2.4.0</jayway.version>
 	</properties>
 
 	<modules>
 		<module>common-rest</module>
 		<module>support-data-common</module>
 		<module>support-data-rest</module>
+		<module>uniprotkb-common</module>
 		<module>uniprotkb-rest</module>
 		<module>proteome-rest</module>
 		<module>uniparc-rest</module>
@@ -443,7 +446,7 @@
 							<systemProperties>
 								<property>
 									<name>cv.dr.ord.location</name>
-									<value>${project.build.directory}/../../uniprotkb-rest/src/test/resources/xdb/dr_ord</value>
+									<value>${project.build.directory}/../../uniprotkb-common/src/test/resources/xdb/dr_ord</value>
 								</property>
 							</systemProperties>
 							<!-- Exclude integration tests from unit test run -->
@@ -462,7 +465,7 @@
 							<systemProperties>
 								<property>
 									<name>cv.dr.ord.location</name>
-									<value>${project.build.directory}/../../uniprotkb-rest/src/test/resources/xdb/dr_ord</value>
+									<value>${project.build.directory}/../../uniprotkb-common/src/test/resources/xdb/dr_ord</value>
 								</property>
 							</systemProperties>
 							<skipITs>${skipITs}</skipITs>
