@@ -48,12 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 24 Apr 2019
  */
-@Tag(
-        name = "proteome",
-        description =
-                "The Proteomes service provides access to UniProtKB proteomes with"
-                        + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
-                        + " proteome identifiers, species names or taxonomy identifiers")
+@Tag(name = TAG_PROTEOME, description = TAG_PROTEOME_DESC)
 @RestController
 @Validated
 @RequestMapping("/proteomes")

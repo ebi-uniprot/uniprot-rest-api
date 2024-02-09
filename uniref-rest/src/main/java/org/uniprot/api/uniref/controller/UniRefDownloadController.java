@@ -9,7 +9,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uniprot.api.rest.controller.BasicDownloadController;
@@ -25,6 +25,7 @@ import org.uniprot.api.rest.output.job.JobSubmitResponse;
 import org.uniprot.api.uniref.request.UniRefDownloadRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,6 +34,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  * @author tibrahim
  * @created 14/08/2023
  */
+@Tag(name = UNIREF_TAG, description = UNIREF_TAG_DESC)
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
 public class UniRefDownloadController extends BasicDownloadController {
@@ -55,12 +57,12 @@ public class UniRefDownloadController extends BasicDownloadController {
     @Operation(
             summary = JOB_RUN_UNIREF_OPERATION,
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = JobSubmitResponse.class))
-                            })
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = JobSubmitResponse.class))
+                        })
             })
     public ResponseEntity<JobSubmitResponse> submitJob(
             @Valid @ModelAttribute UniRefDownloadRequest request) {
@@ -82,8 +84,7 @@ public class UniRefDownloadController extends BasicDownloadController {
                         })
             })
     public ResponseEntity<JobStatusResponse> getJobStatus(
-            @Parameter(description = JOB_ID_UNIREF_DESCRIPTION)
-            @PathVariable String jobId) {
+            @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
         return getAsyncDownloadStatus(job);
@@ -95,16 +96,19 @@ public class UniRefDownloadController extends BasicDownloadController {
     @Operation(
             summary = JOB_DETAILS_UNIREF_OPERATION,
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = DownloadJobDetailResponse.class))
-                            })
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            DownloadJobDetailResponse.class))
+                        })
             })
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
-            @Parameter(description = JOB_ID_UNIREF_DESCRIPTION)
-            @PathVariable String jobId, HttpServletRequest servletRequest) {
+            @Parameter(description = JOB_ID_UNIREF_DESCRIPTION) @PathVariable String jobId,
+            HttpServletRequest servletRequest) {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);

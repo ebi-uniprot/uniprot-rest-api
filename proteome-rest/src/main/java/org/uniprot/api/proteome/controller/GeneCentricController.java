@@ -49,7 +49,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 30 Apr 2019
  */
-@Tag(name = "genecentric", description = "gene centric service")
+@Tag(name = TAG_GENECENTRIC, description = TAG_GENECENTRIC_DESC)
 @RestController
 @Validated
 @RequestMapping("/genecentric")
@@ -234,7 +234,9 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 LIST_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<GeneCentricEntry>> getByAccession(
-            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
+            @Parameter(
+                            description = ACCESSION_UNIPROTKB_DESCRIPTION,
+                            example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,

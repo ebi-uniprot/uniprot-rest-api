@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.util.List;
@@ -23,9 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 11/03/2021
  */
-@Tag(
-        name = "Configuration",
-        description = "These services provide configuration data used in the UniProt website")
+@Tag(name = TAG_CONFIG, description = TAG_CONFIG_DESC)
 @RestController
 @RequestMapping("/configure/taxonomy")
 public class TaxonomyConfigureController {
@@ -36,7 +35,7 @@ public class TaxonomyConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in the taxonomy services.",
+            summary = CONFIG_TAXONOMY_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -57,7 +56,7 @@ public class TaxonomyConfigureController {
     }
 
     @Operation(
-            summary = "List of search fields available in taxonomy services.",
+            summary = CONFIG_TAXONOMY_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

@@ -43,7 +43,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb")
-@Tag(name = "UniProtKB")
+@Tag(name = TAG_UNIPROTKB, description = TAG_UNIPROTKB_DESC)
 public class UniProtKBInteractionController extends BasicSearchController<InteractionEntry> {
 
     private final UniProtKBEntryInteractionService interactionService;
@@ -83,7 +83,9 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
                         })
             })
     public ResponseEntity<MessageConverterContext<InteractionEntry>> getInteractions(
-            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
+            @Parameter(
+                            description = ACCESSION_UNIPROTKB_DESCRIPTION,
+                            example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,

@@ -1,15 +1,14 @@
 package org.uniprot.api.uniparc.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import lombok.Data;
 
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidEnumDisplayValue;
 import org.uniprot.core.uniparc.UniParcDatabase;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad

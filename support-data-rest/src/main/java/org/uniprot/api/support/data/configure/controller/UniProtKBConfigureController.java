@@ -1,6 +1,7 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.io.IOException;
@@ -33,9 +34,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(
-        name = "Configuration",
-        description = "These services provide configuration data used in the UniProt website")
+@Tag(name = TAG_CONFIG, description = TAG_CONFIG_DESC)
 @RestController
 @RequestMapping("/configure/uniprotkb")
 public class UniProtKBConfigureController {
@@ -46,23 +45,8 @@ public class UniProtKBConfigureController {
         this.service = service;
     }
 
-    // FIXME Delete this method once UI team starts consuming response of api search-fields.
-    //  See method getUniProtSearchTerms
-    @Operation(hidden = true)
-    @GetMapping("/search_terms")
-    public ResponseEntity<String> getUniProtSearchTermsTemp() throws IOException {
-        if (searchTermResponse == null) {
-            InputStream in = getClass().getResourceAsStream("/search_terms-response.json");
-            searchTermResponse = StreamUtils.copyToString(in, Charset.defaultCharset());
-        }
-
-        final HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(searchTermResponse, httpHeaders, HttpStatus.OK);
-    }
-
     @Operation(
-            summary = "List of search fields available to use in UniProtKB query.",
+            summary = CONFIG_UNIPROTKB_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -83,7 +67,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of annotation evidences available in the UniProtKB services.",
+            summary = CONFIG_UNIPROTKB_ANNOTATION_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -103,7 +87,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of GO annotation evidences available in the UniProtKB services.",
+            summary = CONFIG_UNIPROTKB_GO_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -123,7 +107,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of databases available in the UniProtKB services.",
+            summary = CONFIG_UNIPROTKB_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -142,14 +126,8 @@ public class UniProtKBConfigureController {
         return service.getDatabases();
     }
 
-    @Operation(hidden = true)
-    @GetMapping("/resultfields")
-    public List<FieldGroup> getResultFields() {
-        return service.getResultFields();
-    }
-
     @Operation(
-            summary = "List of return fields available in the UniProtKB services.",
+            summary = CONFIG_UNIPROTKB_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -170,7 +148,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of database details available in the UniProtKB services.",
+            summary = CONFIG_UNIPROTKB_ALL_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -191,7 +169,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
-            summary = "List of evidence database details available in the UniProtKB services.",
+            summary = CONFIG_UNIPROTKB_EVID_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

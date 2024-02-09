@@ -19,6 +19,19 @@ public class OpenApiConstants {
             "The <tt>jobId</tt> returned from the <tt>run</tt> submission.";
 
     // UniProtKB
+
+    public static final String TAG_UNIPROTKB = "UniProtKB";
+    public static final String TAG_UNIPROTKB_DESC = "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.";
+
+    public static final String TAG_UNIPROTKB_JOB = "UniProtKB job";
+    public static final String TAG_UNIPROTKB_JOB_DESC = "UniProtKB asynchronous download jobs are different from \"normal\" downloads offered via stream. "
+            + "First, a separate file must be generated for download. "
+            + "Much like <tt>IDMapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
+            + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
+            + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+
+    public static final String TAG_UNIPROTKB_GROUP = "UniProtKB group by";
+    public static final String TAG_UNIPROTKB_GROUP_DESC = "Allows you to browse your query results using the taxonomy, keyword, Gene Ontology or Enzyme Classification hierarchies and to view the distribution of your search results across the terms within each group.";
     public static final String QUERY_UNIPROTKB_ID_DESCRIPTION =
             "Criteria to search within the accessions. "
                     + QUERY_ADVANCED
@@ -58,7 +71,8 @@ public class OpenApiConstants {
             SORT_DESCRIPTION
                     + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_UNIPROTKB_EXAMPLE = "accession desc";
-    public static final String ACCESSION_UNIPROTKB_DESCRIPTION = "Unique identifier for the UniProtKB entry";
+    public static final String ACCESSION_UNIPROTKB_DESCRIPTION =
+            "Unique identifier for the UniProtKB entry";
     public static final String ACCESSION_UNIPROTKB_EXAMPLE = "P05067";
     public static final String VERSION_UNIPROTKB_DESCRIPTION =
             "Version of the entry. Versions are integers 1 or above; enter <tt>last</tt> for the latest version.</br>"
@@ -77,7 +91,8 @@ public class OpenApiConstants {
             "List of taxonomy groups with respect to the given query and parent";
 
     // Proteome
-    public static final String UPID_PROTEOME_DESCRIPTION = "Unique identifier for the Proteome entry";
+    public static final String UPID_PROTEOME_DESCRIPTION =
+            "Unique identifier for the Proteome entry";
     public static final String UPID_PROTEOME_EXAMPLE = "UP000005640";
 
     // Id Mapping
@@ -86,177 +101,305 @@ public class OpenApiConstants {
     public static final String SUB_SEQUENCE_DESCRIPTION =
             "Flag to write subsequences. Only accepted in fasta format";
 
-    //Support date cross reference
-    public static final String QUERY_CROSSREF_DESCRIPTION = "Criteria to search cross-reference databases. "
-            + QUERY_ADVANCED
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+    // Support date cross reference
+    public static final String TAG_CROSSREF = "Cross-referenced databases";
+    public static final String TAG_CROSSREF_DESC = "The cross-references section of UniProtKB entries "
+            + "displays explicit and implicit links to databases such as nucleotide sequence databases, "
+            + "model organism databases and genomics and proteomics resources. A single entry can have "
+            + "cross-references to several dozen different databases and have several hundred individual links. "
+            + "The databases are categorized for easy user perusal and understanding of how the "
+            + "different databases relate to both UniProtKB and to each other";
+    public static final String QUERY_CROSSREF_DESCRIPTION =
+            "Criteria to search cross-reference databases. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_CROSSREF_EXAMPLE = "Ensembl";
-    public static final String SORT_CROSSREF_DESCRIPTION = SORT_DESCRIPTION
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_CROSSREF_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_CROSSREF_EXAMPLE = "id desc";
-    public static final String FIELDS_CROSSREF_DESCRIPTION = FIELDS_DESCRIPTION
-            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_CROSSREF_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_CROSSREF_EXAMPLE = "id,name,abbrev,category";
-    public static final String ID_CROSSREF_DESCRIPTION = "Unique identifier for the cross-reference database entry";
+    public static final String ID_CROSSREF_DESCRIPTION =
+            "Unique identifier for the cross-reference database entry";
     public static final String ID_CROSSREF_EXAMPLE = "DB-0244";
-    public static final String ID_CROSSREF_OPERATION = "Get cross-reference database entry by a single accession.";
-    public static final String SEARCH_CROSSREF_OPERATION = "Retrieve cross-reference database entries by a search query.";
-    public static final String STREAM_CROSSREF_OPERATION = "Download cross-reference database entries retrieved by a search query.";
+    public static final String ID_CROSSREF_OPERATION =
+            "Get cross-reference database entry by a single accession.";
+    public static final String SEARCH_CROSSREF_OPERATION =
+            "Retrieve cross-reference database entries by a search query.";
+    public static final String STREAM_CROSSREF_OPERATION =
+            "Download cross-reference database entries retrieved by a search query.";
 
-    //Support date Keywords
+    //Gene Centric
+    public static final String TAG_GENECENTRIC = "genecentric";
+    public static final String TAG_GENECENTRIC_DESC = "gene centric service";
+
+    //Proteome
+    public static final String TAG_PROTEOME = "Proteome";
+    public static final String TAG_PROTEOME_DESC = "The Proteomes service provides access to UniProtKB proteomes with"
+            + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
+            + " proteome identifiers, species names or taxonomy identifiers";
+
+    // Support date Keywords
+    public static final String TAG_KEYWORDS = "Keywords";
+    public static final String TAG_KEYWORDS_DESC = "UniProtKB Keywords constitute a controlled vocabulary with a hierarchical structure. Keywords summarise the content of a UniProtKB entry and facilitate the search for proteins of interest. An entry often contains several keywords. Keywords can be used to retrieve subsets of protein entries. Keywords are classified in 10 categories: Biological process, Cellular component, Coding sequence diversity, Developmental stage, DiseaseEntry, Domain, Ligand, Molecular function, Post-translational modification, Technical term.";
     public static final String ID_KEYWORDS_OPERATION = "Get keyword entry by a single accession.";
-    public static final String SEARCH_KEYWORDS_OPERATION = "Retrieve keyword entries by a search query.";
-    public static final String STREAM_KEYWORDS_OPERATION = "Download keyword entries retrieved by a search query.";
+    public static final String SEARCH_KEYWORDS_OPERATION =
+            "Retrieve keyword entries by a search query.";
+    public static final String STREAM_KEYWORDS_OPERATION =
+            "Download keyword entries retrieved by a search query.";
     public static final String ID_KEYWORDS_DESCRIPTION = "Unique identifier for the keyword entry";
     public static final String ID_KEYWORDS_EXAMPLE = "KW-0020";
-    public static final String FIELDS_KEYWORDS_DESCRIPTION = FIELDS_DESCRIPTION
-            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_KEYWORDS_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_KEYWORDS_EXAMPLE = "id,name,category";
-    public static final String SORT_KEYWORDS_DESCRIPTION = SORT_DESCRIPTION
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_KEYWORDS_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_KEYWORDS_EXAMPLE = "name asc";
-    public static final String QUERY_KEYWORDS_DESCRIPTION = "Criteria to search keywords. "
-            + QUERY_ADVANCED
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+    public static final String QUERY_KEYWORDS_DESCRIPTION =
+            "Criteria to search keywords. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_KEYWORDS_EXAMPLE = "Phosphoprotein";
 
-    //Support date diseases
-    public static final String ID_DISEASE_OPERATION = "Get human disease entry by a single accession.";
-    public static final String SEARCH_DISEASE_OPERATION = "Retrieve human disease entries by a search query.";
-    public static final String STREAM_DISEASE_OPERATION = "Download human disease entries retrieved by a search query.";
-    public static final String QUERY_DISEASE_DESCRIPTION = "Criteria to search human diseases. "
-            + QUERY_ADVANCED
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+    // Support date diseases
+    public static final String TAG_DISEASE = "Human Diseases";
+    public static final String TAG_DISEASE_DESC = "The human diseases in which proteins are involved are "
+            + "described in UniProtKB entries with a controlled vocabulary.";
+    public static final String ID_DISEASE_OPERATION =
+            "Get human disease entry by a single accession.";
+    public static final String SEARCH_DISEASE_OPERATION =
+            "Retrieve human disease entries by a search query.";
+    public static final String STREAM_DISEASE_OPERATION =
+            "Download human disease entries retrieved by a search query.";
+    public static final String QUERY_DISEASE_DESCRIPTION =
+            "Criteria to search human diseases. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_DISEASE_EXAMPLE = "Alzheimer";
-    public static final String SORT_DISEASE_DESCRIPTION = SORT_DESCRIPTION
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_DISEASE_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_DISEASE_EXAMPLE = "id asc";
-    public static final String ID_DISEASE_DESCRIPTION = "Unique identifier for the human disease entry";
+    public static final String ID_DISEASE_DESCRIPTION =
+            "Unique identifier for the human disease entry";
     public static final String ID_DISEASE_EXAMPLE = "DI-04530";
-    public static final String FIELDS_DISEASE_DESCRIPTION = FIELDS_DESCRIPTION
-            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_DISEASE_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_DISEASE_EXAMPLE = "id,name";
 
-    //support- data literature citations
-    public static final String ID_LIT_OPERATION = "Get literature citation entry by a single accession.";
-    public static final String ID_LIT_DESCRIPTION = "Unique identifier for the literature citation entry";
+    // support- data literature citations
+    public static final String TAG_LITERATURE = "Literature citations";
+    public static final String TAG_LITERATURE_DESC = "Search publications that are linked to UniProtKB. Publications can be manually curated, computationally mapped, or community curated.";
+
+    public static final String ID_LIT_OPERATION =
+            "Get literature citation entry by a single accession.";
+    public static final String ID_LIT_DESCRIPTION =
+            "Unique identifier for the literature citation entry";
     public static final String ID_LIT_EXAMPLE = "10024047";
-    public static final String FIELDS_LIT_DESCRIPTION = FIELDS_DESCRIPTION
-            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_LIT_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_LIT_EXAMPLE = "id,title,authors,publication_date";
-    public static final String SEARCH_LIT_OPERATION = "Retrieve literature citation entries by a search query.";
-    public static final String STREAM_LIT_OPERATION = "Download literature citation entries retrieved by a search query.";
-    public static final String QUERY_LIT_DESCRIPTION = "Criteria to search literature citations. "
-            + QUERY_ADVANCED
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+    public static final String SEARCH_LIT_OPERATION =
+            "Retrieve literature citation entries by a search query.";
+    public static final String STREAM_LIT_OPERATION =
+            "Download literature citation entries retrieved by a search query.";
+    public static final String QUERY_LIT_DESCRIPTION =
+            "Criteria to search literature citations. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_LIT_EXAMPLE = "\"genome analysis\"";
-    public static final String SORT_LIT_DESCRIPTION = SORT_DESCRIPTION
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_LIT_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_LIT_EXAMPLE = "id desc";
 
-    //STATISTICS
+    // STATISTICS
+    public static final String TAG_RELEASE_STAT = "Release statistics";
+    public static final String TAG_RELEASE_STAT_DESC = "UniProtKB release statistics";
     public static final String RELEASE_NAME_STATS_DESCRIPTION = "UniProt release name";
     public static final String TYPE_STATS_DESCRIPTION = "Statistic type";
-    public static final String CATEGORY_STATS_DESCRIPTION = "List of statistics categories, separated by commas.";
+    public static final String CATEGORY_STATS_DESCRIPTION =
+            "List of statistics categories, separated by commas.";
     public static final String RELEASE_NAME_STATS_EXAMPLE = "2023_05";
     public static final String TYPE_STATS_EXAMPLE = "reviewed";
     public static final String CATEGORY_STATS_EXAMPLE = "TOTAL_ORGANISM,COMMENTS";
 
-    //SUBCEL
-    public static final String ID_SUBCEL_OPERATION = "Get subcellular location entry by a single accession.";
-    public static final String SEARCH_SUBCEL_OPERATION = "Retrieve subcellular location entries by a search query.";
-    public static final String STREAM_SUBCEL_OPERATION = "Download subcellular location entries retrieved by a search query.";
-    public static final String ID_SUBCEL_DESCRIPTION = "Unique identifier for the subcellular location entry";
+    // SUBCEL
+    public static final String TAG_SUBCEL = "Subcellular locations";
+    public static final String TAG_SUBCEL_DESC = "The subcellular locations in which a protein is found are described in UniProtKB entries with a controlled vocabulary, which includes also membrane topology and orientation terms.";
+    public static final String ID_SUBCEL_OPERATION =
+            "Get subcellular location entry by a single accession.";
+    public static final String SEARCH_SUBCEL_OPERATION =
+            "Retrieve subcellular location entries by a search query.";
+    public static final String STREAM_SUBCEL_OPERATION =
+            "Download subcellular location entries retrieved by a search query.";
+    public static final String ID_SUBCEL_DESCRIPTION =
+            "Unique identifier for the subcellular location entry";
     public static final String ID_SUBCEL_EXAMPLE = "SL-0039";
-    public static final String FIELDS_SUBCEL_DESCRIPTION = FIELDS_DESCRIPTION
-            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_SUBCEL_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_SUBCEL_EXAMPLE = "id,name,category";
-    public static final String QUERY_SUBCEL_DESCRIPTION = "Criteria to search subcellular locations. "
-            + QUERY_ADVANCED
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
+    public static final String QUERY_SUBCEL_DESCRIPTION =
+            "Criteria to search subcellular locations. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_SUBCEL_EXAMPLE = "\"Cell membrane\"";
-    public static final String SORT_SUBCEL_DESCRIPTION = SORT_DESCRIPTION
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_SUBCEL_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_SUBCEL_EXAMPLE = "id asc";
 
-    //SUGGEST
-    public static final String SUGGESTER_OPERATION = "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).";
+    // SUGGEST
+    public static final String TAG_SUGGESTER = "Suggester";
+    public static final String TAG_SUGGESTER_DESC = "This service provides configuration data used in UniProt website for suggester (auto-complete) data";
+
+    public static final String SUGGESTER_OPERATION =
+            "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).";
     public static final String DICT_SUGGESTER_DESCRIPTION = "Suggest data dictionary.";
     public static final String DICT_SUGGESTER_EXAMPLE = "ORGANISM";
     public static final String QUERY_SUGGESTER_DESCRIPTION = "Text to look up for auto-complete.";
     public static final String QUERY_SUGGESTER_EXAMPLE = "huma";
 
-    //TAXONOMY
+    // TAXONOMY
+    public static final String TAG_TAXONOMY = "Taxonomy";
+    public static final String TAG_TAXONOMY_DESC = "UniProtKB taxonomy data is manually curated: next to manually verified organism names, we provide a selection of external links, organism strains and viral host information.";
     public static final String ID_TAX_OPERATION = "Get taxonomy entry by a single taxon id.";
-    public static final String IDS_TAX_OPERATION = "Get taxonomy entries by a list of taxon ids. (Max. 1K entries)";
-    public static final String SEARCH_TAX_OPERATION = "Retrieve taxonomy entries by a search query.";
-    public static final String STREAM_TAX_OPERATION = "Download taxonomy entries retrieved by a search query.";
+    public static final String IDS_TAX_OPERATION =
+            "Get taxonomy entries by a list of taxon ids. (Max. 1K entries)";
+    public static final String SEARCH_TAX_OPERATION =
+            "Retrieve taxonomy entries by a search query.";
+    public static final String STREAM_TAX_OPERATION =
+            "Download taxonomy entries retrieved by a search query.";
     public static final String ID_TAX_DESCRIPTION = "Unique identifier for the taxonomy entry";
     public static final String ID_TAX_EXAMPLE = "9606";
-    public static final String FIELDS_TAX_DESCRIPTION = FIELDS_DESCRIPTION
-            + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_TAX_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_TAX_EXAMPLE = "id,common_name,scientific_name,lineage";
     public static final String IDS_TAX_DESCRIPTION = "Comma separated list of taxon ids";
     public static final String IDS_TAX_EXAMPLE = "9606,10116,9913";
-    public static final String FACET_FILTER_TAX_DESCRIPTION = "Criteria to filter taxonomy. <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
+    public static final String FACET_FILTER_TAX_DESCRIPTION =
+            "Criteria to filter taxonomy. <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String FACET_FILTER_TAX_EXAMPLE = "superkingdom:Eukaryota";
-    public static final String QUERY_TAX_DESCRIPTION = "Criteria to search taxonomy. "
-            + QUERY_ADVANCED
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
+    public static final String QUERY_TAX_DESCRIPTION =
+            "Criteria to search taxonomy. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_TAX_EXAMPLE = "\"Homo sapiens\"";
-    public static final String SORT_TAX_DESCRIPTION = SORT_DESCRIPTION
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_TAX_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_TAX_EXAMPLE = "scientific desc";
-    public static final String IDS_SIZE_TAX_DESCRIPTION = "Pagination size. Defaults to number of taxonIds passed (Single page).";
+    public static final String IDS_SIZE_TAX_DESCRIPTION =
+            "Pagination size. Defaults to number of taxonIds passed (Single page).";
 
+    //CONFIGURATION
+    public static final String TAG_CONFIG = "Configuration";
+    public static final String TAG_CONFIG_DESC = "These services provide configuration data used in the UniProt website";
+    public static final String CONFIG_UNIRULE_FIELDS_OPERATION = "List of return fields available in the UniRule services.";
+    public static final String CONFIG_UNIRULE_SEARCH_OPERATION = "List of search fields available in the UniRule services.";
+    public static final String CONFIG_ARBA_SEARCH_OPERATION = "List of return fields available in the Arba services.";
+    public static final String CONFIG_ARBA_FIELDS_OPERATION = "List of search fields available in the Arba services.";
+    public static final String CONFIG_CROSSREF_FIELDS_OPERATION = "List of return fields available in the database services.";
+    public static final String CONFIG_CROSSREF_SEARCH_OPERATION = "List of search fields available in the database services.";
+    public static final String CONFIG_DISEASE_SEARCH_OPERATION = "List of search fields available in the disease services.";
+    public static final String CONFIG_DISEASE_FIELDS_OPERATION = "List of return fields available in the disease services.";
+    public static final String CONFIG_IDMAPPING_FIELDS_OPERATION = "List of fields available to use in IdMapping from and to dropdown lists.";
+    public static final String CONFIG_KEYWORD_FIELDS_OPERATION = "List of return fields available in the keyword services.";
+    public static final String CONFIG_KEYWORD_SEARCH_OPERATION = "List of search fields available in the keyword services.";
+    public static final String CONFIG_PROTEOME_FIELDS_OPERATION = "List of return fields available in the proteomes services.";
+    public static final String CONFIG_PROTEOME_SEARCH_OPERATION = "List of search fields available in the proteomes services.";
+    public static final String CONFIG_SUBCEL_FIELDS_OPERATION = "List of return fields available in the locations services.";
+    public static final String CONFIG_SUBCEL_SEARCH_OPERATION = "List of search fields available in the locations services.";
+    public static final String CONFIG_TAXONOMY_FIELDS_OPERATION = "List of return fields available in the taxonomy services.";
+    public static final String CONFIG_TAXONOMY_SEARCH_OPERATION = "List of search fields available in taxonomy services.";
+    public static final String CONFIG_UNIPARC_FIELDS_OPERATION = "List of return fields available in the UniParc services.";
+    public static final String CONFIG_UNIPARC_SEARCH_OPERATION = "List of search fields available in the UniParc services.";
+    public static final String CONFIG_UNIREF_FIELDS_OPERATION = "List of return fields available in the UniRef services.";
+    public static final String CONFIG_UNIREF_SEARCH_OPERATION = "List of search fields available in the UniRef services.";
+    public static final String CONFIG_UNIPROTKB_SEARCH_OPERATION = "List of search fields available to use in UniProtKB query.";
+    public static final String CONFIG_UNIPROTKB_ANNOTATION_OPERATION = "List of annotation evidences available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_GO_OPERATION = "List of GO annotation evidences available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_DATABASE_OPERATION = "List of databases available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_FIELDS_OPERATION = "List of return fields available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_ALL_DATABASE_OPERATION = "List of database details available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_EVID_DATABASE_OPERATION = "List of evidence database details available in the UniProtKB services.";
 
-    //UniParc
-    public static final String SEARCH_UNIPARC_OPERATION = "Retrieve UniParc entries by a search query.";
+    // UniParc
+    public static final String SEARCH_UNIPARC_OPERATION =
+            "Retrieve UniParc entries by a search query.";
     public static final String ID_UNIPARC_OPERATION = "Get UniParc entry by a single upi.";
-    public static final String STREAM_UNIPARC_OPERATION = "Download UniParc entries retrieved by a search query.";
-    public static final String ACCESSION_UNIPARC_OPERATION = "Get UniParc entry by UniProtKB accession";
-    public static final String DBID_UNIPARC_OPERATION = "Get UniParc entries by all UniParc cross reference accessions";
-    public static final String PROTEOME_UPID_UNIPARC_OPERATION = "Get UniParc entries by Proteome UPID";
+    public static final String STREAM_UNIPARC_OPERATION =
+            "Download UniParc entries retrieved by a search query.";
+    public static final String ACCESSION_UNIPARC_OPERATION =
+            "Get UniParc entry by UniProtKB accession";
+    public static final String DBID_UNIPARC_OPERATION =
+            "Get UniParc entries by all UniParc cross reference accessions";
+    public static final String PROTEOME_UPID_UNIPARC_OPERATION =
+            "Get UniParc entries by Proteome UPID";
     public static final String DATABASES_UNIPARC_OPERATION = "Retrieve UniParc databases by a upi.";
-    public static final String BEST_GUESS_UNIPARC_OPERATION = "Best Guess returns UniParc entry with a cross-reference to the longest active UniProtKB sequence.";
-    public static final String BEST_GUESS_UNIPARC_OPERATION_DESC = "For a given user input (request parameters), Best Guess returns the UniParcEntry with a cross-reference to the longest active UniProtKB sequence (preferably from Swiss-Prot and if not then TrEMBL). It also returns the sequence and related information. If it finds more than one longest active UniProtKB sequence it returns 400 (Bad Request) error response with the list of cross references found.";
+    public static final String BEST_GUESS_UNIPARC_OPERATION =
+            "Best Guess returns UniParc entry with a cross-reference to the longest active UniProtKB sequence.";
+    public static final String BEST_GUESS_UNIPARC_OPERATION_DESC =
+            "For a given user input (request parameters), Best Guess returns the UniParcEntry with a cross-reference to the longest active UniProtKB sequence (preferably from Swiss-Prot and if not then TrEMBL). It also returns the sequence and related information. If it finds more than one longest active UniProtKB sequence it returns 400 (Bad Request) error response with the list of cross references found.";
     public static final String SEQUENCE_UNIPARC_OPERATION = "Get UniParc entry by protein sequence";
     public static final String IDS_UNIPARC_OPERATION = "Get UniParc entries by a list of upis.";
     public static final String PROTEOME_UPID_UNIPARC_DESCRIPTION = UPID_PROTEOME_DESCRIPTION;
     public static final String PROTEOME_UPID_UNIPARC_EXAMPLE = UPID_PROTEOME_EXAMPLE;
-    public static final String QUERY_UNIPARC_DESCRIPTION = "Criteria to search UniParc. "
-            + QUERY_ADVANCED
-            + " <a href='https://rest.uniprot.org/configure/uniparc/search-fields'>List of valid search fields</a>";
+    public static final String QUERY_UNIPARC_DESCRIPTION =
+            "Criteria to search UniParc. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniparc/search-fields'>List of valid search fields</a>";
     public static final String QUERY_UNIPARC_EXAMPLE = "\"Homo Sapiens\"";
-    public static final String SORT_UNIPARC_DESCRIPTION = SORT_DESCRIPTION
-            + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_UNIPARC_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String SORT_UNIPARC_EXAMPLE = "upi asc";
-    public static final String FIELDS_UNIPARC_DESCRIPTION = FIELDS_DESCRIPTION
-            + "  <a href='https://rest.uniprot.org/configure/uniparc/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_UNIPARC_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniparc/result-fields'>List of valid fields</a>";
     public static final String FIELDS_UNIPARC_EXAMPLE = "upi,organism,length";
     public static final String SEQUENCE_UNIPARC_DESCRIPTION = "Protein Sequence";
     public static final String SEQUENCE_UNIPARC_EXAMPLE = "";
-    public static final String ID_UNIPARC_DESCRIPTION = "Unique identifier for the UniParc id (UPI)";
+    public static final String ID_UNIPARC_DESCRIPTION =
+            "Unique identifier for the UniParc id (UPI)";
     public static final String ID_UNIPARC_EXAMPLE = "UPI000002DB1C";
-    public static final String IDS_UNIPARC_DESCRIPTION = "Comma separated list of UniParc ids (upis)";
+    public static final String IDS_UNIPARC_DESCRIPTION =
+            "Comma separated list of UniParc ids (upis)";
     public static final String IDS_UNIPARC_EXAMPLE = "UPI000002DB1C,UPI000002A2F2";
-    public static final String SIZE_IDS_UNIPARC_DESCRIPTION = "Pagination size. Defaults to number of upis passed (Single page).";
+    public static final String SIZE_IDS_UNIPARC_DESCRIPTION =
+            "Pagination size. Defaults to number of upis passed (Single page).";
     public static final String TAXON_IDS_UNIPARC_DESCRIPTION = IDS_TAX_DESCRIPTION + ". (Max. 100)";
     public static final String TAXON_IDS_UNIPARC_EXAMPLE = IDS_TAX_EXAMPLE;
-    public static final String DBTYPES_UNIPARC_DESCRIPTION = "Comma separated list of UniParc cross reference database names. (Max. 50)";
+    public static final String DBTYPES_UNIPARC_DESCRIPTION =
+            "Comma separated list of UniParc cross reference database names. (Max. 50)";
     public static final String DBTYPES_UNIPARC_EXAMPLE = "EnsemblBacteria,FlyBase";
-    public static final String ACTIVE_UNIPARC_DESCRIPTION = "Flag to filter by active(true) or inactive(false) cross reference";
+    public static final String ACTIVE_UNIPARC_DESCRIPTION =
+            "Flag to filter by active(true) or inactive(false) cross reference";
     public static final String DBID_UNIPARC_DESCRIPTION = "UniParc cross-referenced id";
     public static final String DBID_UNIPARC_EXAMPLE = "AAC02967,XP_006524055";
     public static final String ACCESSION_UNIPARC_DESCRIPTION = ACCESSION_UNIPROTKB_DESCRIPTION;
     public static final String ACCESSION_UNIPARC_EXAMPLE = ACCESSION_UNIPROTKB_EXAMPLE;
 
-    //Arba
+    // Arba
+    public static final String TAG_ARBA = "Arba";
+    public static final String TAG_ARBA_DESC = "The Association-Rule-Based Annotator(ARBA) resource for automatic annotation in the UniProt Knowledgebase ";
     public static final String ID_ARBA_OPERATION = "Get ArbaRule entry by a single arbaId.";
-    public static final String SEARCH_ARBA_OPERATION = "Retrieve ArbaRule entries by a search query.";
-    public static final String STREAM_ARBA_OPERATION = "Download ArbaRule entries retrieved by a search query.";
+    public static final String SEARCH_ARBA_OPERATION =
+            "Retrieve ArbaRule entries by a search query.";
+    public static final String STREAM_ARBA_OPERATION =
+            "Download ArbaRule entries retrieved by a search query.";
     public static final String ID_ARBA_DESCRIPTION = "Get Arba entry by an arbaId";
-    public static final String FIELDS_ARBA_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_ARBA_DESCRIPTION =
+            "Comma separated list of fields to be returned in response";
     public static final String ID_ARBA_EXAMPLE = "";
     public static final String FIELDS_ARBA_EXAMPLE = "";
     public static final String QUERY_ARBA_DESCRIPTION = "";
@@ -264,44 +407,76 @@ public class OpenApiConstants {
     public static final String SORT_ARBA_DESCRIPTION = "";
     public static final String SORT_ARBA_EXAMPLE = "";
 
-    //UniRule
+    // UniRule
+    public static final String TAG_UNIRULE = "UniRule";
+    public static final String TAG_UNIRULE_DESC = "The unified rule(UniRule) resource for automatic annotation in the UniProt Knowledgebase ";
+
     public static final String ID_UNIRULE_OPERATION = "Get UniRule entry by a single uniruleid.";
     public static final String ID_UNIRULE_DESCRIPTION = "Get UniRule entry by an uniruleid";
-    public static final String FIELDS_UNIRULE_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_UNIRULE_DESCRIPTION =
+            "Comma separated list of fields to be returned in response";
     public static final String ID_UNIRULE_EXAMPLE = "";
     public static final String FIELDS_UNIRULE_EXAMPLE = "";
-    public static final String SEARCH_UNIRULE_OPERATION = "Retrieve UniRule entries by a search query.";
-    public static final String STREAM_UNIRULE_OPERATION = "Download UniRule entries retrieved by a search query.";
+    public static final String SEARCH_UNIRULE_OPERATION =
+            "Retrieve UniRule entries by a search query.";
+    public static final String STREAM_UNIRULE_OPERATION =
+            "Download UniRule entries retrieved by a search query.";
 
-    public static final String QUERY_UNIRULE_DESCRIPTION = "Criteria to search UniRules. It can take any valid Lucene query.";
+    public static final String QUERY_UNIRULE_DESCRIPTION =
+            "Criteria to search UniRules. It can take any valid Lucene query.";
     public static final String SORT_UNIRULE_DESCRIPTION = "Name of the field to be sorted on";
     public static final String QUERY_UNIRULE_EXAMPLE = "";
     public static final String SORT_UNIRULE_EXAMPLE = "";
 
-
-    //UniRef
-    public static final String ID_UNIREF_MEMBER_OPERATION = "Retrieve UniRef members by cluster id.";
+    // UniRef
+    public static final String UNIREF_TAG = "uniref";
+    public static final String UNIREF_TAG_DESC = "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.";
+    public static final String ID_UNIREF_MEMBER_OPERATION =
+            "Retrieve UniRef members by cluster id.";
     public static final String ID_UNIREF_OPERATION = "Retrieve an UniRef cluster by id.";
     public static final String JOB_STATUS_UNIREF_OPERATION = "Get the status of a job.";
     public static final String JOB_ID_UNIREF_DESCRIPTION = "";
     public static final String JOB_DETAILS_UNIREF_OPERATION = "";
-    public static final String JOB_RUN_UNIREF_OPERATION = "Submit UniRef asynchronous download job.";
-    public static final String ID_UNIREF_LIGHT_OPERATION = "Retrieve a light object of UniRef cluster by id.";
-    public static final String SEARCH_UNIREF_LIGHT_OPERATION = "Search for a UniRef cluster (or clusters) by a SOLR query.";
-    public static final String STREAM_UNIREF_LIGHT_OPERATION = "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.";
+    public static final String JOB_RUN_UNIREF_OPERATION =
+            "Submit UniRef asynchronous download job.";
+    public static final String ID_UNIREF_LIGHT_OPERATION =
+            "Retrieve a light object of UniRef cluster by id.";
+    public static final String SEARCH_UNIREF_LIGHT_OPERATION =
+            "Search for a UniRef cluster (or clusters) by a SOLR query.";
+    public static final String STREAM_UNIREF_LIGHT_OPERATION =
+            "Stream an UniRef cluster (or clusters) retrieved by a SOLR query.";
     public static final String IDS_UNIREF_LIGHT_OPERATION = "Get UniRef entries by a list of ids.";
     public static final String ID_UNIREF_DESCRIPTION = "Unique identifier for the UniRef cluster";
     public static final String ID_UNIREF_EXAMPLE = "";
-    public static final String FIELDS_UNIREF_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_UNIREF_DESCRIPTION =
+            "Comma separated list of fields to be returned in response";
     public static final String FIELDS_UNIREF_EXAMPLE = "";
-    public static final String QUERY_UNIREF_DESCRIPTION = "Criteria to search UniRef clusters. It can take any valid solr query.";
+    public static final String QUERY_UNIREF_DESCRIPTION =
+            "Criteria to search UniRef clusters. It can take any valid solr query.";
     public static final String QUERY_UNIREF_EXAMPLE = "";
     public static final String SORT_UNIREF_DESCRIPTION = "Name of the field to be sorted on";
-    public static final String COMPLETE_UNIREF_DESCRIPTION = "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms";
+    public static final String COMPLETE_UNIREF_DESCRIPTION =
+            "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms";
     public static final String IDS_UNIREF_DESCRIPTION = "Comma separated list of UniRef ids";
     public static final String IDS_UNIREF_EXAMPLE = "";
     public static final String SORT_UNIREF_EXAMPLE = "";
-    public static final String SIZE_UNIREF_ID_DESCRIPTION = "Pagination size. Defaults to number of ids passed. (Single page)";
-    public static final String FACET_FILTER_UNIREF_DESCRIPTION = "Facet filter query for UniRef Cluster Members";
+    public static final String SIZE_UNIREF_ID_DESCRIPTION =
+            "Pagination size. Defaults to number of ids passed. (Single page)";
+    public static final String FACET_FILTER_UNIREF_DESCRIPTION =
+            "Facet filter query for UniRef Cluster Members";
     public static final String FACET_FILTER_UNIREF_EXAMPLE = "";
+
+    //HELP
+    public static final String TAG_HELP = "help";
+    public static final String TAG_HELP_DESC = "UniProt Help centre API";
+    public static final String ID_HELP_OPERATION = "Get Help Centre Page by Id.";
+    public static final String SEARCH_HELP_OPERATION = "Search Help pages by given Lucene search query.";
+    public static final String ID_HELP_DESCRIPTION = "Help centre page id to find";
+    public static final String FIELDS_HELP_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String TAG_RELEASE_NOTES = "release-notes";
+    public static final String TAG_RELEASE_NOTES_DESC = "UniProt Release Notes API";
+    public static final String ID_RELEASE_NOTES_OPERATION = "Get Release Notes by Id.";
+    public static final String SEARCH_RELEASE_NOTES_OPERATION = "Search Release Notes pages by given Lucene search query.";
+    public static final String ID_RELEASE_NOTES_DESCRIPTION = "Release Notes page id to find";
+    public static final String FIELDS_RELEASE_NOTES_DESCRIPTION = "Comma separated list of fields to be returned in response";
 }

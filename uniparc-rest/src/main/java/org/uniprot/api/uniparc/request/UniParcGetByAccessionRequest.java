@@ -1,5 +1,9 @@
 package org.uniprot.api.uniparc.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.FIELDS_UNIPARC_DESCRIPTION;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.FIELDS_UNIPARC_EXAMPLE;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -7,16 +11,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.FIELDS_UNIPARC_DESCRIPTION;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.FIELDS_UNIPARC_EXAMPLE;
 
 /**
  * @author sahmad

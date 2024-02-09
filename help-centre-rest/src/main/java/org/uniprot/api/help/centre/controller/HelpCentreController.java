@@ -1,6 +1,8 @@
 package org.uniprot.api.help.centre.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.ID_HELP_OPERATION;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
 import java.util.Optional;
@@ -19,6 +21,7 @@ import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.request.HelpCentreSearchRequest;
 import org.uniprot.api.help.centre.service.HelpCentreService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -36,7 +39,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 07/07/2021
  */
-@Tag(name = "help", description = "UniProt Help centre API")
+@Tag(name = TAG_HELP, description = TAG_HELP_DESC)
 @RestController
 @Validated
 @RequestMapping("/help")
@@ -59,7 +62,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
     }
 
     @Operation(
-            summary = "Get Help Centre Page by Id.",
+            summary = ID_HELP_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -73,14 +76,14 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
             value = "/{id}",
             produces = {APPLICATION_JSON_VALUE, MARKDOWN_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<HelpCentreEntry>> getByHelpCentrePageId(
-            @Parameter(description = "Help centre page id to find")
+            @Parameter(description = ID_HELP_DESCRIPTION)
                     @Pattern(
                             regexp = HELP_CENTRE_ID_REGEX,
                             flags = {Pattern.Flag.CASE_INSENSITIVE},
                             message = "{search.helpcentre.invalid.id}")
                     @PathVariable("id")
                     String id,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = FIELDS_HELP_DESCRIPTION)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.HELP)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -91,7 +94,7 @@ public class HelpCentreController extends BasicSearchController<HelpCentreEntry>
     }
 
     @Operation(
-            summary = "Search Help pages by given Lucene search query.",
+            summary = SEARCH_HELP_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

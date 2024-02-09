@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.support.data.suggester.response.Suggestions;
 import org.uniprot.api.support.data.suggester.service.SuggesterService;
 
@@ -28,10 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  *
  * @author Edd
  */
-@Tag(
-        name = "Suggester",
-        description =
-                "This service provides configuration data used in UniProt website for suggester (auto-complete) data")
+@Tag(name = TAG_SUGGESTER, description = TAG_SUGGESTER_DESC)
 @RestController
 public class SuggesterController {
     private final SuggesterService suggesterService;
@@ -60,7 +56,24 @@ public class SuggesterController {
             value = "/suggester",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<Suggestions> suggester(
-            @Parameter(description = DICT_SUGGESTER_DESCRIPTION, schema = @Schema(type = "type", allowableValues = {"KEYWORD", "SUBCELL", "MAIN", "TAXONOMY", "GO", "EC", "CATALYTIC_ACTIVITY", "ORGANISM", "HOST", "CHEBI"}), example = DICT_SUGGESTER_EXAMPLE)
+            @Parameter(
+                            description = DICT_SUGGESTER_DESCRIPTION,
+                            schema =
+                                    @Schema(
+                                            type = "type",
+                                            allowableValues = {
+                                                "KEYWORD",
+                                                "SUBCELL",
+                                                "MAIN",
+                                                "TAXONOMY",
+                                                "GO",
+                                                "EC",
+                                                "CATALYTIC_ACTIVITY",
+                                                "ORGANISM",
+                                                "HOST",
+                                                "CHEBI"
+                                            }),
+                            example = DICT_SUGGESTER_EXAMPLE)
                     @RequestParam(value = "dict", required = true)
                     String dict,
             @Parameter(description = QUERY_SUGGESTER_DESCRIPTION, example = QUERY_SUGGESTER_EXAMPLE)

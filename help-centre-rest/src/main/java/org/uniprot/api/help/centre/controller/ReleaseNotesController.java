@@ -1,6 +1,7 @@
 package org.uniprot.api.help.centre.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.MARKDOWN_MEDIA_TYPE_VALUE;
 
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.request.HelpCentreSearchRequest;
 import org.uniprot.api.help.centre.service.HelpCentreService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -40,7 +42,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author jluo
  * @date: 13 Apr 2022
  */
-@Tag(name = "release-notes", description = "UniProt Release Notes API")
+@Tag(name = TAG_RELEASE_NOTES, description = TAG_RELEASE_NOTES_DESC)
 @RestController
 @Validated
 @RequestMapping("/release-notes")
@@ -62,7 +64,7 @@ public class ReleaseNotesController extends BasicSearchController<HelpCentreEntr
     }
 
     @Operation(
-            summary = "Get Release Notes by Id.",
+            summary = ID_RELEASE_NOTES_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -76,8 +78,8 @@ public class ReleaseNotesController extends BasicSearchController<HelpCentreEntr
             value = "/{id}",
             produces = {APPLICATION_JSON_VALUE, MARKDOWN_MEDIA_TYPE_VALUE})
     public ResponseEntity<MessageConverterContext<HelpCentreEntry>> getByHelpCentrePageId(
-            @Parameter(description = "Release Notes page id to find") @PathVariable("id") String id,
-            @Parameter(description = "Comma separated list of fields to be returned in response")
+            @Parameter(description = ID_RELEASE_NOTES_DESCRIPTION) @PathVariable("id") String id,
+            @Parameter(description = FIELDS_RELEASE_NOTES_DESCRIPTION)
                     @ValidReturnFields(uniProtDataType = UniProtDataType.HELP)
                     @RequestParam(value = "fields", required = false)
                     String fields,
@@ -88,7 +90,7 @@ public class ReleaseNotesController extends BasicSearchController<HelpCentreEntr
     }
 
     @Operation(
-            summary = "Search Release Notes pages by given Lucene search query.",
+            summary = SEARCH_RELEASE_NOTES_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

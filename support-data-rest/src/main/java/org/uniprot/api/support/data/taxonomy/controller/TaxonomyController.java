@@ -23,7 +23,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -43,10 +42,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(
-        name = "Taxonomy",
-        description =
-                "UniProtKB taxonomy data is manually curated: next to manually verified organism names, we provide a selection of external links, organism strains and viral host information.")
+@Tag(name = TAG_TAXONOMY, description = TAG_TAXONOMY_DESC)
 @RestController
 @RequestMapping("/taxonomy")
 @Validated
@@ -227,7 +223,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<TaxonomyEntry>>> stream(
             @Valid @ModelAttribute TaxonomyStreamRequest streamRequest,
             @Parameter(hidden = true)
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);

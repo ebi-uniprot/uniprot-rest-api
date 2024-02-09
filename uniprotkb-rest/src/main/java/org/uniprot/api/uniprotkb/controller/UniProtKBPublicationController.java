@@ -44,7 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @RestController
 @RequestMapping(value = "/uniprotkb")
-@Tag(name = "UniProtKB")
+@Tag(name = TAG_UNIPROTKB, description = TAG_UNIPROTKB_DESC)
 public class UniProtKBPublicationController extends BasicSearchController<PublicationEntry> {
     private final PublicationService publicationService;
 
@@ -86,7 +86,9 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
             })
     public ResponseEntity<MessageConverterContext<PublicationEntry>>
             getMappedPublicationsByUniProtAccession(
-                    @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
+                    @Parameter(
+                                    description = ACCESSION_UNIPROTKB_DESCRIPTION,
+                                    example = ACCESSION_UNIPROTKB_EXAMPLE)
                             @PathVariable("accession")
                             @Pattern(
                                     regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_REGEX,

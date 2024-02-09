@@ -24,7 +24,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
@@ -215,7 +214,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntry>>> stream(
             @Valid @ModelAttribute UniParcStreamRequest streamRequest,
             @Parameter(hidden = true)
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         setBasicRequestFormat(streamRequest, request);

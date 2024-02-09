@@ -1,5 +1,7 @@
 package org.uniprot.api.uniparc.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -8,9 +10,6 @@ import lombok.EqualsAndHashCode;
 import org.springdoc.api.annotations.ParameterObject;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad

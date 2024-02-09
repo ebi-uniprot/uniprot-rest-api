@@ -13,7 +13,6 @@ import javax.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import org.springframework.http.MediaType;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
 import org.uniprot.api.rest.validation.*;

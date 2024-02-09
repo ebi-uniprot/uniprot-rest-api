@@ -25,7 +25,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.request.IdsSearchRequest;
@@ -53,10 +52,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 09/07/2020
  */
-@Tag(
-        name = "uniref",
-        description =
-                "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
+@Tag(name = UNIREF_TAG, description = UNIREF_TAG_DESC)
 @RestController
 @Validated
 @RequestMapping("/uniref")
@@ -120,7 +116,9 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                             message = "{search.invalid.id.value}")
                     String id,
             @ValidReturnFields(uniProtDataType = UniProtDataType.UNIREF)
-                    @Parameter(description = FIELDS_UNIREF_DESCRIPTION, example = FIELDS_UNIREF_EXAMPLE)
+                    @Parameter(
+                            description = FIELDS_UNIREF_DESCRIPTION,
+                            example = FIELDS_UNIREF_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
@@ -231,7 +229,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
     public DeferredResult<ResponseEntity<MessageConverterContext<UniRefEntryLight>>> stream(
             @Valid @ModelAttribute UniRefStreamRequest streamRequest,
             @Parameter(hidden = true)
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_XML_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         setBasicRequestFormat(streamRequest, request);

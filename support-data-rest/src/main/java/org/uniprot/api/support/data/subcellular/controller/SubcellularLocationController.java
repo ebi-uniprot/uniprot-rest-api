@@ -23,7 +23,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -45,10 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 2019-07-19
  */
-@Tag(
-        name = "Subcellular locations",
-        description =
-                "The subcellular locations in which a protein is found are described in UniProtKB entries with a controlled vocabulary, which includes also membrane topology and orientation terms.")
+@Tag(name = TAG_SUBCEL, description = TAG_SUBCEL_DESC)
 @RestController
 @RequestMapping("/locations")
 @Validated
@@ -205,7 +201,7 @@ public class SubcellularLocationController extends BasicSearchController<Subcell
     public DeferredResult<ResponseEntity<MessageConverterContext<SubcellularLocationEntry>>> stream(
             @Valid @ModelAttribute SubcellularLocationStreamRequest streamRequest,
             @Parameter(hidden = true)
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);

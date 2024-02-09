@@ -42,11 +42,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/diseases")
 @Validated
-@Tag(
-        name = "Human Diseases",
-        description =
-                "The human diseases in which proteins are involved are "
-                        + "described in UniProtKB entries with a controlled vocabulary.")
+@Tag(name = TAG_DISEASE, description = TAG_DISEASE_DESC)
 public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     private static final String DATA_TYPE = "diseases";
     @Autowired private DiseaseService diseaseService;
@@ -188,7 +184,7 @@ public class DiseaseController extends BasicSearchController<DiseaseEntry> {
     public DeferredResult<ResponseEntity<MessageConverterContext<DiseaseEntry>>> stream(
             @Valid @ModelAttribute DiseaseStreamRequest streamRequest,
             @Parameter(hidden = true)
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);

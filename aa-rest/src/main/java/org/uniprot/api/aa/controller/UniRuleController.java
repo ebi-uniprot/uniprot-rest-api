@@ -26,7 +26,6 @@ import org.uniprot.api.aa.service.UniRuleService;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -45,10 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 11/11/2020
  */
-@Tag(
-        name = "unirule",
-        description =
-                "The unified rule(UniRule) resource for automatic annotation in the UniProt Knowledgebase ")
+@Tag(name = TAG_UNIRULE, description = TAG_UNIRULE_DESC)
 @RestController
 @Validated
 @RequestMapping("/unirule")

@@ -1,11 +1,12 @@
 package org.uniprot.api.uniref.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -14,8 +15,6 @@ import org.uniprot.core.util.Utils;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author lgonzales

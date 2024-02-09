@@ -43,15 +43,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/database")
 @Validated
-@Tag(
-        name = "Cross-referenced databases",
-        description =
-                "The cross-references section of UniProtKB entries "
-                        + "displays explicit and implicit links to databases such as nucleotide sequence databases, "
-                        + "model organism databases and genomics and proteomics resources. A single entry can have "
-                        + "cross-references to several dozen different databases and have several hundred individual links. "
-                        + "The databases are categorized for easy user perusal and understanding of how the "
-                        + "different databases relate to both UniProtKB and to each other")
+@Tag(name = TAG_CROSSREF, description = TAG_CROSSREF_DESC)
 public class CrossRefController extends BasicSearchController<CrossRefEntry> {
     private static final String DATA_TYPE = "databases";
     @Autowired private CrossRefService crossRefService;

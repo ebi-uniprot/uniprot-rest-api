@@ -24,7 +24,6 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -46,16 +45,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 2019-07-04
  */
-@Tag(
-        name = "Literature citations",
-        description =
-                "Search publications that are linked to UniProtKB. Publications can be manually curated, computationally mapped, or community curated.")
+@Tag(name = TAG_LITERATURE, description = TAG_LITERATURE_DESC)
 @RestController
 @RequestMapping("/citations")
 @Validated
 public class LiteratureController extends BasicSearchController<LiteratureEntry> {
     private static final String DATA_TYPE = "citations";
-
     private final LiteratureService literatureService;
     private static final String LITERATURE_ID_REGEX = "^[0-9]+$|CI-\\w{1,13}$|IND[0-9]+$";
 
@@ -197,7 +192,7 @@ public class LiteratureController extends BasicSearchController<LiteratureEntry>
     public DeferredResult<ResponseEntity<MessageConverterContext<LiteratureEntry>>> stream(
             @Valid @ModelAttribute LiteratureStreamRequest streamRequest,
             @Parameter(hidden = true)
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
 

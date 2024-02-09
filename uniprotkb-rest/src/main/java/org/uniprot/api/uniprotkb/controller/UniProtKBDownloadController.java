@@ -37,14 +37,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
-@Tag(
-        name = "UniProtKB job",
-        description =
-                "UniProtKB asynchronous download jobs are different from \"normal\" downloads offered via stream. "
-                        + "First, a separate file must be generated for download. "
-                        + "Much like <tt>IDMapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
-                        + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
-                        + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.")
+@Tag(name = TAG_UNIPROTKB_JOB, description = TAG_UNIPROTKB_JOB_DESC)
 public class UniProtKBDownloadController extends BasicDownloadController {
     static final String DOWNLOAD_RESOURCE = UNIPROTKB_RESOURCE + "/download";
     private final ProducerMessageService messageService;

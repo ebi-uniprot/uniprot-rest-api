@@ -1,17 +1,16 @@
 package org.uniprot.api.uniref.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.Pattern;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author lgonzales

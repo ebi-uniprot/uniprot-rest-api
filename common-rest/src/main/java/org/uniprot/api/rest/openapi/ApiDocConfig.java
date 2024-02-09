@@ -1,11 +1,9 @@
 package org.uniprot.api.rest.openapi;
 
+import static org.uniprot.core.util.Utils.notNullNotEmpty;
+
 import java.util.*;
 
-import io.swagger.v3.oas.models.Operation;
-import io.swagger.v3.oas.models.PathItem;
-import io.swagger.v3.oas.models.parameters.Parameter;
-import org.apache.commons.collections.CollectionUtils;
 import org.springdoc.core.SpringDocConfigProperties;
 import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springdoc.core.providers.ObjectMapperProvider;
@@ -20,11 +18,11 @@ import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Schema;
-import org.uniprot.core.util.Utils;
-
-import static org.uniprot.core.util.Utils.notNullNotEmpty;
+import io.swagger.v3.oas.models.parameters.Parameter;
 
 @Configuration
 public class ApiDocConfig {
@@ -49,10 +47,11 @@ public class ApiDocConfig {
                     "#/components/schemas/UniRefEntryId",
                     "#/components/schemas/UniRuleId");
 
-    private static final Comparator<Parameter> parameterComparator = Comparator
-            .comparing(Parameter::getRequired).reversed()
-            .thenComparing(Parameter::getName, Comparator.comparing("size"::equals))
-            .thenComparing(Parameter::getName, Comparator.comparing("download"::equals));
+    private static final Comparator<Parameter> parameterComparator =
+            Comparator.comparing(Parameter::getRequired)
+                    .reversed()
+                    .thenComparing(Parameter::getName, Comparator.comparing("size"::equals))
+                    .thenComparing(Parameter::getName, Comparator.comparing("download"::equals));
 
     @Bean
     ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties) {
@@ -71,11 +70,11 @@ public class ApiDocConfig {
     }
 
     private static void sortRequestParametersForGetAndPostMethods(Collection<PathItem> pathItems) {
-        for(PathItem item : pathItems){
-            if(hasParameterToSort(item.getGet())){
+        for (PathItem item : pathItems) {
+            if (hasParameterToSort(item.getGet())) {
                 item.getGet().getParameters().sort(parameterComparator);
             }
-            if(hasParameterToSort(item.getPost())){
+            if (hasParameterToSort(item.getPost())) {
                 item.getPost().getParameters().sort(parameterComparator);
             }
         }

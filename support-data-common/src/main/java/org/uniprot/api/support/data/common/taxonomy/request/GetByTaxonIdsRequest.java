@@ -15,7 +15,6 @@ import lombok.Data;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.*;
 import org.uniprot.api.support.data.common.taxonomy.repository.TaxonomyFacetConfig;

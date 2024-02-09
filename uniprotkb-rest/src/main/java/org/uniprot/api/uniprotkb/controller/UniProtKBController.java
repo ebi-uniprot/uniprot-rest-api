@@ -65,10 +65,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @RequestMapping(value = UNIPROTKB_RESOURCE)
-@Tag(
-        name = "UniProtKB",
-        description =
-                "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.")
+@Tag(name = TAG_UNIPROTKB, description = TAG_UNIPROTKB_DESC)
 public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
     private static final String DATA_TYPE = "uniprotkb";
     static final String UNIPROTKB_RESOURCE = "/uniprotkb";
@@ -188,7 +185,9 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntry>> getByAccession(
-            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
+            @Parameter(
+                            description = ACCESSION_UNIPROTKB_DESCRIPTION,
+                            example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = FieldRegexConstants.UNIPROTKB_ACCESSION_OR_ID,

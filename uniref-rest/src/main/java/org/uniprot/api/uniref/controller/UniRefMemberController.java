@@ -1,6 +1,7 @@
 package org.uniprot.api.uniref.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
@@ -35,10 +36,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 05/01/2021
  */
-@Tag(
-        name = "uniref",
-        description =
-                "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.")
+@Tag(name = UNIREF_TAG, description = UNIREF_TAG_DESC)
 @RestController
 @Validated
 @RequestMapping("/uniref")

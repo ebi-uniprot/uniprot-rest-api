@@ -1,5 +1,8 @@
 package org.uniprot.api.uniparc.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.FIELDS_UNIPARC_EXAMPLE;
+
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -11,9 +14,6 @@ import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.FIELDS_UNIPARC_EXAMPLE;
 
 /**
  * @author lgonzales

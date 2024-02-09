@@ -30,7 +30,6 @@ import org.uniprot.api.aa.service.ArbaService;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;
@@ -49,10 +48,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 19/07/2021
  */
-@Tag(
-        name = "arba",
-        description =
-                "The Association-Rule-Based Annotator(ARBA) resource for automatic annotation in the UniProt Knowledgebase ")
+@Tag(name = TAG_ARBA, description = TAG_ARBA_DESC)
 @RestController
 @Validated
 @RequestMapping("/arba")

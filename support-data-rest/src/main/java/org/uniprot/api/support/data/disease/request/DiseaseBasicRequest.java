@@ -1,5 +1,7 @@
 package org.uniprot.api.support.data.disease.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -11,8 +13,6 @@ import org.uniprot.api.rest.validation.ValidSolrSortFields;
 import org.uniprot.store.config.UniProtDataType;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * @author sahmad
