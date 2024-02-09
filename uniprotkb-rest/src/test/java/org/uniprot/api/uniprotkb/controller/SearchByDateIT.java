@@ -1,11 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.io.IOException;
@@ -23,19 +18,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.flatfile.writer.LineType;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.config.UniProtDataType;
@@ -190,21 +189,33 @@ class SearchByDateIT {
     private void verifyTest(String query, String... accessions) throws Exception {
         ResultActions response =
                 mockMvc.perform(
-                        get(SEARCH_RESOURCE)
-                                .header(ACCEPT, APPLICATION_JSON_VALUE)
+                        MockMvcRequestBuilders.get(SEARCH_RESOURCE)
+                                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                                 .param("query", query));
 
         if (accessions == null) {
             // then
-            response.andDo(log())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.results.*.primaryAccession").doesNotExist());
+            response.andDo(MockMvcResultHandlers.log())
+                    .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                    .andExpect(
+                            MockMvcResultMatchers.header()
+                                    .string(
+                                            HttpHeaders.CONTENT_TYPE,
+                                            MediaType.APPLICATION_JSON_VALUE))
+                    .andExpect(
+                            MockMvcResultMatchers.jsonPath("$.results.*.primaryAccession")
+                                    .doesNotExist());
         } else {
-            response.andDo(log())
-                    .andExpect(status().is(HttpStatus.OK.value()))
-                    .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.results.*.primaryAccession", contains(accessions)));
+            response.andDo(MockMvcResultHandlers.log())
+                    .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                    .andExpect(
+                            MockMvcResultMatchers.header()
+                                    .string(
+                                            HttpHeaders.CONTENT_TYPE,
+                                            MediaType.APPLICATION_JSON_VALUE))
+                    .andExpect(
+                            MockMvcResultMatchers.jsonPath(
+                                    "$.results.*.primaryAccession", contains(accessions)));
         }
     }
 

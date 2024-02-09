@@ -60,7 +60,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
                     "Adds content disposition attachment to response headers, this way it can be downloaded as a file in the browser.")
     @Pattern(
             flags = {Pattern.Flag.CASE_INSENSITIVE},
-            regexp = "^true|false$",
+            regexp = "^true$|^false$",
             message = "{search.taxonomy.invalid.download}")
     private String download;
 

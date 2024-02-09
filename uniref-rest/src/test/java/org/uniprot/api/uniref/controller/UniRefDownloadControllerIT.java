@@ -6,8 +6,6 @@ import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.uniref.utils.UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore;
-import static org.uniprot.api.uniref.utils.UniRefAsyncDownloadUtils.setUp;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,8 +44,9 @@ import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
-import org.uniprot.api.uniref.repository.DataStoreTestConfig;
-import org.uniprot.api.uniref.repository.UniRefQueryRepository;
+import org.uniprot.api.uniref.common.UniRefAsyncDownloadUtils;
+import org.uniprot.api.uniref.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.core.uniref.UniRefEntryLight;
 import org.uniprot.store.datastore.UniProtStoreClient;
 import org.uniprot.store.search.SolrCollection;
@@ -87,12 +86,13 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @BeforeAll
     public void runSaveEntriesInSolrAndStore() throws Exception {
         prepareDownloadFolders();
-        saveEntriesInSolrAndStore(unirefQueryRepository, cloudSolrClient, solrClient, storeClient);
+        UniRefAsyncDownloadUtils.saveEntriesInSolrAndStore(
+                unirefQueryRepository, cloudSolrClient, solrClient, storeClient);
     }
 
     @BeforeEach
     void setUpRestTemplate() {
-        setUp(restTemplate);
+        UniRefAsyncDownloadUtils.setUp(restTemplate);
     }
 
     @Test

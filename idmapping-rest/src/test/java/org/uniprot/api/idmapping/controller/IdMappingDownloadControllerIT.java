@@ -11,9 +11,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
+import static org.uniprot.api.rest.download.queue.RedisUtil.jobCreatedInRedis;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.File;
@@ -24,6 +26,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -60,7 +63,10 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.idmapping.IdMappingREST;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
@@ -101,6 +107,7 @@ import com.jayway.jsonpath.JsonPath;
 @WebMvcTest(IdMappingDownloadController.class)
 @ExtendWith(value = {SpringExtension.class})
 @AutoConfigureWebClient
+@Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class IdMappingDownloadControllerIT {
 
@@ -139,9 +146,11 @@ public class IdMappingDownloadControllerIT {
     private static final UniProtKBEntry TEMPLATE_KB_ENTRY =
             UniProtEntryMocker.create(UniProtEntryMocker.Type.SP_CANONICAL);
 
+    @Container
     protected static final RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
 
+    @Container
     protected static final GenericContainer<?> redisContainer =
             new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
 
@@ -169,6 +178,9 @@ public class IdMappingDownloadControllerIT {
 
     @BeforeAll
     public void setUpDownload() throws Exception {
+        Duration asyncDuration = Duration.ofMillis(500);
+        Awaitility.setDefaultPollDelay(asyncDuration);
+        Awaitility.setDefaultPollInterval(asyncDuration);
         Files.createDirectories(Path.of(this.idsFolder));
         Files.createDirectories(Path.of(this.resultFolder));
 
@@ -376,6 +388,9 @@ public class IdMappingDownloadControllerIT {
     }
 
     protected JobStatus getJobStatus(String jobId) throws Exception {
+
+        await().until(jobCreatedInRedis(downloadJobRepository, jobId));
+
         MockHttpServletRequestBuilder requestBuilder =
                 get(JOB_STATUS_ENDPOINT, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
         ResultActions response = this.mockMvc.perform(requestBuilder);
@@ -493,6 +508,84 @@ public class IdMappingDownloadControllerIT {
                         jsonPath(
                                 "$.errors[0].code", is(PredefinedAPIStatus.SERVER_ERROR.getCode())))
                 .andExpect(jsonPath("$.errors[0].message", is(downloadJob.getError())));
+    }
+
+    @Test
+    void resubmit_withForceOnAlreadyFinishedJob() throws Exception {
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        DownloadJob downloadJob =
+                DownloadJob.builder().id(asyncJobId).status(JobStatus.FINISHED).build();
+        downloadJobRepository.save(downloadJob);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("jobId", idMappingJobId)
+                                .param("format", "json")
+                                .param("fields", "accession")
+                                .param("force", "true"));
+
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)))
+                .andExpect(jsonPath("$.message", containsString("has already been finished")));
+    }
+
+    @Test
+    void resubmit_withForceOnAlreadyFailedJobAfterMaxRetry() throws Exception {
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        DownloadJob downloadJob =
+                DownloadJob.builder().id(asyncJobId).retried(3).status(JobStatus.ERROR).build();
+        downloadJobRepository.save(downloadJob);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("jobId", idMappingJobId)
+                                .param("format", "json")
+                                .param("fields", "accession")
+                                .param("force", "true"));
+
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)))
+                .andExpect(jsonPath("$.message").doesNotExist());
+    }
+
+    @Test
+    void resubmit_withForceOnAlreadyFailedJobBeforeMaxRetry() throws Exception {
+        String idMappingJobId = "JOB_ID_DETAILS_ERROR";
+        String asyncJobId = "8930747c182756f2d7e1078f1358457ccac71f23";
+
+        cacheIdMappingJob(idMappingJobId, "UniParc", JobStatus.FINISHED, List.of());
+        DownloadJob downloadJob =
+                DownloadJob.builder().id(asyncJobId).retried(1).status(JobStatus.ERROR).build();
+        downloadJobRepository.save(downloadJob);
+
+        ResultActions response =
+                mockMvc.perform(
+                        post(JOB_SUBMIT_ENDPOINT)
+                                .header(ACCEPT, MediaType.APPLICATION_JSON)
+                                .param("jobId", idMappingJobId)
+                                .param("format", "json")
+                                .param("fields", "accession")
+                                .param("force", "true"));
+
+        response.andDo(print())
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.jobId", is(asyncJobId)))
+                .andExpect(jsonPath("$.message", containsString("already being retried")));
     }
 
     @Test

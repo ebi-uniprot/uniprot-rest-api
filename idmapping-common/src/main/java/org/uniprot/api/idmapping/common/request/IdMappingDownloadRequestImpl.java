@@ -17,6 +17,8 @@ public class IdMappingDownloadRequestImpl implements IdMappingDownloadRequest {
 
     private String fields;
 
+    private boolean force;
+
     @Override
     public void setFormat(String format) {
         this.format = UniProtKBRequestUtil.parseFormat(format);

@@ -32,7 +32,7 @@ public interface SearchRequest extends BasicRequest {
 
     default List<String> getFacetList() {
         if (hasFacets()) {
-            return Arrays.asList(getFacets().split(("\\s*,\\s*")));
+            return Arrays.asList(getFacets().replaceAll("\\s", "").split(","));
         } else {
             return Collections.emptyList();
         }

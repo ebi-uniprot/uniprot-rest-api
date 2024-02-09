@@ -14,9 +14,11 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.job.JobSubmitFeedback;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.rest.request.HashGenerator;
 
@@ -35,22 +37,27 @@ public class RabbitProducerMessageService implements ProducerMessageService {
     private final MessageConverter converter;
     private final DownloadJobRepository jobRepository;
     private final HashGenerator<DownloadRequest> hashGenerator;
+    private final AsyncDownloadSubmissionRules asyncDownloadSubmissionRules;
+    private final AsyncDownloadFileHandler asyncDownloadFileHandler;
     public static final String JOB_ID = "jobId";
 
     public RabbitProducerMessageService(
             MessageConverter converter,
             RabbitTemplate rabbitTemplate,
             DownloadJobRepository downloadJobRepository,
-            HashGenerator<DownloadRequest> hashGenerator) {
+            HashGenerator<DownloadRequest> hashGenerator,
+            AsyncDownloadSubmissionRules asyncDownloadSubmissionRules,
+            AsyncDownloadFileHandler asyncDownloadFileHandler) {
         this.rabbitTemplate = rabbitTemplate;
         this.converter = converter;
         this.jobRepository = downloadJobRepository;
         this.hashGenerator = hashGenerator;
+        this.asyncDownloadSubmissionRules = asyncDownloadSubmissionRules;
+        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
     }
 
     @Override
     public String sendMessage(DownloadRequest downloadRequest) {
-
         MessageProperties messageHeader = new MessageProperties();
         String jobId = this.hashGenerator.generateHash(downloadRequest);
         messageHeader.setHeader(JOB_ID, jobId);
@@ -60,15 +67,27 @@ public class RabbitProducerMessageService implements ProducerMessageService {
         }
 
         downloadRequest.setLargeSolrStreamRestricted(false);
+        boolean force = downloadRequest.isForce();
+        JobSubmitFeedback jobSubmitFeedback = asyncDownloadSubmissionRules.submit(jobId, force);
 
-        if (!this.jobRepository.existsById(jobId)) {
+        if (jobSubmitFeedback.isAllowed()) {
+            if (force) {
+                cleanBeforeResubmission(jobId);
+                log.info("Message with jobId {} is ready to resubmit", jobId);
+            }
             doSendMessage(downloadRequest, messageHeader, jobId);
             log.info("Message with jobId {} ready to be processed", jobId);
         } else {
             alreadyProcessed(jobId);
+            throw new IllegalDownloadJobSubmissionException(jobId, jobSubmitFeedback.getMessage());
         }
 
         return jobId;
+    }
+
+    private void cleanBeforeResubmission(String jobId) {
+        jobRepository.deleteById(jobId);
+        asyncDownloadFileHandler.deleteAllFiles(jobId);
     }
 
     @Override

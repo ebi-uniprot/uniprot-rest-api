@@ -426,8 +426,8 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
     /**
      * Tests that class level validation is called after field level validation. It also tests that
      * class level validation (see annotation on {@link
-     * org.uniprot.api.uniprotkb.controller.request.UniProtKBDownloadRequest} ) is not called if the
-     * fields validation is failed.
+     * org.uniprot.controller.request.UniProtKBDownloadRequest} ) is not called if the fields
+     * validation is failed.
      *
      * @throws Exception
      */
@@ -483,6 +483,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         ResultActions response = callGetJobStatus(jobId);
         // then
         response.andDo(log())
+                .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.jobStatus", Matchers.notNullValue()));
         String responseAsString = response.andReturn().getResponse().getContentAsString();
@@ -512,8 +513,7 @@ public abstract class AbstractDownloadControllerIT extends AbstractDownloadIT {
         String jobStatusUrl = getDownloadAPIsBasePath() + "/status/{jobId}";
         MockHttpServletRequestBuilder requestBuilder =
                 get(jobStatusUrl, jobId).header(ACCEPT, MediaType.APPLICATION_JSON);
-        ResultActions response = getMockMvcObject().perform(requestBuilder);
-        return response;
+        return getMockMvcObject().perform(requestBuilder);
     }
 
     protected String callRunAPIAndVerify(

@@ -16,7 +16,6 @@ import org.uniprot.store.config.returnfield.model.ReturnField;
  * @date: 21 Jun 2019
  */
 public class OutputFieldsParser {
-    private static final String COMMA = "\\s*,\\s*";
 
     public static List<ReturnField> parse(String fields, final ReturnFieldConfig fieldConfig) {
         List<ReturnField> returnFields;
@@ -25,7 +24,7 @@ public class OutputFieldsParser {
             // add from field as the first field if present for idmapping
             addFromFieldIfPresent(returnFields, fieldConfig);
             returnFields.addAll(
-                    Arrays.stream(fields.split(COMMA))
+                    Arrays.stream(fields.replaceAll("\\s", "").split(","))
                             .map(fieldConfig::getReturnFieldByName)
                             .collect(Collectors.toList()));
 

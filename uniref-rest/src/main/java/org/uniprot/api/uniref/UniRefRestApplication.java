@@ -14,9 +14,9 @@ import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 @ComponentScan(
         basePackages = {
             "org.uniprot.api.uniref",
+            "org.uniprot.api.uniref.common",
             "org.uniprot.api.rest",
-            "org.uniprot.api.common.repository.stream.rdf",
-            "org.uniprot.api.common.repository.stream.store.uniref",
+            "org.uniprot.api.common.repository.stream.rdf"
         })
 public class UniRefRestApplication {
     public static void main(String[] args) {
