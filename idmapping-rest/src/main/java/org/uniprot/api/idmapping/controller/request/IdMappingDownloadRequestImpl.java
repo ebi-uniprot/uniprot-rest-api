@@ -15,11 +15,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 @ParameterObject
 public class IdMappingDownloadRequestImpl implements IdMappingDownloadRequest {
 
-    @Parameter(description = ID_MAPPING_JOB_ID_DESCRIPTION)
+    @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION)
     @NotNull(message = "{search.required}")
     private String jobId;
 
-    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = "json")
+    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = FORMAT_UNIPROTKB_EXAMPLE)
     @NotNull(message = "{search.required}")
     private String format;
 

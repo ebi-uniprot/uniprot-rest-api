@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.JOB_ID_IDMAPPING_DESCRIPTION;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
@@ -116,7 +117,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntryPair>> getMappedEntries(
-            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
                     String jobId,
             @Valid @ModelAttribute UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
@@ -176,7 +177,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<UniParcEntryPair>>>
             streamMappedEntries(
-                    @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+                    @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
                             String jobId,
                     @Valid @ModelAttribute UniParcIdMappingStreamRequest streamRequest,
                     HttpServletRequest request,

@@ -2,6 +2,8 @@ package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.TAG_IDMAPPING_DOWNLOAD_JOB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,7 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.job.JobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
@@ -41,7 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 22/02/2021
  */
-@Tag(name = "job", description = "APIs related to job")
+@Tag(name = TAG_IDMAPPING, description = TAG_IDMAPPING_DESCRIPTION)
 @RestController
 @RequestMapping(IDMAPPING_PATH)
 public class IdMappingJobController {
@@ -60,7 +63,7 @@ public class IdMappingJobController {
             value = "/run",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Submit a job.",
+            summary = RUN_IDMAPPING_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -79,7 +82,7 @@ public class IdMappingJobController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get the status of a job.",
+            summary = STATUS_IDMAPPING_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -89,7 +92,7 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobStatusResponse> getStatus(
-            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
                     String jobId,
             HttpServletRequest servletRequest) {
         return createStatus(
@@ -100,7 +103,7 @@ public class IdMappingJobController {
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get the details of a job.",
+            summary = DETAILS_IDMAPPING_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -110,7 +113,7 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobDetailResponse> getDetails(
-            @Parameter(description = "Unique identifier for idmapping job") @PathVariable
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
                     String jobId,
             HttpServletRequest servletRequest) {
         IdMappingJob job = cacheService.getJobAsResource(jobId);

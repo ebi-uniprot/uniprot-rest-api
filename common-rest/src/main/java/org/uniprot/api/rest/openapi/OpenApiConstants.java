@@ -79,6 +79,7 @@ public class OpenApiConstants {
                     + "Please note that when passing <tt>version</tt> file formats are restricted to <tt>fasta</tt> and <tt>txt</tt> only";
     public static final String FORMAT_UNIPROTKB_DESCRIPTION =
             "The file format for download. <a href='https://rest.uniprot.org/configure/uniprotkb/formats'>Valid formats are listed here</a>";
+    public static final String FORMAT_UNIPROTKB_EXAMPLE = "json";
     public static final String GROUP_PARENT_DESCRIPTION =
             "If nothing is passed, the root of the hierarchical tree is returned with all available children. If the parent is specified, only children below the parent node is returned.";
     public static final String GROUP_EC_DESCRIPTION =
@@ -96,8 +97,18 @@ public class OpenApiConstants {
     public static final String UPID_PROTEOME_EXAMPLE = "UP000005640";
 
     // Id Mapping
-    public static final String ID_MAPPING_JOB_ID_DESCRIPTION =
+    public static final String JOB_ID_IDMAPPING_DESCRIPTION =
             "Unique identifier for idmapping job";
+    public static final String TAG_IDMAPPING_DOWNLOAD_JOB = "downloadJob";
+    public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC = "APIs related to idMapping download job";
+    public static final String RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Submit a idmapping download job.";
+    public static final String STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Get the status of a idmapping download job.";
+    public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Get the details of a idmapping download job";
+    public static final String TAG_IDMAPPING = "job";
+    public static final String TAG_IDMAPPING_DESCRIPTION = "APIs related to job";
+    public static final String RUN_IDMAPPING_OPERATION = "Submit a job.";
+    public static final String STATUS_IDMAPPING_OPERATION = "Get the status of a job.";
+    public static final String DETAILS_IDMAPPING_OPERATION = "Get the details of a job.";
     public static final String SUB_SEQUENCE_DESCRIPTION =
             "Flag to write subsequences. Only accepted in fasta format";
 
