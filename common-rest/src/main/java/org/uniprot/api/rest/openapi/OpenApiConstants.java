@@ -109,7 +109,7 @@ public class OpenApiConstants {
     public static final String STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Get the status of a idmapping download job.";
     public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Get the details of a idmapping download job";
     public static final String TAG_IDMAPPING = "job";
-    public static final String TAG_IDMAPPING_DESCRIPTION = "APIs related to job";
+    public static final String TAG_IDMAPPING_DESC = "APIs related to job";
     public static final String RUN_IDMAPPING_OPERATION = "Submit a job.";
     public static final String STATUS_IDMAPPING_OPERATION = "Get the status of a job.";
     public static final String DETAILS_IDMAPPING_OPERATION = "Get the details of a job.";
@@ -366,7 +366,7 @@ public class OpenApiConstants {
     public static final String CONFIG_UTIL_QUERY_EXAMPLE = " (gene:cdc7) AND (organism_id:9606)";
     // UniParc
     public static final String TAG_UNIPARC = "UniParc";
-    public static final String TAG_UNIPARC_DESCRIPTION = "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).";
+    public static final String TAG_UNIPARC_DESC = "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).";
     public static final String SEARCH_UNIPARC_OPERATION =
             "Retrieve UniParc entries by a search query.";
     public static final String ID_UNIPARC_OPERATION = "Get UniParc entry by a single upi.";
@@ -462,8 +462,8 @@ public class OpenApiConstants {
     public static final String SORT_UNIRULE_EXAMPLE = "";
 
     // UniRef
-    public static final String UNIREF_TAG = "uniref";
-    public static final String UNIREF_TAG_DESC = "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.";
+    public static final String TAG_UNIREF = "UniRef";
+    public static final String TAG_UNIREF_DESC = "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.";
     public static final String ID_UNIREF_MEMBER_OPERATION =
             "Retrieve UniRef members by cluster id.";
     public static final String ID_UNIREF_OPERATION = "Retrieve an UniRef cluster by id.";
@@ -512,4 +512,16 @@ public class OpenApiConstants {
     public static final String SEARCH_RELEASE_NOTES_OPERATION = "Search Release Notes pages by given Lucene search query.";
     public static final String ID_RELEASE_NOTES_DESCRIPTION = "Release Notes page id to find";
     public static final String FIELDS_RELEASE_NOTES_DESCRIPTION = "Comma separated list of fields to be returned in response";
+
+    //UniSave
+    public static final String TAG_UNISAVE = "UniSave";
+    public static final String TAG_UNISAVE_DESC = "An archive of every entry version, in every UniProtKB release.";
+    public static final String ID_UNISAVE_OPERATION = "Gets entry information based on an accession.";
+    public static final String DIFF_UNISAVE_OPERATION = "Gets the differences between the contents of two versions of an entry.";
+    public static final String STATUS_UNISAVE_OPERATION = "Gets status information of an entry.";
+    public static final String INCLUDE_CONTENT_UNISAVE_DESCRIPTION = "Whether or not to include the entry content (true|false).";
+    public static final String VERSIONS_UNISAVE_DESCRIPTION = "Greater than zero entry version numbers, e.g., 1,3-8,15-20,6.";
+    public static final String UNIQUE_SEQUENCE_UNISAVE_DESCRIPTION = "Whether or not to aggregate sequences that are unique (true|false)";
+    public static final String VERSION1_UNISAVE_DESCRIPTION = "One of the entry versions, whose contents is analysed in the diff.";
+    public static final String VERSION2_UNISAVE_DESCRIPTION = "The other entry version, whose contents is analysed in the diff.";
 }

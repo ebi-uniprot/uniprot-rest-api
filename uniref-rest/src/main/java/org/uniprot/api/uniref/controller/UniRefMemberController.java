@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 05/01/2021
  */
-@Tag(name = UNIREF_TAG, description = UNIREF_TAG_DESC)
+@Tag(name = TAG_UNIREF, description = TAG_UNIREF_DESC)
 @RestController
 @Validated
 @RequestMapping("/uniref")

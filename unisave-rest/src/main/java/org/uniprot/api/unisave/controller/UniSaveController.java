@@ -2,6 +2,7 @@ package org.uniprot.api.unisave.controller;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.unisave.request.UniSaveRequest.ACCESSION_PATTERN;
 
@@ -42,9 +43,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/unisave")
 @Slf4j
 @Validated
-@Tag(
-        name = "UniSave",
-        description = "An archive of every entry version, in every UniProtKB release.")
+@Tag(name = TAG_UNISAVE, description = TAG_UNISAVE_DESC)
 public class UniSaveController {
     private final MessageConverterContextFactory<UniSaveEntry> converterContextFactory;
     private final UniSaveService service;
@@ -58,7 +57,7 @@ public class UniSaveController {
     }
 
     @Operation(
-            summary = "Gets entry information based on an accession.",
+            summary = ID_UNISAVE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -79,7 +78,7 @@ public class UniSaveController {
                 TSV_MEDIA_TYPE_VALUE
             })
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getEntries(
-            @Parameter(description = "The accession of a UniProtKB entry.")
+            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = ACCESSION_PATTERN,
@@ -104,7 +103,7 @@ public class UniSaveController {
     }
 
     @Operation(
-            summary = "Gets the differences between the contents of two versions of an entry.",
+            summary = DIFF_UNISAVE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -117,7 +116,7 @@ public class UniSaveController {
             value = "/{accession}/diff",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getDiff(
-            @Parameter(description = "The accession of a UniProtKB entry.")
+            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = ACCESSION_PATTERN,
@@ -141,7 +140,7 @@ public class UniSaveController {
     }
 
     @Operation(
-            summary = "Gets status information of an entry.",
+            summary = STATUS_UNISAVE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -154,7 +153,7 @@ public class UniSaveController {
             value = "/{accession}/status",
             produces = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MessageConverterContext<UniSaveEntry>> getStatus(
-            @Parameter(description = "The accession of a UniProtKB entry.")
+            @Parameter(description = ACCESSION_UNIPROTKB_DESCRIPTION, example = ACCESSION_UNIPROTKB_EXAMPLE)
                     @PathVariable("accession")
                     @Pattern(
                             regexp = ACCESSION_PATTERN,

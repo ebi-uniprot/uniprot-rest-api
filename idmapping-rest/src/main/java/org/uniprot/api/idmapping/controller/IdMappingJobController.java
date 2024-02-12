@@ -3,7 +3,6 @@ package org.uniprot.api.idmapping.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.uniprot.api.idmapping.controller.IdMappingJobController.IDMAPPING_PATH;
 import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.TAG_IDMAPPING_DOWNLOAD_JOB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,6 @@ import org.uniprot.api.idmapping.model.IdMappingJob;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.IdMappingJobService;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.job.JobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
@@ -44,7 +42,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 22/02/2021
  */
-@Tag(name = TAG_IDMAPPING, description = TAG_IDMAPPING_DESCRIPTION)
+@Tag(name = TAG_IDMAPPING, description = TAG_IDMAPPING_DESC)
 @RestController
 @RequestMapping(IDMAPPING_PATH)
 public class IdMappingJobController {

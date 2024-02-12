@@ -8,6 +8,8 @@ import javax.validation.constraints.Positive;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.Parameter;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 /**
  * Created 27/03/20
  *
@@ -26,29 +28,27 @@ public class UniSaveRequest {
         @Parameter(hidden = true)
         private String accession;
 
-        @Parameter(description = "Add download headers to response (true|false).")
+        @Parameter(description = DOWNLOAD_DESCRIPTION)
         private boolean download;
 
-        @Parameter(description = "Whether or not to include the entry content (true|false).")
+        @Parameter(description = INCLUDE_CONTENT_UNISAVE_DESCRIPTION)
         private boolean includeContent;
 
-        @Parameter(description = "Greater than zero entry version numbers, e.g., 1,3-8,15-20,6.")
+        @Parameter(description = VERSIONS_UNISAVE_DESCRIPTION)
         private String versions;
 
-        @Parameter(
-                description = "Whether or not to aggregate sequences that are unique (true|false)")
+        @Parameter(description = UNIQUE_SEQUENCE_UNISAVE_DESCRIPTION)
         private boolean uniqueSequences;
     }
 
     @Data
     public static class Diff {
-        @Parameter(
-                description = "One of the entry versions, whose contents is analysed in the diff.")
+        @Parameter(description = VERSION1_UNISAVE_DESCRIPTION)
         @NotNull(message = "{search.required}")
         @Positive(message = "{search.positive}")
         private Integer version1;
 
-        @Parameter(description = "The other entry version, whose contents is analysed in the diff.")
+        @Parameter(description = VERSION2_UNISAVE_DESCRIPTION)
         @NotNull(message = "{search.required}")
         @Positive(message = "{search.positive}")
         private Integer version2;

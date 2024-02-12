@@ -44,7 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 29/03/2021
  */
-@Tag(name = TAG_UNIPARC, description = TAG_UNIPARC_DESCRIPTION)
+@Tag(name = TAG_UNIPARC, description = TAG_UNIPARC_DESC)
 @RestController
 @Validated
 @RequestMapping("/uniparc")

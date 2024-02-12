@@ -18,7 +18,6 @@ import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.queue.ProducerMessageService;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
@@ -34,7 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
  * @author tibrahim
  * @created 14/08/2023
  */
-@Tag(name = UNIREF_TAG, description = UNIREF_TAG_DESC)
+@Tag(name = TAG_UNIREF, description = TAG_UNIREF_DESC)
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
 public class UniRefDownloadController extends BasicDownloadController {
