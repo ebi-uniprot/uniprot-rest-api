@@ -101,6 +101,10 @@ public class OpenApiConstants {
             "Unique identifier for idmapping job";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB = "downloadJob";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC = "APIs related to idMapping download job";
+    public static final String TAG_IDMAPPING_RESULT = "results";
+    public static final String TAG_IDMAPPING_RESULT_DESC = "APIs to get result of the submitted job.";
+    public static final String ID_MAPPING_RESULT_OPERATION = "Search result by a submitted job id.";
+    public static final String ID_MAPPING_STREAM_OPERATION = "Stream result by a submitted job id.";
     public static final String RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Submit a idmapping download job.";
     public static final String STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Get the status of a idmapping download job.";
     public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Get the details of a idmapping download job";
@@ -111,6 +115,20 @@ public class OpenApiConstants {
     public static final String DETAILS_IDMAPPING_OPERATION = "Get the details of a job.";
     public static final String SUB_SEQUENCE_DESCRIPTION =
             "Flag to write subsequences. Only accepted in fasta format";
+    public static final String FROM_IDMAPPING_JOB_DESCRIPTION = "Name of the from type";
+    public static final String TO_IDMAPPING_JOB_DESCRIPTION = "Name of the to type";
+    public static final String IDS_IDMAPPING_JOB_DESCRIPTION = "Comma separated list of ids";
+    public static final String TAX_ID_IDMAPPING_JOB_DESCRIPTION = "Value of the taxon Id";
+    public static final String FROM_IDMAPPING_JOB_EXAMPLE = "";
+    public static final String TO_IDMAPPING_JOB_EXAMPLE = "";
+    public static final String IDS_IDMAPPING_JOB_EXAMPLE = "";
+    public static final String TAX_ID_IDMAPPING_JOB_EXAMPLE = "";
+    public static final String IDMAPPING_UNIREF_RESULT_SEARCH_OPERATION = "Search result of UniRef cluster (or clusters) by a submitted job id.";
+    public static final String IDMAPPING_UNIREF_RESULT_STREAM_OPERATION = "Stream an UniRef cluster (or clusters) retrieved by a submitted job id.";
+    public static final String IDMAPPING_UNIPARC_RESULT_SEARCH_OPERATION = "Search result of UniParc sequence entry (or entries) by a submitted job id.";
+    public static final String IDMAPPING_UNIPARC_RESULT_STREAM_OPERATION = "Stream a UniParc sequence entry (or entries) by a submitted job id.";
+    public static final String IDMAPPING_UNIPROTKB_RESULT_SEARCH_OPERATION = "Search result for a UniProtKB protein entry (or entries) mapped by a submitted job id.";
+    public static final String IDMAPPING_UNIPROTKB_RESULT_STREAM_OPERATION = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.";
 
     // Support date cross reference
     public static final String TAG_CROSSREF = "Cross-referenced databases";
@@ -343,8 +361,12 @@ public class OpenApiConstants {
     public static final String CONFIG_UNIPROTKB_FIELDS_OPERATION = "List of return fields available in the UniProtKB services.";
     public static final String CONFIG_UNIPROTKB_ALL_DATABASE_OPERATION = "List of database details available in the UniProtKB services.";
     public static final String CONFIG_UNIPROTKB_EVID_DATABASE_OPERATION = "List of evidence database details available in the UniProtKB services.";
-
+    public static final String CONFIG_UTIL_QUERY_PARSER_OPERATION = "Utility service that parse a query string into a Structured response object.";
+    public static final String CONFIG_UTIL_QUERY_DESCRIPTION = "Query string to be parsed.";
+    public static final String CONFIG_UTIL_QUERY_EXAMPLE = " (gene:cdc7) AND (organism_id:9606)";
     // UniParc
+    public static final String TAG_UNIPARC = "UniParc";
+    public static final String TAG_UNIPARC_DESCRIPTION = "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).";
     public static final String SEARCH_UNIPARC_OPERATION =
             "Retrieve UniParc entries by a search query.";
     public static final String ID_UNIPARC_OPERATION = "Get UniParc entry by a single upi.";

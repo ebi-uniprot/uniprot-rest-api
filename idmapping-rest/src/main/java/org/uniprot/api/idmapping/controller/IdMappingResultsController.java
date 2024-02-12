@@ -53,16 +53,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  *
  * @author Edd
  */
-@Tag(name = IdMappingResultsController.TAG_IDMAPPING_RESULTS, description = IdMappingResultsController.TAG_IDMAPPING_RESULTS_DESC)
+@Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @RestController
 @Validated
 @Slf4j
 @RequestMapping(value = IdMappingJobController.IDMAPPING_PATH)
 public class IdMappingResultsController extends BasicSearchController<IdMappingStringPair> {
-    public static final String TAG_IDMAPPING_RESULTS = "results";
-    public static final String TAG_IDMAPPING_RESULTS_DESC = "APIs to get result of the submitted job.";
-    public static final String ID_MAPPING_RESULT_OPERATION = "Search result by a submitted job id.";
-    public static final String ID_MAPPING_STREAM_OPERATION = "Stream result by a submitted job id.";
+
     private final IdMappingPIRService idMappingService;
     private final IdMappingJobCacheService cacheService;
 

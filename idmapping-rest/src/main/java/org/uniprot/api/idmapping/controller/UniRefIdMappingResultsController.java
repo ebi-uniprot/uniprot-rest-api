@@ -1,7 +1,7 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.JOB_ID_IDMAPPING_DESCRIPTION;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
 
@@ -45,7 +45,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 25/02/2021
  */
-@Tag(name = "results", description = "APIs to get result of the submitted job.")
+@Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @RestController
 @RequestMapping(
         value =
@@ -86,7 +86,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search result of UniRef cluster (or clusters) by a submitted job id.",
+            summary = IDMAPPING_UNIREF_RESULT_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -136,7 +136,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream an UniRef cluster (or clusters) retrieved by a submitted job id.",
+            summary = IDMAPPING_UNIREF_RESULT_STREAM_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -161,8 +161,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                     @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
                             String jobId,
                     @Valid @ModelAttribute UniRefIdMappingStreamRequest streamRequest,
-                    HttpServletRequest request,
-                    HttpServletResponse response) {
+                    HttpServletRequest request) {
 
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
         MediaType contentType = getAcceptHeader(request);

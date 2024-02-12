@@ -197,7 +197,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
             @ValidReturnFields(uniProtDataType = UniProtDataType.UNIPROTKB)
                     @Parameter(
                             description = FIELDS_UNIPROTKB_DESCRIPTION,
-                            example = "accession,protein_name,gene_names,organism_name")
+                            example = FIELDS_UNIPROTKB_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             @Parameter(description = VERSION_UNIPROTKB_DESCRIPTION)

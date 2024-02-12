@@ -2,7 +2,7 @@ package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.JOB_ID_IDMAPPING_DESCRIPTION;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 
@@ -50,7 +50,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 17/02/2021
  */
-@Tag(name = "results", description = "APIs to get result of the submitted job.")
+@Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @Slf4j
 @RestController
 @RequestMapping(
@@ -95,8 +95,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary =
-                    "Search result for a UniProtKB protein entry (or entries) mapped by a submitted job id.",
+            summary = IDMAPPING_UNIPROTKB_RESULT_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -163,7 +162,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.",
+            summary = IDMAPPING_UNIPROTKB_RESULT_STREAM_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -198,8 +197,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                     @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
                             String jobId,
                     @Valid @ModelAttribute UniProtKBIdMappingStreamRequest streamRequest,
-                    HttpServletRequest request,
-                    HttpServletResponse response) {
+                    HttpServletRequest request) {
         IdMappingJob cachedJobResult = cacheService.getCompletedJobAsResource(jobId);
         MediaType contentType = getAcceptHeader(request);
 

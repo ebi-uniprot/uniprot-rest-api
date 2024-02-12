@@ -44,10 +44,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author sahmad
  * @created 29/03/2021
  */
-@Tag(
-        name = "uniparc",
-        description =
-                "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).")
+@Tag(name = TAG_UNIPARC, description = TAG_UNIPARC_DESCRIPTION)
 @RestController
 @Validated
 @RequestMapping("/uniparc")

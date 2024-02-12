@@ -2,6 +2,7 @@ package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.openapi.OpenApiConstants.JOB_ID_IDMAPPING_DESCRIPTION;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
@@ -31,6 +32,7 @@ import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.UniParcIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
+import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -47,7 +49,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author lgonzales
  * @since 25/02/2021
  */
-@Tag(name = "results", description = "APIs to get result of the submitted job.")
+@Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @RestController
 @RequestMapping(
         value =
@@ -89,7 +91,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search result of UniParc sequence entry (or entries) by a submitted job id.",
+            summary = IDMAPPING_UNIPARC_RESULT_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -147,7 +149,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream a UniParc sequence entry (or entries) by a submitted job id.",
+            summary = IDMAPPING_UNIPARC_RESULT_STREAM_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
