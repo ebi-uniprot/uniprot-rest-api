@@ -10,15 +10,6 @@
 	</parent>
 	<artifactId>idmapping-rest</artifactId>
 
-	<properties>
-		<slf4j.version>1.7.25</slf4j.version>
-		<logback.version>1.2.3</logback.version>
-		<awaitility.version>4.2.0</awaitility.version>
-		<testcontainers.version>1.19.4</testcontainers.version>
-		<jna.version>5.8.0</jna.version>
-		<jayway.version>2.4.0</jayway.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

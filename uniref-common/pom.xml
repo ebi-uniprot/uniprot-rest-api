@@ -10,10 +10,6 @@
 	</parent>
 	<artifactId>uniref-common</artifactId>
 
-	<properties>
-		<testcontainers.version>1.17.6</testcontainers.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

@@ -13,10 +13,6 @@
 	<name>uniparc-rest</name>
 	<description>UniParc Rest API</description>
 
-	<properties>
-		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>uk.ac.ebi.uniprot</groupId>

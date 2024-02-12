@@ -13,12 +13,6 @@
 	<name>uniref-rest</name>
 	<description>UniRef Rest API</description>
 
-	<properties>
-		<awaitility.version>4.2.0</awaitility.version>
-		<testcontainers.version>1.19.4</testcontainers.version>
-		<dev.jna.version>5.8.0</dev.jna.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>uk.ac.ebi.uniprot</groupId>
@@ -144,7 +138,7 @@
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>${dev.jna.version}</version>
+			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

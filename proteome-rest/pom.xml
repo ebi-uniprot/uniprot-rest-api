@@ -11,10 +11,6 @@
 	<name>proteome-rest</name>
 	<description>Proteome Rest API</description>
 
-	<properties>
-		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
