@@ -9,7 +9,6 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.support.data.configure.response.AdvancedSearchTerm;
 import org.uniprot.api.support.data.configure.response.UniParcDatabaseDetail;
 import org.uniprot.api.support.data.configure.response.UniProtReturnField;
@@ -79,7 +78,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of database details available for UniParc entry page.",
+            summary = CONFIG_UNIPARC_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -100,7 +99,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
-            summary = "List of return fields available in a UniParc entry.",
+            summary = CONFIG_UNIPARC_ENTRY_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

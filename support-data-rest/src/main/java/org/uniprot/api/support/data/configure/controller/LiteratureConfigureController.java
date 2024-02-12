@@ -29,8 +29,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/configure/citations")
 public class LiteratureConfigureController {
-    public static final String CONFIG_LITERATURE_FIELDS_OPERATION = "List of return fields available in the citations services.";
-    public static final String CONFIG_LITERATURE_SEARCH_OPERATION = "List of search fields available in the citations services.";
+    public static final String CONFIG_LITERATURE_FIELDS_OPERATION =
+            "List of return fields available in the citations services.";
+    public static final String CONFIG_LITERATURE_SEARCH_OPERATION =
+            "List of search fields available in the citations services.";
     private final LiteratureConfigureService service;
 
     public LiteratureConfigureController(LiteratureConfigureService service) {

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
 import org.uniprot.api.support.data.configure.response.SolrJsonQuery;
 import org.uniprot.api.support.data.configure.service.UtilService;
@@ -53,7 +52,9 @@ public class UtilController {
             })
     @GetMapping("/queryParser")
     public SolrJsonQuery parseSolrQuery(
-            @Parameter(description = CONFIG_UTIL_QUERY_DESCRIPTION, example = CONFIG_UTIL_QUERY_EXAMPLE)
+            @Parameter(
+                            description = CONFIG_UTIL_QUERY_DESCRIPTION,
+                            example = CONFIG_UTIL_QUERY_EXAMPLE)
                     @NotNull(message = "{query.parameter.required}")
                     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
                     @RequestParam(name = "query")

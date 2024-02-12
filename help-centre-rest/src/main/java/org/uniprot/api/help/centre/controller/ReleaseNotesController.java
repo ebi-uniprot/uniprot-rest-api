@@ -24,7 +24,6 @@ import org.uniprot.api.help.centre.model.HelpCentreEntry;
 import org.uniprot.api.help.centre.request.HelpCentreSearchRequest;
 import org.uniprot.api.help.centre.service.HelpCentreService;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.validation.ValidReturnFields;

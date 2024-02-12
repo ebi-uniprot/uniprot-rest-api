@@ -160,8 +160,8 @@ public class CrossRefController extends BasicSearchController<CrossRefEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<CrossRefEntry>>> stream(
             @Valid @ModelAttribute CrossRefStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
-                    @Parameter(hidden = true)
+            @Parameter(hidden = true)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         Optional<String> acceptedRdfContentType = getAcceptedRdfContentType(request);

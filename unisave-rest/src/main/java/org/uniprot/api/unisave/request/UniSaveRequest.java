@@ -1,5 +1,7 @@
 package org.uniprot.api.unisave.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import java.util.regex.Pattern;
 
 import javax.validation.constraints.NotNull;
@@ -7,8 +9,6 @@ import javax.validation.constraints.Positive;
 
 import lombok.Data;
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * Created 27/03/20

@@ -54,7 +54,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
 
     @PostMapping(value = "/run", produces = APPLICATION_JSON_VALUE)
     @Operation(
-            summary = "Submit UniProtKB asynchronous download job.",
+            summary = JOB_RUN_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -74,7 +74,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             value = "/status/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get progress of UniProtKB asynchronous download job.",
+            summary = JOB_STATUS_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -94,7 +94,7 @@ public class UniProtKBDownloadController extends BasicDownloadController {
             value = "/details/{jobId}",
             produces = {APPLICATION_JSON_VALUE})
     @Operation(
-            summary = "Get details of UniProtKB asynchronous download job.",
+            summary = JOB_DETAILS_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

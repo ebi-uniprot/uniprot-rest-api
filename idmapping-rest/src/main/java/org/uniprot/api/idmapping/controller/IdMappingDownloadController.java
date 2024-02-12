@@ -28,7 +28,6 @@ import org.uniprot.api.rest.download.configuration.AsyncDownloadHeartBeatConfigu
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
@@ -97,8 +96,7 @@ public class IdMappingDownloadController extends BasicDownloadController {
                         })
             })
     public ResponseEntity<JobStatusResponse> getJobStatus(
-            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
-                    String jobId) {
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId) {
         Optional<DownloadJob> optJob = jobRepository.findById(jobId);
         DownloadJob job = getAsyncDownloadJob(optJob, jobId);
         return getAsyncDownloadStatus(job);
@@ -110,16 +108,18 @@ public class IdMappingDownloadController extends BasicDownloadController {
     @Operation(
             summary = DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION,
             responses = {
-                    @ApiResponse(
-                            content = {
-                                    @Content(
-                                            mediaType = APPLICATION_JSON_VALUE,
-                                            schema = @Schema(implementation = DownloadJobDetailResponse.class))
-                            })
+                @ApiResponse(
+                        content = {
+                            @Content(
+                                    mediaType = APPLICATION_JSON_VALUE,
+                                    schema =
+                                            @Schema(
+                                                    implementation =
+                                                            DownloadJobDetailResponse.class))
+                        })
             })
     public ResponseEntity<DownloadJobDetailResponse> getDetails(
-            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
-                    String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             HttpServletRequest servletRequest) {
 
         Optional<DownloadJob> optJob = this.jobRepository.findById(jobId);

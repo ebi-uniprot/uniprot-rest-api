@@ -32,7 +32,6 @@ import org.uniprot.api.idmapping.model.UniParcEntryPair;
 import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.service.impl.UniParcIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.core.xml.jaxb.uniparc.Entry;
@@ -119,8 +118,7 @@ public class UniParcIdMappingResultsController extends BasicSearchController<Uni
                         })
             })
     public ResponseEntity<MessageConverterContext<UniParcEntryPair>> getMappedEntries(
-            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
-                    String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Valid @ModelAttribute UniParcIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {

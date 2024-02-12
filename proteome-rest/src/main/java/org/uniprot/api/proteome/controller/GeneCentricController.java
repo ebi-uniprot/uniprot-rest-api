@@ -79,7 +79,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
     }
 
     @Operation(
-            summary = "Retrieve GeneCentric entries by a search query.",
+            summary = SEARCH_GENECENTRIC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -130,7 +130,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve all proteins of Proteome id.",
+            summary = UPID_GENECENTRIC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -166,7 +166,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
     }
 
     @Operation(
-            summary = "Download GeneCentric entries retrieved by a search query.",
+            summary = STREAM_GENECENTRIC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -211,7 +211,7 @@ public class GeneCentricController extends BasicSearchController<GeneCentricEntr
     }
 
     @Operation(
-            summary = "Retrieve an gene centric entry by uniprot accession.",
+            summary = ID_GENECENTRIC_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

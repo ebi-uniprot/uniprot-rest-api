@@ -107,8 +107,7 @@ public class IdMappingResultsController extends BasicSearchController<IdMappingS
                         })
             })
     public ResponseEntity<MessageConverterContext<IdMappingStringPair>> results(
-            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
-                    String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Valid @ModelAttribute IdMappingPageRequest pageRequest,
             HttpServletRequest request,
             HttpServletResponse response) {

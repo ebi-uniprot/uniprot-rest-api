@@ -83,7 +83,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Search for Proteomes.",
+            summary = SEARCH_PROTEOME_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -129,7 +129,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve an Proteome entry by upid.",
+            summary = ID_PROTEOME_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -171,7 +171,7 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Stream proteomes entry (or entries) via search.",
+            summary = STREAM_PROTEOME_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -198,7 +198,8 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
             })
     public DeferredResult<ResponseEntity<MessageConverterContext<ProteomeEntry>>> stream(
             @Valid @ModelAttribute ProteomeStreamRequest streamRequest,
-            @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
+            @Parameter(hidden = true)
+                    @RequestHeader(value = "Accept", defaultValue = APPLICATION_JSON_VALUE)
                     MediaType contentType,
             HttpServletRequest request) {
         return super.stream(

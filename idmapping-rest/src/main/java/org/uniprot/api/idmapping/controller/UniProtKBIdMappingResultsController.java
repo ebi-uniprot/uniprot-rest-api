@@ -125,8 +125,7 @@ public class UniProtKBIdMappingResultsController extends BasicSearchController<U
                         })
             })
     public ResponseEntity<MessageConverterContext<UniProtKBEntryPair>> getMappedEntries(
-            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
-                    String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Valid @ModelAttribute UniProtKBIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {

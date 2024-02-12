@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class GeneCentricUPIdRequest {
 
-    @Parameter(description = "Unique identifier for the Proteome entry")
+    @Parameter(description = UPID_PROTEOME_DESCRIPTION, example = UPID_PROTEOME_EXAMPLE)
     @Pattern(
             regexp = FieldRegexConstants.PROTEOME_ID_REGEX,
             flags = {Pattern.Flag.CASE_INSENSITIVE},

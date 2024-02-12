@@ -1,18 +1,17 @@
 package org.uniprot.api.rest.request.idmapping;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+
 import java.io.Serializable;
 
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
-import org.uniprot.api.rest.openapi.OpenApiConstants;
 import org.uniprot.api.rest.validation.ValidCommaSeparatedItemsLength;
 import org.uniprot.api.rest.validation.ValidIdType;
 
 import io.swagger.v3.oas.annotations.Parameter;
-
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 
 /**
  * Created 16/02/2021
@@ -39,6 +38,8 @@ public class IdMappingJobRequest implements Serializable {
     @ValidCommaSeparatedItemsLength
     private String ids;
 
-    @Parameter(description = TAX_ID_IDMAPPING_JOB_DESCRIPTION, example = TAX_ID_IDMAPPING_JOB_EXAMPLE)
+    @Parameter(
+            description = TAX_ID_IDMAPPING_JOB_DESCRIPTION,
+            example = TAX_ID_IDMAPPING_JOB_EXAMPLE)
     private String taxId;
 }

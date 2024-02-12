@@ -90,8 +90,7 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobStatusResponse> getStatus(
-            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
-                    String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             HttpServletRequest servletRequest) {
         return createStatus(
                 cacheService.getJobAsResource(jobId), servletRequest.getRequestURL().toString());
@@ -111,8 +110,7 @@ public class IdMappingJobController {
                         })
             })
     public ResponseEntity<JobDetailResponse> getDetails(
-            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
-                    String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             HttpServletRequest servletRequest) {
         IdMappingJob job = cacheService.getJobAsResource(jobId);
         IdMappingJobRequest jobRequest = job.getIdMappingRequest();

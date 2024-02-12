@@ -21,17 +21,42 @@ public class OpenApiConstants {
     // UniProtKB
 
     public static final String TAG_UNIPROTKB = "UniProtKB";
-    public static final String TAG_UNIPROTKB_DESC = "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.";
+    public static final String TAG_UNIPROTKB_DESC =
+            "The UniProt Knowledgebase (UniProtKB) is the central hub for the collection of functional information on proteins, with accurate, consistent and rich annotation. In addition to capturing the core data mandatory for each UniProtKB entry (mainly, the amino acid sequence, protein name or description, taxonomic data and citation information), as much annotation information as possible is added. This includes widely accepted biological ontologies, classifications and cross-references, and clear indications of the quality of annotation in the form of evidence attribution of experimental and computational data. The UniProt Knowledgebase consists of two sections: \"UniProtKB/Swiss-Prot\" (reviewed, manually annotated) and \"UniProtKB/TrEMBL\" (unreviewed, automatically annotated), respectively.";
 
     public static final String TAG_UNIPROTKB_JOB = "UniProtKB job";
-    public static final String TAG_UNIPROTKB_JOB_DESC = "UniProtKB asynchronous download jobs are different from \"normal\" downloads offered via stream. "
-            + "First, a separate file must be generated for download. "
-            + "Much like <tt>IDMapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
-            + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
-            + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+    public static final String TAG_UNIPROTKB_JOB_DESC =
+            "UniProtKB asynchronous download jobs are different from \"normal\" downloads offered via stream. "
+                    + "First, a separate file must be generated for download. "
+                    + "Much like <tt>IDMapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
+                    + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
+                    + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
 
+    public static final String SEARCH_UNIPROTKB_OPERATION =
+            "Retrieve UniProtKB entries by a search query.";
+    public static final String ID_UNIPROTKB_OPERATION =
+            "Get UniProtKB entry by a single accession.";
+    public static final String STREAM_UNIPROTKB_OPERATION =
+            "Download UniProtKB entries retrieved by a search query. (Max. 10 million entries)";
+    public static final String STREAM_UNIPROTKB_OPERATION_DESC =
+            "The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniProtKB asynchronous download job' requests described below. The 'UniProtKB asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.";
+    public static final String IDS_UNIPROTKB_OPERATION =
+            "Get UniProtKB entries by a list of accessions. (Max. 1K entries)";
+    public static final String JOB_RUN_UNIPROTKB_OPERATION =
+            "Submit UniProtKB asynchronous download job.";
+    public static final String JOB_STATUS_UNIPROTKB_OPERATION =
+            "Get progress of UniProtKB asynchronous download job.";
+    public static final String JOB_DETAILS_UNIPROTKB_OPERATION =
+            "Get details of UniProtKB asynchronous download job.";
+    public static final String PUBLICATION_UNIPROTKB_OPERATION =
+            "Get publications for a UniProtKB entry by accession.";
+    public static final String PUBLICATION_UNIPROTKB_OPERATION_DESC =
+            "Get all publication data for a UniProtKB entry by accession, including computationally-mapped and community-mapped sources.";
+    public static final String INTERACTION_UNIPROTKB_OPERATION =
+            "Get interactions for a UniProtKB entry by accession.";
     public static final String TAG_UNIPROTKB_GROUP = "UniProtKB group by";
-    public static final String TAG_UNIPROTKB_GROUP_DESC = "Allows you to browse your query results using the taxonomy, keyword, Gene Ontology or Enzyme Classification hierarchies and to view the distribution of your search results across the terms within each group.";
+    public static final String TAG_UNIPROTKB_GROUP_DESC =
+            "Allows you to browse your query results using the taxonomy, keyword, Gene Ontology or Enzyme Classification hierarchies and to view the distribution of your search results across the terms within each group.";
     public static final String QUERY_UNIPROTKB_ID_DESCRIPTION =
             "Criteria to search within the accessions. "
                     + QUERY_ADVANCED
@@ -97,17 +122,21 @@ public class OpenApiConstants {
     public static final String UPID_PROTEOME_EXAMPLE = "UP000005640";
 
     // Id Mapping
-    public static final String JOB_ID_IDMAPPING_DESCRIPTION =
-            "Unique identifier for idmapping job";
+    public static final String JOB_ID_IDMAPPING_DESCRIPTION = "Unique identifier for idmapping job";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB = "downloadJob";
-    public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC = "APIs related to idMapping download job";
+    public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC =
+            "APIs related to idMapping download job";
     public static final String TAG_IDMAPPING_RESULT = "results";
-    public static final String TAG_IDMAPPING_RESULT_DESC = "APIs to get result of the submitted job.";
+    public static final String TAG_IDMAPPING_RESULT_DESC =
+            "APIs to get result of the submitted job.";
     public static final String ID_MAPPING_RESULT_OPERATION = "Search result by a submitted job id.";
     public static final String ID_MAPPING_STREAM_OPERATION = "Stream result by a submitted job id.";
-    public static final String RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Submit a idmapping download job.";
-    public static final String STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Get the status of a idmapping download job.";
-    public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION = "Get the details of a idmapping download job";
+    public static final String RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION =
+            "Submit a idmapping download job.";
+    public static final String STATUS_IDMAPPING_DOWNLOAD_JOB_OPERATION =
+            "Get the status of a idmapping download job.";
+    public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION =
+            "Get the details of a idmapping download job";
     public static final String TAG_IDMAPPING = "job";
     public static final String TAG_IDMAPPING_DESC = "APIs related to job";
     public static final String RUN_IDMAPPING_OPERATION = "Submit a job.";
@@ -123,21 +152,28 @@ public class OpenApiConstants {
     public static final String TO_IDMAPPING_JOB_EXAMPLE = "";
     public static final String IDS_IDMAPPING_JOB_EXAMPLE = "";
     public static final String TAX_ID_IDMAPPING_JOB_EXAMPLE = "";
-    public static final String IDMAPPING_UNIREF_RESULT_SEARCH_OPERATION = "Search result of UniRef cluster (or clusters) by a submitted job id.";
-    public static final String IDMAPPING_UNIREF_RESULT_STREAM_OPERATION = "Stream an UniRef cluster (or clusters) retrieved by a submitted job id.";
-    public static final String IDMAPPING_UNIPARC_RESULT_SEARCH_OPERATION = "Search result of UniParc sequence entry (or entries) by a submitted job id.";
-    public static final String IDMAPPING_UNIPARC_RESULT_STREAM_OPERATION = "Stream a UniParc sequence entry (or entries) by a submitted job id.";
-    public static final String IDMAPPING_UNIPROTKB_RESULT_SEARCH_OPERATION = "Search result for a UniProtKB protein entry (or entries) mapped by a submitted job id.";
-    public static final String IDMAPPING_UNIPROTKB_RESULT_STREAM_OPERATION = "Download UniProtKB protein entry (or entries) mapped by a submitted job id.";
+    public static final String IDMAPPING_UNIREF_RESULT_SEARCH_OPERATION =
+            "Search result of UniRef cluster (or clusters) by a submitted job id.";
+    public static final String IDMAPPING_UNIREF_RESULT_STREAM_OPERATION =
+            "Stream an UniRef cluster (or clusters) retrieved by a submitted job id.";
+    public static final String IDMAPPING_UNIPARC_RESULT_SEARCH_OPERATION =
+            "Search result of UniParc sequence entry (or entries) by a submitted job id.";
+    public static final String IDMAPPING_UNIPARC_RESULT_STREAM_OPERATION =
+            "Stream a UniParc sequence entry (or entries) by a submitted job id.";
+    public static final String IDMAPPING_UNIPROTKB_RESULT_SEARCH_OPERATION =
+            "Search result for a UniProtKB protein entry (or entries) mapped by a submitted job id.";
+    public static final String IDMAPPING_UNIPROTKB_RESULT_STREAM_OPERATION =
+            "Download UniProtKB protein entry (or entries) mapped by a submitted job id.";
 
     // Support date cross reference
     public static final String TAG_CROSSREF = "Cross-referenced databases";
-    public static final String TAG_CROSSREF_DESC = "The cross-references section of UniProtKB entries "
-            + "displays explicit and implicit links to databases such as nucleotide sequence databases, "
-            + "model organism databases and genomics and proteomics resources. A single entry can have "
-            + "cross-references to several dozen different databases and have several hundred individual links. "
-            + "The databases are categorized for easy user perusal and understanding of how the "
-            + "different databases relate to both UniProtKB and to each other";
+    public static final String TAG_CROSSREF_DESC =
+            "The cross-references section of UniProtKB entries "
+                    + "displays explicit and implicit links to databases such as nucleotide sequence databases, "
+                    + "model organism databases and genomics and proteomics resources. A single entry can have "
+                    + "cross-references to several dozen different databases and have several hundred individual links. "
+                    + "The databases are categorized for easy user perusal and understanding of how the "
+                    + "different databases relate to both UniProtKB and to each other";
     public static final String QUERY_CROSSREF_DESCRIPTION =
             "Criteria to search cross-reference databases. "
                     + QUERY_ADVANCED
@@ -161,19 +197,32 @@ public class OpenApiConstants {
     public static final String STREAM_CROSSREF_OPERATION =
             "Download cross-reference database entries retrieved by a search query.";
 
-    //Gene Centric
+    // Gene Centric
     public static final String TAG_GENECENTRIC = "genecentric";
     public static final String TAG_GENECENTRIC_DESC = "gene centric service";
+    public static final String SEARCH_GENECENTRIC_OPERATION =
+            "Retrieve GeneCentric entries by a search query.";
+    public static final String STREAM_GENECENTRIC_OPERATION =
+            "Download GeneCentric entries retrieved by a search query.";
+    public static final String UPID_GENECENTRIC_OPERATION = "Retrieve all proteins of Proteome id.";
+    public static final String ID_GENECENTRIC_OPERATION =
+            "Retrieve an gene centric entry by uniprot accession.";
 
-    //Proteome
+    // Proteome
     public static final String TAG_PROTEOME = "Proteome";
-    public static final String TAG_PROTEOME_DESC = "The Proteomes service provides access to UniProtKB proteomes with"
-            + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
-            + " proteome identifiers, species names or taxonomy identifiers";
+    public static final String TAG_PROTEOME_DESC =
+            "The Proteomes service provides access to UniProtKB proteomes with"
+                    + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
+                    + " proteome identifiers, species names or taxonomy identifiers";
+    public static final String SEARCH_PROTEOME_OPERATION = "Search for Proteomes.";
+    public static final String ID_PROTEOME_OPERATION = "Retrieve an Proteome entry by upid.";
+    public static final String STREAM_PROTEOME_OPERATION =
+            "Stream proteomes entry (or entries) via search.";
 
     // Support date Keywords
     public static final String TAG_KEYWORDS = "Keywords";
-    public static final String TAG_KEYWORDS_DESC = "UniProtKB Keywords constitute a controlled vocabulary with a hierarchical structure. Keywords summarise the content of a UniProtKB entry and facilitate the search for proteins of interest. An entry often contains several keywords. Keywords can be used to retrieve subsets of protein entries. Keywords are classified in 10 categories: Biological process, Cellular component, Coding sequence diversity, Developmental stage, DiseaseEntry, Domain, Ligand, Molecular function, Post-translational modification, Technical term.";
+    public static final String TAG_KEYWORDS_DESC =
+            "UniProtKB Keywords constitute a controlled vocabulary with a hierarchical structure. Keywords summarise the content of a UniProtKB entry and facilitate the search for proteins of interest. An entry often contains several keywords. Keywords can be used to retrieve subsets of protein entries. Keywords are classified in 10 categories: Biological process, Cellular component, Coding sequence diversity, Developmental stage, DiseaseEntry, Domain, Ligand, Molecular function, Post-translational modification, Technical term.";
     public static final String ID_KEYWORDS_OPERATION = "Get keyword entry by a single accession.";
     public static final String SEARCH_KEYWORDS_OPERATION =
             "Retrieve keyword entries by a search query.";
@@ -197,8 +246,9 @@ public class OpenApiConstants {
 
     // Support date diseases
     public static final String TAG_DISEASE = "Human Diseases";
-    public static final String TAG_DISEASE_DESC = "The human diseases in which proteins are involved are "
-            + "described in UniProtKB entries with a controlled vocabulary.";
+    public static final String TAG_DISEASE_DESC =
+            "The human diseases in which proteins are involved are "
+                    + "described in UniProtKB entries with a controlled vocabulary.";
     public static final String ID_DISEASE_OPERATION =
             "Get human disease entry by a single accession.";
     public static final String SEARCH_DISEASE_OPERATION =
@@ -224,7 +274,8 @@ public class OpenApiConstants {
 
     // support- data literature citations
     public static final String TAG_LITERATURE = "Literature citations";
-    public static final String TAG_LITERATURE_DESC = "Search publications that are linked to UniProtKB. Publications can be manually curated, computationally mapped, or community curated.";
+    public static final String TAG_LITERATURE_DESC =
+            "Search publications that are linked to UniProtKB. Publications can be manually curated, computationally mapped, or community curated.";
 
     public static final String ID_LIT_OPERATION =
             "Get literature citation entry by a single accession.";
@@ -262,7 +313,8 @@ public class OpenApiConstants {
 
     // SUBCEL
     public static final String TAG_SUBCEL = "Subcellular locations";
-    public static final String TAG_SUBCEL_DESC = "The subcellular locations in which a protein is found are described in UniProtKB entries with a controlled vocabulary, which includes also membrane topology and orientation terms.";
+    public static final String TAG_SUBCEL_DESC =
+            "The subcellular locations in which a protein is found are described in UniProtKB entries with a controlled vocabulary, which includes also membrane topology and orientation terms.";
     public static final String ID_SUBCEL_OPERATION =
             "Get subcellular location entry by a single accession.";
     public static final String SEARCH_SUBCEL_OPERATION =
@@ -288,7 +340,8 @@ public class OpenApiConstants {
 
     // SUGGEST
     public static final String TAG_SUGGESTER = "Suggester";
-    public static final String TAG_SUGGESTER_DESC = "This service provides configuration data used in UniProt website for suggester (auto-complete) data";
+    public static final String TAG_SUGGESTER_DESC =
+            "This service provides configuration data used in UniProt website for suggester (auto-complete) data";
 
     public static final String SUGGESTER_OPERATION =
             "Provide suggestions (auto-complete) for a subset of datasets (dictionaries).";
@@ -299,7 +352,8 @@ public class OpenApiConstants {
 
     // TAXONOMY
     public static final String TAG_TAXONOMY = "Taxonomy";
-    public static final String TAG_TAXONOMY_DESC = "UniProtKB taxonomy data is manually curated: next to manually verified organism names, we provide a selection of external links, organism strains and viral host information.";
+    public static final String TAG_TAXONOMY_DESC =
+            "UniProtKB taxonomy data is manually curated: next to manually verified organism names, we provide a selection of external links, organism strains and viral host information.";
     public static final String ID_TAX_OPERATION = "Get taxonomy entry by a single taxon id.";
     public static final String IDS_TAX_OPERATION =
             "Get taxonomy entries by a list of taxon ids. (Max. 1K entries)";
@@ -330,43 +384,78 @@ public class OpenApiConstants {
     public static final String IDS_SIZE_TAX_DESCRIPTION =
             "Pagination size. Defaults to number of taxonIds passed (Single page).";
 
-    //CONFIGURATION
+    // CONFIGURATION
     public static final String TAG_CONFIG = "Configuration";
-    public static final String TAG_CONFIG_DESC = "These services provide configuration data used in the UniProt website";
-    public static final String CONFIG_UNIRULE_FIELDS_OPERATION = "List of return fields available in the UniRule services.";
-    public static final String CONFIG_UNIRULE_SEARCH_OPERATION = "List of search fields available in the UniRule services.";
-    public static final String CONFIG_ARBA_SEARCH_OPERATION = "List of return fields available in the Arba services.";
-    public static final String CONFIG_ARBA_FIELDS_OPERATION = "List of search fields available in the Arba services.";
-    public static final String CONFIG_CROSSREF_FIELDS_OPERATION = "List of return fields available in the database services.";
-    public static final String CONFIG_CROSSREF_SEARCH_OPERATION = "List of search fields available in the database services.";
-    public static final String CONFIG_DISEASE_SEARCH_OPERATION = "List of search fields available in the disease services.";
-    public static final String CONFIG_DISEASE_FIELDS_OPERATION = "List of return fields available in the disease services.";
-    public static final String CONFIG_IDMAPPING_FIELDS_OPERATION = "List of fields available to use in IdMapping from and to dropdown lists.";
-    public static final String CONFIG_KEYWORD_FIELDS_OPERATION = "List of return fields available in the keyword services.";
-    public static final String CONFIG_KEYWORD_SEARCH_OPERATION = "List of search fields available in the keyword services.";
-    public static final String CONFIG_PROTEOME_FIELDS_OPERATION = "List of return fields available in the proteomes services.";
-    public static final String CONFIG_PROTEOME_SEARCH_OPERATION = "List of search fields available in the proteomes services.";
-    public static final String CONFIG_SUBCEL_FIELDS_OPERATION = "List of return fields available in the locations services.";
-    public static final String CONFIG_SUBCEL_SEARCH_OPERATION = "List of search fields available in the locations services.";
-    public static final String CONFIG_TAXONOMY_FIELDS_OPERATION = "List of return fields available in the taxonomy services.";
-    public static final String CONFIG_TAXONOMY_SEARCH_OPERATION = "List of search fields available in taxonomy services.";
-    public static final String CONFIG_UNIPARC_FIELDS_OPERATION = "List of return fields available in the UniParc services.";
-    public static final String CONFIG_UNIPARC_SEARCH_OPERATION = "List of search fields available in the UniParc services.";
-    public static final String CONFIG_UNIREF_FIELDS_OPERATION = "List of return fields available in the UniRef services.";
-    public static final String CONFIG_UNIREF_SEARCH_OPERATION = "List of search fields available in the UniRef services.";
-    public static final String CONFIG_UNIPROTKB_SEARCH_OPERATION = "List of search fields available to use in UniProtKB query.";
-    public static final String CONFIG_UNIPROTKB_ANNOTATION_OPERATION = "List of annotation evidences available in the UniProtKB services.";
-    public static final String CONFIG_UNIPROTKB_GO_OPERATION = "List of GO annotation evidences available in the UniProtKB services.";
-    public static final String CONFIG_UNIPROTKB_DATABASE_OPERATION = "List of databases available in the UniProtKB services.";
-    public static final String CONFIG_UNIPROTKB_FIELDS_OPERATION = "List of return fields available in the UniProtKB services.";
-    public static final String CONFIG_UNIPROTKB_ALL_DATABASE_OPERATION = "List of database details available in the UniProtKB services.";
-    public static final String CONFIG_UNIPROTKB_EVID_DATABASE_OPERATION = "List of evidence database details available in the UniProtKB services.";
-    public static final String CONFIG_UTIL_QUERY_PARSER_OPERATION = "Utility service that parse a query string into a Structured response object.";
+    public static final String TAG_CONFIG_DESC =
+            "These services provide configuration data used in the UniProt website";
+    public static final String CONFIG_UNIRULE_FIELDS_OPERATION =
+            "List of return fields available in the UniRule services.";
+    public static final String CONFIG_UNIRULE_SEARCH_OPERATION =
+            "List of search fields available in the UniRule services.";
+    public static final String CONFIG_ARBA_SEARCH_OPERATION =
+            "List of return fields available in the Arba services.";
+    public static final String CONFIG_ARBA_FIELDS_OPERATION =
+            "List of search fields available in the Arba services.";
+    public static final String CONFIG_CROSSREF_FIELDS_OPERATION =
+            "List of return fields available in the database services.";
+    public static final String CONFIG_CROSSREF_SEARCH_OPERATION =
+            "List of search fields available in the database services.";
+    public static final String CONFIG_DISEASE_SEARCH_OPERATION =
+            "List of search fields available in the disease services.";
+    public static final String CONFIG_DISEASE_FIELDS_OPERATION =
+            "List of return fields available in the disease services.";
+    public static final String CONFIG_IDMAPPING_FIELDS_OPERATION =
+            "List of fields available to use in IdMapping from and to dropdown lists.";
+    public static final String CONFIG_KEYWORD_FIELDS_OPERATION =
+            "List of return fields available in the keyword services.";
+    public static final String CONFIG_KEYWORD_SEARCH_OPERATION =
+            "List of search fields available in the keyword services.";
+    public static final String CONFIG_PROTEOME_FIELDS_OPERATION =
+            "List of return fields available in the proteomes services.";
+    public static final String CONFIG_PROTEOME_SEARCH_OPERATION =
+            "List of search fields available in the proteomes services.";
+    public static final String CONFIG_SUBCEL_FIELDS_OPERATION =
+            "List of return fields available in the locations services.";
+    public static final String CONFIG_SUBCEL_SEARCH_OPERATION =
+            "List of search fields available in the locations services.";
+    public static final String CONFIG_TAXONOMY_FIELDS_OPERATION =
+            "List of return fields available in the taxonomy services.";
+    public static final String CONFIG_TAXONOMY_SEARCH_OPERATION =
+            "List of search fields available in taxonomy services.";
+    public static final String CONFIG_UNIPARC_FIELDS_OPERATION =
+            "List of return fields available in the UniParc services.";
+    public static final String CONFIG_UNIPARC_SEARCH_OPERATION =
+            "List of search fields available in the UniParc services.";
+    public static final String CONFIG_UNIPARC_DATABASE_OPERATION =
+            "List of database details available for UniParc entry page.";
+    public static final String CONFIG_UNIPARC_ENTRY_FIELDS_OPERATION =
+            "List of return fields available in a UniParc entry.";
+    public static final String CONFIG_UNIREF_FIELDS_OPERATION =
+            "List of return fields available in the UniRef services.";
+    public static final String CONFIG_UNIREF_SEARCH_OPERATION =
+            "List of search fields available in the UniRef services.";
+    public static final String CONFIG_UNIPROTKB_SEARCH_OPERATION =
+            "List of search fields available to use in UniProtKB query.";
+    public static final String CONFIG_UNIPROTKB_ANNOTATION_OPERATION =
+            "List of annotation evidences available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_GO_OPERATION =
+            "List of GO annotation evidences available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_DATABASE_OPERATION =
+            "List of databases available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_FIELDS_OPERATION =
+            "List of return fields available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_ALL_DATABASE_OPERATION =
+            "List of database details available in the UniProtKB services.";
+    public static final String CONFIG_UNIPROTKB_EVID_DATABASE_OPERATION =
+            "List of evidence database details available in the UniProtKB services.";
+    public static final String CONFIG_UTIL_QUERY_PARSER_OPERATION =
+            "Utility service that parse a query string into a Structured response object.";
     public static final String CONFIG_UTIL_QUERY_DESCRIPTION = "Query string to be parsed.";
     public static final String CONFIG_UTIL_QUERY_EXAMPLE = " (gene:cdc7) AND (organism_id:9606)";
     // UniParc
     public static final String TAG_UNIPARC = "UniParc";
-    public static final String TAG_UNIPARC_DESC = "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).";
+    public static final String TAG_UNIPARC_DESC =
+            "UniParc is a comprehensive and non-redundant database that contains most of the publicly available protein sequences in the world. Proteins may exist in different source databases and in multiple copies in the same database. UniParc avoids such redundancy by storing each unique sequence only once and giving it a stable and unique identifier (UPI).";
     public static final String SEARCH_UNIPARC_OPERATION =
             "Retrieve UniParc entries by a search query.";
     public static final String ID_UNIPARC_OPERATION = "Get UniParc entry by a single upi.";
@@ -424,7 +513,8 @@ public class OpenApiConstants {
 
     // Arba
     public static final String TAG_ARBA = "Arba";
-    public static final String TAG_ARBA_DESC = "The Association-Rule-Based Annotator(ARBA) resource for automatic annotation in the UniProt Knowledgebase ";
+    public static final String TAG_ARBA_DESC =
+            "The Association-Rule-Based Annotator(ARBA) resource for automatic annotation in the UniProt Knowledgebase ";
     public static final String ID_ARBA_OPERATION = "Get ArbaRule entry by a single arbaId.";
     public static final String SEARCH_ARBA_OPERATION =
             "Retrieve ArbaRule entries by a search query.";
@@ -442,7 +532,8 @@ public class OpenApiConstants {
 
     // UniRule
     public static final String TAG_UNIRULE = "UniRule";
-    public static final String TAG_UNIRULE_DESC = "The unified rule(UniRule) resource for automatic annotation in the UniProt Knowledgebase ";
+    public static final String TAG_UNIRULE_DESC =
+            "The unified rule(UniRule) resource for automatic annotation in the UniProt Knowledgebase ";
 
     public static final String ID_UNIRULE_OPERATION = "Get UniRule entry by a single uniruleid.";
     public static final String ID_UNIRULE_DESCRIPTION = "Get UniRule entry by an uniruleid";
@@ -463,7 +554,8 @@ public class OpenApiConstants {
 
     // UniRef
     public static final String TAG_UNIREF = "UniRef";
-    public static final String TAG_UNIREF_DESC = "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.";
+    public static final String TAG_UNIREF_DESC =
+            "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.";
     public static final String ID_UNIREF_MEMBER_OPERATION =
             "Retrieve UniRef members by cluster id.";
     public static final String ID_UNIREF_OPERATION = "Retrieve an UniRef cluster by id.";
@@ -499,29 +591,41 @@ public class OpenApiConstants {
             "Facet filter query for UniRef Cluster Members";
     public static final String FACET_FILTER_UNIREF_EXAMPLE = "";
 
-    //HELP
+    // HELP
     public static final String TAG_HELP = "help";
     public static final String TAG_HELP_DESC = "UniProt Help centre API";
     public static final String ID_HELP_OPERATION = "Get Help Centre Page by Id.";
-    public static final String SEARCH_HELP_OPERATION = "Search Help pages by given Lucene search query.";
+    public static final String SEARCH_HELP_OPERATION =
+            "Search Help pages by given Lucene search query.";
     public static final String ID_HELP_DESCRIPTION = "Help centre page id to find";
-    public static final String FIELDS_HELP_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_HELP_DESCRIPTION =
+            "Comma separated list of fields to be returned in response";
     public static final String TAG_RELEASE_NOTES = "release-notes";
     public static final String TAG_RELEASE_NOTES_DESC = "UniProt Release Notes API";
     public static final String ID_RELEASE_NOTES_OPERATION = "Get Release Notes by Id.";
-    public static final String SEARCH_RELEASE_NOTES_OPERATION = "Search Release Notes pages by given Lucene search query.";
+    public static final String SEARCH_RELEASE_NOTES_OPERATION =
+            "Search Release Notes pages by given Lucene search query.";
     public static final String ID_RELEASE_NOTES_DESCRIPTION = "Release Notes page id to find";
-    public static final String FIELDS_RELEASE_NOTES_DESCRIPTION = "Comma separated list of fields to be returned in response";
+    public static final String FIELDS_RELEASE_NOTES_DESCRIPTION =
+            "Comma separated list of fields to be returned in response";
 
-    //UniSave
+    // UniSave
     public static final String TAG_UNISAVE = "UniSave";
-    public static final String TAG_UNISAVE_DESC = "An archive of every entry version, in every UniProtKB release.";
-    public static final String ID_UNISAVE_OPERATION = "Gets entry information based on an accession.";
-    public static final String DIFF_UNISAVE_OPERATION = "Gets the differences between the contents of two versions of an entry.";
+    public static final String TAG_UNISAVE_DESC =
+            "An archive of every entry version, in every UniProtKB release.";
+    public static final String ID_UNISAVE_OPERATION =
+            "Gets entry information based on an accession.";
+    public static final String DIFF_UNISAVE_OPERATION =
+            "Gets the differences between the contents of two versions of an entry.";
     public static final String STATUS_UNISAVE_OPERATION = "Gets status information of an entry.";
-    public static final String INCLUDE_CONTENT_UNISAVE_DESCRIPTION = "Whether or not to include the entry content (true|false).";
-    public static final String VERSIONS_UNISAVE_DESCRIPTION = "Greater than zero entry version numbers, e.g., 1,3-8,15-20,6.";
-    public static final String UNIQUE_SEQUENCE_UNISAVE_DESCRIPTION = "Whether or not to aggregate sequences that are unique (true|false)";
-    public static final String VERSION1_UNISAVE_DESCRIPTION = "One of the entry versions, whose contents is analysed in the diff.";
-    public static final String VERSION2_UNISAVE_DESCRIPTION = "The other entry version, whose contents is analysed in the diff.";
+    public static final String INCLUDE_CONTENT_UNISAVE_DESCRIPTION =
+            "Whether or not to include the entry content (true|false).";
+    public static final String VERSIONS_UNISAVE_DESCRIPTION =
+            "Greater than zero entry version numbers, e.g., 1,3-8,15-20,6.";
+    public static final String UNIQUE_SEQUENCE_UNISAVE_DESCRIPTION =
+            "Whether or not to aggregate sequences that are unique (true|false)";
+    public static final String VERSION1_UNISAVE_DESCRIPTION =
+            "One of the entry versions, whose contents is analysed in the diff.";
+    public static final String VERSION2_UNISAVE_DESCRIPTION =
+            "The other entry version, whose contents is analysed in the diff.";
 }

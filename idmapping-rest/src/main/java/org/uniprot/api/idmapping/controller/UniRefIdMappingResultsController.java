@@ -106,8 +106,7 @@ public class UniRefIdMappingResultsController extends BasicSearchController<UniR
                         })
             })
     public ResponseEntity<MessageConverterContext<UniRefEntryPair>> getMappedEntries(
-            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable
-                    String jobId,
+            @Parameter(description = JOB_ID_IDMAPPING_DESCRIPTION) @PathVariable String jobId,
             @Valid @ModelAttribute UniRefIdMappingSearchRequest searchRequest,
             HttpServletRequest request,
             HttpServletResponse response) {

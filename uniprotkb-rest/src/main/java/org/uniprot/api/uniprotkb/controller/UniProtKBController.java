@@ -106,7 +106,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Retrieve UniProtKB entries by a search query.",
+            summary = SEARCH_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -163,7 +163,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniProtKB entry by a single accession.",
+            summary = ID_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -251,10 +251,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary =
-                    "Download UniProtKB entries retrieved by a search query. (Max. 10 million entries)",
-            description =
-                    "The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniProtKB asynchronous download job' requests described below. The 'UniProtKB asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.",
+            summary = STREAM_UNIPROTKB_OPERATION,
+            description = STREAM_UNIPROTKB_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {
@@ -317,7 +315,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniProtKB entries by a list of accessions. (Max. 1K entries)",
+            summary = IDS_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {
@@ -366,7 +364,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = "Get UniProtKB entries by a list of accessions.",
+            summary = IDS_UNIPROTKB_OPERATION,
             hidden = true,
             responses = {
                 @ApiResponse(
