@@ -1,7 +1,7 @@
 package org.uniprot.api.uniprotkb.common.service.publication.request;
 
 import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
+import static org.uniprot.api.rest.request.SearchRequest.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.PositiveOrZero;
@@ -10,7 +10,6 @@ import lombok.Data;
 
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
-import org.uniprot.api.rest.request.SearchRequest;
 import org.uniprot.api.rest.validation.ValidContentTypes;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
@@ -29,7 +28,7 @@ public class PublicationRequest {
 
     @Parameter(description = SIZE_DESCRIPTION)
     @PositiveOrZero(message = "{search.positive}")
-    @Max(value = SearchRequest.MAX_RESULTS_SIZE, message = "{search.max.page.size}")
+    @Max(value = MAX_RESULTS_SIZE, message = "{search.max.page.size}")
     private Integer size;
 
     @Parameter(hidden = true)

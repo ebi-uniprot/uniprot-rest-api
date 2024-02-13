@@ -5,7 +5,6 @@ import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.uniprot.api.idmapping.controller.request.IdMappingPageRequest;
 import org.uniprot.api.idmapping.common.request.IdMappingPageRequest;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.api.rest.validation.ValidSolrQueryFields;

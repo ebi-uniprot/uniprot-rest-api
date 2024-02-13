@@ -1,8 +1,11 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb.request;
 
+import static org.uniprot.api.rest.openapi.OpenApiConstants.FORMAT_UNIPROTKB_DESCRIPTION;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.request.DownloadRequest;
@@ -11,9 +14,12 @@ import org.uniprot.api.rest.validation.CustomConstraintGroup;
 import org.uniprot.api.rest.validation.ValidAsyncDownloadFormats;
 import org.uniprot.api.rest.validation.ValidDownloadRequest;
 
+import io.swagger.v3.oas.annotations.Parameter;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ValidDownloadRequest(groups = CustomConstraintGroup.class)
+@ParameterObject
 public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements DownloadRequest {
     @ValidAsyncDownloadFormats(
             formats = {
@@ -29,6 +35,7 @@ public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements 
                 UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE,
                 UniProtMediaType.HDF5_MEDIA_TYPE_VALUE
             })
+    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = "json")
     private String format;
 
     private boolean force;

@@ -54,6 +54,11 @@ public class ApiDocConfig {
                     .thenComparing(Parameter::getName, Comparator.comparing("download"::equals));
 
     @Bean
+    SpringDocConfigProperties springDocConfigProperties() {
+        return new SpringDocConfigProperties();
+    }
+
+    @Bean
     ObjectMapperProvider objectMapperProvider(SpringDocConfigProperties springDocConfigProperties) {
         ObjectMapperProvider mapperProvider = new ObjectMapperProvider(springDocConfigProperties);
         ObjectMapper openApiMapper = mapperProvider.jsonMapper();

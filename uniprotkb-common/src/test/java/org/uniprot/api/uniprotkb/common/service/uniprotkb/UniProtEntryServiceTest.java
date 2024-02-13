@@ -1,7 +1,6 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb;
 
 import static java.util.Collections.EMPTY_SET;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
