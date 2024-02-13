@@ -40,6 +40,6 @@ public class GeneCentricFastaMessageConverter
 
     private byte[] getProteinFasta(Protein protein) {
         UniProtKBFasta related = UniProtKBFastaBuilder.from(protein).build();
-        return (UniProtKBFastaParser.toFasta(related) + "\n").getBytes();
+        return (UniProtKBFastaParser.toFastaString(related) + "\n").getBytes();
     }
 }

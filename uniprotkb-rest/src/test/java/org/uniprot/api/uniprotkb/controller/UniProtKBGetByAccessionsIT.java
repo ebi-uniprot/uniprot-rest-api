@@ -358,6 +358,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
                 String[] range = id.substring(id.indexOf('[') + 1, id.indexOf(']')).split("-");
                 int sequenceLength = Integer.parseInt(range[1]) - Integer.parseInt(range[0]) + 1;
                 Assertions.assertEquals(sequenceLength, fasta.getSequence().getLength());
+                Assertions.assertEquals(range[0] + "-" + range[1], fasta.getSequenceRange());
             }
         }
     }
@@ -367,7 +368,7 @@ class UniProtKBGetByAccessionsIT extends AbstractGetByIdsControllerIT {
         List<UniProtKBFasta> uniProtKBFastas =
                 Arrays.stream(fastaEntries)
                         .map(fasta -> fasta.startsWith(">") ? fasta : ">" + fasta)
-                        .map(UniProtKBFastaParser::fromFasta)
+                        .map(UniProtKBFastaParser::fromFastaString)
                         .collect(Collectors.toList());
         return uniProtKBFastas;
     }

@@ -10,9 +10,7 @@ import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
-import org.uniprot.core.Sequence;
 import org.uniprot.core.fasta.UniProtKBFasta;
-import org.uniprot.core.fasta.impl.UniProtKBFastaBuilder;
 import org.uniprot.core.parser.fasta.uniprot.UniProtKBFastaParser;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.util.Pair;
@@ -38,11 +36,12 @@ public class UniProtKBFastaMessageConverter
         if (entity.isActive()) {
             String sequenceRange = getPassedSequenceRange(entity.getPrimaryAccession().getValue());
             if (Objects.isNull(sequenceRange)) {
-                outputStream.write((UniProtKBFastaParser.toFasta(entity) + "\n").getBytes());
+                outputStream.write((UniProtKBFastaParser.toFastaString(entity) + "\n").getBytes());
             } else {
-                UniProtKBFasta uniProtKBFasta = getUniProtKBFasta(entity, sequenceRange);
+                UniProtKBFasta uniProtKBFasta =
+                        UniProtKBFastaParser.toUniProtKBFasta(entity, sequenceRange);
                 outputStream.write(
-                        (UniProtKBFastaParser.toFasta(uniProtKBFasta) + "\n").getBytes());
+                        (UniProtKBFastaParser.toFastaString(uniProtKBFasta) + "\n").getBytes());
             }
         }
     }
@@ -77,22 +76,5 @@ public class UniProtKBFastaMessageConverter
     protected void cleanUp() {
         super.cleanUp();
         TL_ACCESSION_SEQUENCE_RANGES.remove();
-    }
-
-    private UniProtKBFasta getUniProtKBFasta(UniProtKBEntry entity, String sequenceRange) {
-        UniProtKBFasta uniProtKBFasta = UniProtKBFastaParser.toUniProtKBFasta(entity);
-        return UniProtKBFastaBuilder.from(uniProtKBFasta)
-                .sequence(getSubsequence(uniProtKBFasta.getSequence(), sequenceRange))
-                .build();
-    }
-
-    private String getSubsequence(Sequence sequence, String sequenceRange) {
-        String[] rangeTokens = sequenceRange.split("-");
-        int start = Integer.parseInt(rangeTokens[0]);
-        int end = Integer.parseInt(rangeTokens[1]);
-        return sequence.getValue()
-                .substring(
-                        Math.min(start - 1, sequence.getLength()),
-                        Math.min(end, sequence.getLength()));
     }
 }

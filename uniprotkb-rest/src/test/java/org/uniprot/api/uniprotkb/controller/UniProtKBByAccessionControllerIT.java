@@ -944,12 +944,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        content()
-                                .string(
-                                        is(
-                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n"
-                                                        + "AEITAEGLKPQ\n")));
+                .andExpect(content().string(is(">sp|Q8DIA7|10-20\n" + "AEITAEGLKPQ\n")));
     }
 
     @Test
@@ -961,12 +956,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        content()
-                                .string(
-                                        is(
-                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n"
-                                                        + "MSQTP\n")));
+                .andExpect(content().string(is(">sp|Q8DIA7|1-5\n" + "MSQTP\n")));
     }
 
     @Test
@@ -982,11 +972,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        content()
-                                .string(
-                                        is(
-                                                ">sp|Q8DIA7|PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1\n\n")));
+                .andExpect(content().string(is(">sp|Q8DIA7|9999-999999\n\n")));
     }
 
     @Test
@@ -1006,11 +992,7 @@ class UniProtKBByAccessionControllerIT extends AbstractGetByIdWithTypeExtensionC
         response.andDo(log())
                 .andExpect(status().is(HttpStatus.OK.value()))
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, FASTA_MEDIA_TYPE_VALUE))
-                .andExpect(
-                        content()
-                                .string(
-                                        is(
-                                                ">sp|P21802-2|FGFR2-2_HUMAN Isoform 2 of Fibroblast growth factor receptor 2 OS=Homo sapiens OX=9606 GN=FGFR2\nLVVVTMATLSL\n")));
+                .andExpect(content().string(is(">sp|P21802-2|10-20\nLVVVTMATLSL\n")));
     }
 
     @ParameterizedTest

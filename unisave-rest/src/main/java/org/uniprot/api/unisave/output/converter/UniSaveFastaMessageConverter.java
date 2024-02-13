@@ -44,7 +44,7 @@ public class UniSaveFastaMessageConverter extends AbstractEntityHttpMessageConve
             fastaContent = fastaStringBuilder.toString();
         } else if (entity.isCurrentRelease()) {
             UniProtKBEntry uniProtKBEntry = UNIPROT_FF_PARSER.parse(content);
-            fastaContent = UniProtKBFastaParser.toFasta(uniProtKBEntry);
+            fastaContent = UniProtKBFastaParser.toFastaString(uniProtKBEntry);
         } else {
             String sequence = extractSequenceFromContent(content);
 
