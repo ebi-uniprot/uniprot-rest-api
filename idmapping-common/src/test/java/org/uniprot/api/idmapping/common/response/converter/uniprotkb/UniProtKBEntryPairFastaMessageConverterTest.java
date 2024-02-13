@@ -9,6 +9,7 @@ import org.uniprot.api.idmapping.common.response.model.UniProtKBEntryPair;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.core.impl.SequenceBuilder;
 import org.uniprot.core.uniprotkb.*;
+import org.uniprot.core.uniprotkb.description.FlagType;
 import org.uniprot.core.uniprotkb.description.impl.NameBuilder;
 import org.uniprot.core.uniprotkb.description.impl.ProteinDescriptionBuilder;
 import org.uniprot.core.uniprotkb.description.impl.ProteinNameBuilder;
@@ -18,7 +19,7 @@ import org.uniprot.core.uniprotkb.taxonomy.impl.OrganismBuilder;
 class UniProtKBEntryPairFastaMessageConverterTest {
 
     @Test
-    void toSubSequenceFasta() throws IOException {
+    void toSubsequenceFasta() throws IOException {
         UniProtKBEntryPairFastaMessageConverter converter =
                 new UniProtKBEntryPairFastaMessageConverter();
 
@@ -29,6 +30,18 @@ class UniProtKBEntryPairFastaMessageConverterTest {
         UniProtKBEntry entry =
                 new UniProtKBEntryBuilder("P21802", "P21802_HUMAN", UniProtKBEntryType.SWISSPROT)
                         .sequence(new SequenceBuilder("ABCDEFGHIJKLMNOPQRSTUVXZ").build())
+                        .entryAudit(new EntryAuditBuilder().sequenceVersion(2).build())
+                        .proteinDescription(
+                                new ProteinDescriptionBuilder()
+                                        .flag(FlagType.FRAGMENTS_PRECURSOR)
+                                        .recommendedName(
+                                                new ProteinNameBuilder()
+                                                        .fullName(
+                                                                new NameBuilder()
+                                                                        .value("Rec Name Value")
+                                                                        .build())
+                                                        .build())
+                                        .build())
                         .build();
         UniProtKBEntryPair entryPair =
                 UniProtKBEntryPair.builder().from("P21802[5-10]").to(entry).build();
