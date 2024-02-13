@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
+import org.uniprot.api.uniref.common.service.entry.UniRefEntryService;
 import org.uniprot.api.uniref.request.UniRefIdRequest;
-import org.uniprot.api.uniref.service.UniRefEntryService;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.xml.jaxb.uniref.Entry;
 

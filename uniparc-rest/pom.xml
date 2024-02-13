@@ -13,15 +13,7 @@
 	<name>uniparc-rest</name>
 	<description>UniParc Rest API</description>
 
-	<properties>
-		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
-	</properties>
-
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>xml-parser</artifactId>
@@ -34,7 +26,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
-			<artifactId>common-rest</artifactId>
+			<artifactId>uniparc-common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
@@ -50,6 +42,7 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!--test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

@@ -8,9 +8,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +21,15 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Testcontainers
 public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
 
     @Value("${download.idFilesFolder}")
@@ -43,8 +49,11 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
 
     @Autowired protected AmqpAdmin amqpAdmin;
 
+    @Container
     protected static RabbitMQContainer rabbitMQContainer =
             new RabbitMQContainer(DockerImageName.parse("rabbitmq:3-management"));
+
+    @Container
     protected static GenericContainer<?> redisContainer =
             new GenericContainer<>(DockerImageName.parse("redis:6-alpine")).withExposedPorts(6379);
 
@@ -61,6 +70,13 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
         System.setProperty(
                 "uniprot.redis.port", String.valueOf(redisContainer.getFirstMappedPort()));
         propertyRegistry.add("ALLOW_EMPTY_PASSWORD", () -> "yes");
+    }
+
+    @BeforeAll
+    public void setUpAsyncDownload() {
+        Duration asyncDuration = Duration.ofMillis(500);
+        Awaitility.setDefaultPollDelay(asyncDuration);
+        Awaitility.setDefaultPollInterval(asyncDuration);
     }
 
     protected void prepareDownloadFolders() throws IOException {

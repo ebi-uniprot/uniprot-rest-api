@@ -16,6 +16,7 @@ import static org.uniprot.api.unisave.UniSaveEntityMocker.*;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
@@ -53,6 +54,7 @@ import org.uniprot.api.unisave.repository.domain.impl.EntryInfoImpl;
 @ContextConfiguration(
         classes = {UniSaveControllerTest.TestConfig.class, UniSaveRESTApplication.class})
 @WebMvcTest(UniSaveController.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UniSaveControllerTest {
     private static final String ACCESSION = "P12345";
     private static final String INVALID_ACCESSION_FORMAT = "WRONG-FORMAT";

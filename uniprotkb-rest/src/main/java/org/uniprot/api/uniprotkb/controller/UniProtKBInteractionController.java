@@ -12,6 +12,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniprotkb.service.UniProtKBEntryInteractionService;
+import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtKBEntryInteractionService;
 import org.uniprot.core.uniprotkb.interaction.InteractionEntry;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
@@ -54,7 +55,11 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
             MessageConverterContextFactory<InteractionEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             UniProtKBEntryInteractionService interactionService) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB_INTERACTION);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                MessageConverterContextFactory.Resource.UNIPROTKB_INTERACTION);
         this.interactionService = interactionService;
     }
 
@@ -71,7 +76,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
 
     @GetMapping(
             value = "/{accession}/interactions",
-            produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
     @Operation(
             summary = INTERACTION_UNIPROTKB_OPERATION,
             responses = {

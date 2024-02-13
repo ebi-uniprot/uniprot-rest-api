@@ -1,6 +1,6 @@
 package org.uniprot.api.idmapping.controller.validator;
 
-import org.uniprot.api.idmapping.controller.request.IdMappingDownloadRequest;
+import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequest;
 
 public interface IdMappingDownloadRequestValidator {
 

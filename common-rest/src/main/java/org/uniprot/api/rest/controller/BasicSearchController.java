@@ -5,6 +5,8 @@ import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpDownloa
 import static org.uniprot.api.rest.output.header.HeaderFactory.createHttpSearchHeader;
 import static org.uniprot.api.rest.request.HttpServletRequestContentTypeMutator.isBrowserAsFarAsWeKnow;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -31,6 +33,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.pagination.PaginatedResultsEvent;
 import org.uniprot.api.rest.request.BasicRequest;
 import org.uniprot.api.rest.request.StreamRequest;
+import org.uniprot.core.util.Pair;
 import org.uniprot.core.util.Utils;
 
 /**
@@ -81,11 +84,20 @@ public abstract class BasicSearchController<T> {
 
     protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
             T entity, String fields, HttpServletRequest request) {
+        return getEntityResponse(entity, fields, null, request);
+    }
+
+    protected ResponseEntity<MessageConverterContext<T>> getEntityResponse(
+            T entity,
+            String fields,
+            Map<String, List<Pair<String, Boolean>>> accessionSequenceMap,
+            HttpServletRequest request) {
         MediaType contentType = getAcceptHeader(request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
         context.setFields(fields);
         context.setFileType(getBestFileTypeFromRequest(request));
         context.setEntityOnly(true);
+        context.setAccessionSequenceRange(accessionSequenceMap);
         if (contentType.equals(LIST_MEDIA_TYPE)) {
             context.setEntityIds(Stream.of(getEntityId(entity)));
         } else {
@@ -141,6 +153,18 @@ public abstract class BasicSearchController<T> {
             boolean subSequence,
             HttpServletRequest request,
             HttpServletResponse response) {
+        return this.getSearchResponse(
+                result, fields, isDownload, subSequence, null, request, response);
+    }
+
+    protected ResponseEntity<MessageConverterContext<T>> getSearchResponse(
+            QueryResult<T> result,
+            String fields,
+            boolean isDownload,
+            boolean subSequence,
+            Map<String, List<Pair<String, Boolean>>> accessionSequenceStatus,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         MediaType contentType = getAcceptHeader(request);
         MessageConverterContext<T> context = converterContextFactory.get(resource, contentType);
 
@@ -154,6 +178,7 @@ public abstract class BasicSearchController<T> {
             Stream<String> accList = result.getContent().map(this::getEntityId);
             context.setEntityIds(accList);
         } else {
+            context.setAccessionSequenceRange(accessionSequenceStatus);
             context.setEntities(result.getContent());
             context.setExtraOptions(result.getExtraOptions());
             context.setWarnings(result.getWarnings());

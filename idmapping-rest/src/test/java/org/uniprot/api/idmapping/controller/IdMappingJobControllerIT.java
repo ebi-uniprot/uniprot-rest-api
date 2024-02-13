@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.ENRICHMENT_WARNING;
 import static org.uniprot.api.rest.output.PredefinedAPIStatus.LIMIT_EXCEED_ERROR;
 
@@ -51,10 +52,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
 import org.uniprot.api.common.repository.search.ProblemPair;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.IdMappingStringPair;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 import org.uniprot.store.config.idmapping.IdMappingFieldConfig;
@@ -82,12 +83,9 @@ class IdMappingJobControllerIT {
     @Value("${id.mapping.max.to.ids.count}")
     private Integer maxAllowedToIds;
 
-    private static final String JOB_SUBMIT_ENDPOINT =
-            IdMappingJobController.IDMAPPING_PATH + "/run";
-    private static final String JOB_STATUS_ENDPOINT =
-            IdMappingJobController.IDMAPPING_PATH + "/status/{jobId}";
-    private static final String JOB_DETAILS_ENDPOINT =
-            IdMappingJobController.IDMAPPING_PATH + "/details/{jobId}";
+    private static final String JOB_SUBMIT_ENDPOINT = IDMAPPING_PATH + "/run";
+    private static final String JOB_STATUS_ENDPOINT = IDMAPPING_PATH + "/status/{jobId}";
+    private static final String JOB_DETAILS_ENDPOINT = IDMAPPING_PATH + "/details/{jobId}";
 
     @Autowired private MockMvc mockMvc;
     @MockBean private IdMappingJobCacheService cacheService;

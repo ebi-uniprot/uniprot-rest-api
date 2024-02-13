@@ -23,7 +23,7 @@ public class GeneCentricStreamRequest extends GeneCentricBasicRequest implements
 
     @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
-            regexp = "^true|false$",
+            regexp = "^true$|^false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{stream.invalid.download}")
     private String download;

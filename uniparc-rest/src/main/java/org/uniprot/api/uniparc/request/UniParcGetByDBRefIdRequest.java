@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import org.springdoc.api.annotations.ParameterObject;
+import org.uniprot.api.uniparc.common.service.request.UniParcGetByIdPageSearchRequest;
 
 import io.swagger.v3.oas.annotations.Parameter;
 

@@ -57,7 +57,7 @@ public class GetByTaxonIdsRequest implements SearchRequest {
     @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
             flags = {Pattern.Flag.CASE_INSENSITIVE},
-            regexp = "^true|false$",
+            regexp = "^true$|^false$",
             message = "{search.taxonomy.invalid.download}")
     private String download;
 

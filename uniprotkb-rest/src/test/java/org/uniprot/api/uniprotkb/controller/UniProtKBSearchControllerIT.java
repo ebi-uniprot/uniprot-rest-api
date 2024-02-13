@@ -2,22 +2,7 @@ package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.COPYRIGHT_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_CLOSE_TAG;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.UNIPROTKB_XML_SCHEMA;
-import static org.uniprot.api.rest.output.converter.ConverterConstants.XML_DECLARATION;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
-import static org.uniprot.store.indexer.uniprot.mockers.InactiveEntryMocker.DELETED;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,6 +17,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -51,6 +37,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.search.SolrQueryRepository;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractSearchWithSuggestionsControllerIT;
@@ -61,12 +50,14 @@ import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
+import org.uniprot.api.rest.output.UniProtMediaType;
+import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.repository.DataStoreTestConfig;
-import org.uniprot.api.uniprotkb.repository.search.impl.UniprotQueryRepository;
-import org.uniprot.api.uniprotkb.repository.store.UniProtKBStoreClient;
+import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
+import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.json.parser.uniprot.UniProtKBEntryIT;
@@ -210,16 +201,21 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=accession:P21802&includeIsoform=invalid")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=accession:P21802&includeIsoform=invalid")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 contains(
                                         "Invalid includeIsoform parameter value. Expected true or false")));
@@ -254,16 +250,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=(Serine/arginine repetitive matrix protein 2)")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=(Serine/arginine repetitive matrix protein 2)")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains(acc)));
     }
 
     @Test
@@ -295,16 +298,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=(\"Serine/arginine repetitive matrix protein 2\")")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=(\"Serine/arginine repetitive matrix protein 2\")")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains(acc)));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains(acc)));
     }
 
     @Test
@@ -324,16 +334,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=sec_acc:B4DFC2&fields=accession,gene_primary")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=sec_acc:B4DFC2&fields=accession,gene_primary")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")));
     }
 
     @Test
@@ -353,18 +370,29 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=accession:p21802&fields=accession,gene_primary")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=accession:p21802&fields=accession,gene_primary")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-2")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802-1")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802-2")));
     }
 
     @Test
@@ -384,17 +412,28 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=accession_id:P21802-1&fields=accession,gene_primary")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=accession_id:P21802-1&fields=accession,gene_primary")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802-1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-2")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802-1")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802-2")));
     }
 
     @Test
@@ -414,19 +453,26 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=gene:FGFR2&fields=accession,gene_primary&includeIsoform=true")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=gene:FGFR2&fields=accession,gene_primary&includeIsoform=true")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder("P21802", "P21802-2")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-1")));
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802-1")));
     }
 
     @Test
@@ -446,19 +492,26 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=accession:P21802&fields=accession,gene_primary&includeIsoform=true")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=accession:P21802&fields=accession,gene_primary&includeIsoform=true")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.primaryAccession",
                                 containsInAnyOrder("P21802", "P21802-2")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-1")));
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802-1")));
     }
 
     @Test
@@ -478,17 +531,28 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=((gene:FGFR2) AND (is_isoform:true))&fields=accession,gene_primary")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=((gene:FGFR2) AND (is_isoform:true))&fields=accession,gene_primary")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-1")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802-2")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802-1")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802-2")));
     }
 
     @Test
@@ -502,18 +566,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=accession:"
-                                                + acc
-                                                + "&facets=reviewed")
-                                        .header(ACCEPT, APPLICATION_XML_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=accession:"
+                                                        + acc
+                                                        + "&facets=reviewed")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_XML_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        content()
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
                                 .string(
                                         containsString(
                                                 "Invalid content type received, 'application/xml'. Expected one of [application/json]")));
@@ -530,7 +599,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         getStoreManager().save(DataStoreManager.StoreType.UNIPROT, activeDrome);
 
         InactiveUniProtEntry inactiveDrome =
-                InactiveUniProtEntry.from("I8FBX0", "INACTIVE_DROME", DELETED, null);
+                InactiveUniProtEntry.from(
+                        "I8FBX0", "INACTIVE_DROME", InactiveEntryMocker.DELETED, null);
         getStoreManager()
                 .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
 
@@ -538,17 +608,21 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=DROME")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=DROME")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.uniProtkbId",
-                                contains(activeDrome.getUniProtkbId().getValue())));
+                                Matchers.contains(activeDrome.getUniProtkbId().getValue())));
     }
 
     @ParameterizedTest
@@ -580,13 +654,18 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(String.format("%s?query=%s", SEARCH_RESOURCE, id))
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].uniProtkbId", is(id)));
+                                MockMvcRequestBuilders.get(
+                                                String.format("%s?query=%s", SEARCH_RESOURCE, id))
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results[0].uniProtkbId", is(id)));
     }
 
     @ParameterizedTest
@@ -614,13 +693,19 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(String.format("%s?query=%s", SEARCH_RESOURCE, idPart))
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].uniProtkbId", is(id)));
+                                MockMvcRequestBuilders.get(
+                                                String.format(
+                                                        "%s?query=%s", SEARCH_RESOURCE, idPart))
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results[0].uniProtkbId", is(id)));
     }
 
     @Test
@@ -645,13 +730,19 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(String.format("%s?query=%s", SEARCH_RESOURCE, idPart))
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].uniProtkbId", is(id)));
+                                MockMvcRequestBuilders.get(
+                                                String.format(
+                                                        "%s?query=%s", SEARCH_RESOURCE, idPart))
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results[0].uniProtkbId", is(id)));
     }
 
     @Test
@@ -676,12 +767,18 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(String.format("%s?query=%s", SEARCH_RESOURCE, idPart))
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(0)));
+                                MockMvcRequestBuilders.get(
+                                                String.format(
+                                                        "%s?query=%s", SEARCH_RESOURCE, idPart))
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(0)));
     }
 
     @ParameterizedTest
@@ -712,13 +809,19 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(String.format("%s?query=%s", SEARCH_RESOURCE, idPart))
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].uniProtkbId", is(id)));
+                                MockMvcRequestBuilders.get(
+                                                String.format(
+                                                        "%s?query=%s", SEARCH_RESOURCE, idPart))
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results[0].uniProtkbId", is(id)));
     }
 
     @Test
@@ -736,14 +839,20 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=*")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=*")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", containsInAnyOrder("P21802")));
     }
 
     @Test
@@ -762,25 +871,40 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=accession:q14301&fields=accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q14301")));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=accession:q14301&fields=accession")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("Q14301")));
 
         // when default search returns only itself
         response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=q14301&fields=accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q14301")));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=q14301&fields=accession")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("Q14301")));
     }
 
     @Test
@@ -799,29 +923,47 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=id:Q14301_FGFR2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].primaryAccession", is("Q14301")))
-                .andExpect(jsonPath("$.results[0].uniProtkbId", is("Q14301_FGFR2")))
-                .andExpect(jsonPath("$.results[0].inactiveReason.inactiveReasonType", is("MERGED")))
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=id:Q14301_FGFR2")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath("$.results[0].inactiveReason.mergeDemergeTo", contains("P21802")));
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("Q14301")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].uniProtkbId", is("Q14301_FGFR2")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].inactiveReason.inactiveReasonType", is("MERGED")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].inactiveReason.mergeDemergeTo", contains("P21802")));
 
         // when default search returns only itself
         response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=Q14301_FGFR2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q14301")));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=Q14301_FGFR2")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("Q14301")));
     }
 
     @Test
@@ -839,21 +981,30 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=accession:Q00007")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=accession:Q00007")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q00007")))
-                .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("Q00007")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.entryType", contains("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
                                 contains("DEMERGED")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.mergeDemergeTo",
                                 contains(contains("P21802", "P63151"))));
 
@@ -861,14 +1012,20 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=Q00007")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=Q00007")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q00007")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("Q00007")));
     }
 
     @Test
@@ -886,27 +1043,40 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=id:FGFR2_HUMAN")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=id:FGFR2_HUMAN")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802", "Q00007")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802", "Q00007")));
 
         // when search id by default field, it returns only the active ID
         response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=FGFR2_HUMAN")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=FGFR2_HUMAN")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")));
     }
 
     @Test
@@ -924,18 +1094,26 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "accession:I8FBX2")
                                         .param("fields", "accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")))
-                .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("I8FBX2")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.entryType", contains("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
                                 contains("DELETED")));
 
@@ -943,13 +1121,19 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=I8FBX2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=I8FBX2")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("I8FBX2")));
     }
 
     @Test
@@ -967,16 +1151,25 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=id:I8FBX2_YERPE")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=id:I8FBX2_YERPE")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")))
-                .andExpect(jsonPath("$.results.*.entryType", contains("Inactive")))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("I8FBX2")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.entryType", contains("Inactive")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.inactiveReason.inactiveReasonType",
                                 contains("DELETED")));
 
@@ -984,13 +1177,19 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=I8FBX2_YERPE")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=I8FBX2_YERPE")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("I8FBX2")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("I8FBX2")));
     }
 
     @Test
@@ -1004,25 +1203,38 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=accession:q8dia7-1")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=accession:q8dia7-1")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q8DIA7")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("Q8DIA7")));
 
         // when search accession by default deefault search
         response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=q8dia7-1")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=q8dia7-1")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("Q8DIA7")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("Q8DIA7")));
     }
 
     @Test
@@ -1041,17 +1253,24 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=Familial&fields=accession,gene_primary&showSingleTermMatchedFields=true")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=Familial&fields=accession,gene_primary&showSingleTermMatchedFields=true")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.matchedFields.size()", is(1)))
-                .andExpect(jsonPath("$.matchedFields.*.name", contains("cc_disease")))
-                .andExpect(jsonPath("$.matchedFields.*.hits", contains(1)));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.matchedFields.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.matchedFields.*.name", contains("cc_disease")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.matchedFields.*.hits", contains(1)));
     }
 
     @Test
@@ -1064,16 +1283,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=gene:FGFR2&fields=accession,gene_primary&showSingleTermMatchedFields=true")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=gene:FGFR2&fields=accession,gene_primary&showSingleTermMatchedFields=true")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
-                .andExpect(jsonPath("$.matchedFields").doesNotExist());
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.matchedFields").doesNotExist());
     }
 
     @Test
@@ -1086,16 +1312,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=Fibroblast growth&fields=accession,gene_primary&showSingleTermMatchedFields=true")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=Fibroblast growth&fields=accession,gene_primary&showSingleTermMatchedFields=true")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
-                .andExpect(jsonPath("$.matchedFields").doesNotExist());
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.matchedFields").doesNotExist());
     }
 
     @Test
@@ -1109,16 +1342,21 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=Familial&fields=accession,gene_primary&showSingleTermMatchedFields=true")
-                                        .header(ACCEPT, APPLICATION_XML_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=Familial&fields=accession,gene_primary&showSingleTermMatchedFields=true")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_XML_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_XML_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        content()
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
                                 .string(
                                         containsString(
                                                 "Invalid content type received, 'application/xml'. Expected one of [application/json]")));
@@ -1134,16 +1372,22 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "PR:P21802")
                                         .param("fields", "accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")));
     }
 
     @Test
@@ -1156,26 +1400,32 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "HGNC:3689 AND accession:P21802")
                                         .param("fields", "accession,cc_interaction")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.comments[0].interactions[0].organismDiffer",
                                 contains(true)))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.comments[0].interactions[0].interactantOne.uniProtKBAccession",
                                 contains("P21802")))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.comments[0].interactions[0].interactantTwo.uniProtKBAccession",
                                 contains("P03968")));
     }
@@ -1191,16 +1441,22 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "GO:0016020")
                                         .param("fields", "accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")));
     }
 
     @Test
@@ -1216,17 +1472,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "Reactome NOT(organism_id:9606)")
                                         .param("fields", "accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("F1Q0X3")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("F1Q0X3")));
     }
 
     @Test
@@ -1242,17 +1504,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "Reactome -organism_id:9606")
                                         .param("fields", "accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("F1Q0X3")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("F1Q0X3")));
     }
 
     @Test
@@ -1268,17 +1536,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "Reactome !organism_id:9606")
                                         .param("fields", "accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("F1Q0X3")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("F1Q0X3")));
     }
 
     @Test
@@ -1291,17 +1565,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "adiponectin")
                                         .param("fields", "accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")));
     }
 
     @Test
@@ -1321,15 +1601,25 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=id:FGFR2_HUMAN&fields=accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=id:FGFR2_HUMAN&fields=accession")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802")))
-                .andExpect(jsonPath("$.results.*.primaryAccession", not("P21802-2")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", containsInAnyOrder("P21802")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", not("P21802-2")));
     }
 
     @Test
@@ -1349,16 +1639,22 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE
-                                                + "?query=id:FGFR2_HUMAN AND is_isoform:true&fields=accession")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE
+                                                        + "?query=id:FGFR2_HUMAN AND is_isoform:true&fields=accession")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
     }
 
     @Test
@@ -1378,15 +1674,20 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=P21802-2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=P21802-2")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
     }
 
     @Test
@@ -1406,15 +1707,20 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=(p21802-2)")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=(p21802-2)")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath("$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", containsInAnyOrder("P21802-2")));
     }
 
     @Test
@@ -1436,16 +1742,22 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "RHEA:10596")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].primaryAccession", is("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("P21802")));
     }
 
     @Test
@@ -1467,16 +1779,22 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "VAR_004127")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results[0].primaryAccession", is("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("P21802")));
     }
 
     @Test
@@ -1496,18 +1814,29 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=*&fields=xref_dbsnp")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(
+                                                SEARCH_RESOURCE + "?query=*&fields=xref_dbsnp")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")))
-                .andExpect(jsonPath("$.results.*.features").exists())
-                .andExpect(jsonPath("$.results.*.uniProtKBCrossReferences").doesNotExist())
-                .andExpect(jsonPath("$.results[0].features[0].type", is("Natural variant")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.*.features").exists())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$.results.*.uniProtKBCrossReferences")
+                                .doesNotExist())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].features[0].type", is("Natural variant")));
     }
 
     @Test
@@ -1521,19 +1850,25 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=gene:*GFR*2")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=gene:*GFR*2")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.results.*.uniProtkbId",
-                                contains(canonicalEntry.getUniProtkbId().getValue())))
-                .andExpect(jsonPath("$.results.*.genes[0].geneName.value", contains("FGFR2")))
-                .andExpect(jsonPath("$.warnings").doesNotExist());
+                                Matchers.contains(canonicalEntry.getUniProtkbId().getValue())))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.genes[0].geneName.value", contains("FGFR2")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.warnings").doesNotExist());
     }
 
     @Test
@@ -1545,15 +1880,21 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=(p21802)")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=(p21802)")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
 
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(1)))
-                .andExpect(jsonPath("$.results.*.primaryAccession", contains("P21802")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(1)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results.*.primaryAccession", contains("P21802")));
     }
 
     //    TRM-28310
@@ -1570,16 +1911,26 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE + "?query=b3gat1")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE + "?query=b3gat1")
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.results.size()", is(2)))
-                .andExpect(jsonPath("$.results[0].primaryAccession", is("B3GAT1")))
-                .andExpect(jsonPath("$.results[1].primaryAccession", is("Q9P2W7")))
-                .andExpect(jsonPath("$.results[1].genes[0].geneName.value", is("B3GAT1")));
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
+                .andExpect(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.results.size()", is(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[0].primaryAccession", is("B3GAT1")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[1].primaryAccession", is("Q9P2W7")))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
+                                "$.results[1].genes[0].geneName.value", is("B3GAT1")));
     }
 
     @Test
@@ -1592,18 +1943,24 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "P21802")
                                         .param(
                                                 "fields",
                                                 "accession, xref_ensembl_full ,xref_interpro")
-                                        .header(ACCEPT, TSV_MEDIA_TYPE_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                UniProtMediaType.TSV_MEDIA_TYPE_VALUE));
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, TSV_MEDIA_TYPE_VALUE))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.OK.value()))
                 .andExpect(
-                        content()
+                        MockMvcResultMatchers.header()
+                                .string(
+                                        HttpHeaders.CONTENT_TYPE,
+                                        UniProtMediaType.TSV_MEDIA_TYPE_VALUE))
+                .andExpect(
+                        MockMvcResultMatchers.content()
                                 .string(
                                         containsString(
                                                 "P21802\t\"ENST00000346997; ENSP00000263451; ENSG00000066468. [P21802-5]\";"
@@ -1632,19 +1989,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         ResultActions response =
                 getMockMvc()
                         .perform(
-                                get(SEARCH_RESOURCE)
+                                MockMvcRequestBuilders.get(SEARCH_RESOURCE)
                                         .param("query", "P21802")
                                         .param(
                                                 "fields",
                                                 "accession, xref_ensembl_full ,xref_kegg_full")
-                                        .header(ACCEPT, APPLICATION_JSON_VALUE));
+                                        .header(
+                                                HttpHeaders.ACCEPT,
+                                                MediaType.APPLICATION_JSON_VALUE));
         // then
-        response.andDo(log())
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.messages.size()", is(2)))
+        response.andDo(MockMvcResultHandlers.log())
+                .andExpect(MockMvcResultMatchers.status().is(HttpStatus.BAD_REQUEST.value()))
                 .andExpect(
-                        jsonPath(
+                        MockMvcResultMatchers.header()
+                                .string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.messages.size()", is(2)))
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath(
                                 "$.messages.*",
                                 containsInAnyOrder(
                                         "Invalid fields parameter value 'xref_kegg_full'",
@@ -1753,7 +2114,8 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                 || SaveScenario.FACETS_SUCCESS.equals(saveContext)) {
 
             InactiveUniProtEntry inactiveDrome =
-                    InactiveUniProtEntry.from("I8FBX0", "INACTIVE_DROME", DELETED, null);
+                    InactiveUniProtEntry.from(
+                            "I8FBX0", "INACTIVE_DROME", InactiveEntryMocker.DELETED, null);
             getStoreManager()
                     .saveEntriesInSolr(DataStoreManager.StoreType.INACTIVE_UNIPROT, inactiveDrome);
 
@@ -1980,7 +2342,9 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         protected SearchParameter searchCanReturnSuccessParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("accession:p21802"))
-                    .resultMatcher(jsonPath("$.results.*.primaryAccession", contains("P21802")))
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
+                                    "$.results.*.primaryAccession", contains("P21802")))
                     .build();
         }
 
@@ -1988,7 +2352,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         protected SearchParameter searchCanReturnNotFoundParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("accession:P12345"))
-                    .resultMatcher(jsonPath("$.results.size()", is(0)))
+                    .resultMatcher(MockMvcResultMatchers.jsonPath("$.results.size()", is(0)))
                     .build();
         }
 
@@ -1997,11 +2361,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("organism_name:*"))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.results.*.primaryAccession",
                                     contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.results.*.organism.taxonId",
                                     containsInAnyOrder(9606, 197221)))
                     .build();
@@ -2011,9 +2375,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
         protected SearchParameter searchQueryWithInvalidTypeQueryReturnBadRequestParameter() {
             return SearchParameter.builder()
                     .queryParam("query", Collections.singletonList("gene:[1 TO 10]"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.messages.*",
                                     contains(
                                             "'gene' filter type 'range' is invalid. Expected 'general' filter type")))
@@ -2031,9 +2396,10 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                             + "OR is_isoform:invalid OR structure_3d:invalid OR active:invalid OR proteome:INVALID"
                                             + "OR uniparc:invalid OR uniref_cluster_50:invalid OR uniref_cluster_90:invalid "
                                             + "OR uniref_cluster_100:invalid OR fragment:INVALID OR precursor:INVALID"))
-                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath("$.url", not(isEmptyOrNullString())))
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.messages.*",
                                     containsInAnyOrder(
                                             "The 'accession' filter value 'INVALID' has invalid format. It should be a valid UniProtKB accession",
@@ -2061,11 +2427,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("sort", Collections.singletonList("gene desc"))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.results.*.primaryAccession",
                                     contains(ACCESSION_SP, ACCESSION_SP_CANONICAL)))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.results.*.genes[0].geneName.value",
                                     contains("purL", "FGFR2")))
                     .build();
@@ -2079,16 +2445,23 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                             "fields",
                             Collections.singletonList("accession,gene_primary,protein_name"))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.results.*.primaryAccession",
                                     contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
-                    .resultMatcher(jsonPath("$.results.*.proteinDescription").exists())
-                    .resultMatcher(jsonPath("$.results.*.genes").exists())
-                    .resultMatcher(jsonPath("$.results.*.comments").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.features").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.keywords").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.references").doesNotExist())
-                    .resultMatcher(jsonPath("$.results.*.sequence").doesNotExist())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath("$.results.*.proteinDescription")
+                                    .exists())
+                    .resultMatcher(MockMvcResultMatchers.jsonPath("$.results.*.genes").exists())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath("$.results.*.comments").doesNotExist())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath("$.results.*.features").doesNotExist())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath("$.results.*.keywords").doesNotExist())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath("$.results.*.references").doesNotExist())
+                    .resultMatcher(
+                            MockMvcResultMatchers.jsonPath("$.results.*.sequence").doesNotExist())
                     .build();
         }
 
@@ -2098,13 +2471,14 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                     .queryParam("query", Collections.singletonList("*:*"))
                     .queryParam("facets", Collections.singletonList("reviewed,fragment"))
                     .resultMatcher(
-                            jsonPath(
+                            MockMvcResultMatchers.jsonPath(
                                     "$.results.*.primaryAccession",
                                     contains(ACCESSION_SP_CANONICAL, ACCESSION_SP, "P00001")))
-                    .resultMatcher(jsonPath("$.facets", notNullValue()))
-                    .resultMatcher(jsonPath("$.facets", not(empty())))
+                    .resultMatcher(MockMvcResultMatchers.jsonPath("$.facets", notNullValue()))
+                    .resultMatcher(MockMvcResultMatchers.jsonPath("$.facets", not(empty())))
                     .resultMatcher(
-                            jsonPath("$.facets.*.name", containsInAnyOrder("reviewed", "fragment")))
+                            MockMvcResultMatchers.jsonPath(
+                                    "$.facets.*.name", containsInAnyOrder("reviewed", "fragment")))
                     .build();
         }
     }
@@ -2120,7 +2494,7 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .resultMatcher(
-                                            jsonPath(
+                                            MockMvcResultMatchers.jsonPath(
                                                     "$.results.*.primaryAccession",
                                                     contains(ACCESSION_SP_CANONICAL, ACCESSION_SP)))
                                     .build())
@@ -2128,46 +2502,53 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             startsWith(
-                                                                    XML_DECLARATION
-                                                                            + UNIPROTKB_XML_SCHEMA)))
+                                                                    ConverterConstants
+                                                                                    .XML_DECLARATION
+                                                                            + ConverterConstants
+                                                                                    .UNIPROTKB_XML_SCHEMA)))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "<accession>P21802</accession>")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "<accession>Q8DIA7</accession>")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             endsWith(
-                                                                    COPYRIGHT_TAG
-                                                                            + UNIPROTKB_XML_CLOSE_TAG)))
+                                                                    ConverterConstants.COPYRIGHT_TAG
+                                                                            + ConverterConstants
+                                                                                    .UNIPROTKB_XML_CLOSE_TAG)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(FF_MEDIA_TYPE)
-                                    .resultMatcher(content().string(containsString("AC   P21802;")))
-                                    .resultMatcher(content().string(containsString("AC   Q8DIA7;")))
-                                    .build())
-                    .contentTypeParam(
-                            ContentTypeParam.builder()
-                                    .contentType(FASTA_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.FF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
+                                                    .string(containsString("AC   P21802;")))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .string(containsString("AC   Q8DIA7;")))
+                                    .build())
+                    .contentTypeParam(
+                            ContentTypeParam.builder()
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     ">sp|Q8DIA7|"
                                                                             + "PURL_THEEB Phosphoribosylformylglycinamidine synthase subunit PurL "
                                                                             + "OS=Thermosynechococcus elongatus (strain BP-1) OX=197221 GN=purL PE=3 SV=1")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     ">sp|P21802|FGFR2_HUMAN Fibroblast"
@@ -2175,51 +2556,56 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(GFF_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content().string(containsString("##gff-version 3")))
+                                            MockMvcResultMatchers.content()
+                                                    .string(containsString("##gff-version 3")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "##sequence-region Q8DIA7 1 761")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "##sequence-region P21802 1 821")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(LIST_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(containsString(ACCESSION_SP_CANONICAL)))
-                                    .resultMatcher(content().string(containsString(ACCESSION_SP)))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .string(containsString(ACCESSION_SP)))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(TSV_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "Entry\tEntry Name\tReviewed\tProtein names\tGene Names\tOrganism\tLength")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "Q8DIA7\tPURL_THEEB\treviewed\tPhosphoribosylformylglycinamidine synthase subunit PurL (FGAM synthase)")))
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "P21802\tFGFR2_HUMAN\treviewed\tFibroblast growth factor receptor 2 (FGFR-2)")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().contentType(XLS_MEDIA_TYPE))
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .build();
         }
@@ -2231,9 +2617,11 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                     .contentTypeParam(
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .resultMatcher(jsonPath("$.url", not(isEmptyOrNullString())))
                                     .resultMatcher(
-                                            jsonPath(
+                                            MockMvcResultMatchers.jsonPath(
+                                                    "$.url", not(isEmptyOrNullString())))
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.jsonPath(
                                                     "$.messages.*",
                                                     contains(
                                                             "The 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession")))
@@ -2242,60 +2630,62 @@ class UniProtKBSearchControllerIT extends AbstractSearchWithSuggestionsControlle
                             ContentTypeParam.builder()
                                     .contentType(MediaType.APPLICATION_XML)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             containsString(
                                                                     "<messages>The 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession</messages>")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(FASTA_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.FASTA_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(GFF_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.GFF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(FF_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.FF_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(LIST_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.LIST_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(TSV_MEDIA_TYPE)
+                                    .contentType(UniProtMediaType.TSV_MEDIA_TYPE)
                                     .resultMatcher(
-                                            content()
+                                            MockMvcResultMatchers.content()
                                                     .string(
                                                             is(
                                                                     "Error messages\nThe 'accession' filter value 'invalid' has invalid format. It should be a valid UniProtKB accession")))
                                     .build())
                     .contentTypeParam(
                             ContentTypeParam.builder()
-                                    .contentType(XLS_MEDIA_TYPE)
-                                    .resultMatcher(content().contentType(XLS_MEDIA_TYPE))
+                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE)
+                                    .resultMatcher(
+                                            MockMvcResultMatchers.content()
+                                                    .contentType(UniProtMediaType.XLS_MEDIA_TYPE))
                                     .build())
                     .build();
         }

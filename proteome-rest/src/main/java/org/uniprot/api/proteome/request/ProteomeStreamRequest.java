@@ -23,7 +23,7 @@ public class ProteomeStreamRequest extends ProteomeBasicRequest implements Strea
 
     @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
-            regexp = "^true|false$",
+            regexp = "^true$|^false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{stream.invalid.download}")
     private String download;

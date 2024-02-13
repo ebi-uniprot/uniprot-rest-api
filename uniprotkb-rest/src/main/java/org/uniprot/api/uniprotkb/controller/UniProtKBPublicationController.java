@@ -13,6 +13,7 @@ import javax.validation.constraints.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.validation.annotation.Validated;
@@ -25,9 +26,9 @@ import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
-import org.uniprot.api.uniprotkb.controller.request.PublicationRequest;
-import org.uniprot.api.uniprotkb.model.PublicationEntry;
-import org.uniprot.api.uniprotkb.service.PublicationService;
+import org.uniprot.api.uniprotkb.common.repository.model.PublicationEntry;
+import org.uniprot.api.uniprotkb.common.service.publication.PublicationService;
+import org.uniprot.api.uniprotkb.common.service.publication.request.PublicationRequest;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,7 +55,11 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
             MessageConverterContextFactory<PublicationEntry> converterContextFactory,
             ThreadPoolTaskExecutor downloadTaskExecutor,
             PublicationService publicationService) {
-        super(eventPublisher, converterContextFactory, downloadTaskExecutor, UNIPROTKB_PUBLICATION);
+        super(
+                eventPublisher,
+                converterContextFactory,
+                downloadTaskExecutor,
+                MessageConverterContextFactory.Resource.UNIPROTKB_PUBLICATION);
         this.publicationService = publicationService;
     }
 
@@ -71,7 +76,7 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
 
     @GetMapping(
             value = "/{accession}/publications",
-            produces = {APPLICATION_JSON_VALUE})
+            produces = {MediaType.APPLICATION_JSON_VALUE})
     @Operation(
             summary = PUBLICATION_UNIPROTKB_OPERATION,
             description = PUBLICATION_UNIPROTKB_OPERATION_DESC,

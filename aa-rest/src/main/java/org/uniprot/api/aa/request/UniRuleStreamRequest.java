@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 public class UniRuleStreamRequest extends UniRuleBasicRequest implements StreamRequest {
     @Parameter(description = DOWNLOAD_DESCRIPTION)
     @Pattern(
-            regexp = "^(?:true|false)$",
+            regexp = "^true$|^false$",
             flags = {Pattern.Flag.CASE_INSENSITIVE},
             message = "{search.aa.invalid.download}")
     private String download;

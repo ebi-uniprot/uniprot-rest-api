@@ -12,11 +12,6 @@
 	<artifactId>unisave-rest</artifactId>
 	<description>UniSave Rest API</description>
 
-	<properties>
-		<slf4j.version>1.7.25</slf4j.version>
-		<logback.version>1.2.3</logback.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -30,6 +25,10 @@
 				<exclusion>
 					<groupId>org.apache.tomcat</groupId>
 					<artifactId>tomcat-jdbc</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -46,6 +45,10 @@
 				<exclusion>
 					<groupId>com.vaadin.external.google</groupId>
 					<artifactId>android-json</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
 				</exclusion>
 			</exclusions>
 
@@ -91,6 +94,16 @@
 			<groupId>org.uniprot</groupId>
 			<artifactId>common-rest</artifactId>
 			<version>${project.parent.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>jakarta.xml.bind</groupId>
+					<artifactId>jakarta.xml.bind-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
 		</dependency>
 	</dependencies>
 

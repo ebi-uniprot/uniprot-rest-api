@@ -13,14 +13,10 @@
 
 	<properties>
 		<hamcrest-all.version>1.3</hamcrest-all.version>
-		<solrj.version>8.11.2</solrj.version>
 		<poi.version>4.1.0</poi.version>
 		<jaxb.version>2.3.1</jaxb.version>
-		<dropwizard.metrics.version>4.1.9</dropwizard.metrics.version>
 		<micrometer-registry-prometheus.version>1.6.6</micrometer-registry-prometheus.version>
 		<redisson-spring-data-version>3.17.7</redisson-spring-data-version>
-		<testcontainers.version>1.17.6</testcontainers.version>
-		<dev.jna.version>5.8.0</dev.jna.version>
 	</properties>
 
 	<dependencies>
@@ -151,13 +147,6 @@
 			<artifactId>commons-compress</artifactId>
 		</dependency>
 
-
-		<!-- xml marshaller -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>${jaxb.version}</version>
-		</dependency>
 		<!-- OBO Format Writer -->
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
@@ -253,7 +242,7 @@
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>${dev.jna.version}</version>
+			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

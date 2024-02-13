@@ -35,7 +35,6 @@ import com.jayway.jsonpath.JsonPath;
  */
 public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<T> {
 
-    private static final String COMMA = "\\s*,\\s*";
     private static final String PATH_PREFIX = "$..";
     protected final ObjectMapper objectMapper;
 
@@ -201,7 +200,7 @@ public class JsonMessageConverter<T> extends AbstractEntityHttpMessageConverter<
     protected List<ReturnField> getFilterFieldMap(String fields) {
         if (notNullNotEmpty(fields)) {
             List<ReturnField> filters = new ArrayList<>();
-            for (String field : fields.split(COMMA)) {
+            for (String field : fields.replaceAll("\\s", "").split(",")) {
                 filters.add(returnFieldConfig.getReturnFieldByName(field));
             }
             filters.addAll(returnFieldConfig.getRequiredReturnFields());

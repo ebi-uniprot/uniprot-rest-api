@@ -13,16 +13,15 @@
 	<name>uniref-rest</name>
 	<description>UniRef Rest API</description>
 
-	<properties>
-		<awaitility.version>4.2.0</awaitility.version>
-		<testcontainers.version>1.17.6</testcontainers.version>
-		<dev.jna.version>5.8.0</dev.jna.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>uniref-common</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
@@ -74,6 +73,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.uniprot</groupId>
+			<artifactId>uniref-common</artifactId>
+			<version>${project.parent.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
 			<artifactId>uniprot-indexer-integration-test</artifactId>
 			<version>${uniprot-store.version}</version>
 			<scope>test</scope>
@@ -118,7 +124,7 @@
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna</artifactId>
-			<version>${dev.jna.version}</version>
+			<version>${jna.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -20,7 +20,7 @@ import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.job.DownloadJobDetailResponse;
 import org.uniprot.api.rest.output.job.JobStatusResponse;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
-import org.uniprot.api.uniref.request.UniRefDownloadRequest;
+import org.uniprot.api.uniref.common.queue.UniRefDownloadRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

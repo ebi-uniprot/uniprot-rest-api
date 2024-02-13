@@ -36,10 +36,10 @@ import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterReso
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
-import org.uniprot.api.uniref.repository.DataStoreTestConfig;
-import org.uniprot.api.uniref.repository.UniRefQueryRepository;
-import org.uniprot.api.uniref.repository.store.UniRefLightStoreClient;
-import org.uniprot.api.uniref.repository.store.UniRefMemberStoreClient;
+import org.uniprot.api.uniref.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
+import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
+import org.uniprot.api.uniref.common.repository.store.UniRefMemberStoreClient;
 import org.uniprot.core.uniref.RepresentativeMember;
 import org.uniprot.core.uniref.UniRefEntry;
 import org.uniprot.core.uniref.UniRefEntryLight;

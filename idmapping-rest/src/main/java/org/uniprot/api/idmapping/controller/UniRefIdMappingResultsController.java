@@ -1,6 +1,8 @@
 package org.uniprot.api.idmapping.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.UNIREF_ID_MAPPING_PATH;
 import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIREF;
@@ -22,13 +24,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingSearchRequest;
-import org.uniprot.api.idmapping.controller.request.uniref.UniRefIdMappingStreamRequest;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.UniRefEntryPair;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
-import org.uniprot.api.idmapping.service.impl.UniRefIdService;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.request.uniref.UniRefIdMappingSearchRequest;
+import org.uniprot.api.idmapping.common.request.uniref.UniRefIdMappingStreamRequest;
+import org.uniprot.api.idmapping.common.response.model.UniRefEntryPair;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.common.service.impl.UniRefIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -47,14 +49,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @RestController
-@RequestMapping(
-        value =
-                IdMappingJobController.IDMAPPING_PATH
-                        + "/"
-                        + UniRefIdMappingResultsController.UNIREF_ID_MAPPING_PATH)
+@RequestMapping(value = IDMAPPING_PATH + "/" + UNIREF_ID_MAPPING_PATH)
 public class UniRefIdMappingResultsController extends BasicSearchController<UniRefEntryPair> {
     private static final String DATA_TYPE = "uniref";
-    public static final String UNIREF_ID_MAPPING_PATH = "uniref";
+
     private final UniRefIdService idService;
     private final IdMappingJobCacheService cacheService;
 

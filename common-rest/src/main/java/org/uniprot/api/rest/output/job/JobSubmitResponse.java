@@ -2,6 +2,9 @@ package org.uniprot.api.rest.output.job;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author sahmad
@@ -9,6 +12,9 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
+@RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class JobSubmitResponse {
     private final String jobId;
+    private String message;
 }

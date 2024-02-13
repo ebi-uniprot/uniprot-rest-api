@@ -3,7 +3,8 @@ package org.uniprot.api.idmapping.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.JOB_ID_IDMAPPING_DESCRIPTION;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
+import static org.uniprot.api.idmapping.common.service.IdMappingJobService.UNIPARC_ID_MAPPING_PATH;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPARC;
 
@@ -24,13 +25,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.uniprot.api.common.concurrency.Gatekeeper;
 import org.uniprot.api.common.repository.search.QueryResult;
-import org.uniprot.api.idmapping.controller.request.uniparc.UniParcIdMappingSearchRequest;
-import org.uniprot.api.idmapping.controller.request.uniparc.UniParcIdMappingStreamRequest;
-import org.uniprot.api.idmapping.model.IdMappingJob;
-import org.uniprot.api.idmapping.model.IdMappingResult;
-import org.uniprot.api.idmapping.model.UniParcEntryPair;
-import org.uniprot.api.idmapping.service.IdMappingJobCacheService;
-import org.uniprot.api.idmapping.service.impl.UniParcIdService;
+import org.uniprot.api.idmapping.common.model.IdMappingJob;
+import org.uniprot.api.idmapping.common.model.IdMappingResult;
+import org.uniprot.api.idmapping.common.request.uniparc.UniParcIdMappingSearchRequest;
+import org.uniprot.api.idmapping.common.request.uniparc.UniParcIdMappingStreamRequest;
+import org.uniprot.api.idmapping.common.response.model.UniParcEntryPair;
+import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.idmapping.common.service.impl.UniParcIdService;
 import org.uniprot.api.rest.controller.BasicSearchController;
 import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
@@ -50,14 +51,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @Tag(name = TAG_IDMAPPING_RESULT, description = TAG_IDMAPPING_RESULT_DESC)
 @RestController
-@RequestMapping(
-        value =
-                IdMappingJobController.IDMAPPING_PATH
-                        + "/"
-                        + UniParcIdMappingResultsController.UNIPARC_ID_MAPPING_PATH)
+@RequestMapping(value = IDMAPPING_PATH + "/" + UNIPARC_ID_MAPPING_PATH)
 public class UniParcIdMappingResultsController extends BasicSearchController<UniParcEntryPair> {
     private static final String DATA_TYPE = "uniparc";
-    public static final String UNIPARC_ID_MAPPING_PATH = "uniparc";
     private final UniParcIdService idService;
     private final IdMappingJobCacheService cacheService;
 

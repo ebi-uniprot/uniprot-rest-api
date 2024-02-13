@@ -29,6 +29,8 @@ import org.uniprot.api.common.exception.ImportantMessageServiceException;
 import org.uniprot.api.common.exception.InvalidRequestException;
 import org.uniprot.api.common.exception.NoContentException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
+import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
 /** @author lgonzales */
 class ResponseExceptionHandlerTest {
@@ -183,6 +185,35 @@ class ResponseExceptionHandlerTest {
         assertNotNull(errorMessage.getMessages());
         assertEquals(1, errorMessage.getMessages().size());
         assertThat(errorMessage.getMessages().get(0), containsString(message));
+    }
+
+    @Test
+    void handleIllegalDownloadJobSubmissionException() {
+        // when
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
+
+        String message = "message describing error";
+        String jobId = "jobId";
+        IllegalDownloadJobSubmissionException error =
+                new IllegalDownloadJobSubmissionException(jobId, message);
+
+        ResponseEntity<JobSubmitResponse> responseEntity =
+                errorHandler.handleIllegalDownloadJobSubmissionException(error, request);
+
+        // then
+        assertNotNull(responseEntity);
+        assertNotNull(responseEntity.getStatusCode());
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+
+        assertNotNull(responseEntity.getHeaders());
+        assertEquals(1, responseEntity.getHeaders().size());
+        assertEquals(MediaType.APPLICATION_JSON, responseEntity.getHeaders().getContentType());
+
+        assertNotNull(responseEntity.getBody());
+        JobSubmitResponse body = responseEntity.getBody();
+        assertSame(jobId, body.getJobId());
+        assertSame(message, body.getMessage());
     }
 
     @Test
