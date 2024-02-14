@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class ProteomeBasicRequest {
 
-    @Parameter(description = QUERY_DESCRIPTION)
+    @Parameter(description = QUERY_PROTEOME_DESCRIPTION, example = QUERY_PROTEOME_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -29,11 +29,11 @@ public class ProteomeBasicRequest {
             messagePrefix = "search.proteome")
     private String query;
 
-    @Parameter(description = SORT_DESCRIPTION)
+    @Parameter(description = SORT_PROTEOME_DESCRIPTION, example = SORT_PROTEOME_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String sort;
 
-    @Parameter(description = FIELDS_DESCRIPTION)
+    @Parameter(description = FIELDS_PROTEOME_DESCRIPTION, example = FIELDS_PROTEOME_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
     private String fields;
 

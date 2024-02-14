@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 @Data
 public class GeneCentricBasicRequest {
 
-    @Parameter(description = QUERY_DESCRIPTION)
+    @Parameter(description = QUERY_GENECENTRIC_DESCRIPTION, example = QUERY_GENECENTRIC_EXAMPLE)
     @NotNull(message = "{search.required}")
     @ValidSolrQuerySyntax(message = "{search.invalid.query}")
     @ValidSolrQueryFields(
@@ -29,11 +29,11 @@ public class GeneCentricBasicRequest {
             messagePrefix = "search.genecentric")
     private String query;
 
-    @Parameter(description = SORT_DESCRIPTION)
+    @Parameter(description = SORT_GENECENTRIC_EXAMPLE, example = SORT_GENECENTRIC_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String sort;
 
-    @Parameter(description = FIELDS_DESCRIPTION)
+    @Parameter(description = FIELDS_GENECENTRIC_DESCRIPTION, example = FIELDS_GENECENTRIC_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String fields;
 

@@ -116,11 +116,6 @@ public class OpenApiConstants {
     public static final String GROUP_TAXONOMY_DESCRIPTION =
             "List of taxonomy groups with respect to the given query and parent";
 
-    // Proteome
-    public static final String UPID_PROTEOME_DESCRIPTION =
-            "Unique identifier for the Proteome entry";
-    public static final String UPID_PROTEOME_EXAMPLE = "UP000005640";
-
     // Id Mapping
     public static final String JOB_ID_IDMAPPING_DESCRIPTION = "Unique identifier for idmapping job";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB = "downloadJob";
@@ -207,6 +202,19 @@ public class OpenApiConstants {
     public static final String UPID_GENECENTRIC_OPERATION = "Retrieve all proteins of Proteome id.";
     public static final String ID_GENECENTRIC_OPERATION =
             "Retrieve an gene centric entry by uniprot accession.";
+    public static final String QUERY_GENECENTRIC_DESCRIPTION =
+            "Criteria to search gene centric. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+    public static final String QUERY_GENECENTRIC_EXAMPLE = "gene:APP";
+    public static final String SORT_GENECENTRIC_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_GENECENTRIC_EXAMPLE = "organism_name asc";
+    public static final String FIELDS_GENECENTRIC_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_GENECENTRIC_EXAMPLE = "accession,gene_name,proteome_id";
 
     // Proteome
     public static final String TAG_PROTEOME = "Proteome";
@@ -218,6 +226,23 @@ public class OpenApiConstants {
     public static final String ID_PROTEOME_OPERATION = "Retrieve an Proteome entry by upid.";
     public static final String STREAM_PROTEOME_OPERATION =
             "Stream proteomes entry (or entries) via search.";
+    public static final String UPID_PROTEOME_DESCRIPTION =
+            "Unique identifier for the Proteome entry";
+    public static final String UPID_PROTEOME_EXAMPLE = "UP000005640";
+
+    public static final String QUERY_PROTEOME_DESCRIPTION =
+            "Criteria to search proteomes. "
+                    + QUERY_ADVANCED
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+    public static final String QUERY_PROTEOME_EXAMPLE = "eukaryota";
+    public static final String SORT_PROTEOME_DESCRIPTION =
+            SORT_DESCRIPTION
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
+    public static final String SORT_PROTEOME_EXAMPLE = "organism_name asc";
+    public static final String FIELDS_PROTEOME_DESCRIPTION =
+            FIELDS_DESCRIPTION
+                    + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
+    public static final String FIELDS_PROTEOME_EXAMPLE = "upid,organism,organism_id";
 
     // Support date Keywords
     public static final String TAG_KEYWORDS = "Keywords";

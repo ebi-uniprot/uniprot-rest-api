@@ -29,7 +29,7 @@ public class GeneCentricUPIdRequest {
             message = "{search.invalid.upid.value}")
     private String upid;
 
-    @Parameter(description = FIELDS_DESCRIPTION)
+    @Parameter(description = FIELDS_GENECENTRIC_DESCRIPTION, example = FIELDS_GENECENTRIC_EXAMPLE)
     @ValidReturnFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String fields;
 

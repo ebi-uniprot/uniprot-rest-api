@@ -153,7 +153,9 @@ public class ProteomeController extends BasicSearchController<ProteomeEntry> {
                             message = "{search.invalid.upid.value}")
                     String upid,
             @ValidReturnFields(uniProtDataType = UniProtDataType.PROTEOME)
-                    @Parameter(description = FIELDS_DESCRIPTION)
+                    @Parameter(
+                            description = FIELDS_PROTEOME_DESCRIPTION,
+                            example = FIELDS_PROTEOME_EXAMPLE)
                     @RequestParam(value = "fields", required = false)
                     String fields,
             HttpServletRequest request) {
