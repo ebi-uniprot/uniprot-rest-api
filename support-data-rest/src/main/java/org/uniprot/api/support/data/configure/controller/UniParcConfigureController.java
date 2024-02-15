@@ -36,6 +36,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPARC_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -57,6 +58,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPARC_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
@@ -78,6 +80,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPARC_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(
@@ -99,6 +102,7 @@ public class UniParcConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPARC_ENTRY_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(

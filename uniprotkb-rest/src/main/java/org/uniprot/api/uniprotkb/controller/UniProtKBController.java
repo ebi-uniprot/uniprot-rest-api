@@ -323,6 +323,7 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = IDS_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
@@ -372,8 +373,8 @@ public class UniProtKBController extends BasicSearchController<UniProtKBEntry> {
                 GFF_MEDIA_TYPE_VALUE
             })
     @Operation(
-            summary = IDS_UNIPROTKB_OPERATION,
             hidden = true,
+            summary = IDS_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
                         content = {

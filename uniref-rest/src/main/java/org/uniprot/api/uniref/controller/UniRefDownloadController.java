@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * @author tibrahim
  * @created 14/08/2023
  */
-@Tag(name = TAG_UNIREF, description = TAG_UNIREF_DESC)
+@Tag(name = TAG_UNIREF_JOB, description = TAG_UNIREF_JOB_DESC)
 @RestController
 @RequestMapping(value = DOWNLOAD_RESOURCE)
 public class UniRefDownloadController extends BasicDownloadController {

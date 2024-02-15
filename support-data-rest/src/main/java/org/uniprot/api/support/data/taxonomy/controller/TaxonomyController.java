@@ -118,6 +118,7 @@ public class TaxonomyController extends BasicSearchController<TaxonomyEntry> {
     }
 
     @Operation(
+            hidden = true,
             summary = IDS_TAX_OPERATION,
             responses = {
                 @ApiResponse(

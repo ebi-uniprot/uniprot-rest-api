@@ -31,6 +31,7 @@ public class IdMappingConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_IDMAPPING_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(

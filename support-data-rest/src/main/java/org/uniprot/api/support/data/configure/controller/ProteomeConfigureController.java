@@ -37,6 +37,7 @@ public class ProteomeConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_PROTEOME_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -58,6 +59,7 @@ public class ProteomeConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_PROTEOME_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(

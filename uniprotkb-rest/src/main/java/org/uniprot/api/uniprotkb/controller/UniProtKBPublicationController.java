@@ -77,6 +77,7 @@ public class UniProtKBPublicationController extends BasicSearchController<Public
             value = "/{accession}/publications",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @Operation(
+            hidden = true,
             summary = PUBLICATION_UNIPROTKB_OPERATION,
             description = PUBLICATION_UNIPROTKB_OPERATION_DESC,
             responses = {

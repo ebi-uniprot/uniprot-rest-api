@@ -37,6 +37,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPROTKB_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
@@ -58,6 +59,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPROTKB_ANNOTATION_OPERATION,
             responses = {
                 @ApiResponse(
@@ -78,6 +80,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPROTKB_GO_OPERATION,
             responses = {
                 @ApiResponse(
@@ -98,6 +101,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPROTKB_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(
@@ -118,6 +122,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPROTKB_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -139,6 +144,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPROTKB_ALL_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(
@@ -160,6 +166,7 @@ public class UniProtKBConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIPROTKB_EVID_DATABASE_OPERATION,
             responses = {
                 @ApiResponse(

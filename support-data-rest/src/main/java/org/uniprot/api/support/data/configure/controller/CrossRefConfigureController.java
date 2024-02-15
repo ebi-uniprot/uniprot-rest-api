@@ -35,6 +35,7 @@ public class CrossRefConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_CROSSREF_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -56,6 +57,7 @@ public class CrossRefConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_CROSSREF_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(

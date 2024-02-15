@@ -35,6 +35,7 @@ public class SubcellularLocationConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_SUBCEL_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -56,6 +57,7 @@ public class SubcellularLocationConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_SUBCEL_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(

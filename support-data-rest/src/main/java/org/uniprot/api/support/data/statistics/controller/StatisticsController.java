@@ -30,6 +30,7 @@ public class StatisticsController {
     }
 
     @Operation(
+            hidden = true,
             summary = "Get release statistics by UniProt release name and statistics type.",
             responses = {
                 @ApiResponse(

@@ -36,7 +36,8 @@ public class GroupByTaxonomyController extends GroupByController {
         this.uniProtKBGroupByTaxonomyService = uniProtKBGroupByTaxonomyService;
     }
 
-    @Operation(summary = GROUP_TAXONOMY_DESCRIPTION)
+    @Operation(hidden = true,
+            summary = GROUP_TAXONOMY_DESCRIPTION)
     @ApiResponse(
             content =
                     @Content(

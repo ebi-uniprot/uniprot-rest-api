@@ -35,6 +35,7 @@ public class DiseaseConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_DISEASE_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -56,6 +57,7 @@ public class DiseaseConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_DISEASE_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(

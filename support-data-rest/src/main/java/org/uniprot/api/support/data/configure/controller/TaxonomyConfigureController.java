@@ -35,6 +35,7 @@ public class TaxonomyConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_TAXONOMY_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -56,6 +57,7 @@ public class TaxonomyConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_TAXONOMY_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(

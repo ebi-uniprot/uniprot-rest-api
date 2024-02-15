@@ -247,6 +247,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = ACCESSION_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
@@ -283,6 +284,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = DBID_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
@@ -330,6 +332,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = PROTEOME_UPID_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
@@ -370,6 +373,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
             value = "/bestguess",
             produces = {APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE, FASTA_MEDIA_TYPE_VALUE})
     @Operation(
+            hidden = true,
             summary = BEST_GUESS_UNIPARC_OPERATION,
             description = BEST_GUESS_UNIPARC_OPERATION_DESC,
             responses = {
@@ -409,6 +413,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 LIST_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = SEQUENCE_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(
@@ -447,6 +452,7 @@ public class UniParcController extends BasicSearchController<UniParcEntry> {
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = IDS_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(

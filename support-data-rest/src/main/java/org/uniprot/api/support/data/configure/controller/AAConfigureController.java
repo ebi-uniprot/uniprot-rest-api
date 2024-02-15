@@ -37,6 +37,7 @@ public class AAConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIRULE_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -58,6 +59,7 @@ public class AAConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIRULE_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
@@ -79,6 +81,7 @@ public class AAConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_ARBA_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(
@@ -100,6 +103,7 @@ public class AAConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_ARBA_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(

@@ -36,6 +36,7 @@ public class UtilController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UTIL_QUERY_PARSER_OPERATION,
             responses = {
                 @ApiResponse(

@@ -9,6 +9,7 @@ import javax.validation.constraints.Positive;
 
 import lombok.Data;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.springdoc.api.annotations.ParameterObject;
 
 /**
  * Created 27/03/20
@@ -24,6 +25,7 @@ public class UniSaveRequest {
     public static final Pattern VERSION_PART_PATTERN_REGEX = Pattern.compile(VERSION_PART_PATTERN);
 
     @Data
+    @ParameterObject
     public static class Entries {
         @Parameter(hidden = true)
         private String accession;
@@ -42,6 +44,7 @@ public class UniSaveRequest {
     }
 
     @Data
+    @ParameterObject
     public static class Diff {
         @Parameter(description = VERSION1_UNISAVE_DESCRIPTION)
         @NotNull(message = "{search.required}")

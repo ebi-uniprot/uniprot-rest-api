@@ -74,6 +74,11 @@
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 		<!-- tests -->
 		<dependency>
 			<groupId>org.uniprot</groupId>

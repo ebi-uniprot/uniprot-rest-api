@@ -66,6 +66,7 @@ public class UniParcDatabaseController extends BasicSearchController<UniParcCros
             value = "/{upi}/databases",
             produces = {TSV_MEDIA_TYPE_VALUE, APPLICATION_JSON_VALUE, XLS_MEDIA_TYPE_VALUE})
     @Operation(
+            hidden = true,
             summary = DATABASES_UNIPARC_OPERATION,
             responses = {
                 @ApiResponse(

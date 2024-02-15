@@ -35,6 +35,7 @@ public class KeywordConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_KEYWORD_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -56,6 +57,7 @@ public class KeywordConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_KEYWORD_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(

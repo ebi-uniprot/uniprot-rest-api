@@ -29,7 +29,7 @@ public class GeneCentricBasicRequest {
             messagePrefix = "search.genecentric")
     private String query;
 
-    @Parameter(description = SORT_GENECENTRIC_EXAMPLE, example = SORT_GENECENTRIC_EXAMPLE)
+    @Parameter(description = SORT_GENECENTRIC_DESCRIPTION, example = SORT_GENECENTRIC_EXAMPLE)
     @ValidSolrSortFields(uniProtDataType = UniProtDataType.GENECENTRIC)
     private String sort;
 

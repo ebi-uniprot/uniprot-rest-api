@@ -37,6 +37,7 @@ public class UniRefConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIREF_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -58,6 +59,7 @@ public class UniRefConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_UNIREF_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(

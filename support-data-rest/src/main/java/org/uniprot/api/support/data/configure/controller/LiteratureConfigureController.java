@@ -40,6 +40,7 @@ public class LiteratureConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_LITERATURE_FIELDS_OPERATION,
             responses = {
                 @ApiResponse(
@@ -61,6 +62,7 @@ public class LiteratureConfigureController {
     }
 
     @Operation(
+            hidden = true,
             summary = CONFIG_LITERATURE_SEARCH_OPERATION,
             responses = {
                 @ApiResponse(

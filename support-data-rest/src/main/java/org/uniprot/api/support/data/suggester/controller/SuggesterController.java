@@ -38,6 +38,7 @@ public class SuggesterController {
     }
 
     @Operation(
+            hidden = true,
             summary = SUGGESTER_OPERATION,
             responses = {
                 @ApiResponse(

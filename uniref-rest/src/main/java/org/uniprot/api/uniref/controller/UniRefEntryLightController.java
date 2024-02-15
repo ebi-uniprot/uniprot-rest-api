@@ -258,6 +258,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
                 XLS_MEDIA_TYPE_VALUE
             })
     @Operation(
+            hidden = true,
             summary = IDS_UNIREF_LIGHT_OPERATION,
             responses = {
                 @ApiResponse(

@@ -77,6 +77,7 @@ public class UniProtKBInteractionController extends BasicSearchController<Intera
             value = "/{accession}/interactions",
             produces = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_XML_VALUE})
     @Operation(
+            hidden = true,
             summary = INTERACTION_UNIPROTKB_OPERATION,
             responses = {
                 @ApiResponse(
