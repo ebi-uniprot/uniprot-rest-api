@@ -126,7 +126,7 @@ public class OpenApiConstants {
             + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
     public static final String TAG_IDMAPPING_RESULT = "ID Mapping results";
     public static final String TAG_IDMAPPING_RESULT_DESC =
-            "APIs to get result of the submitted job.";
+            "API calls to retrieve the results of a submitted ID Mapping job.";
     public static final String ID_MAPPING_RESULT_OPERATION = "Search result by a submitted job id.";
     public static final String ID_MAPPING_STREAM_OPERATION = "Stream result by a submitted job id.";
     public static final String RUN_IDMAPPING_DOWNLOAD_JOB_OPERATION =
@@ -195,18 +195,18 @@ public class OpenApiConstants {
     public static final String STREAM_CROSSREF_OPERATION =
             "Download cross-reference database entries retrieved by a search query.";
 
-    // Gene Centric
-    public static final String TAG_GENECENTRIC = "Gene centric";
-    public static final String TAG_GENECENTRIC_DESC = "Gene centric services of a proteome, where the set of genes and their products are grouped under a single canonical gene identifier";
+    // GeneCentric
+    public static final String TAG_GENECENTRIC = "GeneCentric";
+    public static final String TAG_GENECENTRIC_DESC = "GeneCentric services of a proteome, where the set of genes and their products are grouped under a single canonical gene identifier";
     public static final String SEARCH_GENECENTRIC_OPERATION =
             "Retrieve GeneCentric entries by a search query.";
     public static final String STREAM_GENECENTRIC_OPERATION =
             "Download GeneCentric entries retrieved by a search query.";
     public static final String UPID_GENECENTRIC_OPERATION = "Retrieve GeneCentric entries of a single Proteome ID.";
     public static final String ID_GENECENTRIC_OPERATION =
-            "Retrieve a gene centric entry by a single UniProtKB accession.";
+            "Retrieve a GeneCentric entry by a single UniProtKB accession.";
     public static final String QUERY_GENECENTRIC_DESCRIPTION =
-            "Criteria to search gene centric. "
+            "Criteria to search GeneCentric. "
                     + QUERY_ADVANCED
                     + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
     public static final String QUERY_GENECENTRIC_EXAMPLE = "gene:APP";
@@ -222,15 +222,13 @@ public class OpenApiConstants {
     // Proteome
     public static final String TAG_PROTEOME = "Proteome";
     public static final String TAG_PROTEOME_DESC =
-            "The Proteomes service provides access to UniProtKB proteomes with"
-                    + " end points to search for proteomes (including reference or redundant proteomes) by UniProt"
-                    + " proteome identifiers, species names or taxonomy identifiers";
-    public static final String SEARCH_PROTEOME_OPERATION = "Retrieve Proteome entries by a search query.";
-    public static final String ID_PROTEOME_OPERATION = "Get Proteome entry by a single upid.";
+            "The Proteomes service offers access to UniProtKB proteomes, allowing users to search for proteomes (including reference or redundant proteomes) using UniProt proteome identifiers, species names, or taxonomy identifiers";
+    public static final String SEARCH_PROTEOME_OPERATION = "Retrieve proteome entries by a search query.";
+    public static final String ID_PROTEOME_OPERATION = "Get proteome entry by a single upid.";
     public static final String STREAM_PROTEOME_OPERATION =
-            "Download Proteome entries retrieved by a search query.";
+            "Download proteome entries retrieved by a search query.";
     public static final String UPID_PROTEOME_DESCRIPTION =
-            "Unique identifier for the Proteome entry";
+            "Unique identifier for the proteome entry";
     public static final String UPID_PROTEOME_EXAMPLE = "UP000005640";
 
     public static final String QUERY_PROTEOME_DESCRIPTION =
