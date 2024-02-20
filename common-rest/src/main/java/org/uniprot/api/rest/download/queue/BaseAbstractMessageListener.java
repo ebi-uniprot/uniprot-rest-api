@@ -32,8 +32,6 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
 
     protected final DownloadConfigProperties downloadConfigProperties;
 
-    private final AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
-
     private final DownloadJobRepository jobRepository;
 
     protected final RabbitTemplate rabbitTemplate;
@@ -41,12 +39,10 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
 
     public BaseAbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
-            AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
             RabbitTemplate rabbitTemplate,
             HeartBeatProducer heartBeatProducer) {
         this.downloadConfigProperties = downloadConfigProperties;
-        this.asyncDownloadQueueConfigProperties = asyncDownloadQueueConfigProperties;
         this.jobRepository = jobRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.heartBeatProducer = heartBeatProducer;
@@ -210,17 +206,11 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
         return getRetryCount(message) >= getMaxRetryCount();
     }
 
-    private int getMaxRetryCount() {
-        return asyncDownloadQueueConfigProperties.getRetryMaxCount();
-    }
+    protected abstract int getMaxRetryCount();
 
-    private String getRejectedQueueName() {
-        return asyncDownloadQueueConfigProperties.getRejectedQueueName();
-    }
+    protected abstract String getRejectedQueueName();
 
-    private String getRetryQueueName() {
-        return asyncDownloadQueueConfigProperties.getRetryQueueName();
-    }
+    protected abstract String getRetryQueueName();
 
     private int getRetryCount(Message message) {
         Integer retryCountHandledError =

@@ -18,21 +18,53 @@ import org.springframework.context.annotation.Profile;
 public class QueueConsumerConfig {
 
     @Bean
-    public MessageListenerContainer messageListenerContainer(
+    public MessageListenerContainer idMappingMessageListenerContainer(
             ConnectionFactory connectionFactory,
-            @Qualifier("DownloadListener") MessageListener messageListener,
-            AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+            @Qualifier("IdMappingDownloadListener") MessageListener messageListener,
+            IdMappingAsyncDownloadQueueConfigProperties configProps) {
 
         SimpleMessageListenerContainer simpleMessageListenerContainer =
                 new SimpleMessageListenerContainer();
         simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
-        simpleMessageListenerContainer.setQueueNames(asyncDownloadQConfigProps.getQueueName());
+        simpleMessageListenerContainer.setQueueNames(configProps.getQueueName());
         simpleMessageListenerContainer.setMessageListener(messageListener);
-        simpleMessageListenerContainer.setConcurrentConsumers(
-                asyncDownloadQConfigProps.getConcurrentConsumers());
+        simpleMessageListenerContainer.setConcurrentConsumers(configProps.getConcurrentConsumers());
         simpleMessageListenerContainer.setDefaultRequeueRejected(false);
-        simpleMessageListenerContainer.setPrefetchCount(
-                asyncDownloadQConfigProps.getPrefetchCount());
+        simpleMessageListenerContainer.setPrefetchCount(configProps.getPrefetchCount());
+        return simpleMessageListenerContainer;
+    }
+
+    @Bean
+    public MessageListenerContainer uniProtKBMessageListenerContainer(
+            ConnectionFactory connectionFactory,
+            @Qualifier("UniProtKBDownloadListener") MessageListener messageListener,
+            UniProtKBAsyncDownloadQueueConfigProperties configProps) {
+
+        SimpleMessageListenerContainer simpleMessageListenerContainer =
+                new SimpleMessageListenerContainer();
+        simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
+        simpleMessageListenerContainer.setQueueNames(configProps.getQueueName());
+        simpleMessageListenerContainer.setMessageListener(messageListener);
+        simpleMessageListenerContainer.setConcurrentConsumers(configProps.getConcurrentConsumers());
+        simpleMessageListenerContainer.setDefaultRequeueRejected(false);
+        simpleMessageListenerContainer.setPrefetchCount(configProps.getPrefetchCount());
+        return simpleMessageListenerContainer;
+    }
+
+    @Bean
+    public MessageListenerContainer uniRefMessageListenerContainer(
+            ConnectionFactory connectionFactory,
+            @Qualifier("UniRefDownloadListener") MessageListener messageListener,
+            UniRefAsyncDownloadQueueConfigProperties configProps) {
+
+        SimpleMessageListenerContainer simpleMessageListenerContainer =
+                new SimpleMessageListenerContainer();
+        simpleMessageListenerContainer.setConnectionFactory(connectionFactory);
+        simpleMessageListenerContainer.setQueueNames(configProps.getQueueName());
+        simpleMessageListenerContainer.setMessageListener(messageListener);
+        simpleMessageListenerContainer.setConcurrentConsumers(configProps.getConcurrentConsumers());
+        simpleMessageListenerContainer.setDefaultRequeueRejected(false);
+        simpleMessageListenerContainer.setPrefetchCount(configProps.getPrefetchCount());
         return simpleMessageListenerContainer;
     }
 }

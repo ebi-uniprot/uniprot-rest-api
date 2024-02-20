@@ -41,7 +41,7 @@ import org.uniprot.store.config.returnfield.factory.ReturnFieldConfigFactory;
 @Setter
 public class UniRefMessageConverterConfig {
     @Bean
-    public WebMvcConfigurer extendedMessageConverters(Gatekeeper downloadGatekeeper) {
+    public WebMvcConfigurer uniRefExtendedMessageConverters(Gatekeeper downloadGatekeeper) {
         return new WebMvcConfigurer() {
             @Override
             public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {

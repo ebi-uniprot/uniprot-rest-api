@@ -49,7 +49,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniref.UniRefRestApplication;
-import org.uniprot.api.uniref.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniref.common.repository.UniRefDataStoreTestConfig;
 import org.uniprot.api.uniref.common.repository.search.UniRefQueryRepository;
 import org.uniprot.api.uniref.common.repository.store.UniRefEntryFacetConfig;
 import org.uniprot.api.uniref.common.repository.store.UniRefLightStoreClient;
@@ -77,7 +77,7 @@ import org.uniprot.store.indexer.uniref.UniRefDocumentConverter;
 @Slf4j
 @ContextConfiguration(
         classes = {
-            DataStoreTestConfig.class,
+            UniRefDataStoreTestConfig.class,
             UniRefRestApplication.class,
             ErrorHandlerConfig.class
         })

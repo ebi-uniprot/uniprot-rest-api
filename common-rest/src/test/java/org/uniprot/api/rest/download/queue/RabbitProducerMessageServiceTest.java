@@ -41,7 +41,7 @@ class RabbitProducerMessageServiceTest {
     @BeforeEach
     void setUp() {
         service =
-                new RabbitProducerMessageService(
+                new UniProtKBRabbitProducerMessageService(
                         converter,
                         rabbitTemplate,
                         jobRepository,

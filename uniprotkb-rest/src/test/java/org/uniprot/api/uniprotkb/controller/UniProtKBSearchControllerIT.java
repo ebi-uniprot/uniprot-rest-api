@@ -55,7 +55,7 @@ import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyEntryTest;
@@ -94,7 +94,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 @ContextConfiguration(
         classes = {
-            DataStoreTestConfig.class,
+            UniProtKBDataStoreTestConfig.class,
             AsyncDownloadMocks.class,
             UniProtKBREST.class,
             ErrorHandlerConfig.class

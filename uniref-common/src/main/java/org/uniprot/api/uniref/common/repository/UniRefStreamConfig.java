@@ -6,7 +6,6 @@ import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
-import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,10 +30,9 @@ import org.uniprot.store.search.SolrCollection;
 @Slf4j
 public class UniRefStreamConfig {
 
-    @Bean
+    @Bean(name = "uniRefTupleStreamTemplate")
     public TupleStreamTemplate tupleStreamTemplate(
             StreamerConfigProperties configProperties,
-            HttpClient httpClient,
             SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
@@ -68,7 +66,7 @@ public class UniRefStreamConfig {
         return new StoreStreamer<>(storeStreamerConfig);
     }
 
-    @Bean
+    @Bean(name = "uniRefStoreStreamerConfig")
     public StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig(
             UniRefLightStoreClient uniRefLightStoreClient,
             TupleStreamTemplate tupleStreamTemplate,
@@ -90,22 +88,22 @@ public class UniRefStreamConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("uniRefStreamerConfigProperties")
     @ConfigurationProperties(prefix = "streamer.uniref")
     public StreamerConfigProperties resultsConfigProperties() {
         return new StreamerConfigProperties();
     }
 
-    @Bean
+    @Bean("uniRefFacetTupleStreamTemplate")
     public FacetTupleStreamTemplate facetTupleStreamTemplate(
-            RepositoryConfigProperties configProperties, HttpClient httpClient) {
+            RepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniref.name())
                 .zookeeperHost(configProperties.getZkHost())
                 .build();
     }
 
-    @Bean
+    @Bean("uniRefDocumentIdStream")
     public TupleStreamDocumentIdStream documentIdStream(
             TupleStreamTemplate tupleStreamTemplate, StreamerConfigProperties streamConfig) {
         return TupleStreamDocumentIdStream.builder()

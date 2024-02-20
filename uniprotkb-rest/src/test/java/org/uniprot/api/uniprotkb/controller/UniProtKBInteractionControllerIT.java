@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
@@ -52,7 +52,11 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
  */
 @Slf4j
 @ContextConfiguration(
-        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
+        classes = {
+            UniProtKBDataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class
+        })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniProtKBInteractionController.class)
 @AutoConfigureWebClient

@@ -32,7 +32,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.core.flatfile.writer.LineType;
@@ -48,7 +48,11 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "offline")
 @SpringBootTest(
-        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
+        classes = {
+            UniProtKBDataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class
+        })
 @WebAppConfiguration
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SearchByDateIT {

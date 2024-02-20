@@ -36,7 +36,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.JobOperation;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.core.uniref.UniRefEntryLight;
@@ -50,7 +50,7 @@ import org.uniprot.store.search.SolrCollection;
  * @since 08/03/2021
  */
 @ActiveProfiles(profiles = {"offline", "idmapping"})
-@ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
+@ContextConfiguration(classes = {IdMappingDataStoreTestConfig.class, IdMappingREST.class})
 @WebMvcTest(UniRefIdMappingResultsController.class)
 @AutoConfigureWebClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

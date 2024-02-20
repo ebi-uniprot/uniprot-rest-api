@@ -5,7 +5,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.AbstractXmlValidationTest;
-import org.uniprot.api.uniparc.common.response.MessageConverterConfig;
+import org.uniprot.api.uniparc.common.response.UniParcMessageConverterConfig;
 import org.uniprot.core.uniparc.UniParcEntry;
 import org.uniprot.store.indexer.uniparc.mockers.UniParcEntryMocker;
 
@@ -18,7 +18,7 @@ class UniParcXmlMessageConverterTest extends AbstractXmlValidationTest<UniParcEn
 
     @Override
     public MessageConverterContext<UniParcEntry> getMessageConverterConfig() {
-        return new MessageConverterConfig()
+        return new UniParcMessageConverterConfig()
                 .uniparcMessageConverterContextFactory()
                 .get(MessageConverterContextFactory.Resource.UNIPARC, MediaType.APPLICATION_XML);
     }

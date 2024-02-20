@@ -29,7 +29,7 @@ import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBIdsPostRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.UniProtKBEntryType;
@@ -45,7 +45,11 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
  * @since 2021-07-127
  */
 @ContextConfiguration(
-        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
+        classes = {
+            UniProtKBDataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class
+        })
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniProtKBPublicationController.class)
 @AutoConfigureWebClient

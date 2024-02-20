@@ -9,7 +9,7 @@ import org.uniprot.api.rest.output.context.MessageConverterContext;
 import org.uniprot.api.rest.output.context.MessageConverterContextFactory;
 import org.uniprot.api.rest.output.converter.AbstractEntityHttpMessageConverter;
 import org.uniprot.api.rest.output.converter.AbstractXmlValidationTest;
-import org.uniprot.api.uniprotkb.common.response.MessageConverterConfig;
+import org.uniprot.api.uniprotkb.common.response.UniProtKBMessageConverterConfig;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.store.indexer.uniprot.mockers.UniProtEntryMocker;
 
@@ -34,7 +34,7 @@ class UniProtKBXmlMessageConverterTest extends AbstractXmlValidationTest<UniProt
 
     @Override
     public MessageConverterContext<UniProtKBEntry> getMessageConverterConfig() {
-        return new MessageConverterConfig()
+        return new UniProtKBMessageConverterConfig()
                 .messageConverterContextFactory()
                 .get(MessageConverterContextFactory.Resource.UNIPROTKB, MediaType.APPLICATION_XML);
     }

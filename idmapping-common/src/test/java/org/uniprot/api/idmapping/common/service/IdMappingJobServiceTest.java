@@ -38,7 +38,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientException;
 import org.uniprot.api.common.exception.ResourceNotFoundException;
-import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
@@ -54,7 +54,11 @@ import org.uniprot.api.rest.request.idmapping.IdMappingJobRequest;
 @ActiveProfiles(profiles = {"offline", "idmapping"})
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
-        classes = {IdMappingJobServiceImpl.class, TestConfig.class, DataStoreTestConfig.class})
+        classes = {
+            IdMappingJobServiceImpl.class,
+            TestConfig.class,
+            IdMappingDataStoreTestConfig.class
+        })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IdMappingJobServiceTest {
     @Autowired private IdMappingJobServiceImpl jobService;

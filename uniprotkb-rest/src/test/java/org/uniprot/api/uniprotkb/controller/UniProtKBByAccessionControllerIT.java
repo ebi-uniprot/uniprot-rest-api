@@ -59,7 +59,7 @@ import org.uniprot.api.rest.service.NTriplesPrologs;
 import org.uniprot.api.rest.service.RdfPrologs;
 import org.uniprot.api.rest.service.TurtlePrologs;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
-import org.uniprot.api.uniprotkb.common.repository.DataStoreTestConfig;
+import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.api.uniprotkb.common.repository.search.UniprotQueryRepository;
 import org.uniprot.api.uniprotkb.common.repository.store.UniProtKBStoreClient;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniSaveClient;
@@ -77,7 +77,11 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 /** @author lgonzales */
 @ContextConfiguration(
-        classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class, UniProtKBREST.class})
+        classes = {
+            UniProtKBDataStoreTestConfig.class,
+            AsyncDownloadMocks.class,
+            UniProtKBREST.class
+        })
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniProtKBController.class)

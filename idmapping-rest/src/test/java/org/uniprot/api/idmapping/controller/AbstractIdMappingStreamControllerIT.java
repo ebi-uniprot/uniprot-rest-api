@@ -21,14 +21,14 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 
 /**
  * @author lgonzales
  * @since 10/03/2021
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
+@ContextConfiguration(classes = {IdMappingDataStoreTestConfig.class, IdMappingREST.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractIdMappingStreamControllerIT extends AbstractIdMappingBasicControllerIT {
 

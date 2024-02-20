@@ -10,6 +10,7 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class IdMappingProducerMessageServiceImpl implements IdMappingProducerMes
 
     public IdMappingProducerMessageServiceImpl(
             MessageConverter converter,
-            RabbitTemplate rabbitTemplate,
+            @Qualifier("idMappingRabbitTemplate") RabbitTemplate rabbitTemplate,
             DownloadJobRepository downloadJobRepository,
             HashGenerator<IdMappingDownloadRequest> idMappingHashGenerator,
             AsyncDownloadSubmissionRules asyncDownloadSubmissionRules,

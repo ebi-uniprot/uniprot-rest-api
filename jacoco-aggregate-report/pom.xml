@@ -102,6 +102,12 @@
 			<version>${uniprot-core.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.uniprot</groupId>
+			<artifactId>async-download-rest</artifactId>
+			<version>1.0.29-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

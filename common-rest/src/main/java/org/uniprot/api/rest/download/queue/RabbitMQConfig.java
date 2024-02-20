@@ -24,8 +24,20 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps() {
-        return new AsyncDownloadQueueConfigProperties();
+    public UniProtKBAsyncDownloadQueueConfigProperties
+            uniProtKBAsyncDownloadQueueConfigProperties() {
+        return new UniProtKBAsyncDownloadQueueConfigProperties();
+    }
+
+    @Bean
+    public IdMappingAsyncDownloadQueueConfigProperties
+            idMappingAsyncDownloadQueueConfigProperties() {
+        return new IdMappingAsyncDownloadQueueConfigProperties();
+    }
+
+    @Bean
+    public UniRefAsyncDownloadQueueConfigProperties uniRefAsyncDownloadQueueConfigProperties() {
+        return new UniRefAsyncDownloadQueueConfigProperties();
     }
 
     @Bean
@@ -39,7 +51,8 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Exchange downloadExchange(AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+    public Exchange downloadExchange(
+            UniProtKBAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return ExchangeBuilder.directExchange(asyncDownloadQConfigProps.getExchangeName())
                 .durable(asyncDownloadQConfigProps.isDurable())
                 .build();
@@ -55,7 +68,8 @@ public class RabbitMQConfig {
      * Else the message is sent to UQ.
      */
     @Bean
-    public Queue downloadQueue(AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+    public Queue downloadQueue(
+            UniProtKBAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return QueueBuilder.durable(asyncDownloadQConfigProps.getQueueName())
                 .deadLetterExchange(asyncDownloadQConfigProps.getExchangeName())
                 .deadLetterRoutingKey(asyncDownloadQConfigProps.getRetryQueueName())
@@ -65,7 +79,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    Queue retryQueue(AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+    Queue retryQueue(UniProtKBAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return QueueBuilder.durable(asyncDownloadQConfigProps.getRetryQueueName())
                 .ttl(asyncDownloadQConfigProps.getRetryDelayInMillis())
                 .deadLetterExchange(asyncDownloadQConfigProps.getExchangeName())
@@ -76,7 +90,7 @@ public class RabbitMQConfig {
 
     // queue where failed messages after maximum retries will end up
     @Bean
-    Queue undeliveredQueue(AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+    Queue undeliveredQueue(UniProtKBAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return QueueBuilder.durable(asyncDownloadQConfigProps.getRejectedQueueName())
                 .quorum()
                 .build();
@@ -86,7 +100,7 @@ public class RabbitMQConfig {
     public Binding downloadBinding(
             Queue downloadQueue,
             Exchange downloadExchange,
-            AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
+            UniProtKBAsyncDownloadQueueConfigProperties asyncDownloadQConfigProps) {
         return BindingBuilder.bind(downloadQueue)
                 .to((DirectExchange) downloadExchange)
                 .with(asyncDownloadQConfigProps.getRoutingKey());

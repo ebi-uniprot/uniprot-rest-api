@@ -29,17 +29,11 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
     public AbstractMessageListener(
             MessageConverter converter,
             DownloadConfigProperties downloadConfigProperties,
-            AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
             HeartBeatProducer heartBeatProducer) {
-        super(
-                downloadConfigProperties,
-                asyncDownloadQueueConfigProperties,
-                jobRepository,
-                rabbitTemplate,
-                heartBeatProducer);
+        super(downloadConfigProperties, jobRepository, rabbitTemplate, heartBeatProducer);
         this.converter = converter;
         this.downloadResultWriter = downloadResultWriter;
     }

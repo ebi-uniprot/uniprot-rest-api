@@ -34,7 +34,7 @@ import org.uniprot.store.search.SolrCollection;
 @Slf4j
 public class UniParcStreamConfig {
 
-    @Bean
+    @Bean("uniParcTupleStreamTemplate")
     public TupleStreamTemplate tupleStreamTemplate(
             StreamerConfigProperties configProperties,
             HttpClient httpClient,
@@ -71,13 +71,13 @@ public class UniParcStreamConfig {
         return new StoreStreamer<>(storeStreamerConfig);
     }
 
-    @Bean
+    @Bean("uniParcStreamerConfigProperties")
     @ConfigurationProperties(prefix = "streamer.uniparc")
     public StreamerConfigProperties resultsConfigProperties() {
         return new StreamerConfigProperties();
     }
 
-    @Bean
+    @Bean("uniParcFacetTupleStreamTemplate")
     public FacetTupleStreamTemplate facetTupleStreamTemplate(
             RepositoryConfigProperties configProperties, HttpClient httpClient) {
         return FacetTupleStreamTemplate.builder()
@@ -86,7 +86,7 @@ public class UniParcStreamConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("uniParcTupleStreamDocumentIdStream")
     public TupleStreamDocumentIdStream documentIdStream(
             TupleStreamTemplate tupleStreamTemplate, StreamerConfigProperties streamConfig) {
         return TupleStreamDocumentIdStream.builder()

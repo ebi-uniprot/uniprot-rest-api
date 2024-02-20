@@ -55,9 +55,10 @@ public class ResultsConfig {
                 config.getHttphost());
     }
 
-    @Bean
+    @Bean("uniProtKBTupleStream")
     public TupleStreamTemplate tupleStreamTemplate(
-            StreamerConfigProperties configProperties,
+            @Qualifier("uniProtKBStreamerConfigProperties")
+                    StreamerConfigProperties configProperties,
             @Qualifier("uniProtKBSolrClient") SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
@@ -75,10 +76,10 @@ public class ResultsConfig {
     }
 
     @Bean
-    public StoreStreamerConfig<UniProtKBEntry> storeStreamerConfig(
+    public StoreStreamerConfig<UniProtKBEntry> uniProtKBStoreStreamerConfig(
             UniProtKBStoreClient uniProtClient,
-            TupleStreamTemplate tupleStreamTemplate,
-            @Qualifier("streamConfig") StreamerConfigProperties streamConfig,
+            @Qualifier("uniProtKBTupleStream") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
             TupleStreamDocumentIdStream documentIdStream) {
 
         RetryPolicy<Object> storeRetryPolicy =
@@ -96,16 +97,16 @@ public class ResultsConfig {
                 .build();
     }
 
-    @Bean(name = "streamConfig")
+    @Bean(name = "uniProtKBStreamerConfigProperties")
     @ConfigurationProperties(prefix = "streamer.uniprot")
     public StreamerConfigProperties resultsConfigProperties() {
         return new StreamerConfigProperties();
     }
 
-    @Bean
+    @Bean("uniProtKBTupleStreamDocumentIdStream")
     public TupleStreamDocumentIdStream documentIdStream(
-            TupleStreamTemplate tupleStreamTemplate,
-            @Qualifier("streamConfig") StreamerConfigProperties streamConfig) {
+            @Qualifier("uniProtKBTupleStream") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig) {
         return TupleStreamDocumentIdStream.builder()
                 .tupleStreamTemplate(tupleStreamTemplate)
                 .streamConfig(streamConfig)

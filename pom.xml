@@ -81,6 +81,7 @@
 		<module>help-centre-rest</module>
 		<module>benchmark-rest</module>
 		<module>jacoco-aggregate-report</module>
+		<module>async-download-rest</module>
 	</modules>
 
 	<dependencyManagement>

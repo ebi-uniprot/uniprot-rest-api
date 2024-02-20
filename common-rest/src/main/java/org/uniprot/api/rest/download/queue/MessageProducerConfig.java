@@ -23,15 +23,39 @@ public class MessageProducerConfig {
     @Value("${async.download.hash.salt}")
     private String hashSalt;
 
-    @Bean
-    public RabbitTemplate rabbitTemplate(
+    @Bean("uniProtKBRabbitTemplate")
+    public RabbitTemplate uniProtKBRabbitTemplate(
             ConnectionFactory connectionFactory,
-            AsyncDownloadQueueConfigProperties asyncDownloadQConfigProps,
+            UniProtKBAsyncDownloadQueueConfigProperties uniProtKBAsyncDownloadQueueConfigProperties,
             MessageConverter jsonMessageConverter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(jsonMessageConverter);
-        template.setExchange(asyncDownloadQConfigProps.getExchangeName());
-        template.setRoutingKey(asyncDownloadQConfigProps.getRoutingKey());
+        template.setExchange(uniProtKBAsyncDownloadQueueConfigProperties.getExchangeName());
+        template.setRoutingKey(uniProtKBAsyncDownloadQueueConfigProperties.getRoutingKey());
+        return template;
+    }
+
+    @Bean("uniRefRabbitTemplate")
+    public RabbitTemplate uniRefRabbitTemplate(
+            ConnectionFactory connectionFactory,
+            UniRefAsyncDownloadQueueConfigProperties uniRefAsyncDownloadQueueConfigProperties,
+            MessageConverter jsonMessageConverter) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(jsonMessageConverter);
+        template.setExchange(uniRefAsyncDownloadQueueConfigProperties.getExchangeName());
+        template.setRoutingKey(uniRefAsyncDownloadQueueConfigProperties.getRoutingKey());
+        return template;
+    }
+
+    @Bean("idMappingRabbitTemplate")
+    public RabbitTemplate idMappingRabbitTemplate(
+            ConnectionFactory connectionFactory,
+            IdMappingAsyncDownloadQueueConfigProperties idMappingAsyncDownloadQueueConfigProperties,
+            MessageConverter jsonMessageConverter) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(jsonMessageConverter);
+        template.setExchange(idMappingAsyncDownloadQueueConfigProperties.getExchangeName());
+        template.setRoutingKey(idMappingAsyncDownloadQueueConfigProperties.getRoutingKey());
         return template;
     }
 

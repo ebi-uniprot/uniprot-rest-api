@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.uniprot.api.common.repository.search.facet.FacetConfig;
 import org.uniprot.api.idmapping.IdMappingREST;
-import org.uniprot.api.idmapping.common.DataStoreTestConfig;
+import org.uniprot.api.idmapping.common.IdMappingDataStoreTestConfig;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -39,7 +39,7 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  * @author lgonzales
  * @since 26/02/2021
  */
-@ContextConfiguration(classes = {DataStoreTestConfig.class, IdMappingREST.class})
+@ContextConfiguration(classes = {IdMappingDataStoreTestConfig.class, IdMappingREST.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractIdMappingResultsControllerIT extends AbstractIdMappingBasicControllerIT {
 
