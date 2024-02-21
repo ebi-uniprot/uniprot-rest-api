@@ -28,9 +28,9 @@ public class OpenAPIConstants {
     public static final String TAG_UNIPROTKB_JOB_DESC =
             "UniProtKB asynchronous download jobs are different from \"normal\" downloads offered via stream. "
                     + "First, a separate file must be generated for download. "
-                    + "Much like <tt>ID Mapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
+                    + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
-                    + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+                    + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
 
     public static final String SEARCH_UNIPROTKB_OPERATION =
             "Retrieve UniProtKB entries by a search query.";
@@ -123,9 +123,9 @@ public class OpenAPIConstants {
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC =
             "ID Mapping asynchronous download jobs are different from \"normal\" downloads offered via stream. "
                     + "First, a separate file must be generated for download. "
-                    + "Much like <tt>ID Mapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
+                    + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
-                    + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+                    + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
     public static final String TAG_IDMAPPING_RESULT = "ID Mapping results";
     public static final String TAG_IDMAPPING_RESULT_DESC =
             "API calls to retrieve the results of a submitted ID Mapping job.";
@@ -603,9 +603,9 @@ public class OpenAPIConstants {
     public static final String TAG_UNIREF_JOB_DESC =
             "UniRef asynchronous download jobs are different from \"normal\" downloads offered via stream. "
                     + "First, a separate file must be generated for download. "
-                    + "Much like <tt>ID Mapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
+                    + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
-                    + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+                    + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
     public static final String ID_UNIREF_MEMBER_OPERATION =
             "Retrieve UniRef members by a single cluster id.";
     public static final String ID_UNIREF_OPERATION =
