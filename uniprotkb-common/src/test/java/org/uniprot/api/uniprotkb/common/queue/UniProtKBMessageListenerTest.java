@@ -1,5 +1,20 @@
 package org.uniprot.api.uniprotkb.common.queue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
+import static org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,21 +44,6 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBDownloadRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
-import static org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
-
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UniProtKBMessageListenerTest {
@@ -61,8 +61,7 @@ class UniProtKBMessageListenerTest {
     @Mock private DownloadResultWriter downloadResultWriter;
     @Mock private RabbitTemplate rabbitTemplate;
     @Mock private HeartBeatProducer heartBeatProducer;
-    @Mock
-    private AsyncDownloadFileHandler asyncDownloadFileHandler;
+    @Mock private AsyncDownloadFileHandler asyncDownloadFileHandler;
 
     @InjectMocks private UniProtKBMessageListener uniProtKBMessageListener;
 
@@ -133,7 +132,13 @@ class UniProtKBMessageListenerTest {
 
         // verify the ids file and clean up
         verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
-        verify(jobRepository).update(eq(jobId), argThat(map -> Objects.equals(0, map.get(UPDATE_COUNT)) && Objects.equals(map.get(PROCESSED_ENTRIES), 0)));
+        verify(jobRepository)
+                .update(
+                        eq(jobId),
+                        argThat(
+                                map ->
+                                        Objects.equals(0, map.get(UPDATE_COUNT))
+                                                && Objects.equals(map.get(PROCESSED_ENTRIES), 0)));
         Path idsFilePath = Path.of("target/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
