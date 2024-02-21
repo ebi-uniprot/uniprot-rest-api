@@ -213,7 +213,7 @@ public class OpenAPIConstants {
     public static final String QUERY_GENECENTRIC_DESCRIPTION =
             "Criteria to search GeneCentric. "
                     + QUERY_ADVANCED
-                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_GENECENTRIC_EXAMPLE = "gene:APP";
     public static final String SORT_GENECENTRIC_DESCRIPTION =
             SORT_DESCRIPTION
@@ -240,7 +240,7 @@ public class OpenAPIConstants {
     public static final String QUERY_PROTEOME_DESCRIPTION =
             "Criteria to search proteomes. "
                     + QUERY_ADVANCED
-                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_PROTEOME_EXAMPLE = "eukaryota";
     public static final String SORT_PROTEOME_DESCRIPTION =
             SORT_DESCRIPTION
@@ -273,7 +273,7 @@ public class OpenAPIConstants {
     public static final String QUERY_KEYWORDS_DESCRIPTION =
             "Criteria to search keywords. "
                     + QUERY_ADVANCED
-                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_KEYWORDS_EXAMPLE = "Phosphoprotein";
 
     // Support date diseases
@@ -290,7 +290,7 @@ public class OpenAPIConstants {
     public static final String QUERY_DISEASE_DESCRIPTION =
             "Criteria to search human diseases. "
                     + QUERY_ADVANCED
-                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_DISEASE_EXAMPLE = "Alzheimer";
     public static final String SORT_DISEASE_DESCRIPTION =
             SORT_DESCRIPTION
@@ -325,7 +325,7 @@ public class OpenAPIConstants {
     public static final String QUERY_LIT_DESCRIPTION =
             "Criteria to search literature citations. "
                     + QUERY_ADVANCED
-                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";;
+                    + " <a href='https://rest.uniprot.org/configure/uniprotkb/search-fields'>List of valid search fields</a>";
     public static final String QUERY_LIT_EXAMPLE = "\"genome analysis\"";
     public static final String SORT_LIT_DESCRIPTION =
             SORT_DESCRIPTION
