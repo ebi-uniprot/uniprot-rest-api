@@ -13,6 +13,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.common.params.FacetParams;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ImportantMessageServiceException;
@@ -91,7 +92,8 @@ public class UniProtEntryService
             FacetTupleStreamTemplate facetTupleStreamTemplate,
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
-            TupleStreamDocumentIdStream solrIdStreamer,
+            @Qualifier("uniProtKBTupleStreamDocumentIdStream")
+                    TupleStreamDocumentIdStream solrIdStreamer,
             RdfStreamer uniProtRdfStreamer) {
         super(
                 repository,

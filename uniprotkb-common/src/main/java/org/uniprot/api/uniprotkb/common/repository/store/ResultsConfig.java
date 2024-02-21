@@ -80,7 +80,8 @@ public class ResultsConfig {
             UniProtKBStoreClient uniProtClient,
             @Qualifier("uniProtKBTupleStream") TupleStreamTemplate tupleStreamTemplate,
             @Qualifier("uniProtKBStreamerConfigProperties") StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream) {
+            @Qualifier("uniProtKBTupleStreamDocumentIdStream")
+                    TupleStreamDocumentIdStream documentIdStream) {
 
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()

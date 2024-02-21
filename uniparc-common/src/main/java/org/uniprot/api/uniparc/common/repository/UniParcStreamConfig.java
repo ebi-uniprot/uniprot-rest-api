@@ -8,6 +8,7 @@ import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,8 +37,7 @@ public class UniParcStreamConfig {
 
     @Bean("uniParcTupleStreamTemplate")
     public TupleStreamTemplate tupleStreamTemplate(
-            StreamerConfigProperties configProperties,
-            HttpClient httpClient,
+            @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties configProperties,
             SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
@@ -49,17 +49,22 @@ public class UniParcStreamConfig {
 
     @Bean
     public StoreStreamer<UniParcEntry> uniParcEntryStoreStreamer(
-            UniParcStoreClient uniParcClient,
-            TupleStreamTemplate tupleStreamTemplate,
-            StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream) {
+            StoreStreamerConfig<UniParcEntry> storeStreamerConfig) {
+        return new StoreStreamer<>(storeStreamerConfig);
+    }
 
+    @Bean
+    public StoreStreamerConfig<UniParcEntry> storeStreamerConfig(
+            UniParcStoreClient uniParcClient,
+            @Qualifier("uniParcTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig,
+            @Qualifier("uniParcTupleStreamDocumentIdStream")
+                    TupleStreamDocumentIdStream documentIdStream) {
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
                         .handle(IOException.class)
                         .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
                         .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
-
         StoreStreamerConfig<UniParcEntry> storeStreamerConfig =
                 StoreStreamerConfig.<UniParcEntry>builder()
                         .storeClient(uniParcClient)
@@ -68,7 +73,7 @@ public class UniParcStreamConfig {
                         .storeFetchRetryPolicy(storeRetryPolicy)
                         .documentIdStream(documentIdStream)
                         .build();
-        return new StoreStreamer<>(storeStreamerConfig);
+        return storeStreamerConfig;
     }
 
     @Bean("uniParcStreamerConfigProperties")
@@ -88,7 +93,8 @@ public class UniParcStreamConfig {
 
     @Bean("uniParcTupleStreamDocumentIdStream")
     public TupleStreamDocumentIdStream documentIdStream(
-            TupleStreamTemplate tupleStreamTemplate, StreamerConfigProperties streamConfig) {
+            @Qualifier("uniParcTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniParcStreamerConfigProperties") StreamerConfigProperties streamConfig) {
         return TupleStreamDocumentIdStream.builder()
                 .tupleStreamTemplate(tupleStreamTemplate)
                 .streamConfig(streamConfig)

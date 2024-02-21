@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-import static org.uniprot.api.rest.download.queue.RedisUtil.jobCreatedInRedis;
+import static org.uniprot.api.async.download.queue.common.RedisUtil.jobCreatedInRedis;
 import static org.uniprot.store.indexer.uniref.mockers.UniRefEntryMocker.createEntry;
 
 import java.io.File;
@@ -71,6 +71,7 @@ import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.controller.validator.UniParcIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniProtKBIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniRefIdMappingDownloadRequestValidator;
+import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;
 import org.uniprot.api.idmapping.common.response.model.IdMappingStringPair;
@@ -78,7 +79,6 @@ import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.IdMappingJobService;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
 import org.uniprot.api.rest.output.PredefinedAPIStatus;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.context.FileType;

@@ -16,10 +16,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.uniprot.api.common.repository.search.facet.FacetProperty;
 import org.uniprot.api.proteome.controller.DataStoreTestConfig;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {DataStoreTestConfig.class, AsyncDownloadMocks.class})
+@SpringBootTest(classes = {DataStoreTestConfig.class})
 @ActiveProfiles(profiles = "offline")
 @Import(ProteomeFacetConfig.class)
 class ProteomeFacetConfigTest {

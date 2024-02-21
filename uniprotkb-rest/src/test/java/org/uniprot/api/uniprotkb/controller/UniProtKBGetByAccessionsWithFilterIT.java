@@ -1,13 +1,7 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +30,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
 import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
@@ -55,12 +48,7 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
  * @since 2019-07-26
  */
 @Slf4j
-@ContextConfiguration(
-        classes = {
-            UniProtKBDataStoreTestConfig.class,
-            AsyncDownloadMocks.class,
-            UniProtKBREST.class
-        })
+@ContextConfiguration(classes = {UniProtKBDataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniProtKBPublicationController.class)
 @AutoConfigureWebClient

@@ -30,38 +30,38 @@ public class UniRefRdfStreamerConfig {
     }
 
     @Bean
-    public RdfStreamer unirefRdfStreamer(
-            RdfStreamerConfigProperties unirefRdfStreamerConfigProperties,
-            RdfServiceFactory unirefRdfServiceFactory) {
+    public RdfStreamer uniRefRdfStreamer(
+            RdfStreamerConfigProperties uniRefRdfStreamerConfigProperties,
+            RdfServiceFactory uniRefRdfServiceFactory) {
         return new RdfStreamer(
-                unirefRdfStreamerConfigProperties.getBatchSize(),
+                uniRefRdfStreamerConfigProperties.getBatchSize(),
                 prologProvider,
-                unirefRdfServiceFactory,
-                RdfStreamConfig.rdfRetryPolicy(unirefRdfStreamerConfigProperties),
+                uniRefRdfServiceFactory,
+                RdfStreamConfig.rdfRetryPolicy(uniRefRdfStreamerConfigProperties),
                 rdfEntryCountProvider);
     }
 
     @Bean
-    public RdfServiceFactory unirefRdfServiceFactory(RestTemplate unirefRdfRestTemplate) {
-        return new RdfServiceFactory(unirefRdfRestTemplate, tagPositionProvider);
+    public RdfServiceFactory uniRefRdfServiceFactory(RestTemplate uniRefRdfRestTemplate) {
+        return new RdfServiceFactory(uniRefRdfRestTemplate, tagPositionProvider);
     }
 
     @Bean
-    public RestTemplate unirefRdfRestTemplate(
-            RdfStreamerConfigProperties unirefRdfStreamerConfigProperties) {
+    public RestTemplate uniRefRdfRestTemplate(
+            RdfStreamerConfigProperties uniRefRdfStreamerConfigProperties) {
         ClientHttpRequestFactory factory =
                 new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory());
         RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.setInterceptors(
                 Collections.singletonList(new RequestResponseLoggingInterceptor()));
         restTemplate.setUriTemplateHandler(
-                new DefaultUriBuilderFactory(unirefRdfStreamerConfigProperties.getRequestUrl()));
+                new DefaultUriBuilderFactory(uniRefRdfStreamerConfigProperties.getRequestUrl()));
         return restTemplate;
     }
 
     @Bean
     @ConfigurationProperties(prefix = "uniref.rdf.streamer")
-    public RdfStreamerConfigProperties unirefRdfStreamerConfigProperties() {
+    public RdfStreamerConfigProperties uniRefRdfStreamerConfigProperties() {
         return new RdfStreamerConfigProperties();
     }
 }

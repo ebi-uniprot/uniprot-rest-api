@@ -1,16 +1,14 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.MediaType.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.uniprot.api.rest.output.UniProtMediaType.*;
+import static org.uniprot.api.rest.output.UniProtMediaType.FASTA_MEDIA_TYPE_VALUE;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.util.HashMap;
@@ -52,7 +50,6 @@ import org.uniprot.api.rest.controller.param.GetIdContentTypeParam;
 import org.uniprot.api.rest.controller.param.GetIdParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractGetIdParameterResolver;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.api.rest.service.NTriplesPrologs;
@@ -76,12 +73,7 @@ import org.uniprot.store.search.document.uniprot.UniProtDocument;
 import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 
 /** @author lgonzales */
-@ContextConfiguration(
-        classes = {
-            UniProtKBDataStoreTestConfig.class,
-            AsyncDownloadMocks.class,
-            UniProtKBREST.class
-        })
+@ContextConfiguration(classes = {UniProtKBDataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @AutoConfigureWebClient
 @WebMvcTest(UniProtKBController.class)

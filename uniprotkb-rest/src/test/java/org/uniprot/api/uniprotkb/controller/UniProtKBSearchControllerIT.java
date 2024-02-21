@@ -1,15 +1,10 @@
 package org.uniprot.api.uniprotkb.controller;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.containsString;
 import static org.uniprot.api.uniprotkb.controller.UniProtKBController.UNIPROTKB_RESOURCE;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -49,7 +44,6 @@ import org.uniprot.api.rest.controller.param.SearchContentTypeParam;
 import org.uniprot.api.rest.controller.param.SearchParameter;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchContentTypeParamResolver;
 import org.uniprot.api.rest.controller.param.resolver.AbstractSearchParameterResolver;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.converter.ConverterConstants;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
@@ -95,7 +89,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 @ContextConfiguration(
         classes = {
             UniProtKBDataStoreTestConfig.class,
-            AsyncDownloadMocks.class,
             UniProtKBREST.class,
             ErrorHandlerConfig.class
         })

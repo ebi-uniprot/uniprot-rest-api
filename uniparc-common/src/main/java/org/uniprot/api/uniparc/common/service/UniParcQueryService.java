@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.uniprot.api.common.exception.ServiceException;
@@ -78,7 +79,8 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SearchFieldConfig uniParcSearchFieldConfig,
             RdfStreamer uniparcRdfStreamer,
             FacetTupleStreamTemplate facetTupleStreamTemplate,
-            TupleStreamDocumentIdStream solrIdStreamer) {
+            @Qualifier("uniParcTupleStreamDocumentIdStream")
+                    TupleStreamDocumentIdStream solrIdStreamer) {
 
         super(
                 repository,

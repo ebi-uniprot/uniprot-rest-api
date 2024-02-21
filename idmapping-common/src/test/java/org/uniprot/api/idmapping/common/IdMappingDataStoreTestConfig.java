@@ -8,6 +8,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -37,12 +38,6 @@ public class IdMappingDataStoreTestConfig {
     @Profile("offline")
     public HttpClient idMappingHttpClient() {
         return mock(HttpClient.class);
-    }
-
-    @Bean("uniProtKBSolrClient1")
-    @Profile("offline")
-    public SolrClient uniProtKBSolrClient1() throws URISyntaxException {
-        return mock(SolrClient.class);
     }
 
     @Bean
@@ -102,8 +97,10 @@ public class IdMappingDataStoreTestConfig {
 
     @Bean
     @Profile("offline")
-    public IdMappingRepository idMappingRepo() throws URISyntaxException {
-        return new IdMappingRepository(uniProtKBSolrClient1(), idMappingSolrClient());
+    public IdMappingRepository idMappingRepo(
+            @Qualifier("uniProtKBSolrClient") SolrClient uniProtKBSolrClient)
+            throws URISyntaxException {
+        return new IdMappingRepository(uniProtKBSolrClient, idMappingSolrClient());
     }
 
     @Bean

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.RetryPolicy;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,7 @@ public class UniRefStreamConfig {
 
     @Bean(name = "uniRefTupleStreamTemplate")
     public TupleStreamTemplate tupleStreamTemplate(
-            StreamerConfigProperties configProperties,
+            @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties configProperties,
             SolrClient solrClient,
             SolrRequestConverter requestConverter) {
         return TupleStreamTemplate.builder()
@@ -44,34 +45,16 @@ public class UniRefStreamConfig {
 
     @Bean
     public StoreStreamer<UniRefEntryLight> unirefEntryStoreStreamer(
-            UniRefLightStoreClient uniRefLightStoreClient,
-            TupleStreamTemplate tupleStreamTemplate,
-            StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream) {
-
-        RetryPolicy<Object> storeRetryPolicy =
-                new RetryPolicy<>()
-                        .handle(IOException.class)
-                        .withDelay(Duration.ofMillis(streamConfig.getStoreFetchRetryDelayMillis()))
-                        .withMaxRetries(streamConfig.getStoreFetchMaxRetries());
-
-        StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig =
-                StoreStreamerConfig.<UniRefEntryLight>builder()
-                        .streamConfig(streamConfig)
-                        .storeClient(uniRefLightStoreClient)
-                        .tupleStreamTemplate(tupleStreamTemplate)
-                        .storeFetchRetryPolicy(storeRetryPolicy)
-                        .documentIdStream(documentIdStream)
-                        .build();
+            StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig) {
         return new StoreStreamer<>(storeStreamerConfig);
     }
 
     @Bean(name = "uniRefStoreStreamerConfig")
     public StoreStreamerConfig<UniRefEntryLight> storeStreamerConfig(
             UniRefLightStoreClient uniRefLightStoreClient,
-            TupleStreamTemplate tupleStreamTemplate,
-            StreamerConfigProperties streamConfig,
-            TupleStreamDocumentIdStream documentIdStream) {
+            @Qualifier("uniRefTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig,
+            @Qualifier("uniRefDocumentIdStream") TupleStreamDocumentIdStream documentIdStream) {
 
         RetryPolicy<Object> storeRetryPolicy =
                 new RetryPolicy<>()
@@ -105,7 +88,8 @@ public class UniRefStreamConfig {
 
     @Bean("uniRefDocumentIdStream")
     public TupleStreamDocumentIdStream documentIdStream(
-            TupleStreamTemplate tupleStreamTemplate, StreamerConfigProperties streamConfig) {
+            @Qualifier("uniRefTupleStreamTemplate") TupleStreamTemplate tupleStreamTemplate,
+            @Qualifier("uniRefStreamerConfigProperties") StreamerConfigProperties streamConfig) {
         return TupleStreamDocumentIdStream.builder()
                 .tupleStreamTemplate(tupleStreamTemplate)
                 .streamConfig(streamConfig)

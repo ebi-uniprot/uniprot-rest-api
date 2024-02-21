@@ -45,7 +45,6 @@ import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 import org.uniprot.api.rest.controller.ControllerITUtils;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.validation.error.ErrorHandlerConfig;
@@ -54,7 +53,8 @@ import org.uniprot.api.uniprotkb.common.repository.UniProtKBDataStoreTestConfig;
 import org.uniprot.core.json.parser.taxonomy.TaxonomyJsonConfig;
 import org.uniprot.core.taxonomy.TaxonomyEntry;
 import org.uniprot.core.taxonomy.TaxonomyRank;
-import org.uniprot.core.taxonomy.impl.*;
+import org.uniprot.core.taxonomy.impl.TaxonomyEntryBuilder;
+import org.uniprot.core.taxonomy.impl.TaxonomyLineageBuilder;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 import org.uniprot.core.uniprotkb.impl.UniProtKBEntryBuilder;
 import org.uniprot.store.config.UniProtDataType;
@@ -79,7 +79,6 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
 @ContextConfiguration(
         classes = {
             UniProtKBDataStoreTestConfig.class,
-            AsyncDownloadMocks.class,
             UniProtKBREST.class,
             ErrorHandlerConfig.class
         })

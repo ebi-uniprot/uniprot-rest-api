@@ -44,7 +44,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.controller.AbstractGetByIdsControllerIT;
-import org.uniprot.api.rest.download.AsyncDownloadMocks;
 import org.uniprot.api.rest.output.UniProtMediaType;
 import org.uniprot.api.rest.respository.facet.impl.UniProtKBFacetConfig;
 import org.uniprot.api.uniprotkb.UniProtKBREST;
@@ -71,12 +70,7 @@ import org.uniprot.store.spark.indexer.uniprot.converter.UniProtEntryConverter;
  * @author lgonzales
  * @since 2019-07-10
  */
-@ContextConfiguration(
-        classes = {
-            UniProtKBDataStoreTestConfig.class,
-            AsyncDownloadMocks.class,
-            UniProtKBREST.class
-        })
+@ContextConfiguration(classes = {UniProtKBDataStoreTestConfig.class, UniProtKBREST.class})
 @ActiveProfiles(profiles = "offline")
 @WebMvcTest(UniProtKBPublicationController.class)
 @AutoConfigureWebClient
