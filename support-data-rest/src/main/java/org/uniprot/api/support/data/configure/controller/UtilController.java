@@ -1,9 +1,9 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.TAG_CONFIG;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.TAG_CONFIG_DESC;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG_DESC;
 
 import javax.validation.constraints.NotNull;
 

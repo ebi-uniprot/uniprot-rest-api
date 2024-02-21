@@ -1,6 +1,6 @@
 package org.uniprot.api.uniref.common.service.member.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.request.SearchRequest.MAX_RESULTS_SIZE;
 
 import javax.validation.constraints.Max;

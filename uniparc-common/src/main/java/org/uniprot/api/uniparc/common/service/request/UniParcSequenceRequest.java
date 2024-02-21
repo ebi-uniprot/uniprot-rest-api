@@ -1,6 +1,6 @@
 package org.uniprot.api.uniparc.common.service.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.store.config.UniProtDataType.*;
 import static org.uniprot.store.search.field.validator.FieldRegexConstants.*;
 

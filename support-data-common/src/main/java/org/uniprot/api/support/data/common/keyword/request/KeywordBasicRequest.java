@@ -1,6 +1,6 @@
 package org.uniprot.api.support.data.common.keyword.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.NotNull;
 

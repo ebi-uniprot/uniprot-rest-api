@@ -1,6 +1,6 @@
 package org.uniprot.api.uniprotkb.common.service.publication.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.request.SearchRequest.*;
 
 import javax.validation.constraints.Max;

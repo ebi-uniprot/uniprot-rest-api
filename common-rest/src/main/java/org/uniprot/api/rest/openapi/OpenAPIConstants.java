@@ -1,6 +1,6 @@
 package org.uniprot.api.rest.openapi;
 
-public class OpenApiConstants {
+public class OpenAPIConstants {
 
     public static final String QUERY_ADVANCED =
             "Advanced queries can be built with parentheses and conditionals such as AND/OR/NOT.";

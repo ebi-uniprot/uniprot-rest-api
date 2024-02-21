@@ -1,9 +1,9 @@
 package org.uniprot.api.support.data.configure.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.TAG_CONFIG;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.TAG_CONFIG_DESC;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.TAG_CONFIG_DESC;
 import static org.uniprot.api.support.data.configure.response.AdvancedSearchTerm.PATH_PREFIX_FOR_AUTOCOMPLETE_SEARCH_FIELDS;
 
 import java.util.List;

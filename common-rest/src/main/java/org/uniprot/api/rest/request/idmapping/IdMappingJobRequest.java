@@ -1,6 +1,6 @@
 package org.uniprot.api.rest.request.idmapping;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import java.io.Serializable;
 

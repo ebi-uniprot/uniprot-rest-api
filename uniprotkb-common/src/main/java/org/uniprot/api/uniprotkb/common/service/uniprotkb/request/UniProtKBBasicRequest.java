@@ -1,6 +1,6 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;

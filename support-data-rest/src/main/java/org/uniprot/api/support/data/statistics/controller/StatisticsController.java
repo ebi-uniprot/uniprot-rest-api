@@ -1,7 +1,7 @@
 package org.uniprot.api.support.data.statistics.controller;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import java.util.Set;
 

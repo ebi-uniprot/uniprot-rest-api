@@ -4,7 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 import static org.uniprot.api.idmapping.common.service.IdMappingJobService.IDMAPPING_PATH;
 import static org.uniprot.api.idmapping.common.service.IdMappingJobService.UNIPROTKB_ID_MAPPING_PATH;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 import static org.uniprot.api.rest.output.context.MessageConverterContextFactory.Resource.UNIPROTKB;
 

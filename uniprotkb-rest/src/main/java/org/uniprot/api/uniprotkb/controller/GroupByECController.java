@@ -1,6 +1,6 @@
 package org.uniprot.api.uniprotkb.controller;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.uniprotkb.controller.GroupByECController.GROUP_BY_EC_RESOURCE;
 
 import javax.validation.constraints.Pattern;

@@ -1,6 +1,6 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.FORMAT_UNIPROTKB_DESCRIPTION;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPROTKB_DESCRIPTION;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

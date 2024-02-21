@@ -8,11 +8,11 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.cfg.PackageVersion;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 
-public class ApiDocsAnnotationIntrospector extends JacksonAnnotationIntrospector {
+public class APIDocsAnnotationIntrospector extends JacksonAnnotationIntrospector {
 
     private static final long serialVersionUID = 891330293783978035L;
 
-    public ApiDocsAnnotationIntrospector() {}
+    public APIDocsAnnotationIntrospector() {}
 
     @Override
     public Version version() {

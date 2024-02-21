@@ -1,7 +1,7 @@
 package org.uniprot.api.uniparc.common.service.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-import static org.uniprot.api.rest.openapi.OpenApiConstants.FIELDS_UNIPARC_EXAMPLE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.FIELDS_UNIPARC_EXAMPLE;
 
 import javax.validation.constraints.NotNull;
 

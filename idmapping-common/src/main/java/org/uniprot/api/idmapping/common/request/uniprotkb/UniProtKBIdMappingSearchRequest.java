@@ -1,7 +1,5 @@
 package org.uniprot.api.idmapping.common.request.uniprotkb;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -1,6 +1,6 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.DOWNLOAD_DESCRIPTION;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.DOWNLOAD_DESCRIPTION;
 
 import javax.validation.constraints.Pattern;
 

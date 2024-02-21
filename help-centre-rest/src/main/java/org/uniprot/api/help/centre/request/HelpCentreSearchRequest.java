@@ -1,6 +1,6 @@
 package org.uniprot.api.help.centre.request;
 
-import static org.uniprot.api.rest.openapi.OpenApiConstants.*;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 
 import java.util.stream.Collectors;
 
