@@ -110,7 +110,7 @@ public class APIDocConfig {
     }
 
     private static void cleanStringSerialiserSchemaObjects(Map<String, Schema> schemaMap) {
-        //removing objects that are not being referenced anymore.
+        // removing objects that are not being referenced anymore.
         for (String serialiser : STRING_SERIALISER_LIST) {
             String schemaKey = serialiser.substring(serialiser.lastIndexOf("/") + 1);
             schemaMap.remove(schemaKey);
@@ -125,7 +125,7 @@ public class APIDocConfig {
             }
             if (propSchema.get$ref() != null
                     && STRING_SERIALISER_LIST.contains(propSchema.get$ref())) {
-                //changing type from object to string
+                // changing type from object to string
                 propSchema.set$ref(null);
                 propSchema.type("string");
             }
@@ -144,41 +144,47 @@ public class APIDocConfig {
 
     private void configureCitationSchema(OpenAPI openAPI, Schema citationParent) {
         citationParent.setAllOf(new ArrayList<Schema>());
-        getSchemaReferenceMapForClass(Book.class, citationParent).forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(ElectronicArticle.class, citationParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(JournalArticle.class, citationParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(Literature.class, citationParent).forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(Patent.class, citationParent).forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(Submission.class, citationParent).forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(Thesis.class, citationParent).forEach(openAPI::schema);
+        Map<String, Schema> citations = new HashMap<>();
+        citations.putAll(getSchemaReferenceMapForClass(Book.class, citationParent));
+        citations.putAll(getSchemaReferenceMapForClass(ElectronicArticle.class, citationParent));
+        citations.putAll(getSchemaReferenceMapForClass(JournalArticle.class, citationParent));
+        citations.putAll(getSchemaReferenceMapForClass(Literature.class, citationParent));
+        citations.putAll(getSchemaReferenceMapForClass(Patent.class, citationParent));
+        citations.putAll(getSchemaReferenceMapForClass(Submission.class, citationParent));
+        citations.putAll(getSchemaReferenceMapForClass(Thesis.class, citationParent));
+        citations.entrySet().forEach(entry ->
+            addSchemaToOpenApi(entry, openAPI, "citationType")
+        );
     }
 
     private void configureCommentSchema(OpenAPI openAPI, Schema commentParent) {
         commentParent.setAllOf(new ArrayList<Schema>());
-        getSchemaReferenceMapForClass(AlternativeProductsComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(BPCPComment.class, commentParent).forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(CatalyticActivityComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(CofactorComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(DiseaseComment.class, commentParent).forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(FreeTextComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(InteractionComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(MassSpectrometryComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(RnaEditingComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(SequenceCautionComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(SubcellularLocationComment.class, commentParent)
-                .forEach(openAPI::schema);
-        getSchemaReferenceMapForClass(WebResourceComment.class, commentParent)
-                .forEach(openAPI::schema);
+        Map<String, Schema> comments = new HashMap<>();
+        comments.putAll(
+                getSchemaReferenceMapForClass(AlternativeProductsComment.class, commentParent));
+        comments.putAll(getSchemaReferenceMapForClass(BPCPComment.class, commentParent));
+        comments.putAll(
+                getSchemaReferenceMapForClass(CatalyticActivityComment.class, commentParent));
+        comments.putAll(getSchemaReferenceMapForClass(CofactorComment.class, commentParent));
+        comments.putAll(getSchemaReferenceMapForClass(DiseaseComment.class, commentParent));
+        comments.putAll(getSchemaReferenceMapForClass(FreeTextComment.class, commentParent));
+        comments.putAll(getSchemaReferenceMapForClass(InteractionComment.class, commentParent));
+        comments.putAll(
+                getSchemaReferenceMapForClass(MassSpectrometryComment.class, commentParent));
+        comments.putAll(getSchemaReferenceMapForClass(RnaEditingComment.class, commentParent));
+        comments.putAll(getSchemaReferenceMapForClass(SequenceCautionComment.class, commentParent));
+        comments.putAll(
+                getSchemaReferenceMapForClass(SubcellularLocationComment.class, commentParent));
+        comments.putAll(getSchemaReferenceMapForClass(WebResourceComment.class, commentParent));
+        comments.entrySet().forEach(entry ->
+                addSchemaToOpenApi(entry, openAPI, "commentType")
+        );
+    }
+
+    private static void addSchemaToOpenApi(Map.Entry<String, Schema> entry,OpenAPI openAPI, String cleanFieldName) {
+        Schema value = entry.getValue();
+        value.getProperties().remove(cleanFieldName);
+        openAPI.schema(entry.getKey(), value);
     }
 
     private Map<String, Schema> getSchemaReferenceMapForClass(Class<?> className, Schema parent) {
