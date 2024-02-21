@@ -117,13 +117,15 @@ public class OpenApiConstants {
             "List of taxonomy groups with respect to the given query and parent";
 
     // ID Mapping
-    public static final String JOB_ID_IDMAPPING_DESCRIPTION = "Unique identifier for ID Mapping job";
+    public static final String JOB_ID_IDMAPPING_DESCRIPTION =
+            "Unique identifier for ID Mapping job";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB = "ID Mapping async download";
-    public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC = "ID Mapping asynchronous download jobs are different from \"normal\" downloads offered via stream. "
-            + "First, a separate file must be generated for download. "
-            + "Much like <tt>ID Mapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
-            + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
-            + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+    public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC =
+            "ID Mapping asynchronous download jobs are different from \"normal\" downloads offered via stream. "
+                    + "First, a separate file must be generated for download. "
+                    + "Much like <tt>ID Mapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
+                    + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
+                    + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
     public static final String TAG_IDMAPPING_RESULT = "ID Mapping results";
     public static final String TAG_IDMAPPING_RESULT_DESC =
             "API calls to retrieve the results of a submitted ID Mapping job.";
@@ -136,7 +138,8 @@ public class OpenApiConstants {
     public static final String DETAILS_IDMAPPING_DOWNLOAD_JOB_OPERATION =
             "Get details of ID Mapping asynchronous download job";
     public static final String TAG_IDMAPPING = "ID Mapping job";
-    public static final String TAG_IDMAPPING_DESC = "The ID Mapping service can map between the identifiers used in one database, to the identifiers of another, e.g., from UniProt to Ensembl, or to PomBase, etc. If you map to UniProtKB, UniParc or UniRef data, the full entries will be returned to you for convenience.";
+    public static final String TAG_IDMAPPING_DESC =
+            "The ID Mapping service can map between the identifiers used in one database, to the identifiers of another, e.g., from UniProt to Ensembl, or to PomBase, etc. If you map to UniProtKB, UniParc or UniRef data, the full entries will be returned to you for convenience.";
     public static final String RUN_IDMAPPING_OPERATION = "Submit ID Mapping job.";
     public static final String STATUS_IDMAPPING_OPERATION = "Get status of ID Mapping job.";
     public static final String DETAILS_IDMAPPING_OPERATION = "Get details of ID Mapping job.";
@@ -197,12 +200,14 @@ public class OpenApiConstants {
 
     // GeneCentric
     public static final String TAG_GENECENTRIC = "GeneCentric";
-    public static final String TAG_GENECENTRIC_DESC = "GeneCentric services of a proteome, where the set of genes and their products are grouped under a single canonical gene identifier";
+    public static final String TAG_GENECENTRIC_DESC =
+            "GeneCentric services of a proteome, where the set of genes and their products are grouped under a single canonical gene identifier";
     public static final String SEARCH_GENECENTRIC_OPERATION =
             "Retrieve GeneCentric entries by a search query.";
     public static final String STREAM_GENECENTRIC_OPERATION =
             "Download GeneCentric entries retrieved by a search query.";
-    public static final String UPID_GENECENTRIC_OPERATION = "Retrieve GeneCentric entries of a single Proteome ID.";
+    public static final String UPID_GENECENTRIC_OPERATION =
+            "Retrieve GeneCentric entries of a single Proteome ID.";
     public static final String ID_GENECENTRIC_OPERATION =
             "Retrieve a GeneCentric entry by a single UniProtKB accession.";
     public static final String QUERY_GENECENTRIC_DESCRIPTION =
@@ -223,7 +228,8 @@ public class OpenApiConstants {
     public static final String TAG_PROTEOME = "Proteome";
     public static final String TAG_PROTEOME_DESC =
             "The Proteomes service offers access to UniProtKB proteomes, allowing users to search for proteomes (including reference or redundant proteomes) using UniProt proteome identifiers, species names, or taxonomy identifiers";
-    public static final String SEARCH_PROTEOME_OPERATION = "Retrieve proteome entries by a search query.";
+    public static final String SEARCH_PROTEOME_OPERATION =
+            "Retrieve proteome entries by a search query.";
     public static final String ID_PROTEOME_OPERATION = "Get proteome entry by a single upid.";
     public static final String STREAM_PROTEOME_OPERATION =
             "Download proteome entries retrieved by a search query.";
@@ -542,13 +548,12 @@ public class OpenApiConstants {
     public static final String TAG_ARBA_DESC =
             "The Association-Rule-Based Annotator(ARBA) resource for automatic annotation in the UniProt Knowledgebase ";
     public static final String ID_ARBA_OPERATION = "Get ARBA entry by a single accession.";
-    public static final String SEARCH_ARBA_OPERATION =
-            "Retrieve ARBA entries by a search query.";
+    public static final String SEARCH_ARBA_OPERATION = "Retrieve ARBA entries by a search query.";
     public static final String STREAM_ARBA_OPERATION =
             "Download ARBA entries retrieved by a search query.";
     public static final String ID_ARBA_DESCRIPTION = "Get ARBA entry by an arbaId";
     public static final String FIELDS_ARBA_DESCRIPTION =
-    FIELDS_DESCRIPTION
+            FIELDS_DESCRIPTION
                     + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String ID_ARBA_EXAMPLE = "ARBA00000063";
     public static final String FIELDS_ARBA_EXAMPLE = "rule_id,statistics,annotation_covered";
@@ -573,7 +578,8 @@ public class OpenApiConstants {
             FIELDS_DESCRIPTION
                     + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String ID_UNIRULE_EXAMPLE = "UR000000076";
-    public static final String FIELDS_UNIRULE_EXAMPLE = "rule_id,statistics,taxonomic_scope,annotation_covered";
+    public static final String FIELDS_UNIRULE_EXAMPLE =
+            "rule_id,statistics,taxonomic_scope,annotation_covered";
     public static final String SEARCH_UNIRULE_OPERATION =
             "Retrieve UniRule entries by a search query.";
     public static final String STREAM_UNIRULE_OPERATION =
@@ -594,25 +600,31 @@ public class OpenApiConstants {
     public static final String TAG_UNIREF_DESC =
             "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.";
     public static final String TAG_UNIREF_JOB = "UniRef async download";
-    public static final String TAG_UNIREF_JOB_DESC = "UniRef asynchronous download jobs are different from \"normal\" downloads offered via stream. "
-            + "First, a separate file must be generated for download. "
-            + "Much like <tt>ID Mapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
-            + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
-            + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+    public static final String TAG_UNIREF_JOB_DESC =
+            "UniRef asynchronous download jobs are different from \"normal\" downloads offered via stream. "
+                    + "First, a separate file must be generated for download. "
+                    + "Much like <tt>ID Mapping</tt> services at UniProt, this file generation request can be submitted via the <tt>run</tt> post request, "
+                    + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
+                    + "When the file generation job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
     public static final String ID_UNIREF_MEMBER_OPERATION =
             "Retrieve UniRef members by a single cluster id.";
-    public static final String ID_UNIREF_OPERATION = "Retrieve a light object of UniRef cluster by a single cluster id.";
+    public static final String ID_UNIREF_OPERATION =
+            "Retrieve a light object of UniRef cluster by a single cluster id.";
     public static final String JOB_ID_UNIREF_DESCRIPTION = JOB_ID_DESCRIPTION;
-    public static final String JOB_RUN_UNIREF_OPERATION = "Submit UniRef asynchronous download job.";
-    public static final String JOB_STATUS_UNIREF_OPERATION = "Get progress of UniRef asynchronous download job.";
-    public static final String JOB_DETAILS_UNIREF_OPERATION = "Get details of UniRef asynchronous download job.";
+    public static final String JOB_RUN_UNIREF_OPERATION =
+            "Submit UniRef asynchronous download job.";
+    public static final String JOB_STATUS_UNIREF_OPERATION =
+            "Get progress of UniRef asynchronous download job.";
+    public static final String JOB_DETAILS_UNIREF_OPERATION =
+            "Get details of UniRef asynchronous download job.";
     public static final String ID_UNIREF_LIGHT_OPERATION =
             "Retrieve a light object of UniRef cluster by id.";
     public static final String SEARCH_UNIREF_LIGHT_OPERATION =
             "Retrieve a light object of UniRef cluster by a search query.";
     public static final String STREAM_UNIREF_LIGHT_OPERATION =
             "Download a light object of UniRef cluster retrieved by a search query.";
-    public static final String IDS_UNIREF_LIGHT_OPERATION = "Get UniRef entries by a list of cluster ids.";
+    public static final String IDS_UNIREF_LIGHT_OPERATION =
+            "Get UniRef entries by a list of cluster ids.";
     public static final String ID_UNIREF_DESCRIPTION = "Unique identifier for the UniRef cluster";
     public static final String ID_UNIREF_EXAMPLE = "UniRef100_P05067";
     public static final String FIELDS_UNIREF_DESCRIPTION =
@@ -629,8 +641,10 @@ public class OpenApiConstants {
                     + " <a href='https://rest.uniprot.org/configure/uniprotkb/sort'>List of valid sort fields</a>";
     public static final String COMPLETE_UNIREF_DESCRIPTION =
             "Flag to include all member ids and organisms, or not. By default, it returns a maximum of 10 member ids and organisms";
-    public static final String IDS_UNIREF_DESCRIPTION = "Comma separated list of UniRef cluster ids";
-    public static final String IDS_UNIREF_EXAMPLE = "UniRef100_P21802,UniRef90_P05067,UniRef50_A0A007";
+    public static final String IDS_UNIREF_DESCRIPTION =
+            "Comma separated list of UniRef cluster ids";
+    public static final String IDS_UNIREF_EXAMPLE =
+            "UniRef100_P21802,UniRef90_P05067,UniRef50_A0A007";
     public static final String SORT_UNIREF_EXAMPLE = "id asc";
     public static final String SIZE_UNIREF_ID_DESCRIPTION =
             "Pagination size. Defaults to number of ids passed. (Single page)";
@@ -642,8 +656,7 @@ public class OpenApiConstants {
     public static final String TAG_HELP = "help";
     public static final String TAG_HELP_DESC = "UniProt Help centre API";
     public static final String ID_HELP_OPERATION = "Get Help Centre Page by Id.";
-    public static final String SEARCH_HELP_OPERATION =
-            "Retrieve help pages by a search query.";
+    public static final String SEARCH_HELP_OPERATION = "Retrieve help pages by a search query.";
     public static final String ID_HELP_DESCRIPTION = "Help centre page id to find";
     public static final String FIELDS_HELP_DESCRIPTION =
             FIELDS_DESCRIPTION
