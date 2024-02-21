@@ -110,6 +110,7 @@ public class APIDocConfig {
     }
 
     private static void cleanStringSerialiserSchemaObjects(Map<String, Schema> schemaMap) {
+        //removing objects that are not being referenced anymore.
         for (String serialiser : STRING_SERIALISER_LIST) {
             String schemaKey = serialiser.substring(serialiser.lastIndexOf("/") + 1);
             schemaMap.remove(schemaKey);
@@ -124,6 +125,7 @@ public class APIDocConfig {
             }
             if (propSchema.get$ref() != null
                     && STRING_SERIALISER_LIST.contains(propSchema.get$ref())) {
+                //changing type from object to string
                 propSchema.set$ref(null);
                 propSchema.type("string");
             }
