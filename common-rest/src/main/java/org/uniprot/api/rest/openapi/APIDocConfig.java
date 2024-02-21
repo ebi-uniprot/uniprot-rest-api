@@ -27,7 +27,7 @@ import io.swagger.v3.oas.models.parameters.Parameter;
 @Configuration
 public class APIDocConfig {
 
-    private static final List<String> STRING_SERILISER_LIST =
+    private static final List<String> STRING_SERIALISER_LIST =
             List.of(
                     "#/components/schemas/UniProtKBId",
                     "#/components/schemas/ProteomeId",
@@ -47,7 +47,7 @@ public class APIDocConfig {
                     "#/components/schemas/UniRefEntryId",
                     "#/components/schemas/UniRuleId");
 
-    private static final Comparator<Parameter> parameterComparator =
+    private static final Comparator<Parameter> PARAMETER_COMPARATOR =
             Comparator.comparing(Parameter::getRequired)
                     .reversed()
                     .thenComparing(Parameter::getName, Comparator.comparing("size"::equals))
@@ -67,9 +67,9 @@ public class APIDocConfig {
     }
 
     @Bean
-    public OpenApiCustomiser defaultOpenApiCustomizer(ObjectMapperProvider objectMapperProvider) {
+    public OpenApiCustomiser defaultOpenApiCustomiser() {
         return openAPI -> {
-            customizeSchema(openAPI);
+            customiseSchema(openAPI);
             sortRequestParametersForGetAndPostMethods(openAPI.getPaths().values());
         };
     }
@@ -77,10 +77,10 @@ public class APIDocConfig {
     private static void sortRequestParametersForGetAndPostMethods(Collection<PathItem> pathItems) {
         for (PathItem item : pathItems) {
             if (hasParameterToSort(item.getGet())) {
-                item.getGet().getParameters().sort(parameterComparator);
+                item.getGet().getParameters().sort(PARAMETER_COMPARATOR);
             }
             if (hasParameterToSort(item.getPost())) {
-                item.getPost().getParameters().sort(parameterComparator);
+                item.getPost().getParameters().sort(PARAMETER_COMPARATOR);
             }
         }
     }
@@ -89,7 +89,7 @@ public class APIDocConfig {
         return operation != null && notNullNotEmpty(operation.getParameters());
     }
 
-    private void customizeSchema(OpenAPI openAPI) {
+    private void customiseSchema(OpenAPI openAPI) {
         Map<String, Schema> schemaMap = openAPI.getComponents().getSchemas();
         Schema commentParent = schemaMap.get("Comment");
         if (commentParent != null) {
@@ -104,21 +104,29 @@ public class APIDocConfig {
             if ("Evidence".equals(item.getName())) {
                 configureEvidenceSchema(item);
             }
-            for (Object prop : item.getProperties().values()) {
-                Schema propSchema = (Schema) prop;
-                if (prop instanceof ArraySchema) {
-                    propSchema = propSchema.getItems();
-                }
-                if (propSchema.get$ref() != null
-                        && STRING_SERILISER_LIST.contains(propSchema.get$ref())) {
-                    propSchema.set$ref(null);
-                    propSchema.type("string");
-                }
-            }
+            configureStringTypesSerialisers(item);
         }
-        for (String serialiser : STRING_SERILISER_LIST) {
+        cleanStringSerialiserSchemaObjects(schemaMap);
+    }
+
+    private static void cleanStringSerialiserSchemaObjects(Map<String, Schema> schemaMap) {
+        for (String serialiser : STRING_SERIALISER_LIST) {
             String schemaKey = serialiser.substring(serialiser.lastIndexOf("/") + 1);
             schemaMap.remove(schemaKey);
+        }
+    }
+
+    private static void configureStringTypesSerialisers(Schema item) {
+        for (Object prop : item.getProperties().values()) {
+            Schema propSchema = (Schema) prop;
+            if (prop instanceof ArraySchema) {
+                propSchema = propSchema.getItems();
+            }
+            if (propSchema.get$ref() != null
+                    && STRING_SERIALISER_LIST.contains(propSchema.get$ref())) {
+                propSchema.set$ref(null);
+                propSchema.type("string");
+            }
         }
     }
 
