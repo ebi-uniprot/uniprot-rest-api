@@ -1,5 +1,17 @@
 package org.uniprot.api.rest.download.queue;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
+import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
+import org.uniprot.api.rest.download.model.DownloadJob;
+import org.uniprot.api.rest.download.model.JobStatus;
+import org.uniprot.api.rest.download.repository.DownloadJobRepository;
+import org.uniprot.api.rest.output.context.FileType;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,24 +23,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageBuilder;
-import org.springframework.amqp.core.MessageListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
-import org.uniprot.api.rest.download.model.DownloadJob;
-import org.uniprot.api.rest.download.model.JobStatus;
-import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.context.FileType;
-
 @Slf4j
 public abstract class BaseAbstractMessageListener implements MessageListener {
 
     public static final String CURRENT_RETRIED_COUNT_HEADER = "x-uniprot-retry-count";
     public static final String CURRENT_RETRIED_ERROR_HEADER = "x-uniprot-error";
     public static final String JOB_ID_HEADER = "jobId";
+    private static final String UPDATE_COUNT = "updateCount";
+    private static final String UPDATED = "updated";
+    private static final String PROCESSED_ENTRIES = "processedEntries";
 
     protected final DownloadConfigProperties downloadConfigProperties;
 
@@ -38,18 +41,21 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
 
     protected final RabbitTemplate rabbitTemplate;
     private final HeartBeatProducer heartBeatProducer;
+    private final AsyncDownloadFileHandler asyncDownloadFileHandler;
 
     public BaseAbstractMessageListener(
             DownloadConfigProperties downloadConfigProperties,
             AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties,
             DownloadJobRepository jobRepository,
             RabbitTemplate rabbitTemplate,
-            HeartBeatProducer heartBeatProducer) {
+            HeartBeatProducer heartBeatProducer,
+            AsyncDownloadFileHandler asyncDownloadFileHandler) {
         this.downloadConfigProperties = downloadConfigProperties;
         this.asyncDownloadQueueConfigProperties = asyncDownloadQueueConfigProperties;
         this.jobRepository = jobRepository;
         this.rabbitTemplate = rabbitTemplate;
         this.heartBeatProducer = heartBeatProducer;
+        this.asyncDownloadFileHandler = asyncDownloadFileHandler;
     }
 
     @Override
@@ -71,6 +77,10 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
             Optional<DownloadJob> optDownloadJob = this.jobRepository.findById(jobId);
             String errorMsg = "Unable to find jobId " + jobId + " in db";
             downloadJob = optDownloadJob.orElseThrow(() -> new MessageListenerException(errorMsg));
+
+            if (downloadJob.getRetried() > 0) {
+                cleanBeforeRetry(jobId);
+            }
 
             processMessage(message, downloadJob);
             // get the fresh object from redis
@@ -96,6 +106,15 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                         ex);
             }
         }
+    }
+
+    private void cleanBeforeRetry(String jobId) {
+        jobRepository.update(jobId, Map.of(
+                UPDATE_COUNT, 0,
+                UPDATED, LocalDateTime.now(),
+                PROCESSED_ENTRIES, 0)
+        );
+        asyncDownloadFileHandler.deleteAllFiles(jobId);
     }
 
     public Message addAdditionalHeaders(Message message, Exception ex) {
@@ -132,8 +151,8 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
     protected void writeIdentifiers(Path filePath, Stream<String> ids, DownloadJob downloadJob)
             throws IOException {
         try (BufferedWriter writer =
-                Files.newBufferedWriter(
-                        filePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+                     Files.newBufferedWriter(
+                             filePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             Iterable<String> iterator = ids::iterator;
             for (String id : iterator) {
                 writer.append(id);
