@@ -17,6 +17,7 @@ import org.uniprot.api.common.repository.search.EntryPair;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.request.IdMappingDownloadRequest;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
 import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -47,13 +48,15 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
             MessageConverter converter,
             IdMappingJobCacheService idMappingJobCacheService,
             IdMappingDownloadResultWriterFactory writerFactory,
-            HeartBeatProducer heartBeatProducer) {
+            HeartBeatProducer heartBeatProducer,
+            AsyncDownloadFileHandler asyncDownloadFileHandler) {
         super(
                 downloadConfigProperties,
                 asyncDownloadQueueConfigProperties,
                 jobRepository,
                 rabbitTemplate,
-                heartBeatProducer);
+                heartBeatProducer,
+                asyncDownloadFileHandler);
         this.converter = converter;
         this.idMappingJobCacheService = idMappingJobCacheService;
         this.downloadConfigProperties = downloadConfigProperties;

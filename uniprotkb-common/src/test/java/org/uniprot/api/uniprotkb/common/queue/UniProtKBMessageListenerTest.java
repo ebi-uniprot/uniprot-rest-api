@@ -1,19 +1,5 @@
 package org.uniprot.api.uniprotkb.common.queue;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
-import static org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.search.page.impl.CursorPage;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
 import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.queue.AsyncDownloadQueueConfigProperties;
@@ -42,20 +29,40 @@ import org.uniprot.api.uniprotkb.common.service.uniprotkb.UniProtEntryService;
 import org.uniprot.api.uniprotkb.common.service.uniprotkb.request.UniProtKBDownloadRequest;
 import org.uniprot.core.uniprotkb.UniProtKBEntry;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener.CURRENT_RETRIED_COUNT_HEADER;
+import static org.uniprot.api.uniprotkb.common.queue.UniProtKBMessageListener.CURRENT_RETRIED_ERROR_HEADER;
+
 @ExtendWith({MockitoExtension.class})
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class UniProtKBMessageListenerTest {
+class UniProtKBMessageListenerTest {
+
+    private static final String UPDATE_COUNT = "updateCount";
+    private static final String PROCESSED_ENTRIES = "processedEntries";
     @Mock private MessageConverter converter;
     @Mock private UniProtEntryService service;
-    @Mock DownloadConfigProperties downloadConfigProperties;
+    @Mock private DownloadConfigProperties downloadConfigProperties;
 
-    @Mock AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
+    @Mock private AsyncDownloadQueueConfigProperties asyncDownloadQueueConfigProperties;
 
-    @Mock DownloadJobRepository jobRepository;
+    @Mock private DownloadJobRepository jobRepository;
 
     @Mock private DownloadResultWriter downloadResultWriter;
-    @Mock RabbitTemplate rabbitTemplate;
-    @Mock HeartBeatProducer heartBeatProducer;
+    @Mock private RabbitTemplate rabbitTemplate;
+    @Mock private HeartBeatProducer heartBeatProducer;
+    @Mock
+    private AsyncDownloadFileHandler asyncDownloadFileHandler;
 
     @InjectMocks private UniProtKBMessageListener uniProtKBMessageListener;
 
@@ -85,6 +92,48 @@ public class UniProtKBMessageListenerTest {
         this.uniProtKBMessageListener.onMessage(message);
 
         // verify the ids file and clean up
+        Path idsFilePath = Path.of("target/" + jobId);
+        Assertions.assertTrue(Files.exists(idsFilePath));
+        List<String> ids = Files.readAllLines(idsFilePath);
+        Assertions.assertNotNull(ids);
+        Assertions.assertEquals(accessions.size(), ids.size());
+        Assertions.assertEquals(accessions, ids);
+        Files.delete(idsFilePath);
+        Assertions.assertTrue(Files.notExists(idsFilePath));
+        verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
+        verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
+        verify(heartBeatProducer).stop(jobId);
+    }
+
+    @Test
+    void testOnMessageWhenRetry() throws IOException {
+        UniProtKBDownloadRequest downloadRequest = new UniProtKBDownloadRequest();
+        downloadRequest.setQuery("field:value");
+        downloadRequest.setFormat(MediaType.APPLICATION_JSON.toString());
+        String jobId = UUID.randomUUID().toString();
+        MessageBuilder builder = MessageBuilder.withBody(downloadRequest.toString().getBytes());
+        Message message = builder.setHeader("jobId", jobId).build();
+        DownloadJob downloadJob = DownloadJob.builder().id(jobId).build();
+        downloadJob.setRetried(1);
+        // stub
+        List<String> accessions = List.of("P12345", "P05067");
+        when(this.jobRepository.findById(jobId)).thenReturn(Optional.of(downloadJob));
+        when(this.converter.fromMessage(message)).thenReturn(downloadRequest);
+        when(this.downloadConfigProperties.getIdFilesFolder()).thenReturn("target");
+        when(this.downloadConfigProperties.getResultFilesFolder()).thenReturn("target");
+        when(this.service.streamIds(downloadRequest)).thenReturn(accessions.stream());
+        when(this.service.search(any(SearchRequest.class)))
+                .thenReturn(
+                        QueryResult.<UniProtKBEntry>builder()
+                                .page(CursorPage.of("", 10, 2))
+                                .build());
+        when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(3);
+
+        this.uniProtKBMessageListener.onMessage(message);
+
+        // verify the ids file and clean up
+        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
+        verify(jobRepository).update(eq(jobId), argThat(map -> Objects.equals(0, map.get(UPDATE_COUNT)) && Objects.equals(map.get(PROCESSED_ENTRIES), 0)));
         Path idsFilePath = Path.of("target/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);

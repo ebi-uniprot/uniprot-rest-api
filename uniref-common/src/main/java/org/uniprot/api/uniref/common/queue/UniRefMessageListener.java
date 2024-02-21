@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.uniprot.api.common.repository.search.QueryResult;
 import org.uniprot.api.common.repository.stream.store.StoreRequest;
 import org.uniprot.api.rest.download.DownloadResultWriter;
+import org.uniprot.api.rest.download.file.AsyncDownloadFileHandler;
 import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
@@ -47,7 +48,8 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
             DownloadResultWriter downloadResultWriter,
             RabbitTemplate rabbitTemplate,
             UniRefEntryLightService service,
-            HeartBeatProducer heartBeatProducer) {
+            HeartBeatProducer heartBeatProducer,
+            AsyncDownloadFileHandler asyncDownloadFileHandler) {
         super(
                 converter,
                 downloadConfigProperties,
@@ -55,7 +57,8 @@ public class UniRefMessageListener extends AbstractMessageListener implements Me
                 jobRepository,
                 downloadResultWriter,
                 rabbitTemplate,
-                heartBeatProducer);
+                heartBeatProducer,
+                asyncDownloadFileHandler);
         this.service = service;
     }
 
