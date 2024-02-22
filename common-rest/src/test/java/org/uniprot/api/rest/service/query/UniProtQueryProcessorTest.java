@@ -471,6 +471,30 @@ class UniProtQueryProcessorTest {
         assertThat(processedQuery, is(expectedQuery));
     }
 
+    @Test
+    void queryWithGreaterThanCharActualUserQuery() {
+        String processedQuery = processor.processQuery("3'->5' exoribonuclease");
+        assertThat(processedQuery, is("3'->5' AND exoribonuclease"));
+    }
+
+    @Test
+    void queryWithGreaterThanChar() {
+        String processedQuery = processor.processQuery("name>aaa exoribonuclease");
+        assertThat(processedQuery, is("name>aaa AND exoribonuclease"));
+    }
+
+    @Test
+    void queryWithLessThanChar() {
+        String processedQuery = processor.processQuery("name<zzz exoribonuclease");
+        assertThat(processedQuery, is("name<zzz AND exoribonuclease"));
+    }
+
+    @Test
+    void queryWithGreaterThanCharInQuotedString() {
+        String processedQuery = processor.processQuery("\"name>aaa exoribonuclease\"");
+        assertThat(processedQuery, is("\"name>aaa exoribonuclease\""));
+    }
+
     private static Stream<Arguments> getQueryWithSupportedLeadingWildcard() {
         return Stream.of(
                 Arguments.of("gene:*CIROP AND field:*text", "gene:*CIROP AND field:text"),
