@@ -71,6 +71,7 @@ import org.uniprot.api.async.download.AsyncDownloadRestApp;
 import org.uniprot.api.async.download.controller.validator.UniParcIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniProtKBIdMappingDownloadRequestValidator;
 import org.uniprot.api.async.download.controller.validator.UniRefIdMappingDownloadRequestValidator;
+import org.uniprot.api.async.download.queue.AsyncDownloadTestConfig;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
 import org.uniprot.api.idmapping.common.model.IdMappingJob;
 import org.uniprot.api.idmapping.common.model.IdMappingResult;

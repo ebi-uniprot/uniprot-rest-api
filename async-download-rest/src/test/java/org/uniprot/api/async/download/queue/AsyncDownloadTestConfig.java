@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 @TestConfiguration
-@Profile("asyncDownload & offline")
+@Profile("offline & asyncDownload")
 public class AsyncDownloadTestConfig {
     @Bean
     public RedissonClient redisson() throws IOException {

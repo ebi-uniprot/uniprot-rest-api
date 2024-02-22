@@ -21,7 +21,7 @@ import org.uniprot.api.rest.download.model.DownloadJob;
  */
 @Configuration
 @Profile({"asyncDownload"})
-@EnableRedisRepositories(basePackages = "org.uniprot.api.rest.download.repository")
+@EnableRedisRepositories(basePackages = "org.uniprot.api.async.download.repository")
 public class RedisConfiguration {
 
     @Value("${redis.hash.prefix}")
