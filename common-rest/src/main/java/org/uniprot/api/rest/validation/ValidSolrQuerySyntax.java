@@ -47,7 +47,7 @@ public @interface ValidSolrQuerySyntax {
                 try {
                     QueryParser qp = new QueryParser("", new WhitespaceAnalyzer());
                     qp.setAllowLeadingWildcard(true);
-                    queryString = replaceForwardSlashes(queryString);
+                    queryString = replaceForwardSlashesLessThanAndGreaterThan(queryString);
                     Query parsedQuery = qp.parse(queryString);
                     if (!validateWildcard(parsedQuery)) {
                         String errorMessage = "{search.invalid.query.wildcard}";
