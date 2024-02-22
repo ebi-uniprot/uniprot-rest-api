@@ -63,7 +63,8 @@ public class UniProtQueryProcessor implements QueryProcessor {
     public String processQuery(String query) {
         try {
             StandardSyntaxParser syntaxParser = new StandardSyntaxParser();
-            String queryWithEscapedForwardSlashes = replaceForwardSlashes(query);
+            String queryWithEscapedForwardSlashes =
+                    replaceForwardSlashesLessThanAndGreaterThan(query);
             QueryNode queryTree =
                     syntaxParser.parse(queryWithEscapedForwardSlashes, IMPOSSIBLE_FIELD);
             QueryNode processedQueryTree = queryProcessorPipeline.process(queryTree);
