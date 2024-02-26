@@ -97,7 +97,7 @@ public @interface ValidSolrQueryFields {
                 try {
                     QueryParser qp = new QueryParser(DEFAULT_FIELD_NAME, new WhitespaceAnalyzer());
                     qp.setAllowLeadingWildcard(true);
-                    queryString = replaceForwardSlashesLessThanAndGreaterThan(queryString);
+                    queryString = escapeSpecialCharacters(queryString);
                     Query query = qp.parse(queryString);
                     if (!(query instanceof MatchAllDocsQuery)) {
                         isValid = hasValidQueryField(query, context);
