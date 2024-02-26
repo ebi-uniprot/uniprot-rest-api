@@ -152,9 +152,7 @@ public class APIDocConfig {
         citations.putAll(getSchemaReferenceMapForClass(Patent.class, citationParent));
         citations.putAll(getSchemaReferenceMapForClass(Submission.class, citationParent));
         citations.putAll(getSchemaReferenceMapForClass(Thesis.class, citationParent));
-        citations.entrySet().forEach(entry ->
-            addSchemaToOpenApi(entry, openAPI, "citationType")
-        );
+        citations.entrySet().forEach(entry -> addSchemaToOpenApi(entry, openAPI, "citationType"));
     }
 
     private void configureCommentSchema(OpenAPI openAPI, Schema commentParent) {
@@ -176,12 +174,11 @@ public class APIDocConfig {
         comments.putAll(
                 getSchemaReferenceMapForClass(SubcellularLocationComment.class, commentParent));
         comments.putAll(getSchemaReferenceMapForClass(WebResourceComment.class, commentParent));
-        comments.entrySet().forEach(entry ->
-                addSchemaToOpenApi(entry, openAPI, "commentType")
-        );
+        comments.entrySet().forEach(entry -> addSchemaToOpenApi(entry, openAPI, "commentType"));
     }
 
-    private static void addSchemaToOpenApi(Map.Entry<String, Schema> entry,OpenAPI openAPI, String cleanFieldName) {
+    private static void addSchemaToOpenApi(
+            Map.Entry<String, Schema> entry, OpenAPI openAPI, String cleanFieldName) {
         Schema value = entry.getValue();
         value.getProperties().remove(cleanFieldName);
         openAPI.schema(entry.getKey(), value);

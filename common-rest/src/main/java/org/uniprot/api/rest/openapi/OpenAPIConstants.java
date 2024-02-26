@@ -26,7 +26,7 @@ public class OpenAPIConstants {
 
     public static final String TAG_UNIPROTKB_JOB = "UniProtKB async download";
     public static final String TAG_UNIPROTKB_JOB_DESC =
-            "UniProtKB asynchronous download jobs are different from \"normal\" downloads offered via stream. "
+            "UniProtKB asynchronous download jobs are different from \"synchronous downloads\" downloads offered via stream. "
                     + "First, a separate file must be generated for download. "
                     + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
@@ -121,7 +121,7 @@ public class OpenAPIConstants {
             "Unique identifier for ID Mapping job";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB = "ID Mapping async download";
     public static final String TAG_IDMAPPING_DOWNLOAD_JOB_DESC =
-            "ID Mapping asynchronous download jobs are different from \"normal\" downloads offered via stream. "
+            "ID Mapping asynchronous download jobs are different from \"synchronous downloads\" downloads offered via stream. "
                     + "First, a separate file must be generated for download. "
                     + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
@@ -601,7 +601,7 @@ public class OpenAPIConstants {
             "The UniProt Reference Clusters (UniRef) provide clustered sets of sequences from the UniProt Knowledgebase (including isoforms) and selected UniParc records. This hides redundant sequences and obtains complete coverage of the sequence space at three resolutions: UniRef100, UniRef90 and UniRef50.";
     public static final String TAG_UNIREF_JOB = "UniRef async download";
     public static final String TAG_UNIREF_JOB_DESC =
-            "UniRef asynchronous download jobs are different from \"normal\" downloads offered via stream. "
+            "UniRef asynchronous download jobs are different from \"synchronous downloads\" downloads offered via stream. "
                     + "First, a separate file must be generated for download. "
                     + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
