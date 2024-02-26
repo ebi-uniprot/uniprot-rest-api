@@ -83,7 +83,10 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
                 return field + SOLR_FIELD_SEPARATOR + text.toUpperCase();
             } else if (validFieldIgnoreCase(field)) {
                 return field.toLowerCase() + SOLR_FIELD_SEPARATOR + text;
-            } else {
+            } else if(){
+                //is a alias => return the field itself
+            }
+            else {
                 return super.toQueryString(escaper);
             }
         }
