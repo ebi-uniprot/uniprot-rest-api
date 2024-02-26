@@ -38,7 +38,7 @@ public class UniSaveRequest {
         @Parameter(description = INCLUDE_CONTENT_UNISAVE_DESCRIPTION)
         private boolean includeContent;
 
-        @Parameter(description = VERSIONS_UNISAVE_DESCRIPTION)
+        @Parameter(description = VERSIONS_UNISAVE_DESCRIPTION, example = VERSIONS_UNISAVE_EXAMPLE)
         private String versions;
 
         @Parameter(description = UNIQUE_SEQUENCE_UNISAVE_DESCRIPTION)

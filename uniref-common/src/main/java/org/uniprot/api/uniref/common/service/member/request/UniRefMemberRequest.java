@@ -10,6 +10,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidFacets;
 import org.uniprot.api.rest.validation.ValidSolrQueryFacetFields;
 import org.uniprot.api.rest.validation.ValidSolrQuerySyntax;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 05/01/2021
  */
 @Data
+@ParameterObject
 public class UniRefMemberRequest {
 
     @Parameter(description = ID_UNIREF_DESCRIPTION, example = ID_UNIREF_EXAMPLE)

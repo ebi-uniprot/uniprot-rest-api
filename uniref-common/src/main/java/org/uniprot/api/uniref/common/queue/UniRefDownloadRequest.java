@@ -1,8 +1,10 @@
 package org.uniprot.api.uniref.common.queue;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.*;
 import static org.uniprot.api.rest.output.UniProtMediaType.*;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,8 +30,10 @@ public class UniRefDownloadRequest extends UniRefStreamRequest implements Downlo
                 TURTLE_MEDIA_TYPE_VALUE,
                 N_TRIPLES_MEDIA_TYPE_VALUE
             })
+    @Parameter(description = FORMAT_UNIREF_DESCRIPTION, example = FORMAT_UNIREF_EXAMPLE)
     private String format;
 
+    @Parameter(hidden = true)
     private boolean force;
 
     public void setFormat(String format) {

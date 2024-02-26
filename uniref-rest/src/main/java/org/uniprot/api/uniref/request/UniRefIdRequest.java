@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.uniprot.api.rest.validation.ValidReturnFields;
 import org.uniprot.store.config.UniProtDataType;
 import org.uniprot.store.search.field.validator.FieldRegexConstants;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @since 21/07/2020
  */
 @Data
+@ParameterObject
 public class UniRefIdRequest {
 
     @Parameter(description = ID_UNIREF_DESCRIPTION, example = ID_UNIREF_EXAMPLE)

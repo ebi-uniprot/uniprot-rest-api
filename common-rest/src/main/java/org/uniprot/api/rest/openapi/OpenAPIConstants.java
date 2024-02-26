@@ -3,7 +3,7 @@ package org.uniprot.api.rest.openapi;
 public class OpenAPIConstants {
 
     public static final String QUERY_ADVANCED =
-            "Advanced queries can be built with parentheses and conditionals such as AND/OR/NOT.";
+            "Advanced queries can be built with parentheses and conditionals such as AND, OR and NOT.";
     public static final String QUERY_DESCRIPTION = "Criteria to search. " + QUERY_ADVANCED;
     public static final String FIELDS_DESCRIPTION =
             "List of fields to be returned, separated by commas.";
@@ -227,7 +227,7 @@ public class OpenAPIConstants {
     // Proteome
     public static final String TAG_PROTEOME = "Proteome";
     public static final String TAG_PROTEOME_DESC =
-            "The Proteomes service offers access to UniProtKB proteomes, allowing users to search for proteomes (including reference or redundant proteomes) using UniProt proteome identifiers, species names, or taxonomy identifiers";
+            "The proteomes service offers access to UniProtKB proteomes, allowing users to search for proteomes (including reference or redundant proteomes) using UniProt proteome identifiers, species names, or taxonomy identifiers";
     public static final String SEARCH_PROTEOME_OPERATION =
             "Retrieve proteome entries by a search query.";
     public static final String ID_PROTEOME_OPERATION = "Get proteome entry by a single upid.";
@@ -493,6 +493,8 @@ public class OpenAPIConstants {
     public static final String ID_UNIPARC_OPERATION = "Get UniParc entry by a single upi.";
     public static final String STREAM_UNIPARC_OPERATION =
             "Download UniParc entries retrieved by a search query.";
+    public static final String STREAM_UNIPARC_OPERATION_DESC =
+            "The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniParc asynchronous download job' requests described below. The 'UniParc asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.";
     public static final String ACCESSION_UNIPARC_OPERATION =
             "Get UniParc entry by UniProtKB accession";
     public static final String DBID_UNIPARC_OPERATION =
@@ -606,10 +608,13 @@ public class OpenAPIConstants {
                     + "Much like <tt>ID Mapping</tt> services at UniProt, this job submission request can be submitted via the <tt>run</tt> post request, "
                     + "which will return a job id. This id can be used to monitor the progress of the job via the <tt>status</tt> endpoint. "
                     + "When the submitted job is completed, the <tt>status</tt> endpoint will redirect to the downloadable zip file.";
+    public static final String FORMAT_UNIREF_DESCRIPTION =
+            "The file format for download. <a href='https://rest.uniprot.org/configure/uniref/formats'>Valid formats are listed here</a>";
+    public static final String FORMAT_UNIREF_EXAMPLE = "json";
     public static final String ID_UNIREF_MEMBER_OPERATION =
-            "Retrieve UniRef members by a single cluster id.";
+            "Retrieve UniRef cluster members by a single cluster id.";
     public static final String ID_UNIREF_OPERATION =
-            "Retrieve a light object of UniRef cluster by a single cluster id.";
+            "Get UniRef cluster entry by a single cluster id.";
     public static final String JOB_ID_UNIREF_DESCRIPTION = JOB_ID_DESCRIPTION;
     public static final String JOB_RUN_UNIREF_OPERATION =
             "Submit UniRef asynchronous download job.";
@@ -618,11 +623,13 @@ public class OpenAPIConstants {
     public static final String JOB_DETAILS_UNIREF_OPERATION =
             "Get details of UniRef asynchronous download job.";
     public static final String ID_UNIREF_LIGHT_OPERATION =
-            "Retrieve a light object of UniRef cluster by id.";
+            "Get a light UniRef cluster entry by a single cluster id.";
     public static final String SEARCH_UNIREF_LIGHT_OPERATION =
-            "Retrieve a light object of UniRef cluster by a search query.";
+            "Retrieve light UniRef cluster entries by a search query.";
     public static final String STREAM_UNIREF_LIGHT_OPERATION =
-            "Download a light object of UniRef cluster retrieved by a search query.";
+            "Download light UniRef cluster entries retrieved by a search query. (Max. 10 million entries)";
+    public static final String STREAM_UNIREF_LIGHT_OPERATION_DESC =
+            "The stream endpoint has a maximum limit of 10 million entries. For larger requests, please use the 'UniRef asynchronous download job' requests described below. The 'UniRef asynchronous download job' requests can be used for any size -- the asynchronous download jobs can be paused and resumed at your convenience, unlike the stream endpoint.";
     public static final String IDS_UNIREF_LIGHT_OPERATION =
             "Get UniRef entries by a list of cluster ids.";
     public static final String ID_UNIREF_DESCRIPTION = "Unique identifier for the UniRef cluster";
@@ -632,7 +639,7 @@ public class OpenAPIConstants {
                     + "  <a href='https://rest.uniprot.org/configure/uniprotkb/result-fields'>List of valid fields</a>";
     public static final String FIELDS_UNIREF_EXAMPLE = "id,name,types,organism,identity";
     public static final String QUERY_UNIREF_DESCRIPTION =
-            "Criteria to search UniRefs. "
+            "Criteria to search UniRef. "
                     + QUERY_ADVANCED
                     + " <a href='https://rest.uniprot.org/configure/uniparc/search-fields'>List of valid search fields</a>";
     public static final String QUERY_UNIREF_EXAMPLE = "\"Transcription factors\" AND identity:1.0";
@@ -676,14 +683,15 @@ public class OpenAPIConstants {
     public static final String TAG_UNISAVE_DESC =
             "An archive of every entry version, in every UniProtKB release.";
     public static final String ID_UNISAVE_OPERATION =
-            "Gets entry information based on an accession.";
+            "Get entry information based on a single accession.";
     public static final String DIFF_UNISAVE_OPERATION =
-            "Gets the differences between the contents of two versions of an entry.";
-    public static final String STATUS_UNISAVE_OPERATION = "Gets status information of an entry.";
+            "Get the differences between the contents of two versions of an entry.";
+    public static final String STATUS_UNISAVE_OPERATION = "Get status information a single accession.";
     public static final String INCLUDE_CONTENT_UNISAVE_DESCRIPTION =
             "Whether or not to include the entry content (true|false).";
     public static final String VERSIONS_UNISAVE_DESCRIPTION =
-            "Greater than zero entry version numbers, e.g., 1,3-8,15-20,6.";
+            "Can be a greater-than-zero entry version number, comma separated list of numbers, a range written with a dash(-), or a combination of the above. e.g. 6; 1,3-8; 15-20.";
+    public static final String VERSIONS_UNISAVE_EXAMPLE = "1,3-8";
     public static final String UNIQUE_SEQUENCE_UNISAVE_DESCRIPTION =
             "Whether or not to aggregate sequences that are unique (true|false)";
     public static final String VERSION1_UNISAVE_DESCRIPTION =

@@ -26,6 +26,7 @@ public class IdMappingDownloadRequestImpl implements IdMappingDownloadRequest {
     @Parameter(description = FIELDS_DESCRIPTION)
     private String fields;
 
+    @Parameter(hidden = true)
     private boolean force;
 
     @Override

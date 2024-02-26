@@ -1,6 +1,7 @@
 package org.uniprot.api.uniprotkb.common.service.uniprotkb.request;
 
 import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPROTKB_DESCRIPTION;
+import static org.uniprot.api.rest.openapi.OpenAPIConstants.FORMAT_UNIPROTKB_EXAMPLE;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,9 +36,10 @@ public class UniProtKBDownloadRequest extends UniProtKBStreamRequest implements 
                 UniProtMediaType.N_TRIPLES_MEDIA_TYPE_VALUE,
                 UniProtMediaType.HDF5_MEDIA_TYPE_VALUE
             })
-    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = "json")
+    @Parameter(description = FORMAT_UNIPROTKB_DESCRIPTION, example = FORMAT_UNIPROTKB_EXAMPLE)
     private String format;
 
+    @Parameter(hidden = true)
     private boolean force;
 
     public void setFormat(String format) {

@@ -198,6 +198,7 @@ public class UniRefEntryLightController extends BasicSearchController<UniRefEntr
             })
     @Operation(
             summary = STREAM_UNIREF_LIGHT_OPERATION,
+            description = STREAM_UNIREF_LIGHT_OPERATION_DESC,
             responses = {
                 @ApiResponse(
                         content = {

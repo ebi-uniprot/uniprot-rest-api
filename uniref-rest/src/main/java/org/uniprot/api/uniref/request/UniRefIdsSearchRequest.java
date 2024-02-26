@@ -12,6 +12,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import lombok.Data;
 
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.MediaType;
 import org.uniprot.api.rest.request.IdsSearchRequest;
 import org.uniprot.api.rest.respository.facet.impl.UniRefFacetConfig;
@@ -25,6 +26,7 @@ import io.swagger.v3.oas.annotations.Parameter;
  * @created 18/03/2021
  */
 @Data
+@ParameterObject
 public class UniRefIdsSearchRequest implements IdsSearchRequest {
 
     @NotNull(message = "{search.required}")
