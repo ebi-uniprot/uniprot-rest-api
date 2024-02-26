@@ -21,9 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.service.query.UniProtQueryProcessor;
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
@@ -31,18 +29,21 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 @ExtendWith(MockitoExtension.class)
 class UniProtFieldQueryNodeProcessorTest {
-    @Mock
-    private SearchFieldConfig searchFieldConfig;
+    @Mock private SearchFieldConfig searchFieldConfig;
 
     @Before
     public void setUp() throws Exception {
-        when(searchFieldConfig.findSearchFieldItemByAlias(anyString())).thenReturn(Optional.empty());
+        when(searchFieldConfig.findSearchFieldItemByAlias(anyString()))
+                .thenReturn(Optional.empty());
     }
 
     @Test
     void processInvalidFieldNameUpperCaseThenDoNothing() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldsNames(Set.of("field")).searchFieldConfig(searchFieldConfig).build();
+                UniProtQueryProcessorConfig.builder()
+                        .searchFieldsNames(Set.of("field"))
+                        .searchFieldConfig(searchFieldConfig)
+                        .build();
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
 
         FieldQueryNode node = new FieldQueryNode("OTHER", "value", 1, 2);
@@ -81,13 +82,17 @@ class UniProtFieldQueryNodeProcessorTest {
     @Test
     void toQueryString_validAlias_returnsFieldName() throws QueryNodeException {
         UniProtQueryProcessorConfig conf =
-                UniProtQueryProcessorConfig.builder().searchFieldConfig(searchFieldConfig).searchFieldsNames(Set.of("otherField")).build();
+                UniProtQueryProcessorConfig.builder()
+                        .searchFieldConfig(searchFieldConfig)
+                        .searchFieldsNames(Set.of("otherField"))
+                        .build();
         UniProtFieldQueryNodeProcessor processor = new UniProtFieldQueryNodeProcessor(conf);
         SearchFieldItem searchFieldItem = new SearchFieldItem();
         String fieldName = "field";
         searchFieldItem.setFieldName(fieldName);
         String alias = "alias";
-        when(searchFieldConfig.findSearchFieldItemByAlias(alias)).thenReturn(Optional.of(searchFieldItem));
+        when(searchFieldConfig.findSearchFieldItemByAlias(alias))
+                .thenReturn(Optional.of(searchFieldItem));
 
         FieldQueryNode node = new FieldQueryNode(alias, "value", 1, 2);
         QueryNode processedNode = processor.process(node);

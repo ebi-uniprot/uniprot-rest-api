@@ -50,8 +50,7 @@ class UniProtQueryProcessorTest {
     private static final String FIELD_NAME = "accession";
     private UniProtQueryProcessor processor;
     private UniProtQueryProcessorConfig config;
-    @Mock
-    private SearchFieldConfig searchFieldConfig;
+    @Mock private SearchFieldConfig searchFieldConfig;
 
     @BeforeEach
     void setUp() {

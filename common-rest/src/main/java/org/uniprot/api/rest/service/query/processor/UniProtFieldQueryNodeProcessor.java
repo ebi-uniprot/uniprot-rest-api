@@ -1,5 +1,13 @@
 package org.uniprot.api.rest.service.query.processor;
 
+import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
+import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.UNIPROTKB_ACCESSION_FIELD;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FuzzyQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -9,14 +17,6 @@ import org.apache.lucene.queryparser.flexible.core.processors.QueryNodeProcessor
 import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 import org.uniprot.store.search.SolrQueryUtil;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.IMPOSSIBLE_FIELD;
-import static org.uniprot.api.rest.service.query.UniProtQueryProcessor.UNIPROTKB_ACCESSION_FIELD;
 
 /**
  * Created 23/08/2020
@@ -91,10 +91,13 @@ class UniProtFieldQueryNodeProcessor extends QueryNodeProcessorImpl {
             } else if (validFieldIgnoreCase(field)) {
                 return field.toLowerCase() + SOLR_FIELD_SEPARATOR + text;
             } else {
-                //is an alias => return the field itself
-                Optional<SearchFieldItem> searchFieldItemByAlias = searchFieldConfig.findSearchFieldItemByAlias(field);
+                // is an alias => return the field itself
+                Optional<SearchFieldItem> searchFieldItemByAlias =
+                        searchFieldConfig.findSearchFieldItemByAlias(field);
                 if (searchFieldItemByAlias.isPresent()) {
-                    return searchFieldItemByAlias.get().getFieldName() + SOLR_FIELD_SEPARATOR + text;
+                    return searchFieldItemByAlias.get().getFieldName()
+                            + SOLR_FIELD_SEPARATOR
+                            + text;
                 }
             }
             return super.toQueryString(escaper);

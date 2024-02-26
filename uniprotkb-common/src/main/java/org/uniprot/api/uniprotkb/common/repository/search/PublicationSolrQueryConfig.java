@@ -26,7 +26,8 @@ public class PublicationSolrQueryConfig {
     }
 
     @Bean
-    public UniProtQueryProcessorConfig publicationQueryProcessorConfig(SearchFieldConfig publicationSearchFieldConfig) {
+    public UniProtQueryProcessorConfig publicationQueryProcessorConfig(
+            SearchFieldConfig publicationSearchFieldConfig) {
         return UniProtQueryProcessorConfig.builder()
                 .optimisableFields(emptyList())
                 .whiteListFields(emptyMap())

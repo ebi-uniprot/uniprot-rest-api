@@ -35,7 +35,8 @@ public class HelpCentreSolrQueryConfig {
 
     @Bean
     public UniProtQueryProcessorConfig helpCentreQueryProcessorConfig(
-            WhitelistFieldConfig whiteListFieldConfig, SearchFieldConfig helpCentreSearchFieldConfig) {
+            WhitelistFieldConfig whiteListFieldConfig,
+            SearchFieldConfig helpCentreSearchFieldConfig) {
         Map<String, String> helpCentreWhiteListFields =
                 whiteListFieldConfig
                         .getField()
