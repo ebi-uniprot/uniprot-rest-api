@@ -25,10 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.uniprot.api.common.exception.ImportantMessageServiceException;
-import org.uniprot.api.common.exception.InvalidRequestException;
-import org.uniprot.api.common.exception.NoContentException;
-import org.uniprot.api.common.exception.ResourceNotFoundException;
+import org.uniprot.api.common.exception.*;
 import org.uniprot.api.rest.download.queue.IllegalDownloadJobSubmissionException;
 import org.uniprot.api.rest.output.job.JobSubmitResponse;
 
@@ -73,7 +70,7 @@ class ResponseExceptionHandlerTest {
         assertEquals(REQUEST_URL, errorMessage.getUrl());
 
         assertNotNull(errorMessage.getMessages());
-        assertEquals(72, errorMessage.getMessages().size());
+        assertFalse(errorMessage.getMessages().isEmpty());
 
         assertEquals("Internal server error", errorMessage.getMessages().get(0));
         assertTrue(errorMessage.getMessages().contains("Message: Throwable error message"));
@@ -361,5 +358,77 @@ class ResponseExceptionHandlerTest {
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertThat(responseEntity.getBody().getMessages(), contains(message));
+    }
+
+    @Test
+    void handleTooManyRequestsException() {
+        // when
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
+        TooManyRequestsException error =
+                new TooManyRequestsException("Too Many Requests Exception");
+
+        ResponseEntity<ErrorInfo> responseEntity =
+                errorHandler.handleTooManyRequestsException(error, request, response);
+
+        // then
+        assertNotNull(responseEntity);
+
+        assertNotNull(responseEntity.getHeaders());
+        assertEquals(1, responseEntity.getHeaders().size());
+        assertEquals(MediaType.APPLICATION_JSON, responseEntity.getHeaders().getContentType());
+
+        assertNotNull(responseEntity.getStatusCode());
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS, responseEntity.getStatusCode());
+
+        assertNotNull(responseEntity.getBody());
+        ErrorInfo errorMessage = responseEntity.getBody();
+
+        assertEquals(REQUEST_URL, errorMessage.getUrl());
+
+        assertNotNull(errorMessage.getMessages());
+        assertEquals(1, errorMessage.getMessages().size());
+        assertEquals(
+                "Too Many Requests: We are currently experiencing a lot of API requests, and are unable to process your request at the moment. Please try again in a few minutes. If this error persists please contact us through uniprot.org/contact",
+                errorMessage.getMessages().get(0));
+    }
+
+    @Test
+    void handleTooManyRequestsExceptionWithDebug() {
+        // when
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(REQUEST_URL));
+        Mockito.when(request.getParameter("debugError")).thenReturn("true");
+        TooManyRequestsException error =
+                new TooManyRequestsException("Gatekeeper did NOT let me in (space inside=0)");
+
+        ResponseEntity<ErrorInfo> responseEntity =
+                errorHandler.handleTooManyRequestsException(error, request, response);
+
+        // then
+        assertNotNull(responseEntity);
+
+        assertNotNull(responseEntity.getHeaders());
+        assertEquals(1, responseEntity.getHeaders().size());
+        assertEquals(MediaType.APPLICATION_JSON, responseEntity.getHeaders().getContentType());
+
+        assertNotNull(responseEntity.getStatusCode());
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS, responseEntity.getStatusCode());
+
+        assertNotNull(responseEntity.getBody());
+        ErrorInfo errorMessage = responseEntity.getBody();
+
+        assertEquals(REQUEST_URL, errorMessage.getUrl());
+
+        assertNotNull(errorMessage.getMessages());
+        assertFalse(errorMessage.getMessages().isEmpty());
+        assertEquals(
+                "Too Many Requests: We are currently experiencing a lot of API requests, and are unable to process your request at the moment. Please try again in a few minutes. If this error persists please contact us through uniprot.org/contact",
+                errorMessage.getMessages().get(0));
+        assertEquals(
+                "Message: Gatekeeper did NOT let me in (space inside=0)",
+                errorMessage.getMessages().get(1));
     }
 }

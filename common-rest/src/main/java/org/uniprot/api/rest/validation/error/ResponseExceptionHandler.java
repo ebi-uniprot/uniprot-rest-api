@@ -60,6 +60,7 @@ public class ResponseExceptionHandler {
     private static final String INTERNAL_ERROR_MESSAGE = "search.internal.error";
     private static final String REQUIRED_REQUEST_PARAM = "request.parameter.required";
     private static final String INVALID_REQUEST = "request.invalid";
+    private static final String TOO_MANY_REQUEST = "stream.too.many.request.error";
 
     private MessageSource messageSource;
 
@@ -332,5 +333,21 @@ public class ResponseExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(getContentTypeFromRequest(request))
                 .body(new ErrorInfo(request.getRequestURL().toString(), List.of(ex.getMessage())));
+    }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ErrorInfo> handleTooManyRequestsException(
+            Throwable ex, HttpServletRequest request, HttpServletResponse response) {
+        String url = Encode.forHtml(request.getRequestURL().toString());
+
+        List<String> messages = new ArrayList<>();
+        messages.add(messageSource.getMessage(TOO_MANY_REQUEST, null, Locale.getDefault()));
+        addDebugError(request, ex, messages);
+
+        response.setHeader(CACHE_CONTROL, HttpCommonHeaderConfig.NO_CACHE);
+
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .contentType(getContentTypeFromRequest(request))
+                .body(new ErrorInfo(url, messages));
     }
 }
