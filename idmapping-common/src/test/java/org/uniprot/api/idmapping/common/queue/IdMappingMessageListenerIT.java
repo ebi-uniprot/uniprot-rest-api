@@ -229,6 +229,7 @@ class IdMappingMessageListenerIT {
         Assertions.assertDoesNotThrow(() -> this.idMappingMessageListener.onMessage(message));
         Mockito.verify(this.rabbitTemplate, atMostOnce())
                 .convertAndSend(eq(rejectedQueueName), any(Message.class));
+        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
     }
 
     @Test

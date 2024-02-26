@@ -188,11 +188,6 @@ class UniProtKBMessageListenerTest {
 
         this.uniProtKBMessageListener.onMessage(message);
 
-        // verify the ids file is cleaned up during IOException
-        Path idsFilePath = Path.of("target/" + jobId);
-        Assertions.assertTrue(Files.notExists(idsFilePath));
-        Path resultFilePath = Path.of("target/" + jobId + ".json");
-        Assertions.assertTrue(Files.notExists(resultFilePath));
         verifyLoggingTotalNoOfEntries(jobRepository, downloadJob);
         verify(heartBeatProducer, atLeastOnce()).createForIds(same(downloadJob));
         verify(heartBeatProducer).stop(jobId);
@@ -208,6 +203,7 @@ class UniProtKBMessageListenerTest {
         Message message = builder.setHeader("jobId", jobId).build();
         when(this.asyncDownloadQueueConfigProperties.getRetryMaxCount()).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> this.uniProtKBMessageListener.onMessage(message));
+        verify(asyncDownloadFileHandler).deleteAllFiles(jobId);
     }
 
     @Test

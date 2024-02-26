@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -22,7 +21,6 @@ import org.uniprot.api.rest.download.heartbeat.HeartBeatProducer;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.download.repository.DownloadJobRepository;
-import org.uniprot.api.rest.output.context.FileType;
 
 @Slf4j
 public abstract class BaseAbstractMessageListener implements MessageListener {
@@ -72,6 +70,7 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
                         "Message with job id {} discarded after max retry {}",
                         jobId,
                         getMaxRetryCount());
+                asyncDownloadFileHandler.deleteAllFiles(jobId);
                 return;
             }
 
@@ -204,27 +203,9 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
         }
     }
 
-    protected void logMessageAndDeleteFile(Exception ex, String jobId) {
+    protected void logMessage(Exception ex, String jobId) {
         log.warn("Unable to write file due to error for job id {}", jobId);
         log.warn(ex.getMessage());
-        Path idsFile = Paths.get(downloadConfigProperties.getIdFilesFolder(), jobId);
-        deleteFile(idsFile, jobId);
-        String resultFileName = jobId + "." + FileType.GZIP.getExtension();
-        Path resultFile =
-                Paths.get(downloadConfigProperties.getResultFilesFolder(), resultFileName);
-        deleteFile(resultFile, jobId);
-    }
-
-    protected static void deleteFile(Path file, String jobId) {
-        try {
-            Files.deleteIfExists(file);
-        } catch (IOException e) {
-            log.warn(
-                    "Unable to delete file {} during IOException failure for job id {}",
-                    file.toFile().getName(),
-                    jobId);
-            throw new MessageListenerException(e);
-        }
     }
 
     private boolean isMaxRetriedReached(Message message) {

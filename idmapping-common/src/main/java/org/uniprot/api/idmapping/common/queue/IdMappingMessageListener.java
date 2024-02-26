@@ -106,7 +106,7 @@ public class IdMappingMessageListener extends BaseAbstractMessageListener
                     request, idMappingJob.getIdMappingResult(), downloadJob, contentType);
             log.info("Voldemort results saved for job {}", downloadJob.getId());
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, downloadJob.getId());
+            logMessage(ex, downloadJob.getId());
             throw new MessageListenerException(ex);
         }
     }

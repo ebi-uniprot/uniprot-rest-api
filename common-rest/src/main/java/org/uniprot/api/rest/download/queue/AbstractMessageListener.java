@@ -79,7 +79,7 @@ public abstract class AbstractMessageListener extends BaseAbstractMessageListene
                     request, downloadJob, idsFile, contentType, storeRequest, getDataType());
             log.info("Voldemort results saved for job {}", jobId);
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId);
+            logMessage(ex, jobId);
             throw new MessageListenerException(ex);
         }
     }
