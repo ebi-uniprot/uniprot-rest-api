@@ -77,8 +77,9 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
             SolrQueryConfig uniParcSolrQueryConf,
             UniProtQueryProcessorConfig uniParcQueryProcessorConfig,
             SearchFieldConfig uniParcSearchFieldConfig,
-            RdfStreamer uniparcRdfStreamer,
-            FacetTupleStreamTemplate facetTupleStreamTemplate,
+            RdfStreamer uniParcRdfStreamer,
+            @Qualifier("uniParcFacetTupleStreamTemplate")
+                    FacetTupleStreamTemplate facetTupleStreamTemplate,
             @Qualifier("uniParcTupleStreamDocumentIdStream")
                     TupleStreamDocumentIdStream solrIdStreamer) {
 
@@ -96,7 +97,7 @@ public class UniParcQueryService extends StoreStreamerSearchService<UniParcDocum
         this.repository = repository;
         this.entryConverter = uniParcQueryResultConverter;
         this.solrQueryConfig = uniParcSolrQueryConf;
-        this.rdfStreamer = uniparcRdfStreamer;
+        this.rdfStreamer = uniParcRdfStreamer;
     }
 
     public UniParcEntry getByUniParcId(UniParcGetByUniParcIdRequest getByUniParcIdRequest) {

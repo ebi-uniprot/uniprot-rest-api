@@ -33,20 +33,20 @@ class UniParcRdfStreamerConfigTest {
     @Test
     void uniparcRdfStreamer() {
         RdfStreamer rdfStreamer =
-                uniparcRdfStreamerConfig.uniparcRdfStreamer(properties, rdfServiceFactory);
+                uniparcRdfStreamerConfig.uniParcRdfStreamer(properties, rdfServiceFactory);
         assertNotNull(rdfStreamer);
     }
 
     @Test
     void uniparcRdfServiceFactory() {
         RdfServiceFactory rdfServiceFactory =
-                uniparcRdfStreamerConfig.uniparcRdfServiceFactory(restTemplate);
+                uniparcRdfStreamerConfig.uniParcRdfServiceFactory(restTemplate);
         assertNotNull(rdfServiceFactory);
     }
 
     @Test
     void uniparcRdfRestTemplate() {
-        RestTemplate template = uniparcRdfStreamerConfig.uniparcRdfRestTemplate(properties);
+        RestTemplate template = uniparcRdfStreamerConfig.uniParcRdfRestTemplate(properties);
         assertNotNull(template);
     }
 }

@@ -1,9 +1,8 @@
 package org.uniprot.api.async.download.controller.queue;
 
-import static org.awaitility.Awaitility.*;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.*;
 import static org.uniprot.api.async.download.queue.common.RedisUtil.*;
-import static org.uniprot.api.async.download.queue.common.RedisUtil.jobUnfinished;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,10 +34,13 @@ import org.uniprot.api.async.download.controller.AbstractAsyncDownloadIT;
 import org.uniprot.api.async.download.controller.UniProtKBDownloadController;
 import org.uniprot.api.async.download.queue.AsyncDownloadTestConfig;
 import org.uniprot.api.async.download.queue.common.BaseAbstractMessageListener;
+import org.uniprot.api.async.download.queue.common.ProducerMessageService;
 import org.uniprot.api.async.download.queue.common.RedisConfiguration;
 import org.uniprot.api.async.download.queue.embeddings.EmbeddingsTestConsumer;
 import org.uniprot.api.async.download.queue.uniprotkb.UniProtKBDownloadRequest;
 import org.uniprot.api.async.download.queue.uniprotkb.UniProtKBMessageListener;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.common.repository.stream.store.uniprotkb.TaxonomyLineageRepository;
 import org.uniprot.api.idmapping.common.service.IdMappingJobCacheService;
 import org.uniprot.api.idmapping.common.service.TestConfig;
@@ -73,6 +75,31 @@ import org.uniprot.store.search.SolrCollection;
 @AutoConfigureWebClient
 public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
+    @Value("${download.idFilesFolder}")
+    protected String idsFolder;
+
+    @Value("${download.resultFilesFolder}")
+    protected String resultFolder;
+
+    @Value("${async.download.uniprotkb.queueName}")
+    private String downloadQueue;
+
+    @Value("${async.download.uniprotkb.retryQueueName}")
+    private String retryQueue;
+
+    @Value(("${async.download.uniprotkb.rejectedQueueName}"))
+    private String rejectedQueue;
+
+    @Qualifier("uniProtKBTupleStream")
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
+
+    @Autowired private FacetTupleStreamTemplate uniProtKBFacetTupleStreamTemplate;
+
+    @Qualifier("uniProtKB")
+    @SpyBean
+    private ProducerMessageService messageService;
+
     @Value("${async.download.embeddings.maxEntryCount}")
     protected long maxEntryCount;
 
@@ -86,6 +113,7 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
     @Autowired private TaxonomyLineageRepository taxRepository;
 
+    @Qualifier("uniProtStoreClient")
     @Autowired
     private UniProtStoreClient<UniProtKBEntry> storeClient; // in memory voldemort store client
 
@@ -200,5 +228,45 @@ public class UniProtKBAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected int getMessageSuccessAfterRetryCount() {
         return 10;
+    }
+
+    @Override
+    protected ProducerMessageService getProducerMessageService() {
+        return this.messageService;
+    }
+
+    @Override
+    protected TupleStreamTemplate getTupleStreamTemplate() {
+        return this.tupleStreamTemplate;
+    }
+
+    @Override
+    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
+        return this.uniProtKBFacetTupleStreamTemplate;
+    }
+
+    @Override
+    protected String getIdsFolder() {
+        return this.idsFolder;
+    }
+
+    @Override
+    protected String getResultFolder() {
+        return this.resultFolder;
+    }
+
+    @Override
+    protected String getDownloadQueue() {
+        return this.downloadQueue;
+    }
+
+    @Override
+    protected String getRejectedQueue() {
+        return this.rejectedQueue;
+    }
+
+    @Override
+    protected String getRetryQueue() {
+        return this.retryQueue;
     }
 }

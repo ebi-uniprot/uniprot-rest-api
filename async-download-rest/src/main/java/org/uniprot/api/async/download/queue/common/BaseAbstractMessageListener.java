@@ -78,7 +78,7 @@ public abstract class BaseAbstractMessageListener implements MessageListener {
             }
         } catch (Exception ex) {
             if (getRetryCountByBroker(message) <= getMaxRetryCount()) {
-                log.error("Download job id {} failed with error {}", jobId, ex.getStackTrace());
+                log.error("#####Download job id {} failed with error {}", jobId, ex.getMessage());
                 Message updatedMessage = addAdditionalHeaders(message, ex);
                 updateDownloadJob(updatedMessage, downloadJob, JobStatus.ERROR);
                 sendToRetryQueue(jobId, updatedMessage);

@@ -35,8 +35,8 @@ public class UniProtStoreConfig {
         return new UniProtKBStoreClient(client);
     }
 
-    @Bean
-    public FacetTupleStreamTemplate facetTupleStreamTemplate(
+    @Bean("uniProtKBFacetTupleStreamTemplate")
+    public FacetTupleStreamTemplate uniProtKBFacetTupleStreamTemplate(
             RepositoryConfigProperties configProperties) {
         return FacetTupleStreamTemplate.builder()
                 .collection(SolrCollection.uniprot.name())

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
@@ -32,21 +31,6 @@ import org.uniprot.api.rest.controller.AbstractStreamControllerIT;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Testcontainers
 public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
-
-    @Value("${download.idFilesFolder}")
-    protected String idsFolder;
-
-    @Value("${download.resultFilesFolder}")
-    protected String resultFolder;
-
-    @Value("${async.download.queueName}")
-    protected String downloadQueue;
-
-    @Value("${async.download.retryQueueName}")
-    protected String retryQueue;
-
-    @Value(("${async.download.rejectedQueueName}"))
-    protected String rejectedQueue;
 
     @Autowired protected AmqpAdmin amqpAdmin;
 
@@ -81,8 +65,8 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
     }
 
     protected void prepareDownloadFolders() throws IOException {
-        Files.createDirectories(Path.of(this.idsFolder));
-        Files.createDirectories(Path.of(this.resultFolder));
+        Files.createDirectories(Path.of(this.getIdsFolder()));
+        Files.createDirectories(Path.of(this.getResultFolder()));
     }
 
     protected void uncompressFile(Path zippedFile, Path unzippedFile) throws IOException {
@@ -113,13 +97,23 @@ public abstract class AbstractDownloadIT extends AbstractStreamControllerIT {
 
     @AfterAll
     public void cleanUpData() throws Exception {
-        cleanUpFolder(this.idsFolder);
-        cleanUpFolder(this.resultFolder);
+        cleanUpFolder(this.getIdsFolder());
+        cleanUpFolder(this.getResultFolder());
         getDownloadJobRepository().deleteAll();
-        this.amqpAdmin.purgeQueue(rejectedQueue, true);
-        this.amqpAdmin.purgeQueue(downloadQueue, true);
-        this.amqpAdmin.purgeQueue(retryQueue, true);
+        this.amqpAdmin.purgeQueue(getRejectedQueue(), true);
+        this.amqpAdmin.purgeQueue(getDownloadQueue(), true);
+        this.amqpAdmin.purgeQueue(getRetryQueue(), true);
         rabbitMQContainer.stop();
         redisContainer.stop();
     }
+
+    protected abstract String getIdsFolder();
+
+    protected abstract String getResultFolder();
+
+    protected abstract String getDownloadQueue();
+
+    protected abstract String getRejectedQueue();
+
+    protected abstract String getRetryQueue();
 }

@@ -111,10 +111,10 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
         await().until(jobProcessed(jobId), equalTo(JobStatus.FINISHED));
         getAndVerifyDetails(jobId);
         String fileWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.resultFolder + "/" + fileWithExt);
+        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileWithExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -156,10 +156,10 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
         verifyIdsFile(jobId);
         // verify result file
         String fileWithExt = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.resultFolder + "/" + fileWithExt);
+        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileWithExt);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -184,7 +184,7 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
     @Override
     protected void verifyIdsFile(String jobId) throws IOException {
         // verify the ids file
-        Path idsFilePath = Path.of(this.idsFolder + "/" + jobId);
+        Path idsFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
@@ -310,5 +310,30 @@ class UniRefDownloadControllerIT extends AbstractDownloadControllerIT {
 
     protected DownloadJobRepository getDownloadJobRepository() {
         return this.downloadJobRepository;
+    }
+
+    @Override
+    protected String getIdsFolder() {
+        return null;
+    }
+
+    @Override
+    protected String getResultFolder() {
+        return null;
+    }
+
+    @Override
+    protected String getDownloadQueue() {
+        return null;
+    }
+
+    @Override
+    protected String getRejectedQueue() {
+        return null;
+    }
+
+    @Override
+    protected String getRetryQueue() {
+        return null;
     }
 }

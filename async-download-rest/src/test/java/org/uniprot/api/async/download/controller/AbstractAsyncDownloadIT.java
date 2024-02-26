@@ -32,8 +32,6 @@ import org.uniprot.api.async.download.queue.common.BaseAbstractMessageListener;
 import org.uniprot.api.async.download.queue.common.MessageListenerException;
 import org.uniprot.api.async.download.queue.common.ProducerMessageService;
 import org.uniprot.api.async.download.repository.DownloadJobRepository;
-import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
-import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.download.model.DownloadJob;
 import org.uniprot.api.rest.download.model.JobStatus;
 import org.uniprot.api.rest.output.context.FileType;
@@ -49,12 +47,10 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
     protected int maxRetry;
 
     @Autowired protected AmqpAdmin amqpAdmin;
-    @Autowired protected TupleStreamTemplate tupleStreamTemplate;
-    @Autowired protected FacetTupleStreamTemplate facetTupleStreamTemplate;
     @Autowired protected HashGenerator<DownloadRequest> hashGenerator;
 
     @SpyBean protected DownloadJobRepository downloadJobRepository;
-    @SpyBean protected ProducerMessageService messageService;
+
     @SpyBean protected MessageConverter messageConverter;
 
     protected abstract Stream<String> streamIds(DownloadRequest downloadRequest);
@@ -83,9 +79,9 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         String query = getMessageSuccessQuery();
         MediaType format = MediaType.APPLICATION_JSON;
         DownloadRequest request = createDownloadRequest(query, format);
-        String jobId = this.messageService.sendMessage(request);
+        String jobId = this.getProducerMessageService().sendMessage(request);
         // Producer
-        verify(this.messageService, never()).alreadyProcessed(jobId);
+        verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
         // redis entry created
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobFinished(downloadJobRepository, jobId));
@@ -103,9 +99,9 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         String query = getMessageSuccessAfterRetryQuery();
         MediaType format = MediaType.APPLICATION_JSON;
         DownloadRequest request = createDownloadRequest(query, format);
-        String jobId = this.messageService.sendMessage(request);
+        String jobId = this.getProducerMessageService().sendMessage(request);
         // Producer
-        verify(this.messageService, never()).alreadyProcessed(jobId);
+        verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         // verify  redis
@@ -129,9 +125,9 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
                         new MessageListenerException(
                                 "Forced exception in streamIds to test max retry"));
         // send request to queue
-        String jobId = this.messageService.sendMessage(request);
+        String jobId = this.getProducerMessageService().sendMessage(request);
         // Producer
-        verify(this.messageService, never()).alreadyProcessed(jobId);
+        verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         await().until(jobRetriedMaximumTimes(downloadJobRepository, jobId, maxRetry));
@@ -140,7 +136,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         // after certain delay the job should be reprocessed
         await().until(
                         verifyMessageCountIsThanOrEqualToRejectedCount(
-                                amqpAdmin, rejectedQueue, rejectedMsgCount));
+                                amqpAdmin, getRejectedQueue(), rejectedMsgCount));
         verifyRedisEntry(query, jobId, JobStatus.ERROR, this.maxRetry, true, 0);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
@@ -159,12 +155,12 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         doThrow(new MessageListenerException("Forcing to throw unexpected exception"))
                 .when(getMessageListener())
                 .dummyMethodForTesting(jobId, JobStatus.ERROR);
-        this.messageService.sendMessage(request);
-        verify(this.messageService, never()).alreadyProcessed(jobId);
+        this.getProducerMessageService().sendMessage(request);
+        verify(this.getProducerMessageService(), never()).alreadyProcessed(jobId);
         await().until(jobCreatedInRedis(downloadJobRepository, jobId));
         await().atMost(Duration.ofSeconds(20)).until(jobErrored(downloadJobRepository, jobId));
         await().until(verifyJobRetriedCountIsEqualToGivenCount(downloadJobRepository, jobId, 2));
-        await().until(getMessageCountInQueue(amqpAdmin, this.rejectedQueue), equalTo(1));
+        await().until(getMessageCountInQueue(amqpAdmin, this.getRejectedQueue()), equalTo(1));
         verifyRedisEntry(query, jobId, JobStatus.ERROR, 2, true, 0);
         verifyIdsAndResultFilesDoNotExist(jobId);
     }
@@ -208,10 +204,10 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
         verifyIdsFile(jobId);
         // verify result file
         String fileName = jobId + FileType.GZIP.getExtension();
-        Path resultFilePath = Path.of(this.resultFolder + "/" + fileName);
+        Path resultFilePath = Path.of(this.getResultFolder() + "/" + fileName);
         Assertions.assertTrue(Files.exists(resultFilePath));
         // uncompress the gz file
-        Path unzippedFile = Path.of(this.resultFolder + "/" + jobId);
+        Path unzippedFile = Path.of(this.getResultFolder() + "/" + jobId);
         uncompressFile(resultFilePath, unzippedFile);
         Assertions.assertTrue(Files.exists(unzippedFile));
         String resultsJson = Files.readString(unzippedFile);
@@ -221,7 +217,7 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
     }
 
     protected void verifyIdsFile(String jobId) throws IOException {
-        Path idsFilePath = Path.of(this.idsFolder + "/" + jobId);
+        Path idsFilePath = Path.of(this.getIdsFolder() + "/" + jobId);
         Assertions.assertTrue(Files.exists(idsFilePath));
         List<String> ids = Files.readAllLines(idsFilePath);
         Assertions.assertNotNull(ids);
@@ -229,25 +225,17 @@ public abstract class AbstractAsyncDownloadIT extends AbstractDownloadIT {
 
     protected void verifyIdsAndResultFilesDoNotExist(String jobId) throws IOException {
         // verify the ids file
-        Path idsFilePath = Paths.get(this.idsFolder, jobId);
+        Path idsFilePath = Paths.get(this.getIdsFolder(), jobId);
         Assertions.assertTrue(Files.notExists(idsFilePath));
         // verify result file
-        Path resultFilePath = Paths.get(this.resultFolder, jobId);
+        Path resultFilePath = Paths.get(this.getResultFolder(), jobId);
         Assertions.assertTrue(Files.notExists(resultFilePath));
-    }
-
-    @Override
-    protected TupleStreamTemplate getTupleStreamTemplate() {
-        return this.tupleStreamTemplate;
-    }
-
-    @Override
-    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
-        return this.facetTupleStreamTemplate;
     }
 
     @Override
     protected DownloadJobRepository getDownloadJobRepository() {
         return this.downloadJobRepository;
     }
+
+    protected abstract ProducerMessageService getProducerMessageService();
 }

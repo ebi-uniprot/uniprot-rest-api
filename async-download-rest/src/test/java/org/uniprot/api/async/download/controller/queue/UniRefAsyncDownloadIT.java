@@ -13,6 +13,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,9 +30,12 @@ import org.uniprot.api.async.download.controller.AbstractAsyncDownloadIT;
 import org.uniprot.api.async.download.controller.UniRefDownloadController;
 import org.uniprot.api.async.download.queue.AsyncDownloadTestConfig;
 import org.uniprot.api.async.download.queue.common.BaseAbstractMessageListener;
+import org.uniprot.api.async.download.queue.common.ProducerMessageService;
 import org.uniprot.api.async.download.queue.common.RedisConfiguration;
 import org.uniprot.api.async.download.queue.uniref.UniRefDownloadRequest;
 import org.uniprot.api.async.download.queue.uniref.UniRefMessageListener;
+import org.uniprot.api.common.repository.solrstream.FacetTupleStreamTemplate;
+import org.uniprot.api.common.repository.stream.common.TupleStreamTemplate;
 import org.uniprot.api.rest.request.DownloadRequest;
 import org.uniprot.api.uniref.common.UniRefAsyncDownloadUtils;
 import org.uniprot.api.uniref.common.repository.UniRefDataStoreTestConfig;
@@ -58,10 +62,21 @@ import org.uniprot.store.search.SolrCollection;
 @AutoConfigureWebClient
 public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
 
+    @Qualifier("uniRefTupleStreamTemplate")
+    @Autowired
+    private TupleStreamTemplate tupleStreamTemplate;
+
+    @Autowired private FacetTupleStreamTemplate uniRefFacetTupleStreamTemplate;
+
+    @Qualifier("uniRef")
+    @SpyBean
+    private ProducerMessageService messageService;
+
     @SpyBean private UniRefMessageListener uniRefMessageListener;
 
     @Autowired private UniRefQueryRepository unirefQueryRepository;
 
+    @Qualifier("uniRefLightStoreClient")
     @Autowired
     private UniProtStoreClient<UniRefEntryLight> storeClient; // in memory voldemort store client
 
@@ -122,6 +137,16 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     }
 
     @Override
+    protected TupleStreamTemplate getTupleStreamTemplate() {
+        return this.tupleStreamTemplate;
+    }
+
+    @Override
+    protected FacetTupleStreamTemplate getFacetTupleStreamTemplate() {
+        return this.uniRefFacetTupleStreamTemplate;
+    }
+
+    @Override
     protected String getMessageSuccessQuery() {
         return "identity:*";
     }
@@ -144,5 +169,35 @@ public class UniRefAsyncDownloadIT extends AbstractAsyncDownloadIT {
     @Override
     protected int getMessageSuccessAfterRetryCount() {
         return 1;
+    }
+
+    @Override
+    protected ProducerMessageService getProducerMessageService() {
+        return this.messageService;
+    }
+
+    @Override
+    protected String getIdsFolder() {
+        return null;
+    }
+
+    @Override
+    protected String getResultFolder() {
+        return null;
+    }
+
+    @Override
+    protected String getDownloadQueue() {
+        return null;
+    }
+
+    @Override
+    protected String getRejectedQueue() {
+        return null;
+    }
+
+    @Override
+    protected String getRetryQueue() {
+        return null;
     }
 }

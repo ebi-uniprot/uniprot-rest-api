@@ -48,7 +48,7 @@ public class HeartBeatProducer {
                                 downloadJob.getId(),
                                 Map.of(UPDATE_COUNT, newUpdateCount, UPDATED, LocalDateTime.now()));
                     });
-            log.debug(
+            log.info(
                     String.format(
                             "%s: Download Job ID: %s was updated in Solr phase",
                             downloadJob.getUpdateCount(), downloadJob.getId()));
@@ -109,7 +109,7 @@ public class HeartBeatProducer {
                                         UPDATED, LocalDateTime.now(),
                                         PROCESSED_ENTRIES, pe));
                     });
-            log.debug(
+            log.info(
                     String.format(
                             "%s: Download Job ID: %s was updated in writing phase. Number of  entries processed: %d",
                             downloadJob.getUpdateCount(),

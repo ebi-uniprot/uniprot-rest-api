@@ -6,12 +6,19 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.uniprot.api.idmapping.common.service.config.IdMappingRdfStreamerConfig;
 import org.uniprot.api.idmapping.common.service.config.UniParcIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniProtKBIdMappingResultsConfig;
 import org.uniprot.api.idmapping.common.service.config.UniRefIdMappingResultsConfig;
+import org.uniprot.api.idmapping.common.service.impl.UniParcIdService;
+import org.uniprot.api.idmapping.common.service.impl.UniProtKBIdService;
+import org.uniprot.api.idmapping.common.service.impl.UniRefIdService;
 import org.uniprot.api.rest.output.header.HttpCommonHeaderConfig;
 import org.uniprot.api.rest.respository.RepositoryConfig;
+import org.uniprot.api.uniparc.common.repository.rdf.UniParcRdfStreamerConfig;
+import org.uniprot.api.uniprotkb.common.repository.store.UniProtRdfStreamerConfig;
 import org.uniprot.api.uniprotkb.common.service.groupby.GroupByServiceConfig;
+import org.uniprot.api.uniref.common.repository.rdf.UniRefRdfStreamerConfig;
 
 @SpringBootApplication
 @EnableCaching
@@ -35,7 +42,14 @@ import org.uniprot.api.uniprotkb.common.service.groupby.GroupByServiceConfig;
                         classes = {
                             UniProtKBIdMappingResultsConfig.class,
                             UniRefIdMappingResultsConfig.class,
-                            UniParcIdMappingResultsConfig.class
+                            UniParcIdMappingResultsConfig.class,
+                            UniParcRdfStreamerConfig.class,
+                            UniProtRdfStreamerConfig.class,
+                            UniRefRdfStreamerConfig.class,
+                            IdMappingRdfStreamerConfig.class,
+                            UniParcIdService.class,
+                            UniProtKBIdService.class,
+                            UniRefIdService.class
                         }))
 public class AsyncDownloadRestApp {
     public static void main(String[] args) {

@@ -89,7 +89,8 @@ public class UniProtEntryService
             UniProtKBStoreClient entryStore,
             StoreStreamer<UniProtKBEntry> uniProtEntryStoreStreamer,
             TaxonomyLineageService taxService,
-            FacetTupleStreamTemplate facetTupleStreamTemplate,
+            @Qualifier("uniProtKBFacetTupleStreamTemplate")
+                    FacetTupleStreamTemplate facetTupleStreamTemplate,
             UniProtQueryProcessorConfig uniProtKBQueryProcessorConfig,
             SearchFieldConfig uniProtKBSearchFieldConfig,
             @Qualifier("uniProtKBTupleStreamDocumentIdStream")
