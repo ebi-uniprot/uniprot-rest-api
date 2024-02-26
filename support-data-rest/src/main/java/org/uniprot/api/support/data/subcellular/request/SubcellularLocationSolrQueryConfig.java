@@ -42,6 +42,7 @@ public class SubcellularLocationSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(subcellSearchFieldConfig))
                 .whiteListFields(subcellWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(subcellSearchFieldConfig)
                 .build();
     }
 

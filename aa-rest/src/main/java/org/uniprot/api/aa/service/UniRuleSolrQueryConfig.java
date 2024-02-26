@@ -44,6 +44,7 @@ public class UniRuleSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(uniRuleSearchFieldConfig))
                 .whiteListFields(uniRuleWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(uniRuleSearchFieldConfig)
                 .build();
     }
 

@@ -38,6 +38,7 @@ public class LiteratureSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(literatureSearchFieldConfig))
                 .whiteListFields(emptyMap())
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(literatureSearchFieldConfig)
                 .build();
     }
 

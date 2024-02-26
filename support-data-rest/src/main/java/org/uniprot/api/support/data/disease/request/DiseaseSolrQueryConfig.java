@@ -41,6 +41,7 @@ public class DiseaseSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(diseaseSearchFieldConfig))
                 .whiteListFields(diseaseWhitelistFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(diseaseSearchFieldConfig)
                 .build();
     }
 

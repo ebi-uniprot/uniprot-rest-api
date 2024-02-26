@@ -7,13 +7,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -29,11 +25,15 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryNodeProcessorPipeline;
 import org.uniprot.api.rest.service.query.processor.UniProtQueryProcessorConfig;
+import org.uniprot.store.config.searchfield.common.SearchFieldConfig;
 import org.uniprot.store.config.searchfield.model.SearchFieldItem;
 
 /**
@@ -45,10 +45,13 @@ import org.uniprot.store.config.searchfield.model.SearchFieldItem;
  *
  * @author Edd
  */
+@ExtendWith(MockitoExtension.class)
 class UniProtQueryProcessorTest {
     private static final String FIELD_NAME = "accession";
     private UniProtQueryProcessor processor;
     private UniProtQueryProcessorConfig config;
+    @Mock
+    private SearchFieldConfig searchFieldConfig;
 
     @BeforeEach
     void setUp() {
@@ -61,6 +64,7 @@ class UniProtQueryProcessorTest {
                                         searchFieldWithValidRegex(FIELD_NAME, "(?i)^P[0-9]+$")))
                         .whiteListFields(whitelistFields)
                         .searchFieldsNames(Set.of("field"))
+                        .searchFieldConfig(searchFieldConfig)
                         .leadingWildcardFields(Set.of("gene", "protein_name"))
                         .build();
         processor = UniProtQueryProcessor.newInstance(config);

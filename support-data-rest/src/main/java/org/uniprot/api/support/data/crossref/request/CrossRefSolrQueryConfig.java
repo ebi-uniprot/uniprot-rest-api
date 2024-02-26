@@ -42,6 +42,7 @@ public class CrossRefSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(crossRefSearchFieldConfig))
                 .whiteListFields(crossRefWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(crossRefSearchFieldConfig)
                 .build();
     }
 

@@ -43,6 +43,7 @@ public class GeneCentricSolrQueryConfig {
                         getDefaultSearchOptimisedFieldItems(geneCentricSearchFieldConfig))
                 .whiteListFields(geneCentricWhitelistFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(geneCentricSearchFieldConfig)
                 .build();
     }
 

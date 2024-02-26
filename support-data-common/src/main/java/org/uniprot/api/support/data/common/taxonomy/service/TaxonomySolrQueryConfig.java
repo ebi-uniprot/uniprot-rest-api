@@ -41,6 +41,7 @@ public class TaxonomySolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(taxonomySearchFieldConfig))
                 .whiteListFields(taxonomyWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(taxonomySearchFieldConfig)
                 .build();
     }
 

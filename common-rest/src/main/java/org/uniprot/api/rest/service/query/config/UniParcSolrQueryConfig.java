@@ -42,6 +42,7 @@ public class UniParcSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(uniParcSearchFieldConfig))
                 .whiteListFields(uniParcWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(uniParcSearchFieldConfig)
                 .build();
     }
 

@@ -40,6 +40,7 @@ public class KeywordSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(keywordSearchFieldConfig))
                 .whiteListFields(keywordWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(keywordSearchFieldConfig)
                 .build();
     }
 

@@ -44,6 +44,7 @@ public class ArbaSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(arbaSearchFieldConfig))
                 .whiteListFields(uniRuleWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(arbaSearchFieldConfig)
                 .build();
     }
 

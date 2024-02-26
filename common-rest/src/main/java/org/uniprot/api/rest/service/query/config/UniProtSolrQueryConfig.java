@@ -51,6 +51,7 @@ public class UniProtSolrQueryConfig {
                 .whiteListFields(uniprotWhiteListFields)
                 .searchFieldsNames(searchFields)
                 .leadingWildcardFields(uniProtKBSolrQueryConf.getLeadingWildcardFields())
+                .searchFieldConfig(uniProtKBSearchFieldConfig)
                 .build();
     }
 

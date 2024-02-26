@@ -41,6 +41,7 @@ public class ProteomeSolrQueryConfig {
                 .optimisableFields(getDefaultSearchOptimisedFieldItems(proteomeSearchFieldConfig))
                 .whiteListFields(proteomeWhiteListFields)
                 .searchFieldsNames(searchFields)
+                .searchFieldConfig(proteomeSearchFieldConfig)
                 .build();
     }
 
