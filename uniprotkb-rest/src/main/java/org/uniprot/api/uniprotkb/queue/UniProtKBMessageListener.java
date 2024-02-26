@@ -111,7 +111,7 @@ public class UniProtKBMessageListener extends AbstractMessageListener implements
                         null);
             }
         } catch (Exception ex) {
-            logMessageAndDeleteFile(ex, jobId);
+            logMessage(ex, jobId);
             throw new MessageListenerException(ex);
         }
     }
